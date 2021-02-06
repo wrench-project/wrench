@@ -21,7 +21,7 @@ namespace wrench {
     *
     * @param job: the job that has timed out
     */
-    JobTimeout::JobTimeout(WorkflowJob *job) {
+    JobTimeout::JobTimeout(std::shared_ptr<WorkflowJob> job) {
         this->job = job;
     }
 
@@ -30,7 +30,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    WorkflowJob *JobTimeout::getJob() {
+    std::shared_ptr<WorkflowJob> JobTimeout::getJob() {
         return this->job;
     }
 

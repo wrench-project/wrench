@@ -84,7 +84,7 @@ namespace wrench {
 
 //        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
-        /** The code below was to avoid a memory leak on the actor! However, weirdly,
+        /** The code below was to avoid a memory_manager_service leak on the actor! However, weirdly,
          *  it now causes problems due to SimGrid complaining that on_exit() functions
          *  shouldn't do blocking things.... So it's commented-out for now
          */
@@ -193,7 +193,7 @@ namespace wrench {
 
         }
 
-        // Set the mailbox_name receiver (causes memory leak)
+        // Set the mailbox_name receiver (causes memory_manager_service leak)
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
 
@@ -210,7 +210,7 @@ namespace wrench {
             this->state = S4U_Daemon::State::DOWN;
             // Call cleanup
             this->cleanup(this->hasReturnedFromMain(), this->getReturnValue());
-            // Free memory for the object unless the service is set to auto-restart
+            // Free memory_manager_service for the object unless the service is set to auto-restart
             if (not this->isSetToAutoRestart()) {
                 auto life_saver = this->life_saver;
                 this->life_saver = nullptr;

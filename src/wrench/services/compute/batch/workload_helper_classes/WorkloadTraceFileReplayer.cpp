@@ -49,15 +49,15 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         // Create and handle a bogus workflow
-        auto workflow = new Workflow();
-        this->addWorkflow(workflow);
+        this->workflow = std::shared_ptr<Workflow>(new Workflow());
+        this->addWorkflow(this->workflow.get());
 
         // Create the dual WMS that will just receive workflow execution events so that I don't have to
         std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
                 new WorkloadTraceFileReplayerEventReceiver(this->hostname, job_manager));
 
         // Start the WorkloadTraceFileReplayerEventReceiver
-        event_receiver->addWorkflow(workflow, S4U_Simulation::getClock());
+        event_receiver->addWorkflow(workflow.get(), S4U_Simulation::getClock());
         event_receiver->simulation = this->simulation;
         event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
 
@@ -102,7 +102,7 @@ namespace wrench {
             }
 
             // Create a Standard Job with only the tasks
-            StandardJob *standard_job;
+            std::shared_ptr<StandardJob> standard_job;
             try {
                 standard_job = job_manager->createStandardJob(to_submit, {});
             } catch (std::invalid_argument &e) {
@@ -137,6 +137,8 @@ namespace wrench {
         // Memory leak: workflow
         // Not clear how to fix this since we can't delete it until all tasks are completed...
         // And yet when we get here there are still running tasks...
+        // AND: some users may want to inspect these tasks anyway! So perhaps we really don't want to
+        // clear RAM
         return 0;
     }
 

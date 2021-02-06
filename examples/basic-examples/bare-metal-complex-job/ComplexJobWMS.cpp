@@ -85,10 +85,10 @@ namespace wrench {
          * where is should be read/written while the task executes */
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
 
-        file_locations[infile_1] = FileLocation::LOCATION(storage_service2);
-        file_locations[infile_2] = FileLocation::LOCATION(storage_service1);
-        file_locations[outfile_1] = FileLocation::LOCATION(storage_service2);
-        file_locations[outfile_2] = FileLocation::LOCATION(storage_service2);
+        file_locations[infile_1] = FileLocation::LOCATION(storage_service2);  // read from storage service #2
+        file_locations[infile_2] = FileLocation::LOCATION(storage_service1);  // read from storage service #1
+        file_locations[outfile_1] = FileLocation::LOCATION(storage_service2); // written to storage service #2
+        file_locations[outfile_2] = FileLocation::LOCATION(storage_service2); // written to storage service #2
 
         /* Let's create a set of "pre" file copy operations to be performed
          * BEFORE the task can run */

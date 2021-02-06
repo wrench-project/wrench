@@ -39,7 +39,14 @@ namespace wrench {
 
         void shutdown() override {};
 
-        virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) = 0;
+        /**
+         * @brief Virtual method to figure out on which actual resources a job could be scheduled right now
+         * @param num_nodes: number of nodes
+         * @param cores_per_node: number of cores per node
+         * @param ram_per_node: amount of RAM
+         * @return a host:<core,RAM> map
+         */
+        virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
 
     };
 

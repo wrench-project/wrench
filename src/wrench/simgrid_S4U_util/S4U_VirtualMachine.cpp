@@ -27,7 +27,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      * @param num_cores: the number of cores the VM can use
-     * @param ram_memory: the VM RAM memory capacity
+     * @param ram_memory: the VM RAM memory_manager_service capacity
      * @param property_list: a property list ({} means use all defaults)
      * @param messagepayload_list: a message payload list ({} means use all defaults)
      */
@@ -63,8 +63,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the memory consumption
-    * @return the memory consumption
+    * @brief Get the memory_manager_service consumption
+    * @return the memory_manager_service consumption
     */
     double S4U_VirtualMachine::getMemory() {
         return this->ram_memory;
@@ -179,7 +179,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the property list for the BareMetalComputeService that is to run on the VM ({} means "use all defaults")
+     * @brief Get the property list for the bare_metal that is to run on the VM ({} means "use all defaults")
      * @return a property list
      */
     std::map<std::string, std::string> S4U_VirtualMachine::getPropertyList() {
@@ -187,7 +187,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
+     * @brief Get the message payload list for the bare_metal that will run on the VM ({} means "use all defaults")
      * @return a message payload list
      */
     std::map<std::string, double> S4U_VirtualMachine::getMessagePayloadList() {

@@ -11,7 +11,7 @@
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
- **    - Submit both of them as part of a single job to the first available BareMetalComputeService so tbat:
+ **    - Submit both of them as part of a single job to the first available bare_metal so tbat:
  **       - The most expensive task uses 6 cores
  **       - The least expensive task uses 4 cores
  **       - Each task reads the input file from the StorageService
@@ -41,7 +41,8 @@ namespace wrench {
             storage_services,
             {}, nullptr,
             hostname,
-            "two-tasks-at-a-time") {}
+            "two-tasks-at-a-time") {
+    }
 
     /**
      * @brief main method of the TwoTasksAtATimeWMS daemon
@@ -55,7 +56,10 @@ namespace wrench {
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
+        WRENCH_INFO("WMS starting on host %s at time %lf",
+                    Simulation::getHostName().c_str(),
+                    Simulation::getCurrentSimulatedDate());
+        
         WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
@@ -69,9 +73,9 @@ namespace wrench {
         while (not this->getWorkflow()->isDone()) {
 
             /* Get the ready tasks */
-            auto ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
-            /* Sort them by flops */
+            /* Sort them by increasing flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
                       [](const WorkflowTask *t1, const WorkflowTask  *t2) -> bool {
 
@@ -111,8 +115,8 @@ namespace wrench {
             /* Then, we create the "service-specific arguments" that make it possible to configure
              * the way in which tasks in a job can run on the compute service */
             std::map<std::string, std::string> service_specific_args;
-            service_specific_args[cheap_ready_task->getID()] = "4";
-            service_specific_args[expensive_ready_task->getID()] = "6";
+            service_specific_args[cheap_ready_task->getID()] = "4"; // 4 cores, run on any host
+            service_specific_args[expensive_ready_task->getID()] = "6"; // 6 cores, run on any host
 
             WRENCH_INFO("Submitting the job, asking for %s cores for task %s, and "
                         "%s cores for task %s",

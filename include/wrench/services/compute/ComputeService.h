@@ -18,14 +18,12 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 namespace wrench {
 
     class Simulation;
-
-    class StandardJob;
-
-    class PilotJob;
 
     class StorageService;
 
@@ -68,7 +66,7 @@ namespace wrench {
 
 //        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
 
-        void terminateJob(WorkflowJob *job);
+        void terminateJob(std::shared_ptr<WorkflowJob> job);
 
         bool supportsStandardJobs();
 
@@ -114,7 +112,7 @@ namespace wrench {
          * @param service_specific_arguments: the set of service-specific arguments
          */
         virtual void
-        submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+        submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
          * @brief Method to submit a pilot job to the service
@@ -122,19 +120,19 @@ namespace wrench {
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
-        virtual void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+        virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
          * @brief Method to terminate a running standard job
          * @param job: the standard job
          */
-        virtual void terminateStandardJob(StandardJob *job) = 0;
+        virtual void terminateStandardJob(std::shared_ptr<StandardJob> job) = 0;
 
         /**
          * @brief Method to terminate a running pilot job
          * @param job: the pilot job
          */
-        virtual void terminatePilotJob(PilotJob *job) = 0;
+        virtual void terminatePilotJob(std::shared_ptr<PilotJob> job) = 0;
 
         /**
          * @brief Method that returns the computer service's scratch space's storage service
@@ -152,7 +150,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
+        void submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string>& = {});
 
         ComputeService(const std::string &hostname,
                        std::string service_name,

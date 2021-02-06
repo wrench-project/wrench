@@ -30,11 +30,14 @@ namespace wrench {
          * @brief The batch scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
          *      - "fcfs": First Come First Serve
-         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only  allocates resources at the node level
+         *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
+         *      - "conservative_bf_core_level": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the core level (i.e., two jobs may run on the same node  if that node has enough cores to support both jobs)
+         *
          *    - If ENABLE_BATSCHED is set to on:
          *      - whatever scheduling algorithm is supported by Batsched
          *        (by default: "conservative_bf", other options include
          *        "easy_bf" and "easy_bf_fast")
+         *      - These only allocate resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
          *
          **/
         DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
@@ -75,8 +78,8 @@ namespace wrench {
          * (see https://github.com/oar-team/batsim), in which case is must have the ".json" extension).
          * The jobs in the trace whose node/host/processor/core requirements exceed the capacity
          * of the batch service will simply be capped at that capacity. Job submission times in the trace files
-         * are relative to the BatchService's start time (i.e., all jobs in the trace files will be replayed
-         * assuming that the BatchService starts at time zero). Note that in the BATSIM JSON format, the trace does not
+         * are relative to the batch's start time (i.e., all jobs in the trace files will be replayed
+         * assuming that the batch starts at time zero). Note that in the BATSIM JSON format, the trace does not
          * contains requested vs. actual trace runtimes, and to all requested runtimes are 100% accurate.
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);
@@ -110,7 +113,7 @@ namespace wrench {
         /**
          * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).
          *      - If ENABLE_BATSCHED is set to off or not set: ignored
-         *      - If ENABLE_BATSCHED is set to on: The trace file is generated in CVS format as follows:
+         *      - If ENABLE_BATSCHED is set to on: The trace file is generated in CSV format as follows:
          *          allocated_processors,consumed_energy,execution_time,finish_time,job_id,metadata,
          *          requested_number_of_processors,requested_time,starting_time,stretch,submission_time,success,
          *          turnaround_time,waiting_time,workload_name

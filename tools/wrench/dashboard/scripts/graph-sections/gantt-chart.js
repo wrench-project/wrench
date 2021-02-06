@@ -61,9 +61,9 @@ function generateGanttChart(rawData, containedId = null, zoom = true, label = nu
     };
 
     const colors = {
-        "read": '#cbb5dd',
-        "compute": '#f7daad',
-        "write": '#abdcf4'
+        "read": '#44AA99',
+        "compute": '#DDCC77',
+        "write": '#88CCEE'
     };
 
     // prepare data

@@ -50,13 +50,13 @@ namespace wrench {
          * @param pilot_job: a pilot job
          * @param compute_service: a compute service
          */
-        PilotJobStartedEvent(PilotJob *pilot_job,
+        PilotJobStartedEvent(std::shared_ptr<PilotJob> pilot_job,
                              std::shared_ptr<ComputeService>  compute_service)
                 : pilot_job(pilot_job), compute_service(compute_service) {}
 
     public:
         /** @brief The pilot job that has started */
-        PilotJob *pilot_job;
+        std::shared_ptr<PilotJob> pilot_job;
         /** @brief The compute service on which the pilot job has started */
         std::shared_ptr<ComputeService>  compute_service;
 

@@ -24,7 +24,7 @@ namespace wrench {
      * @param ending_time_stamp: the job's end date
      * @param arrival_time_stamp: the job's arrival date
      */
-    BatchJob::BatchJob(WorkflowJob *job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
+    BatchJob::BatchJob(std::shared_ptr<WorkflowJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
                        unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
@@ -35,7 +35,6 @@ namespace wrench {
         if (job_id <= 0 || num_nodes == 0 || cores_per_node == 0) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): either jobid (" + std::to_string(job_id) +
-                    "), time_in_minutes (" + std::to_string(time_in_minutes) +
                     "), num_nodes (" + std::to_string(num_nodes) +
                     "), cores_per_node (" + std::to_string(cores_per_node) +
                     ") is less than or equal to zero"
@@ -85,15 +84,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory requirement
+     * @brief Get the memory_manager_service requirement
      * @return a size in bytes
      */
     double BatchJob::getMemoryRequirement() {
-        WorkflowJob *workflow_job = this->job;
+        std::shared_ptr<WorkflowJob> workflow_job = this->job;
         double memory_requirement = 0.0;
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-            auto standard_job = (StandardJob *) workflow_job;
-            for (auto const &t : standard_job->getTasks()) {
+        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
+            for (auto const &t : sjob->getTasks()) {
                 double ram = t->getMemoryRequirement();
                 memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
             }
@@ -114,7 +112,7 @@ namespace wrench {
      * @brief Get the workflow job corresponding to this batch job
      * @return a workflow job
      */
-    WorkflowJob *BatchJob::getWorkflowJob() {
+    std::shared_ptr<WorkflowJob> BatchJob::getWorkflowJob() {
         return this->job;
     }
 

@@ -34,8 +34,8 @@ namespace wrench {
     HTCondorNegotiatorService::HTCondorNegotiatorService(
             std::string &hostname,
             std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
-            std::map<WorkflowJob *, std::shared_ptr<ComputeService>> &running_jobs,
-            std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> &pending_jobs,
+            std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
+            std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
             std::string &reply_mailbox,
             std::shared_ptr<ComputeService> &grid_universe_batch_service)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
@@ -61,8 +61,8 @@ namespace wrench {
      * @return whether the priority of the left-hand-side workflow job is higher
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(
-            std::tuple<WorkflowJob *, std::map<std::string, std::string>> &lhs,
-            std::tuple<WorkflowJob *, std::map<std::string, std::string>> &rhs) {
+            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &lhs,
+            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &rhs) {
         return std::get<0>(lhs)->getPriority() > std::get<0>(rhs)->getPriority();
     }
 
@@ -78,7 +78,7 @@ namespace wrench {
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
-        std::vector<WorkflowJob *> scheduled_jobs;
+        std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
 
         // sort tasks by priority
         std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
@@ -88,6 +88,7 @@ namespace wrench {
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
 
+<<<<<<< HEAD
 
             //GRID STANDARD JOB
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
@@ -97,6 +98,11 @@ namespace wrench {
                         if (not item.first->supportsStandardJobs()) {
                             continue;
                         }
+=======
+            // STANDARD JOB
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+                for (auto &item : *this->compute_resources) {
+>>>>>>> master
 
                         if (item.second >= standard_job->getMinimumRequiredNumCores()) {
 
@@ -125,22 +131,27 @@ namespace wrench {
                     if (service_specific_arguments["universe"].compare("grid") == 0) {
                         auto num_tasks = std::to_string((int) std::min(standard_job->getNumTasks(),this->grid_universe_batch_service->getNumHosts()));
 
+<<<<<<< HEAD
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-N", num_tasks));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
 
                         std::map<std::string, std::string> service_specs_copy;
+=======
+                    if (item.second >= sjob->getMinimumRequiredNumCores()) {
+>>>>>>> master
 
-                        WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                                    standard_job->getTasks().size());
+                        WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
+                                    sjob->getTasks().size());
 
-                        for (auto task : standard_job->getTasks()) {
+                        for (auto task : sjob->getTasks()) {
                             // temporary printing task IDs
                             WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                         }
 
                         //S4U_Simulation::sleep(140.0);
 
+<<<<<<< HEAD
                         standard_job->pushCallbackMailbox(this->reply_mailbox);
                         this->grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
                         this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
@@ -153,18 +164,33 @@ namespace wrench {
                     }
                 }
             } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) { // PILOT JOB
+=======
+                        sjob->pushCallbackMailbox(this->reply_mailbox);
+                        item.first->submitStandardJob(sjob, service_specific_arguments);
+                        this->running_jobs->insert(std::make_pair(job, item.first));
+                        scheduled_jobs.push_back(job);
+                        item.second -= sjob->getMinimumRequiredNumCores();
+
+                        WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
+                                    sjob->getTasks().size());
+                        break;
+                    }
+                }
+
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) { // PILOT JOB
+>>>>>>> master
 
                 for (auto &item : *this->compute_resources) {
                     if (not item.first->supportsPilotJobs()) {
                         continue;
                     }
 
-                    pilot_job->pushCallbackMailbox(this->reply_mailbox);
-                    item.first->submitPilotJob(pilot_job, service_specific_arguments);
+                    pjob->pushCallbackMailbox(this->reply_mailbox);
+                    item.first->submitPilotJob(pjob, service_specific_arguments);
                     this->running_jobs->insert(std::make_pair(job, item.first));
                     scheduled_jobs.push_back(job);
 
-                    WRENCH_INFO("Dispatched pilot job %s", pilot_job->getName().c_str());
+                    WRENCH_INFO("Dispatched pilot job %s", pjob->getName().c_str());
                     break;
                 }
             }

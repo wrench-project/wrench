@@ -208,7 +208,7 @@ auto storage_service = simulation.add(new wrench::SimpleStorageService( "WMSHost
 The `wrench::SimpleStorageService` class implements a  simulation of a
 remotely-accessible storage service on which files can be stored, copied,
 deleted, read, and written. In this particular case, the storage service
-is  started on host `WMSHost`. It uses storage mounted as `/`.  The
+is  started on host `WMSHost`. It uses storage mounted at `/`.  The
 last two arguments, as for the compute service, are used to configure
 particular properties of the service. In this case, the service is
 configured to use a 50-MB buffer size to pipeline network and disk accesses
@@ -360,7 +360,7 @@ enabled by default in WRENCH simulations. To enable it, pass the
 simulator that makes use of this plugin  (and an example platform
 description file that defines host power consumption profiles).
 
-It also possible to dump all simulation output to a JSON file.
+It is also possible to dump all simulation output to a JSON file.
 This is done with the `wrench::SimulationOutput::dump*JSON()`
 member functions. The documentation of each member function details the structure of the
 JSON output, in case you want to parse/process the JSON by hand. See the API

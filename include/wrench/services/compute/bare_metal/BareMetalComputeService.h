@@ -104,13 +104,13 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void submitStandardJob(StandardJob *job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void submitPilotJob(PilotJob *job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void terminateStandardJob(StandardJob *job) override;
+        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
-        void terminatePilotJob(PilotJob *job) override;
+        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         ~BareMetalComputeService();
 
@@ -130,7 +130,7 @@ namespace wrench {
                                 std::map<std::string, std::string> property_list,
                                 std::map<std::string, double> messagepayload_list,
                                 double ttl,
-                                PilotJob *pj, std::string suffix,
+                                std::shared_ptr<PilotJob> pj, std::string suffix,
                                 std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
         // Private Constructor
@@ -146,7 +146,7 @@ namespace wrench {
                               std::map<std::string, std::string> property_list,
                               std::map<std::string, double> messagepayload_list,
                               double ttl,
-                              PilotJob *pj);
+                              std::shared_ptr<PilotJob> pj);
 
 
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
@@ -162,25 +162,25 @@ namespace wrench {
         double death_date;
         std::shared_ptr<Alarm> death_alarm = nullptr;
 
-        PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
+        std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
 
-        std::map<StandardJob *, std::set<WorkflowFile*>> files_in_scratch;
+        std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
 
         // Set of running jobs
-        std::set<StandardJob *> running_jobs;
+        std::set<std::shared_ptr<StandardJob> > running_jobs;
 
         // Job task execution specs
-        std::map<StandardJob *, std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
+        std::map<std::shared_ptr<StandardJob> , std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
 
         // Map of all Workunits
-        std::map<StandardJob *, std::set<std::shared_ptr<Workunit>>> all_workunits;
+        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> all_workunits;
 
         std::deque<std::shared_ptr<Workunit>> ready_workunits;
-//        std::map<StandardJob *, std::set<Workunit *>> running_workunits;
-        std::map<StandardJob *, std::set<std::shared_ptr<Workunit>>> completed_workunits;
+//        std::map<std::shared_ptr<StandardJob> , std::set<Workunit *>> running_workunits;
+        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> completed_workunits;
 
         // Set of running WorkunitExecutors
-        std::map<StandardJob *, std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
+        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
@@ -204,7 +204,7 @@ namespace wrench {
 
         void forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor);
 
-        void processStandardJobTerminationRequest(StandardJob *job, const std::string &answer_mailbox);
+        void processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job, const std::string &answer_mailbox);
 
         bool processNextMessage();
 
@@ -223,22 +223,22 @@ namespace wrench {
                     COMPUTE_SERVICE_KILLED
         };
 
-        void terminateRunningStandardJob(StandardJob *job, JobTerminationCause termination_cause);
+        void terminateRunningStandardJob(std::shared_ptr<StandardJob> job, JobTerminationCause termination_cause);
 
-        void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
+        void failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause);
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job, std::map<std::string, std::string> service_specific_args);
+        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 
-        void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
                                                               std::string required_host, unsigned long required_num_cores, double required_ram,
                                                               std::set<std::string> &hosts_to_avoid);
 
-        bool jobCanRun(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
+        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
 
         bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
 

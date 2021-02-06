@@ -200,11 +200,11 @@ namespace wrench {
                                             "' in batch workload trace file");
                                 }
                                 break;
-                            case 9: // Requested memory
+                            case 9: // Requested memory_manager_service
                                 // In KiB
                                 if (sscanf(item.c_str(), "%lf", &requested_ram) != 1) {
                                     throw std::invalid_argument(
-                                            "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested memory '" +
+                                            "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested memory_manager_service '" +
                                             item +
                                             "' in batch workload trace file");
                                 }

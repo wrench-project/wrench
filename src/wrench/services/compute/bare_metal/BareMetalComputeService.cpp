@@ -30,9 +30,8 @@
 #include "wrench/services/helpers/HostStateChangeDetector.h"
 #include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
 #include "wrench/workflow/failure_causes/HostError.h"
-#include "wrench/services/memory/MemoryManager.h"
 
-WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for BareMetalComputeService");
+WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal");
 
 
 namespace wrench {
@@ -128,7 +127,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void BareMetalComputeService::submitStandardJob(StandardJob *job,
+    void BareMetalComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
                                                     const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
@@ -144,7 +143,7 @@ namespace wrench {
             }
             if (not found) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::submitStandardJob(): Service-specific argument provided for task with ID '" +
+                        "bare_metal::submitStandardJob(): Service-specific argument provided for task with ID '" +
                         arg.first + "' but there is no task with such ID in the job");
             }
         }
@@ -212,14 +211,14 @@ namespace wrench {
         }
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -242,7 +241,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void
-    BareMetalComputeService::submitPilotJob(PilotJob *job,
+    BareMetalComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
                                             const std::map<std::string, std::string> &service_specific_args) {
 
         assertServiceIsUp();
@@ -261,7 +260,7 @@ namespace wrench {
         }
 
         // Wait for a reply
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
@@ -269,7 +268,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -279,7 +278,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
+                    "bare_metal::submitPilotJob(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
     }
@@ -289,10 +288,10 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a map of <num_cores, memory> tuples, indexed by hostname, which represents
+     * @param compute_resources: a map of <num_cores, memory_manager_service> tuples, indexed by hostname, which represents
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
-     *          - use memory = ComputeService::ALL_RAM to use all RAM available on the host
+     *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
      * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -351,7 +350,7 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_resources: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -367,7 +366,7 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list,
             double ttl,
-            PilotJob *pj,
+            std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                                                 "bare_metal" + suffix,
                                                                                                 "bare_metal" + suffix,
@@ -386,7 +385,7 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_hosts:: a list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_hosts:: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -413,7 +412,7 @@ namespace wrench {
      * @brief Helper method called by all constructors to initiate object instance
      *
      * @param hostname: the name of the host
-     * @param compute_resources: compute_resources: a map of <num_cores, memory> pairs, indexed by hostname, which represent
+     * @param compute_resources: compute_resources: a map of <num_cores, memory_manager_service> pairs, indexed by hostname, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -428,11 +427,11 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list,
             double ttl,
-            PilotJob *pj) {
+            std::shared_ptr<PilotJob> pj) {
 
         if (ttl < 0) {
             throw std::invalid_argument(
-                    "BareMetalComputeService::initiateInstance(): invalid TTL value (must be >0)");
+                    "bare_metal::initiateInstance(): invalid TTL value (must be >0)");
         }
 
         // Set default and specified properties
@@ -448,7 +447,7 @@ namespace wrench {
         // Check that there is at least one core per host and that hosts have enough cores
         if (compute_resources.empty()) {
             throw std::invalid_argument(
-                    "BareMetalComputeService::initiateInstance(): the resource list is empty");
+                    "bare_metal::initiateInstance(): the resource list is empty");
         }
         for (auto host : compute_resources) {
 
@@ -459,18 +458,18 @@ namespace wrench {
                 available_cores = S4U_Simulation::getHostNumCores(hname);
             } catch (std::runtime_error &e) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::initiateInstance(): Host '" + hname + "' does not exist");
+                        "bare_metal::initiateInstance(): Host '" + hname + "' does not exist");
             }
             if (requested_cores == ComputeService::ALL_CORES) {
                 requested_cores = available_cores;
             }
             if (requested_cores == 0) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): at least 1 core should be requested");
+                        "bare_metal::bare_metal(): at least 1 core should be requested");
             }
             if (requested_cores > available_cores) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): host " + hname + "only has " +
+                        "bare_metal::bare_metal(): host " + hname + "only has " +
                         std::to_string(available_cores) + " cores but " +
                         std::to_string(requested_cores) + " are requested");
             }
@@ -479,7 +478,7 @@ namespace wrench {
             double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
             if (requested_ram < 0) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): requested ram should be non-negative");
+                        "bare_metal::bare_metal(): requested ram should be non-negative");
             }
 
             if (requested_ram == ComputeService::ALL_RAM) {
@@ -488,7 +487,7 @@ namespace wrench {
 
             if (requested_ram > available_ram) {
                 throw std::invalid_argument(
-                        "BareMetalComputeService::BareMetalComputeService(): host " + hname + "only has " +
+                        "bare_metal::bare_metal(): host " + hname + "only has " +
                         std::to_string(available_ram) + " bytes of RAM but " +
                         std::to_string(requested_ram) + " are requested");
             }
@@ -555,16 +554,6 @@ namespace wrench {
             this->death_date = S4U_Simulation::getClock() + this->ttl;
         }
 
-        // If writeback device simulation is activated
-        if (Simulation::isWriteback()) {
-            // Start periodical flushing
-            simgrid::s4u::Disk* memory = simgrid::s4u::Host::by_name(this->getHostname())->get_disks().at(0);
-            std::shared_ptr<MemoryManager> memory_manager_ptr = MemoryManager::initAndStart(this->simulation, memory,
-                                                                                     0.4, 5, 30, this->hostname);
-            this->simulation->add(memory_manager_ptr.get());
-            memory_manager_ptr->log();
-        }
-
         /** Main loop **/
         while (this->processNextMessage()) {
 
@@ -573,7 +562,7 @@ namespace wrench {
 
         }
 
-        WRENCH_INFO("BareMetalComputeService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("bare_metal on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return this->exit_code;
     }
 
@@ -695,7 +684,7 @@ namespace wrench {
 
             std::string picked_host;
 
-            StandardJob *job = wu->getJob();
+            std::shared_ptr<StandardJob> job = wu->getJob();
             std::string target_host;
             unsigned long target_num_cores;
             double required_ram;
@@ -744,7 +733,7 @@ namespace wrench {
             } catch (std::shared_ptr<HostError> &e) {
                 // This is an error on the target host!!
                 throw std::runtime_error(
-                        "BareMetalComputeService::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
+                        "bare_metal::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
             }
 
 
@@ -802,13 +791,13 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-        if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOnMessage>(message)) {
+        if (auto msg = dynamic_cast<HostHasTurnedOnMessage*>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<HostHasChangedSpeedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<HostHasChangedSpeedMessage*>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<HostHasTurnedOffMessage>(message)) {
+        } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage*>(message.get())) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
                     BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
@@ -830,7 +819,7 @@ namespace wrench {
                 return false;
             }
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceStopDaemonMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
 
             this->terminate(false);
 
@@ -844,29 +833,29 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitStandardJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage*>(message.get())) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitPilotJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage*>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceResourceInformationRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage*>(message.get())) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateStandardJobRequestMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage*>(message.get())) {
             processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorDoneMessage>(message)) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorDoneMessage*>(message.get())) {
             processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<WorkunitExecutorFailedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorFailedMessage*>(message.get())) {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return true;
 
-        } else if (auto msg = std::dynamic_pointer_cast<ServiceHasCrashedMessage>(message)) {
+        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage*>(message.get())) {
             auto service = msg->service;
             auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
@@ -905,7 +894,7 @@ namespace wrench {
  * @param cause: the failure cause
  */
     void
-    BareMetalComputeService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
+    BareMetalComputeService::failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause) {
 
         WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
@@ -929,7 +918,7 @@ namespace wrench {
 * @brief terminate a running standard job
 * @param job: the job
 */
-    void BareMetalComputeService::terminateRunningStandardJob(StandardJob *job,
+    void BareMetalComputeService::terminateRunningStandardJob(std::shared_ptr<StandardJob> job,
                                                               BareMetalComputeService::JobTerminationCause termination_cause) {
 
         /** Kill all relevant work unit executors */
@@ -981,7 +970,7 @@ namespace wrench {
 
                 case WorkflowTask::InternalState::TASK_RUNNING:
                     throw std::runtime_error(
-                            "BareMetalComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
+                            "bare_metal::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
                             "after a WorkUnitExecutor was killed!");
                 case WorkflowTask::InternalState::TASK_FAILED:
                     // Making failed task READY again!!!
@@ -990,7 +979,7 @@ namespace wrench {
 
                 default:
                     throw std::runtime_error(
-                            "BareMetalComputeService::terminateRunningStandardJob(): unexpected task state");
+                            "bare_metal::terminateRunningStandardJob(): unexpected task state");
             }
         }
 
@@ -1073,7 +1062,7 @@ namespace wrench {
  * @throw WorkflowExecutionException
  * @throw std::runtime_error
  */
-    void BareMetalComputeService::terminateStandardJob(StandardJob *job) {
+    void BareMetalComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
 
         assertServiceIsUp();
 
@@ -1090,21 +1079,21 @@ namespace wrench {
         }
 
         // Get the answer
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = std::dynamic_pointer_cast<ComputeServiceTerminateStandardJobAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage*>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::terminateStandardJob(): Received an unexpected [" +
+                    "bare_metal::terminateStandardJob(): Received an unexpected [" +
                     message->getName() + "] message!");
         }
     }
@@ -1118,7 +1107,7 @@ namespace wrench {
 
     void BareMetalComputeService::processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                                     std::shared_ptr<Workunit> workunit) {
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
 
         // Get the scratch files that executor may have generated
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
@@ -1158,7 +1147,7 @@ namespace wrench {
                 if (child->task != nullptr) {
                     if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                         throw std::runtime_error(
-                                "BareMetalComputeService::processWorkunitExecutorCompletion(): Weird task state " +
+                                "bare_metal::processWorkunitExecutorCompletion(): Weird task state " +
                                 std::to_string(child->task->getInternalState()) + " for task " +
                                 child->task->getID());
                     }
@@ -1217,7 +1206,7 @@ namespace wrench {
     void BareMetalComputeService::processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor,
                                                                  std::shared_ptr<Workunit> workunit,
                                                                  std::shared_ptr<FailureCause> cause) {
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
 
         // Get the scratch files that executor may have generated
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
@@ -1243,12 +1232,12 @@ namespace wrench {
 
 
     /**
-     * @brief Helper function to "forget" a workunit executor (and free memory)
+     * @brief Helper function to "forget" a workunit executor (and free memory_manager_service)
      * @param workunit_executor: the workunit executor
      */
     void BareMetalComputeService::forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor) {
 
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
         std::shared_ptr<WorkunitExecutor> found_it;
         for (auto const &wue : this->workunit_executors[job]) {
             if (wue == workunit_executor) {
@@ -1257,7 +1246,7 @@ namespace wrench {
         }
         if (found_it == nullptr) {
             throw std::runtime_error(
-                    "BareMetalComputeService::processWorkunitExecutorCompletion(): Couldn't find workunit executor");
+                    "bare_metal::processWorkunitExecutorCompletion(): Couldn't find workunit executor");
         }
         this->workunit_executors[job].erase(found_it);
 
@@ -1270,7 +1259,7 @@ namespace wrench {
  * @param job: the job to terminate
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
-    void BareMetalComputeService::processStandardJobTerminationRequest(StandardJob *job,
+    void BareMetalComputeService::processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job,
                                                                        const std::string &answer_mailbox) {
 
         // If the job doesn't exit, we reply right away
@@ -1322,7 +1311,7 @@ namespace wrench {
      * @param service_specific_arguments: the service-specific arguments
      * @return true if the job can run
      */
-    bool BareMetalComputeService::jobCanRun(StandardJob *job,
+    bool BareMetalComputeService::jobCanRun(std::shared_ptr<StandardJob> job,
                                             std::map<std::string, std::string> &service_specific_arguments) {
 
         for (auto t : job->getTasks()) {
@@ -1379,7 +1368,7 @@ namespace wrench {
  *
  */
     void BareMetalComputeService::processSubmitStandardJob(
-            const std::string &answer_mailbox, StandardJob *job,
+            const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
 
@@ -1458,7 +1447,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void BareMetalComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                        PilotJob *job,
+                                                        std::shared_ptr<PilotJob> job,
                                                         std::map<std::string, std::string> service_specific_args) {
         WRENCH_INFO("Asked to run a pilot job");
 
@@ -1478,7 +1467,7 @@ namespace wrench {
         }
 
         throw std::runtime_error(
-                "BareMetalComputeService::processSubmitPilotJob(): We shouldn't be here! (fatal)");
+                "bare_metal::processSubmitPilotJob(): We shouldn't be here! (fatal)");
     }
 
 /**
@@ -1606,9 +1595,9 @@ namespace wrench {
  *
  * @throw std::runtime_error
  */
-    void BareMetalComputeService::terminatePilotJob(PilotJob *job) {
+    void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error(
-                "BareMetalComputeService::terminatePilotJob(): not implemented because BareMetalComputeService never supports pilot jobs");
+                "bare_metal::terminatePilotJob(): not implemented because bare_metal never supports pilot jobs");
     }
 
 
@@ -1623,7 +1612,7 @@ namespace wrench {
 
         WRENCH_INFO("Handling a WorkunitExecutor crash!");
         // Get the scratch files that executor may have generated
-        StandardJob *job = workunit_executor->getJob();
+        std::shared_ptr<StandardJob> job = workunit_executor->getJob();
         for (auto &f : workunit_executor->getFilesStoredInScratch()) {
             if (this->files_in_scratch.find(job) == this->files_in_scratch.end()) {
                 this->files_in_scratch.insert(std::make_pair(job, (std::set<WorkflowFile *>) {}));

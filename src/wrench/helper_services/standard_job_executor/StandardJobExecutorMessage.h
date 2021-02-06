@@ -78,14 +78,14 @@ namespace wrench {
     class StandardJobExecutorDoneMessage : public StandardJobExecutorMessage {
     public:
         StandardJobExecutorDoneMessage(
-                StandardJob *job,
+                std::shared_ptr<StandardJob> job,
                 std::shared_ptr<StandardJobExecutor> executor,
                 double payload);
 
         /** @brief The standard job executor that has completed the standard job */
         std::shared_ptr<StandardJobExecutor> executor;
         /** @brief The standard job that has completed */
-        StandardJob *job;
+        std::shared_ptr<StandardJob> job;
 
     };
 
@@ -95,7 +95,7 @@ namespace wrench {
     class StandardJobExecutorFailedMessage : public StandardJobExecutorMessage {
     public:
         StandardJobExecutorFailedMessage(
-                StandardJob *job,
+                std::shared_ptr<StandardJob> job,
                 std::shared_ptr<StandardJobExecutor> executor,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
@@ -103,7 +103,7 @@ namespace wrench {
         /** @brief The standard job executor that has ailed to complete the standard job */
         std::shared_ptr<StandardJobExecutor> executor;
         /** @brief The standard job that has failed */
-        StandardJob *job;
+        std::shared_ptr<StandardJob> job;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
 
