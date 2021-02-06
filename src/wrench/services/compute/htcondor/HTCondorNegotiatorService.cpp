@@ -88,58 +88,48 @@ namespace wrench {
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
 
-<<<<<<< HEAD
-
             //GRID STANDARD JOB
             //Diverts grid jobs to batch service if it has been provided when initializing condor.
-            if (auto standard_job = dynamic_cast<StandardJob *>(job)) {
+            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
                 if (service_specific_arguments.find("universe") == service_specific_arguments.end()) {
                     for (auto &item : *this->compute_resources) {
                         if (not item.first->supportsStandardJobs()) {
                             continue;
                         }
-=======
-            // STANDARD JOB
-            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                for (auto &item : *this->compute_resources) {
->>>>>>> master
 
-                        if (item.second >= standard_job->getMinimumRequiredNumCores()) {
+                        if (item.second >= sjob->getMinimumRequiredNumCores()) {
 
-                            WRENCH_INFO("Dispatching job %s with %ld tasks", standard_job->getName().c_str(),
-                                        standard_job->getTasks().size());
+                            WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
+                                        sjob->getTasks().size());
 
-                            for (auto task : standard_job->getTasks()) {
+                            for (auto task : sjob->getTasks()) {
                                 // temporary printing task IDs
                                 WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                             }
 
                             WRENCH_INFO("---> %lu", service_specific_arguments.size());
 
-                            standard_job->pushCallbackMailbox(this->reply_mailbox);
-                            item.first->submitStandardJob(standard_job, service_specific_arguments);
+                            sjob->pushCallbackMailbox(this->reply_mailbox);
+                            item.first->submitStandardJob(sjob, service_specific_arguments);
                             this->running_jobs->insert(std::make_pair(job, item.first));
                             scheduled_jobs.push_back(job);
-                            item.second -= standard_job->getMinimumRequiredNumCores();
+                            item.second -= sjob->getMinimumRequiredNumCores();
 
-                            WRENCH_INFO("Dispatched job %s with %ld tasks", standard_job->getName().c_str(),
-                                        standard_job->getTasks().size());
+                            WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
+                                        sjob->getTasks().size());
                             break;
                         }
                     }
                 } else {
                     if (service_specific_arguments["universe"].compare("grid") == 0) {
-                        auto num_tasks = std::to_string((int) std::min(standard_job->getNumTasks(),this->grid_universe_batch_service->getNumHosts()));
+                        auto num_tasks = std::to_string((int) std::min(sjob->getNumTasks(),this->grid_universe_batch_service->getNumHosts()));
 
-<<<<<<< HEAD
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-N", num_tasks));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
                         service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
 
                         std::map<std::string, std::string> service_specs_copy;
-=======
-                    if (item.second >= sjob->getMinimumRequiredNumCores()) {
->>>>>>> master
+
 
                         WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
                                     sjob->getTasks().size());
@@ -151,34 +141,19 @@ namespace wrench {
 
                         //S4U_Simulation::sleep(140.0);
 
-<<<<<<< HEAD
-                        standard_job->pushCallbackMailbox(this->reply_mailbox);
-                        this->grid_universe_batch_service->submitStandardJob(standard_job, service_specific_arguments);
+                        sjob->pushCallbackMailbox(this->reply_mailbox);
+                        this->grid_universe_batch_service->submitStandardJob(sjob, service_specific_arguments);
                         this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
                         scheduled_jobs.push_back(job);
-                        standard_job->getMinimumRequiredNumCores();
+                        sjob->getMinimumRequiredNumCores();
 
                         WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service",
-                                    standard_job->getName().c_str(),
-                                    standard_job->getTasks().size());
-                    }
-                }
-            } else if (auto pilot_job = dynamic_cast<PilotJob *>(job)) { // PILOT JOB
-=======
-                        sjob->pushCallbackMailbox(this->reply_mailbox);
-                        item.first->submitStandardJob(sjob, service_specific_arguments);
-                        this->running_jobs->insert(std::make_pair(job, item.first));
-                        scheduled_jobs.push_back(job);
-                        item.second -= sjob->getMinimumRequiredNumCores();
-
-                        WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
+                                    sjob->getName().c_str(),
                                     sjob->getTasks().size());
-                        break;
                     }
                 }
-
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) { // PILOT JOB
->>>>>>> master
+
 
                 for (auto &item : *this->compute_resources) {
                     if (not item.first->supportsPilotJobs()) {

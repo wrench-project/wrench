@@ -45,6 +45,8 @@ docs
 # Examples
 wrench-simple-example-cloud
 wrench-simple-example-batch
+examples/condor-grid-example/wrench-example-condor-grid-universe
+*wrench-example*
 
 #JSON
 host_utilization_layout.json
