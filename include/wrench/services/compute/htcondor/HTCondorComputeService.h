@@ -28,7 +28,8 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                 {HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
-                {HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}
+                {HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                {HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "false"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -47,7 +48,8 @@ namespace wrench {
                                const std::string &pool_name,
                                std::set<ComputeService *> compute_resources,
                                std::map<std::string, std::string> property_list = {},
-                               std::map<std::string, double> messagepayload_list = {});
+                               std::map<std::string, double> messagepayload_list = {},
+                               ComputeService *grid_universe_batch_service = nullptr);
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -61,6 +63,8 @@ namespace wrench {
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
         void setLocalStorageService(std::shared_ptr<StorageService> local_storage_service);
+
+        bool supportsGridUniverse();
 
         /***********************/
         /** \endcond          **/
