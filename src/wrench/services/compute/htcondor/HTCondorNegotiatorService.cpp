@@ -36,9 +36,11 @@ namespace wrench {
             std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
             std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
-            std::string &reply_mailbox)
+            std::string &reply_mailbox,
+            std::shared_ptr<ComputeService> &grid_universe_batch_service)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
-              compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs) {
+              compute_resources(&compute_resources), running_jobs(&running_jobs), pending_jobs(pending_jobs),
+              grid_universe_batch_service(grid_universe_batch_service) {
 
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -86,15 +88,48 @@ namespace wrench {
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
 
-            // STANDARD JOB
+            //GRID STANDARD JOB
+            //Diverts grid jobs to batch service if it has been provided when initializing condor.
             if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                for (auto &item : *this->compute_resources) {
+                if (service_specific_arguments.find("universe") == service_specific_arguments.end()) {
+                    for (auto &item : *this->compute_resources) {
+                        if (not item.first->supportsStandardJobs()) {
+                            continue;
+                        }
 
-                    if (not item.first->supportsStandardJobs()) {
-                        continue;
+                        if (item.second >= sjob->getMinimumRequiredNumCores()) {
+
+                            WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
+                                        sjob->getTasks().size());
+
+                            for (auto task : sjob->getTasks()) {
+                                // temporary printing task IDs
+                                WRENCH_INFO("    Task ID: %s", task->getID().c_str());
+                            }
+
+                            WRENCH_INFO("---> %lu", service_specific_arguments.size());
+
+                            sjob->pushCallbackMailbox(this->reply_mailbox);
+                            item.first->submitStandardJob(sjob, service_specific_arguments);
+                            this->running_jobs->insert(std::make_pair(job, item.first));
+                            scheduled_jobs.push_back(job);
+                            item.second -= sjob->getMinimumRequiredNumCores();
+
+                            WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
+                                        sjob->getTasks().size());
+                            break;
+                        }
                     }
+                } else {
+                    if (service_specific_arguments["universe"].compare("grid") == 0) {
+                        auto num_tasks = std::to_string((int) std::min(sjob->getNumTasks(),this->grid_universe_batch_service->getNumHosts()));
 
-                    if (item.second >= sjob->getMinimumRequiredNumCores()) {
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-N", num_tasks));
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
+                        service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
+
+                        std::map<std::string, std::string> service_specs_copy;
+
 
                         WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
                                     sjob->getTasks().size());
@@ -104,21 +139,21 @@ namespace wrench {
                             WRENCH_INFO("    Task ID: %s", task->getID().c_str());
                         }
 
-                        WRENCH_INFO("---> %lu", service_specific_arguments.size());
+                        //S4U_Simulation::sleep(140.0);
 
                         sjob->pushCallbackMailbox(this->reply_mailbox);
-                        item.first->submitStandardJob(sjob, service_specific_arguments);
-                        this->running_jobs->insert(std::make_pair(job, item.first));
+                        this->grid_universe_batch_service->submitStandardJob(sjob, service_specific_arguments);
+                        this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
                         scheduled_jobs.push_back(job);
-                        item.second -= sjob->getMinimumRequiredNumCores();
+                        sjob->getMinimumRequiredNumCores();
 
-                        WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
+                        WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service",
+                                    sjob->getName().c_str(),
                                     sjob->getTasks().size());
-                        break;
                     }
                 }
-
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) { // PILOT JOB
+
 
                 for (auto &item : *this->compute_resources) {
                     if (not item.first->supportsPilotJobs()) {
@@ -136,19 +171,18 @@ namespace wrench {
             }
         }
 
-        // Send the callback to the originator
-        try {
-            S4U_Mailbox::putMessage(
-                    this->reply_mailbox, new NegotiatorCompletionMessage(
-                            scheduled_jobs, this->getMessagePayloadValue(
-                                    HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return 1;
-        }
+            // Send the callback to the originator
+            try {
+                S4U_Mailbox::putMessage(
+                        this->reply_mailbox, new NegotiatorCompletionMessage(
+                                scheduled_jobs, this->getMessagePayloadValue(
+                                        HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return 1;
+            }
 
-        WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
-                    S4U_Simulation::getHostName().c_str());
-        return 0;
+            WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
+                        S4U_Simulation::getHostName().c_str());
+            return 0;
     }
-
 }

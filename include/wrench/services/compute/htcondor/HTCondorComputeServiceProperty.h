@@ -21,6 +21,9 @@ namespace wrench {
 
     public:
 
+        /** @brief Whether the condor service supports grid jobs that are offloaded to batch service **/
+        DECLARE_PROPERTY_NAME(SUPPORTS_GRID_UNIVERSE);
+
     };
 }
 
