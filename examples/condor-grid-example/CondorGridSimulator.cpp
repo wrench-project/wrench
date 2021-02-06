@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
     bool join_merge_join_merge = false;
     bool three_four_split = false;
     bool seismology = false;
-    bool seismology_500 = false;
+    bool montage = false;
 
     if(argc>2){
         batch_bandwidth = std::stoi(std::string(argv[2]));
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
     } else if (argc==7 && std::stod(std::string(argv[6]))==7) {
         seismology = true;
     } else if (argc==7 && std::stod(std::string(argv[6]))==8) {
-        seismology_500 = true;
+        montage = true;
     }
 
 
@@ -619,9 +619,9 @@ int main(int argc, char **argv) {
         grid_workflow->addControlDependency(task15, task17);
         grid_workflow->addControlDependency(task16, task17);
     } else if (seismology) {
-        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("seismology.json", "10000000000f", false);
-    } else if (seismology_500) {
-        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("seismology_500.json", "10000000000f", false);
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("seismology.json", "3500000000f", false);
+    } else if (montage) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage.json", "3500000000f", false);
     }
 
     // Create a Storage Service
