@@ -27,7 +27,7 @@ namespace wrench {
         WRENCH_INFO("Starting!");
         while (true) {
 
-            StandardJob *job = nullptr;
+            std::shared_ptr<StandardJob> job = nullptr;
 
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion...");
@@ -53,12 +53,13 @@ namespace wrench {
 
             }
 
-            // Remove tasks that correspond to the job
-            for (auto t : job->getTasks()) {
-                this->getWorkflow()->removeTask(t);
-            }
+            // DO NOT Remove tasks that correspond to the job, since people may still care! And
+            // besides, timestamps have been generated that correspond to these tasks!
+//            for (auto t : job->getTasks()) {
+//                this->getWorkflow()->removeTask(t);
+//            }
 
-            this->job_manager->forgetJob(job);
+//            this->job_manager->forgetJob(job);
         }
 
     }

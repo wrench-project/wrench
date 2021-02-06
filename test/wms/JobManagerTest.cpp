@@ -156,7 +156,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -179,7 +179,8 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -333,7 +334,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -356,7 +357,8 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -392,7 +394,7 @@ private:
         }
 
         try {
-            job_manager->submitJob((wrench::WorkflowJob *) (1234), nullptr, {});
+            job_manager->submitJob(std::shared_ptr<wrench::WorkflowJob>((wrench::WorkflowJob *) (1234), [](void *ptr){}), nullptr, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
         } catch (std::invalid_argument &e) {
         }
@@ -400,12 +402,6 @@ private:
         try {
             job_manager->terminateJob(nullptr);
             throw std::runtime_error("Should not be able to terminate a nullptr job");
-        } catch (std::invalid_argument &e) {
-        }
-
-        try {
-            job_manager->forgetJob(nullptr);
-            throw std::runtime_error("Should not be able to forget a nullptr job");
         } catch (std::invalid_argument &e) {
         }
 
@@ -422,7 +418,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -446,7 +442,8 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -488,7 +485,7 @@ private:
         }
 
         // Create a standard job
-        wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
 
         // Try to submit a standard job to the wrong service
         try {
@@ -555,7 +552,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -597,7 +594,8 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -649,7 +647,7 @@ private:
         t3->setPriority(42);
 
         // Create a standard job
-        wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
         job->getMinimumRequiredNumCores(); // coverage
         job->getPriority(); // coverage
 
@@ -707,7 +705,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
     int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
+    char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     simulation->init(&argc, argv);
@@ -735,6 +733,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     delete simulation;
 
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+     free(argv[i]);
     free(argv);
 }

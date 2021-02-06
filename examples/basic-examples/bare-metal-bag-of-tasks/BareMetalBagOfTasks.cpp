@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 
     /* Add workflow tasks and files */
     for (int i=0; i < num_tasks; i++) {
-        /* Create a task: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory footprint */
+        /* Create a task: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow.addTask("task_" + std::to_string(i), dist(rng), 1, 10, 10000000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
         task->addInputFile(workflow.addFile("input_" + std::to_string(i), 10000000));
@@ -111,11 +111,11 @@ int main(int argc, char **argv) {
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.
-     * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds 
+     * A wrench::bare_metal is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
-    std::cerr << "Instantiating a BareMetalComputeService on ComputeHost..." << std::endl;
+    std::cerr << "Instantiating a bare_metal on ComputeHost..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 

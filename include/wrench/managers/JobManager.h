@@ -47,32 +47,32 @@ namespace wrench {
         void kill();
 
 
-        StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
                                        std::map<WorkflowFile *, std::shared_ptr<FileLocation>  > file_locations,
                                        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies,
                                        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> post_file_copies,
                                        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
 
 
-        StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
                                        std::map<WorkflowFile *,
                                                std::shared_ptr<FileLocation>  > file_locations);
 
-        StandardJob *createStandardJob(WorkflowTask *task,
+        std::shared_ptr<StandardJob>  createStandardJob(WorkflowTask *task,
                                        std::map<WorkflowFile *,
                                                std::shared_ptr<FileLocation>  > file_locations);
 
-        PilotJob *createPilotJob();
+        std::shared_ptr<PilotJob> createPilotJob();
 
-        void submitJob(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service, std::map<std::string, std::string> service_specific_args = {});
+        void submitJob(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service, std::map<std::string, std::string> service_specific_args = {});
 
-        void terminateJob(WorkflowJob *);
+        void terminateJob(std::shared_ptr<WorkflowJob> job);
 
-        void forgetJob(WorkflowJob *job);
+//        void forgetJob(WorkflowJob *job);
 
-        std::set<PilotJob *> getPendingPilotJobs();
+        std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
 
-        std::set<PilotJob *> getRunningPilotJobs();
+        std::set<std::shared_ptr<PilotJob>> getRunningPilotJobs();
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -93,28 +93,27 @@ namespace wrench {
 
         int main() override;
         bool processNextMessage();
-        void processStandardJobCompletion(StandardJob *job, std::shared_ptr<ComputeService> compute_service);
-        void processStandardJobFailure(StandardJob *job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
-        void processPilotJobStart(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
-        void processPilotJobExpiration(PilotJob *job, std::shared_ptr<ComputeService> compute_service);
+        void processStandardJobCompletion(std::shared_ptr<StandardJob>job, std::shared_ptr<ComputeService> compute_service);
+        void processStandardJobFailure(std::shared_ptr<StandardJob>job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
+        void processPilotJobStart(std::shared_ptr<PilotJob>job, std::shared_ptr<ComputeService> compute_service);
+        void processPilotJobExpiration(std::shared_ptr<PilotJob>job, std::shared_ptr<ComputeService> compute_service);
 
 
 
         // Relevant WMS
         std::shared_ptr<WMS> wms;
 
-        // Job map
-        std::map<WorkflowJob*, std::unique_ptr<WorkflowJob>> jobs;
-
         // Job lists
-        std::set<StandardJob *> pending_standard_jobs;
-        std::set<StandardJob *> running_standard_jobs;
-        std::set<StandardJob *> completed_standard_jobs;
-        std::set<StandardJob *> failed_standard_jobs;
+        std::set<std::shared_ptr<StandardJob>> new_standard_jobs;
+        std::set<std::shared_ptr<StandardJob>> pending_standard_jobs;
+        std::set<std::shared_ptr<StandardJob>> running_standard_jobs;
+        std::set<std::shared_ptr<StandardJob>> completed_standard_jobs;
+        std::set<std::shared_ptr<StandardJob>> failed_standard_jobs;
 
-        std::set<PilotJob *> pending_pilot_jobs;
-        std::set<PilotJob *> running_pilot_jobs;
-        std::set<PilotJob *> completed_pilot_jobs;
+        std::set<std::shared_ptr<PilotJob>> new_pilot_jobs;
+        std::set<std::shared_ptr<PilotJob>> pending_pilot_jobs;
+        std::set<std::shared_ptr<PilotJob>> running_pilot_jobs;
+        std::set<std::shared_ptr<PilotJob>> completed_pilot_jobs;
 
     };
 

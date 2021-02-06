@@ -92,7 +92,7 @@ namespace wrench {
 
         static void disableColor();
 
-        static void disableLog();
+//        static void disableLog();
 
         /***********************/
         /** \endcond           */

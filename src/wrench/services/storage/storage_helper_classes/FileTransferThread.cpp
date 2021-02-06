@@ -16,6 +16,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <wrench/services/storage/storage_helpers/FileTransferThread.h>
+#include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_transfer_thread, "Log category for File Transfer Thread");
 
@@ -258,13 +259,11 @@ namespace wrench {
 
         } else {
             /** Non-zero buffer size */
-
             bool done = false;
 
             // Receive the first chunk
             auto msg = S4U_Mailbox::getMessage(mailbox);
-            if (auto file_content_chunk_msg =
-                    std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+            if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
                 throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
@@ -273,17 +272,37 @@ namespace wrench {
 
             try {
 
+                if (Simulation::isPageCachingEnabled()) {
+                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
+//                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
+                }
+
                 // Receive chunks and write them to disk
                 while (not done) {
                     // Issue the receive
                     auto req = S4U_Mailbox::igetMessage(mailbox);
-                    // Write to disk
-                    simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
+
+                    // In NFS, write to cache only if the current host not the server host where the file is stored
+                    // If the current host is file server, write to disk directly
+                    if (Simulation::isPageCachingEnabled()) {
+
+                        bool write_locally = location->getServerStorageService() == nullptr ;
+
+                        if (write_locally) {
+                            simulation->writebackWithMemoryCache(file, msg->payload, location, true);
+                        } else {
+                            simulation->writeThroughWithMemoryCache(file, msg->payload, location);
+                        }
+                    } else {
+                        // Write to disk
+                        simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
                                                 location->getMountPoint());
+                    }
+
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -291,9 +310,27 @@ namespace wrench {
                                 msg->getName() + "] message!");
                     }
                 }
+
                 // I/O for the last chunk
-                simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
+                if (Simulation::isPageCachingEnabled()) {
+                    bool write_locally = location->getServerStorageService() == nullptr ;
+
+                    if (write_locally) {
+                        simulation->writebackWithMemoryCache(file, msg->payload, location, true);
+                    } else {
+                        simulation->writeThroughWithMemoryCache(file, msg->payload, location);
+                    }
+                } else {
+//                     Write to disk
+                    simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
                                             location->getMountPoint());
+                }
+
+                if (Simulation::isPageCachingEnabled()) {
+                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
+//                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
+                }
+
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }
@@ -326,22 +363,35 @@ namespace wrench {
                 // Sending a zero-byte file is really sending a 1-byte file
                 double remaining = std::max<double>(1, file->getSize());
 
+                if (Simulation::isPageCachingEnabled()) {
+                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
+                }
+
                 while (remaining > 0) {
                     double chunk_size = std::min<double>(this->buffer_size, remaining);
-                    WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
-                    simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
+
+                    if (Simulation::isPageCachingEnabled()) {
+                        simulation->readWithMemoryCache(file, chunk_size, location);
+                    } else {
+                        WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
+                        simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
-                    WRENCH_INFO("Read %s bytes from disk", std::to_string(chunk_size).c_str());
+                    }
+
                     remaining -= (double)(this->buffer_size);
                     if (req) {
                         req->wait();
-                        WRENCH_INFO("Bytes sent over the network were received");
+//                        WRENCH_INFO("Bytes sent over the network were received");
                     }
-                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
+//                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
                     req = S4U_Mailbox::iputMessage(mailbox,
                                                    new StorageServiceFileContentChunkMessage(
                                                            this->file,
                                                            (unsigned long)chunk_size, (remaining <= 0)));
+                }
+                if (Simulation::isPageCachingEnabled()) {
+                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
+//                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
                 req->wait();
                 WRENCH_INFO("Bytes sent over the network were received");
@@ -448,7 +498,7 @@ namespace wrench {
         }
 
         // Wait for a reply to the request
-        std::shared_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
             message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
@@ -457,7 +507,7 @@ namespace wrench {
         }
 
 
-        if (auto msg = std::dynamic_pointer_cast<StorageServiceFileReadAnswerMessage>(message)) {
+        if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage*>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 throw msg->failure_cause;
@@ -481,7 +531,7 @@ namespace wrench {
                 // Receive the first chunk
                 auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
                 if (auto file_content_chunk_msg =
-                        std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                        dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
                     throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
@@ -492,16 +542,22 @@ namespace wrench {
                 while (not done) {
                     // Issue the receive
                     auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
-
+//                    WRENCH_INFO("Downloaded of %f of file  %s from location %s",
+//                                msg->payload, file->getID().c_str(), src_location->toString().c_str());
                     // Do the I/O
-                    simulation->writeToDisk(msg->payload,
+                    if (Simulation::isPageCachingEnabled()) {
+                        simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
+                    } else {
+                        // Write to disk
+                        simulation->writeToDisk(msg->payload,
                                                 dst_location->getStorageService()->getHostname(),
                                                 dst_location->getMountPoint());
-
+                    }
                     // Wait for the comm to finish
+//                    WRENCH_INFO("Wrote of %f of file  %s", msg->payload, file->getID().c_str());
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            std::dynamic_pointer_cast<StorageServiceFileContentChunkMessage>(msg)) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
@@ -509,9 +565,14 @@ namespace wrench {
                     }
                 }
                 // Do the I/O for the last chunk
-                simulation->writeToDisk(msg->payload,
+                if (Simulation::isPageCachingEnabled()) {
+                    simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
+                } else {
+                    // Write to disk
+                    simulation->writeToDisk(msg->payload,
                                             dst_location->getStorageService()->getHostname(),
                                             dst_location->getMountPoint());
+                }
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }

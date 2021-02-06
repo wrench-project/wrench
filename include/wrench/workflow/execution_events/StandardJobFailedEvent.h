@@ -51,7 +51,7 @@ namespace wrench {
          * @param compute_service: a compute service
          * @param failure_cause: a failure_cause
          */
-        StandardJobFailedEvent(StandardJob *standard_job,
+        StandardJobFailedEvent(std::shared_ptr<StandardJob> standard_job,
                                std::shared_ptr<ComputeService>  compute_service,
                                std::shared_ptr<FailureCause> failure_cause)
                 : standard_job(standard_job),
@@ -61,7 +61,7 @@ namespace wrench {
     public:
 
         /** @brief The standard job that has failed */
-        StandardJob *standard_job;
+        std::shared_ptr<StandardJob> standard_job;
         /** @brief The compute service on which the job has failed */
         std::shared_ptr<ComputeService>  compute_service;
         /** @brief The cause of the failure */

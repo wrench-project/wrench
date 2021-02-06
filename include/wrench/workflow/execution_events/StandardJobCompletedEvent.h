@@ -53,13 +53,13 @@ namespace wrench {
          * @param standard_job: a standard job
          * @param compute_service: a compute service
          */
-        StandardJobCompletedEvent(StandardJob *standard_job,
+        StandardJobCompletedEvent(std::shared_ptr<StandardJob> standard_job,
                                   std::shared_ptr<ComputeService>  compute_service)
                 : standard_job(standard_job), compute_service(compute_service) {}
     public:
 
         /** @brief The standard job that has completed */
-        StandardJob *standard_job;
+        std::shared_ptr<StandardJob> standard_job;
         /** @brief The compute service on which the standard job has completed */
         std::shared_ptr<ComputeService>  compute_service;
 

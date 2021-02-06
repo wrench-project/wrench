@@ -27,7 +27,7 @@ namespace wrench {
      * @param job: the job that wasn't supported
      * @param compute_service: the compute service that did not support it
      */
-    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, std::shared_ptr<ComputeService> compute_service) {
+    JobTypeNotSupported::JobTypeNotSupported(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -36,7 +36,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    WorkflowJob *JobTypeNotSupported::getJob() {
+    std::shared_ptr<WorkflowJob> JobTypeNotSupported::getJob() {
         return this->job;
     }
 
@@ -53,8 +53,14 @@ namespace wrench {
      * @return the message
      */
     std::string JobTypeNotSupported::toString() {
+        std::string job_type = "unknown";
+        if (std::dynamic_pointer_cast<StandardJob>(this->job)) {
+            job_type = "'standard'";
+        } else if (std::dynamic_pointer_cast<PilotJob>(this->job)) {
+            job_type = "'pilot'";
+        }
         return "Compute service " + this->compute_service->getName() + " on host " +
-               this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
+               this->compute_service->getHostname() + " does not support jobs of type " + job_type;
     }
 
 }

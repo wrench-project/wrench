@@ -71,7 +71,7 @@ namespace wrench {
 
       double pilot_job_duration_in_minutes = ceil(pilot_job_duration/60.0);
       //TODO: For now we are asking for a pilot job that requires no RAM
-      WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createPilotJob();
+      auto job = this->getJobManager()->createPilotJob();
       this->getJobManager()->submitJob(job, target_service, {{"-N","1"},{"-c","1"},{"-t",std::to_string(pilot_job_duration_in_minutes)}});
 
     }

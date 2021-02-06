@@ -233,14 +233,14 @@ namespace wrench {
         std::map<std::string, double> job_estimated_start_times = {};
         for (auto job : set_of_jobs) {
             // Get the answer
-            std::shared_ptr<SimulationMessage> message = nullptr;
+            std::unique_ptr<SimulationMessage> message = nullptr;
             try {
                 message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             } catch (std::shared_ptr<NetworkError> &cause) {
                 throw WorkflowExecutionException(cause);
             }
 
-            if (auto msg = std::dynamic_pointer_cast<BatchQueryAnswerMessage>(message)) {
+            if (auto msg = dynamic_cast<BatchQueryAnswerMessage*>(message.get())) {
                 job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
             } else {
                 throw std::runtime_error(

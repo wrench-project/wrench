@@ -30,12 +30,6 @@ namespace wrench {
                   const std::set<std::shared_ptr<StorageService>> &storage_services,
                   const std::string &hostname);
 
-    protected:
-
-        // Overriden method
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
-
     private:
         // main() method of the WMS
         int main() override;

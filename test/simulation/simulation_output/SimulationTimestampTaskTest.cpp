@@ -108,12 +108,12 @@ private:
         auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
-        wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task1, {});
+        auto job1 = job_manager->createStandardJob(this->test->task1, {});
         job_manager->submitJob(job1, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
         this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 0);
-        wrench::StandardJob *job2 = job_manager->createStandardJob(this->test->task2, {});
+        auto job2 = job_manager->createStandardJob(this->test->task2, {});
         job_manager->submitJob(job2, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
@@ -121,7 +121,7 @@ private:
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
-        wrench::StandardJob *failed_job = job_manager->createStandardJob(
+        auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
@@ -155,7 +155,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -264,7 +264,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(nullptr), std::invalid_argument);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -302,7 +303,7 @@ private:
             this->test->task1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
             this->test->task1->setState(wrench::WorkflowTask::State::READY);
 
-            wrench::StandardJob *job1 = job_manager->createStandardJob(this->test->task1, {});
+            auto job1 = job_manager->createStandardJob(this->test->task1, {});
             job_manager->submitJob(job1, this->test->compute_service);
             this->waitForAndProcessNextEvent();
         }
@@ -311,7 +312,7 @@ private:
         this->test->failed_task->addInputFile(this->test->large_input_file);
         this->test->failed_task->addInputFile(this->test->small_input_file);
 
-        wrench::StandardJob *failed_job = job_manager->createStandardJob(
+        auto failed_job = job_manager->createStandardJob(
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
@@ -324,7 +325,7 @@ private:
 
         this->waitForAndProcessNextEvent();
 
-        wrench::StandardJob *passing_job = job_manager->createStandardJob(
+        auto passing_job = job_manager->createStandardJob(
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
@@ -343,7 +344,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -475,7 +476,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_GT(failed_task_completion_date_1, failed_task_start_date_2);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -511,14 +513,14 @@ private:
         auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("terminated_task", 1000.0, 1, 1, 0);
-        wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1, {});
+        auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1, {});
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
         // should a StandardJobTerminated event be sent? (if terminateJob is called then waitForAndProcessNextEvent() we get stuck)
 
         this->test->task2 = this->getWorkflow()->addTask("failed_task", 1000.0, 1, 1, 0);
-        wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->task2, {});
+        auto job_that_will_fail = job_manager->createStandardJob(this->test->task2, {});
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         this->test->compute_service->stop();
@@ -534,7 +536,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskTerminateAndFailTest)
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
-    auto argv = (char **) calloc(1, sizeof(char *));
+    auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -599,6 +601,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
     ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
 
     delete simulation;
-    free(argv[0]);
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

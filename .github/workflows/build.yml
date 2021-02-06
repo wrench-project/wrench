@@ -1,0 +1,133 @@
+name: Build
+
+on: [ push ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - build: "Ubuntu Bionic - g++-7"
+            DIST: ubuntu-bionic
+            COMPILER: gcc7
+            batsched: off
+
+          - build: "Ubuntu Bionic - g++-7 (batsched)"
+            DIST: ubuntu-bionic
+            COMPILER: gcc7-batsched
+            batsched: on
+
+          - build: "Ubuntu Bionic - clang-9"
+            DIST: ubuntu-bionic
+            COMPILER: clang9
+            batsched: off
+
+          - build: "Ubuntu Focal - g++-9"
+            DIST: ubuntu-focal
+            COMPILER: gcc9
+            batsched: off
+
+          - build: "Ubuntu Focal - clang-10"
+            DIST: ubuntu-focal
+            COMPILER: clang10
+            batsched: off
+
+          - build: "Debian Stretch - g++-6"
+            DIST: debian-stretch
+            COMPILER: gcc6
+            batsched: off
+
+          - build: "Debian Buster - g++-8"
+            DIST: debian-buster
+            COMPILER: gcc8
+            batsched: off
+
+          - build: "Debian Bullseye - g++-10"
+            DIST: debian-bullseye
+            COMPILER: gcc10
+            batsched: off
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure Docker
+        run: |
+          sudo apt-get update
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Source Build and Test
+        env:
+          DIST: ${{ matrix.DIST }}
+          COMPILER: ${{ matrix.COMPILER }}
+          batsched: ${{ matrix.batsched }}
+        run: |
+          docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
+          docker run -m 4g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+          docker exec wrench git clone https://github.com/wrench-project/wrench;
+          # if not the master branch, switch to branch
+          if [[ "$GITHUB_REF" != "refs/heads/master" ]]; then
+            BRANCH_NAME=$(echo ${GITHUB_REF} | sed 's/refs\/heads\///g');
+            docker exec -w /home/wrench/wrench wrench git checkout ${BRANCH_NAME};
+          fi
+          docker exec wrench mkdir wrench/build;
+          # build and test wrench
+          docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+          docker exec -w /home/wrench/wrench/build wrench make all unit_tests;
+          docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
+
+      - name: Documentation Build and Deployment
+        env:
+          DIST: ${{ matrix.DIST }}
+          COMPILER: ${{ matrix.COMPILER }}
+          batsched: ${{ matrix.batsched }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+        run: |
+          if [[ "$DIST" == "ubuntu-focal" && "$COMPILER" == "gcc9" && "$batsched" == "off" ]]; then
+            docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+            docker exec -w /home/wrench/wrench/build wrench make doc;
+            docker cp wrench:/home/wrench/wrench/docs .;
+            cp -R ./docs/wrench-doc $HOME/gh-pages-to-deploy;
+            echo "Starting to update gh-pages"
+            #copy data we're interested in to other place
+            git config --global user.email "actions@github.com"
+            git config --global user.name "GitHub Actions"
+            #using token clone gh-pages branch
+            git clone --quiet --branch=gh-pages https://${TOKEN_GITHUB}@github.com/wrench-project/wrench.git gh-pages > /dev/null;
+            #go into directory and copy data we're interested in to that directory
+            cd gh-pages;
+            cp -Rf $HOME/gh-pages-to-deploy/* .;
+            touch .nojekyll;
+            #add, commit and push files
+            git add -f .;
+            git diff-index --quiet HEAD || git commit -m "GitHub build $GITHUB_RUN_NUMBER";
+            git push -fq origin gh-pages > /dev/null;
+            echo "Done updating gh-pages.";
+          fi
+
+      - name: Code Coverage
+        env:
+          DIST: ${{ matrix.DIST }}
+          COMPILER: ${{ matrix.COMPILER }}
+          batsched: ${{ matrix.batsched }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          if [[ "$DIST" == "ubuntu-focal" && "$COMPILER" == "gcc9" && "$batsched" == "off" ]]; then
+            docker exec -w /home/wrench/wrench/build wrench lcov --directory . --capture --output-file coverage.info;
+            docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+            docker cp wrench:/home/wrench/wrench/build/coverage.info .;
+            bash <(curl -s https://codecov.io/bash) -f coverage.info -t ${CODECOV_TOKEN};
+          fi
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: github
+          SLACK_ICON: https://github.com/wrench-project.png?size=48
+          SLACK_USERNAME: wrench-builds
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          MSG_MINIMAL: ref,actions url, commit
+          SLACK_TITLE: Build ${{ matrix.build }}
+          SLACK_FOOTER: ''
