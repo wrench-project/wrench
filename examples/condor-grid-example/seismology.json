@@ -1,364 +1,2118 @@
 {
-  "name": "seismology-0",
-  "description": "Trace generated with wrench-pegasus-parser.py from http://wrench-project.org",
-  "createdAt": "2020-12-09T23:11:56.757373Z",
-  "schemaVersion": "1.0",
-  "wms": {
-    "name": "Pegasus",
-    "version": "4.9.3",
-    "url": "http://pegasus.isi.edu"
-  },
-  "author": {
-    "name": "cc",
-    "email": "wkoch530@gmail.com"
-  },
-  "workflow": {
-    "executedAt": "20201127T200855+0000",
-    "machines": [
-      {
-        "system": "linux",
-        "architecture": "x86_64",
-        "release": "4.15.0-106-generic",
-        "nodeName": "wrench-htcondor-1",
-        "memory": 131795968,
-        "cpu": {
-          "count": 48,
-          "speed": 1200,
-          "vendor": "GenuineIntel"
-        }
-      },
-      {
-        "system": "linux",
-        "architecture": "x86_64",
-        "release": "4.15.0-106-generic",
-        "nodeName": "wrench-htcondor-4",
-        "memory": 131795964,
-        "cpu": {
-          "count": 48,
-          "speed": 1201,
-          "vendor": "GenuineIntel"
-        }
-      },
-      {
-        "system": "linux",
-        "architecture": "x86_64",
-        "release": "4.15.0-106-generic",
-        "nodeName": "wrench-htcondor-5",
-        "memory": 131795964,
-        "cpu": {
-          "count": 48,
-          "speed": 1257,
-          "vendor": "GenuineIntel"
-        }
-      }
-    ],
-    "jobs": [
-      {
-        "name": "sG1IterDecon_ID0000001",
-        "type": "compute",
-        "runtime": 1.998,
-        "parents": [
-          "stage_in_remote_local_0_0"
+    "name": "workflow-test",
+    "description": "Trace generated with WorkflowHub - https://workflowhub.org",
+    "createdAt": "2021-01-28T00:33:25.830634",
+    "schemaVersion": "1.0",
+    "author": {
+        "name": "cc",
+        "email": "support@workflowhub.org"
+    },
+    "wms": {
+        "name": "Pegasus",
+        "version": "5.0",
+        "url": "https://pegasus.isi.edu"
+    },
+    "workflow": {
+        "executedAt": "01-27-21T22:36:05Z",
+        "makespan": 6417.0,
+        "jobs": [
+            {
+                "name": "sG1IterDecon_ID0000001",
+                "type": "compute",
+                "runtime": 2.0,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "sbc-ci-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-sbc-ci-_ldsp.lht",
+                        "size": 2952
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-sbc-ci-_ldsp.lht",
+                        "size": 2968
+                    }
+                ],
+                "avgCPU": 70.65,
+                "memory": 3468,
+                "priority": 20,
+                "arguments": [
+                    "mshock-sbc-ci-_ldsp.lht",
+                    "egf-sbc-ci-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000002",
+                "type": "compute",
+                "runtime": 1.711,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-d03-xt-_ldsp.lht",
+                        "size": 2448
+                    },
+                    {
+                        "link": "output",
+                        "name": "d03-xt-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-d03-xt-_ldsp.lht",
+                        "size": 2428
+                    }
+                ],
+                "avgCPU": 63.3548,
+                "memory": 3380,
+                "priority": 20,
+                "arguments": [
+                    "mshock-d03-xt-_ldsp.lht",
+                    "egf-d03-xt-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000003",
+                "type": "compute",
+                "runtime": 1.134,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "f49a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-f49a-ta-_ldsp.lht",
+                        "size": 3900
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-f49a-ta-_ldsp.lht",
+                        "size": 3916
+                    }
+                ],
+                "avgCPU": 51.3228,
+                "memory": 3524,
+                "priority": 20,
+                "arguments": [
+                    "mshock-f49a-ta-_ldsp.lht",
+                    "egf-f49a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000004",
+                "type": "compute",
+                "runtime": 2.634,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-858a-ta-_ldsp.lht",
+                        "size": 5020
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-858a-ta-_ldsp.lht",
+                        "size": 5040
+                    },
+                    {
+                        "link": "output",
+                        "name": "858a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    }
+                ],
+                "avgCPU": 79.9165,
+                "memory": 3500,
+                "priority": 20,
+                "arguments": [
+                    "mshock-858a-ta-_ldsp.lht",
+                    "egf-858a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000005",
+                "type": "compute",
+                "runtime": 0.955,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-tixi-iu-00_ldsp.lht",
+                        "size": 4484
+                    },
+                    {
+                        "link": "output",
+                        "name": "tixi-iu-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-tixi-iu-00_ldsp.lht",
+                        "size": 4496
+                    }
+                ],
+                "avgCPU": 47.3298,
+                "memory": 3528,
+                "priority": 20,
+                "arguments": [
+                    "mshock-tixi-iu-00_ldsp.lht",
+                    "egf-tixi-iu-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000006",
+                "type": "compute",
+                "runtime": 1.277,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-wvt-iu-10_ldsp.lht",
+                        "size": 4172
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-wvt-iu-10_ldsp.lht",
+                        "size": 4188
+                    },
+                    {
+                        "link": "output",
+                        "name": "wvt-iu-10_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 61.5505,
+                "memory": 3588,
+                "priority": 20,
+                "arguments": [
+                    "mshock-wvt-iu-10_ldsp.lht",
+                    "egf-wvt-iu-10_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000007",
+                "type": "compute",
+                "runtime": 1.684,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "r11a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-r11a-ta-_ldsp.lht",
+                        "size": 2772
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-r11a-ta-_ldsp.lht",
+                        "size": 2788
+                    }
+                ],
+                "avgCPU": 48.8124,
+                "memory": 3608,
+                "priority": 20,
+                "arguments": [
+                    "mshock-r11a-ta-_ldsp.lht",
+                    "egf-r11a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000008",
+                "type": "compute",
+                "runtime": 1.995,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-u51a-ta-_ldsp.lht",
+                        "size": 4344
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-u51a-ta-_ldsp.lht",
+                        "size": 4368
+                    },
+                    {
+                        "link": "output",
+                        "name": "u51a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 71.1278,
+                "memory": 3532,
+                "priority": 20,
+                "arguments": [
+                    "mshock-u51a-ta-_ldsp.lht",
+                    "egf-u51a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000009",
+                "type": "compute",
+                "runtime": 0.642,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "b022-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-b022-pb-_ldsp.lht",
+                        "size": 1928
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-b022-pb-_ldsp.lht",
+                        "size": 1908
+                    }
+                ],
+                "avgCPU": 5.6075,
+                "memory": 3520,
+                "priority": 20,
+                "arguments": [
+                    "mshock-b022-pb-_ldsp.lht",
+                    "egf-b022-pb-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000010",
+                "type": "compute",
+                "runtime": 2.672,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-lz3-xp-_ldsp.lht",
+                        "size": 9600
+                    },
+                    {
+                        "link": "output",
+                        "name": "lz3-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-lz3-xp-_ldsp.lht",
+                        "size": 9584
+                    }
+                ],
+                "avgCPU": 80.1647,
+                "memory": 3600,
+                "priority": 20,
+                "arguments": [
+                    "mshock-lz3-xp-_ldsp.lht",
+                    "egf-lz3-xp-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000011",
+                "type": "compute",
+                "runtime": 2.296,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-lz1-xp-_ldsp.lht",
+                        "size": 9596
+                    },
+                    {
+                        "link": "output",
+                        "name": "lz1-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-lz1-xp-_ldsp.lht",
+                        "size": 9616
+                    }
+                ],
+                "avgCPU": 77.3084,
+                "memory": 3560,
+                "priority": 20,
+                "arguments": [
+                    "mshock-lz1-xp-_ldsp.lht",
+                    "egf-lz1-xp-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000012",
+                "type": "compute",
+                "runtime": 2.631,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "355a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-355a-ta-_ldsp.lht",
+                        "size": 4752
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-355a-ta-_ldsp.lht",
+                        "size": 4736
+                    }
+                ],
+                "avgCPU": 80.2737,
+                "memory": 3560,
+                "priority": 20,
+                "arguments": [
+                    "mshock-355a-ta-_ldsp.lht",
+                    "egf-355a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000013",
+                "type": "compute",
+                "runtime": 1.964,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-irm-ci-_ldsp.lht",
+                        "size": 3116
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-irm-ci-_ldsp.lht",
+                        "size": 3132
+                    },
+                    {
+                        "link": "output",
+                        "name": "irm-ci-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 71.945,
+                "memory": 3464,
+                "priority": 20,
+                "arguments": [
+                    "mshock-irm-ci-_ldsp.lht",
+                    "egf-irm-ci-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000014",
+                "type": "compute",
+                "runtime": 1.219,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-hnr-iu-00_ldsp.lht",
+                        "size": 8356
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-hnr-iu-00_ldsp.lht",
+                        "size": 8368
+                    },
+                    {
+                        "link": "output",
+                        "name": "hnr-iu-00_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    }
+                ],
+                "avgCPU": 56.6858,
+                "memory": 3484,
+                "priority": 20,
+                "arguments": [
+                    "mshock-hnr-iu-00_ldsp.lht",
+                    "egf-hnr-iu-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000015",
+                "type": "compute",
+                "runtime": 0.942,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-n49a-ta-_ldsp.lht",
+                        "size": 4080
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-n49a-ta-_ldsp.lht",
+                        "size": 4060
+                    },
+                    {
+                        "link": "output",
+                        "name": "n49a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 43.7367,
+                "memory": 3464,
+                "priority": 20,
+                "arguments": [
+                    "mshock-n49a-ta-_ldsp.lht",
+                    "egf-n49a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000016",
+                "type": "compute",
+                "runtime": 1.026,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "mcwv-us-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-mcwv-us-00_ldsp.lht",
+                        "size": 4376
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-mcwv-us-00_ldsp.lht",
+                        "size": 4356
+                    }
+                ],
+                "avgCPU": 49.9025,
+                "memory": 3612,
+                "priority": 20,
+                "arguments": [
+                    "mshock-mcwv-us-00_ldsp.lht",
+                    "egf-mcwv-us-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000017",
+                "type": "compute",
+                "runtime": 1.379,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-246a-ta-_ldsp.lht",
+                        "size": 4396
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-246a-ta-_ldsp.lht",
+                        "size": 4380
+                    },
+                    {
+                        "link": "output",
+                        "name": "246a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 40.029,
+                "memory": 3468,
+                "priority": 20,
+                "arguments": [
+                    "mshock-246a-ta-_ldsp.lht",
+                    "egf-246a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000018",
+                "type": "compute",
+                "runtime": 0.544,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-t42a-ta-_ldsp.lht",
+                        "size": 3952
+                    },
+                    {
+                        "link": "output",
+                        "name": "t42a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-t42a-ta-_ldsp.lht",
+                        "size": 3968
+                    }
+                ],
+                "avgCPU": 13.0515,
+                "memory": 3464,
+                "priority": 20,
+                "arguments": [
+                    "mshock-t42a-ta-_ldsp.lht",
+                    "egf-t42a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000019",
+                "type": "compute",
+                "runtime": 0.939,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-u43a-ta-_ldsp.lht",
+                        "size": 4048
+                    },
+                    {
+                        "link": "output",
+                        "name": "u43a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-u43a-ta-_ldsp.lht",
+                        "size": 4028
+                    }
+                ],
+                "avgCPU": 49.4143,
+                "memory": 3656,
+                "priority": 20,
+                "arguments": [
+                    "mshock-u43a-ta-_ldsp.lht",
+                    "egf-u43a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000020",
+                "type": "compute",
+                "runtime": 1.533,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-d02-xt-_ldsp.lht",
+                        "size": 2464
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-d02-xt-_ldsp.lht",
+                        "size": 2452
+                    },
+                    {
+                        "link": "output",
+                        "name": "d02-xt-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    }
+                ],
+                "avgCPU": 63.7312,
+                "memory": 3604,
+                "priority": 20,
+                "arguments": [
+                    "mshock-d02-xt-_ldsp.lht",
+                    "egf-d02-xt-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000021",
+                "type": "compute",
+                "runtime": 1.986,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-j40a-ta-_ldsp.lht",
+                        "size": 3584
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-j40a-ta-_ldsp.lht",
+                        "size": 3608
+                    },
+                    {
+                        "link": "output",
+                        "name": "j40a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 71.1984,
+                "memory": 3468,
+                "priority": 20,
+                "arguments": [
+                    "mshock-j40a-ta-_ldsp.lht",
+                    "egf-j40a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000022",
+                "type": "compute",
+                "runtime": 1.178,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "k41a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-k41a-ta-_ldsp.lht",
+                        "size": 3672
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-k41a-ta-_ldsp.lht",
+                        "size": 3656
+                    }
+                ],
+                "avgCPU": 54.7538,
+                "memory": 3488,
+                "priority": 20,
+                "arguments": [
+                    "mshock-k41a-ta-_ldsp.lht",
+                    "egf-k41a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000023",
+                "type": "compute",
+                "runtime": 0.907,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-dan-ci-_ldsp.lht",
+                        "size": 3088
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-dan-ci-_ldsp.lht",
+                        "size": 3068
+                    },
+                    {
+                        "link": "output",
+                        "name": "dan-ci-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 43.3297,
+                "memory": 3660,
+                "priority": 20,
+                "arguments": [
+                    "mshock-dan-ci-_ldsp.lht",
+                    "egf-dan-ci-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000024",
+                "type": "compute",
+                "runtime": 2.214,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-ech-g-10_ldsp.lht",
+                        "size": 7272
+                    },
+                    {
+                        "link": "output",
+                        "name": "ech-g-10_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-ech-g-10_ldsp.lht",
+                        "size": 7276
+                    }
+                ],
+                "avgCPU": 73.8934,
+                "memory": 3548,
+                "priority": 20,
+                "arguments": [
+                    "mshock-ech-g-10_ldsp.lht",
+                    "egf-ech-g-10_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000025",
+                "type": "compute",
+                "runtime": 0.892,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-nor-dk-_ldsp.lht",
+                        "size": 4376
+                    },
+                    {
+                        "link": "output",
+                        "name": "nor-dk-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-nor-dk-_ldsp.lht",
+                        "size": 4376
+                    }
+                ],
+                "avgCPU": 49.4395,
+                "memory": 3524,
+                "priority": 20,
+                "arguments": [
+                    "mshock-nor-dk-_ldsp.lht",
+                    "egf-nor-dk-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000026",
+                "type": "compute",
+                "runtime": 1.697,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-pic1-ye-01_ldsp.lht",
+                        "size": 1908
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-pic1-ye-01_ldsp.lht",
+                        "size": 1896
+                    },
+                    {
+                        "link": "output",
+                        "name": "pic1-ye-01_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    }
+                ],
+                "avgCPU": 63.5239,
+                "memory": 3604,
+                "priority": 20,
+                "arguments": [
+                    "mshock-pic1-ye-01_ldsp.lht",
+                    "egf-pic1-ye-01_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000027",
+                "type": "compute",
+                "runtime": 0.896,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-b073-pb-_ldsp.lht",
+                        "size": 2824
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-b073-pb-_ldsp.lht",
+                        "size": 2808
+                    },
+                    {
+                        "link": "output",
+                        "name": "b073-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 40.4018,
+                "memory": 3528,
+                "priority": 20,
+                "arguments": [
+                    "mshock-b073-pb-_ldsp.lht",
+                    "egf-b073-pb-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000028",
+                "type": "compute",
+                "runtime": 0.931,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-wcny-ld-_ldsp.lht",
+                        "size": 4336
+                    },
+                    {
+                        "link": "output",
+                        "name": "wcny-ld-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-wcny-ld-_ldsp.lht",
+                        "size": 4316
+                    }
+                ],
+                "avgCPU": 48.3351,
+                "memory": 3656,
+                "priority": 20,
+                "arguments": [
+                    "mshock-wcny-ld-_ldsp.lht",
+                    "egf-wcny-ld-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000029",
+                "type": "compute",
+                "runtime": 0.576,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-b036-pb-_ldsp.lht",
+                        "size": 2196
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-b036-pb-_ldsp.lht",
+                        "size": 2212
+                    },
+                    {
+                        "link": "output",
+                        "name": "b036-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    }
+                ],
+                "avgCPU": 8.5069,
+                "memory": 3540,
+                "priority": 20,
+                "arguments": [
+                    "mshock-b036-pb-_ldsp.lht",
+                    "egf-b036-pb-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000030",
+                "type": "compute",
+                "runtime": 0.471,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "w43a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-w43a-ta-_ldsp.lht",
+                        "size": 4116
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-w43a-ta-_ldsp.lht",
+                        "size": 4100
+                    }
+                ],
+                "avgCPU": 35.6688,
+                "memory": 3532,
+                "priority": 20,
+                "arguments": [
+                    "mshock-w43a-ta-_ldsp.lht",
+                    "egf-w43a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000031",
+                "type": "compute",
+                "runtime": 0.587,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-143a-ta-_ldsp.lht",
+                        "size": 4224
+                    },
+                    {
+                        "link": "output",
+                        "name": "143a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-143a-ta-_ldsp.lht",
+                        "size": 4244
+                    }
+                ],
+                "avgCPU": 20.954,
+                "memory": 3468,
+                "priority": 20,
+                "arguments": [
+                    "mshock-143a-ta-_ldsp.lht",
+                    "egf-143a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000032",
+                "type": "compute",
+                "runtime": 1.941,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "z55a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-z55a-ta-_ldsp.lht",
+                        "size": 4644
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-z55a-ta-_ldsp.lht",
+                        "size": 4664
+                    }
+                ],
+                "avgCPU": 73.1582,
+                "memory": 3528,
+                "priority": 20,
+                "arguments": [
+                    "mshock-z55a-ta-_ldsp.lht",
+                    "egf-z55a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000033",
+                "type": "compute",
+                "runtime": 2.14,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "ech-g-00_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-ech-g-00_ldsp.lht",
+                        "size": 7272
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-ech-g-00_ldsp.lht",
+                        "size": 7276
+                    }
+                ],
+                "avgCPU": 76.9159,
+                "memory": 3660,
+                "priority": 20,
+                "arguments": [
+                    "mshock-ech-g-00_ldsp.lht",
+                    "egf-ech-g-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000034",
+                "type": "compute",
+                "runtime": 1.979,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "isco-us-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-isco-us-00_ldsp.lht",
+                        "size": 3096
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-isco-us-00_ldsp.lht",
+                        "size": 3080
+                    }
+                ],
+                "avgCPU": 71.5008,
+                "memory": 3464,
+                "priority": 20,
+                "arguments": [
+                    "mshock-isco-us-00_ldsp.lht",
+                    "egf-isco-us-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000035",
+                "type": "compute",
+                "runtime": 1.979,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-nc12-xq-_ldsp.lht",
+                        "size": 4648
+                    },
+                    {
+                        "link": "output",
+                        "name": "nc12-xq-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-nc12-xq-_ldsp.lht",
+                        "size": 4668
+                    }
+                ],
+                "avgCPU": 71.6523,
+                "memory": 3456,
+                "priority": 20,
+                "arguments": [
+                    "mshock-nc12-xq-_ldsp.lht",
+                    "egf-nc12-xq-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000036",
+                "type": "compute",
+                "runtime": 0.712,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-blun-nu-_ldsp.lht",
+                        "size": 6104
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-blun-nu-_ldsp.lht",
+                        "size": 6080
+                    },
+                    {
+                        "link": "output",
+                        "name": "blun-nu-_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    }
+                ],
+                "avgCPU": 53.5112,
+                "memory": 3568,
+                "priority": 20,
+                "arguments": [
+                    "mshock-blun-nu-_ldsp.lht",
+                    "egf-blun-nu-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000037",
+                "type": "compute",
+                "runtime": 0.564,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-a12-xd-_ldsp.lht",
+                        "size": 3196
+                    },
+                    {
+                        "link": "output",
+                        "name": "a12-xd-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-a12-xd-_ldsp.lht",
+                        "size": 3212
+                    }
+                ],
+                "avgCPU": 19.5035,
+                "memory": 3576,
+                "priority": 20,
+                "arguments": [
+                    "mshock-a12-xd-_ldsp.lht",
+                    "egf-a12-xd-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000038",
+                "type": "compute",
+                "runtime": 1.834,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "tuc-iu-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-tuc-iu-00_ldsp.lht",
+                        "size": 3412
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-tuc-iu-00_ldsp.lht",
+                        "size": 3428
+                    }
+                ],
+                "avgCPU": 77.0992,
+                "memory": 3472,
+                "priority": 20,
+                "arguments": [
+                    "mshock-tuc-iu-00_ldsp.lht",
+                    "egf-tuc-iu-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000039",
+                "type": "compute",
+                "runtime": 1.638,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-humo-bk-00_ldsp.lht",
+                        "size": 2200
+                    },
+                    {
+                        "link": "output",
+                        "name": "humo-bk-00_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-humo-bk-00_ldsp.lht",
+                        "size": 2212
+                    }
+                ],
+                "avgCPU": 65.9951,
+                "memory": 3644,
+                "priority": 20,
+                "arguments": [
+                    "mshock-humo-bk-00_ldsp.lht",
+                    "egf-humo-bk-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000040",
+                "type": "compute",
+                "runtime": 2.143,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-l41a-ta-_ldsp.lht",
+                        "size": 3676
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-l41a-ta-_ldsp.lht",
+                        "size": 3692
+                    },
+                    {
+                        "link": "output",
+                        "name": "l41a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 65.9356,
+                "memory": 3468,
+                "priority": 20,
+                "arguments": [
+                    "mshock-l41a-ta-_ldsp.lht",
+                    "egf-l41a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000041",
+                "type": "compute",
+                "runtime": 0.795,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-biny-us-00_ldsp.lht",
+                        "size": 4404
+                    },
+                    {
+                        "link": "output",
+                        "name": "biny-us-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-biny-us-00_ldsp.lht",
+                        "size": 4420
+                    }
+                ],
+                "avgCPU": 39.8742,
+                "memory": 3484,
+                "priority": 20,
+                "arguments": [
+                    "mshock-biny-us-00_ldsp.lht",
+                    "egf-biny-us-00_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000042",
+                "type": "compute",
+                "runtime": 4.192,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-lz2-xp-_ldsp.lht",
+                        "size": 9604
+                    },
+                    {
+                        "link": "output",
+                        "name": "lz2-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-lz2-xp-_ldsp.lht",
+                        "size": 9588
+                    }
+                ],
+                "avgCPU": 86.4027,
+                "memory": 3576,
+                "priority": 20,
+                "arguments": [
+                    "mshock-lz2-xp-_ldsp.lht",
+                    "egf-lz2-xp-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000043",
+                "type": "compute",
+                "runtime": 0.721,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-g55a-ta-_ldsp.lht",
+                        "size": 4216
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-g55a-ta-_ldsp.lht",
+                        "size": 4196
+                    },
+                    {
+                        "link": "output",
+                        "name": "g55a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 29.4036,
+                "memory": 3588,
+                "priority": 20,
+                "arguments": [
+                    "mshock-g55a-ta-_ldsp.lht",
+                    "egf-g55a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000044",
+                "type": "compute",
+                "runtime": 2.635,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-tara-iu-10_ldsp.lht",
+                        "size": 6968
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-tara-iu-10_ldsp.lht",
+                        "size": 6952
+                    },
+                    {
+                        "link": "output",
+                        "name": "tara-iu-10_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    }
+                ],
+                "avgCPU": 80.3795,
+                "memory": 3576,
+                "priority": 20,
+                "arguments": [
+                    "mshock-tara-iu-10_ldsp.lht",
+                    "egf-tara-iu-10_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000045",
+                "type": "compute",
+                "runtime": 0.443,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "mshock-b024-pb-_ldsp.lht",
+                        "size": 1936
+                    },
+                    {
+                        "link": "output",
+                        "name": "b024-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-b024-pb-_ldsp.lht",
+                        "size": 1952
+                    }
+                ],
+                "avgCPU": 8.3521,
+                "memory": 3472,
+                "priority": 20,
+                "arguments": [
+                    "mshock-b024-pb-_ldsp.lht",
+                    "egf-b024-pb-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000046",
+                "type": "compute",
+                "runtime": 1.623,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "k04d-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-k04d-ta-_ldsp.lht",
+                        "size": 2236
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-k04d-ta-_ldsp.lht",
+                        "size": 2248
+                    }
+                ],
+                "avgCPU": 66.8515,
+                "memory": 3456,
+                "priority": 20,
+                "arguments": [
+                    "mshock-k04d-ta-_ldsp.lht",
+                    "egf-k04d-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000047",
+                "type": "compute",
+                "runtime": 1.943,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "u50a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-u50a-ta-_ldsp.lht",
+                        "size": 4300
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-u50a-ta-_ldsp.lht",
+                        "size": 4324
+                    }
+                ],
+                "avgCPU": 73.1858,
+                "memory": 3576,
+                "priority": 20,
+                "arguments": [
+                    "mshock-u50a-ta-_ldsp.lht",
+                    "egf-u50a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-4"
+            },
+            {
+                "name": "sG1IterDecon_ID0000048",
+                "type": "compute",
+                "runtime": 1.558,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "j42a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-j42a-ta-_ldsp.lht",
+                        "size": 3692
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-j42a-ta-_ldsp.lht",
+                        "size": 3676
+                    }
+                ],
+                "avgCPU": 67.5225,
+                "memory": 3472,
+                "priority": 20,
+                "arguments": [
+                    "mshock-j42a-ta-_ldsp.lht",
+                    "egf-j42a-ta-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000049",
+                "type": "compute",
+                "runtime": 4.101,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "output",
+                        "name": "lzaz-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-lzaz-xp-_ldsp.lht",
+                        "size": 9584
+                    },
+                    {
+                        "link": "input",
+                        "name": "egf-lzaz-xp-_ldsp.lht",
+                        "size": 9604
+                    }
+                ],
+                "avgCPU": 88.1736,
+                "memory": 3596,
+                "priority": 20,
+                "arguments": [
+                    "mshock-lzaz-xp-_ldsp.lht",
+                    "egf-lzaz-xp-_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "sG1IterDecon_ID0000050",
+                "type": "compute",
+                "runtime": 1.64,
+                "parents": [],
+                "children": [
+                    "wrapper_siftSTFByMisfit_ID0000051"
+                ],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "egf-cor-iu-10_ldsp.lht",
+                        "size": 2052
+                    },
+                    {
+                        "link": "output",
+                        "name": "cor-iu-10_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "mshock-cor-iu-10_ldsp.lht",
+                        "size": 2036
+                    }
+                ],
+                "avgCPU": 65.9756,
+                "memory": 3528,
+                "priority": 20,
+                "arguments": [
+                    "mshock-cor-iu-10_ldsp.lht",
+                    "egf-cor-iu-10_ldsp.lht"
+                ],
+                "machine": "wrench-htcondor-5"
+            },
+            {
+                "name": "wrapper_siftSTFByMisfit_ID0000051",
+                "type": "compute",
+                "runtime": 0.27,
+                "parents": [
+                    "sG1IterDecon_ID0000001",
+                    "sG1IterDecon_ID0000002",
+                    "sG1IterDecon_ID0000003",
+                    "sG1IterDecon_ID0000004",
+                    "sG1IterDecon_ID0000005",
+                    "sG1IterDecon_ID0000006",
+                    "sG1IterDecon_ID0000007",
+                    "sG1IterDecon_ID0000008",
+                    "sG1IterDecon_ID0000009",
+                    "sG1IterDecon_ID0000010",
+                    "sG1IterDecon_ID0000011",
+                    "sG1IterDecon_ID0000012",
+                    "sG1IterDecon_ID0000013",
+                    "sG1IterDecon_ID0000014",
+                    "sG1IterDecon_ID0000015",
+                    "sG1IterDecon_ID0000016",
+                    "sG1IterDecon_ID0000017",
+                    "sG1IterDecon_ID0000018",
+                    "sG1IterDecon_ID0000019",
+                    "sG1IterDecon_ID0000020",
+                    "sG1IterDecon_ID0000021",
+                    "sG1IterDecon_ID0000022",
+                    "sG1IterDecon_ID0000023",
+                    "sG1IterDecon_ID0000024",
+                    "sG1IterDecon_ID0000025",
+                    "sG1IterDecon_ID0000026",
+                    "sG1IterDecon_ID0000027",
+                    "sG1IterDecon_ID0000028",
+                    "sG1IterDecon_ID0000029",
+                    "sG1IterDecon_ID0000030",
+                    "sG1IterDecon_ID0000031",
+                    "sG1IterDecon_ID0000032",
+                    "sG1IterDecon_ID0000033",
+                    "sG1IterDecon_ID0000034",
+                    "sG1IterDecon_ID0000035",
+                    "sG1IterDecon_ID0000036",
+                    "sG1IterDecon_ID0000037",
+                    "sG1IterDecon_ID0000038",
+                    "sG1IterDecon_ID0000039",
+                    "sG1IterDecon_ID0000040",
+                    "sG1IterDecon_ID0000041",
+                    "sG1IterDecon_ID0000042",
+                    "sG1IterDecon_ID0000043",
+                    "sG1IterDecon_ID0000044",
+                    "sG1IterDecon_ID0000045",
+                    "sG1IterDecon_ID0000046",
+                    "sG1IterDecon_ID0000047",
+                    "sG1IterDecon_ID0000048",
+                    "sG1IterDecon_ID0000049",
+                    "sG1IterDecon_ID0000050"
+                ],
+                "children": [],
+                "files": [
+                    {
+                        "link": "input",
+                        "name": "k41a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "u50a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "d02-xt-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "tuc-iu-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "cor-iu-10_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "hnr-iu-00_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "ech-g-10_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "lzaz-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "j40a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "ech-g-00_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "k04d-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "nor-dk-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "irm-ci-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "wvt-iu-10_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "output",
+                        "name": "good-fits.tar.gz",
+                        "size": 26663
+                    },
+                    {
+                        "link": "input",
+                        "name": "dan-ci-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "nc12-xq-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "wcny-ld-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "sbc-ci-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "b073-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "t42a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "d03-xt-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "b022-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "lz1-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "n49a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "a12-xd-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "tara-iu-10_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "u51a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "b036-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "biny-us-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "u43a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "lz2-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "f49a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "b024-pb-_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "246a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "humo-bk-00_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "mcwv-us-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "r11a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "z55a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "tixi-iu-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "lz3-xp-_ldsp.lht_iter_g1.stf",
+                        "size": 17016
+                    },
+                    {
+                        "link": "input",
+                        "name": "j42a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "blun-nu-_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "355a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "pic1-ye-01_ldsp.lht_iter_g1.stf",
+                        "size": 2680
+                    },
+                    {
+                        "link": "input",
+                        "name": "g55a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "l41a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "isco-us-00_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "w43a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    },
+                    {
+                        "link": "input",
+                        "name": "858a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 8824
+                    },
+                    {
+                        "link": "input",
+                        "name": "143a-ta-_ldsp.lht_iter_g1.stf",
+                        "size": 4728
+                    }
+                ],
+                "avgCPU": 25.5556,
+                "memory": 9456,
+                "priority": 30,
+                "arguments": [
+                    "sbc-ci-_ldsp.lht_iter_g1.stf",
+                    "d03-xt-_ldsp.lht_iter_g1.stf",
+                    "f49a-ta-_ldsp.lht_iter_g1.stf",
+                    "858a-ta-_ldsp.lht_iter_g1.stf",
+                    "tixi-iu-00_ldsp.lht_iter_g1.stf",
+                    "wvt-iu-10_ldsp.lht_iter_g1.stf",
+                    "r11a-ta-_ldsp.lht_iter_g1.stf",
+                    "u51a-ta-_ldsp.lht_iter_g1.stf",
+                    "b022-pb-_ldsp.lht_iter_g1.stf",
+                    "lz3-xp-_ldsp.lht_iter_g1.stf",
+                    "lz1-xp-_ldsp.lht_iter_g1.stf",
+                    "355a-ta-_ldsp.lht_iter_g1.stf",
+                    "irm-ci-_ldsp.lht_iter_g1.stf",
+                    "hnr-iu-00_ldsp.lht_iter_g1.stf",
+                    "n49a-ta-_ldsp.lht_iter_g1.stf",
+                    "mcwv-us-00_ldsp.lht_iter_g1.stf",
+                    "246a-ta-_ldsp.lht_iter_g1.stf",
+                    "t42a-ta-_ldsp.lht_iter_g1.stf",
+                    "u43a-ta-_ldsp.lht_iter_g1.stf",
+                    "d02-xt-_ldsp.lht_iter_g1.stf",
+                    "j40a-ta-_ldsp.lht_iter_g1.stf",
+                    "k41a-ta-_ldsp.lht_iter_g1.stf",
+                    "dan-ci-_ldsp.lht_iter_g1.stf",
+                    "ech-g-10_ldsp.lht_iter_g1.stf",
+                    "nor-dk-_ldsp.lht_iter_g1.stf",
+                    "pic1-ye-01_ldsp.lht_iter_g1.stf",
+                    "b073-pb-_ldsp.lht_iter_g1.stf",
+                    "wcny-ld-_ldsp.lht_iter_g1.stf",
+                    "b036-pb-_ldsp.lht_iter_g1.stf",
+                    "w43a-ta-_ldsp.lht_iter_g1.stf",
+                    "143a-ta-_ldsp.lht_iter_g1.stf",
+                    "z55a-ta-_ldsp.lht_iter_g1.stf",
+                    "ech-g-00_ldsp.lht_iter_g1.stf",
+                    "isco-us-00_ldsp.lht_iter_g1.stf",
+                    "nc12-xq-_ldsp.lht_iter_g1.stf",
+                    "blun-nu-_ldsp.lht_iter_g1.stf",
+                    "a12-xd-_ldsp.lht_iter_g1.stf",
+                    "tuc-iu-00_ldsp.lht_iter_g1.stf",
+                    "humo-bk-00_ldsp.lht_iter_g1.stf",
+                    "l41a-ta-_ldsp.lht_iter_g1.stf",
+                    "biny-us-00_ldsp.lht_iter_g1.stf",
+                    "lz2-xp-_ldsp.lht_iter_g1.stf",
+                    "g55a-ta-_ldsp.lht_iter_g1.stf",
+                    "tara-iu-10_ldsp.lht_iter_g1.stf",
+                    "b024-pb-_ldsp.lht_iter_g1.stf",
+                    "k04d-ta-_ldsp.lht_iter_g1.stf",
+                    "u50a-ta-_ldsp.lht_iter_g1.stf",
+                    "j42a-ta-_ldsp.lht_iter_g1.stf",
+                    "lzaz-xp-_ldsp.lht_iter_g1.stf",
+                    "cor-iu-10_ldsp.lht_iter_g1.stf"
+                ],
+                "machine": "wrench-htcondor-4"
+            }
         ],
-        "files": [
-          {
-            "link": "input",
-            "name": "egf-sbc-ci-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "mshock-sbc-ci-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "output",
-            "name": "sbc-ci-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          }
-        ],
-        "avgCPU": 70.5205,
-        "arguments": [
-          "mshock-sbc-ci-_ldsp.lht",
-          "egf-sbc-ci-_ldsp.lht"
-        ],
-        "machine": "wrench-htcondor-5",
-        "priority": 20
-      },
-      {
-        "name": "sG1IterDecon_ID0000002",
-        "type": "compute",
-        "runtime": 1.579,
-        "parents": [
-          "stage_in_remote_local_0_0"
-        ],
-        "files": [
-          {
-            "link": "input",
-            "name": "mshock-d03-xt-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "egf-d03-xt-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "output",
-            "name": "d03-xt-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          }
-        ],
-        "avgCPU": 68.2711,
-        "arguments": [
-          "mshock-d03-xt-_ldsp.lht",
-          "egf-d03-xt-_ldsp.lht"
-        ],
-        "machine": "wrench-htcondor-4",
-        "priority": 20
-      },
-      {
-        "name": "sG1IterDecon_ID0000003",
-        "type": "compute",
-        "runtime": 0.906,
-        "parents": [
-          "stage_in_remote_local_0_0"
-        ],
-        "files": [
-          {
-            "link": "input",
-            "name": "mshock-f49a-ta-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "egf-f49a-ta-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "output",
-            "name": "f49a-ta-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          }
-        ],
-        "avgCPU": 64.128,
-        "arguments": [
-          "mshock-f49a-ta-_ldsp.lht",
-          "egf-f49a-ta-_ldsp.lht"
-        ],
-        "machine": "wrench-htcondor-4",
-        "priority": 20
-      },
-      {
-        "name": "sG1IterDecon_ID0000004",
-        "type": "compute",
-        "runtime": 2.655,
-        "parents": [
-          "stage_in_remote_local_0_0"
-        ],
-        "files": [
-          {
-            "link": "input",
-            "name": "mshock-858a-ta-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "egf-858a-ta-_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "output",
-            "name": "858a-ta-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          }
-        ],
-        "avgCPU": 79.548,
-        "arguments": [
-          "mshock-858a-ta-_ldsp.lht",
-          "egf-858a-ta-_ldsp.lht"
-        ],
-        "machine": "wrench-htcondor-5",
-        "priority": 20
-      },
-      {
-        "name": "sG1IterDecon_ID0000005",
-        "type": "compute",
-        "runtime": 0.853,
-        "parents": [
-          "stage_in_remote_local_0_0"
-        ],
-        "files": [
-          {
-            "link": "input",
-            "name": "egf-tixi-iu-00_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "mshock-tixi-iu-00_ldsp.lht",
-            "size": 0
-          },
-          {
-            "link": "output",
-            "name": "tixi-iu-00_ldsp.lht_iter_g1.stf",
-            "size": 0
-          }
-        ],
-        "avgCPU": 53.1067,
-        "arguments": [
-          "mshock-tixi-iu-00_ldsp.lht",
-          "egf-tixi-iu-00_ldsp.lht"
-        ],
-        "machine": "wrench-htcondor-4",
-        "priority": 20
-      },
-      {
-        "name": "wrapper_siftSTFByMisfit_ID0000006",
-        "type": "compute",
-        "runtime": 0.354,
-        "parents": [
-          "sG1IterDecon_ID0000003",
-          "sG1IterDecon_ID0000002",
-          "stage_in_remote_local_1_0",
-          "sG1IterDecon_ID0000005",
-          "sG1IterDecon_ID0000004",
-          "sG1IterDecon_ID0000001"
-        ],
-        "files": [
-          {
-            "link": "input",
-            "name": "f49a-ta-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "pysacio.py",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "pytutil.py",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "sbc-ci-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "858a-ta-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "d03-xt-_ldsp.lht_iter_g1.stf",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "siftSTFByMisfit",
-            "size": 0
-          },
-          {
-            "link": "input",
-            "name": "tixi-iu-00_ldsp.lht_iter_g1.stf",
-            "size": 0
-          },
-          {
-            "link": "output",
-            "name": "good-fits.tar.gz",
-            "size": 0
-          }
-        ],
-        "avgCPU": 9.887,
-        "arguments": [
-          "sbc-ci-_ldsp.lht_iter_g1.stf",
-          "d03-xt-_ldsp.lht_iter_g1.stf",
-          "f49a-ta-_ldsp.lht_iter_g1.stf",
-          "858a-ta-_ldsp.lht_iter_g1.stf",
-          "tixi-iu-00_ldsp.lht_iter_g1.stf"
-        ],
-        "machine": "wrench-htcondor-4",
-        "priority": 30
-      },
-      {
-        "name": "create_dir_seismology_0_local",
-        "type": "auxiliary",
-        "runtime": 2.041,
-        "parents": [],
-        "files": [],
-        "priority": 800
-      },
-      {
-        "name": "stage_in_remote_local_1_0",
-        "type": "transfer",
-        "runtime": 4.116,
-        "parents": [
-          "create_dir_seismology_0_local"
-        ],
-        "files": [],
-        "avgCPU": 3.5714,
-        "arguments": [
-          "--threads",
-          "2"
-        ],
-        "machine": "wrench-htcondor-1",
-        "priority": 700
-      },
-      {
-        "name": "stage_in_remote_local_0_0",
-        "type": "transfer",
-        "runtime": 4.111,
-        "parents": [
-          "create_dir_seismology_0_local"
-        ],
-        "files": [],
-        "avgCPU": 4.7434,
-        "arguments": [
-          "--threads",
-          "2"
-        ],
-        "machine": "wrench-htcondor-1",
-        "priority": 700
-      },
-      {
-        "name": "stage_out_local_local_1_0",
-        "type": "transfer",
-        "runtime": 2.125,
-        "parents": [
-          "wrapper_siftSTFByMisfit_ID0000006"
-        ],
-        "files": [],
-        "avgCPU": 5.8353,
-        "arguments": [
-          "--threads",
-          "2"
-        ],
-        "machine": "wrench-htcondor-1",
-        "priority": 900
-      },
-      {
-        "name": "register_local_1_0",
-        "type": "auxiliary",
-        "runtime": 0.364,
-        "parents": [
-          "stage_out_local_local_1_0"
-        ],
-        "files": [],
-        "avgCPU": 229.9451,
-        "arguments": [
-          "--conf",
-          "/home/cc/seismology-workflow/submit/cc/pegasus/seismology/run0002/pegasus.17094983419388532163.properties",
-          "-v",
-          "--insert",
-          "/home/cc/seismology-workflow/submit/cc/pegasus/seismology/run0002/00/00/register_local_1_0.in"
-        ],
-        "machine": "wrench-htcondor-1",
-        "priority": 50
-      }
-    ],
-    "makespan": 1553.0
-  }
+        "machines": [
+            {
+                "nodeName": "wrench-htcondor-4",
+                "system": "linux",
+                "architecture": "x86_64",
+                "memory": 131795964,
+                "release": "4.15.0-106-generic",
+                "cpu": {
+                    "count": 48,
+                    "speed": 1200,
+                    "vendor": "GenuineIntel"
+                }
+            },
+            {
+                "nodeName": "wrench-htcondor-5",
+                "system": "linux",
+                "architecture": "x86_64",
+                "memory": 131795964,
+                "release": "4.15.0-106-generic",
+                "cpu": {
+                    "count": 48,
+                    "speed": 1201,
+                    "vendor": "GenuineIntel"
+                }
+            }
+        ]
+    }
 }
