@@ -637,7 +637,7 @@ private:
 
 
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
-        wrench::StandardJob *grid_job = job_manager->createStandardJob(
+        std::shared_ptr<wrench::StandardJob>grid_job = job_manager->createStandardJob(
                 {this->test->task7},
                 {},
                 {std::make_tuple(this->test->input_file2,
