@@ -87,7 +87,7 @@ namespace wrench {
                 test_service_specs.insert(std::pair<std::string, std::string>("grid_end", "grid"));
             }
 
-            wrench::StandardJob *grid_job = job_manager->createStandardJob(
+             std::shared_ptr<wrench::StandardJob> grid_job = job_manager->createStandardJob(
                     tasks, file_locations);
             //printf("Submitting job with %lu tasks\n",tasks.size());
 

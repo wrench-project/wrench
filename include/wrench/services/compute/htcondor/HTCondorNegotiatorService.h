@@ -54,18 +54,12 @@ namespace wrench {
         std::string reply_mailbox;
         /** set of compute resources **/
         std::map<std::shared_ptr<ComputeService>, unsigned long> *compute_resources;
-<<<<<<< HEAD
         /**map of ongoing jobs **/
-        std::map<WorkflowJob *, std::shared_ptr<ComputeService>> *running_jobs;
-        /** queue of pending jobs **/
-        std::vector<std::tuple<WorkflowJob *, std::map<std::string, std::string>>> pending_jobs;
-        /**batch service specified for grid universe jobs **/
-        std::shared_ptr<ComputeService> &grid_universe_batch_service;
-=======
         std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> *running_jobs;
         /** queue of pending jobs **/
         std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> pending_jobs;
->>>>>>> master
+        /**batch service specified for grid universe jobs **/
+        std::shared_ptr<ComputeService> &grid_universe_batch_service;
     };
 
     /***********************/
