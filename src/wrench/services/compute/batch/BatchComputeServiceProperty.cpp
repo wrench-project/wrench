@@ -15,6 +15,10 @@ namespace wrench {
     SET_PROPERTY_NAME(BatchComputeServiceProperty, HOST_SELECTION_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, TASK_SELECTION_ALGORITHM);
 
+    SET_PROPERTY_NAME(BatchComputeServiceProperty, SUPPORTS_GRID_UNIVERSE);
+    SET_PROPERTY_NAME(BatchComputeServiceProperty, GRID_PRE_EXECUTION_DELAY);
+    SET_PROPERTY_NAME(BatchComputeServiceProperty, GRID_POST_EXECUTION_DELAY);
+
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_SCHEDULING_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_QUEUE_ORDERING_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_RJMS_PADDING_DELAY);

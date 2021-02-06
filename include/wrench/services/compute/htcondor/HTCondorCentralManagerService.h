@@ -42,7 +42,8 @@ namespace wrench {
         HTCondorCentralManagerService(const std::string &hostname,
                                       std::set<ComputeService *> compute_resources,
                                       std::map<std::string, std::string> property_list = {},
-                                      std::map<std::string, double> messagepayload_list = {});
+                                      std::map<std::string, double> messagepayload_list = {},
+                                      ComputeService *grid_universe_batch_service = nullptr);
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -67,6 +68,7 @@ namespace wrench {
         void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
         void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+
 
         /***********************/
         /** \endcond          **/
@@ -95,6 +97,10 @@ namespace wrench {
 
         /** set of compute resources **/
         std::set<ComputeService *> compute_resources;
+        /** batch compute service for grid universe jobs**/
+        ComputeService *grid_universe_batch_service;
+        /** shared ptr for grid universe batch service**/
+        std::shared_ptr<ComputeService> grid_universe_batch_service_shared_ptr;
         /** queue of pending jobs **/
         std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
