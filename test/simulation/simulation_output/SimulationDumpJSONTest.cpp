@@ -1327,7 +1327,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
-    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
+    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, true, false, false, false, true);
 
     nlohmann::json expected_json_link_usage = R"(
     {
@@ -1470,7 +1470,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     EXPECT_THROW(simulation->getOutput().dumpDiskOperationsJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpDiskOperationsJSON(this->disk_operations_json_file_path));
-    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
+    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/disk_unified.json", false, true, true, false, false, true, false);
 
     // Performing programmatic checks of the JSON output
     std::ifstream json_file(disk_operations_json_file_path);
@@ -1749,14 +1749,16 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpUnifiedJSONTest) {
 
 void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--activate-energy");
+    argv[2] = strdup("--wrench-full-logs");
 
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);
+
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
