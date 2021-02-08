@@ -159,6 +159,27 @@ namespace wrench {
         */
         DECLARE_PROPERTY_NAME(BATSCHED_CONTIGUOUS_ALLOCATION);
 
+        /** @brief Indicates batch service being used for grid universe through HTCondor
+         *      - defaults to false
+         *      - If true, upon standard job completion there will be additional delay (sleep) to mirror real world
+         *      delay in this environment
+         *      - property is set on first receiving grid universe job.
+         */
+        DECLARE_PROPERTY_NAME(SUPPORTS_GRID_UNIVERSE);
+
+        /** @brief Overhead delay in seconds between condor and slurm for the start of execution
+         *      - defaults to calibrated figure
+         *      - property is set on first receiving grid universe job.
+         */
+        DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
+
+        /** @brief Overhead delay in seconds between condor and slurm for the completion of execution
+         *      - defaults to calibrated figure
+         *      - property is set on first receiving grid universe job.
+         */
+        DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
+
+
 
         /***********************/
         /** \cond INTERNAL     */
@@ -168,6 +189,7 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
+
 
     };
 }
