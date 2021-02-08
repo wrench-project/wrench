@@ -355,6 +355,12 @@ namespace wrench {
             username = batch_job_args.at("-u");
         }
 
+        //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
+        if (this->grid_execution_start) {
+            S4U_Simulation::sleep(this->getPropertyValueAsDouble(BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY));
+            this->grid_execution_start = false;
+        }
+
         // Sanity check
         if ((num_hosts == 0) or (num_cores_per_host == 0) or  (time_asked_for_in_minutes == 0)) {
             throw std::invalid_argument("BatchComputeService::submitWorkflowJob(): service-specific arguments should have non-zero values");
@@ -435,7 +441,29 @@ namespace wrench {
      *
      */
     void BatchComputeService::submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &batch_job_args) {
-
+        if(batch_job_args.find("universe") != batch_job_args.end()){
+            this->grid_execution = true;
+        }
+        if(batch_job_args.find("grid_start") != batch_job_args.end()) {
+            this->grid_execution_start = true;
+        }
+        if(batch_job_args.find("grid_end") != batch_job_args.end()) {
+            this->grid_execution_end = true;
+        }
+        /**
+         * Problem here was just overwriting properties with default because I was switching them one at a time. Also was removing any set when creating service.
+        if(batch_job_args.find("grid_pre_delay") != batch_job_args.end()){
+            //std::cerr << "Triggered property change: " << batch_job_args.at("grid_pre_delay") << std::endl;
+            this->setProperties(this->default_property_values, {{BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, batch_job_args.at("grid_pre_delay")}});
+        }
+        if(batch_job_args.find("grid_post_delay") != batch_job_args.end()){
+            //std::cerr << "Triggered property change: " << batch_job_args.at("grid_post_delay") << std::endl;
+            this->setProperties(this->default_property_values, {{BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY, batch_job_args.at("grid_post_delay")}});
+        }
+        std::cerr << "Supports Grid Universe before submitting to workflow: " << this->getPropertyValueAsString(BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE)<< std::endl;
+        std::cerr << "Pre delay: " << this->getPropertyValueAsString(BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY) << std::endl;
+        std::cerr << "Post Delay: " << this->getPropertyValueAsString(BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY) << std::endl;
+        */
         try {
             this->submitWorkflowJob(job, batch_job_args);
         } catch (std::exception &e) {
@@ -1255,6 +1283,12 @@ namespace wrench {
         }
         this->finished_standard_job_executors.clear();
 
+        //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
+        //This flag should only be active for last grid job in sequence.
+        if(this->grid_execution_end) {
+            S4U_Simulation::sleep(this->getPropertyValueAsDouble(BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY));
+            this->grid_execution_end = false;
+        }
 
         if (not executor_on_the_list) {
             WRENCH_WARN("BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list - Likely getting wires crossed due to concurrent completion and time-outs.. ignoring")
