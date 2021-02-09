@@ -85,7 +85,7 @@ def _write_cmakelists(project_dir):
         '',
         'add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")',
         '',
-        'set(CMAKE_CXX_STANDARD 11)',
+        'set(CMAKE_CXX_STANDARD 14)',
         '',
         'set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CmakeModules/")',
         '',
