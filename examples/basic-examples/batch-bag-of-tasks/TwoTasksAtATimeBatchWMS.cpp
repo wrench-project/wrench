@@ -94,8 +94,7 @@ namespace wrench {
             auto ready_task1 = ready_tasks.at(index);
             auto ready_task2 = (ready_tasks.size() > 1 ? ready_tasks.at((index + 1) % ready_tasks.size()) : nullptr);
 
-            /* Swap the  tasks is ready_task2 is cheaper than ready_task 1, for the  sake  of the
-             * example */
+            /* Swap the tasks if ready_task2 is cheaper than ready_task 1, for the  sake of the example */
             if (ready_task2 and (ready_task2->getFlops() < ready_task1->getFlops())) {
                 auto tmp = ready_task1;
                 ready_task1 = ready_task2;
@@ -143,8 +142,8 @@ namespace wrench {
             }
 
             // But let's submit the job so that it requests time sufficient only
-            // for the cheaper task, which  will lead to the
-            // expensive task, if any, being terminated prematurely (i.e., it will fail and thus still be ready).
+            // for the cheaper task, which will lead to the
+            // expensive task, if any, to be terminated prematurely (i.e., it will fail and thus still be ready).
 
             service_specific_arguments["-t"] = std::to_string(execution_times_in_minutes[ready_task1]);
 

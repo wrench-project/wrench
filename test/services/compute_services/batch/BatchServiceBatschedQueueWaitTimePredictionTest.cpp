@@ -250,7 +250,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -431,7 +431,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -658,7 +658,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -932,7 +932,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

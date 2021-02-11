@@ -26,7 +26,7 @@ namespace wrench {
 
     public:
 
-        /*
+        /**
          * @brief Constructor
          *
          * @param cs: the batch compute service for which this scheduler is operating

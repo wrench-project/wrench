@@ -99,7 +99,7 @@ namespace wrench {
 
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
 
-        double getLinkUsage(const std::string &linkname, bool  record_as_time_stamp);
+        double getLinkUsage(const std::string &link_name, bool  record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
         static bool doesHostExist(std::string hostname);

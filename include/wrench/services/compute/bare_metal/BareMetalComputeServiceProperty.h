@@ -18,7 +18,7 @@
 namespace wrench {
 
    /**
-    * @brief Configurable properties for a BareMetalComputeService
+    * @brief Configurable properties for a bare_metal
     */
     class BareMetalComputeServiceProperty : public ComputeServiceProperty {
 

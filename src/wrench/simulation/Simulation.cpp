@@ -149,7 +149,8 @@ namespace wrench {
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
             std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";
-            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory')\n";
+            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory' which )\n";
+            std::cout << "                acts as additional RAM that can only be used for caching file pages)\n";
             std::cerr << "\n";
         }
 
@@ -285,21 +286,21 @@ namespace wrench {
     /**
      * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
      *        simulation output if record_as_time_stamp is set to true
-     * @param linkname: the link name
+     * @param link_name: the link name
      * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
      * @return current bandwidth usage in Bps
      * @throws std::invalid_argument
      */
-    double Simulation::getLinkUsage(const std::string &linkname, bool record_as_time_stamp) {
-        if (linkname.empty()) {
-            throw std::invalid_argument("Simulation::getLinkUsage() requires a valid linkname");
+    double Simulation::getLinkUsage(const std::string &link_name, bool record_as_time_stamp) {
+        if (link_name.empty()) {
+            throw std::invalid_argument("Simulation::getLinkUsage() requires a valid link name");
         }
 
         double time_now = getCurrentSimulatedDate();
-        double usage = S4U_Simulation::getLinkUsage(linkname);
+        double usage = S4U_Simulation::getLinkUsage(link_name);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestampLinkUsage(linkname, usage);
+            this->getOutput().addTimestampLinkUsage(link_name, usage);
         }
 
         return usage;
@@ -754,9 +755,9 @@ namespace wrench {
     /**
      * @brief Wrapper enabling timestamps for disk writes
      *
-     * @param num_bytes - number of bytes written
-     * @param hostname - hostname to write to
-     * @param mount_point - mount point of disk to write to
+     * @param num_bytes: number of bytes written
+     * @param hostname: name of the host to write to
+     * @param mount_point: mount point of the disk to write to at the host
      *
      * @throw invalid_argument
      */
@@ -776,10 +777,11 @@ namespace wrench {
     }
 
     /**
-     * Read file locally, only available if writeback is activated.
-     * @param filename: name of the file read.
-     * @param n_bytes: amount of read data in byte.
-     * @param mountpoint: mountpoint where file is located.
+     * @brief Read file locally, only available if writeback is activated.
+     *
+     * @param file: workflow file
+     * @param n_bytes: number of read bytes
+     * @param location: file location
      */
     void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
 
@@ -817,10 +819,12 @@ namespace wrench {
     }
 
     /**
-     * Write a file locally with writeback strategy, only available if writeback is activated.
-     * @param filename: name of the file written.
-     * @param n_bytes: amount of written data in byte.
-     * @param mountpoint: mount point where file is located.
+     * @brief Write a file locally with writeback strategy, only available if writeback is activated.
+     *
+     * @param file: workflow file
+     * @param n_bytes: number of written bytes
+     * @param location: file location
+     * @param is_dirty: true or false
      */
     void Simulation::writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty) {
 
@@ -864,10 +868,11 @@ namespace wrench {
     }
 
     /**
-     * Write-through a file locally, only available if writeback is activated.
-     * @param filename: name of the file written.
-     * @param n_bytes: amount of written data in byte.
-     * @param mountpoint: mount point where file is located.
+     * @brief Write-through a file locally, only available if writeback is activated.
+     *
+     * @param file: workflow file
+     * @param n_bytes: number of written bytes
+     * @param location: file location
      */
     void Simulation::writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
 
@@ -889,9 +894,10 @@ namespace wrench {
     }
 
     /**
-     * Find a MemoryManager of a host with hostname
+     * @brief Find MemoryManager running on a host based on hostname
+     *
      * @param hostname: name of the host
-     * @return MemoryManager of the host
+     * @return pointer to the memory manager running on the host (or nullptr)
      */
     MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
         for (const auto &ptr : this->memory_managers) {
@@ -904,6 +910,7 @@ namespace wrench {
 
     /**
      * @brief Wrapper for S4U_Simulation hostExists()
+     *
      * @param hostname - name of host being queried
      * @return boolean of existence
      */
@@ -913,6 +920,7 @@ namespace wrench {
 
     /**
      * @brief Wrapper for S4U_Simulation linkExists()
+     *
      * @param linkname - name of link being queried
      * @return boolean of existence
      */
@@ -1382,7 +1390,7 @@ namespace wrench {
             }
         }
 
-        // Check that if --pagecache is passed, each host has a memory_manager_service disk
+        // Check that if --pagecache is passed, each host has a "/memory" disk
         if (this->isPageCachingEnabled()) {
             for (auto const &h : hostnames) {
                 bool has_memory_disk = false;
@@ -1399,7 +1407,5 @@ namespace wrench {
             }
         }
     }
-
-
 
 };

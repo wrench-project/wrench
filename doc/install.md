@@ -21,9 +21,11 @@ And, one of the following:
 - [PugiXML](http://pugixml.org/) -- version 1.8 or higher
 - [JSON for Modern C++](https://github.com/nlohmann/json) -- version 3.9.0 or higher 
 
+(See the troubleshooting section below if encountering difficulties installing dependencies)
+
 ## Optional Dependencies ##                  {#install-prerequisites-opt-dependencies}
 
-- [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running test cases)
+- [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running tests)
 - [Doxygen](http://www.doxygen.org) -- version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for realistic simulation of compute resources managed by production batch schedulers
 
@@ -32,7 +34,8 @@ And, one of the following:
 ## Building WRENCH ##               {#install-source-build}
 
 You can download the _@WRENCHRelease.tar.gz_ archive from the 
-[GitHub releases](https://github.com/wrench-project/wrench/releases) page and install it as follows:
+[GitHub releases](https://github.com/wrench-project/wrench/releases) page. Once you have
+installed dependencies (see above), you can install WRENCH as follows:
 
 ~~~~~~~~~~~~~{.sh}
 tar xf @WRENCHRelease.tar.gz
@@ -70,12 +73,17 @@ make unit_tests
  
 ## Installation Troubleshooting ##  {#install-troubleshooting}
 
-##### `Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)`
+#### Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)
     
  - This error on MacOS is because the `pkg-config` package is not installed
  - Solution: install this package
     - MacPorts: `sudo port install pkg-config`
     - Brew: `sudo brew install pkg-config`
+
+#### Could not find libgfortran when building the SimGrid dependency
+
+  - This is an error that sometimes occurs on MacOS
+  - A quick fix is to disable the SMPI feature of SimGrid when configuring it: `cmake -Denable_smpi=off .`
 
 # Docker Containers #             {#install-docker}
 
