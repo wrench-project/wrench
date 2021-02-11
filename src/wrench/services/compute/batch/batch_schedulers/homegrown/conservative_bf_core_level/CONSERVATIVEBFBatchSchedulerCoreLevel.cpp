@@ -236,7 +236,7 @@ namespace wrench {
      * @param num_nodes: number of nodes
      * @param cores_per_node: number of cores per node
      * @param ram_per_node: amount of RAM
-     * @return
+     * @return a host:<core,RAM> map
      */
     std::map<std::string, std::tuple<unsigned long, double>>
     CONSERVATIVEBFBatchSchedulerCoreLevel::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {

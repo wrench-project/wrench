@@ -56,9 +56,12 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
                 {BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
+                {BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE,                      "false"},
                 {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
+                {BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY,                    "78.0"},
+                {BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY,                   "16.0"},
 #ifdef ENABLE_BATSCHED
                 {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
 //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
@@ -111,7 +114,7 @@ namespace wrench {
         /***********************/
         std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned long,unsigned long, double>> resources);
 
-        std::vector<std::tuple<std::string, int, int, int, int, double, double>> getQueue();
+        std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> getQueue();
 
         /***********************/
         /** \endcond          **/
@@ -169,6 +172,11 @@ namespace wrench {
 
         bool clean_exit = false;
 
+        //Used to add appropriate overhead to grid universe jobs.
+        bool grid_execution = false;
+        bool grid_execution_start = false;
+        bool grid_execution_end = false;
+
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
 
@@ -178,7 +186,7 @@ namespace wrench {
         //alarms for pilot jobs (only one pilot job alarm)
         std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
-        /* Resources information in BatchService */
+        /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
@@ -186,7 +194,7 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
-        /* End Resources information in BatchService */
+        /* End Resources information in batch */
 
         // Vector of standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
@@ -274,7 +282,7 @@ namespace wrench {
         //Process the pilot job completion
         void processPilotJobCompletion(std::shared_ptr<PilotJob> job);
 
-        //Process standardjob timeout
+        //Process standard job timeout
         void processStandardJobTimeout(std::shared_ptr<StandardJob> job);
 
         //process standard job termination request

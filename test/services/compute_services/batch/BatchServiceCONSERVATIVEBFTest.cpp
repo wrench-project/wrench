@@ -205,7 +205,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -377,7 +377,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     this->seed = seed;
 
@@ -553,7 +553,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -723,7 +723,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -898,7 +898,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test()
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1073,7 +1073,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_CORE_LEVEL_test(in
     auto simulation = new wrench::Simulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("batch_service_test");
+    argv[0] = strdup("unit_test");
 
     this->seed = seed;
 

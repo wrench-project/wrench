@@ -18,6 +18,14 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
+
+    /**
+     * @brief A class that implemnets a MemoryManager service to simulate Linux in-memory 
+     * page caching for I/O operations
+     */
     class MemoryManager : public Service {
 
     public:
@@ -68,7 +76,7 @@ namespace wrench {
 
         double getDirtyRatio() const;
 
-        void setDirtyRatio(double dirtyRatio);
+        void setDirtyRatio(double dirty_ratio);
 
         double getFreeMemory() const;
 
@@ -83,6 +91,8 @@ namespace wrench {
         double getEvictableMemory();
 
         double getAvailableMemory();
+
+        double getTotalMemory();
 
         double flush(double amount, std::string excluded_filename);
 
@@ -107,6 +117,9 @@ namespace wrench {
 
         void export_log(std::string filename);
 
+        /***********************/
+        /** \endcond          */
+        /***********************/
     };
 
 }

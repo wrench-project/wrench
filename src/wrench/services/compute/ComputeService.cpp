@@ -38,7 +38,7 @@ namespace wrench {
      * @brief Submit a job to the compute service
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
-     *      - to a BareMetalComputeService: {}
+     *      - to a bare_metal: {}
      *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
      *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
      *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
@@ -429,7 +429,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                    "bare_metal::getServiceResourceInformation(): unexpected [" + msg->getName() +
                     "] message");
         }
     }

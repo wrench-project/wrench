@@ -39,7 +39,8 @@ namespace wrench {
             const std::string &hostname,
             std::set<ComputeService *> compute_resources,
             std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list)
+            std::map<std::string, double> messagepayload_list,
+            ComputeService *grid_universe_batch_service)
             : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", "") {
 
         // Check compute_resource viability
@@ -61,6 +62,8 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
+
+        this->grid_universe_batch_service = grid_universe_batch_service;
     }
 
     /**
@@ -121,6 +124,7 @@ namespace wrench {
                     "] message!");
         }
     }
+
 
     /**
      * @brief Asynchronously submit a pilot job to the cloud service
@@ -200,8 +204,13 @@ namespace wrench {
         WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
+
         // start the compute resource services
         try {
+            if(grid_universe_batch_service){
+                this->grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
+                //WRENCH_INFO("starting service---> %p", grid_universe_batch_service_shared_ptr.get());
+            }
             for (auto cs : this->compute_resources) {
                 auto cs_shared_ptr = this->simulation->startNewService(cs);
 
@@ -209,7 +218,7 @@ namespace wrench {
 
                 if (auto virtualized_cluster = dynamic_cast<VirtualizedClusterComputeService *>(cs)) {
                     // for cloud services, we must create/start VMs, each of which
-                    // is a BareMetalComputeService. Right now, we greedily use the whole Cloud!
+                    // is a bare_metal. Right now, we greedily use the whole Cloud!
 
                     for (auto const &host : virtualized_cluster->getExecutionHosts()) {
                         unsigned long num_cores = Simulation::getHostNumCores(host);
@@ -244,10 +253,12 @@ namespace wrench {
                 if (not this->pending_jobs.empty()) {
 
                     this->dispatching_jobs = true;
+                    //WRENCH_INFO("adding batch service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                             new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
                                                           this->running_jobs,
-                                                          this->pending_jobs, this->mailbox_name));
+                                                          this->pending_jobs, this->mailbox_name,
+                                                          this->grid_universe_batch_service_shared_ptr));
                     negotiator->simulation = this->simulation;
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
 
@@ -294,7 +305,7 @@ namespace wrench {
                         new ServiceDaemonStoppedMessage(
                                 this->getMessagePayloadValue(
                                         HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (std::shared_ptr <NetworkError> &cause) {
                 return false;
             }
             return false;
@@ -323,8 +334,8 @@ namespace wrench {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
 
-        } else {
-            throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+        }else {
+                throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -351,6 +362,7 @@ namespace wrench {
                         this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
     }
+
 
     /**
      * @brief Process a submit pilot job request

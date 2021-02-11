@@ -113,12 +113,12 @@ int main(int argc, char **argv) {
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "500000000"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.
-     * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds 
+     * A wrench::bare_metal is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has scratch storage space (mount point argument = "/scratch").
      * This means that the WMS can opt to leave files in scratch. However, files in scratch are removed after
      * a job completes */
-    std::cerr << "Instantiating a BareMetalComputeService on ComputeHost..." << std::endl;
+    std::cerr << "Instantiating a bare_metal on ComputeHost..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "/scratch/", {}, {}));
 
