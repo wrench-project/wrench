@@ -149,7 +149,8 @@ namespace wrench {
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
             std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";
-            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory')\n";
+            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory' which )\n";
+            std::cout << "                acts as additional RAM that can only be used for caching file pages)\n";
             std::cerr << "\n";
         }
 
