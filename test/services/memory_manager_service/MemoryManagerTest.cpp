@@ -18,7 +18,7 @@
 WRENCH_LOG_CATEGORY(memory_manager_test, "Log category for MemoryManager test");
 
 #define GB (1000.0*1000.0*1000.0)
-#define RAM_SIZE  32
+#define PAGE_CACHE_RAM_SIZE  32
 #define FILE_SIZE 20
 
 class MemoryManagerTest : public ::testing::Test {
@@ -74,13 +74,13 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\""+std::to_string(RAM_SIZE)+"GB\"/>"
+                          "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "       </host> "
                           "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\""+std::to_string(RAM_SIZE)+"GB\"/>"
+                          "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
                           "             <prop id=\"mount\" value=\"/memory\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"

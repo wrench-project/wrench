@@ -177,11 +177,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Get currently available memory
+     * @brief Get currently available cache memory
      * @return a number of bytes
      */
     double MemoryManager::getAvailableMemory() {
         return this->free + this->cached - this->dirty;
+    }
+
+    /**
+     * @brief Get total available cache memory
+     * @return a number of bytes
+     */
+    double MemoryManager::getTotalMemory() {
+        return this->total;
     }
 
     /**
