@@ -137,7 +137,7 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("test");
+    argv[0] = strdup("unit_test");
 //    argv[1] = strdup("--wrench-log-full");
 
 

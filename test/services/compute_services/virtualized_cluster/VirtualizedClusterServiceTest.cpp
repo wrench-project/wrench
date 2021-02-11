@@ -1831,7 +1831,7 @@ private:
 
         // Check that the VM is down, as it should
         if (not cloud_service->isVMDown(vm_name)) {
-            throw std::runtime_error("VM should be down after its BareMetalComputeService has been stopped");
+            throw std::runtime_error("VM should be down after its bare_metal has been stopped");
         }
 
         return 0;

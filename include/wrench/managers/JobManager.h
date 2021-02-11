@@ -73,6 +73,7 @@ namespace wrench {
         std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
 
         std::set<std::shared_ptr<PilotJob>> getRunningPilotJobs();
+
         /***********************/
         /** \cond INTERNAL    */
         /***********************/

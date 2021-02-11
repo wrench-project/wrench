@@ -18,7 +18,7 @@ WRENCH_LOG_CATEGORY(wrench_periodic_flush, "Log category for Periodic Flush");
 namespace wrench {
 
     /**
-     * Constructor
+     * @brief Constructor
      *
      * @param memory: disk model used to simulate memory_manager_service
      * @param dirty_ratio: dirty_ratio parameter as in the Linux kernel
@@ -31,14 +31,15 @@ namespace wrench {
             Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
 
-        total = S4U_Simulation::getHostMemoryCapacity(hostname);
-        free = total;
-        dirty = 0;
-        cached = 0;
+        // Get RAM disk size
+        this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");
+        this->free = total;
+        this->dirty = 0;
+        this->cached = 0;
     }
 
     /**
-     * Initialize and start the memory_manager_service manager
+     * @brief Initialize and start the memory_manager_service manager
      *
      * @param simulation
      * @param memory: disk model used to simulate memory_manager_service
@@ -89,44 +90,84 @@ namespace wrench {
         this->killActor();
     }
 
+    /**
+     * @brief Get the memory disk
+     * @return the disk that acts as the memory cache
+     */
     s4u_Disk *MemoryManager::getMemory() const {
         return memory;
     }
 
+    /**
+     * @brief Set the memory disk
+     * @param memory: a disk that acts as the memory cache
+     */
     void MemoryManager::setMemory(s4u_Disk *memory) {
         this->memory = memory;
     }
 
+    /**
+     * @brief Get the dirty ratio
+     * @return the dirty ratio 
+     */
     double MemoryManager::getDirtyRatio() const {
         return dirty_ratio;
     }
 
-    void MemoryManager::setDirtyRatio(double dirtyRatio) {
-        dirty_ratio = dirtyRatio;
+    /**
+     * @brief Set the dirty ratio
+     * @param dirty_ratio: the dirty ratio 
+     */
+    void MemoryManager::setDirtyRatio(double dirty_ratio) {
+        this->dirty_ratio = dirty_ratio;
     }
 
+    /**
+     * @brief Get the amount of free memory
+     * @return a number of bytes
+     */
     double MemoryManager::getFreeMemory() const {
         return free;
     }
 
+    /**
+     * @brief Release memory
+     * @param released_amt: number of bytes to release
+     */
     void MemoryManager::releaseMemory(double released_amt) {
         this->free += released_amt;
         if (this->free > this->total) this->free = this->total;
     }
 
+    /**
+     * @brief Update the amount of used memory
+     * @param used_amt: number of bytes
+     */
     void MemoryManager::useAnonymousMemory(double used_amt) {
         this->free -= used_amt;
         if (this->free < 0) this->free = 0;
     }
 
+    /**
+     * @brief Get total number of cached bytes
+     * @return a number of bytes
+     */
     double MemoryManager::getTotalCachedAmount() const {
         return cached;
     }
 
+    /**
+     * @brief Get number of dirty bytes
+     * @return a number of bytes
+     */
     double MemoryManager::getDirty() const {
         return dirty;
     }
 
+    /**
+     * @brief Get current evictable memory
+     * @return a number of bytes
+     */
     double MemoryManager::getEvictableMemory() {
         double sum = 0;
         for (unsigned int i = 0; i < inactive_list.size(); i++) {
@@ -135,12 +176,24 @@ namespace wrench {
         return sum;
     }
 
+    /**
+     * @brief Get currently available cache memory
+     * @return a number of bytes
+     */
     double MemoryManager::getAvailableMemory() {
         return this->free + this->cached - this->dirty;
     }
 
     /**
-     * Flush dirty data in a LRU list
+     * @brief Get total available cache memory
+     * @return a number of bytes
+     */
+    double MemoryManager::getTotalMemory() {
+        return this->total;
+    }
+
+    /**
+     * @brief Flush dirty data in a LRU list
      * @param list: the LRU list whose data will be flushed
      * @param amount: the amount requested to flush
      * @return flushed amount
@@ -200,8 +253,9 @@ namespace wrench {
     }
 
     /**
-     * Flush dirty data from cache
+     * @brief Flush dirty data from cache
      * @param amount: request amount to be flushed
+     * @param excluded_filename: name of file to exclude
      * @return flushed amount
      */
     double MemoryManager::flush(double amount, std::string excluded_filename) {
@@ -223,7 +277,7 @@ namespace wrench {
     }
 
     /**
-     * Flush expired dirty data in a list.
+     * @brief Flush expired dirty data in a list.
      * Expired dirty data is the dirty data not accessed in a period longer than expired_time
      * @param list: the LRU to be flushed
      * @return flushed amount
@@ -259,7 +313,7 @@ namespace wrench {
     }
 
     /**
-     * Periodical flushing, which flushes expired dirty data in a list.
+     * @brief Periodical flushing, which flushes expired dirty data in a list.
      * Expired dirty data is the dirty data not accessed in a period longer than expired_time
      * @return flushed amount
      */
@@ -271,8 +325,9 @@ namespace wrench {
     }
 
     /**
-     * Evicted clean data from cache.
+     * @brief Evicted clean data from cache.
      * @param amount: the requested amount of data to be flushed
+     * @param excluded_filename: name of file that cannot be flushed
      * @return flushed amount
      */
     double MemoryManager::evict(double amount, std::string excluded_filename) {
@@ -314,9 +369,12 @@ namespace wrench {
     }
 
     /**
-     * Read data from disk to cache.
-     * @param filename
-     * @param amount
+     * @brief Read data from disk to cache.
+     * @param filename: file name
+     * @param location: file location
+     * @param amount: number of bytes
+     * @param async: tue if operation is asynchronous
+     * @return a simgrid pointer to a pending I/O operation, or nullptr
      */
     simgrid::s4u::IoPtr MemoryManager::readToCache(std::string filename, std::shared_ptr<FileLocation> location,
                                                    double amount, bool async) {
@@ -337,8 +395,9 @@ namespace wrench {
     }
 
     /**
-     * Simulate a read from cache, re-access and update cached file data
+     * @brief Simulate a read from cache, re-access and update cached file data
      * @param filename: name of the file read
+     * @param amount: number of bytes
      */
     void MemoryManager::readChunkFromCache(std::string filename, double amount) {
 
@@ -441,9 +500,11 @@ namespace wrench {
     }
 
     /**
-     * Simulate a file write to cache
+     * @brief Simulate a file write to cache
      * @param filename: name of the file written
+     * @param location: file location
      * @param amount: amount of data written
+     * @param is_dirty: true or false
      */
     void MemoryManager::writebackToCache(std::string filename, std::shared_ptr<FileLocation> location,
                                          double amount, bool is_dirty) {
@@ -452,6 +513,14 @@ namespace wrench {
         memory->write(amount);
     }
 
+    /**
+     * @brief Add a file to cache
+     *
+     * @param filename: file name
+     * @param location: file location
+     * @param amount: number of bytes
+     * @param is_dirty: true or false
+     */
     void MemoryManager::addToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty) {
         Block *bl = new Block(filename, location, amount, S4U_Simulation::getClock(), is_dirty, S4U_Simulation::getClock());
         inactive_list.push_back(bl);
@@ -463,12 +532,18 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Helper function to compare block by last access
+     * @param blk1 : a block
+     * @param blk2 : another block
+     * @return true if blk1 was accessed before blk2, false otherwise
+     */
     bool compare_last_access(Block *blk1, Block *blk2) {
         return blk1->getLastAccess() < blk2->getLastAccess();
     }
 
     /**
-     * Balance the amount of data in LRU lists.
+     * @brief Method to balance the amount of data in LRU lists.
      * If the amount of data in the active list is more than doubled of the inactive list,
      * move blocks from the active list to the inactive list to make their sizes equal.
      */
@@ -517,7 +592,7 @@ namespace wrench {
     }
 
     /**
-     * Get amount of cached data of a file in cache
+     * @brief Get amount of cached data of a file in cache
      * @param filename: name of the file
      * @return the amount of cached data
      */
@@ -541,7 +616,7 @@ namespace wrench {
     }
 
     /**
-     * Get list of cached blocks of a file
+     * @brief Get list of cached blocks of a file
      * @param filename : name of the file
      * @return a vector of cached blocks of the file
      */
@@ -566,8 +641,9 @@ namespace wrench {
     }
 
     /**
-     * Retrieve the disk where the file is stored.
+     * @brief Retrieve the disk where the file is stored.
      * @param mountpoint: mountpoint on the disk where the file is stored
+     * @param hostname: host at which the file is stored
      * @return
      */
     s4u_Disk *MemoryManager::getDisk(std::string mountpoint, std::string hostname) {
@@ -591,6 +667,9 @@ namespace wrench {
         return nullptr;
     }
 
+    /**
+     * @brief Append to the log
+     */
     void MemoryManager::log() {
         this->time_log.push_back(this->simulation->getCurrentSimulatedDate());
         this->dirty_log.push_back(this->dirty);
@@ -598,6 +677,10 @@ namespace wrench {
         this->free_log.push_back(this->free);
     }
 
+    /**
+     * @brief Export the log to a file
+     * @param filename: file path
+     */
     void MemoryManager::export_log(std::string filename) {
         FILE *log_file = fopen(filename.c_str(), "w");
         fprintf(log_file, "time, total_mem, dirty, cache, used_mem\n");
