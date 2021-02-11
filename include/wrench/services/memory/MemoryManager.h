@@ -92,6 +92,8 @@ namespace wrench {
 
         double getAvailableMemory();
 
+        double getTotalMemory();
+
         double flush(double amount, std::string excluded_filename);
 
         double evict(double amount, std::string excluded_filename);
