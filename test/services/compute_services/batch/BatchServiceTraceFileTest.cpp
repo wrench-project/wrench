@@ -1737,7 +1737,7 @@ private:
         {
             wrench::Simulation::sleep(10);
 
-            std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state = cs->getQueue();
+            std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> queue_state = cs->getQueue();
             if (queue_state.size() != 4) {
               throw std::runtime_error("Unexpected queue state (should have 4 entries - has " + std::to_string(queue_state.size()) + ")");
             }
@@ -1767,7 +1767,7 @@ private:
         {
             wrench::Simulation::sleep(4000);
 
-            std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state = cs->getQueue();
+            std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> queue_state = cs->getQueue();
             if (queue_state.size() != 3) {
                 throw std::runtime_error("Unexpected queue state (should have 3 entries - has " + std::to_string(queue_state.size()) + + ")");
             }
@@ -1783,7 +1783,7 @@ private:
 
 //            WRENCH_INFO("QUEUE STATE:");
 //            for (auto const &j : queue_state) {
-//                WRENCH_INFO("%s %d %d %d %d %.2lf %.2lf",
+//                WRENCH_INFO("%s %s %d %d %d %.2lf %.2lf",
 //                            std::get<0>(j).c_str(),
 //                            std::get<1>(j),
 //                            std::get<2>(j),
