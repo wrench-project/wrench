@@ -1,6 +1,19 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.8
+
+(February 18, 2021) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
+
+- I/O simulation model that includes the key features of the Linux page cache ([#199](https://github.com/wrench-project/wrench/issues/199), [#202](https://github.com/wrench-project/wrench/issues/202), [#218](https://github.com/wrench-project/wrench/issues/218))  
+- Extended HTCondor component model with the Grid Universe ([#161](https://github.com/wrench-project/wrench/issues/161))
+- Improvements to the WRENCH Dashboard ([#170](https://github.com/wrench-project/wrench/issues/170), [#212](https://github.com/wrench-project/wrench/issues/212))
+- Improvements to documentation ([#219](https://github.com/wrench-project/wrench/issues/219) and code ([#189](https://github.com/wrench-project/wrench/issues/189), [#214](https://github.com/wrench-project/wrench/issues/214))
+
+**Note**: WRENCH 1.8 requires [SimGrid 3.26](https://simgrid.org)
+
+---
+
 ### WRENCH 1.7
 
 (September 18, 2020) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
