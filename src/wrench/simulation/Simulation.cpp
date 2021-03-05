@@ -165,6 +165,7 @@ namespace wrench {
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
+            std::cout << "   --activate-host-shutdown: activates WRENCH's capability to simulate host failures/shutdowns during execution\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
             std::cout << "   --help-wrench: displays this help message\n";
             std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";

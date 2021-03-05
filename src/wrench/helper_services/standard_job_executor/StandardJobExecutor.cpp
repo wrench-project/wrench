@@ -356,8 +356,10 @@ namespace wrench {
             cleanUpScratch();
         }
 
-        this->host_state_monitor->kill();
-        this->host_state_monitor = nullptr; // Which will release the pointer to this service!
+        if (Simulation::isHostShutdownSimulationEnabled()) {
+            this->host_state_monitor->kill();
+            this->host_state_monitor = nullptr; // Which will release the pointer to this service!
+        }
 
         WRENCH_INFO("Standard Job Executor on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;

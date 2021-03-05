@@ -564,6 +564,13 @@ namespace wrench {
 
         }
 
+        // Create and start the host state monitor if necessary
+        if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
+            this->host_state_change_monitor->kill();
+            this->host_state_change_monitor = nullptr; // Which will release the pointer to this service!
+
+        }
+
         WRENCH_INFO("bare_metal on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return this->exit_code;
     }
