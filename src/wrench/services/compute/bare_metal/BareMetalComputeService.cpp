@@ -534,6 +534,8 @@ namespace wrench {
         }
         WRENCH_INFO("%s", msg.c_str());
 
+        // Create and start the host state monitor if necessary
+        if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled())
         {
             // Create the host state monitor
             std::vector<std::string> hosts_to_monitor;

@@ -742,6 +742,8 @@ private:
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
+            // Coverage: just get the number of hosts
+            auto num_hosts = this->test->compute_service->getNumHosts();
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 

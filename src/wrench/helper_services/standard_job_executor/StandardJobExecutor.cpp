@@ -297,16 +297,18 @@ namespace wrench {
             WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
         }
 
-        // Create the host state monitor
-        std::vector<std::string> hosts_to_monitor;
-        for (auto const &h : this->compute_resources) {
-            hosts_to_monitor.push_back(h.first);
+        if (Simulation::isHostShutdownSimulationEnabled()) {
+            // Create the host state monitor
+            std::vector<std::string> hosts_to_monitor;
+            for (auto const &h : this->compute_resources) {
+                hosts_to_monitor.push_back(h.first);
+            }
+            this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
+                    new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, false,
+                                                this->getSharedPtr<Service>(), this->mailbox_name));
+            this->host_state_monitor->simulation = this->simulation;
+            this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
         }
-        this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
-                new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, false,
-                                            this->getSharedPtr<Service>(), this->mailbox_name));
-        this->host_state_monitor->simulation = this->simulation;
-        this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
 
         /** Create all Workunits **/
         std::set<std::shared_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
