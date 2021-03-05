@@ -139,7 +139,7 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
     simulation->init(&argc, argv);
 

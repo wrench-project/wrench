@@ -117,7 +117,7 @@ void AlarmTest::do_downHost_Test() {
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
     simulation->init(&argc, argv);
 

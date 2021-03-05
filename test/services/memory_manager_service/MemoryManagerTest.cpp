@@ -120,7 +120,7 @@ void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--pagecache");
+    argv[1] = strdup("--wrench-pagecache-simulation");
 //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
@@ -192,11 +192,10 @@ TEST_F(MemoryManagerTest, MemoryManagerChainOfTask) {
 void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc =3;
+    int argc =2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--pagecache");
-    argv[2] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-pagecache-simulation");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 

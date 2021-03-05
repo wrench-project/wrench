@@ -75,7 +75,7 @@ Note that this member function takes in the command-line arguments passed to the
 function of the simulator. This is so that it can parse WRENCH-specific and
 [SimGrid-specific](https://simgrid.org/doc/latest/Configuring_SimGrid.html)
 command-line arguments. (Recall that WRENCH is based on
-[SimGrid](https://simgrid.org).) Two useful such arguments are `--help-wrench`,
+[SimGrid](https://simgrid.org).) Two useful such arguments are `--wrench-help`,
 which displays a WRENCH help message, and `--help-simgrid`, which displays
 an extensive SimGrid help message.
 
@@ -355,7 +355,7 @@ definitions (levels of performance, CPU frequency) in the
 The `wrench::Simulation::getEnergyConsumed()` member function returns energy consumed 
 by all hosts in the platform.  **Important:** The energy plugin is NOT
 enabled by default in WRENCH simulations. To enable it, pass the
-`--activate-energy` command line option to the simulator.  See
+`--wrench-energy-simulation` command line option to the simulator.  See
 `examples/basic-examples/cloud-bag-of-tasks-energy` for an example
 simulator that makes use of this plugin  (and an example platform
 description file that defines host power consumption profiles).

@@ -27,13 +27,13 @@
  ** and outputs energy consumption measures. 
  **
  ** Example invocation of the simulator for a 10-task workflow, with no logging:
- **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --activate-energy
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --wrench-energy-simulation
  **
  ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --activate-energy --log=custom_wms.threshold=info
+ **    ./wrench-example-cloud-bag-of-tasks 10 ./four_hosts.xml --wrench-energy-simulation --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task workflow with full logging:
- **    ./wrench-example-cloud-bag-of-tasks 6 ./four_hosts.xml --activate-energy  --wrench-full-log
+ **    ./wrench-example-cloud-bag-of-tasks 6 ./four_hosts.xml --wrench-energy-simulation  --wrench-full-log
  **/
 
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <an EVEN number of tasks> <xml platform file> --activate-energy [--log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <an EVEN number of tasks> <xml platform file> --wrench-energy-simulation [--log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 
