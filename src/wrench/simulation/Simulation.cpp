@@ -116,7 +116,9 @@ namespace wrench {
         std::vector<std::string> cleanedup_args;
 
         for (i = 0; i < *argc; i++) {
-            if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
+            if (not strcmp(argv[i], "--help")) {
+                simulator_help_requested = true;
+            } else if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
             } else if ((not strcmp(argv[i], "--wrench-full-log")) or
                        (not strcmp(argv[i], "--wrench-full-logs")) or
@@ -182,7 +184,7 @@ namespace wrench {
             (*argc)++;
         }
 
-// If version requested, put back the "--version" argument
+        // If version requested, put back the "--version" argument
         if (version_requested) {
             std::cout << "This program was linked against WRENCH version " << getWRENCHVersionString();
 #ifdef ENABLE_BATSCHED
@@ -200,15 +202,15 @@ namespace wrench {
                          "    doi = {10.1016/j.future.2020.05.030}\n"
                          "  }\n\n"
                          "-----------------------------------------------------------------------------------\n\n";
-// put the argument back in so that we also see the
-// SimGrid message
+            // put the argument back in so that we also see the
+            // SimGrid message
             argv[(*argc)] = strdup("--version");
             (*argc)++;
         }
 
-// reconstruct argc/argv
+        // reconstruct argc/argv
 
-// If SimGrid help is requested, put back in a "--help" argument
+        // If SimGrid help is requested, put back in a "--help" argument
         if (simgrid_help_requested) {
             argv[(*argc)] = strdup("--help");
             (*argc)++;
@@ -221,7 +223,7 @@ namespace wrench {
             exit(0);
         }
 
-// If simulator help requested, put back in the "--help" argument that was passed down
+        // If simulator help requested, put back in the "--help" argument that was passed down
         if (simulator_help_requested) {
             argv[*argc] = strdup("--help");
             (*argc)++;
