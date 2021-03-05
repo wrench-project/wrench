@@ -1,7 +1,7 @@
 {
     "name": "workflow-test",
     "description": "Trace generated with WorkflowHub - https://workflowhub.org",
-    "createdAt": "2021-01-21T20:49:13.003517",
+    "createdAt": "2021-02-12T04:30:31.955106",
     "schemaVersion": "1.0",
     "author": {
         "name": "cc",
@@ -13,13 +13,13 @@
         "url": "https://pegasus.isi.edu"
     },
     "workflow": {
-        "executedAt": "01-16-21T02:57:13Z",
-        "makespan": 9764.0,
+        "executedAt": "02-12-21T00:49:22Z",
+        "makespan": 9328.0,
         "jobs": [
             {
                 "name": "mProject_ID0000001",
                 "type": "compute",
-                "runtime": 450.379,
+                "runtime": 455.477,
                 "parents": [],
                 "children": [
                     "mBackground_ID0000013",
@@ -30,27 +30,27 @@
                 "files": [
                     {
                         "link": "output",
-                        "name": "pposs2ukstu_blue_001_001.fits",
+                        "name": "pposs2ukstu_blue_001_001_area.fits",
                         "size": 53193600
                     },
                     {
-                        "link": "input",
-                        "name": "poss2ukstu_blue_001_001.fits",
-                        "size": 9655401
-                    },
-                    {
                         "link": "output",
-                        "name": "pposs2ukstu_blue_001_001_area.fits",
+                        "name": "pposs2ukstu_blue_001_001.fits",
                         "size": 53193600
                     },
                     {
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "input",
+                        "name": "poss2ukstu_blue_001_001.fits",
+                        "size": 9655401
                     }
                 ],
-                "avgCPU": 99.3574,
-                "memory": 121652,
+                "avgCPU": 99.5343,
+                "memory": 121584,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -58,12 +58,12 @@
                     "pposs2ukstu_blue_001_001.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mProject_ID0000002",
                 "type": "compute",
-                "runtime": 454.02,
+                "runtime": 456.053,
                 "parents": [],
                 "children": [
                     "mDiffFit_ID0000009",
@@ -72,11 +72,6 @@
                     "mBackground_ID0000014"
                 ],
                 "files": [
-                    {
-                        "link": "output",
-                        "name": "pposs2ukstu_blue_001_002.fits",
-                        "size": 53173440
-                    },
                     {
                         "link": "output",
                         "name": "pposs2ukstu_blue_001_002_area.fits",
@@ -91,10 +86,15 @@
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "output",
+                        "name": "pposs2ukstu_blue_001_002.fits",
+                        "size": 53173440
                     }
                 ],
-                "avgCPU": 99.4853,
-                "memory": 121536,
+                "avgCPU": 99.4955,
+                "memory": 121616,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -102,12 +102,12 @@
                     "pposs2ukstu_blue_001_002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mProject_ID0000003",
                 "type": "compute",
-                "runtime": 456.514,
+                "runtime": 481.568,
                 "parents": [],
                 "children": [
                     "mDiffFit_ID0000008",
@@ -118,16 +118,6 @@
                 "files": [
                     {
                         "link": "output",
-                        "name": "pposs2ukstu_blue_002_001_area.fits",
-                        "size": 53153280
-                    },
-                    {
-                        "link": "input",
-                        "name": "poss2ukstu_blue_002_001.fits",
-                        "size": 8814262
-                    },
-                    {
-                        "link": "output",
                         "name": "pposs2ukstu_blue_002_001.fits",
                         "size": 53153280
                     },
@@ -135,10 +125,20 @@
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "output",
+                        "name": "pposs2ukstu_blue_002_001_area.fits",
+                        "size": 53153280
+                    },
+                    {
+                        "link": "input",
+                        "name": "poss2ukstu_blue_002_001.fits",
+                        "size": 8814262
                     }
                 ],
-                "avgCPU": 99.4438,
-                "memory": 121712,
+                "avgCPU": 99.5783,
+                "memory": 121640,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -146,12 +146,12 @@
                     "pposs2ukstu_blue_002_001.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mProject_ID0000004",
                 "type": "compute",
-                "runtime": 455.991,
+                "runtime": 454.097,
                 "parents": [],
                 "children": [
                     "mDiffFit_ID0000009",
@@ -161,28 +161,28 @@
                 ],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "poss2ukstu_blue_002_002.fits",
-                        "size": 8238776
-                    },
-                    {
                         "link": "output",
                         "name": "pposs2ukstu_blue_002_002.fits",
-                        "size": 53173440
-                    },
-                    {
-                        "link": "output",
-                        "name": "pposs2ukstu_blue_002_002_area.fits",
                         "size": 53173440
                     },
                     {
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "input",
+                        "name": "poss2ukstu_blue_002_002.fits",
+                        "size": 8238776
+                    },
+                    {
+                        "link": "output",
+                        "name": "pposs2ukstu_blue_002_002_area.fits",
+                        "size": 53173440
                     }
                 ],
-                "avgCPU": 99.3978,
-                "memory": 121608,
+                "avgCPU": 99.5611,
+                "memory": 121468,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -190,12 +190,12 @@
                     "pposs2ukstu_blue_002_002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000005",
                 "type": "compute",
-                "runtime": 2.702,
+                "runtime": 2.357,
                 "parents": [
                     "mProject_ID0000001",
                     "mProject_ID0000002"
@@ -205,24 +205,9 @@
                 ],
                 "files": [
                     {
-                        "link": "output",
-                        "name": "1-fit.000001.000002.txt",
-                        "size": 286
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_blue_001_001_area.fits",
-                        "size": 53193600
-                    },
-                    {
                         "link": "input",
                         "name": "pposs2ukstu_blue_001_001.fits",
                         "size": 53193600
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_blue_001_002_area.fits",
-                        "size": 53173440
                     },
                     {
                         "link": "input",
@@ -233,10 +218,25 @@
                         "link": "input",
                         "name": "pposs2ukstu_blue_001_002.fits",
                         "size": 53173440
+                    },
+                    {
+                        "link": "output",
+                        "name": "1-fit.000001.000002.txt",
+                        "size": 286
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_001_002_area.fits",
+                        "size": 53173440
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_001_001_area.fits",
+                        "size": 53193600
                     }
                 ],
-                "avgCPU": 0.185,
-                "memory": 2924,
+                "avgCPU": 0.2121,
+                "memory": 2856,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -247,12 +247,12 @@
                     "1-diff.000001.000002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000006",
                 "type": "compute",
-                "runtime": 2.932,
+                "runtime": 2.387,
                 "parents": [
                     "mProject_ID0000001",
                     "mProject_ID0000003"
@@ -263,8 +263,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_001.fits",
-                        "size": 53153280
+                        "name": "pposs2ukstu_blue_001_001.fits",
+                        "size": 53193600
                     },
                     {
                         "link": "input",
@@ -273,8 +273,13 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_001_001_area.fits",
-                        "size": 53193600
+                        "name": "pposs2ukstu_blue_002_001.fits",
+                        "size": 53153280
+                    },
+                    {
+                        "link": "input",
+                        "name": "region-oversized.hdr",
+                        "size": 277
                     },
                     {
                         "link": "output",
@@ -283,17 +288,12 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_001_001.fits",
+                        "name": "pposs2ukstu_blue_001_001_area.fits",
                         "size": 53193600
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
                     }
                 ],
-                "avgCPU": 0.1364,
-                "memory": 2956,
+                "avgCPU": 0.2095,
+                "memory": 2836,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -304,12 +304,12 @@
                     "1-diff.000001.000003.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000007",
                 "type": "compute",
-                "runtime": 1.576,
+                "runtime": 2.113,
                 "parents": [
                     "mProject_ID0000001",
                     "mProject_ID0000004"
@@ -319,9 +319,9 @@
                 ],
                 "files": [
                     {
-                        "link": "output",
-                        "name": "1-fit.000001.000004.txt",
-                        "size": 285
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_001_001.fits",
+                        "size": 53193600
                     },
                     {
                         "link": "input",
@@ -329,14 +329,14 @@
                         "size": 53173440
                     },
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_blue_001_001_area.fits",
-                        "size": 53193600
+                        "link": "output",
+                        "name": "1-fit.000001.000004.txt",
+                        "size": 285
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_001_001.fits",
-                        "size": 53193600
+                        "name": "pposs2ukstu_blue_002_002.fits",
+                        "size": 53173440
                     },
                     {
                         "link": "input",
@@ -345,12 +345,12 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_002.fits",
-                        "size": 53173440
+                        "name": "pposs2ukstu_blue_001_001_area.fits",
+                        "size": 53193600
                     }
                 ],
-                "avgCPU": 0.3173,
-                "memory": 2928,
+                "avgCPU": 0.284,
+                "memory": 2940,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -361,12 +361,12 @@
                     "1-diff.000001.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000008",
                 "type": "compute",
-                "runtime": 1.841,
+                "runtime": 1.103,
                 "parents": [
                     "mProject_ID0000002",
                     "mProject_ID0000003"
@@ -376,9 +376,9 @@
                 ],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_blue_002_001.fits",
-                        "size": 53153280
+                        "link": "output",
+                        "name": "1-fit.000002.000003.txt",
+                        "size": 283
                     },
                     {
                         "link": "input",
@@ -387,8 +387,8 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_001_002_area.fits",
-                        "size": 53173440
+                        "name": "pposs2ukstu_blue_002_001.fits",
+                        "size": 53153280
                     },
                     {
                         "link": "input",
@@ -401,13 +401,13 @@
                         "size": 53173440
                     },
                     {
-                        "link": "output",
-                        "name": "1-fit.000002.000003.txt",
-                        "size": 283
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_001_002_area.fits",
+                        "size": 53173440
                     }
                 ],
-                "avgCPU": 0.2716,
-                "memory": 2908,
+                "avgCPU": 0.4533,
+                "memory": 2860,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -418,12 +418,12 @@
                     "1-diff.000002.000003.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000009",
                 "type": "compute",
-                "runtime": 2.004,
+                "runtime": 1.514,
                 "parents": [
                     "mProject_ID0000002",
                     "mProject_ID0000004"
@@ -444,7 +444,7 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_001_002_area.fits",
+                        "name": "pposs2ukstu_blue_002_002.fits",
                         "size": 53173440
                     },
                     {
@@ -459,12 +459,12 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_002.fits",
+                        "name": "pposs2ukstu_blue_001_002_area.fits",
                         "size": 53173440
                     }
                 ],
-                "avgCPU": 0.1996,
-                "memory": 2928,
+                "avgCPU": 0.3303,
+                "memory": 2932,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -475,12 +475,12 @@
                     "1-diff.000002.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000010",
                 "type": "compute",
-                "runtime": 1.895,
+                "runtime": 1.505,
                 "parents": [
                     "mProject_ID0000003",
                     "mProject_ID0000004"
@@ -491,8 +491,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_001.fits",
-                        "size": 53153280
+                        "name": "pposs2ukstu_blue_002_002_area.fits",
+                        "size": 53173440
                     },
                     {
                         "link": "input",
@@ -501,8 +501,8 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_002_area.fits",
-                        "size": 53173440
+                        "name": "pposs2ukstu_blue_002_001.fits",
+                        "size": 53153280
                     },
                     {
                         "link": "input",
@@ -510,18 +510,18 @@
                         "size": 277
                     },
                     {
-                        "link": "output",
-                        "name": "1-fit.000003.000004.txt",
-                        "size": 285
-                    },
-                    {
                         "link": "input",
                         "name": "pposs2ukstu_blue_002_002.fits",
                         "size": 53173440
+                    },
+                    {
+                        "link": "output",
+                        "name": "1-fit.000003.000004.txt",
+                        "size": 285
                     }
                 ],
-                "avgCPU": 0.2639,
-                "memory": 2892,
+                "avgCPU": 0.3322,
+                "memory": 2844,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -532,12 +532,12 @@
                     "1-diff.000003.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mConcatFit_ID0000011",
                 "type": "compute",
-                "runtime": 0.304,
+                "runtime": 0.287,
                 "parents": [
                     "mDiffFit_ID0000005",
                     "mDiffFit_ID0000006",
@@ -551,19 +551,19 @@
                 ],
                 "files": [
                     {
+                        "link": "input",
+                        "name": "1-fit.000002.000004.txt",
+                        "size": 284
+                    },
+                    {
                         "link": "output",
                         "name": "1-fits.tbl",
                         "size": 1457
                     },
                     {
                         "link": "input",
-                        "name": "1-fit.000001.000002.txt",
-                        "size": 286
-                    },
-                    {
-                        "link": "input",
-                        "name": "1-fit.000002.000004.txt",
-                        "size": 284
+                        "name": "1-fit.000002.000003.txt",
+                        "size": 283
                     },
                     {
                         "link": "input",
@@ -577,8 +577,8 @@
                     },
                     {
                         "link": "input",
-                        "name": "1-fit.000001.000003.txt",
-                        "size": 291
+                        "name": "1-fit.000001.000002.txt",
+                        "size": 286
                     },
                     {
                         "link": "input",
@@ -587,24 +587,24 @@
                     },
                     {
                         "link": "input",
-                        "name": "1-fit.000002.000003.txt",
-                        "size": 283
+                        "name": "1-fit.000001.000003.txt",
+                        "size": 291
                     }
                 ],
-                "avgCPU": 75.9868,
-                "memory": 70904,
+                "avgCPU": 78.7456,
+                "memory": 70780,
                 "priority": 40,
                 "arguments": [
                     "1-stat.tbl",
                     "1-fits.tbl",
                     "."
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBgModel_ID0000012",
                 "type": "compute",
-                "runtime": 0.694,
+                "runtime": 0.681,
                 "parents": [
                     "mConcatFit_ID0000011"
                 ],
@@ -616,11 +616,6 @@
                 ],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "1-fits.tbl",
-                        "size": 1457
-                    },
-                    {
                         "link": "output",
                         "name": "1-corrections.tbl",
                         "size": 276
@@ -629,10 +624,15 @@
                         "link": "input",
                         "name": "1-images.tbl",
                         "size": 2246
+                    },
+                    {
+                        "link": "input",
+                        "name": "1-fits.tbl",
+                        "size": 1457
                     }
                 ],
-                "avgCPU": 92.0749,
-                "memory": 137012,
+                "avgCPU": 92.0705,
+                "memory": 137060,
                 "priority": 50,
                 "arguments": [
                     "-i",
@@ -641,12 +641,12 @@
                     "1-fits.tbl",
                     "1-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBackground_ID0000013",
                 "type": "compute",
-                "runtime": 3.19,
+                "runtime": 2.566,
                 "parents": [
                     "mProject_ID0000001",
                     "mBgModel_ID0000012"
@@ -658,23 +658,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "1-projected.tbl",
-                        "size": 952
-                    },
-                    {
-                        "link": "input",
                         "name": "1-corrections.tbl",
                         "size": 276
-                    },
-                    {
-                        "link": "output",
-                        "name": "cposs2ukstu_blue_001_001_area.fits",
-                        "size": 53193600
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_blue_001_001_area.fits",
-                        "size": 53193600
                     },
                     {
                         "link": "input",
@@ -685,10 +670,25 @@
                         "link": "output",
                         "name": "cposs2ukstu_blue_001_001.fits",
                         "size": 53193600
+                    },
+                    {
+                        "link": "input",
+                        "name": "1-projected.tbl",
+                        "size": 952
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_blue_001_001_area.fits",
+                        "size": 53193600
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_001_001_area.fits",
+                        "size": 53193600
                     }
                 ],
-                "avgCPU": 23.3229,
-                "memory": 107720,
+                "avgCPU": 28.2541,
+                "memory": 107656,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -697,12 +697,12 @@
                     "1-projected.tbl",
                     "1-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBackground_ID0000014",
                 "type": "compute",
-                "runtime": 3.208,
+                "runtime": 2.735,
                 "parents": [
                     "mProject_ID0000002",
                     "mBgModel_ID0000012"
@@ -712,16 +712,6 @@
                     "mImgtbl_ID0000017"
                 ],
                 "files": [
-                    {
-                        "link": "output",
-                        "name": "cposs2ukstu_blue_001_002_area.fits",
-                        "size": 53173440
-                    },
-                    {
-                        "link": "input",
-                        "name": "1-projected.tbl",
-                        "size": 952
-                    },
                     {
                         "link": "input",
                         "name": "1-corrections.tbl",
@@ -734,17 +724,27 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_001_002_area.fits",
+                        "name": "1-projected.tbl",
+                        "size": 952
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_blue_001_002_area.fits",
                         "size": 53173440
                     },
                     {
                         "link": "input",
                         "name": "pposs2ukstu_blue_001_002.fits",
                         "size": 53173440
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_001_002_area.fits",
+                        "size": 53173440
                     }
                 ],
-                "avgCPU": 23.4414,
-                "memory": 107684,
+                "avgCPU": 24.3876,
+                "memory": 107548,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -753,12 +753,12 @@
                     "1-projected.tbl",
                     "1-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBackground_ID0000015",
                 "type": "compute",
-                "runtime": 3.341,
+                "runtime": 2.913,
                 "parents": [
                     "mProject_ID0000003",
                     "mBgModel_ID0000012"
@@ -770,16 +770,6 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_001.fits",
-                        "size": 53153280
-                    },
-                    {
-                        "link": "input",
-                        "name": "1-projected.tbl",
-                        "size": 952
-                    },
-                    {
-                        "link": "input",
                         "name": "1-corrections.tbl",
                         "size": 276
                     },
@@ -789,18 +779,28 @@
                         "size": 53153280
                     },
                     {
-                        "link": "output",
-                        "name": "cposs2ukstu_blue_002_001_area.fits",
+                        "link": "input",
+                        "name": "1-projected.tbl",
+                        "size": 952
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_002_001.fits",
                         "size": 53153280
                     },
                     {
                         "link": "output",
                         "name": "cposs2ukstu_blue_002_001.fits",
                         "size": 53153280
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_blue_002_001_area.fits",
+                        "size": 53153280
                     }
                 ],
-                "avgCPU": 21.4307,
-                "memory": 107600,
+                "avgCPU": 22.4511,
+                "memory": 107616,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -809,12 +809,12 @@
                     "1-projected.tbl",
                     "1-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBackground_ID0000016",
                 "type": "compute",
-                "runtime": 4.05,
+                "runtime": 2.742,
                 "parents": [
                     "mProject_ID0000004",
                     "mBgModel_ID0000012"
@@ -825,13 +825,23 @@
                 ],
                 "files": [
                     {
-                        "link": "output",
-                        "name": "cposs2ukstu_blue_002_002_area.fits",
-                        "size": 53173440
+                        "link": "input",
+                        "name": "1-corrections.tbl",
+                        "size": 276
                     },
                     {
                         "link": "output",
                         "name": "cposs2ukstu_blue_002_002.fits",
+                        "size": 53173440
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_blue_002_002_area.fits",
+                        "size": 53173440
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_blue_002_002_area.fits",
                         "size": 53173440
                     },
                     {
@@ -841,22 +851,12 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_blue_002_002_area.fits",
-                        "size": 53173440
-                    },
-                    {
-                        "link": "input",
-                        "name": "1-corrections.tbl",
-                        "size": 276
-                    },
-                    {
-                        "link": "input",
                         "name": "pposs2ukstu_blue_002_002.fits",
                         "size": 53173440
                     }
                 ],
-                "avgCPU": 17.0617,
-                "memory": 107820,
+                "avgCPU": 26.8053,
+                "memory": 107756,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -865,12 +865,12 @@
                     "1-projected.tbl",
                     "1-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mImgtbl_ID0000017",
                 "type": "compute",
-                "runtime": 0.398,
+                "runtime": 0.443,
                 "parents": [
                     "mBackground_ID0000013",
                     "mBackground_ID0000014",
@@ -881,6 +881,11 @@
                     "mAdd_ID0000018"
                 ],
                 "files": [
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_blue_001_001.fits",
+                        "size": 53193600
+                    },
                     {
                         "link": "input",
                         "name": "cposs2ukstu_blue_002_002.fits",
@@ -897,23 +902,18 @@
                         "size": 952
                     },
                     {
-                        "link": "input",
-                        "name": "cposs2ukstu_blue_002_001.fits",
-                        "size": 53153280
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_blue_001_001.fits",
-                        "size": 53193600
-                    },
-                    {
                         "link": "output",
                         "name": "1-updated-corrected.tbl",
                         "size": 2606
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_blue_002_001.fits",
+                        "size": 53153280
                     }
                 ],
-                "avgCPU": 46.7337,
-                "memory": 71204,
+                "avgCPU": 42.8894,
+                "memory": 71208,
                 "priority": 70,
                 "arguments": [
                     ".",
@@ -921,12 +921,12 @@
                     "1-corrected.tbl",
                     "1-updated-corrected.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mAdd_ID0000018",
                 "type": "compute",
-                "runtime": 1.419,
+                "runtime": 1.332,
                 "parents": [
                     "mBackground_ID0000013",
                     "mBackground_ID0000014",
@@ -941,13 +941,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_blue_002_002_area.fits",
-                        "size": 53173440
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_blue_001_002_area.fits",
-                        "size": 53173440
+                        "name": "cposs2ukstu_blue_001_001.fits",
+                        "size": 53193600
                     },
                     {
                         "link": "input",
@@ -956,8 +951,8 @@
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_blue_001_001_area.fits",
-                        "size": 53193600
+                        "name": "cposs2ukstu_blue_001_002.fits",
+                        "size": 53173440
                     },
                     {
                         "link": "input",
@@ -966,17 +961,22 @@
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_blue_001_002.fits",
+                        "name": "cposs2ukstu_blue_002_002_area.fits",
                         "size": 53173440
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_blue_002_001_area.fits",
-                        "size": 53153280
+                        "name": "1-updated-corrected.tbl",
+                        "size": 2606
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_blue_001_001_area.fits",
+                        "size": 53193600
                     },
                     {
                         "link": "output",
-                        "name": "1-mosaic_area.fits",
+                        "name": "1-mosaic.fits",
                         "size": 25922880
                     },
                     {
@@ -986,22 +986,22 @@
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_blue_001_001.fits",
-                        "size": 53193600
+                        "name": "cposs2ukstu_blue_002_001_area.fits",
+                        "size": 53153280
                     },
                     {
                         "link": "input",
-                        "name": "1-updated-corrected.tbl",
-                        "size": 2606
+                        "name": "cposs2ukstu_blue_001_002_area.fits",
+                        "size": 53173440
                     },
                     {
                         "link": "output",
-                        "name": "1-mosaic.fits",
+                        "name": "1-mosaic_area.fits",
                         "size": 25922880
                     }
                 ],
-                "avgCPU": 39.3235,
-                "memory": 70076,
+                "avgCPU": 42.1922,
+                "memory": 69996,
                 "priority": 80,
                 "arguments": [
                     "-e",
@@ -1009,12 +1009,12 @@
                     "region.hdr",
                     "1-mosaic.fits"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mViewer_ID0000019",
                 "type": "compute",
-                "runtime": 1.937,
+                "runtime": 1.929,
                 "parents": [
                     "mAdd_ID0000018"
                 ],
@@ -1031,8 +1031,8 @@
                         "size": 25922880
                     }
                 ],
-                "avgCPU": 94.2179,
-                "memory": 67212,
+                "avgCPU": 94.3494,
+                "memory": 67276,
                 "priority": 90,
                 "arguments": [
                     "-ct",
@@ -1045,12 +1045,12 @@
                     "-png",
                     "1-mosaic.png"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mProject_ID0000020",
                 "type": "compute",
-                "runtime": 287.465,
+                "runtime": 284.838,
                 "parents": [],
                 "children": [
                     "mBackground_ID0000032",
@@ -1066,11 +1066,6 @@
                     },
                     {
                         "link": "output",
-                        "name": "pposs2ukstu_red_001_001.fits",
-                        "size": 52536960
-                    },
-                    {
-                        "link": "output",
                         "name": "pposs2ukstu_red_001_001_area.fits",
                         "size": 52536960
                     },
@@ -1078,10 +1073,15 @@
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "output",
+                        "name": "pposs2ukstu_red_001_001.fits",
+                        "size": 52536960
                     }
                 ],
-                "avgCPU": 99.0743,
-                "memory": 120232,
+                "avgCPU": 99.3895,
+                "memory": 120096,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -1089,12 +1089,12 @@
                     "pposs2ukstu_red_001_001.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mProject_ID0000021",
                 "type": "compute",
-                "runtime": 290.14,
+                "runtime": 292.096,
                 "parents": [],
                 "children": [
                     "mBackground_ID0000033",
@@ -1106,7 +1106,7 @@
                     {
                         "link": "input",
                         "name": "poss2ukstu_red_001_002.fits",
-                        "size": 6494409
+                        "size": 6494407
                     },
                     {
                         "link": "output",
@@ -1124,8 +1124,8 @@
                         "size": 277
                     }
                 ],
-                "avgCPU": 99.0698,
-                "memory": 120456,
+                "avgCPU": 99.1784,
+                "memory": 120256,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -1133,12 +1133,12 @@
                     "pposs2ukstu_red_001_002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mProject_ID0000022",
                 "type": "compute",
-                "runtime": 284.914,
+                "runtime": 285.088,
                 "parents": [],
                 "children": [
                     "mBackground_ID0000034",
@@ -1149,8 +1149,13 @@
                 "files": [
                     {
                         "link": "output",
-                        "name": "pposs2ukstu_red_002_001.fits",
+                        "name": "pposs2ukstu_red_002_001_area.fits",
                         "size": 52513920
+                    },
+                    {
+                        "link": "input",
+                        "name": "region-oversized.hdr",
+                        "size": 277
                     },
                     {
                         "link": "input",
@@ -1159,17 +1164,12 @@
                     },
                     {
                         "link": "output",
-                        "name": "pposs2ukstu_red_002_001_area.fits",
+                        "name": "pposs2ukstu_red_002_001.fits",
                         "size": 52513920
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
                     }
                 ],
-                "avgCPU": 99.1461,
-                "memory": 120256,
+                "avgCPU": 99.2613,
+                "memory": 120300,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -1177,12 +1177,12 @@
                     "pposs2ukstu_red_002_001.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mProject_ID0000023",
                 "type": "compute",
-                "runtime": 295.781,
+                "runtime": 293.919,
                 "parents": [],
                 "children": [
                     "mBackground_ID0000035",
@@ -1192,6 +1192,16 @@
                 ],
                 "files": [
                     {
+                        "link": "input",
+                        "name": "poss2ukstu_red_002_002.fits",
+                        "size": 6376873
+                    },
+                    {
+                        "link": "input",
+                        "name": "region-oversized.hdr",
+                        "size": 277
+                    },
+                    {
                         "link": "output",
                         "name": "pposs2ukstu_red_002_002_area.fits",
                         "size": 52536960
@@ -1200,20 +1210,10 @@
                         "link": "output",
                         "name": "pposs2ukstu_red_002_002.fits",
                         "size": 52536960
-                    },
-                    {
-                        "link": "input",
-                        "name": "poss2ukstu_red_002_002.fits",
-                        "size": 6376872
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
                     }
                 ],
-                "avgCPU": 99.1064,
-                "memory": 120520,
+                "avgCPU": 99.1345,
+                "memory": 120352,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -1221,12 +1221,12 @@
                     "pposs2ukstu_red_002_002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000024",
                 "type": "compute",
-                "runtime": 2.736,
+                "runtime": 2.354,
                 "parents": [
                     "mProject_ID0000020",
                     "mProject_ID0000021"
@@ -1235,11 +1235,6 @@
                     "mConcatFit_ID0000030"
                 ],
                 "files": [
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_001_002_area.fits",
-                        "size": 52557120
-                    },
                     {
                         "link": "input",
                         "name": "pposs2ukstu_red_001_002.fits",
@@ -1252,6 +1247,11 @@
                     },
                     {
                         "link": "input",
+                        "name": "pposs2ukstu_red_001_001_area.fits",
+                        "size": 52536960
+                    },
+                    {
+                        "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
                     },
@@ -1262,12 +1262,12 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_red_001_001_area.fits",
-                        "size": 52536960
+                        "name": "pposs2ukstu_red_001_002_area.fits",
+                        "size": 52557120
                     }
                 ],
-                "avgCPU": 0.1827,
-                "memory": 2932,
+                "avgCPU": 0.2124,
+                "memory": 2944,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -1278,12 +1278,12 @@
                     "2-diff.000001.000002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000025",
                 "type": "compute",
-                "runtime": 3.239,
+                "runtime": 2.094,
                 "parents": [
                     "mProject_ID0000020",
                     "mProject_ID0000022"
@@ -1303,9 +1303,9 @@
                         "size": 52513920
                     },
                     {
-                        "link": "output",
-                        "name": "2-fit.000001.000003.txt",
-                        "size": 287
+                        "link": "input",
+                        "name": "pposs2ukstu_red_001_001_area.fits",
+                        "size": 52536960
                     },
                     {
                         "link": "input",
@@ -1318,13 +1318,13 @@
                         "size": 52536960
                     },
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_001_001_area.fits",
-                        "size": 52536960
+                        "link": "output",
+                        "name": "2-fit.000001.000003.txt",
+                        "size": 287
                     }
                 ],
-                "avgCPU": 0.1544,
-                "memory": 2904,
+                "avgCPU": 0.2388,
+                "memory": 2844,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -1335,12 +1335,12 @@
                     "2-diff.000001.000003.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000026",
                 "type": "compute",
-                "runtime": 1.241,
+                "runtime": 1.088,
                 "parents": [
                     "mProject_ID0000020",
                     "mProject_ID0000023"
@@ -1351,23 +1351,18 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_red_002_002_area.fits",
-                        "size": 52536960
-                    },
-                    {
-                        "link": "input",
                         "name": "pposs2ukstu_red_001_001_area.fits",
                         "size": 52536960
-                    },
-                    {
-                        "link": "output",
-                        "name": "2-fit.000001.000004.txt",
-                        "size": 281
                     },
                     {
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_002_002_area.fits",
+                        "size": 52536960
                     },
                     {
                         "link": "input",
@@ -1378,10 +1373,15 @@
                         "link": "input",
                         "name": "pposs2ukstu_red_002_002.fits",
                         "size": 52536960
+                    },
+                    {
+                        "link": "output",
+                        "name": "2-fit.000001.000004.txt",
+                        "size": 281
                     }
                 ],
-                "avgCPU": 0.4835,
-                "memory": 2944,
+                "avgCPU": 0.5515,
+                "memory": 2948,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -1392,12 +1392,12 @@
                     "2-diff.000001.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000027",
                 "type": "compute",
-                "runtime": 3.602,
+                "runtime": 1.123,
                 "parents": [
                     "mProject_ID0000021",
                     "mProject_ID0000022"
@@ -1408,23 +1408,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_red_002_001.fits",
-                        "size": 52513920
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_001_002_area.fits",
-                        "size": 52557120
-                    },
-                    {
-                        "link": "input",
                         "name": "pposs2ukstu_red_001_002.fits",
                         "size": 52557120
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_002_001_area.fits",
-                        "size": 52513920
                     },
                     {
                         "link": "output",
@@ -1433,12 +1418,27 @@
                     },
                     {
                         "link": "input",
+                        "name": "pposs2ukstu_red_002_001.fits",
+                        "size": 52513920
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_002_001_area.fits",
+                        "size": 52513920
+                    },
+                    {
+                        "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_001_002_area.fits",
+                        "size": 52557120
                     }
                 ],
-                "avgCPU": 0.1388,
-                "memory": 2952,
+                "avgCPU": 0.4452,
+                "memory": 2916,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -1449,12 +1449,12 @@
                     "2-diff.000002.000003.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000028",
                 "type": "compute",
-                "runtime": 1.635,
+                "runtime": 1.643,
                 "parents": [
                     "mProject_ID0000021",
                     "mProject_ID0000023"
@@ -1463,16 +1463,6 @@
                     "mConcatFit_ID0000030"
                 ],
                 "files": [
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_001_002_area.fits",
-                        "size": 52557120
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_002_002_area.fits",
-                        "size": 52536960
-                    },
                     {
                         "link": "input",
                         "name": "pposs2ukstu_red_001_002.fits",
@@ -1490,12 +1480,22 @@
                     },
                     {
                         "link": "input",
+                        "name": "pposs2ukstu_red_002_002_area.fits",
+                        "size": 52536960
+                    },
+                    {
+                        "link": "input",
                         "name": "pposs2ukstu_red_002_002.fits",
                         "size": 52536960
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_001_002_area.fits",
+                        "size": 52557120
                     }
                 ],
-                "avgCPU": 0.2446,
-                "memory": 2936,
+                "avgCPU": 0.3043,
+                "memory": 2840,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -1506,12 +1506,12 @@
                     "2-diff.000002.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000029",
                 "type": "compute",
-                "runtime": 2.143,
+                "runtime": 1.515,
                 "parents": [
                     "mProject_ID0000022",
                     "mProject_ID0000023"
@@ -1521,19 +1521,14 @@
                 ],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_002_001.fits",
-                        "size": 52513920
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_002_002_area.fits",
-                        "size": 52536960
-                    },
-                    {
                         "link": "output",
                         "name": "2-fit.000003.000004.txt",
                         "size": 283
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_002_001.fits",
+                        "size": 52513920
                     },
                     {
                         "link": "input",
@@ -1547,12 +1542,17 @@
                     },
                     {
                         "link": "input",
+                        "name": "pposs2ukstu_red_002_002_area.fits",
+                        "size": 52536960
+                    },
+                    {
+                        "link": "input",
                         "name": "pposs2ukstu_red_002_002.fits",
                         "size": 52536960
                     }
                 ],
-                "avgCPU": 0.2333,
-                "memory": 2884,
+                "avgCPU": 0.33,
+                "memory": 2860,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -1563,12 +1563,12 @@
                     "2-diff.000003.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mConcatFit_ID0000030",
                 "type": "compute",
-                "runtime": 0.291,
+                "runtime": 0.303,
                 "parents": [
                     "mDiffFit_ID0000024",
                     "mDiffFit_ID0000025",
@@ -1582,9 +1582,9 @@
                 ],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "2-stat.tbl",
-                        "size": 1180
+                        "link": "output",
+                        "name": "2-fits.tbl",
+                        "size": 1457
                     },
                     {
                         "link": "input",
@@ -1593,13 +1593,23 @@
                     },
                     {
                         "link": "input",
+                        "name": "2-fit.000002.000003.txt",
+                        "size": 282
+                    },
+                    {
+                        "link": "input",
                         "name": "2-fit.000003.000004.txt",
                         "size": 283
                     },
                     {
                         "link": "input",
-                        "name": "2-fit.000002.000003.txt",
-                        "size": 282
+                        "name": "2-fit.000002.000004.txt",
+                        "size": 284
+                    },
+                    {
+                        "link": "input",
+                        "name": "2-stat.tbl",
+                        "size": 1180
                     },
                     {
                         "link": "input",
@@ -1610,32 +1620,22 @@
                         "link": "input",
                         "name": "2-fit.000001.000004.txt",
                         "size": 281
-                    },
-                    {
-                        "link": "input",
-                        "name": "2-fit.000002.000004.txt",
-                        "size": 284
-                    },
-                    {
-                        "link": "output",
-                        "name": "2-fits.tbl",
-                        "size": 1457
                     }
                 ],
-                "avgCPU": 81.0997,
-                "memory": 70828,
+                "avgCPU": 75.5776,
+                "memory": 70888,
                 "priority": 40,
                 "arguments": [
                     "2-stat.tbl",
                     "2-fits.tbl",
                     "."
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBgModel_ID0000031",
                 "type": "compute",
-                "runtime": 0.656,
+                "runtime": 0.666,
                 "parents": [
                     "mConcatFit_ID0000030"
                 ],
@@ -1662,8 +1662,8 @@
                         "size": 276
                     }
                 ],
-                "avgCPU": 92.8354,
-                "memory": 137088,
+                "avgCPU": 92.7928,
+                "memory": 137108,
                 "priority": 50,
                 "arguments": [
                     "-i",
@@ -1672,12 +1672,12 @@
                     "2-fits.tbl",
                     "2-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBackground_ID0000032",
                 "type": "compute",
-                "runtime": 3.197,
+                "runtime": 2.845,
                 "parents": [
                     "mProject_ID0000020",
                     "mBgModel_ID0000031"
@@ -1688,8 +1688,13 @@
                 ],
                 "files": [
                     {
+                        "link": "input",
+                        "name": "2-projected.tbl",
+                        "size": 946
+                    },
+                    {
                         "link": "output",
-                        "name": "cposs2ukstu_red_001_001_area.fits",
+                        "name": "cposs2ukstu_red_001_001.fits",
                         "size": 52536960
                     },
                     {
@@ -1699,8 +1704,8 @@
                     },
                     {
                         "link": "input",
-                        "name": "2-projected.tbl",
-                        "size": 946
+                        "name": "pposs2ukstu_red_001_001_area.fits",
+                        "size": 52536960
                     },
                     {
                         "link": "input",
@@ -1708,18 +1713,13 @@
                         "size": 52536960
                     },
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_001_001_area.fits",
-                        "size": 52536960
-                    },
-                    {
                         "link": "output",
-                        "name": "cposs2ukstu_red_001_001.fits",
+                        "name": "cposs2ukstu_red_001_001_area.fits",
                         "size": 52536960
                     }
                 ],
-                "avgCPU": 20.8008,
-                "memory": 106552,
+                "avgCPU": 23.761,
+                "memory": 106496,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -1728,12 +1728,12 @@
                     "2-projected.tbl",
                     "2-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBackground_ID0000033",
                 "type": "compute",
-                "runtime": 3.156,
+                "runtime": 2.557,
                 "parents": [
                     "mProject_ID0000021",
                     "mBgModel_ID0000031"
@@ -1745,18 +1745,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_red_001_002_area.fits",
-                        "size": 52557120
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_001_002.fits",
-                        "size": 52557120
-                    },
-                    {
-                        "link": "output",
-                        "name": "cposs2ukstu_red_001_002.fits",
-                        "size": 52557120
+                        "name": "2-projected.tbl",
+                        "size": 946
                     },
                     {
                         "link": "output",
@@ -1765,17 +1755,27 @@
                     },
                     {
                         "link": "input",
+                        "name": "pposs2ukstu_red_001_002.fits",
+                        "size": 52557120
+                    },
+                    {
+                        "link": "input",
                         "name": "2-corrections.tbl",
                         "size": 276
                     },
                     {
+                        "link": "output",
+                        "name": "cposs2ukstu_red_001_002.fits",
+                        "size": 52557120
+                    },
+                    {
                         "link": "input",
-                        "name": "2-projected.tbl",
-                        "size": 946
+                        "name": "pposs2ukstu_red_001_002_area.fits",
+                        "size": 52557120
                     }
                 ],
-                "avgCPU": 21.673,
-                "memory": 106648,
+                "avgCPU": 25.1858,
+                "memory": 106564,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -1784,12 +1784,12 @@
                     "2-projected.tbl",
                     "2-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBackground_ID0000034",
                 "type": "compute",
-                "runtime": 3.47,
+                "runtime": 2.436,
                 "parents": [
                     "mProject_ID0000022",
                     "mBgModel_ID0000031"
@@ -1800,23 +1800,13 @@
                 ],
                 "files": [
                     {
-                        "link": "output",
-                        "name": "cposs2ukstu_red_002_001.fits",
-                        "size": 52513920
-                    },
-                    {
                         "link": "input",
-                        "name": "pposs2ukstu_red_002_001.fits",
-                        "size": 52513920
+                        "name": "2-projected.tbl",
+                        "size": 946
                     },
                     {
                         "link": "output",
-                        "name": "cposs2ukstu_red_002_001_area.fits",
-                        "size": 52513920
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_red_002_001_area.fits",
+                        "name": "cposs2ukstu_red_002_001.fits",
                         "size": 52513920
                     },
                     {
@@ -1826,12 +1816,22 @@
                     },
                     {
                         "link": "input",
-                        "name": "2-projected.tbl",
-                        "size": 946
+                        "name": "pposs2ukstu_red_002_001.fits",
+                        "size": 52513920
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_002_001_area.fits",
+                        "size": 52513920
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_red_002_001_area.fits",
+                        "size": 52513920
                     }
                 ],
-                "avgCPU": 19.9135,
-                "memory": 106492,
+                "avgCPU": 27.0525,
+                "memory": 106592,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -1840,12 +1840,12 @@
                     "2-projected.tbl",
                     "2-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBackground_ID0000035",
                 "type": "compute",
-                "runtime": 3.362,
+                "runtime": 3.067,
                 "parents": [
                     "mProject_ID0000023",
                     "mBgModel_ID0000031"
@@ -1857,7 +1857,12 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_red_002_002_area.fits",
+                        "name": "2-projected.tbl",
+                        "size": 946
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_red_002_002.fits",
                         "size": 52536960
                     },
                     {
@@ -1867,27 +1872,22 @@
                     },
                     {
                         "link": "output",
-                        "name": "cposs2ukstu_red_002_002.fits",
+                        "name": "cposs2ukstu_red_002_002_area.fits",
+                        "size": 52536960
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_red_002_002_area.fits",
                         "size": 52536960
                     },
                     {
                         "link": "input",
                         "name": "pposs2ukstu_red_002_002.fits",
                         "size": 52536960
-                    },
-                    {
-                        "link": "input",
-                        "name": "2-projected.tbl",
-                        "size": 946
-                    },
-                    {
-                        "link": "output",
-                        "name": "cposs2ukstu_red_002_002_area.fits",
-                        "size": 52536960
                     }
                 ],
-                "avgCPU": 20.2558,
-                "memory": 106668,
+                "avgCPU": 21.552,
+                "memory": 106428,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -1896,12 +1896,12 @@
                     "2-projected.tbl",
                     "2-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mImgtbl_ID0000036",
                 "type": "compute",
-                "runtime": 0.422,
+                "runtime": 0.408,
                 "parents": [
                     "mBackground_ID0000032",
                     "mBackground_ID0000033",
@@ -1914,23 +1914,18 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_red_002_001.fits",
-                        "size": 52513920
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_red_001_002.fits",
-                        "size": 52557120
-                    },
-                    {
-                        "link": "input",
                         "name": "2-corrected.tbl",
                         "size": 946
                     },
                     {
-                        "link": "output",
-                        "name": "2-updated-corrected.tbl",
-                        "size": 2600
+                        "link": "input",
+                        "name": "cposs2ukstu_red_001_001.fits",
+                        "size": 52536960
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_red_002_001.fits",
+                        "size": 52513920
                     },
                     {
                         "link": "input",
@@ -1939,12 +1934,17 @@
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_red_001_001.fits",
-                        "size": 52536960
+                        "name": "cposs2ukstu_red_001_002.fits",
+                        "size": 52557120
+                    },
+                    {
+                        "link": "output",
+                        "name": "2-updated-corrected.tbl",
+                        "size": 2600
                     }
                 ],
-                "avgCPU": 45.7346,
-                "memory": 71072,
+                "avgCPU": 45.5882,
+                "memory": 71152,
                 "priority": 70,
                 "arguments": [
                     ".",
@@ -1952,12 +1952,12 @@
                     "2-corrected.tbl",
                     "2-updated-corrected.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mAdd_ID0000037",
                 "type": "compute",
-                "runtime": 1.472,
+                "runtime": 1.328,
                 "parents": [
                     "mBackground_ID0000032",
                     "mBackground_ID0000033",
@@ -1971,6 +1971,16 @@
                 ],
                 "files": [
                     {
+                        "link": "output",
+                        "name": "2-mosaic.fits",
+                        "size": 25922880
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_red_001_001.fits",
+                        "size": 52536960
+                    },
+                    {
                         "link": "input",
                         "name": "cposs2ukstu_red_002_001.fits",
                         "size": 52513920
@@ -1982,8 +1992,18 @@
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_red_002_001_area.fits",
-                        "size": 52513920
+                        "name": "region.hdr",
+                        "size": 275
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_red_002_002.fits",
+                        "size": 52536960
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_red_002_002_area.fits",
+                        "size": 52536960
                     },
                     {
                         "link": "input",
@@ -1997,6 +2017,11 @@
                     },
                     {
                         "link": "input",
+                        "name": "cposs2ukstu_red_002_001_area.fits",
+                        "size": 52513920
+                    },
+                    {
+                        "link": "input",
                         "name": "cposs2ukstu_red_001_002_area.fits",
                         "size": 52557120
                     },
@@ -2004,35 +2029,10 @@
                         "link": "input",
                         "name": "2-updated-corrected.tbl",
                         "size": 2600
-                    },
-                    {
-                        "link": "input",
-                        "name": "region.hdr",
-                        "size": 275
-                    },
-                    {
-                        "link": "output",
-                        "name": "2-mosaic.fits",
-                        "size": 25922880
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_red_002_002.fits",
-                        "size": 52536960
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_red_001_001.fits",
-                        "size": 52536960
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_red_002_002_area.fits",
-                        "size": 52536960
                     }
                 ],
-                "avgCPU": 39.7418,
-                "memory": 70020,
+                "avgCPU": 42.5452,
+                "memory": 70060,
                 "priority": 80,
                 "arguments": [
                     "-e",
@@ -2040,30 +2040,30 @@
                     "region.hdr",
                     "2-mosaic.fits"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mViewer_ID0000038",
                 "type": "compute",
-                "runtime": 1.976,
+                "runtime": 1.923,
                 "parents": [
                     "mAdd_ID0000037"
                 ],
                 "children": [],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "2-mosaic.fits",
-                        "size": 25922880
-                    },
-                    {
                         "link": "output",
                         "name": "2-mosaic.png",
                         "size": 1850028
+                    },
+                    {
+                        "link": "input",
+                        "name": "2-mosaic.fits",
+                        "size": 25922880
                     }
                 ],
-                "avgCPU": 92.9656,
-                "memory": 69616,
+                "avgCPU": 95.2158,
+                "memory": 69632,
                 "priority": 90,
                 "arguments": [
                     "-ct",
@@ -2076,12 +2076,12 @@
                     "-png",
                     "2-mosaic.png"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mProject_ID0000039",
                 "type": "compute",
-                "runtime": 412.588,
+                "runtime": 411.332,
                 "parents": [],
                 "children": [
                     "mDiffFit_ID0000045",
@@ -2091,9 +2091,14 @@
                 ],
                 "files": [
                     {
-                        "link": "output",
-                        "name": "pposs2ukstu_ir_001_001_area.fits",
-                        "size": 53009280
+                        "link": "input",
+                        "name": "poss2ukstu_ir_001_001.fits",
+                        "size": 7327984
+                    },
+                    {
+                        "link": "input",
+                        "name": "region-oversized.hdr",
+                        "size": 277
                     },
                     {
                         "link": "output",
@@ -2101,18 +2106,13 @@
                         "size": 53009280
                     },
                     {
-                        "link": "input",
-                        "name": "poss2ukstu_ir_001_001.fits",
-                        "size": 7327978
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
+                        "link": "output",
+                        "name": "pposs2ukstu_ir_001_001_area.fits",
+                        "size": 53009280
                     }
                 ],
-                "avgCPU": 99.4021,
-                "memory": 121276,
+                "avgCPU": 99.5357,
+                "memory": 121452,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -2120,12 +2120,12 @@
                     "pposs2ukstu_ir_001_001.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mProject_ID0000040",
                 "type": "compute",
-                "runtime": 407.823,
+                "runtime": 408.397,
                 "parents": [],
                 "children": [
                     "mDiffFit_ID0000047",
@@ -2135,28 +2135,28 @@
                 ],
                 "files": [
                     {
+                        "link": "input",
+                        "name": "poss2ukstu_ir_001_002.fits",
+                        "size": 7167250
+                    },
+                    {
                         "link": "output",
                         "name": "pposs2ukstu_ir_001_002_area.fits",
                         "size": 53029440
                     },
                     {
                         "link": "input",
-                        "name": "poss2ukstu_ir_001_002.fits",
-                        "size": 7167257
+                        "name": "region-oversized.hdr",
+                        "size": 277
                     },
                     {
                         "link": "output",
                         "name": "pposs2ukstu_ir_001_002.fits",
                         "size": 53029440
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
                     }
                 ],
-                "avgCPU": 99.3551,
-                "memory": 121344,
+                "avgCPU": 99.5103,
+                "memory": 121472,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -2164,12 +2164,12 @@
                     "pposs2ukstu_ir_001_002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mProject_ID0000041",
                 "type": "compute",
-                "runtime": 409.605,
+                "runtime": 409.656,
                 "parents": [],
                 "children": [
                     "mDiffFit_ID0000048",
@@ -2190,17 +2190,17 @@
                     },
                     {
                         "link": "input",
-                        "name": "poss2ukstu_ir_002_001.fits",
-                        "size": 7217492
+                        "name": "region-oversized.hdr",
+                        "size": 277
                     },
                     {
                         "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
+                        "name": "poss2ukstu_ir_002_001.fits",
+                        "size": 7217496
                     }
                 ],
-                "avgCPU": 99.4624,
-                "memory": 121372,
+                "avgCPU": 99.4979,
+                "memory": 121320,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -2208,12 +2208,12 @@
                     "pposs2ukstu_ir_002_001.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mProject_ID0000042",
                 "type": "compute",
-                "runtime": 414.068,
+                "runtime": 410.502,
                 "parents": [],
                 "children": [
                     "mBackground_ID0000054",
@@ -2222,11 +2222,6 @@
                     "mDiffFit_ID0000045"
                 ],
                 "files": [
-                    {
-                        "link": "input",
-                        "name": "poss2ukstu_ir_002_002.fits",
-                        "size": 7120726
-                    },
                     {
                         "link": "output",
                         "name": "pposs2ukstu_ir_002_002_area.fits",
@@ -2241,10 +2236,15 @@
                         "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
+                    },
+                    {
+                        "link": "input",
+                        "name": "poss2ukstu_ir_002_002.fits",
+                        "size": 7120718
                     }
                 ],
-                "avgCPU": 98.9154,
-                "memory": 121396,
+                "avgCPU": 99.3832,
+                "memory": 121348,
                 "priority": 20,
                 "arguments": [
                     "-X",
@@ -2252,12 +2252,12 @@
                     "pposs2ukstu_ir_002_002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000043",
                 "type": "compute",
-                "runtime": 2.38,
+                "runtime": 2.39,
                 "parents": [
                     "mProject_ID0000039",
                     "mProject_ID0000040"
@@ -2272,13 +2272,8 @@
                         "size": 53009280
                     },
                     {
-                        "link": "output",
-                        "name": "3-fit.000001.000002.txt",
-                        "size": 287
-                    },
-                    {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_001_002.fits",
+                        "name": "pposs2ukstu_ir_001_002_area.fits",
                         "size": 53029440
                     },
                     {
@@ -2288,17 +2283,22 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_001_001_area.fits",
-                        "size": 53009280
+                        "name": "pposs2ukstu_ir_001_002.fits",
+                        "size": 53029440
+                    },
+                    {
+                        "link": "output",
+                        "name": "3-fit.000001.000002.txt",
+                        "size": 287
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_001_002_area.fits",
-                        "size": 53029440
+                        "name": "pposs2ukstu_ir_001_001_area.fits",
+                        "size": 53009280
                     }
                 ],
-                "avgCPU": 0.1681,
-                "memory": 2912,
+                "avgCPU": 0.1674,
+                "memory": 2888,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -2309,12 +2309,12 @@
                     "3-diff.000001.000002.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000044",
                 "type": "compute",
-                "runtime": 2.553,
+                "runtime": 2.108,
                 "parents": [
                     "mProject_ID0000039",
                     "mProject_ID0000041"
@@ -2323,6 +2323,16 @@
                     "mConcatFit_ID0000049"
                 ],
                 "files": [
+                    {
+                        "link": "output",
+                        "name": "3-fit.000001.000003.txt",
+                        "size": 290
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_002_001.fits",
+                        "size": 53009280
+                    },
                     {
                         "link": "input",
                         "name": "pposs2ukstu_ir_001_001.fits",
@@ -2335,16 +2345,6 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_002_001.fits",
-                        "size": 53009280
-                    },
-                    {
-                        "link": "output",
-                        "name": "3-fit.000001.000003.txt",
-                        "size": 290
-                    },
-                    {
-                        "link": "input",
                         "name": "region-oversized.hdr",
                         "size": 277
                     },
@@ -2354,8 +2354,8 @@
                         "size": 53009280
                     }
                 ],
-                "avgCPU": 0.1958,
-                "memory": 2896,
+                "avgCPU": 0.2372,
+                "memory": 2892,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -2366,12 +2366,12 @@
                     "3-diff.000001.000003.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000045",
                 "type": "compute",
-                "runtime": 1.122,
+                "runtime": 1.161,
                 "parents": [
                     "mProject_ID0000039",
                     "mProject_ID0000042"
@@ -2382,12 +2382,17 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_001_001.fits",
+                        "name": "pposs2ukstu_ir_002_002_area.fits",
                         "size": 53009280
                     },
                     {
+                        "link": "output",
+                        "name": "3-fit.000001.000004.txt",
+                        "size": 282
+                    },
+                    {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_002_002.fits",
+                        "name": "pposs2ukstu_ir_001_001.fits",
                         "size": 53009280
                     },
                     {
@@ -2401,18 +2406,13 @@
                         "size": 53009280
                     },
                     {
-                        "link": "output",
-                        "name": "3-fit.000001.000004.txt",
-                        "size": 282
-                    },
-                    {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_002_002_area.fits",
+                        "name": "pposs2ukstu_ir_002_002.fits",
                         "size": 53009280
                     }
                 ],
-                "avgCPU": 0.4456,
-                "memory": 2888,
+                "avgCPU": 0.4307,
+                "memory": 2856,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -2423,12 +2423,12 @@
                     "3-diff.000001.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000046",
                 "type": "compute",
-                "runtime": 1.002,
+                "runtime": 1.131,
                 "parents": [
                     "mProject_ID0000040",
                     "mProject_ID0000041"
@@ -2444,7 +2444,12 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_001_002.fits",
+                        "name": "pposs2ukstu_ir_002_001_area.fits",
+                        "size": 53009280
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_001_002_area.fits",
                         "size": 53029440
                     },
                     {
@@ -2454,22 +2459,17 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_002_001_area.fits",
-                        "size": 53009280
+                        "name": "pposs2ukstu_ir_001_002.fits",
+                        "size": 53029440
                     },
                     {
                         "link": "output",
                         "name": "3-fit.000002.000003.txt",
                         "size": 280
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_001_002_area.fits",
-                        "size": 53029440
                     }
                 ],
-                "avgCPU": 0.499,
-                "memory": 2820,
+                "avgCPU": 0.4421,
+                "memory": 2900,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -2480,12 +2480,12 @@
                     "3-diff.000002.000003.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mDiffFit_ID0000047",
                 "type": "compute",
-                "runtime": 1.734,
+                "runtime": 1.66,
                 "parents": [
                     "mProject_ID0000040",
                     "mProject_ID0000042"
@@ -2495,9 +2495,24 @@
                 ],
                 "files": [
                     {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_002_002_area.fits",
+                        "size": 53009280
+                    },
+                    {
                         "link": "output",
                         "name": "3-fit.000002.000004.txt",
                         "size": 286
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_001_002_area.fits",
+                        "size": 53029440
+                    },
+                    {
+                        "link": "input",
+                        "name": "region-oversized.hdr",
+                        "size": 277
                     },
                     {
                         "link": "input",
@@ -2508,25 +2523,10 @@
                         "link": "input",
                         "name": "pposs2ukstu_ir_002_002.fits",
                         "size": 53009280
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_001_002_area.fits",
-                        "size": 53029440
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_002_002_area.fits",
-                        "size": 53009280
                     }
                 ],
-                "avgCPU": 0.2884,
-                "memory": 2912,
+                "avgCPU": 0.3012,
+                "memory": 2860,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -2537,12 +2537,12 @@
                     "3-diff.000002.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mDiffFit_ID0000048",
                 "type": "compute",
-                "runtime": 1.954,
+                "runtime": 1.773,
                 "parents": [
                     "mProject_ID0000041",
                     "mProject_ID0000042"
@@ -2553,22 +2553,12 @@
                 "files": [
                     {
                         "link": "input",
+                        "name": "pposs2ukstu_ir_002_002_area.fits",
+                        "size": 53009280
+                    },
+                    {
+                        "link": "input",
                         "name": "pposs2ukstu_ir_002_001.fits",
-                        "size": 53009280
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_002_002.fits",
-                        "size": 53009280
-                    },
-                    {
-                        "link": "input",
-                        "name": "region-oversized.hdr",
-                        "size": 277
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_002_001_area.fits",
                         "size": 53009280
                     },
                     {
@@ -2578,12 +2568,22 @@
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_002_002_area.fits",
+                        "name": "pposs2ukstu_ir_002_001_area.fits",
+                        "size": 53009280
+                    },
+                    {
+                        "link": "input",
+                        "name": "region-oversized.hdr",
+                        "size": 277
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_002_002.fits",
                         "size": 53009280
                     }
                 ],
-                "avgCPU": 0.2559,
-                "memory": 2892,
+                "avgCPU": 0.282,
+                "memory": 2896,
                 "priority": 30,
                 "arguments": [
                     "-d",
@@ -2594,12 +2594,12 @@
                     "3-diff.000003.000004.fits",
                     "region-oversized.hdr"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mConcatFit_ID0000049",
                 "type": "compute",
-                "runtime": 0.3,
+                "runtime": 0.303,
                 "parents": [
                     "mDiffFit_ID0000043",
                     "mDiffFit_ID0000044",
@@ -2614,23 +2614,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "3-fit.000002.000004.txt",
-                        "size": 286
-                    },
-                    {
-                        "link": "input",
-                        "name": "3-fit.000001.000002.txt",
-                        "size": 287
-                    },
-                    {
-                        "link": "output",
-                        "name": "3-fits.tbl",
-                        "size": 1457
-                    },
-                    {
-                        "link": "input",
-                        "name": "3-stat.tbl",
-                        "size": 1160
+                        "name": "3-fit.000001.000004.txt",
+                        "size": 282
                     },
                     {
                         "link": "input",
@@ -2639,8 +2624,13 @@
                     },
                     {
                         "link": "input",
-                        "name": "3-fit.000002.000003.txt",
-                        "size": 280
+                        "name": "3-fit.000002.000004.txt",
+                        "size": 286
+                    },
+                    {
+                        "link": "output",
+                        "name": "3-fits.tbl",
+                        "size": 1457
                     },
                     {
                         "link": "input",
@@ -2649,24 +2639,34 @@
                     },
                     {
                         "link": "input",
-                        "name": "3-fit.000001.000004.txt",
-                        "size": 282
+                        "name": "3-stat.tbl",
+                        "size": 1160
+                    },
+                    {
+                        "link": "input",
+                        "name": "3-fit.000001.000002.txt",
+                        "size": 287
+                    },
+                    {
+                        "link": "input",
+                        "name": "3-fit.000002.000003.txt",
+                        "size": 280
                     }
                 ],
-                "avgCPU": 78.3333,
-                "memory": 70840,
+                "avgCPU": 74.9175,
+                "memory": 70868,
                 "priority": 40,
                 "arguments": [
                     "3-stat.tbl",
                     "3-fits.tbl",
                     "."
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBgModel_ID0000050",
                 "type": "compute",
-                "runtime": 0.694,
+                "runtime": 0.67,
                 "parents": [
                     "mConcatFit_ID0000049"
                 ],
@@ -2678,6 +2678,11 @@
                 ],
                 "files": [
                     {
+                        "link": "input",
+                        "name": "3-images.tbl",
+                        "size": 2246
+                    },
+                    {
                         "link": "output",
                         "name": "3-corrections.tbl",
                         "size": 276
@@ -2686,15 +2691,10 @@
                         "link": "input",
                         "name": "3-fits.tbl",
                         "size": 1457
-                    },
-                    {
-                        "link": "input",
-                        "name": "3-images.tbl",
-                        "size": 2246
                     }
                 ],
-                "avgCPU": 90.634,
-                "memory": 137100,
+                "avgCPU": 93.7313,
+                "memory": 137096,
                 "priority": 50,
                 "arguments": [
                     "-i",
@@ -2703,12 +2703,12 @@
                     "3-fits.tbl",
                     "3-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBackground_ID0000051",
                 "type": "compute",
-                "runtime": 3.862,
+                "runtime": 3.364,
                 "parents": [
                     "mProject_ID0000039",
                     "mBgModel_ID0000050"
@@ -2718,16 +2718,6 @@
                     "mImgtbl_ID0000055"
                 ],
                 "files": [
-                    {
-                        "link": "input",
-                        "name": "3-projected.tbl",
-                        "size": 940
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_001_001.fits",
-                        "size": 53009280
-                    },
                     {
                         "link": "output",
                         "name": "cposs2ukstu_ir_001_001_area.fits",
@@ -2739,18 +2729,28 @@
                         "size": 276
                     },
                     {
-                        "link": "output",
-                        "name": "cposs2ukstu_ir_001_001.fits",
+                        "link": "input",
+                        "name": "3-projected.tbl",
+                        "size": 940
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_001_001.fits",
                         "size": 53009280
                     },
                     {
                         "link": "input",
                         "name": "pposs2ukstu_ir_001_001_area.fits",
                         "size": 53009280
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_ir_001_001.fits",
+                        "size": 53009280
                     }
                 ],
-                "avgCPU": 18.1771,
-                "memory": 107348,
+                "avgCPU": 19.2033,
+                "memory": 107444,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -2759,12 +2759,12 @@
                     "3-projected.tbl",
                     "3-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mBackground_ID0000052",
                 "type": "compute",
-                "runtime": 3.162,
+                "runtime": 3.62,
                 "parents": [
                     "mProject_ID0000040",
                     "mBgModel_ID0000050"
@@ -2776,8 +2776,18 @@
                 "files": [
                     {
                         "link": "input",
+                        "name": "3-corrections.tbl",
+                        "size": 276
+                    },
+                    {
+                        "link": "input",
                         "name": "3-projected.tbl",
                         "size": 940
+                    },
+                    {
+                        "link": "input",
+                        "name": "pposs2ukstu_ir_001_002_area.fits",
+                        "size": 53029440
                     },
                     {
                         "link": "input",
@@ -2786,27 +2796,17 @@
                     },
                     {
                         "link": "output",
-                        "name": "cposs2ukstu_ir_001_002_area.fits",
-                        "size": 53029440
-                    },
-                    {
-                        "link": "input",
-                        "name": "3-corrections.tbl",
-                        "size": 276
-                    },
-                    {
-                        "link": "output",
                         "name": "cposs2ukstu_ir_001_002.fits",
                         "size": 53029440
                     },
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_001_002_area.fits",
+                        "link": "output",
+                        "name": "cposs2ukstu_ir_001_002_area.fits",
                         "size": 53029440
                     }
                 ],
-                "avgCPU": 20.8729,
-                "memory": 107528,
+                "avgCPU": 19.3923,
+                "memory": 107492,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -2815,12 +2815,12 @@
                     "3-projected.tbl",
                     "3-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBackground_ID0000053",
                 "type": "compute",
-                "runtime": 3.213,
+                "runtime": 3.879,
                 "parents": [
                     "mProject_ID0000041",
                     "mBgModel_ID0000050"
@@ -2832,13 +2832,8 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "3-projected.tbl",
-                        "size": 940
-                    },
-                    {
-                        "link": "output",
-                        "name": "cposs2ukstu_ir_002_001.fits",
-                        "size": 53009280
+                        "name": "3-corrections.tbl",
+                        "size": 276
                     },
                     {
                         "link": "output",
@@ -2847,22 +2842,27 @@
                     },
                     {
                         "link": "input",
+                        "name": "3-projected.tbl",
+                        "size": 940
+                    },
+                    {
+                        "link": "input",
                         "name": "pposs2ukstu_ir_002_001.fits",
                         "size": 53009280
                     },
                     {
                         "link": "input",
-                        "name": "3-corrections.tbl",
-                        "size": 276
+                        "name": "pposs2ukstu_ir_002_001_area.fits",
+                        "size": 53009280
                     },
                     {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_002_001_area.fits",
+                        "link": "output",
+                        "name": "cposs2ukstu_ir_002_001.fits",
                         "size": 53009280
                     }
                 ],
-                "avgCPU": 22.4401,
-                "memory": 107496,
+                "avgCPU": 18.3552,
+                "memory": 107404,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -2871,12 +2871,12 @@
                     "3-projected.tbl",
                     "3-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mBackground_ID0000054",
                 "type": "compute",
-                "runtime": 3.406,
+                "runtime": 3.222,
                 "parents": [
                     "mProject_ID0000042",
                     "mBgModel_ID0000050"
@@ -2888,17 +2888,7 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "3-projected.tbl",
-                        "size": 940
-                    },
-                    {
-                        "link": "input",
-                        "name": "pposs2ukstu_ir_002_002.fits",
-                        "size": 53009280
-                    },
-                    {
-                        "link": "output",
-                        "name": "cposs2ukstu_ir_002_002_area.fits",
+                        "name": "pposs2ukstu_ir_002_002_area.fits",
                         "size": 53009280
                     },
                     {
@@ -2907,18 +2897,28 @@
                         "size": 276
                     },
                     {
+                        "link": "input",
+                        "name": "3-projected.tbl",
+                        "size": 940
+                    },
+                    {
+                        "link": "output",
+                        "name": "cposs2ukstu_ir_002_002_area.fits",
+                        "size": 53009280
+                    },
+                    {
                         "link": "output",
                         "name": "cposs2ukstu_ir_002_002.fits",
                         "size": 53009280
                     },
                     {
                         "link": "input",
-                        "name": "pposs2ukstu_ir_002_002_area.fits",
+                        "name": "pposs2ukstu_ir_002_002.fits",
                         "size": 53009280
                     }
                 ],
-                "avgCPU": 20.0528,
-                "memory": 107256,
+                "avgCPU": 22.005,
+                "memory": 107408,
                 "priority": 60,
                 "arguments": [
                     "-t",
@@ -2927,12 +2927,12 @@
                     "3-projected.tbl",
                     "3-corrections.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mImgtbl_ID0000055",
                 "type": "compute",
-                "runtime": 0.442,
+                "runtime": 0.406,
                 "parents": [
                     "mBackground_ID0000051",
                     "mBackground_ID0000052",
@@ -2949,9 +2949,19 @@
                         "size": 53009280
                     },
                     {
+                        "link": "output",
+                        "name": "3-updated-corrected.tbl",
+                        "size": 2594
+                    },
+                    {
                         "link": "input",
                         "name": "3-corrected.tbl",
                         "size": 940
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_ir_002_002.fits",
+                        "size": 53009280
                     },
                     {
                         "link": "input",
@@ -2959,23 +2969,13 @@
                         "size": 53029440
                     },
                     {
-                        "link": "output",
-                        "name": "3-updated-corrected.tbl",
-                        "size": 2594
-                    },
-                    {
                         "link": "input",
                         "name": "cposs2ukstu_ir_001_001.fits",
                         "size": 53009280
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_ir_002_002.fits",
-                        "size": 53009280
                     }
                 ],
-                "avgCPU": 43.8914,
-                "memory": 71044,
+                "avgCPU": 47.2906,
+                "memory": 71196,
                 "priority": 70,
                 "arguments": [
                     ".",
@@ -2983,12 +2983,12 @@
                     "3-corrected.tbl",
                     "3-updated-corrected.tbl"
                 ],
-                "machine": "wrench-htcondor-4"
+                "machine": "htcondor-slurm-4"
             },
             {
                 "name": "mAdd_ID0000056",
                 "type": "compute",
-                "runtime": 1.927,
+                "runtime": 1.292,
                 "parents": [
                     "mBackground_ID0000051",
                     "mBackground_ID0000052",
@@ -3003,33 +3003,18 @@
                 "files": [
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_ir_002_001_area.fits",
-                        "size": 53009280
-                    },
-                    {
-                        "link": "output",
-                        "name": "3-mosaic_area.fits",
-                        "size": 25922880
-                    },
-                    {
-                        "link": "input",
-                        "name": "cposs2ukstu_ir_002_001.fits",
-                        "size": 53009280
-                    },
-                    {
-                        "link": "input",
                         "name": "cposs2ukstu_ir_001_001_area.fits",
                         "size": 53009280
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_ir_002_002_area.fits",
+                        "name": "cposs2ukstu_ir_002_001_area.fits",
                         "size": 53009280
                     },
                     {
                         "link": "input",
-                        "name": "cposs2ukstu_ir_001_002_area.fits",
-                        "size": 53029440
+                        "name": "cposs2ukstu_ir_002_001.fits",
+                        "size": 53009280
                     },
                     {
                         "link": "input",
@@ -3042,6 +3027,21 @@
                         "size": 2594
                     },
                     {
+                        "link": "output",
+                        "name": "3-mosaic.fits",
+                        "size": 25922880
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_ir_002_002_area.fits",
+                        "size": 53009280
+                    },
+                    {
+                        "link": "input",
+                        "name": "cposs2ukstu_ir_002_002.fits",
+                        "size": 53009280
+                    },
+                    {
                         "link": "input",
                         "name": "cposs2ukstu_ir_001_002.fits",
                         "size": 53029440
@@ -3052,18 +3052,18 @@
                         "size": 53009280
                     },
                     {
-                        "link": "output",
-                        "name": "3-mosaic.fits",
-                        "size": 25922880
+                        "link": "input",
+                        "name": "cposs2ukstu_ir_001_002_area.fits",
+                        "size": 53029440
                     },
                     {
-                        "link": "input",
-                        "name": "cposs2ukstu_ir_002_002.fits",
-                        "size": 53009280
+                        "link": "output",
+                        "name": "3-mosaic_area.fits",
+                        "size": 25922880
                     }
                 ],
-                "avgCPU": 29.5278,
-                "memory": 70224,
+                "avgCPU": 45.2786,
+                "memory": 69960,
                 "priority": 80,
                 "arguments": [
                     "-e",
@@ -3071,12 +3071,12 @@
                     "region.hdr",
                     "3-mosaic.fits"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mViewer_ID0000057",
                 "type": "compute",
-                "runtime": 1.875,
+                "runtime": 1.795,
                 "parents": [
                     "mAdd_ID0000056"
                 ],
@@ -3093,8 +3093,8 @@
                         "size": 2142275
                     }
                 ],
-                "avgCPU": 90.72,
-                "memory": 70156,
+                "avgCPU": 94.4847,
+                "memory": 70252,
                 "priority": 90,
                 "arguments": [
                     "-ct",
@@ -3107,12 +3107,12 @@
                     "-png",
                     "3-mosaic.png"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             },
             {
                 "name": "mViewer_ID0000058",
                 "type": "compute",
-                "runtime": 3.815,
+                "runtime": 3.726,
                 "parents": [
                     "mAdd_ID0000018",
                     "mAdd_ID0000037",
@@ -3121,9 +3121,9 @@
                 "children": [],
                 "files": [
                     {
-                        "link": "input",
-                        "name": "2-mosaic.fits",
-                        "size": 25922880
+                        "link": "output",
+                        "name": "mosaic-color.png",
+                        "size": 4920460
                     },
                     {
                         "link": "input",
@@ -3131,9 +3131,9 @@
                         "size": 25922880
                     },
                     {
-                        "link": "output",
-                        "name": "mosaic-color.png",
-                        "size": 4920460
+                        "link": "input",
+                        "name": "2-mosaic.fits",
+                        "size": 25922880
                     },
                     {
                         "link": "input",
@@ -3141,8 +3141,8 @@
                         "size": 25922880
                     }
                 ],
-                "avgCPU": 96.0944,
-                "memory": 81920,
+                "avgCPU": 97.1283,
+                "memory": 82100,
                 "priority": 90,
                 "arguments": [
                     "-red",
@@ -3163,28 +3163,28 @@
                     "-png",
                     "mosaic-color.png"
                 ],
-                "machine": "wrench-htcondor-5"
+                "machine": "htcondor-slurm-3"
             }
         ],
         "machines": [
             {
-                "nodeName": "wrench-htcondor-4",
+                "nodeName": "htcondor-slurm-4",
                 "system": "linux",
                 "architecture": "x86_64",
-                "memory": 131795964,
-                "release": "4.15.0-106-generic",
+                "memory": 131795956,
+                "release": "4.15.0-134-generic",
                 "cpu": {
                     "count": 48,
-                    "speed": 1201,
+                    "speed": 1200,
                     "vendor": "GenuineIntel"
                 }
             },
             {
-                "nodeName": "wrench-htcondor-5",
+                "nodeName": "htcondor-slurm-3",
                 "system": "linux",
                 "architecture": "x86_64",
-                "memory": 131795964,
-                "release": "4.15.0-106-generic",
+                "memory": 131795956,
+                "release": "4.15.0-134-generic",
                 "cpu": {
                     "count": 48,
                     "speed": 1201,

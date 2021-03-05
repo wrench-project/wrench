@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
     bool ten_split = false;
     bool join_merge_join_merge = false;
     bool three_four_split = false;
-    bool seismology = false;
+    bool genome = false;
     bool montage = false;
 
     if(argc>2){
@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
     } else if (argc==7 && std::stod(std::string(argv[6]))==6) {
         three_four_split = true;
     } else if (argc==7 && std::stod(std::string(argv[6]))==7) {
-        seismology = true;
+        genome = true;
     } else if (argc==7 && std::stod(std::string(argv[6]))==8) {
         montage = true;
     }
@@ -618,8 +618,8 @@ int main(int argc, char **argv) {
         grid_workflow->addControlDependency(task14, task17);
         grid_workflow->addControlDependency(task15, task17);
         grid_workflow->addControlDependency(task16, task17);
-    } else if (seismology) {
-        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("seismology.json", "3500000000f", false);
+    } else if (genome) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("genome.json", "3500000000f", false);
     } else if (montage) {
         grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage.json", "3500000000f", false);
     }
@@ -754,7 +754,7 @@ int main(int argc, char **argv) {
         simulation->stageFile(input_file15, storage_service);
         simulation->stageFile(input_file16, storage_service);
         simulation->stageFile(input_file17, storage_service);
-    } else if (seismology) {
+    } else if (genome) {
 
     }
      **/
