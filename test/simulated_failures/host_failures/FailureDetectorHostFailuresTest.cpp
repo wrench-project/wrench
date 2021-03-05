@@ -174,7 +174,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -296,7 +296,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));

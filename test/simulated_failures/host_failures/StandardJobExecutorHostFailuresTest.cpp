@@ -203,7 +203,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
 
@@ -339,7 +339,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
 
@@ -500,7 +500,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
     simulation->init(&argc, argv);
