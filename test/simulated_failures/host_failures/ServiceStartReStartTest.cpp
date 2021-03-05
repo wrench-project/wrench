@@ -121,10 +121,10 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
+    argv[1] = strdup("--activate-host-shutdown");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -212,10 +212,10 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
+    argv[1] = strdup("--activate-host-shutdown");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

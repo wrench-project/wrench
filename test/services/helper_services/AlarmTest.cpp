@@ -114,9 +114,10 @@ void AlarmTest::do_downHost_Test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--activate-host-shutdown");
 
     simulation->init(&argc, argv);
 
