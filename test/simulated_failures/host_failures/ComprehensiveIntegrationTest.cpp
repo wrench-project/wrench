@@ -412,7 +412,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-host-shutdown");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 //    argv[1] = strdup("--wrench-full-log");
 

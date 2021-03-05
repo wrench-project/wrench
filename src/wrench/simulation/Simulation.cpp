@@ -118,23 +118,25 @@ namespace wrench {
         for (i = 0; i < *argc; i++) {
             if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
                 TerminalOutput::disableColor();
-            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs")) or
-                       (not strcmp(argv[i], "--wrench-log-full"))) {
+            } else if ((not strcmp(argv[i], "--wrench-full-log")) or
+                       (not strcmp(argv[i], "--wrench-full-logs")) or
+                       (not strcmp(argv[i], "--wrench-log-full")) or
+                       (not strcmp(argv[i], "--wrench-logs-full"))
+                    ) {
                 xbt_log_control_set("root.thresh:info");
-            } else if (not strcmp(argv[i], "--activate-energy")) {
+            } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
                 sg_host_energy_plugin_init();
                 this->energy_enabled = true;
-            } else if (not strcmp(argv[i], "--activate-host-shutdown")) {
+            } else if (not strcmp(argv[i], "--wrench-host-shutdown-simulation")) {
                 this->host_shutdown_enabled = true;
-            } else if (not strcmp(argv[i], "--help-wrench")) {
+            } else if ((not strcmp(argv[i], "--help-wrench")) or
+                       (not strcmp(argv[i], "--wrench-help"))) {
                 wrench_help_requested = true;
-            } else if (not strcmp(argv[i], "--help")) {
-                simulator_help_requested = true;
             } else if (not strcmp(argv[i], "--help-simgrid")) {
                 simgrid_help_requested = true;
-            } else if (not strcmp(argv[i], "--version")) {
+            } else if (not strcmp(argv[i], "--wrench-version")) {
                 version_requested = true;
-            } else if (not strcmp(argv[i], "--pagecache")) {
+            } else if (not strcmp(argv[i], "--wrench-pagecache-simulation")) {
                 this->pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
@@ -159,18 +161,18 @@ namespace wrench {
         // Print help message if requested
         if (wrench_help_requested) {
             std::cout << "General WRENCH command-line arguments:\n";
+            std::cout << "   --wrench-help: displays this help message\n";
+            std::cout << "   --wrench-energy-simulation: activates SimGrid's energy plugin\n";
+            std::cout << "     (requires host pstate definitions in XML platform description file)\n";
+            std::cout << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution\n";
+            std::cout << "   --wrench-pagecache-simulation: Activate the in-memory (Linux) page cache simulation (which ";
+            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory' that )\n";
+            std::cout << "                acts as additional RAM that can only be used for caching file pages)\n";
             std::cout << "   --wrench-no-color: disables colored terminal output\n";
             std::cout << "   --wrench-full-log: enables full logging\n";
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
-            std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
-            std::cout << "     (requires host pstate definitions in XML platform description file)\n";
-            std::cout << "   --activate-host-shutdown: activates WRENCH's capability to simulate host failures/shutdowns during execution\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
-            std::cout << "   --help-wrench: displays this help message\n";
-            std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";
-            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory' which )\n";
-            std::cout << "                acts as additional RAM that can only be used for caching file pages)\n";
             std::cerr << "\n";
         }
 
