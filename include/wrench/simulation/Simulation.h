@@ -153,8 +153,11 @@ namespace wrench {
         static double getLinkUsage(std::string linkname);
         static double getLinkBandwidth(std::string linkname);
         static bool isPageCachingEnabled();
+        static bool isHostShutdownSimulationEnabled();
+        static bool isEnergySimulationEnabled();
 
-        /***********************/
+
+            /***********************/
         /** \endcond           */
         /***********************/
 
@@ -203,6 +206,8 @@ namespace wrench {
 
         unsigned int on_state_change_callback_id;
 
+        static bool energy_enabled;
+        static bool host_shutdown_enabled;
         static bool pagecache_enabled;
     };
 
