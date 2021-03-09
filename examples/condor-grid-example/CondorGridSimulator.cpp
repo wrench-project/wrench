@@ -163,6 +163,7 @@ int main(int argc, char **argv) {
     double post_execution_overhead;
     int batch_bandwidth;
     long batch_per_node_flops;
+    double per_task_overhead;
 
     bool diamond_exec = false;
     bool three_task = false;
@@ -179,26 +180,27 @@ int main(int argc, char **argv) {
     if(argc>3){
         pre_execution_overhead = std::stod(std::string(argv[3]));
         post_execution_overhead = std::stod(std::string(argv[4]));
+        per_task_overhead = std::stod(std::string(argv[5]));
     }
-    if(argc>5){
-        batch_per_node_flops = std::stol(std::string(argv[5]));
+    if(argc>6){
+        batch_per_node_flops = std::stol(std::string(argv[6]));
         //printf("%ld\n",batch_per_node_flops);
     }
-    if(argc==7 && std::stod(std::string(argv[6]))==1){
+    if(argc==8 && std::stod(std::string(argv[7]))==1){
         three_task = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==2) {
+    } else if (argc==8 && std::stod(std::string(argv[7]))==2) {
         diamond_exec = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==3){
+    } else if (argc==8 && std::stod(std::string(argv[7]))==3){
         harpoon_join = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==4) {
+    } else if (argc==8 && std::stod(std::string(argv[7]))==4) {
         ten_split = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==5) {
+    } else if (argc==8 && std::stod(std::string(argv[7]))==5) {
         join_merge_join_merge = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==6) {
+    } else if (argc==8 && std::stod(std::string(argv[7]))==6) {
         three_four_split = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==7) {
+    } else if (argc==8 && std::stod(std::string(argv[7]))==7) {
         genome = true;
-    } else if (argc==7 && std::stod(std::string(argv[6]))==8) {
+    } else if (argc==8 && std::stod(std::string(argv[7]))==8) {
         montage = true;
     }
 
@@ -654,6 +656,7 @@ int main(int argc, char **argv) {
                                                                      {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
                                                                      {wrench::BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, std::to_string(pre_execution_overhead)},
                                                                      {wrench::BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY, std::to_string(post_execution_overhead)},
+                                                                     {wrench::BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD, std::to_string(per_task_overhead)}
                                                              });
     } else {
         batch_service = new wrench::BatchComputeService("BatchHost1",
