@@ -166,7 +166,7 @@ namespace wrench {
             std::cout << "   --wrench-help: displays this help message\n";
             std::cout << "   --wrench-energy-simulation: activates SimGrid's energy plugin\n";
             std::cout << "     (requires host pstate definitions in XML platform description file)\n";
-            std::cout << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution\n";
+            std::cout << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution (will slow down simulation)\n";
             std::cout << "   --wrench-pagecache-simulation: Activate the in-memory (Linux) page cache simulation (which ";
             std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory' that )\n";
             std::cout << "                acts as additional RAM that can only be used for caching file pages)\n";
