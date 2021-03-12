@@ -18,7 +18,8 @@
 void generatePlatform(std::string platform_file_path,
                       int disk_speed,
                       int batch_bandwidth = 0,
-                      long batch_per_node_flops = 0 ){
+                      long batch_per_node_flops = 0,
+                      int num_hosts = 2){
 
     if (platform_file_path.empty()) {
         throw std::invalid_argument("generatePlatform() platform_file_path cannot be empty");
@@ -26,7 +27,6 @@ void generatePlatform(std::string platform_file_path,
     if (disk_speed <= 0) {
         throw std::invalid_argument("generatePlatform() disk_speed must be greater than 0");
     }
-
 
     std::string xml_string = "<?xml version='1.0'?>\n"
                              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">\n"
@@ -52,38 +52,9 @@ void generatePlatform(std::string platform_file_path,
                              "          <prop id=\"mount\" value=\"/scratch\"/>\n"
                              "      </disk>\n"
                              "  </host>\n"
-                             "  <host id=\"BatchHost1\" speed=\"1666666666f\" core=\"10\">\n"
-                             "      <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
-                             "          <prop id=\"size\" value=\"1000000GB\"/>\n"
-                             "          <prop id=\"mount\" value=\"/\"/>\n"
-                             "      </disk>\n"
-                             "      <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
-                             "          <prop id=\"size\" value=\"1000000GB\"/>\n"
-                             "          <prop id=\"mount\" value=\"/scratch\"/>\n"
-                             "      </disk>\n"
-                             "  </host>\n"
-                             "  <host id=\"BatchHost2\" speed=\"1666666666f\" core=\"10\">\n"
-                             "    <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
-                             "        <prop id=\"size\" value=\"100000GB\"/>\n"
-                             "        <prop id=\"mount\" value=\"/\"/>\n"
-                             "    </disk>\n"
-                             "    <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
-                             "        <prop id=\"size\" value=\"1000000GB\"/>\n"
-                             "        <prop id=\"mount\" value=\"/scratch\"/>\n"
-                             "    </disk>\n"
-                             "  </host>\n"
                              "  <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>\n"
                              "  <link id=\"2\" bandwidth=\"5000GBps\" latency=\"0us\"/>\n"
-                             "  <link id=\"3\" bandwidth=\"5000GBps\" latency=\"0us\"/>\n"
-                             "  <link id=\"4\" bandwidth=\"5000GBps\" latency=\"0us\"/>\n"
-                             "  <link id=\"5\" bandwidth=\"5000GBps\" latency=\"0us\"/>\n"
-                             "  <link id=\"6\" bandwidth=\"5000GBps\" latency=\"0us\"/>\n"
                              "  <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>\n"
-                             "  <route src=\"BatchHost1\" dst=\"BatchHost2\"> <link_ctn id=\"2\"/> </route>\n"
-                             "  <route src=\"DualCoreHost\" dst=\"BatchHost1\"> <link_ctn id=\"3\"/> </route>\n"
-                             "  <route src=\"DualCoreHost\" dst=\"BatchHost2\"> <link_ctn id=\"4\"/> </route>\n"
-                             "  <route src=\"QuadCoreHost\" dst=\"BatchHost1\"> <link_ctn id=\"5\"/> </route>\n"
-                             "  <route src=\"QuadCoreHost\" dst=\"BatchHost2\"> <link_ctn id=\"6\"/> </route>\n"
                              "</zone>\n"
                              "</platform>\n";
 
@@ -91,46 +62,84 @@ void generatePlatform(std::string platform_file_path,
 
     if (xml_doc.load_string(xml_string.c_str(), pugi::parse_doctype)) {
 
-        pugi::xml_node host0 = xml_doc.child("platform").child("zone").child("host");
-        pugi::xml_node host1 = host0.next_sibling("host");
-        pugi::xml_node host2 = host1.next_sibling("host");
-        pugi::xml_node host3 = host2.next_sibling("host");
+        pugi::xml_node last_host = xml_doc.child("platform").child("zone").find_child_by_attribute("host",
+                                                                                                   "id",
+                                                                                                   "QuadCoreHost");
+        pugi::xml_node last_link = xml_doc.child("platform").child("zone").find_child_by_attribute("link",
+                                                                                                   "id",
+                                                                                                   "2");
 
-        pugi::xml_node disk0 = host2.child("disk");
-        pugi::xml_node disk1 = host2.child("disk").next_sibling("disk");
-        pugi::xml_node disk2 = host3.child("disk");
-        pugi::xml_node disk3 = host3.child("disk").next_sibling("disk");
-
-        disk0.attribute("read_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk0.attribute("write_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk1.attribute("read_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk1.attribute("write_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk2.attribute("read_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk2.attribute("write_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk3.attribute("read_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-        disk3.attribute("write_bw").set_value(std::string(std::to_string(disk_speed) + "MBps").c_str());
-
-        pugi::xml_node link0 = xml_doc.child("platform").child("zone").child("link");
-        pugi::xml_node link1 = link0.next_sibling("link");
-        pugi::xml_node link2 = link1.next_sibling("link");
-        pugi::xml_node link3 = link2.next_sibling("link");
-        pugi::xml_node link4 = link3.next_sibling("link");
-        pugi::xml_node link5 = link4.next_sibling("link");
+        for(int i=0;i<num_hosts;i++){
+            pugi::xml_node host = xml_doc.child("platform").child("zone").prepend_child("host");
+            host.append_attribute("id") = ("slurm_worker_"+std::to_string(i)).c_str();
+            host.append_attribute("speed") = (std::string(std::to_string(batch_per_node_flops) + "f").c_str());
+            host.append_attribute("core") = "10";
 
 
+            ///Create disk and set to r/w value
+            pugi::xml_node disk_1 = host.append_child("disk");
+            disk_1.append_attribute("id") = ("large_disk");
+            disk_1.append_attribute("read_bw") = std::string(std::to_string(disk_speed) + "MBps").c_str();
+            disk_1.append_attribute("write_bw") = std::string(std::to_string(disk_speed) + "MBps").c_str();
+            pugi::xml_node disk_1_size = disk_1.append_child("prop");
+            disk_1_size.append_attribute("id") = "size";
+            disk_1_size.append_attribute("value") = "1000000GB";
+
+            pugi::xml_node disk_1_mount = disk_1.append_child("prop");
+            disk_1_mount.append_attribute("id") = "mount";
+            disk_1_mount.append_attribute("value") = "/";
 
 
-        //Setting two links that are between DualCoreHost (storage service) and the two batch service hosts.
-        if(batch_bandwidth>0){
-            link2.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
-            link3.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
-            link4.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
-            link5.attribute("bandwidth").set_value(std::string(std::to_string(batch_bandwidth) + "MBps").c_str());
-        }
+            pugi::xml_node disk_2 = host.append_child("disk");
+            disk_2.append_attribute("id") = ("scratch");
+            disk_2.append_attribute("read_bw") = std::string(std::to_string(disk_speed) + "MBps").c_str();
+            disk_2.append_attribute("write_bw") = std::string(std::to_string(disk_speed) + "MBps").c_str();
+            pugi::xml_node disk_2_size = disk_2.append_child("prop");
+            disk_2_size.append_attribute("id") = "size";
+            disk_2_size.append_attribute("value") = "1000000GB";
 
-        if(batch_per_node_flops>0){
-            host2.attribute("speed").set_value(std::string(std::to_string(batch_per_node_flops) + "f").c_str());
-            host3.attribute("speed").set_value(std::string(std::to_string(batch_per_node_flops) + "f").c_str());
+            pugi::xml_node disk_2_mount = disk_2.append_child("prop");
+            disk_2_mount.append_attribute("id") = "mount";
+            disk_2_mount.append_attribute("value") = "/scratch";
+
+            ///ADD LINKS
+            pugi::xml_node link_1 = xml_doc.child("platform").child("zone").insert_child_after("link", last_host);
+            link_1.append_attribute("id") = (std::to_string(i)+"_1").c_str();
+            link_1.append_attribute("bandwidth") = std::string(std::to_string(batch_bandwidth) + "MBps").c_str();
+            link_1.append_attribute("latency") = "0us";
+
+            pugi::xml_node link_2 = xml_doc.child("platform").child("zone").insert_child_after("link", last_host);
+            link_2.append_attribute("id") = (std::to_string(i)+"_2").c_str();
+            link_2.append_attribute("bandwidth") = std::string(std::to_string(batch_bandwidth) + "MBps").c_str();
+            link_2.append_attribute("latency") = "0us";
+
+            ///ADD ROUTES
+            pugi::xml_node route_1 = xml_doc.child("platform").child("zone").insert_child_after("route", last_link);
+            route_1.append_attribute("src") = "DualCoreHost";
+            route_1.append_attribute("dst") = ("slurm_worker_"+std::to_string(i)).c_str();
+            pugi::xml_node link_ctn_1 = route_1.append_child("link_ctn");
+            link_ctn_1.append_attribute("id") = (std::to_string(i)+"_1").c_str();
+
+            pugi::xml_node route_2 = xml_doc.child("platform").child("zone").insert_child_after("route", last_link);
+            route_2.append_attribute("src") = "QuadCoreHost";
+            route_2.append_attribute("dst") = ("slurm_worker_"+std::to_string(i)).c_str();
+            pugi::xml_node link_ctn_2 = route_2.append_child("link_ctn");
+            link_ctn_2.append_attribute("id") = (std::to_string(i)+"_2").c_str();
+            if(i>0){
+                for(int j=0;j<i;j++){
+                    ///CREATE ROUTES TO PREVIOUSLY CREATED HOSTS
+                    pugi::xml_node inter_host_link = xml_doc.child("platform").child("zone").insert_child_after("link", last_host);
+                    inter_host_link.append_attribute("id") = (std::to_string(i)+"_"+std::to_string(j)+"_0").c_str();
+                    inter_host_link.append_attribute("bandwidth") = std::string(std::to_string(batch_bandwidth) + "MBps").c_str();
+                    inter_host_link.append_attribute("latency") = "0us";
+
+                    pugi::xml_node inter_host_route = xml_doc.child("platform").child("zone").insert_child_after("route", last_link);
+                    inter_host_route.append_attribute("src") = ("slurm_worker_"+std::to_string(j)).c_str();
+                    inter_host_route.append_attribute("dst") = ("slurm_worker_"+std::to_string(i)).c_str();
+                    pugi::xml_node inter_host_link_ctn = inter_host_route.append_child("link_ctn");
+                    inter_host_link_ctn.append_attribute("id") = (std::to_string(i)+"_"+std::to_string(j)+"_0").c_str();
+                }
+            }
         }
 
         xml_doc.save_file(platform_file_path.c_str());
@@ -154,10 +163,6 @@ int main(int argc, char **argv) {
     auto *simulation = new wrench::Simulation();
 
     simulation->init(&argc, argv);
-
-    // Pull platform from provided xml file.
-    //char *platform_file = argv[1];
-    //simulation->instantiatePlatform(platform_file);
     int disk_speed = std::stoi(std::string(argv[1]));
     double pre_execution_overhead;
     double post_execution_overhead;
@@ -173,6 +178,11 @@ int main(int argc, char **argv) {
     bool three_four_split = false;
     bool genome = false;
     bool montage = false;
+    bool montage_4 = false;
+    bool montage_8 = false;
+    bool montage_16 = false;
+
+    int num_hosts = 2;
 
     if(argc>2){
         batch_bandwidth = std::stoi(std::string(argv[2]));
@@ -186,36 +196,41 @@ int main(int argc, char **argv) {
         batch_per_node_flops = std::stol(std::string(argv[6]));
         //printf("%ld\n",batch_per_node_flops);
     }
-    if(argc==8 && std::stod(std::string(argv[7]))==1){
+    if(argc>=8 && std::stod(std::string(argv[7]))==1){
         three_task = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==2) {
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==2) {
         diamond_exec = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==3){
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==3){
         harpoon_join = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==4) {
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==4) {
         ten_split = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==5) {
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==5) {
         join_merge_join_merge = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==6) {
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==6) {
         three_four_split = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==7) {
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==7) {
         genome = true;
-    } else if (argc==8 && std::stod(std::string(argv[7]))==8) {
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==8) {
         montage = true;
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==9) {
+        montage_4 = true;
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==10) {
+        montage_8 = true;
+    } else if (argc>=8 && std::stod(std::string(argv[7]))==11) {
+        montage_16 = true;
     }
 
-
-
+    if(argc==9){
+        num_hosts = std::stoi(std::string(argv[8]));
+    }
 
     std::string platform_file_path = "/tmp/platform.xml";
     if(argc<3){
         generatePlatform(platform_file_path, disk_speed);
     } else {
-        generatePlatform(platform_file_path, disk_speed, batch_bandwidth, batch_per_node_flops);
+        generatePlatform(platform_file_path, disk_speed, batch_bandwidth, batch_per_node_flops, num_hosts);
     }
     simulation->instantiatePlatform(platform_file_path);
-
-
 
     wrench::WorkflowFile *input_file1, *output_file1, *input_file2, *output_file2,
             *input_file3, *output_file3, *input_file4, *output_file4,
@@ -621,9 +636,15 @@ int main(int argc, char **argv) {
         grid_workflow->addControlDependency(task15, task17);
         grid_workflow->addControlDependency(task16, task17);
     } else if (genome) {
-        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("genome.json", "3500000000f", false);
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("genome.json", "2000000000f", false);
     } else if (montage) {
-        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage.json", "3500000000f", false);
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage.json", "2000000000f", false);
+    } else if (montage_4) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage_4.json", "2000000000f", false);
+    } else if (montage_8) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage_8.json", "2000000000f", false);
+    } else if (montage_16) {
+        grid_workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("montage_16.json", "2000000000f", false);
     }
 
     // Create a Storage Service
@@ -635,7 +656,15 @@ int main(int argc, char **argv) {
 
     // Create list of compute services
     std::set<wrench::ComputeService *> compute_services;
-    std::string execution_host = wrench::Simulation::getHostnameList()[1];
+    std::string execution_host = wrench::Simulation::getHostnameList()[num_hosts+1];
+
+
+    vector<std::string> worker_hosts;
+    for(int i=0;i<num_hosts;i++){
+        worker_hosts.push_back("slurm_worker_"+std::to_string(i));
+    }
+
+
     std::vector<std::string> execution_hosts;
     execution_hosts.push_back(execution_host);
     compute_services.insert(new wrench::BareMetalComputeService(
@@ -648,9 +677,11 @@ int main(int argc, char **argv) {
 
     wrench::BatchComputeService *batch_service = nullptr;
 
+
+
     if(argc>3){
-        batch_service = new wrench::BatchComputeService("BatchHost1",
-                                                             {"BatchHost1", "BatchHost2"},
+        batch_service = new wrench::BatchComputeService("slurm_worker_0",
+                                                             worker_hosts,
                                                              "/scratch",
                                                              {
                                                                      {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
@@ -659,8 +690,8 @@ int main(int argc, char **argv) {
                                                                      {wrench::BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD, std::to_string(per_task_overhead)}
                                                              });
     } else {
-        batch_service = new wrench::BatchComputeService("BatchHost1",
-                                                             {"BatchHost1", "BatchHost2"},
+        batch_service = new wrench::BatchComputeService("slurm_worker_0",
+                                                             worker_hosts,
                                                              "/scratch",
                                                              {
                                                                      {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
@@ -698,70 +729,6 @@ int main(int argc, char **argv) {
     for (auto const &f : grid_workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
-
-    /**
-    if(diamond_exec){
-        simulation->stageFile(input_file2, storage_service);
-        simulation->stageFile(input_file3, storage_service);
-        simulation->stageFile(input_file4, storage_service);
-    } else if (harpoon_join){
-        simulation->stageFile(input_file2, storage_service);
-        simulation->stageFile(input_file3, storage_service);
-        simulation->stageFile(input_file4, storage_service);
-        simulation->stageFile(input_file5, storage_service);
-        simulation->stageFile(input_file6, storage_service);
-        simulation->stageFile(input_file7, storage_service);
-        simulation->stageFile(input_file8, storage_service);
-    } else if (ten_split){
-        simulation->stageFile(input_file2, storage_service);
-        simulation->stageFile(input_file3, storage_service);
-        simulation->stageFile(input_file4, storage_service);
-        simulation->stageFile(input_file5, storage_service);
-        simulation->stageFile(input_file6, storage_service);
-        simulation->stageFile(input_file7, storage_service);
-        simulation->stageFile(input_file8, storage_service);
-        simulation->stageFile(input_file9, storage_service);
-        simulation->stageFile(input_file10, storage_service);
-        simulation->stageFile(input_file11, storage_service);
-        simulation->stageFile(input_file12, storage_service);
-    } else if (three_task){
-        simulation->stageFile(input_file2, storage_service);
-        simulation->stageFile(input_file3, storage_service);
-    } else if (join_merge_join_merge){
-        simulation->stageFile(input_file2, storage_service);
-        simulation->stageFile(input_file3, storage_service);
-        simulation->stageFile(input_file4, storage_service);
-        simulation->stageFile(input_file5, storage_service);
-        simulation->stageFile(input_file6, storage_service);
-        simulation->stageFile(input_file7, storage_service);
-        simulation->stageFile(input_file8, storage_service);
-        simulation->stageFile(input_file9, storage_service);
-        simulation->stageFile(input_file10, storage_service);
-        simulation->stageFile(input_file11, storage_service);
-        simulation->stageFile(input_file12, storage_service);
-        simulation->stageFile(input_file13, storage_service);
-    } else if (three_four_split) {
-        simulation->stageFile(input_file2, storage_service);
-        simulation->stageFile(input_file3, storage_service);
-        simulation->stageFile(input_file4, storage_service);
-        simulation->stageFile(input_file5, storage_service);
-        simulation->stageFile(input_file6, storage_service);
-        simulation->stageFile(input_file7, storage_service);
-        simulation->stageFile(input_file8, storage_service);
-        simulation->stageFile(input_file9, storage_service);
-        simulation->stageFile(input_file10, storage_service);
-        simulation->stageFile(input_file11, storage_service);
-        simulation->stageFile(input_file12, storage_service);
-        simulation->stageFile(input_file13, storage_service);
-        simulation->stageFile(input_file14, storage_service);
-        simulation->stageFile(input_file15, storage_service);
-        simulation->stageFile(input_file16, storage_service);
-        simulation->stageFile(input_file17, storage_service);
-    } else if (genome) {
-
-    }
-     **/
-
 
     // Running a "run a single task" simulation
     simulation->launch();
