@@ -620,6 +620,7 @@ namespace wrench {
 
         /** Main loop **/
         while (processNextMessage()) {
+            WRENCH_INFO("CALLING SCHEDULER");
             this->scheduler->processQueuedJobs();
         }
 
@@ -790,6 +791,7 @@ namespace wrench {
         WRENCH_INFO("Terminating a standard job executor");
         executor->kill(true);
         // Do not update the resource availability, because this is done at a higher level
+        WRENCH_INFO("DONE THE KILL");
 
     }
 
@@ -1699,6 +1701,8 @@ namespace wrench {
             }
         }
 
+        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
+
         if (!is_pending && !is_running && !is_waiting) {
             std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
@@ -1713,12 +1717,13 @@ namespace wrench {
             return;
         }
 
-        // Notify the scheduler of the failuire
+        // Notify the scheduler of the "failure"
         this->scheduler->processJobFailure(batch_job);
 
         // Is it running?
         if (is_running) {
             terminateRunningStandardJob(job);
+            this->freeUpResources(batch_job->getResourcesAllocated());
             this->running_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
