@@ -537,6 +537,7 @@ private:
 
         this->simulation->sleep(1);
 
+
         // Terminate job2 (which is pending)
         job_manager->terminateJob(job2);
 
@@ -583,10 +584,10 @@ TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--log=root.thresh=info");
+//    argv[1] = strdup("--log=root.thresh=info");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -608,7 +609,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
-                                            {})));
+                                            "",{{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}, {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

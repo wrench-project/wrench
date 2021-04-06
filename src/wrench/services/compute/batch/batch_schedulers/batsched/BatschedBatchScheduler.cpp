@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+
 #ifdef ENABLE_BATSCHED
 
 #include <signal.h>
@@ -22,7 +23,7 @@
 
 #endif
 
-
+#include "wrench/logging/TerminalOutput.h"
 #include "BatschedBatchScheduler.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
@@ -30,6 +31,8 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
 #include "wrench/workflow/failure_causes/NetworkError.h"
+
+WRENCH_LOG_CATEGORY(wrench_core_batsched_batch_scheduler, "Log category for BatschedBatchScheduler");
 
 
 namespace wrench {
@@ -308,7 +311,7 @@ namespace wrench {
             return;
         }
 
-        // IMPORTANT: We always as for more time, so that when the alarm goes
+        // IMPORTANT: We always ask for more time, so that when the alarm goes
         // of at the right time, we can respond to it before the Batsched
         // time slice has expired!
         double BATSCHED_JOB_EXTRA_TIME = 1.0;
@@ -360,8 +363,10 @@ namespace wrench {
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
-
+        WRENCH_INFO("CALLING NOTIFYJOBEVENTSTOBATSCHED");
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+        WRENCH_INFO("CALLED NOTIFYJOBEVENTSTOBATSCHED");
+
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "FAILED");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
@@ -382,10 +387,22 @@ namespace wrench {
     void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob>batch_job) {
 
 #ifdef ENABLE_BATSCHED
-        this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
+        // Fake it as a success
+        this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_KILLED", "terminated by users", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "TERMINATED");
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
+#endif
+    }
+
+    void BatschedBatchScheduler::processUnknownJobTermination(std::string job_id) {
+
+#ifdef ENABLE_BATSCHED
+        // Fake it as a success
+        this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
+//        this->appendJobInfoToCSVOutputFile(job_id, "TERMINATED");
+#else
+        throw std::runtime_error("BatschedBatchScheduler::processUknownJobTermination(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
 
