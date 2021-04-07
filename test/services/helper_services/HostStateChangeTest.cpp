@@ -126,6 +126,7 @@ private:
 };
 
 TEST_F(HostStateChangeDetectorServiceTest, StateChangeDetectionTest) {
+    WRENCH_INFO("WTF!!!");
     DO_TEST_WITH_FORK_ONE_ARG(do_StateChangeDetection_test, true);
     DO_TEST_WITH_FORK_ONE_ARG(do_StateChangeDetection_test, false);
 }
@@ -135,11 +136,10 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-log-full");
-
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
     simulation->init(&argc, argv);
 

@@ -790,7 +790,6 @@ namespace wrench {
         WRENCH_INFO("Terminating a standard job executor");
         executor->kill(true);
         // Do not update the resource availability, because this is done at a higher level
-
     }
 
 
@@ -1699,6 +1698,8 @@ namespace wrench {
             }
         }
 
+//        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
+
         if (!is_pending && !is_running && !is_waiting) {
             std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
@@ -1713,21 +1714,22 @@ namespace wrench {
             return;
         }
 
-        // Notify the scheduler of the failuire
-        this->scheduler->processJobFailure(batch_job);
-
         // Is it running?
         if (is_running) {
+            this->scheduler->processJobTermination(batch_job);
             terminateRunningStandardJob(job);
+            this->freeUpResources(batch_job->getResourcesAllocated());
             this->running_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
+            this->scheduler->processJobTermination(batch_job);
             auto to_free = *batch_pending_it;
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
         if (is_waiting) {
+            this->scheduler->processJobTermination(batch_job);
             this->waiting_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
@@ -1799,7 +1801,8 @@ namespace wrench {
         }
         if (workflow_job == nullptr) {
             //throw std::runtime_error("BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has");
-            WRENCH_WARN("BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of known jobs... ignoring (Batsched seems to send this back even when a job has been actively terminated)");
+            WRENCH_WARN("BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of known jobs... just telling Batsched that the job completed (Batsched seems to send this back even when a job has been actively terminated)");
+            this->scheduler->processUnknownJobTermination(execute_events["job_id"]);
             return;
         }
 
