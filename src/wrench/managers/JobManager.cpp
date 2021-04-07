@@ -251,7 +251,7 @@ namespace wrench {
      * @param job: a workflow job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a bare_metal: {{"taskID", "[hostname:][num_cores]}, ...}
+     *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
      *           - If no value is not provided for a task, then the service will choose a host and use as many cores as possible on that host.
      *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
      *           - If a "hostname" value is provided for a task, then the service will run the task on that

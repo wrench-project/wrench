@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0]
-                  << "<xml_platform_file> <workflow_file> --pagecache [--log=custom_wms.threshold=info]"
+                  << "<xml_platform_file> <workflow_file> --wrench-pagecache-simulation [--log=custom_wms.threshold=info]"
                   << std::endl;
         exit(1);
     }
