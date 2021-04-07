@@ -76,6 +76,12 @@ namespace wrench {
         void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
+        * @brief Method to process a job termination when the job is already forgotten (useful for batsched)
+        * @param job_id: the id of the batch job that was terminated
+        */
+        void processUnknownJobTermination(std::string job_id) override;
+
+        /**
          * @brief Method to get start time estimates
          * @param set_of_jobs: the set of job configurations whose start times should 
          * be estimated. Each job configuration is :(i) a name; (ii) a number of nodes;
