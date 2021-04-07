@@ -11,6 +11,7 @@
 #define WRENCH_HOMEGROWNBATCHSCHEDULER_H
 
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
+#include <stdexcept>
 
 
 namespace wrench {
