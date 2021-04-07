@@ -1477,7 +1477,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     nlohmann::json result_json;
     json_file >> result_json;
 
-    std::cerr << result_json << "\n";
+//    std::cerr << result_json << "\n";
 
     for (auto const &operation : (std::vector<std::string>){"reads"}) {
         ASSERT_EQ(result_json["host1"]["/"][operation].size(), 3);
