@@ -43,7 +43,6 @@ namespace wrench {
         this->max_num_nodes = max_num_nodes;
         this->max_num_cores_per_node = max_num_cores_per_node;
 
-        this->integer_sequence;
         for (int i=0; i < this->max_num_nodes; i++) {
             this->integer_sequence.insert(this->integer_sequence.end(), i);
         }
