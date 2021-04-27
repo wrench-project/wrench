@@ -152,7 +152,7 @@ namespace wrench {
         // that the --activate-host-shutdown flag should have been passed
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_state_change.connect(
-                [this](simgrid::s4u::Host const &h) {
+                [](simgrid::s4u::Host const &h) {
                     if (not Simulation::host_shutdown_enabled) {
                         throw std::runtime_error(
                                 "It looks like you are simulating host failures/shutdowns during the simulated execution."
