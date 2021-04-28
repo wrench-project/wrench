@@ -46,6 +46,7 @@ public:
     void do_GridUniverseTest_test();
     void do_NoStandardJobSupportTest_test();
     void do_NoGridUniverseSupportTest_test();
+    void do_NoPilotJobSupportTest_test();
 
 protected:
     HTCondorServiceTest() {
@@ -572,6 +573,9 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
                      std::invalid_argument);
     }
 
+    //Create manager w/o compute services, it will fail.
+    ASSERT_THROW(auto test = new wrench::HTCondorCentralManagerService(hostname, {}),std::invalid_argument);
+
     // Create list of valid compute services
     std::set<wrench::ComputeService *> compute_services;
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -749,6 +753,8 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
                                                          {
                                                                         {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
                                                                         });
+
+
 
 
     // Create a Grid universe HTCondor Service w/o batch service
@@ -1139,5 +1145,150 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
     free(argv[0]);
     free(argv);
 }
+
+/************************************************************************************************/
+/**          PILOT JOB SUBMISSION TEST WHERE PILOT JOBS NOT SUPPORTED                          **/
+/************************************************************************************************/
+
+class HTCondorNoPilotJobTestWMS : public wrench::WMS {
+
+public:
+    HTCondorNoPilotJobTestWMS(HTCondorServiceTest *test,
+                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                     std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    HTCondorServiceTest *test;
+
+    int main() {
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+
+        auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
+        std::shared_ptr<wrench::PilotJob>grid_job = job_manager->createPilotJob();
+
+
+        std::map<std::string, std::string> test_service_specs;
+        test_service_specs.insert(std::pair<std::string, std::string>("universe","grid"));
+
+        // Submit the 2-task job for execution
+        try {
+            job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
+        } catch (wrench::WorkflowExecutionException &e) {
+            return 0;
+            throw std::runtime_error(e.what());
+        }
+
+        // Wait for a workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+            event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        this->test->compute_service->stop();
+
+        return 1;
+    }
+};
+
+TEST_F(HTCondorServiceTest, NoPilotJobSupportTest) {
+    DO_TEST_WITH_FORK(do_NoPilotJobSupportTest_test);
+}
+
+void HTCondorServiceTest::do_NoPilotJobSupportTest_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path1));
+
+
+    // Get a hostname
+    std::string hostname = "DualCoreHost";
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/"})));
+
+    // Create list of compute services
+    std::set<wrench::ComputeService *> compute_services;
+
+    std::string execution_host = wrench::Simulation::getHostnameList()[1];
+    std::vector<std::string> execution_hosts;
+    execution_hosts.push_back(execution_host);
+    compute_services.insert(new wrench::BareMetalComputeService(
+            execution_host,
+            {std::make_pair(
+                    execution_host,
+                    std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                    wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+            "/scratch"));
+
+    auto batch_service = new wrench::BatchComputeService("BatchHost1",
+                                                         {"BatchHost1", "BatchHost2"},
+                                                         "/scratch",
+                                                         {
+                                                                 {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
+                                                         });
+
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::HTCondorComputeService(
+                    hostname, "local", std::move(compute_services),
+                    {
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "false"},
+                    },
+                    {},
+                    batch_service)));
+
+
+
+    std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new HTCondorNoPilotJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
+
+    // Create a file registry
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
+    ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
+
+    // Fails because it will try to run a grid job on a system that does not support standard jobs, WMS is set up to
+    //return 0 in this case and 1 if it successfully completes.
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
+
 
 
