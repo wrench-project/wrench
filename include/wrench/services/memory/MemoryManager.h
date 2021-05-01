@@ -31,7 +31,7 @@ namespace wrench {
     public:
 
     private:
-        s4u_Disk *memory;
+        simgrid::s4u::Disk *memory;
         double dirty_ratio;
         int interval;
         int expired_time;
@@ -50,7 +50,7 @@ namespace wrench {
         std::vector<double> free_log;
 
 
-        MemoryManager(s4u_Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
+        MemoryManager(simgrid::s4u::Disk *memory, double dirty_ratio, int interval, int expired_time, std::string hostname);
 
         int main() override;
 
@@ -64,15 +64,15 @@ namespace wrench {
 
     public:
 
-        static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, s4u_Disk *memory,
+        static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, simgrid::s4u::Disk *memory,
                                                            double dirty_ratio, int interval, int expired_time,
                                                            std::string hostname);
 
         void kill();
 
-        s4u_Disk *getMemory() const;
+        simgrid::s4u::Disk *getMemory() const;
 
-        void setMemory(s4u_Disk *memory);
+        void setMemory(simgrid::s4u::Disk *memory);
 
         double getDirtyRatio() const;
 
@@ -111,7 +111,7 @@ namespace wrench {
 
         std::vector<Block*> getCachedBlocks(std::string filename);
 
-        static s4u_Disk *getDisk(std::string mountpoint, std::string hostname);
+        static simgrid::s4u::Disk *getDisk(std::string mountpoint, std::string hostname);
 
         void log();
 
