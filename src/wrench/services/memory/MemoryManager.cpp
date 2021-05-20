@@ -325,21 +325,39 @@ namespace wrench {
     }
 
     /**
-     * @brief Evicted clean data from cache.
-     * @param amount: the requested amount of data to be flushed
-     * @param excluded_filename: name of file that cannot be flushed
-     * @return flushed amount
+     * @brief Evicted clean data from page cache.
+     * @param amount: the requested amount of data to be evicted
+     * @param excluded_filename: name of file that cannot be evicted
+     * @return evicted amount
      */
     double MemoryManager::evict(double amount, std::string excluded_filename) {
 
         if (amount <= 0) return 0;
 
+        double evicted = evictLruList(this->inactive_list, amount, excluded_filename);
+        if (evicted < amount) {
+            evicted += evictLruList(this->active_list, amount, excluded_filename);
+        }
+
+        return evicted;
+    }
+
+    /**
+     * @brief Evicted clean data from a LRU list.
+     * @param lru_list: the page cache LRU list to be evicted
+     * @param amount: the requested amount of data to be evicted
+     * @param excluded_filename: name of file that cannot be evicted
+     * @return evicted amount
+     */
+    double MemoryManager::evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename) {
+
+        if (amount <= 0) return 0;
 
         double evicted = 0;
 
-        for (unsigned int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < lru_list.size(); i++) {
 
-            Block *blk = inactive_list.at(i);
+            Block *blk = lru_list.at(i);
 
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
@@ -348,7 +366,7 @@ namespace wrench {
             if (blk->isDirty()) continue;
             if (evicted + blk->getSize() <= amount) {
                 evicted += blk->getSize();
-                inactive_list.erase(inactive_list.begin() + i);
+                lru_list.erase(lru_list.begin() + i);
                 i--;
             } else if (evicted < amount && evicted + blk->getSize() > amount) {
                 blk->setSize(blk->getSize() - amount + evicted);
@@ -363,7 +381,6 @@ namespace wrench {
 
         cached -= evicted;
         free += evicted;
-
 
         return evicted;
     }
