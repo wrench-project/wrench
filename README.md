@@ -3,7 +3,6 @@
 [![License: LGPL v3][license-badge]](LICENSE.md)
 [![Coverage Status][codecov-badge]][codecov-link]
 [![Codacy Badge][codacy-badge]][codacy-link]
-[![SonarCloud Badge][sonarcloud-badge]][sonarcloud-link]
 [![CII Best Practices][cii-badge]][cii-link]
 [![Slack][slack-badge]][slack-link]
 
@@ -39,7 +38,7 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.26
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.27
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
