@@ -62,6 +62,8 @@ namespace wrench {
 
         double flushLruList(std::vector<Block *> &list, double amount, std::string excluded_filename);
 
+        double evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename);
+
     public:
 
         static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, simgrid::s4u::Disk *memory,
