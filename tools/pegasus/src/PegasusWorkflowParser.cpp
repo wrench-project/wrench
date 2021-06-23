@@ -29,7 +29,8 @@ namespace wrench {
                                                             const std::string &reference_flop_rate,
                                                             bool redundant_dependencies,
                                                             unsigned long min_cores_per_task,
-                                                            unsigned long max_cores_per_task) {
+                                                            unsigned long max_cores_per_task,
+                                                            bool enforce_num_cores) {
 
         std::ifstream file;
         nlohmann::json j;
@@ -72,12 +73,13 @@ namespace wrench {
                     std::string name = job.at("name");
                     double runtime = job.at("runtime");
                     unsigned long min_num_cores, max_num_cores;
-                    if (job.find("cores") != job.end()) {
+                    // Set the default values
+                    min_num_cores = min_cores_per_task;
+                    max_num_cores = max_cores_per_task;
+                    // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
+                    if ((not enforce_num_cores) and job.find("cores") != job.end()) {
                         min_num_cores = job.at("cores");
                         max_num_cores = job.at("cores");
-                    } else {
-                        min_num_cores = min_cores_per_task;
-                        max_num_cores = max_cores_per_task;
                     }
                     std::string type = job.at("type");
 
@@ -191,7 +193,8 @@ namespace wrench {
     Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                       bool redundant_dependencies,
                                                                       unsigned long min_cores_per_task,
-                                                                      unsigned long max_cores_per_task) {
+                                                                      unsigned long max_cores_per_task,
+                                                                      bool enforce_num_cores) {
         throw std::runtime_error("PegasusWorkflowParser::createExecutableWorkflowFromJSON(): not implemented yet");
     }
 
@@ -201,7 +204,8 @@ namespace wrench {
     Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
                                                            bool redundant_dependencies,
                                                            unsigned long min_cores_per_task,
-                                                           unsigned long max_cores_per_task) {
+                                                           unsigned long max_cores_per_task,
+                                                           bool enforce_num_cores) {
 
         pugi::xml_document dax_tree;
 
@@ -234,17 +238,20 @@ namespace wrench {
             // Set the default values
             min_num_cores = min_cores_per_task;
             max_num_cores = max_cores_per_task;
-            bool found_one = false;
-            for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
-                if (job.attribute(tag.c_str())) {
-                    if (found_one) {
-                        throw std::invalid_argument(
-                                "Workflow::createWorkflowFromDAX(): multiple \"number of cores/procs\" specification for task " +
-                                id);
-                    } else {
-                        found_one = true;
-                        min_num_cores = std::stoi(job.attribute(tag.c_str()).value());
-                        max_num_cores = std::stoi(job.attribute(tag.c_str()).value());
+            // Overwrite the default is we don't enforce the default values AND the DAX specifies core numbers
+            if (not enforce_num_cores) {
+                bool found_one = false;
+                for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
+                    if (job.attribute(tag.c_str())) {
+                        if (found_one) {
+                            throw std::invalid_argument(
+                                    "Workflow::createWorkflowFromDAX(): multiple \"number of cores/procs\" specification for task " +
+                                    id);
+                        } else {
+                            found_one = true;
+                            min_num_cores = std::stoi(job.attribute(tag.c_str()).value());
+                            max_num_cores = std::stoi(job.attribute(tag.c_str()).value());
+                        }
                     }
                 }
             }
