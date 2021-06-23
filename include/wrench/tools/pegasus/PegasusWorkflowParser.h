@@ -45,6 +45,8 @@ namespace wrench {
      *                            cores on which the task can run is set to this value. (default is 1)
      * @param max_cores_per_task: If the DAX file does not specify a number of cores for a task, the maximum number of
      *                            cores on which the task can run is set to this value. (default is 1)
+     * @param enforce_num_cores: Use the min_cores_per_task and max_cores_per_task values even if the DAX file specifies
+     *                           a number of cores for a task. (default is false)
      *
      * @return a workflow
      *
@@ -53,7 +55,8 @@ namespace wrench {
         static Workflow *createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
                                                bool redundant_dependencies = false,
                                                unsigned long min_cores_per_task = 1,
-                                               unsigned long max_cores_per_task = 1);
+                                               unsigned long max_cores_per_task = 1,
+                                               bool enforce_num_cores = false);
 
     /**
      * @brief Create an abstract workflow based on a JSON file
@@ -76,6 +79,8 @@ namespace wrench {
      *                            cores on which the task can run is set to this value. (default is 1)
      * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task, the maximum number of
      *                            cores on which the task can run is set to this value. (default is 1)
+     * @param enforce_num_cores: Use the min_cores_per_task and max_cores_per_task values even if the JSON file specifies
+     *                           a number of cores for a task. (default is false)
      * @return a workflow
      * @throw std::invalid_argument
      *
@@ -83,7 +88,8 @@ namespace wrench {
         static Workflow *createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                 bool redundant_dependencies = false,
                                                 unsigned long min_cores_per_task = 1,
-                                                unsigned long max_cores_per_task = 1);
+                                                unsigned long max_cores_per_task = 1,
+                                                bool enforce_num_cores = false);
 
    /**
      * @brief Create an NON-abstract workflow based on a JSON file
@@ -106,6 +112,8 @@ namespace wrench {
      *                            cores on which the task can run is set to this value. (default is 1)
      * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task, the maximum number of
      *                            cores on which the task can run is set to this value. (default is 1)
+     * @param enforce_num_cores: Use the min_cores_per_task and max_cores_per_task values even if the JSON file specifies
+     *                           a number of cores for a task. (default is false)
      *
      * @return a workflow
      * @throw std::invalid_argument
@@ -113,7 +121,8 @@ namespace wrench {
         static Workflow *createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                           bool redundant_dependencies = false,
                                                           unsigned long min_cores_per_task = 1,
-                                                          unsigned long max_cores_per_task = 1);
+                                                          unsigned long max_cores_per_task = 1,
+                                                          bool enforce_num_cores = false);
 
     };
 
