@@ -741,11 +741,20 @@ namespace wrench {
 
     /**
      * @brief Returns the name of the host on which the task has most recently been executed, or "" if
-     *        the task has never been executed yet
+     *        the task has never been executed yet. Could be a virtual hostname.
      * @return hostname
      */
     std::string WorkflowTask::getExecutionHost() {
         return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
+    }
+
+    /**
+    * @brief Returns the name of the PHYSICAL host on which the task has most recently been executed, or "" if
+    *        the task has never been executed yet.
+    * @return hostname
+    */
+    std::string WorkflowTask::getPhysicalExecutionHost() {
+        return (not this->execution_history.empty()) ? this->execution_history.top().physical_execution_host : "";
     }
 
     /**
@@ -762,14 +771,17 @@ namespace wrench {
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
-        std::string physical_hostname = hostname;
+        std::string physical_hostname;
         /** The conversion below has been removed as it makes more sense to keep the virtual and the physical separate **/
         // Convert the virtual hostname to a physical hostname if needed
-//        if (S4U_VirtualMachine::vm_to_pm_map.find(hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
-//            physical_hostname = S4U_VirtualMachine::vm_to_pm_map[hostname];
-//        }
+        if (S4U_VirtualMachine::vm_to_pm_map.find(hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            physical_hostname = S4U_VirtualMachine::vm_to_pm_map[hostname];
+        } else {
+            physical_hostname = hostname;
+        }
         if (not this->execution_history.empty()) {
-            this->execution_history.top().execution_host = physical_hostname;
+            this->execution_history.top().execution_host = hostname;
+            this->execution_history.top().physical_execution_host = physical_hostname;
         } else {
             throw std::runtime_error(
                     "WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
