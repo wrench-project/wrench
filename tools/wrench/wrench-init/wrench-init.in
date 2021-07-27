@@ -87,7 +87,7 @@ def _write_cmakelists(project_dir):
         '',
         'set(CMAKE_CXX_STANDARD 14)',
         '',
-        'set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CmakeModules/")',
+        'set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")',
         '',
         'find_package(SimGrid REQUIRED)',
         'find_package(Boost REQUIRED)',
