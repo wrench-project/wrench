@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
-# Copyright (c) 2019-2020. The WRENCH Team.
+# Copyright (c) 2019-2021. The WRENCH Team.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -90,9 +90,10 @@ def _write_cmakelists(project_dir):
         'set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CmakeModules/")',
         '',
         'find_package(SimGrid REQUIRED)',
+        'find_package(Boost REQUIRED)',
         '',
         '# include directories for dependencies and WRENCH libraries',
-        'include_directories(src/ ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench)',
+        'include_directories(src/ ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench ${Boost_INCLUDE_DIR})',
         '',
         '# source files',
         'set(SOURCE_FILES',
@@ -144,6 +145,7 @@ def _write_cmakelists(project_dir):
         '                      )'
     ])
 
+
 def _write_findsimgridcmake(project_sub_dir):
     """
     Write the FindSimGrid.cmake file
@@ -163,10 +165,10 @@ def _write_findsimgridcmake(project_sub_dir):
     place like /var/lib/wrench/?)
     """
     _write_contents(project_sub_dir + '/FindSimGrid.cmake',
-"""
-TO_REPLACE_FIND_SIMGRID_CMAKE_END_TO_REPLACE
-""".split('\n')
-    )
+                    """
+                    TO_REPLACE_FIND_SIMGRID_CMAKE_END_TO_REPLACE
+                    """.split('\n')
+                    )
 
 
 def _write_main(project_dir, compute_service):
@@ -469,7 +471,8 @@ def _write_simple_scheduler(project_dir, compute_service):
     ])
 
     if compute_service == 'cloud':
-        file_contents.append('  std::vector<std::shared_ptr<wrench::BareMetalComputeService>> compute_services_running_on_vms;')
+        file_contents.append(
+            '  std::vector<std::shared_ptr<wrench::BareMetalComputeService>> compute_services_running_on_vms;')
 
     file_contents.extend([
         '};',
