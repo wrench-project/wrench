@@ -1060,10 +1060,11 @@ bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 
 void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
+    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1205,6 +1206,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"][i]["pstate_trace"].begin(), result_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
     }
 
+    std::cerr << "EXPECTED: " << expected_json << "\n";
+    std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
     delete simulation;
@@ -1329,6 +1332,9 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
     simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, true, false, false, false, true);
 
+    /* The 125000000.00000001 below is confusing, because it doesn't account for the .97 factor that limits
+     * bandwidth, but that's something tthat was changed in SimGrid3.28 (simulation times are not affected,
+     * just number of bytes) */
     nlohmann::json expected_json_link_usage = R"(
     {
         "link_usage": {
@@ -1340,11 +1346,11 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
                             "time": 0.0
                         },
                         {
-                            "bytes per second": 121250000.0,
+                            "bytes per second": 125000000.00000001,
                             "time": 2.0
                         },
                         {
-                            "bytes per second": 121250000.0,
+                            "bytes per second": 125000000.00000001,
                             "time": 86.0
                         }
                     ],
