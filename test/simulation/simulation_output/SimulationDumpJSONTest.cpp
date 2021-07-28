@@ -1276,10 +1276,9 @@ bool compareLinkname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 
 void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1373,8 +1372,6 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     nlohmann::json result_json;
     json_file >> result_json;
 
-    std::cerr << "EXPECTED: " << expected_json_link_usage << "\n";
-    std::cerr << "GOTTEN: " << result_json << "\n";
     EXPECT_TRUE(expected_json_link_usage == result_json);
 
     delete simulation;
