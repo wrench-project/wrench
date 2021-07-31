@@ -71,12 +71,12 @@ protected:
                            "<zone id=\"AS0\" routing=\"Full\">"
 
                            "<host id=\"host1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"1\" core=\"1\" >"
-                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                           "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
                            "<prop id=\"watt_off\" value=\"10\" />"
                            "</host>"
 
                            "<host id=\"host2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                           "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
                            "<prop id=\"watt_off\" value=\"10\" />"
                            "</host>"
 

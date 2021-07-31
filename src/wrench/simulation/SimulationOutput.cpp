@@ -870,7 +870,7 @@ namespace wrench {
                 // for each pstate, we need to record the following:
                 //     in the case of a single core hosts, then "Idle:Running"
                 //     in the case of multi-core hosts, then "Idle:OneCore:AllCores"
-                std::string watts_per_state_property_string = host->get_property("watt_per_state");
+                std::string watts_per_state_property_string = host->get_property("wattage_per_state");
                 std::vector<std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
