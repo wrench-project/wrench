@@ -1282,7 +1282,6 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1302,7 +1301,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
     //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
-    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::make_unique<wrench::Workflow>();
     wrench::WorkflowTask *single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
