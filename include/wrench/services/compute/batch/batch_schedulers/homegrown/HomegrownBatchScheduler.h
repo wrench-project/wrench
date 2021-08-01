@@ -40,7 +40,7 @@ namespace wrench {
 
         void shutdown() override {};
 
-        void processUnknownJobTermination(std::string job_id) {
+        void processUnknownJobTermination(std::string job_id) override {
             throw std::runtime_error("HomegrownBatchScheduler::processUnknownJobTermination(): this method should not be called since this scheduler is not Batsched");
         }
 

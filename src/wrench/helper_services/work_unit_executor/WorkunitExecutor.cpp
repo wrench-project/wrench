@@ -329,7 +329,10 @@ namespace wrench {
 
 
             // Read  all input files
-            WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
+            if (not task->getInputFiles().empty()) {
+                WRENCH_INFO("Reading the %ld input files for task %s",
+                            task->getInputFiles().size(), task->getID().c_str());
+            }
             try {
                 task->setReadInputStartDate(S4U_Simulation::getClock());
 //                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_read;
@@ -404,9 +407,11 @@ namespace wrench {
                 throw;
             }
 
-            WRENCH_INFO("Writing the %ld output files for task %s",
-                        task->getOutputFiles().size(),
-                        task->getID().c_str());
+            if (not task->getOutputFiles().empty()) {
+                WRENCH_INFO("Writing the %ld output files for task %s",
+                            task->getOutputFiles().size(),
+                            task->getID().c_str());
+            }
 
             // Write all output files
             try {

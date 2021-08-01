@@ -156,6 +156,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
     // getting the execution_host before a task has run at least once should return an empty string
     ASSERT_TRUE(t1->getExecutionHost().empty());
+    ASSERT_TRUE(t1->getPhysicalExecutionHost().empty());
 
     ASSERT_NO_THROW(t1->setStartDate(1.0)); // need to set start date first before anything else
     ASSERT_DOUBLE_EQ(t1->getStartDate(), 1.0);
@@ -186,6 +187,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
     ASSERT_NO_THROW(t1->setExecutionHost("hostname"));
     ASSERT_STREQ(t1->getExecutionHost().c_str(), "hostname");
+    ASSERT_STREQ(t1->getPhysicalExecutionHost().c_str(), "hostname");
 
     ASSERT_NO_THROW(t1->setNumCoresAllocated(10));
     ASSERT_EQ(t1->getNumCoresAllocated(), 10);
