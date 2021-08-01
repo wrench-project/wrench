@@ -595,7 +595,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the "
-                    "energy consumed by the host. Make sure the energy plugin is enabled (--activate-energy)"
+                    "energy consumed by the host. Make sure the energy plugin is enabled (--wrench-energy-simulation)"
             );
         }
         return energy_consumed;
@@ -646,7 +646,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
-                    "Make sure the energy is plugin is enabled (--activate-energy) and "
+                    "Make sure the energy is plugin is enabled (--wrench-energy-simulation) and "
                     "the pstate is within range of pstates available to the host"
             );
         }
@@ -669,7 +669,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
     }
@@ -690,7 +690,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
     }
@@ -712,7 +712,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
     }
@@ -735,7 +735,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy)"
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation)"
 
             );
         }
@@ -764,7 +764,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
         return list;

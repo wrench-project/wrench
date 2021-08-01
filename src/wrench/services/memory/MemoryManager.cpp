@@ -26,7 +26,7 @@ namespace wrench {
      * @param expired_time: the expired time of dirty data to be flushed in second
      * @param hostname: name of the host on which periodical flushing starts
      */
-    MemoryManager::MemoryManager(s4u_Disk *memory, double dirty_ratio,
+    MemoryManager::MemoryManager(simgrid::s4u::Disk *memory, double dirty_ratio,
                                  int interval, int expired_time, std::string hostname) :
             Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
@@ -49,7 +49,7 @@ namespace wrench {
      * @param hostname: name of the host on which periodical flushing starts
      * @return
      */
-    std::shared_ptr<MemoryManager> MemoryManager::initAndStart(wrench::Simulation *simulation, s4u_Disk *memory,
+    std::shared_ptr<MemoryManager> MemoryManager::initAndStart(wrench::Simulation *simulation, simgrid::s4u::Disk *memory,
                                                                double dirty_ratio, int interval, int expired_time,
                                                                std::string hostname) {
 
@@ -94,7 +94,7 @@ namespace wrench {
      * @brief Get the memory disk
      * @return the disk that acts as the memory cache
      */
-    s4u_Disk *MemoryManager::getMemory() const {
+    simgrid::s4u::Disk *MemoryManager::getMemory() const {
         return memory;
     }
 
@@ -102,7 +102,7 @@ namespace wrench {
      * @brief Set the memory disk
      * @param memory: a disk that acts as the memory cache
      */
-    void MemoryManager::setMemory(s4u_Disk *memory) {
+    void MemoryManager::setMemory(simgrid::s4u::Disk *memory) {
         this->memory = memory;
     }
 
@@ -238,7 +238,7 @@ namespace wrench {
 
         std::vector<simgrid::s4u::IoPtr> io_ptrs;
         for (auto it = flushing_map.begin(); it != flushing_map.end(); it++) {
-            s4u_Disk *disk = getDisk(it->first, this->hostname);
+            simgrid::s4u::Disk *disk = getDisk(it->first, this->hostname);
             io_ptrs.push_back(disk->write_async(it->second));
             disk->write_async(it->second);
         }
@@ -301,7 +301,7 @@ namespace wrench {
             block_to_deal_with->setDirty(false);
             flushed += block_to_deal_with->getSize();
 
-            s4u_Disk *disk = getDisk(block_to_deal_with->getLocation()->getMountPoint(), this->hostname);
+            simgrid::s4u::Disk *disk = getDisk(block_to_deal_with->getLocation()->getMountPoint(), this->hostname);
             disk->write(block_to_deal_with->getSize());
 
             this->dirty -= block_to_deal_with->getSize();
@@ -325,21 +325,39 @@ namespace wrench {
     }
 
     /**
-     * @brief Evicted clean data from cache.
-     * @param amount: the requested amount of data to be flushed
-     * @param excluded_filename: name of file that cannot be flushed
-     * @return flushed amount
+     * @brief Evicted clean data from page cache.
+     * @param amount: the requested amount of data to be evicted
+     * @param excluded_filename: name of file that cannot be evicted
+     * @return evicted amount
      */
     double MemoryManager::evict(double amount, std::string excluded_filename) {
 
         if (amount <= 0) return 0;
 
+        double evicted = evictLruList(this->inactive_list, amount, excluded_filename);
+        if (evicted < amount) {
+            evicted += evictLruList(this->active_list, amount, excluded_filename);
+        }
+
+        return evicted;
+    }
+
+    /**
+     * @brief Evicted clean data from a LRU list.
+     * @param lru_list: the page cache LRU list to be evicted
+     * @param amount: the requested amount of data to be evicted
+     * @param excluded_filename: name of file that cannot be evicted
+     * @return evicted amount
+     */
+    double MemoryManager::evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename) {
+
+        if (amount <= 0) return 0;
 
         double evicted = 0;
 
-        for (unsigned int i = 0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < lru_list.size(); i++) {
 
-            Block *blk = inactive_list.at(i);
+            Block *blk = lru_list.at(i);
 
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
@@ -348,7 +366,7 @@ namespace wrench {
             if (blk->isDirty()) continue;
             if (evicted + blk->getSize() <= amount) {
                 evicted += blk->getSize();
-                inactive_list.erase(inactive_list.begin() + i);
+                lru_list.erase(lru_list.begin() + i);
                 i--;
             } else if (evicted < amount && evicted + blk->getSize() > amount) {
                 blk->setSize(blk->getSize() - amount + evicted);
@@ -363,7 +381,6 @@ namespace wrench {
 
         cached -= evicted;
         free += evicted;
-
 
         return evicted;
     }
@@ -385,7 +402,7 @@ namespace wrench {
         inactive_list.push_back(new Block(filename, location, amount, S4U_Simulation::getClock(), false, 0));
         balanceLruLists();
 
-        s4u_Disk *disk = getDisk(location->getMountPoint(), this->hostname);
+        simgrid::s4u::Disk *disk = getDisk(location->getMountPoint(), this->hostname);
         if (async) {
             return disk->read_async(amount);
         } else {
@@ -646,7 +663,7 @@ namespace wrench {
      * @param hostname: host at which the file is stored
      * @return
      */
-    s4u_Disk *MemoryManager::getDisk(std::string mountpoint, std::string hostname) {
+    simgrid::s4u::Disk *MemoryManager::getDisk(std::string mountpoint, std::string hostname) {
 
         mountpoint = FileLocation::sanitizePath(mountpoint);
 

@@ -152,7 +152,7 @@ namespace wrench {
         // that the --activate-host-shutdown flag should have been passed
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_state_change.connect(
-                [this](simgrid::s4u::Host const &h) {
+                [](simgrid::s4u::Host const &h) {
                     if (not Simulation::host_shutdown_enabled) {
                         throw std::runtime_error(
                                 "It looks like you are simulating host failures/shutdowns during the simulated execution."
@@ -888,7 +888,7 @@ namespace wrench {
 
         // free write to cache without forced flushing
         if (remaining_dirty > 0) {
-            mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), "");
+            mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), file->getID());
             mem_bw_amt = std::min(n_bytes, mem_mng->getFreeMemory());
             mem_mng->writebackToCache(file->getID(), location, mem_bw_amt, is_dirty);
         }
@@ -897,7 +897,7 @@ namespace wrench {
         // if dirty_ratio is reached, dirty data needs to be flushed to disk to write new data
         while (remaining > 0) {
             mem_mng->flush(remaining, "");
-            mem_mng->evict(remaining - mem_mng->getFreeMemory(), "");
+            mem_mng->evict(remaining - mem_mng->getFreeMemory(), file->getID());
 
             double to_cache = std::min(mem_mng->getFreeMemory(), remaining);
             mem_mng->writebackToCache(file->getID(), location, to_cache, is_dirty);
@@ -927,7 +927,7 @@ namespace wrench {
         // Write to disk
         this->writeToDisk(n_bytes, hostname, location->getMountPoint());
 
-        mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), "");
+        mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
         mem_mng->addToCache(file->getID(), location, n_bytes, false);
 
         this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
