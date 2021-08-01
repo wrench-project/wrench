@@ -32,7 +32,7 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"Host2\" speed=\"1f, 2f\" pstate=\"0\" core=\"1\"/> "
+                          "       <host id=\"Host2\" speed=\"1.0f,2.0f\" pstate=\"0\" core=\"1\"/> "
                           "       <link id=\"1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -126,7 +126,6 @@ private:
 };
 
 TEST_F(HostStateChangeDetectorServiceTest, StateChangeDetectionTest) {
-    WRENCH_INFO("WTF!!!");
     DO_TEST_WITH_FORK_ONE_ARG(do_StateChangeDetection_test, true);
     DO_TEST_WITH_FORK_ONE_ARG(do_StateChangeDetection_test, false);
 }

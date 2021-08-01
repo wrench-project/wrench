@@ -267,7 +267,7 @@ namespace wrench {
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             try {
                 this->s4u_actor->kill();
-            } catch (simgrid::Exception &) {
+            } catch (simgrid::Exception &e) {
                 throw std::runtime_error("simgrid::s4u::Actor::kill() failed... this shouldn't have happened");
             }
             this->has_returned_from_main = true;

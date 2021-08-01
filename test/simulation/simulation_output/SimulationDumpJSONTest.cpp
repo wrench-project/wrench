@@ -71,12 +71,12 @@ protected:
                            "<zone id=\"AS0\" routing=\"Full\">"
 
                            "<host id=\"host1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"1\" core=\"1\" >"
-                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                           "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
                            "<prop id=\"watt_off\" value=\"10\" />"
                            "</host>"
 
                            "<host id=\"host2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                           "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
                            "<prop id=\"watt_off\" value=\"10\" />"
                            "</host>"
 
@@ -1060,10 +1060,11 @@ bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 
 void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
+    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1205,6 +1206,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"][i]["pstate_trace"].begin(), result_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
     }
 
+    std::cerr << "EXPECTED: " << expected_json << "\n";
+    std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
     delete simulation;
@@ -1279,7 +1282,6 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1299,7 +1301,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
     //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
-    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::make_unique<wrench::Workflow>();
     wrench::WorkflowTask *single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
@@ -1329,6 +1331,9 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
     simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, true, false, false, false, true);
 
+    /* The 125000000.00000001 below is confusing, because it doesn't account for the .97 factor that limits
+     * bandwidth, but that's something tthat was changed in SimGrid3.28 (simulation times are not affected,
+     * just number of bytes) */
     nlohmann::json expected_json_link_usage = R"(
     {
         "link_usage": {
@@ -1340,11 +1345,11 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
                             "time": 0.0
                         },
                         {
-                            "bytes per second": 121250000.0,
+                            "bytes per second": 125000000.00000001,
                             "time": 2.0
                         },
                         {
-                            "bytes per second": 121250000.0,
+                            "bytes per second": 125000000.00000001,
                             "time": 86.0
                         }
                     ],
