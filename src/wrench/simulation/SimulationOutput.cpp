@@ -97,6 +97,30 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
+
+    /*
+     * Two helper functions
+     */
+    static std::vector<simgrid::s4u::Host *> get_all_physical_hosts() {
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+        std::vector<simgrid::s4u::Host *> to_return;
+
+        for (auto const &h : hosts) {
+            // Ignore VMs
+            if (S4U_VirtualMachine::vm_to_pm_map.find(h->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+                continue;
+            }
+            to_return.push_back(h);
+        }
+        return to_return;
+    }
+
+    static std::vector<simgrid::s4u::Link *> get_all_links() {
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        return simgrid_engine->get_all_links();
+    }
+
     /******************/
     /** \endcond      */
     /******************/
@@ -857,13 +881,18 @@ namespace wrench {
 
         try {
 
-            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+//            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
 
-            std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+            std::vector<simgrid::s4u::Host *> hosts = get_all_physical_hosts();
 
             nlohmann::json hosts_energy_consumption_information;
             for (const auto &host : hosts) {
                 nlohmann::json datum;
+
+                // Ignore VMs!
+                if (S4U_VirtualMachine::vm_to_pm_map.find(host->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+                    continue;
+                }
 
                 datum["hostname"] = host->get_name();
 
@@ -1005,10 +1034,10 @@ namespace wrench {
 
         nlohmann::json platform_graph_json;
 
-        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+//        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
 
         // Get all the hosts
-        auto hosts = simgrid_engine->get_all_hosts();
+        auto hosts = get_all_physical_hosts();
 
         // get the by-cluster host information
         std::map<std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
@@ -1040,7 +1069,7 @@ namespace wrench {
         }
 
         // add all network links to the list of vertices
-        std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+        std::vector<simgrid::s4u::Link *> links = get_all_links();
         for (const auto &link : links) {
             if (not(link->get_name() == "__loopback__")) { // Ignore loopback link
                 platform_graph_json["vertices"].push_back({
@@ -1472,7 +1501,7 @@ namespace wrench {
 
         try {
             auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+            std::vector<simgrid::s4u::Link *> links = get_all_links();
 
             for( const auto &link: links) {
                 nlohmann::json datum;

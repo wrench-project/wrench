@@ -260,7 +260,7 @@ namespace wrench {
     }
 
 /**
- * @brief Get the list of names of all the hosts in the platform
+ * @brief Get the list of names of all the physical hosts in the platform
  *
  * @return a vector of hostnames
  */
