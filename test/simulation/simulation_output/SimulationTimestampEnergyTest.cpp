@@ -30,13 +30,13 @@ protected:
                           "<zone id=\"AS0\" routing=\"Full\">"
 
                           "<host id=\"host1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                          "<prop id=\"watt_off\" value=\"10B\" />"
+                          "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                          "<prop id=\"wattage_off\" value=\"10B\" />"
                           "</host>"
 
                           "<host id=\"host2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                          "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                          "<prop id=\"watt_off\" value=\"10B\" />"
+                          "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                          "<prop id=\"wattage_off\" value=\"10B\" />"
                           "</host>"
 
                           "</zone>"
@@ -193,10 +193,11 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampEnergyConsumptionTest) 
 
 void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
+    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 

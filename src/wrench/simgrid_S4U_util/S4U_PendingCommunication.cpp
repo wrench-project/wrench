@@ -93,18 +93,14 @@ namespace wrench {
         int index = 0;
         bool one_comm_failed = false;
         try {
-            WRENCH_INFO("Calling wait_any_for");
             index =  simgrid::s4u::Comm::wait_any_for(&pending_s4u_comms, timeout);
-            WRENCH_INFO("wait_any_for() returned: %d", index);
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
 #endif
         } catch (simgrid::NetworkFailureException &e) {
             one_comm_failed = true;
-            WRENCH_INFO("wait_any_for() in Handle for NetworkFailureException");
         } catch (simgrid::TimeoutException &e) {
             // This likely doesn't happen, but let's keep it here for now
-            WRENCH_INFO("wait_any_for() in Hanlde for TimeoutException");
             one_comm_failed = true;
         }
 
@@ -114,13 +110,9 @@ namespace wrench {
         }
 
         if (one_comm_failed) {
-            WRENCH_INFO("SINCE ONE COMM FAILED, LET'S FIND OUT WHICH ONE");
             for (index = 0; index < (int) pending_s4u_comms.size(); index++) {
                 try {
-                    WRENCH_INFO("CALLING TEST()");
-                    WRENCH_INFO("STATE = %d", pending_s4u_comms[index]->get_state());
-                    auto fuck = pending_s4u_comms[index]->test();
-                    WRENCH_INFO("DIDN'T GET AN EXCEPTION, but test sent back: %d", fuck);
+                    pending_s4u_comms[index]->test();
                 } catch (simgrid::NetworkFailureException &e) {
                     break;
                 } catch (simgrid::TimeoutException &e) {
