@@ -71,13 +71,13 @@ protected:
                            "<zone id=\"AS0\" routing=\"Full\">"
 
                            "<host id=\"host1\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"1\" core=\"1\" >"
-                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                           "<prop id=\"watt_off\" value=\"10\" />"
+                           "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                           "<prop id=\"wattage_off\" value=\"10\" />"
                            "</host>"
 
                            "<host id=\"host2\" speed=\"100.0Mf,50.0Mf,20.0Mf\" pstate=\"0\" core=\"1\" >"
-                           "<prop id=\"watt_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
-                           "<prop id=\"watt_off\" value=\"10\" />"
+                           "<prop id=\"wattage_per_state\" value=\"100.0:200.0, 93.0:170.0, 90.0:150.0\" />"
+                           "<prop id=\"wattage_off\" value=\"10\" />"
                            "</host>"
 
                            "</zone>"
@@ -1137,7 +1137,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                         "speed": 20000000.0
                     }
                 ],
-                "watt_off": "10"
+                "wattage_off": "10"
             },
             {
                 "consumed_energy_trace": [
@@ -1181,7 +1181,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                         "speed": 20000000.0
                     }
                 ],
-                "watt_off": "10"
+                "wattage_off": "10"
             }
         ]
     })"_json;
@@ -2031,7 +2031,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                         "speed": 20000000.0
                     }
                 ],
-                "watt_off": "10"
+                "wattage_off": "10"
             },
             {
                 "consumed_energy_trace": [
@@ -2075,7 +2075,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                         "speed": 20000000.0
                     }
                 ],
-                "watt_off": "10"
+                "wattage_off": "10"
             }
         ]
     })"_json;

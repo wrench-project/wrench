@@ -870,7 +870,7 @@ namespace wrench {
                 // for each pstate, we need to record the following:
                 //     in the case of a single core hosts, then "Idle:Running"
                 //     in the case of multi-core hosts, then "Idle:OneCore:AllCores"
-                std::string watts_per_state_property_string = host->get_property("watt_per_state");
+                std::string watts_per_state_property_string = host->get_property("wattage_per_state");
                 std::vector<std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
@@ -896,10 +896,10 @@ namespace wrench {
                     }
                 }
 
-                const char *watt_off_value = host->get_property("watt_off");
+                const char *wattage_off_value = host->get_property("wattage_off");
 
-                if (watt_off_value != nullptr) {
-                    datum["watt_off"] = std::string(watt_off_value);
+                if (wattage_off_value != nullptr) {
+                    datum["wattage_off"] = std::string(wattage_off_value);
                 }
 
                 for (const auto &pstate_timestamp : this->getTrace<SimulationTimestampPstateSet>()) {
