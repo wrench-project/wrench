@@ -109,7 +109,7 @@ private:
 
       // Get Host list
       std::vector<std::string> host_list;
-      host_list = this->test->compute_servcice1->getHosts();
+      host_list = this->test->compute_service1->getHosts();
       if (host_list.size() != 2) {
           throw std::runtime_error("getHosts() should return a list with 2 items for compute service #1");
       }

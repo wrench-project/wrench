@@ -193,11 +193,10 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampEnergyConsumptionTest) 
 
 void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
-    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
