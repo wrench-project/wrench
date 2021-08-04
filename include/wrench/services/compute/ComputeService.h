@@ -76,6 +76,8 @@ namespace wrench {
 
         unsigned long getNumHosts();
 
+        std::vector<std::string> getHosts();
+
         std::map<std::string, unsigned long> getPerHostNumCores();
 
         unsigned long getTotalNumCores();
