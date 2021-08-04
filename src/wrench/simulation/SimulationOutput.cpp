@@ -835,18 +835,19 @@ namespace wrench {
      *      "energy_consumption": {
      *      {
      *          hostname: <string>,
-     *          pstates: [                 <-- if this host is a single core host, items in this list will be formatted as
-     *              {                          the first item, else if this is a multi core host, items will be formatted as
-     *                  pstate: <int>,         the second item
+     *          pstates: [
+     *              {
+     *                  pstate: <int>,
      *                  idle: <double>,
-     *                  running: <double>,   <-- if single core host
+     *                  epsilon: <double>,
+     *                  all_cores: <double>,
      *                  speed: <double>
      *              },
      *              {
      *                  pstate: <int>,
      *                  idle: <double>,
-     *                  one_core: <double>,  <-- if multi core host
-     *                  all_cores: <double>, <-- if multi core host
+     *                  epsilon: <double>,
+     *                  all_cores: <double>,
      *                  speed: <double>
      *              } ...
      *          ],
@@ -889,10 +890,12 @@ namespace wrench {
 
                 datum["hostname"] = host->get_name();
 
-                // for each pstate, we need to record the following:
-                //     in the case of a single core hosts, then "Idle:Running"
-                //     in the case of multi-core hosts, then "Idle:OneCore:AllCores"
-                std::string watts_per_state_property_string = host->get_property("wattage_per_state");
+                const char *property_string = host->get_property("wattage_per_state");
+                if (property_string == nullptr) {
+                    throw std::runtime_error("Host " + std::string(host->get_name()) +
+                    " does not have a wattage_per_state property!");
+                }
+                std::string watts_per_state_property_string = std::string(property_string);
                 std::vector<std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
@@ -900,21 +903,25 @@ namespace wrench {
                     std::vector<std::string> current_state_watts;
                     boost::split(current_state_watts, watts_per_state.at(pstate), boost::is_any_of(":"));
 
-                    if (host->get_core_count() == 1) {
+                    if (current_state_watts.size() == 2) {
                         datum["pstates"].push_back({
                                                            {"pstate",  pstate},
                                                            {"speed",   host->get_pstate_speed((int) pstate)},
                                                            {"idle",    current_state_watts.at(0)},
-                                                           {"running", current_state_watts.at(1)}
+                                                           {"epsilon",  current_state_watts.at(0)},
+                                                           {"all_cores", current_state_watts.at(1)}
                                                    });
-                    } else {
+                    } else if (current_state_watts.size() == 3) {
                         datum["pstates"].push_back({
                                                            {"pstate",    pstate},
                                                            {"speed",     host->get_pstate_speed((int) pstate)},
                                                            {"idle",      current_state_watts.at(0)},
-                                                           {"one_core",  current_state_watts.at(1)},
+                                                           {"epsilon",  current_state_watts.at(1)},
                                                            {"all_cores", current_state_watts.at(2)}
                                                    });
+                    } else {
+                        throw std::runtime_error("Host " + std::string(host->get_name()) +
+                        "'s wattage_per_state property is invalid (should have 2 or 3 colon-separated numbers)");
                     }
                 }
 
@@ -960,8 +967,8 @@ namespace wrench {
             }
 
         } catch (std::runtime_error &e) {
-            // the functions that get energy information catch any exceptions then throw runtime_errors
-            std::cerr << e.what() << std::endl;
+            // Just re-throw
+            throw;
         }
     }
 
@@ -1524,7 +1531,7 @@ namespace wrench {
                 output.close();
             }
         } catch (std::runtime_error &e) {
-            std::cerr << e.what() << std::endl;
+            throw;
         }
     }
 
