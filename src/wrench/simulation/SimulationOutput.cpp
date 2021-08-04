@@ -881,18 +881,11 @@ namespace wrench {
 
         try {
 
-//            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-
             std::vector<simgrid::s4u::Host *> hosts = get_all_physical_hosts();
 
             nlohmann::json hosts_energy_consumption_information;
             for (const auto &host : hosts) {
                 nlohmann::json datum;
-
-                // Ignore VMs!
-                if (S4U_VirtualMachine::vm_to_pm_map.find(host->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
-                    continue;
-                }
 
                 datum["hostname"] = host->get_name();
 
