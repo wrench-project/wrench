@@ -926,6 +926,10 @@ namespace wrench {
                 }
 
                 const char *wattage_off_value = host->get_property("wattage_off");
+                if (wattage_off_value == nullptr) {
+                    throw std::runtime_error("Host " + std::string(host->get_name()) +
+                                             " does not have a wattage_off property!");
+                }
 
                 if (wattage_off_value != nullptr) {
                     datum["wattage_off"] = std::string(wattage_off_value);
@@ -952,9 +956,6 @@ namespace wrench {
 
                 hosts_energy_consumption_information.push_back(datum);
             }
-
-            // std::cerr << hosts_energy_consumption_information.dump(4);
-
 
             nlohmann::json energy_consumption;
             energy_consumption["energy_consumption"] = hosts_energy_consumption_information;
