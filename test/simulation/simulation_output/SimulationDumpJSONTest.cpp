@@ -1087,7 +1087,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
     ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
-    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
+
+//    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, false, true, false, false, false);
 
     nlohmann::json expected_json = R"(
     {
@@ -1333,7 +1334,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
-    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, true, false, false, false, true);
+    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
 
     nlohmann::json expected_json_link_usage = R"(
     {
@@ -1415,6 +1416,8 @@ private:
     SimulationDumpJSONTest *test;
 
     int main() {
+
+
 
         auto ss = this->getAvailableStorageServices();
         auto ss1 = *(ss.begin());
@@ -1761,7 +1764,6 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);
-
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
