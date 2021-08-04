@@ -108,6 +108,8 @@ it provides a recent and general overview on the framework.
 
 WRENCH has been funded by the National Science Foundation (NSF), and the National Center for Scientific Research (CNRS).
 
+[![NSF Funding 2103489][nsf-2103489-badge]][nsf-2103489-link]
+[![NSF Funding 2103508][nsf-2103508-badge]][nsf-2103508-link]
 [![NSF Funding 20191][nsf-20191-badge]][nsf-20191-link]
 [![NSF Funding 20192][nsf-20192-badge]][nsf-20192-link]
 [![NSF Funding 20161][nsf-20161-badge]][nsf-20161-link]
@@ -131,6 +133,10 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [cii-link]:                 https://bestpractices.coreinfrastructure.org/projects/2357
 [slack-badge]:              https://img.shields.io/badge/slack-%40wrench--project-yellow?logo=slack
 [slack-link]:               https://join.slack.com/t/wrench-project/shared_invite/zt-g88hfxj7-pcuxOBMS7jSBkq1EhAn2~Q
+[nsf-2103489-badge]:        https://img.shields.io/badge/NSF-2103489-blue
+[nsf-2103489-link]:         https://nsf.gov/awardsearch/showAward?AWD_ID=2103489
+[nsf-2103508-badge]:        https://img.shields.io/badge/NSF-2103508-blue
+[nsf-2103508-link]:         https://nsf.gov/awardsearch/showAward?AWD_ID=2103508
 [nsf-20191-badge]:          https://img.shields.io/badge/NSF-1923539-blue
 [nsf-20191-link]:           https://nsf.gov/awardsearch/showAward?AWD_ID=1923539
 [nsf-20192-badge]:          https://img.shields.io/badge/NSF-1923621-blue
