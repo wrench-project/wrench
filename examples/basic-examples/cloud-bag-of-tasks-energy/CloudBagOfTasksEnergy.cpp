@@ -184,6 +184,9 @@ int main(int argc, char **argv) {
        std::cerr << "  - " << item->getDate() << ": " << std::round(item->getContent()->getConsumption()) << " Joules\n";
     }
 
+     /* Dump it all to a JSON file */
+    simulation.getOutput().dumpUnifiedJSON(&workflow, "/tmp/wrench.json", false, true, false, true, false, false, false);
+
 
     return 0;
 }
