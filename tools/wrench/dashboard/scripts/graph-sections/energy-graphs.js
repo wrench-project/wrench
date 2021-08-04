@@ -4,15 +4,11 @@
     legendId: id of the <div> that will contain the graph
 */
 function generateConsumedEnergyGraph(energyData, graphId, legendId) {
-    console.log("ENERGYDATA");
-    console.log(energyData)
     var eData = [];
     var xAxisMarks = ["x"];
     // Iterate through data for each host
     for(var i = 0; i < energyData.length; i++) {
         var hostData = energyData[i]["consumed_energy_trace"];
-        console.log(i)
-        console.log(hostData)
 
         var consumedEnergyData = []
 
