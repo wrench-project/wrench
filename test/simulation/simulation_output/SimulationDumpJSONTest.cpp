@@ -1060,10 +1060,11 @@ bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 
 void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
+    argv[2] = strdup("--wrench-full-log");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1085,8 +1086,9 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
 
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
-    //simulation->getOutput().dumpUnifiedJSON(workflow.get(), "energy_unified.json", false, true, true, true, false);
+    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+
+//    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, false, true, false, false, false);
 
     nlohmann::json expected_json = R"(
     {
@@ -1121,19 +1123,22 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                     {
                         "idle": "100.0",
                         "pstate": 0,
-                        "running": "200.0",
+                        "epsilon": "100.0",
+                        "all_cores": "200.0",
                         "speed": 100000000.0
                     },
                     {
                         "idle": " 93.0",
                         "pstate": 1,
-                        "running": "170.0",
+                        "epsilon": " 93.0",
+                        "all_cores": "170.0",
                         "speed": 50000000.0
                     },
                     {
                         "idle": " 90.0",
+                        "epsilon": " 90.0",
                         "pstate": 2,
-                        "running": "150.0",
+                        "all_cores": "150.0",
                         "speed": 20000000.0
                     }
                 ],
@@ -1164,20 +1169,23 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                 "pstates": [
                     {
                         "idle": "100.0",
+                        "epsilon": "100.0",
                         "pstate": 0,
-                        "running": "200.0",
+                        "all_cores": "200.0",
                         "speed": 100000000.0
                     },
                     {
                         "idle": " 93.0",
+                        "epsilon": " 93.0",
                         "pstate": 1,
-                        "running": "170.0",
+                        "all_cores": "170.0",
                         "speed": 50000000.0
                     },
                     {
                         "idle": " 90.0",
+                        "epsilon": " 90.0",
                         "pstate": 2,
-                        "running": "150.0",
+                        "all_cores": "150.0",
                         "speed": 20000000.0
                     }
                 ],
@@ -1326,7 +1334,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
-    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, true, false, false, false, true);
+    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
 
     nlohmann::json expected_json_link_usage = R"(
     {
@@ -1409,6 +1417,8 @@ private:
 
     int main() {
 
+
+
         auto ss = this->getAvailableStorageServices();
         auto ss1 = *(ss.begin());
         auto ss2 = *(++ss.begin());
@@ -1476,8 +1486,6 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     nlohmann::json result_json;
     json_file >> result_json;
 
-//    std::cerr << result_json << "\n";
-
     for (auto const &operation : (std::vector<std::string>){"reads"}) {
         ASSERT_EQ(result_json["host1"]["/"][operation].size(), 3);
 
@@ -1504,7 +1512,6 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
         ASSERT_EQ(num_bytes, 1000000);
         ASSERT_TRUE(std::abs<double>(duration - 0.5) < 0.0001);
 
-//        std::cerr << "---> " << num_bytes << "  " << duration << "\n";
     }
 
     delete simulation;
@@ -1757,7 +1764,6 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);
-
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
@@ -2014,20 +2020,23 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                 "pstates": [
                     {
                         "idle": "100.0",
+                        "epsilon": "100.0",
                         "pstate": 0,
-                        "running": "200.0",
+                        "all_cores": "200.0",
                         "speed": 100000000.0
                     },
                     {
                         "idle": " 93.0",
+                        "epsilon": " 93.0",
                         "pstate": 1,
-                        "running": "170.0",
+                        "all_cores": "170.0",
                         "speed": 50000000.0
                     },
                     {
                         "idle": " 90.0",
+                        "epsilon": " 90.0",
                         "pstate": 2,
-                        "running": "150.0",
+                        "all_cores": "150.0",
                         "speed": 20000000.0
                     }
                 ],
@@ -2058,20 +2067,23 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                 "pstates": [
                     {
                         "idle": "100.0",
+                        "epsilon": "100.0",
                         "pstate": 0,
-                        "running": "200.0",
+                        "all_cores": "200.0",
                         "speed": 100000000.0
                     },
                     {
                         "idle": " 93.0",
+                        "epsilon": " 93.0",
                         "pstate": 1,
-                        "running": "170.0",
+                        "all_cores": "170.0",
                         "speed": 50000000.0
                     },
                     {
                         "idle": " 90.0",
+                        "epsilon": " 90.0",
                         "pstate": 2,
-                        "running": "150.0",
+                        "all_cores": "150.0",
                         "speed": 20000000.0
                     }
                 ],

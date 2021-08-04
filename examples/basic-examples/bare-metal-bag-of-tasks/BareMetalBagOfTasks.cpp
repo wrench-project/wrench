@@ -161,6 +161,7 @@ int main(int argc, char **argv) {
         std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
     }
 
+    /* Dump it all to a JSON file */
     simulation.getOutput().dumpUnifiedJSON(&workflow, "/tmp/wrench.json");
 
     return 0;
