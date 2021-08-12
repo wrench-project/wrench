@@ -373,7 +373,7 @@ namespace wrench {
 
             // Start it!
             this->cs->startJob(resources, workflow_job, batch_job, num_nodes_asked_for, requested_time,
-                     cores_per_node_asked_for);
+                               cores_per_node_asked_for);
 
 
         }
@@ -388,6 +388,10 @@ namespace wrench {
     }
 
     void FCFSBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
+        // Do nothing
+    }
+
+    void processUnknownJobTermination(std::string job_id) {
         // Do nothing
     }
 

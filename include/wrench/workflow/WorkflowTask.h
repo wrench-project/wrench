@@ -138,6 +138,8 @@ namespace wrench {
 
         std::string getExecutionHost();
 
+        std::string getPhysicalExecutionHost();
+
         WorkflowTask::State getState() const;
 
         std::string getColor();
@@ -229,8 +231,10 @@ namespace wrench {
             /** @brief Task's terminated time **/
             double task_terminated = -1.0;
 
-            /** @brief Task's execution host **/
+            /** @brief Task's execution host (could be a virtual host)**/
             std::string execution_host = "";
+            /** @brief Task's execution physucal host **/
+            std::string physical_execution_host = "";
             /** @brief Task's number of allocated cores **/
             unsigned long num_cores_allocated = 0;
 

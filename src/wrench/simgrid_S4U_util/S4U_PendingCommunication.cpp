@@ -104,6 +104,7 @@ namespace wrench {
             one_comm_failed = true;
         }
 
+
         if (index == -1) {
             return ULONG_MAX;
         }

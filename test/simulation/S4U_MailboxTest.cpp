@@ -126,13 +126,17 @@ private:
             wrench::Simulation::turnOnLink("1");
             wrench::Simulation::sleep(10);
 
+//            WRENCH_INFO("TWO ASYNCHRONOUS SENDS / NETWORK FAILURES");
+
             // Two asynchronous sends, network failure
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_failure;
             sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 100)));
             sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
             wrench::Simulation::sleep(10);
             simgrid::s4u::Link::by_name("1")->turn_off();
+//            WRENCH_INFO("SIZE= %ld", sends_failure.size());
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_failure, 10000);
+//            WRENCH_INFO("index = %ld", index);
             try {
                 sends_failure.at(index)->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
@@ -148,6 +152,7 @@ private:
                 e->toString();
                 e->getMailbox();
             }
+
 
             // One synchronous sends, network failure
             try {
@@ -188,6 +193,8 @@ private:
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
                 e->toString();
             }
+
+//            WRENCH_INFO("TWO ASYNCHRPNOUS RECV / NETWORK FAILURES");
 
             // Two synchronous recv, network failure
             try {
@@ -230,15 +237,15 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-log-full");
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
     simulation->instantiatePlatform(platform_file_path);
-
 
     // Create the WMSs
     this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this,"Host1"));

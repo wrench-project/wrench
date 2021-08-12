@@ -329,7 +329,10 @@ namespace wrench {
 
 
             // Read  all input files
-            WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
+            if (not task->getInputFiles().empty()) {
+                WRENCH_INFO("Reading the %ld input files for task %s",
+                            task->getInputFiles().size(), task->getID().c_str());
+            }
             try {
                 task->setReadInputStartDate(S4U_Simulation::getClock());
 //                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_read;
@@ -363,6 +366,9 @@ namespace wrench {
                         this->simulation->getOutput().addTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task);
                         if (Simulation::isPageCachingEnabled() && l->getServerStorageService() != nullptr) {
                             MemoryManager *mm = simulation->getMemoryManagerByHost(S4U_Simulation::getHostName());
+                            if (f->getSize() > mm->getTotalMemory()) {
+                                throw std::runtime_error("WorkunitExecutor::performWork(): Size of file " + f->getID() + " is larger than memory manager's cache size. This is not yet supported");
+                            }
                             if (mm->getCachedAmount(f->getID().c_str()) < f->getSize()) {
                                 StorageService::copyFile(f,FileLocation::LOCATION(l->getServerStorageService()), l);
                                 isFileRead = true;
@@ -401,9 +407,11 @@ namespace wrench {
                 throw;
             }
 
-            WRENCH_INFO("Writing the %ld output files for task %s",
-                        task->getOutputFiles().size(),
-                        task->getID().c_str());
+            if (not task->getOutputFiles().empty()) {
+                WRENCH_INFO("Writing the %ld output files for task %s",
+                            task->getOutputFiles().size(),
+                            task->getID().c_str());
+            }
 
             // Write all output files
             try {
@@ -411,6 +419,13 @@ namespace wrench {
 //                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> files_to_write;
                 std::vector<std::pair<WorkflowFile *, std::shared_ptr<FileLocation>>> files_to_write;
                 for (auto const &f : task->getOutputFiles()) {
+                    if (Simulation::isPageCachingEnabled()) {
+                        MemoryManager *mm = simulation->getMemoryManagerByHost(S4U_Simulation::getHostName());
+                        if (f->getSize() > mm->getTotalMemory()) {
+                            throw std::runtime_error("WorkunitExecutor::performWork(): Size of file " + f->getID() +
+                                                     " is larger than memory manager's cache size. This is not yet supported");
+                        }
+                    }
                     if (work->file_locations.find(f) != work->file_locations.end()) {
                         files_to_write.push_back(std::make_pair(f, work->file_locations[f]));
                     } else {

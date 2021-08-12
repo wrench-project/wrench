@@ -184,6 +184,7 @@ int main(int argc, char **argv) {
 
     int num_hosts = 2;
 
+
     if(argc>2){
         batch_bandwidth = std::stoi(std::string(argv[2]));
     }
