@@ -45,11 +45,9 @@ namespace wrench {
 
     public:
         HTCondorComputeService(const std::string &hostname,
-                               const std::string &pool_name,
-                               std::set<ComputeService *> compute_resources,
+                               std::set<ComputeService *> compute_services,
                                std::map<std::string, std::string> property_list = {},
-                               std::map<std::string, double> messagepayload_list = {},
-                               ComputeService *grid_universe_batch_service = nullptr);
+                               std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER   **/
