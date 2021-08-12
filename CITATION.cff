@@ -1,0 +1,54 @@
+# YAML 1.2
+---
+authors: 
+  -
+    family-names: Casanova
+    given-names: Henri
+    orcid: "https://orcid.org/0000-0001-6310-0365"
+  -
+    family-names: "Ferreira da Silva"
+    given-names: Rafael
+    orcid: "https://orcid.org/0000-0002-1720-0928"
+  -
+    family-names: Tanaka
+    given-names: Ryan
+  -
+    family-names: Pandey
+    given-names: Suraj
+  -
+    family-names: Jethwani
+    given-names: Gautam
+  -
+    family-names: Koch
+    given-names: William
+  -
+    family-names: Albrecht
+    given-names: Spencer
+  -
+    family-names: Oeth
+    given-names: James
+  -
+    family-names: Suter
+    given-names: Frederic
+    orcid: "https://orcid.org/0000-0003-1902-1955"
+cff-version: "1.1.0"
+date-released: 2020-11-01
+doi: "10.1016/j.future.2020.05.030"
+keywords: 
+  - workflow
+  - "distributed-systems"
+  - hpc
+  - "reproducible-research"
+  - "simulation-framework"
+  - "batch-job"
+  - "scientific-workflows"
+  - "workflow-management-system"
+  - "simulation-modeling"
+  - "scheduling-simulator"
+  - "workflow-simulator"
+license: "LGPL-3.0"
+message: "If you use this software, please cite it using these metadata."
+repository-code: "https://github.com/wrench-project/wrench"
+title: "Developing Accurate and Scalable Simulators of Production Workflow Management Systems with WRENCH"
+version: "1.8"
+...

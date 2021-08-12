@@ -108,7 +108,7 @@ namespace wrench {
         }
 
         if (this->supportsGridUniverse() and (not at_least_one_service_supports_grid_jobs)) {
-            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): if this service is to support grid jobs, then it needs at least one batch compute service. (or change the HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS property)");
+            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): if this service is to support grid jobs, then it needs at least one batch compute service. (or change the HTCondorComputeServiceProperty::SUPPORTS_GRID_JOBS property)");
         }
 
         // create central manager service

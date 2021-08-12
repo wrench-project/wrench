@@ -25,9 +25,12 @@ namespace wrench {
     /**
      * Documention in .h file
      */
-    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename, 
+    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename,
                                                             const std::string &reference_flop_rate,
-                                                            bool redundant_dependencies) {
+                                                            bool redundant_dependencies,
+                                                            unsigned long min_cores_per_task,
+                                                            unsigned long max_cores_per_task,
+                                                            bool enforce_num_cores) {
 
         std::ifstream file;
         nlohmann::json j;
@@ -69,7 +72,15 @@ namespace wrench {
                 for (auto &job : jobs) {
                     std::string name = job.at("name");
                     double runtime = job.at("runtime");
-                    unsigned long num_procs = 1;
+                    unsigned long min_num_cores, max_num_cores;
+                    // Set the default values
+                    min_num_cores = min_cores_per_task;
+                    max_num_cores = max_cores_per_task;
+                    // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
+                    if ((not enforce_num_cores) and job.find("cores") != job.end()) {
+                        min_num_cores = job.at("cores");
+                        max_num_cores = job.at("cores");
+                    }
                     std::string type = job.at("type");
 
                     if (type == "transfer") {
@@ -87,7 +98,7 @@ namespace wrench {
                         throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has uknown type " + type);
                     }
 
-                    task = workflow->addTask(name, runtime * flop_rate, num_procs, num_procs, 0.0);
+                    task = workflow->addTask(name, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
 
                     // task priority
                     try {
@@ -180,7 +191,10 @@ namespace wrench {
      * Documention in .h file
      */
     Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                                       bool redundant_dependencies) {
+                                                                      bool redundant_dependencies,
+                                                                      unsigned long min_cores_per_task,
+                                                                      unsigned long max_cores_per_task,
+                                                                      bool enforce_num_cores) {
         throw std::runtime_error("PegasusWorkflowParser::createExecutableWorkflowFromJSON(): not implemented yet");
     }
 
@@ -188,7 +202,10 @@ namespace wrench {
       * Documention in .h file
       */
     Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
-                                                                   bool redundant_dependencies) {
+                                                           bool redundant_dependencies,
+                                                           unsigned long min_cores_per_task,
+                                                           unsigned long max_cores_per_task,
+                                                           bool enforce_num_cores) {
 
         pugi::xml_document dax_tree;
 
@@ -216,24 +233,32 @@ namespace wrench {
             std::string id = job.attribute("id").value();
             std::string name = job.attribute("name").value();
             double runtime = std::strtod(job.attribute("runtime").value(), nullptr);
-            int num_procs = 1;
-            bool found_one = false;
-            for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
-                if (job.attribute(tag.c_str())) {
-                    if (found_one) {
-                        throw std::invalid_argument(
-                                "Workflow::createWorkflowFromDAX(): multiple \"number of cores/procs\" specification for task " +
-                                id);
-                    } else {
-                        found_one = true;
-                        num_procs = std::stoi(job.attribute(tag.c_str()).value());
+            unsigned long min_num_cores;
+            unsigned long max_num_cores;
+            // Set the default values
+            min_num_cores = min_cores_per_task;
+            max_num_cores = max_cores_per_task;
+            // Overwrite the default is we don't enforce the default values AND the DAX specifies core numbers
+            if (not enforce_num_cores) {
+                bool found_one = false;
+                for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
+                    if (job.attribute(tag.c_str())) {
+                        if (found_one) {
+                            throw std::invalid_argument(
+                                    "Workflow::createWorkflowFromDAX(): multiple \"number of cores/procs\" specification for task " +
+                                    id);
+                        } else {
+                            found_one = true;
+                            min_num_cores = std::stoi(job.attribute(tag.c_str()).value());
+                            max_num_cores = std::stoi(job.attribute(tag.c_str()).value());
+                        }
                     }
                 }
             }
 
             // Create the task
             // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, ram = 0.0
-            task = workflow->addTask(id, runtime * flop_rate, 1, num_procs, 0.0);
+            task = workflow->addTask(id, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
 
             // Go through the children "uses" nodes
             for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {

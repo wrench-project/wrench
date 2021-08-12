@@ -285,7 +285,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-energy");
+    argv[1] = strdup("--wrench-energy-simulation");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -484,7 +484,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--activate-energy");
+//    argv[1] = strdup("--wrench-energy-simulation");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -639,7 +639,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-energy");
+    argv[1] = strdup("--wrench-energy-simulation");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -792,7 +792,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-energy");
+    argv[1] = strdup("--wrench-energy-simulation");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1026,7 +1026,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-energy");
+    argv[1] = strdup("--wrench-energy-simulation");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 

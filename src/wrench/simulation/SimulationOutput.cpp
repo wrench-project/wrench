@@ -97,6 +97,30 @@ namespace wrench {
         }
     } WorkflowTaskExecutionInstance;
 
+
+    /*
+     * Two helper functions
+     */
+    static std::vector<simgrid::s4u::Host *> get_all_physical_hosts() {
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+        std::vector<simgrid::s4u::Host *> to_return;
+
+        for (auto const &h : hosts) {
+            // Ignore VMs
+            if (S4U_VirtualMachine::vm_to_pm_map.find(h->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+                continue;
+            }
+            to_return.push_back(h);
+        }
+        return to_return;
+    }
+
+    static std::vector<simgrid::s4u::Link *> get_all_links() {
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        return simgrid_engine->get_all_links();
+    }
+
     /******************/
     /** \endcond      */
     /******************/
@@ -811,18 +835,19 @@ namespace wrench {
      *      "energy_consumption": {
      *      {
      *          hostname: <string>,
-     *          pstates: [                 <-- if this host is a single core host, items in this list will be formatted as
-     *              {                          the first item, else if this is a multi core host, items will be formatted as
-     *                  pstate: <int>,         the second item
+     *          pstates: [
+     *              {
+     *                  pstate: <int>,
      *                  idle: <double>,
-     *                  running: <double>,   <-- if single core host
+     *                  epsilon: <double>,
+     *                  all_cores: <double>,
      *                  speed: <double>
      *              },
      *              {
      *                  pstate: <int>,
      *                  idle: <double>,
-     *                  one_core: <double>,  <-- if multi core host
-     *                  all_cores: <double>, <-- if multi core host
+     *                  epsilon: <double>,
+     *                  all_cores: <double>,
      *                  speed: <double>
      *              } ...
      *          ],
@@ -857,8 +882,7 @@ namespace wrench {
 
         try {
 
-            auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+            std::vector<simgrid::s4u::Host *> hosts = get_all_physical_hosts();
 
             nlohmann::json hosts_energy_consumption_information;
             for (const auto &host : hosts) {
@@ -866,10 +890,12 @@ namespace wrench {
 
                 datum["hostname"] = host->get_name();
 
-                // for each pstate, we need to record the following:
-                //     in the case of a single core hosts, then "Idle:Running"
-                //     in the case of multi-core hosts, then "Idle:OneCore:AllCores"
-                std::string watts_per_state_property_string = host->get_property("watt_per_state");
+                const char *property_string = host->get_property("wattage_per_state");
+                if (property_string == nullptr) {
+                    throw std::runtime_error("Host " + std::string(host->get_name()) +
+                    " does not have a wattage_per_state property!");
+                }
+                std::string watts_per_state_property_string = std::string(property_string);
                 std::vector<std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
@@ -877,28 +903,36 @@ namespace wrench {
                     std::vector<std::string> current_state_watts;
                     boost::split(current_state_watts, watts_per_state.at(pstate), boost::is_any_of(":"));
 
-                    if (host->get_core_count() == 1) {
+                    if (current_state_watts.size() == 2) {
                         datum["pstates"].push_back({
                                                            {"pstate",  pstate},
                                                            {"speed",   host->get_pstate_speed((int) pstate)},
                                                            {"idle",    current_state_watts.at(0)},
-                                                           {"running", current_state_watts.at(1)}
+                                                           {"epsilon",  current_state_watts.at(0)},
+                                                           {"all_cores", current_state_watts.at(1)}
                                                    });
-                    } else {
+                    } else if (current_state_watts.size() == 3) {
                         datum["pstates"].push_back({
                                                            {"pstate",    pstate},
                                                            {"speed",     host->get_pstate_speed((int) pstate)},
                                                            {"idle",      current_state_watts.at(0)},
-                                                           {"one_core",  current_state_watts.at(1)},
+                                                           {"epsilon",  current_state_watts.at(1)},
                                                            {"all_cores", current_state_watts.at(2)}
                                                    });
+                    } else {
+                        throw std::runtime_error("Host " + std::string(host->get_name()) +
+                        "'s wattage_per_state property is invalid (should have 2 or 3 colon-separated numbers)");
                     }
                 }
 
-                const char *watt_off_value = host->get_property("watt_off");
+                const char *wattage_off_value = host->get_property("wattage_off");
+                if (wattage_off_value == nullptr) {
+                    throw std::runtime_error("Host " + std::string(host->get_name()) +
+                                             " does not have a wattage_off property!");
+                }
 
-                if (watt_off_value != nullptr) {
-                    datum["watt_off"] = std::string(watt_off_value);
+                if (wattage_off_value != nullptr) {
+                    datum["wattage_off"] = std::string(wattage_off_value);
                 }
 
                 for (const auto &pstate_timestamp : this->getTrace<SimulationTimestampPstateSet>()) {
@@ -923,9 +957,6 @@ namespace wrench {
                 hosts_energy_consumption_information.push_back(datum);
             }
 
-            // std::cerr << hosts_energy_consumption_information.dump(4);
-
-
             nlohmann::json energy_consumption;
             energy_consumption["energy_consumption"] = hosts_energy_consumption_information;
             energy_json_part = hosts_energy_consumption_information;
@@ -937,8 +968,8 @@ namespace wrench {
             }
 
         } catch (std::runtime_error &e) {
-            // the functions that get energy information catch any exceptions then throw runtime_errors
-            std::cerr << e.what() << std::endl;
+            // Just re-throw
+            throw;
         }
     }
 
@@ -1004,10 +1035,10 @@ namespace wrench {
 
         nlohmann::json platform_graph_json;
 
-        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+//        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
 
         // Get all the hosts
-        auto hosts = simgrid_engine->get_all_hosts();
+        auto hosts = get_all_physical_hosts();
 
         // get the by-cluster host information
         std::map<std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
@@ -1039,7 +1070,7 @@ namespace wrench {
         }
 
         // add all network links to the list of vertices
-        std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+        std::vector<simgrid::s4u::Link *> links = get_all_links();
         for (const auto &link : links) {
             if (not(link->get_name() == "__loopback__")) { // Ignore loopback link
                 platform_graph_json["vertices"].push_back({
@@ -1471,7 +1502,7 @@ namespace wrench {
 
         try {
             auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Link *> links = simgrid_engine->get_all_links();
+            std::vector<simgrid::s4u::Link *> links = get_all_links();
 
             for( const auto &link: links) {
                 nlohmann::json datum;
@@ -1501,7 +1532,7 @@ namespace wrench {
                 output.close();
             }
         } catch (std::runtime_error &e) {
-            std::cerr << e.what() << std::endl;
+            throw;
         }
     }
 
