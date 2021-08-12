@@ -237,21 +237,21 @@ namespace wrench {
     * @brief Gets the state of the batch queue
     * @return A vector of tuples:
     *              - std::string: username
-    *              - int: job id
+    *              - string: job name
     *              - int: num hosts
     *              - int: num cores per host
     *              - int: time in seconds
     *              - double: submit time
     *              - double: start time (-1.0 if not started yet)
     */
-    std::vector<std::tuple<std::string, int, int, int, int, double, double>> BatchComputeService::getQueue() {
+    std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> BatchComputeService::getQueue() {
 
         // Go through the currently running jobs
-        std::vector<std::tuple<std::string, int, int, int, int, double, double>> queue_state;
+        std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> queue_state;
         for (auto const &j : this->running_jobs) {
             auto tuple = std::make_tuple(
                     j->getUsername(),
-                    j->getJobID(),
+                    j->getWorkflowJob()->getName(),
                     j->getRequestedNumNodes(),
                     j->getRequestedCoresPerNode(),
                     j->getRequestedTime(),
@@ -265,7 +265,7 @@ namespace wrench {
         for (auto const &j : this->waiting_jobs) {
             auto tuple = std::make_tuple(
                     j->getUsername(),
-                    j->getJobID(),
+                    j->getWorkflowJob()->getName(),
                     j->getRequestedNumNodes(),
                     j->getRequestedCoresPerNode(),
                     j->getRequestedTime(),
@@ -279,7 +279,7 @@ namespace wrench {
         for (auto const &j : this->batch_queue) {
             auto tuple = std::make_tuple(
                     j->getUsername(),
-                    j->getJobID(),
+                    j->getWorkflowJob()->getName(),
                     j->getRequestedNumNodes(),
                     j->getRequestedCoresPerNode(),
                     j->getRequestedTime(),
@@ -291,8 +291,8 @@ namespace wrench {
 
         // Sort all jobs by  arrival  time
         std::sort(queue_state.begin(), queue_state.end(),
-                  [](const std::tuple<std::string, int, int, int, int, double, double> j1,
-                     const std::tuple<std::string, int, int, int, int, double, double> j2) -> bool {
+                  [](const std::tuple<std::string, std::string, int, int, int, double, double> j1,
+                     const std::tuple<std::string, std::string, int, int, int, double, double> j2) -> bool {
                       if (std::get<6>(j1) == std::get<6>(j2)) {
                           return (std::get<1>(j1) > std::get<1>(j2));
                       } else {
@@ -790,7 +790,6 @@ namespace wrench {
         WRENCH_INFO("Terminating a standard job executor");
         executor->kill(true);
         // Do not update the resource availability, because this is done at a higher level
-
     }
 
 
@@ -1670,6 +1669,7 @@ namespace wrench {
             if (std::dynamic_pointer_cast<StandardJob>(workflow_job) == job) {
                 batch_job = j;
                 is_running = true;
+                break;
             }
         }
 
@@ -1682,6 +1682,7 @@ namespace wrench {
                 if (std::dynamic_pointer_cast<StandardJob>(workflow_job) == job) {
                     batch_pending_it = it1;
                     is_pending = true;
+                    break;
                 }
             }
         }
@@ -1695,9 +1696,12 @@ namespace wrench {
                 if (std::dynamic_pointer_cast<StandardJob>(workflow_job) == job) {
                     batch_job = j;
                     is_waiting = true;
+                    break;
                 }
             }
         }
+
+//        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
 
         if (!is_pending && !is_running && !is_waiting) {
             std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
@@ -1713,21 +1717,22 @@ namespace wrench {
             return;
         }
 
-        // Notify the scheduler of the failuire
-        this->scheduler->processJobFailure(batch_job);
-
         // Is it running?
         if (is_running) {
+            this->scheduler->processJobTermination(batch_job);
             terminateRunningStandardJob(job);
+            this->freeUpResources(batch_job->getResourcesAllocated());
             this->running_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
+            this->scheduler->processJobTermination(*batch_pending_it);
             auto to_free = *batch_pending_it;
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
         if (is_waiting) {
+            this->scheduler->processJobTermination(batch_job);
             this->waiting_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
         }
@@ -1799,7 +1804,8 @@ namespace wrench {
         }
         if (workflow_job == nullptr) {
             //throw std::runtime_error("BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has");
-            WRENCH_WARN("BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of known jobs... ignoring (Batsched seems to send this back even when a job has been actively terminated)");
+            WRENCH_WARN("BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of known jobs... just telling Batsched that the job completed (Batsched seems to send this back even when a job has been actively terminated)");
+            this->scheduler->processUnknownJobTermination(execute_events["job_id"]);
             return;
         }
 

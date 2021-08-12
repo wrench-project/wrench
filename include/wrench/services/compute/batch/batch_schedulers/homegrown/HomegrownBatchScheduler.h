@@ -11,6 +11,7 @@
 #define WRENCH_HOMEGROWNBATCHSCHEDULER_H
 
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
+#include <stdexcept>
 
 
 namespace wrench {
@@ -39,6 +40,10 @@ namespace wrench {
 
         void shutdown() override {};
 
+        void processUnknownJobTermination(std::string job_id) override {
+            throw std::runtime_error("HomegrownBatchScheduler::processUnknownJobTermination(): this method should not be called since this scheduler is not Batsched");
+        }
+
         /**
          * @brief Virtual method to figure out on which actual resources a job could be scheduled right now
          * @param num_nodes: number of nodes
@@ -47,6 +52,8 @@ namespace wrench {
          * @return a host:<core,RAM> map
          */
         virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
+
+
 
     };
 

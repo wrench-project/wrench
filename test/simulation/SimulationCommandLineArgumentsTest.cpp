@@ -97,7 +97,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--version");
+    argv[1] = strdup("--wrench-version");
 
     pid_t pid = fork();
 
@@ -436,7 +436,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--activate-energy");
+    argv[1] = strdup("--wrench-energy-simulation");
 
     simulation->init(&argc, argv);
 

@@ -357,8 +357,8 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
   wrench::Workflow *workflow = nullptr;
 
-  ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX("bogus", "1f", false), std::invalid_argument);
-  ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->dax_file_path, "1f", false));
+  ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX("bogus", "1f", false, 2, 10), std::invalid_argument);
+  ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->dax_file_path, "1f", false, 2, 10));
   ASSERT_EQ(workflow->getNumberOfTasks(), 36);
   ASSERT_EQ(workflow->getFiles().size(), 56);
 
@@ -369,8 +369,11 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
   ASSERT_EQ(num_output_files, 8);
 
   ASSERT_NEAR(workflow->getTaskByID("ID00000")->getFlops(), 35.79, 0.001);
-  ASSERT_EQ(workflow->getTaskByID("ID00000")->getMinNumCores(), 1);
+  ASSERT_EQ(workflow->getTaskByID("ID00000")->getMinNumCores(), 3);
   ASSERT_EQ(workflow->getTaskByID("ID00000")->getMaxNumCores(), 3);
+
+  ASSERT_EQ(workflow->getTaskByID("ID00002")->getMinNumCores(), 2);
+  ASSERT_EQ(workflow->getTaskByID("ID00002")->getMaxNumCores(), 10);
 
   ASSERT_EQ(workflow->getNumLevels(), 8);
   ASSERT_EQ(workflow->getTasksInTopLevelRange(0,0).size(), 1);

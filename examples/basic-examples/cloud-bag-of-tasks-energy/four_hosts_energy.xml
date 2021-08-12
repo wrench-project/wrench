@@ -11,25 +11,27 @@
             </disk>
             <!-- The power consumption in watt for each pstate (idle:all_cores) -->
             <prop id="wattage_per_state" value="10.00:100.00" />
+            <prop id="wattage_off" value="0.0" />
         </host>
 
         <!-- The host on which the CloudComputeService will run (only one 1Gf pstate) -->
         <host id="CloudProviderHost" speed="1Gf" pstate="0" core="1">
             <!-- The power consumption in watt for each pstate (idle:all_cores) -->
             <prop id="wattage_per_state" value="10.00:100.00" />
+            <prop id="wattage_off" value="0.0" />
        </host>
 
         <!-- A cloud compute host, 2 pstate (a 100Gf and a 200Gf one), that starts in pstate 1  -->
         <host id="CloudHost1" speed="100Gf, 200Gf" pstate="1" core="10">
             <!-- The power consumption in watt for each pstate (idle:all_cores) -->
-            <prop id="wattage_per_state" value="10.00:100.00,10.00:250.00" />
+            <prop id="wattage_per_state" value="10.00:10.00:100.00,10.00:10.00:250.00" />
             <prop id="wattage_off" value="10" />
             <prop id="ram" value="64GB" />
         </host>
         <!-- A cloud compute host, 2 pstate (a 100Gf and a 200Gf one), that starts in pstate 1 -->
         <host id="CloudHost2" speed="100Gf, 200Gf"  pstate="1" core="10">
             <!-- The power consumption in watt for each pstate (idle:all_cores) -->
-            <prop id="wattage_per_state" value="10.00:150.00,10.00:280.00" />
+            <prop id="wattage_per_state" value="10.00:10.00:150.00,10.00:10.00:280.00" />
             <prop id="wattage_off" value="10" />
             <prop id="ram" value="64GB" />
         </host>

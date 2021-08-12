@@ -39,6 +39,8 @@ namespace wrench {
 
     int Simulation::unique_disk_sequence_number = 0;
 
+    bool Simulation::energy_enabled = false;
+    bool Simulation::host_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
 
     /**
@@ -114,22 +116,30 @@ namespace wrench {
         std::vector<std::string> cleanedup_args;
 
         for (i = 0; i < *argc; i++) {
-            if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
-                TerminalOutput::disableColor();
-            } else if ((not strcmp(argv[i], "--wrench-full-log")) or (not strcmp(argv[i], "--wrench-full-logs")) or (not strcmp(argv[i], "--wrench-log-full"))) {
-                xbt_log_control_set("root.thresh:info");
-            } else if (not strcmp(argv[i], "--activate-energy")) {
-                sg_host_energy_plugin_init();
-            } else if (not strcmp(argv[i], "--help-wrench")) {
-                wrench_help_requested = true;
-            } else if (not strcmp(argv[i], "--help")) {
+            if (not strcmp(argv[i], "--help")) {
                 simulator_help_requested = true;
+            } else if ((not strcmp(argv[i], "--wrench-no-color")) or (not strcmp(argv[i], "--wrench-no-colors"))) {
+                TerminalOutput::disableColor();
+            } else if ((not strcmp(argv[i], "--wrench-full-log")) or
+                       (not strcmp(argv[i], "--wrench-full-logs")) or
+                       (not strcmp(argv[i], "--wrench-log-full")) or
+                       (not strcmp(argv[i], "--wrench-logs-full"))
+                    ) {
+                xbt_log_control_set("root.thresh:info");
+            } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
+                sg_host_energy_plugin_init();
+                this->energy_enabled = true;
+            } else if (not strcmp(argv[i], "--wrench-host-shutdown-simulation")) {
+                this->host_shutdown_enabled = true;
+            } else if ((not strcmp(argv[i], "--help-wrench")) or
+                       (not strcmp(argv[i], "--wrench-help"))) {
+                wrench_help_requested = true;
             } else if (not strcmp(argv[i], "--help-simgrid")) {
                 simgrid_help_requested = true;
-            } else if (not strcmp(argv[i], "--version")) {
+            } else if (not strcmp(argv[i], "--wrench-version")) {
                 version_requested = true;
-            } else if (not strcmp(argv[i], "--pagecache")) {
-                pagecache_enabled = true;
+            } else if (not strcmp(argv[i], "--wrench-pagecache-simulation")) {
+                this->pagecache_enabled = true;
             } else {
                 cleanedup_args.emplace_back(argv[i]);
             }
@@ -138,18 +148,33 @@ namespace wrench {
         // Always activate VM migration plugin
         sg_vm_live_migration_plugin_init();
 
+        // Register a callback on host state changes to warn users
+        // that the --activate-host-shutdown flag should have been passed
+        // to the simulator if host shutdowns are to be simulated
+        simgrid::s4u::Host::on_state_change.connect(
+                [](simgrid::s4u::Host const &h) {
+                    if (not Simulation::host_shutdown_enabled) {
+                        throw std::runtime_error(
+                                "It looks like you are simulating host failures/shutdowns during the simulated execution."
+                                " Please restart your simulation passing it the --activate-host-shutdown command-line flag.");
+                    }
+                });
+
+        // Print help message if requested
         if (wrench_help_requested) {
             std::cout << "General WRENCH command-line arguments:\n";
+            std::cout << "   --wrench-help: displays this help message\n";
+            std::cout << "   --wrench-energy-simulation: activates SimGrid's energy plugin\n";
+            std::cout << "     (requires host pstate definitions in XML platform description file)\n";
+            std::cout << "   --wrench-host-shutdown-simulation: activates WRENCH's capability to simulate host failures/shutdowns during execution (will slow down simulation)\n";
+            std::cout << "   --wrench-pagecache-simulation: Activate the in-memory (Linux) page cache simulation (which ";
+            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory' that )\n";
+            std::cout << "                acts as additional RAM that can only be used for caching file pages)\n";
             std::cout << "   --wrench-no-color: disables colored terminal output\n";
             std::cout << "   --wrench-full-log: enables full logging\n";
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
-            std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
-            std::cout << "     (requires host pstate definitions in XML platform description file)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
-            std::cout << "   --help-wrench: displays this help message\n";
-            std::cout << "   --pagecache: Activate the in-memory_manager_service page caching simulation (which then";
-            std::cout << "                requires that all hosts in the platform have a disk mounted at '/memory')\n";
             std::cerr << "\n";
         }
 
@@ -206,13 +231,13 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Instantiate a simulated platform
-     *
-     * @param filename: the path to a SimGrid XML platform description file
-     *
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Instantiate a simulated platform
+ *
+ * @param filename: the path to a SimGrid XML platform description file
+ *
+ * @throw std::runtime_error
+ */
     void Simulation::instantiatePlatform(std::string filename) {
         static bool already_setup = false;
 
@@ -234,62 +259,62 @@ namespace wrench {
         already_setup = true;
     }
 
-    /**
-     * @brief Get the list of names of all the hosts in the platform
-     *
-     * @return a vector of hostnames
-     */
+/**
+ * @brief Get the list of names of all the physical hosts in the platform
+ *
+ * @return a vector of hostnames
+ */
     std::vector<std::string> Simulation::getHostnameList() {
         return S4U_Simulation::getAllHostnames();
     }
 
-    /**
-     * @brief Get the list of link names on the route between two hosts
-     * @param src_host: src hostname
-     * @param dst_host: dst hostname
-     * @return a vector of link names
-     */
+/**
+ * @brief Get the list of link names on the route between two hosts
+ * @param src_host: src hostname
+ * @param dst_host: dst hostname
+ * @return a vector of link names
+ */
     std::vector<std::string> Simulation::getRoute(std::string &src_host, std::string &dst_host) {
         return S4U_Simulation::getRoute(src_host, dst_host);
     }
 
-    /**
-     * @brief Get the list of names of all the links in the platform
-     *
-     * @return a vector of link names
-     */
+/**
+ * @brief Get the list of names of all the links in the platform
+ *
+ * @return a vector of link names
+ */
     std::vector<std::string> Simulation::getLinknameList() {
         return S4U_Simulation::getAllLinknames();
     }
 
-    /**
-     * @brief Get the max bandwidth of a particular link
-     * @param link_name: the link's name
-     *
-     * @return a bandwidth in Bps
-     */
+/**
+ * @brief Get the max bandwidth of a particular link
+ * @param link_name: the link's name
+ *
+ * @return a bandwidth in Bps
+ */
     double Simulation::getLinkBandwidth(std::string link_name) {
         return S4U_Simulation::getLinkBandwidth(link_name);
     }
 
-    /**
-     * @brief Get the current usage of a particular link
-     * @param link_name: the link's name
-     *
-     * @return a bandwidth usage
-     */
+/**
+ * @brief Get the current usage of a particular link
+ * @param link_name: the link's name
+ *
+ * @return a bandwidth usage
+ */
     double Simulation::getLinkUsage(std::string link_name) {
         return S4U_Simulation::getLinkUsage(link_name);
     }
 
-    /**
-     * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
-     *        simulation output if record_as_time_stamp is set to true
-     * @param link_name: the link name
-     * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
-     * @return current bandwidth usage in Bps
-     * @throws std::invalid_argument
-     */
+/**
+ * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
+ *        simulation output if record_as_time_stamp is set to true
+ * @param link_name: the link name
+ * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
+ * @return current bandwidth usage in Bps
+ * @throws std::invalid_argument
+ */
     double Simulation::getLinkUsage(const std::string &link_name, bool record_as_time_stamp) {
         if (link_name.empty()) {
             throw std::invalid_argument("Simulation::getLinkUsage() requires a valid link name");
@@ -306,18 +331,34 @@ namespace wrench {
     }
 
     /**
-     * Check if writeback mode is activated
+     * Check if page caching is activated
      * @return
      */
     bool Simulation::isPageCachingEnabled() {
-        return pagecache_enabled;
+        return Simulation::pagecache_enabled;
     }
 
     /**
-     * Retrieve MemoryManager by hostname
-     * @param hostname
+     * Check if host shutdown simulation is activated
      * @return
      */
+    bool Simulation::isHostShutdownSimulationEnabled() {
+        return Simulation::host_shutdown_enabled;
+    }
+
+    /**
+     * Check if energy simulation is activated
+     * @return
+     */
+    bool Simulation::isEnergySimulationEnabled() {
+        return Simulation::energy_enabled;
+    }
+
+/**
+ * Retrieve MemoryManager by hostname
+ * @param hostname
+ * @return
+ */
 //    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
 //        for (auto mem_mng: this->memory_managers) {
 //            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
@@ -327,21 +368,21 @@ namespace wrench {
 //        return nullptr;
 //    }
 
-    /**
-     * @brief Get the list of names of all the hosts in each cluster composing the platform
-     *
-     * @return a map of lists of hosts, indexed by cluster name
-     *
-     */
+/**
+ * @brief Get the list of names of all the hosts in each cluster composing the platform
+ *
+ * @return a map of lists of hosts, indexed by cluster name
+ *
+ */
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
         return S4U_Simulation::getAllHostnamesByCluster();
     }
 
-    /**
-     * @brief Launch the simulation
-     *
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Launch the simulation
+ *
+ * @throw std::runtime_error
+ */
     void Simulation::launch() {
         // Check that the simulation is correctly initialized
         try {
@@ -376,20 +417,20 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Checks whether the simulation is running or not
-     *
-     * @return true or false
-	 */
+/**
+ * @brief Checks whether the simulation is running or not
+ *
+ * @return true or false
+ */
     bool Simulation::isRunning() {
         return this->is_running;
     }
 
-    /**
-     * @brief Check that the simulation is correctly instantiated by the user
-     *
-     * @throw std::runtime_exception
-     */
+/**
+ * @brief Check that the simulation is correctly instantiated by the user
+ *
+ * @throw std::runtime_exception
+ */
     void Simulation::checkSimulationSetup() {
         // Check that the simulation is initialized
         if (not this->s4u_simulation->isInitialized()) {
@@ -453,11 +494,11 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Start all services
-     *
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Start all services
+ *
+ * @throw std::runtime_error
+ */
     void Simulation::startAllProcesses() {
         try {
             // Start the WMSes
@@ -504,13 +545,13 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Add a ComputeService to the simulation.
-     *
-     * @param service: a compute service
-     *
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Add a ComputeService to the simulation.
+ *
+ * @param service: a compute service
+ *
+ * @throw std::invalid_argument
+ */
     void Simulation::addService(std::shared_ptr<ComputeService> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -519,13 +560,13 @@ namespace wrench {
         this->compute_services.insert(service);
     }
 
-    /**
-     * @brief Add a NetworkProximityService to the simulation.
-     *
-     * @param service: a network proximity service
-     *
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Add a NetworkProximityService to the simulation.
+ *
+ * @param service: a network proximity service
+ *
+ * @throw std::invalid_argument
+ */
     void Simulation::addService(std::shared_ptr<NetworkProximityService> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -534,13 +575,13 @@ namespace wrench {
         this->network_proximity_services.insert(service);
     }
 
-    /**
-    * @brief Add a StorageService to the simulation.
-    *
-    * @param service: a storage service
-    *
-    * @throw std::invalid_argument
-    */
+/**
+* @brief Add a StorageService to the simulation.
+*
+* @param service: a storage service
+*
+* @throw std::invalid_argument
+*/
     void Simulation::addService(std::shared_ptr<StorageService> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -549,13 +590,13 @@ namespace wrench {
         this->storage_services.insert(service);
     }
 
-    /**
-     * @brief Add a WMS to the simulation.
-     *
-     * @param service: a WMS
-     *
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Add a WMS to the simulation.
+ *
+ * @param service: a WMS
+ *
+ * @throw std::invalid_argument
+ */
     void Simulation::addService(std::shared_ptr<WMS> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -564,13 +605,13 @@ namespace wrench {
         this->wmses.insert(service);
     }
 
-    /**
-      * @brief Add a FileRegistryService to the simulation.
-      *
-      * @param service: a file registry service
-      *
-      * @throw std::invalid_argument
-      */
+/**
+  * @brief Add a FileRegistryService to the simulation.
+  *
+  * @param service: a file registry service
+  *
+  * @throw std::invalid_argument
+  */
     void Simulation::addService(std::shared_ptr<FileRegistryService> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -579,13 +620,13 @@ namespace wrench {
         this->file_registry_services.insert(service);
     }
 
-    /**
-      * @brief Add an EnergyMeter service to the simulation.
-      *
-      * @param service: an energy meter service
-      *
-      * @throw std::invalid_argument
-      */
+/**
+  * @brief Add an EnergyMeter service to the simulation.
+  *
+  * @param service: an energy meter service
+  *
+  * @throw std::invalid_argument
+  */
     void Simulation::addService(std::shared_ptr<EnergyMeterService> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -594,13 +635,13 @@ namespace wrench {
         this->energy_meter_services.insert(service);
     }
 
-    /**
-      * @brief Add a BandwidthMeter service to the simulation.
-      *
-      * @param service: a link usage meter service
-      *
-      * @throw std::invalid_argument
-      */
+/**
+  * @brief Add a BandwidthMeter service to the simulation.
+  *
+  * @param service: a link usage meter service
+  *
+  * @throw std::invalid_argument
+  */
     void Simulation::addService(std::shared_ptr<BandwidthMeterService> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
@@ -609,13 +650,13 @@ namespace wrench {
         this->bandwidth_meter_services.insert(service);
     }
 
-    /**
-      * @brief Add a MemoryManager to the simulation.
-      *
-      * @param service: a MemoryManager
-      *
-      * @throw std::invalid_argument
-      */
+/**
+  * @brief Add a MemoryManager to the simulation.
+  *
+  * @param service: a MemoryManager
+  *
+  * @throw std::invalid_argument
+  */
     void Simulation::addService(std::shared_ptr<MemoryManager> memory_manager) {
         if (memory_manager == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
@@ -624,39 +665,39 @@ namespace wrench {
         this->memory_managers.insert(memory_manager);
     }
 
-    /**
-    * @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
-    *
-    * @param file: a file to stage on a storage service
-    * @param storage_service: a storage service
-    *
-    * @throw std::runtime_error
-    * @throw std::invalid_argument
-    */
+/**
+* @brief Stage a copy of a file at a storage service in the root of the (unique) mount point
+*
+* @param file: a file to stage on a storage service
+* @param storage_service: a storage service
+*
+* @throw std::runtime_error
+* @throw std::invalid_argument
+*/
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
     }
 
-    /**
-    * @brief Stage a copy of a file at a storage service in a particular directory
-    *
-    * @param file: a file to stage on a storage service
-    * @param storage_service: a storage service
-    * @param directory_absolute_path: the absolute path of the directory where the file should be stored
-    *
-    * @throw std::runtime_error
-    * @throw std::invalid_argument
-    */
+/**
+* @brief Stage a copy of a file at a storage service in a particular directory
+*
+* @param file: a file to stage on a storage service
+* @param storage_service: a storage service
+* @param directory_absolute_path: the absolute path of the directory where the file should be stored
+*
+* @throw std::runtime_error
+* @throw std::invalid_argument
+*/
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
                                std::string directory_absolute_path) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
     }
 
-    /**
-     * @brief State a copy of a file at a location
-     * @param file: the file
-     * @param location: the location
-     */
+/**
+ * @brief State a copy of a file at a location
+ * @param file: the file
+ * @param location: the location
+ */
     void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
@@ -691,15 +732,15 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Wrapper enabling timestamps for disk reads
-     *
-     * @param num_bytes - number of bytes read
-     * @param hostname - hostname to read from
-     * @param mount_point - mount point of disk to read from
-     *
-     * @throw invalid_argument
-     */
+/**
+ * @brief Wrapper enabling timestamps for disk reads
+ *
+ * @param num_bytes - number of bytes read
+ * @param hostname - hostname to read from
+ * @param mount_point - mount point of disk to read from
+ *
+ * @throw invalid_argument
+ */
     void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
@@ -714,17 +755,17 @@ namespace wrench {
         this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
     }
 
-    /**
-     * @brief Wrapper enabling timestamps for concurrent disk read/writes
-     *
-     * @param num_bytes_to_read - number of bytes read
-     * @param num_bytes_to_write - number of bytes written
-     * @param hostname - hostname where disk is located
-     * @param read_mount_point - mount point of disk to read from
-     * @param write_mount_point - mount point of disk to write to
-     *
-     * @throw invalid_argument
-     */
+/**
+ * @brief Wrapper enabling timestamps for concurrent disk read/writes
+ *
+ * @param num_bytes_to_read - number of bytes read
+ * @param num_bytes_to_write - number of bytes written
+ * @param hostname - hostname where disk is located
+ * @param read_mount_point - mount point of disk to read from
+ * @param write_mount_point - mount point of disk to write to
+ *
+ * @throw invalid_argument
+ */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                             std::string hostname,
                                                             std::string read_mount_point,
@@ -751,15 +792,15 @@ namespace wrench {
                                                          temp_unique_sequence_number);
     }
 
-    /**
-     * @brief Wrapper enabling timestamps for disk writes
-     *
-     * @param num_bytes: number of bytes written
-     * @param hostname: name of the host to write to
-     * @param mount_point: mount point of the disk to write to at the host
-     *
-     * @throw invalid_argument
-     */
+/**
+ * @brief Wrapper enabling timestamps for disk writes
+ *
+ * @param num_bytes: number of bytes written
+ * @param hostname: name of the host to write to
+ * @param mount_point: mount point of the disk to write to at the host
+ *
+ * @throw invalid_argument
+ */
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
@@ -775,13 +816,13 @@ namespace wrench {
                                                           temp_unique_sequence_number);
     }
 
-    /**
-     * @brief Read file locally, only available if writeback is activated.
-     *
-     * @param file: workflow file
-     * @param n_bytes: number of read bytes
-     * @param location: file location
-     */
+/**
+ * @brief Read file locally, only available if writeback is activated.
+ *
+ * @param file: workflow file
+ * @param n_bytes: number of read bytes
+ * @param location: file location
+ */
     void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
 
         std::string hostname = getHostName();
@@ -817,14 +858,14 @@ namespace wrench {
         this->getOutput().addTimestampDiskReadCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
     }
 
-    /**
-     * @brief Write a file locally with writeback strategy, only available if writeback is activated.
-     *
-     * @param file: workflow file
-     * @param n_bytes: number of written bytes
-     * @param location: file location
-     * @param is_dirty: true or false
-     */
+/**
+ * @brief Write a file locally with writeback strategy, only available if writeback is activated.
+ *
+ * @param file: workflow file
+ * @param n_bytes: number of written bytes
+ * @param location: file location
+ * @param is_dirty: true or false
+ */
     void Simulation::writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty) {
 
         std::string hostname = getHostName();
@@ -847,7 +888,7 @@ namespace wrench {
 
         // free write to cache without forced flushing
         if (remaining_dirty > 0) {
-            mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), "");
+            mem_mng->evict(std::min(n_bytes, remaining_dirty) - mem_mng->getFreeMemory(), file->getID());
             mem_bw_amt = std::min(n_bytes, mem_mng->getFreeMemory());
             mem_mng->writebackToCache(file->getID(), location, mem_bw_amt, is_dirty);
         }
@@ -856,7 +897,7 @@ namespace wrench {
         // if dirty_ratio is reached, dirty data needs to be flushed to disk to write new data
         while (remaining > 0) {
             mem_mng->flush(remaining, "");
-            mem_mng->evict(remaining - mem_mng->getFreeMemory(), "");
+            mem_mng->evict(remaining - mem_mng->getFreeMemory(), file->getID());
 
             double to_cache = std::min(mem_mng->getFreeMemory(), remaining);
             mem_mng->writebackToCache(file->getID(), location, to_cache, is_dirty);
@@ -866,13 +907,13 @@ namespace wrench {
         this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
     }
 
-    /**
-     * @brief Write-through a file locally, only available if writeback is activated.
-     *
-     * @param file: workflow file
-     * @param n_bytes: number of written bytes
-     * @param location: file location
-     */
+/**
+ * @brief Write-through a file locally, only available if writeback is activated.
+ *
+ * @param file: workflow file
+ * @param n_bytes: number of written bytes
+ * @param location: file location
+ */
     void Simulation::writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
 
         std::string hostname = getHostName();
@@ -886,18 +927,18 @@ namespace wrench {
         // Write to disk
         this->writeToDisk(n_bytes, hostname, location->getMountPoint());
 
-        mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), "");
+        mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
         mem_mng->addToCache(file->getID(), location, n_bytes, false);
 
         this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes, temp_unique_sequence_number);
     }
 
-    /**
-     * @brief Find MemoryManager running on a host based on hostname
-     *
-     * @param hostname: name of the host
-     * @return pointer to the memory manager running on the host (or nullptr)
-     */
+/**
+ * @brief Find MemoryManager running on a host based on hostname
+ *
+ * @param hostname: name of the host
+ * @return pointer to the memory manager running on the host (or nullptr)
+ */
     MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
         for (const auto &ptr : this->memory_managers) {
             if (strcmp(ptr->getHostname().c_str(), hostname.c_str()) == 0) {
@@ -907,185 +948,185 @@ namespace wrench {
         return nullptr;
     }
 
-    /**
-     * @brief Wrapper for S4U_Simulation hostExists()
-     *
-     * @param hostname - name of host being queried
-     * @return boolean of existence
-     */
+/**
+ * @brief Wrapper for S4U_Simulation hostExists()
+ *
+ * @param hostname - name of host being queried
+ * @return boolean of existence
+ */
     bool Simulation::doesHostExist(std::string hostname) {
         return S4U_Simulation::hostExists(hostname);
     }
 
-    /**
-     * @brief Wrapper for S4U_Simulation linkExists()
-     *
-     * @param linkname - name of link being queried
-     * @return boolean of existence
-     */
+/**
+ * @brief Wrapper for S4U_Simulation linkExists()
+ *
+ * @param linkname - name of link being queried
+ * @return boolean of existence
+ */
     bool Simulation::doesLinkExist(std::string linkname) {
         return S4U_Simulation::linkExists(linkname);
     }
 
-    /**
-     * @brief Get the current simulated date
-     * @return a date
-     */
+/**
+ * @brief Get the current simulated date
+ * @return a date
+ */
     double Simulation::getCurrentSimulatedDate() {
         return S4U_Simulation::getClock();
     }
 
-    /**
-     * @brief Get the memory_manager_service capacity of a host given a hostname
-     * @param hostname: the hostname
-     * @return a memory_manager_service capacity in bytes
-     */
+/**
+ * @brief Get the memory_manager_service capacity of a host given a hostname
+ * @param hostname: the hostname
+ * @return a memory_manager_service capacity in bytes
+ */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
         return S4U_Simulation::getHostMemoryCapacity(hostname);
     }
 
-    /**
-    * @brief Get the number of cores of a host given a hostname
-    * @param hostname: the hostname
-    * @return a number of cores
-    */
+/**
+* @brief Get the number of cores of a host given a hostname
+* @param hostname: the hostname
+* @return a number of cores
+*/
     unsigned long Simulation::getHostNumCores(std::string hostname) {
         return S4U_Simulation::getHostNumCores(hostname);
     }
 
-    /**
-     * @brief Get the flop rate of one core of a host given a hostname
-     * @param hostname: the hostname
-     * @return a flop rate (flop / sec)
-     */
+/**
+ * @brief Get the flop rate of one core of a host given a hostname
+ * @param hostname: the hostname
+ * @return a flop rate (flop / sec)
+ */
     double Simulation::getHostFlopRate(std::string hostname) {
         return S4U_Simulation::getHostFlopRate(hostname);
     }
 
-    /**
-     * @brief Returns whether a host is on or not
-     * @param hostname: the hostname
-     * @return true or false
-     */
+/**
+ * @brief Returns whether a host is on or not
+ * @param hostname: the hostname
+ * @return true or false
+ */
     bool Simulation::isHostOn(std::string hostname) {
         return S4U_Simulation::isHostOn(hostname);
     }
 
-    /**
-     * @brief Turns off a host
-     * @param hostname: the hostname
-     */
+/**
+ * @brief Turns off a host
+ * @param hostname: the hostname
+ */
     void Simulation::turnOffHost(std::string hostname) {
         S4U_Simulation::turnOffHost(hostname);
     }
 
-    /**
-     * @brief Turns on a host
-     * @param hostname: the hostname
-     */
+/**
+ * @brief Turns on a host
+ * @param hostname: the hostname
+ */
     void Simulation::turnOnHost(std::string hostname) {
         S4U_Simulation::turnOnHost(hostname);
     }
 
-    /**
-     * @brief Returns whether a link is on or not
-     * @param linkname: the linkname
-     * @return true or false
-     */
+/**
+ * @brief Returns whether a link is on or not
+ * @param linkname: the linkname
+ * @return true or false
+ */
     bool Simulation::isLinkOn(std::string linkname) {
         return S4U_Simulation::isLinkOn(linkname);
     }
 
-    /**
-     * @brief Turns off a link
-     * @param linkname: the linkname
-     */
+/**
+ * @brief Turns off a link
+ * @param linkname: the linkname
+ */
     void Simulation::turnOffLink(std::string linkname) {
         S4U_Simulation::turnOffLink(linkname);
     }
 
-    /**
-     * @brief Turns on a link
-     * @param linkname: the linkname
-     */
+/**
+ * @brief Turns on a link
+ * @param linkname: the linkname
+ */
     void Simulation::turnOnLink(std::string linkname) {
         S4U_Simulation::turnOnLink(linkname);
     }
 
-    /**
-     * @brief Get the memory_manager_service capacity of the host on which the calling process is running
-     * @return a memory_manager_service capacity in bytes
-     */
+/**
+ * @brief Get the memory_manager_service capacity of the host on which the calling process is running
+ * @return a memory_manager_service capacity in bytes
+ */
     double Simulation::getMemoryCapacity() {
         return S4U_Simulation::getMemoryCapacity();
     }
 
-    /**
-     * @brief Get the number of cores of the host on which the calling process is running
-     * @return a number of cores
-     */
+/**
+ * @brief Get the number of cores of the host on which the calling process is running
+ * @return a number of cores
+ */
     unsigned long Simulation::getNumCores() {
         return S4U_Simulation::getNumCores();
     }
 
-    /**
-     * @brief Get the flop rate of one core of the host on which the calling process is running
-     * @return a flop rate
-     */
+/**
+ * @brief Get the flop rate of one core of the host on which the calling process is running
+ * @return a flop rate
+ */
     double Simulation::getFlopRate() {
         return S4U_Simulation::getFlopRate();
     }
 
-    /**
-     * @brief Get the name of the host on which the calling process is running
-     * @return a host name
-     */
+/**
+ * @brief Get the name of the host on which the calling process is running
+ * @return a host name
+ */
     std::string Simulation::getHostName() {
         return S4U_Simulation::getHostName();
     }
 
-    /**
-     * @brief Make the calling process sleep for a number of (simulated) seconds
-     * @param duration: a number of seconds
-     */
+/**
+ * @brief Make the calling process sleep for a number of (simulated) seconds
+ * @param duration: a number of seconds
+ */
     void Simulation::sleep(double duration) {
         S4U_Simulation::sleep(duration);
     }
 
-    /**
-     * @brief Make the calling process compute
-     * @param flops: a number of floating point operations
-     */
+/**
+ * @brief Make the calling process compute
+ * @param flops: a number of floating point operations
+ */
     void Simulation::compute(double flops) {
         S4U_Simulation::compute(flops);
     }
 
-    /**
-     * @brief Get the simulation output object
-     * @return simulation output object
-     */
+/**
+ * @brief Get the simulation output object
+ * @return simulation output object
+ */
     SimulationOutput &Simulation::getOutput() {
         return this->output;
     }
 
-    /**
-     * @brief Obtains the current energy consumption of a host
-     * @param hostname: the host name
-     * @return current energy consumption in joules
-     * @throws std::invalid_argument
-     */
+/**
+ * @brief Obtains the current energy consumption of a host
+ * @param hostname: the host name
+ * @return current energy consumption in joules
+ * @throws std::invalid_argument
+ */
     double Simulation::getEnergyConsumed(const std::string &hostname) {
         return this->getEnergyConsumed(hostname, false);
     }
 
-    /**
-     * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
-     *        simulation output if can_record is set to true
-     * @param hostname: the host name
-     * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
-     * @return current energy consumption in joules
-     * @throws std::invalid_argument
-     */
+/**
+ * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
+ *        simulation output if can_record is set to true
+ * @param hostname: the host name
+ * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampEnergyConsumption object
+ * @return current energy consumption in joules
+ * @throws std::invalid_argument
+ */
     double Simulation::getEnergyConsumed(const std::string &hostname, bool record_as_time_stamp) {
         if (hostname.empty()) {
             throw std::invalid_argument("Simulation::getEnergyConsumed() requires a valid hostname");
@@ -1101,24 +1142,24 @@ namespace wrench {
         return consumption;
     }
 
-    /**
-    * @brief Obtains the current energy consumption of a host
-    * @param hostnames: the list of hostnames
-    * @return current energy consumption in joules for each host, as a map indexed by hostnames
-    * @throws std::invalid_argument
-    */
+/**
+* @brief Obtains the current energy consumption of a host
+* @param hostnames: the list of hostnames
+* @return current energy consumption in joules for each host, as a map indexed by hostnames
+* @throws std::invalid_argument
+*/
     std::map<std::string, double> Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames) {
         return this->getEnergyConsumed(hostnames, false);
     }
 
-    /**
-    * @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
-    *          simulation output if can_record is set to true
-    * @param hostnames: the list of hostnames
-    * @param record_as_time_stamps: whether or not to record a SimulationTimestampEnergyConsumption object for each host when this method is called
-    * @return current energy consumption in joules for each host, as a map indexed by hostnames
-    * @throws std::invalid_argument
-    */
+/**
+* @brief Obtains the current energy consumption of a host and will add SimulationTimestampEnergyConsumption to
+*          simulation output if can_record is set to true
+* @param hostnames: the list of hostnames
+* @param record_as_time_stamps: whether or not to record a SimulationTimestampEnergyConsumption object for each host when this method is called
+* @return current energy consumption in joules for each host, as a map indexed by hostnames
+* @throws std::invalid_argument
+*/
     std::map<std::string, double>
     Simulation::getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps) {
         if (hostnames.empty()) {
@@ -1132,70 +1173,70 @@ namespace wrench {
         return energy_consumptions;
     }
 
-    /**
-     * @brief Set the power state of the host
-     * @param hostname: the host name
-     * @param pstate: the power state index (as specified in the platform xml description file)
-     */
+/**
+ * @brief Set the power state of the host
+ * @param hostname: the host name
+ * @param pstate: the power state index (as specified in the platform xml description file)
+ */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
         this->getOutput().addTimestampPstateSet(hostname, pstate);
     }
 
-    /**
-     * @brief Get the total number of power states of a host
-     * @param hostname: the host name
-     * @return The number of power states available for the host (as specified in the platform xml description file)
-     */
+/**
+ * @brief Get the total number of power states of a host
+ * @param hostname: the host name
+ * @return The number of power states available for the host (as specified in the platform xml description file)
+ */
     int Simulation::getNumberofPstates(const std::string &hostname) {
         return S4U_Simulation::getNumberofPstates(hostname);
     }
 
-    /**
-     * @brief Get the current power state of a host
-     * @param hostname: the host name
-     * @return The index of the current pstate of the host (as specified in the platform xml description file)
-     */
+/**
+ * @brief Get the current power state of a host
+ * @param hostname: the host name
+ * @return The index of the current pstate of the host (as specified in the platform xml description file)
+ */
     int Simulation::getCurrentPstate(const std::string &hostname) {
         return S4U_Simulation::getCurrentPstate(hostname);
     }
 
-    /**
-     * @brief Get the list of power states available for a host
-     * @param hostname: the host name
-     * @return a list of power states available for the host (as specified in the platform xml description file)
-     */
+/**
+ * @brief Get the list of power states available for a host
+ * @param hostname: the host name
+ * @return a list of power states available for the host (as specified in the platform xml description file)
+ */
     std::vector<int> Simulation::getListOfPstates(const std::string &hostname) {
         return S4U_Simulation::getListOfPstates(hostname);
     }
 
-    /**
-     * @brief Get the minimum power consumption for the host (i.e., idling) at its current pstate
-     * @param hostname: the host name
-     * @return The "idling" power consumption (as specified in the platform xml description file)
-     */
+/**
+ * @brief Get the minimum power consumption for the host (i.e., idling) at its current pstate
+ * @param hostname: the host name
+ * @return The "idling" power consumption (as specified in the platform xml description file)
+ */
     double Simulation::getMinPowerConsumption(const std::string &hostname) {
         return S4U_Simulation::getMinPowerConsumption(hostname);
     }
 
-    /**
-     * @brief Get the maximum power consumption for the host (i.e., 100% utilization) at its current pstate
-     * @param hostname: the host name
-     * @return The "100% used" power consumption (as specified in the platform xml description file)
-     */
+/**
+ * @brief Get the maximum power consumption for the host (i.e., 100% utilization) at its current pstate
+ * @param hostname: the host name
+ * @return The "100% used" power consumption (as specified in the platform xml description file)
+ */
     double Simulation::getMaxPowerConsumption(const std::string &hostname) {
         return S4U_Simulation::getMaxPowerConsumption(hostname);
     }
 
-    /**
-     * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
-     *        Simulation::launch() was called). The simulation takes ownership of
-     *        the reference and will call the destructor.
-     * @param service: An instance of a service
-     * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
+ *        Simulation::launch() was called). The simulation takes ownership of
+ *        the reference and will call the destructor.
+ * @param service: An instance of a service
+ * @return A pointer to the service instance
+ * @throw std::invalid_argument
+ * @throw std::runtime_error
+ */
     std::shared_ptr<ComputeService> Simulation::startNewService(ComputeService *service) {
 
         if (service == nullptr) {
@@ -1218,15 +1259,15 @@ namespace wrench {
         return shared_ptr;
     }
 
-    /**
-     * @brief Starts a new storage service during WMS execution (i.e., one that was not passed to Simulation::add() before
-     *        Simulation::launch() was called). The simulation takes ownership of
-     *        the reference and will call the destructor.
-     * @param service: An instance of a service
-     * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Starts a new storage service during WMS execution (i.e., one that was not passed to Simulation::add() before
+ *        Simulation::launch() was called). The simulation takes ownership of
+ *        the reference and will call the destructor.
+ * @param service: An instance of a service
+ * @return A pointer to the service instance
+ * @throw std::invalid_argument
+ * @throw std::runtime_error
+ */
     std::shared_ptr<StorageService> Simulation::startNewService(StorageService *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -1244,15 +1285,15 @@ namespace wrench {
         return shared_ptr;
     }
 
-    /**
-     * @brief Starts a new network proximity service during WMS execution (i.e., one that was not passed to Simulation::add() before
-     *        Simulation::launch() was called). The simulation takes ownership of
-     *        the reference and will call the destructor.
-     * @param service: An instance of a service
-     * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Starts a new network proximity service during WMS execution (i.e., one that was not passed to Simulation::add() before
+ *        Simulation::launch() was called). The simulation takes ownership of
+ *        the reference and will call the destructor.
+ * @param service: An instance of a service
+ * @return A pointer to the service instance
+ * @throw std::invalid_argument
+ * @throw std::runtime_error
+ */
     std::shared_ptr<NetworkProximityService> Simulation::startNewService(NetworkProximityService *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -1270,15 +1311,15 @@ namespace wrench {
         return shared_ptr;
     }
 
-    /**
-     * @brief Starts a new file registry service during WMS execution (i.e., one that was not passed to Simulation::add() before
-     *        Simulation::launch() was called). The simulation takes ownership of
-     *        the reference and will call the destructor.
-     * @param service: An instance of a service
-     * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Starts a new file registry service during WMS execution (i.e., one that was not passed to Simulation::add() before
+ *        Simulation::launch() was called). The simulation takes ownership of
+ *        the reference and will call the destructor.
+ * @param service: An instance of a service
+ * @return A pointer to the service instance
+ * @throw std::invalid_argument
+ * @throw std::runtime_error
+ */
     std::shared_ptr<FileRegistryService> Simulation::startNewService(FileRegistryService *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -1296,15 +1337,15 @@ namespace wrench {
         return shared_ptr;
     }
 
-    /**
-     * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
-     *        Simulation::launch() was called). The simulation takes ownership of
-     *        the reference and will call the destructor.
-     * @param service: An instance of a service
-     * @return A pointer to the service instance
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Starts a new memory_manager_service manager service during execution (i.e., one that was not passed to Simulation::add() before
+ *        Simulation::launch() was called). The simulation takes ownership of
+ *        the reference and will call the destructor.
+ * @param service: An instance of a service
+ * @return A pointer to the service instance
+ * @throw std::invalid_argument
+ * @throw std::runtime_error
+ */
     std::shared_ptr<MemoryManager> Simulation::startNewService(MemoryManager *service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
@@ -1322,10 +1363,10 @@ namespace wrench {
         return shared_ptr;
     }
 
-    /**
-     * @brief Checks that the platform is well defined
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Checks that the platform is well defined
+ * @throw std::invalid_argument
+ */
     void Simulation::platformSanityCheck() {
         auto hostnames = wrench::Simulation::getHostnameList();
 

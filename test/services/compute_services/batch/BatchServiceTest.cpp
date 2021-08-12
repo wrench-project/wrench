@@ -418,8 +418,10 @@ private:
 
         wrench::WorkflowTask *task1;
         wrench::WorkflowTask *task2;
+        wrench::WorkflowTask *task3;
         std::shared_ptr<wrench::StandardJob> job1;
         std::shared_ptr<wrench::StandardJob> job2;
+        std::shared_ptr<wrench::StandardJob> job3;
 
         // Submit job1 that should start right away
         {
@@ -496,15 +498,63 @@ private:
 
         }
 
+        // Submit job3 that will be stuck in the queue
+        {
+            // Create a sequential task that lasts one min and requires 2 cores
+            task3 = this->getWorkflow()->addTask("task3", 60, 1, 1, 0);
+            task3->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+
+            // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+
+            job3 = job_manager->createStandardJob(
+                    {task3},
+                    {
+                            {*(task3->getInputFiles().begin()),
+                                    wrench::FileLocation::LOCATION(this->test->storage_service1)},
+                    },
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))},
+                    {},
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(
+                            this->getWorkflow()->getFileByID("input_file"),
+                            wrench::FileLocation::LOCATION(this->test->storage_service2))});
+
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "4";
+            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-c"] = "10"; //number of cores per node
+            try {
+                job_manager->submitJob(job3, this->test->compute_service, batch_job_args);
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error(
+                        "Exception: " + std::string(e.what())
+                );
+            }
+
+        }
+
         this->simulation->sleep(1);
+
 
         // Terminate job2 (which is pending)
         job_manager->terminateJob(job2);
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
-
         // Terminate job1 (which is running)
         job_manager->terminateJob(job1);
+
+        // Check that job 3 completes
+        // Wait for a workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+            event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
 
         // Check task states
         if (task1->getState() != wrench::WorkflowTask::State::READY) {
@@ -537,6 +587,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -558,7 +609,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
-                                            {})));
+                                            "",{{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}, {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -742,6 +793,8 @@ private:
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
+            // Coverage: just get the number of hosts
+            auto num_hosts = this->test->compute_service->getNumHosts();
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 

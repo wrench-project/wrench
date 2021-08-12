@@ -16,6 +16,7 @@
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
 #include <wrench/workflow/failure_causes/FailureCause.h>
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -120,15 +121,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of hostnames
+     * @brief Get the list of physical hostnames
      *
      * @return a vector of hostnames
      */
     std::vector<std::string> S4U_Simulation::getAllHostnames() {
         std::vector<simgrid::s4u::Host *> host_list = simgrid::s4u::Engine::get_instance()->get_all_hosts();
         std::vector<std::string> hostname_list;
-        hostname_list.reserve(host_list.size());
         for (auto h : host_list) {
+            // Ignore VMs!
+            if (S4U_VirtualMachine::vm_to_pm_map.find(h->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+                continue;
+            }
             hostname_list.push_back(h->get_name());
         }
         return hostname_list;
@@ -595,7 +599,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the "
-                    "energy consumed by the host. Make sure the energy plugin is enabled (--activate-energy)"
+                    "energy consumed by the host. Make sure the energy plugin is enabled (--wrench-energy-simulation)"
             );
         }
         return energy_consumed;
@@ -646,7 +650,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
-                    "Make sure the energy is plugin is enabled (--activate-energy) and "
+                    "Make sure the energy is plugin is enabled (--wrench-energy-simulation) and "
                     "the pstate is within range of pstates available to the host"
             );
         }
@@ -669,7 +673,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
     }
@@ -690,7 +694,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
     }
@@ -712,7 +716,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
     }
@@ -735,7 +739,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy)"
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation)"
 
             );
         }
@@ -764,7 +768,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. "
-                    "Make sure the energy plugin is enabled (--activate-energy) "
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
             );
         }
         return list;

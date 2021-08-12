@@ -32,7 +32,7 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"Host2\" speed=\"1f, 2f\" pstate=\"0\" core=\"1\"/> "
+                          "       <host id=\"Host2\" speed=\"1.0f,2.0f\" pstate=\"0\" core=\"1\"/> "
                           "       <link id=\"1\" bandwidth=\"1Bps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -135,11 +135,10 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-log-full");
-
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
 
     simulation->init(&argc, argv);
 

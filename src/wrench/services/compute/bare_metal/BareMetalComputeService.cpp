@@ -534,6 +534,8 @@ namespace wrench {
         }
         WRENCH_INFO("%s", msg.c_str());
 
+        // Create and start the host state monitor if necessary
+        if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled())
         {
             // Create the host state monitor
             std::vector<std::string> hosts_to_monitor;
@@ -559,6 +561,13 @@ namespace wrench {
 
             /** Dispatch ready work units **/
             this->dispatchReadyWorkunits();
+
+        }
+
+        // Create and start the host state monitor if necessary
+        if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
+            this->host_state_change_monitor->kill();
+            this->host_state_change_monitor = nullptr; // Which will release the pointer to this service!
 
         }
 

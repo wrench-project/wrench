@@ -107,6 +107,18 @@ private:
         throw std::runtime_error("getNumHosts() should return 2 for compute service #2");
       }
 
+      // Get Host list
+      std::vector<std::string> host_list;
+      host_list = this->test->compute_service1->getHosts();
+      if (host_list.size() != 2) {
+          throw std::runtime_error("getHosts() should return a list with 2 items for compute service #1");
+      }
+      if (std::find(host_list.begin(), host_list.end(), "Host1") == host_list.end()) {
+          throw std::runtime_error("getHosts() should return a list that contains 'Host1' for compute service #1");
+      }
+        if (std::find(host_list.begin(), host_list.end(), "Host2") == host_list.end()) {
+            throw std::runtime_error("getHosts() should return a list that contains 'Host2' for compute service #1");
+        }
 
       // Get number of Cores
       std::map<std::string, unsigned long> num_cores;
