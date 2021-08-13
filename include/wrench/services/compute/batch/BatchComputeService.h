@@ -124,16 +124,19 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
         ~BatchComputeService() override;
+        // helper function
+        static unsigned long parseUnsignedLongServiceSpecificArgument(std::string key, const std::map<std::string, std::string> &args);
         /***********************/
         /** \endcond          **/
+
         /***********************/
 
     private:
-
         friend class WorkloadTraceFileReplayer;
         friend class FCFSBatchScheduler;
         friend class CONSERVATIVEBFBatchScheduler;
         friend class CONSERVATIVEBFBatchSchedulerCoreLevel;
+
         friend class BatschedBatchScheduler;
 
         BatchComputeService(const std::string hostname,
@@ -145,9 +148,6 @@ namespace wrench {
                             std::map<std::string, double> messagepayload_list,
                             std::string suffix
         );
-
-        // helper function
-        static unsigned long parseUnsignedLongServiceSpecificArgument(std::string key, const std::map<std::string, std::string> &args);
 
         // helper function
         void submitWorkflowJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &batch_job_args);

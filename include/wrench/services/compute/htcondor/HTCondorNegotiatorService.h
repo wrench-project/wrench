@@ -34,11 +34,10 @@ namespace wrench {
     public:
 
         HTCondorNegotiatorService(std::string &hostname,
-                                  std::map<std::shared_ptr<ComputeService>, unsigned long> &compute_resources,
+                                  std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
-                                  std::string &reply_mailbox,
-                                  std::shared_ptr<ComputeService> &grid_universe_batch_service);
+                                  std::string &reply_mailbox);
 
         ~HTCondorNegotiatorService();
 
@@ -50,16 +49,18 @@ namespace wrench {
                             std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &rhs);
         };
 
+        std::shared_ptr<ComputeService> pickTargetComputeService(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeServiceGridUniverse(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
+        std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
+
         /** mailbox to reply **/
         std::string reply_mailbox;
         /** set of compute resources **/
-        std::map<std::shared_ptr<ComputeService>, unsigned long> *compute_resources;
+        std::set<std::shared_ptr<ComputeService>> compute_services;
         /**map of ongoing jobs **/
-        std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> *running_jobs;
+        std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> running_jobs;
         /** queue of pending jobs **/
         std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> pending_jobs;
-        /**batch service specified for grid universe jobs **/
-        std::shared_ptr<ComputeService> &grid_universe_batch_service;
     };
 
     /***********************/
