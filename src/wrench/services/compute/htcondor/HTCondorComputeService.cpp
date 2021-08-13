@@ -27,7 +27,8 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which to start the service
-     * @param compute_services: a set of 'child' compute services available to and usable through the HTCondor pool.
+     * @param compute_services: a set of 'child' compute services that have been added to the
+     *    simulation and that are available to and usable through the HTCondor pool.
      *   - BatchComputeService instances will be used for Condor jobs in the "grid" universe
      *   - BareMetalComputeService instances will be used for Condor jobs not in the "grid" universe
      *   - other types of compute services are disallowed
@@ -37,7 +38,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
-                                                   std::set<ComputeService *> compute_services,
+                                                   std::set<std::shared_ptr<ComputeService>> compute_services,
                                                    std::map<std::string, std::string> property_list,
                                                    std::map<std::string, double> messagepayload_list) :
             ComputeService(hostname, "htcondor_service", "htcondor_service", "") {
@@ -48,9 +49,15 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
+        // Check that there are child services
+        if (compute_services.empty()) {
+            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): at least one 'child' compute service should be provided");
+        }
+
         // Check that all services are of allowed types
         for (auto const &cs: compute_services) {
-            if ((not dynamic_cast<BatchComputeService *>(cs)) and (not dynamic_cast<BareMetalComputeService *>(cs))) {
+            if ((not std::dynamic_pointer_cast<std::shared_ptr<BatchComputeService>>(cs)) and
+                (not std::dynamic_pointer_cast<std::shared_ptr<BareMetalComputeService>>(cs))) {
                 throw std::invalid_argument(
                         "HTCondorComputeService::HTCondorComputeService(): Only BatchComputeService or BareMetalComputeService instances can be used as 'child' services");
             }
@@ -77,7 +84,7 @@ namespace wrench {
         // Determine if there is at least one batch service
         bool at_least_one_batch_service = false;
         for (auto const &cs: compute_services) {
-            if (dynamic_cast<BatchComputeService *>(cs)) {
+            if (std::dynamic_pointer_cast<std::shared_ptr<BatchComputeService>>(cs)) {
                 at_least_one_batch_service = true;
                 break;
             }
@@ -120,6 +127,13 @@ namespace wrench {
      */
     bool HTCondorComputeService::supportsGridUniverse() {
         return getPropertyValueAsBoolean(HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE);
+    }
+
+    /**
+     * @brief Add a new 'child' compute service
+     */
+    void HTCondorComputeService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
+        this->central_manager->addComputeService(compute_service);
     }
 
     /**
