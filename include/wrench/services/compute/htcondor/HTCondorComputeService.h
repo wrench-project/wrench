@@ -45,13 +45,15 @@ namespace wrench {
 
     public:
         HTCondorComputeService(const std::string &hostname,
-                               std::set<ComputeService *> compute_services,
+                               std::set<std::shared_ptr<ComputeService>> compute_services,
                                std::map<std::string, std::string> property_list = {},
                                std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
+
+        void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
         void submitStandardJob(std::shared_ptr<StandardJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;

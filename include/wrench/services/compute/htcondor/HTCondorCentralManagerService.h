@@ -39,29 +39,23 @@ namespace wrench {
         };
 
     public:
-        HTCondorCentralManagerService(const std::string &hostname,
-                                      std::set<ComputeService *> compute_resources,
-                                      std::map<std::string, std::string> property_list = {},
-                                      std::map<std::string, double> messagepayload_list = {},
-                                      ComputeService *grid_universe_batch_service = nullptr);
 
         /***********************/
-        /** \cond DEVELOPER   **/
+        /** \cond INTERNAL    */
         /***********************/
+
+        HTCondorCentralManagerService(const std::string &hostname,
+                                      std::set<std::shared_ptr<ComputeService>> compute_services,
+                                      std::map<std::string, std::string> property_list = {},
+                                      std::map<std::string, double> messagepayload_list = {});
+
+        void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
         void submitStandardJob(std::shared_ptr<StandardJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;
 
         void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
-
-        /***********************/
-        /** \endcond          **/
-        /***********************/
-
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
 
         ~HTCondorCentralManagerService() override;
 
@@ -96,21 +90,17 @@ namespace wrench {
         void terminate();
 
         /** set of compute resources **/
-        std::set<ComputeService *> compute_resources;
-        /** batch compute service for grid universe jobs**/
-        ComputeService *grid_universe_batch_service;
-        /** shared ptr for grid universe batch service**/
-        std::shared_ptr<ComputeService> grid_universe_batch_service_shared_ptr;
+        std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/
         std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> pending_jobs;
+        /** running workflow jobs **/
+        std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> running_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispatch jobs **/
         bool resources_unavailable = false;
-        /** **/
-        std::map<std::shared_ptr<ComputeService>, unsigned long> compute_resources_map;
-        /** running workflow jobs **/
-        std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> running_jobs;
+//        /** map of (idle?) cores to compute services **/
+//        std::map<std::shared_ptr<ComputeService>, unsigned long> compute_resources_map;
     };
 
 }
