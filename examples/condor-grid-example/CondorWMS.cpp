@@ -86,7 +86,6 @@ namespace wrench {
             }
             task_count++;
         }
-        std::cerr << "CONDOR ALL SETUP \n";
 
         /* Submit the first 5 tasks as part of a single "grid universe" job to HTCondor */
         auto grid_universe_job = job_manager->createStandardJob(first_five_tasks, file_locations);
@@ -98,7 +97,6 @@ namespace wrench {
         htcondor_service_specific_arguments["-service"] = batch_cs->getName();
         job_manager->submitJob(grid_universe_job, htcondor_cs, htcondor_service_specific_arguments);
 
-        std::cerr << "CONDOR ALL SETUP \n";
         /* Submit the next 5 tasks as individual non "grid universe" jobs to HTCondor */
         for (auto const &t : last_five_tasks) {
             auto job = job_manager->createStandardJob(t, file_locations);

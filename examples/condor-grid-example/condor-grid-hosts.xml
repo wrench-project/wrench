@@ -66,6 +66,7 @@
         <route src="HTCondorHost" dst="CloudHeadNode"> <link_ctn id="network_link"/> </route>
         <route src="HTCondorHost" dst="BatchHeadNode"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="CloudHeadNode"> <link_ctn id="network_link"/> </route>
+        <route src="BatchHeadNode" dst="CloudHeadNode"> <link_ctn id="network_link"/> </route>
         <route src="CloudHeadNode" dst="CloudNode1"> <link_ctn id="network_link"/> </route>
         <route src="CloudHeadNode" dst="CloudNode2"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="CloudNode1"> <link_ctn id="network_link"/> </route>
@@ -79,6 +80,12 @@
         <route src="BatchHeadNode" dst="BatchNode2"> <link_ctn id="network_link"/> </route>
         <route src="BatchHeadNode" dst="BatchNode3"> <link_ctn id="network_link"/> </route>
         <route src="BatchHeadNode" dst="BatchNode4"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode1" dst="BatchNode2"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode1" dst="BatchNode3"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode1" dst="BatchNode4"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode2" dst="BatchNode3"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode2" dst="BatchNode4"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode3" dst="BatchNode4"> <link_ctn id="network_link"/> </route>
 
         <!-- Each loopback link connects each host to itself -->
         <route src="WMSHost" dst="WMSHost"> <link_ctn id="loopback_link"/> </route>

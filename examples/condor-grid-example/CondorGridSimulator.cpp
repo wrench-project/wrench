@@ -105,21 +105,15 @@ int main(int argc, char **argv) {
     // Running the simulation
     simulation->launch();
 
-    /* Gathering some statistics */
-    auto start_timestamps = simulation->getOutput().getTrace<wrench::CondorGridStartTimestamp>();
-    auto end_timestamp = simulation->getOutput().getTrace<wrench::CondorGridEndTimestamp>().back();
-    auto task_finish_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+    /* Printing task execution information directly from WorkflowTask objects -- other
+     * examples showcases how to use simulation->getOutput().getTrace<T>() */
 
-    for (const auto &start_timestamp : start_timestamps) {
-        std::cout << "Started: " << start_timestamp->getContent()->getDate() << std::endl;
+    for (const auto &t : workflow->getTasks()) {
+        std::cout << "Task " + t->getID() << " ";
+        std::cout << "started at time " << t->getStartDate() << " on ";
+        std::cout << "host " << t->getPhysicalExecutionHost() << " and finished at time ";
+        std::cout << t->getEndDate() << "\n";
     }
-    std::cout << "Tasks: " << flush;
-    for (const auto &task_finish_timestamp : task_finish_timestamps) {
-        std::cout << task_finish_timestamp->getContent()->getDate() << ", " << flush;
-    }
-    std::cout << std::endl;
-
-    std::cout << "Ended: " << end_timestamp->getContent()->getDate() << std::endl;
 
     return 0;
 }
