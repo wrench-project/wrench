@@ -36,72 +36,77 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int CondorWMS::main() {
-        simulation->getOutput().addTimestamp<CondorGridStartTimestamp>(new CondorGridStartTimestamp);
 
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        // Create a data movement manager
+        /* Create a data movement manager */
         auto data_movement_manager = this->createDataMovementManager();
 
-        // Create a job manager
+        /* Create a job manager */
         auto job_manager = this->createJobManager();
 
+        /* Get reference to the storage service */
+        auto ss = *(this->getAvailableStorageServices().begin());
 
+        /* Get references to all compute services */
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
+        auto batch_cs = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+        auto cloud_cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
+        /* Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
+        cloud_cs->createVM(5, 32*1000*1000*1000, "my_vm", {}, {});
+        auto vm_cs = cloud_cs->startVM("my_vm");
 
+        /* Add the VM's BareMetalComputeService to the HTCondor compute service */
+        htcondor_cs->addComputeService(vm_cs);
+
+        /* At this point, HTCondor has access to: .... */
+
+        /* Create a map of files, which are all supposed to be on the local SS */
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-        std::shared_ptr<wrench::StorageService> storage_service;
-
-
-        //Only set up for one storage service
-        for (const auto &ss : this->getAvailableStorageServices()) {
-            storage_service = ss;
+        for (auto const &t : this->getWorkflow()->getTasks()) {
+            for (auto const &f : t->getInputFiles()) {
+                file_locations[f] = wrench::FileLocation::LOCATION(ss);
+            }
+            for (auto const &f : t->getOutputFiles()) {
+                file_locations[f] = wrench::FileLocation::LOCATION(ss);
+            }
         }
 
-        //Loop through files and indicate they are stored on the storage service.
-        for( auto &file : this->getWorkflow()->getFiles()){
-            file_locations[file] = FileLocation::LOCATION(storage_service);
+        /* Split the 10 tasks into two groups of 5 tasks */
+        std::vector<wrench::WorkflowTask *> first_five_tasks;
+        std::vector<wrench::WorkflowTask *> last_five_tasks;
+        int task_count = 0;
+        for (auto const &t : this->getWorkflow()->getTasks()) {
+            if (task_count < 5) {
+                first_five_tasks.push_back(t);
+            } else {
+                last_five_tasks.push_back(t);
+            }
+            task_count++;
+        }
+        std::cerr << "CONDOR ALL SETUP \n";
+
+        /* Submit the first 5 tasks as part of a single "grid universe" job to HTCondor */
+        auto grid_universe_job = job_manager->createStandardJob(first_five_tasks, file_locations);
+        std::map<std::string, std::string> htcondor_service_specific_arguments;
+        htcondor_service_specific_arguments["universe"] = "grid";
+        htcondor_service_specific_arguments["-N"] = "3";
+        htcondor_service_specific_arguments["-c"] = "5";
+        htcondor_service_specific_arguments["-t"] = "3600";
+        htcondor_service_specific_arguments["-service"] = batch_cs->getName();
+        job_manager->submitJob(grid_universe_job, htcondor_cs, htcondor_service_specific_arguments);
+
+        std::cerr << "CONDOR ALL SETUP \n";
+        /* Submit the next 5 tasks as individual non "grid universe" jobs to HTCondor */
+        for (auto const &t : last_five_tasks) {
+            auto job = job_manager->createStandardJob(t, file_locations);
+            job_manager->submitJob(job, htcondor_cs);
         }
 
-
-
-
-
-
-        bool first_task = true;
-
-
-
+        /* Wait for all execution events */
         while (not this->getWorkflow()->isDone()) {
-
-            auto tasks = this->getWorkflow()->getReadyTasks();
-            std::map<std::string, std::string> test_service_specs;
-            test_service_specs.insert(std::pair<std::string, std::string>("universe", "grid"));
-            if(first_task){
-                first_task = false;
-                test_service_specs.insert(std::pair<std::string, std::string>("grid_start", "grid"));
-            }
-            if(tasks.size()==1){
-                test_service_specs.insert(std::pair<std::string, std::string>("grid_end", "grid"));
-            }
-
-             std::shared_ptr<wrench::StandardJob> grid_job = job_manager->createStandardJob(
-                    tasks, file_locations);
-            //printf("Submitting job with %lu tasks\n",tasks.size());
-
-            //test_service_specs.insert(std::pair<std::string, std::string>("grid_pre_delay","50.0"));
-            //test_service_specs.insert(std::pair<std::string, std::string>("grid_post_delay","400.0"));
-
-            // Submit the 2-task job for execution
-            try {
-                //printf("Submitting job with %i tasks\n",);
-                job_manager->submitJob(grid_job, htcondor_cs, test_service_specs);
-            } catch (wrench::WorkflowExecutionException &e) {
-                throw std::runtime_error(e.what());
-            }
-            //Waiting for job to finish.
             this->waitForAndProcessNextEvent();
         }
 
