@@ -64,6 +64,7 @@
         <!-- A more realistic topology is likely a good idea -->
         <route src="WMSHost" dst="HTCondorHost"> <link_ctn id="network_link"/> </route>
         <route src="HTCondorHost" dst="CloudHeadNode"> <link_ctn id="network_link"/> </route>
+        <route src="HTCondorHost" dst="BatchHeadNode"> <link_ctn id="network_link"/> </route>
         <route src="WMSHost" dst="CloudHeadNode"> <link_ctn id="network_link"/> </route>
         <route src="CloudHeadNode" dst="CloudNode1"> <link_ctn id="network_link"/> </route>
         <route src="CloudHeadNode" dst="CloudNode2"> <link_ctn id="network_link"/> </route>
