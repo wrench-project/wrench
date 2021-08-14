@@ -77,7 +77,10 @@ int main(int argc, char **argv) {
     auto htcondor_cs = simulation->add(
             new wrench::HTCondorComputeService(
                     "BatchHeadNode", std::move(condor_compute_resources),
-                    {},
+                    {
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}
+                    },
                     {}));
 
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(htcondor_cs)->setLocalStorageService(local_ss);
@@ -110,11 +113,11 @@ int main(int argc, char **argv) {
     for (const auto &start_timestamp : start_timestamps) {
         std::cout << "Started: " << start_timestamp->getContent()->getDate() << std::endl;
     }
-        std::cout << "Tasks: " << flush;
+    std::cout << "Tasks: " << flush;
     for (const auto &task_finish_timestamp : task_finish_timestamps) {
         std::cout << task_finish_timestamp->getContent()->getDate() << ", " << flush;
     }
-        std::cout << std::endl;
+    std::cout << std::endl;
 
     std::cout << "Ended: " << end_timestamp->getContent()->getDate() << std::endl;
 
