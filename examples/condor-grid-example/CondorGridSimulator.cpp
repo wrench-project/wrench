@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 
     /* Create a batch service */
     std::vector<std::string> batch_nodes = {"BatchNode1", "BatchNode2", "BatchNode3", "BatchNode4"};
-    auto batch_cs = simulation->add(new wrench::BareMetalComputeService(
+    auto batch_cs = simulation->add(new wrench::BatchComputeService(
             "BatchHeadNode",
             batch_nodes,
             "/scratch_batch"));
