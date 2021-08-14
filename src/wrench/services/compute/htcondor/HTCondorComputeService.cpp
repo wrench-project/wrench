@@ -49,15 +49,15 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
-        // Check that there are child services
-        if (compute_services.empty()) {
-            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): at least one 'child' compute service should be provided");
-        }
+//        // Check that there are child services
+//        if (compute_services.empty()) {
+//            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): at least one 'child' compute service should be provided");
+//        }
 
         // Check that all services are of allowed types
         for (auto const &cs: compute_services) {
-            if ((not std::dynamic_pointer_cast<std::shared_ptr<BatchComputeService>>(cs)) and
-                (not std::dynamic_pointer_cast<std::shared_ptr<BareMetalComputeService>>(cs))) {
+            if ((not std::dynamic_pointer_cast<BatchComputeService>(cs)) and
+                (not std::dynamic_pointer_cast<BareMetalComputeService>(cs))) {
                 throw std::invalid_argument(
                         "HTCondorComputeService::HTCondorComputeService(): Only BatchComputeService or BareMetalComputeService instances can be used as 'child' services");
             }
@@ -84,23 +84,13 @@ namespace wrench {
         // Determine if there is at least one batch service
         bool at_least_one_batch_service = false;
         for (auto const &cs: compute_services) {
-            if (std::dynamic_pointer_cast<std::shared_ptr<BatchComputeService>>(cs)) {
+            if (std::dynamic_pointer_cast<BatchComputeService>(cs)) {
                 at_least_one_batch_service = true;
                 break;
             }
         }
 
         // Do sanity checks
-        if (this->supportsPilotJobs() and (not at_least_one_service_supports_pilot_jobs)) {
-            throw std::invalid_argument(
-                    "HTCondorComputeService::HTCondorComputeService(): if this service is to support pilot jobs, then at least one of its 'child' compute services should support pilot jobs (or change the HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS property)");
-        }
-
-        if (this->supportsStandardJobs() and (not at_least_one_service_supports_standard_jobs)) {
-            throw std::invalid_argument(
-                    "HTCondorComputeService::HTCondorComputeService(): if this service is to support standard jobs, then at least one of its 'child' compute services should support pilot jobs (or change the HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS property)");
-        }
-
         if (this->supportsGridUniverse() and (not at_least_one_batch_service)) {
             throw std::invalid_argument(
                     "HTCondorComputeService::HTCondorComputeService(): if this service is to support grid jobs, then it needs at least one batch 'child' compute service. (or change the HTCondorComputeServiceProperty::SUPPORTS_GRID_JOBS property)");
