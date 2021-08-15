@@ -2,16 +2,16 @@ Interacting with a HTCondor compute service {#guide-102-htcondor}
 ============
 
 
-A `wrench::HTCondorComputeService` instance is essential a front-end to several 
-"child" compute services. As such one can submit jobs to it, just like one would do to
-other compute services, and it may "decide" to which service these jobs
-will be delegated. In fact, a WMS can even add new child compute services  to be used
+A `wrench::HTCondorComputeService` instance is essentially a front-end to several 
+"child" compute services. As such, one can submit jobs to it, just like one would do to
+any compute service, but it then "decides" to which service these jobs
+will be delegated. In fact, a WMS can even add new child compute services to be used
 by HTCondor dynamically. Which child service is used is dictated/influenced
-by service-specific arguments passed to the `wrench::JobManager::submitJob()` method. 
+by service-specific arguments passed or not passed to the `wrench::JobManager::submitJob()` method. 
 
 
-Rather than going into a long-winded explanation, the examples code-fragment below
-show-case the creation of a `wrench::HTCondorComputeService` instance
+The examples code fragments below
+showcase the creation of a `wrench::HTCondorComputeService` instance
 and its use by a WMS.  Let's start with the creation (in main). Note that
 arguments to service constructors are omitted for brevity (see the WMS
 implementation in `examples/condor-grid-example/CondorWMS.cp` for a
@@ -29,7 +29,9 @@ auto batch2_cs = simulation->add(new wrench::BatchComputeService(...));
 // Create a HTCondorComputeService instance with the above 
 // three services as "child" services
 auto htcondor_cs = simulation->add(
-     new wrench::HTCondorComputeService("some_host", {baremetal_cs, batch1_cs, batch2_cs}, "/scratch");
+     new wrench::HTCondorComputeService("some_host", 
+                                        {baremetal_cs, batch1_cs, batch2_cs}, 
+                                        "/scratch");
 
 // Create a CloudComputeService instance
 auto cloud_cs = simulation->add(new wrench::CloudComputeService(...));
@@ -44,7 +46,7 @@ is to create a few VM instances and add them as child services to the HTCondor s
 auto vm1 = cloud_cs->createVM(...);
 auto vm2 = cloud_cs->createVM(...);
 auto vm1_cs = cloud_cs->startVM(vm1); 
-auto vm2_cs = cloud_cs->startVM(vm1);
+auto vm2_cs = cloud_cs->startVM(vm2);
 
 // Add the two VM's bare-metal compute services to HTCondor
 htcondor_cs->addComputeService(vm1_cs);
@@ -54,7 +56,7 @@ htcondor_cs->addComputeService(vm2_cs);
 So, at this point, HTCondor has access to 3 bare-metal compute services (2 of which are running inside VMs),
 and 2 batch compute services.
 
-Let's consider that the WMS will submit `wrench::StandardJob` instances to HTCondor. These jobs can be
+Let's consider a WMS that will submit `wrench::StandardJob` instances to HTCondor. These jobs can be
 of two kinds or, in HTCondor parlance, belong to one of two universes: **grid** jobs and **non-grid** jobs. 
 By default a job is considered to be in the non-grid universe. But if the service-specific arguments
 passed to `wrench::JobManager::submitJob()` include a "universe":"grid" key:value pair, then the submitted job
@@ -62,7 +64,8 @@ is in the grid universe.  HTCondor handles both kinds of jobs differently:
 
   - Non-grid universe jobs are queued  and dispatched by HTCondor whenever
     possible to idle resources managed by one of the child bare-metal
-    services.  HTCondor chooses the service to use.
+    services.  HTCondor chooses the service to use based on availability
+    of resources. 
 
   - Grid universe jobs are dispatched by HTCondor immediately to 
     a specific child batch compute service. As a result, these jobs
@@ -75,27 +78,27 @@ is in the grid universe.  HTCondor handles both kinds of jobs differently:
 In the example below, we show both kinds of job submissions:
 
 ~~~~~~~~~~~~~{.cpp}
-// Create a non-grid universe standard job and submit it to HTCondor,
-// which will run it on one of its 3 child bare-metal compute services
+// Create a standard job and submit it to HTCondor as a non-grid job,
+// which will thus run it on one of its 3 child bare-metal compute services
 auto ng_job = job_manager->createStandardJob(...);
 job_manager->submitJob(ng_job, htcondor_cs, {}); // no service-specific arguments
 
-// Create a grid universe standard job and submit it to HTCondor,
-// which will run it on a specific child batch compute service. 
-auto n_job = job_manager->createStandardJob(...);
+// Create a standard job and submit it to HTCondor as a grid job,
+// which will run it on the specified child batch compute service. 
+auto g_job = job_manager->createStandardJob(...);
 
 std::map<std::string, std::string> service_specific_args;
-service_specific_args["-N"] = "2";          // 2 compute nodes
-service_specific_args["-c"] = "4";          // 4 cores per compute nodes
-service_specific_args["-t"] = "60";         // runs for one hour
+service_specific_args["-N"] = "2"; // 2 compute nodes
+service_specific_args["-c"] = "4"; // 4 cores per compute nodes
+service_specific_args["-t"] = "60"; // runs for one hour
 service_specific_args["universe"] = "grid"; // Grid universe
-service_specific_args["-service"] = batch1_cs->getName(); // Run on the first batch compute service
+// Set it to run on the first batch compute service
+service_specific_args["-service"] = batch1_cs->getName(); 
 
-job_manager->submitJob(n_job, htcondor_cs, service_specific_args); // no service-specific arguments
+job_manager->submitJob(g_job, htcondor_cs, service_specific_args);
 ~~~~~~~~~~~~~
 
-The above covers the essentials. See the code in the `examples/condor-grid-example/` directory
-for working/usable code. 
+The above covers the essentials. See the API documnetation for more options, and the code in the `examples/condor-grid-example/` directory for working/usable code. 
 
 
 
@@ -107,5 +110,6 @@ implementation of HTCondor. The `wrench::HTCondorComputeService` spawns two
 additional services during execution,
 `wrench::HTCondorCentralManagerService` and
 `wrench::HTCondorNegotiatorService`, both of which loosely correspond to
-actual HTCondor daemons (`collector`, `negotiator`, `schedd`).
+actual HTCondor daemons (`collector`, `negotiator`, `schedd`). Their use
+is fully automated and transparent to the WRENCH developer. 
 
