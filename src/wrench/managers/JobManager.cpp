@@ -263,6 +263,10 @@ namespace wrench {
      *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
+     *      - to a HTCondorComputeService:
+     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}, {"-u":"<string>" (username)}]}
+     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
+     *
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
