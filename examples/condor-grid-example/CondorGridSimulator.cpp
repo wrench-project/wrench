@@ -78,8 +78,7 @@ int main(int argc, char **argv) {
             new wrench::HTCondorComputeService(
                     "BatchHeadNode", std::move(condor_compute_resources),
                     {
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}
+                            {wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "1.0"}
                     },
                     {}));
 

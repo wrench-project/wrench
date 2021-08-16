@@ -45,6 +45,7 @@ namespace wrench {
         /***********************/
 
         HTCondorCentralManagerService(const std::string &hostname,
+                                      double negotiator_startup_overhead,
                                       std::set<std::shared_ptr<ComputeService>> compute_services,
                                       std::map<std::string, std::string> property_list = {},
                                       std::map<std::string, double> messagepayload_list = {});
@@ -62,6 +63,10 @@ namespace wrench {
         void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
         void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+
+        bool jobKindIsSupported(const std::shared_ptr<WorkflowJob>& job, std::map<std::string, std::string> service_specific_arguments);
+
+        bool jobCanRunSomewhere(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
 
 
         /***********************/
@@ -89,6 +94,7 @@ namespace wrench {
 
         void terminate();
 
+
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/
@@ -99,8 +105,9 @@ namespace wrench {
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispatch jobs **/
         bool resources_unavailable = false;
-//        /** map of (idle?) cores to compute services **/
-//        std::map<std::shared_ptr<ComputeService>, unsigned long> compute_resources_map;
+        /** negotiator startup overhead in seconds **/
+        double negotiator_startup_overhead = 0.0;
+
     };
 
 }

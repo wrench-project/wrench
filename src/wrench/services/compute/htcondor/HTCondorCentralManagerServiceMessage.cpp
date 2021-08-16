@@ -28,5 +28,14 @@ namespace wrench {
      */
     NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs, double payload)
             : HTCondorCentralManagerServiceMessage("NEGOTIATOR_DONE", payload), scheduled_jobs(scheduled_jobs) {}
+
+
+    /**
+     * @brief Constructor
+     *
+     * @param payload: the message size in bytes
+     */
+    CentralManagerWakeUpMessage::CentralManagerWakeUpMessage(double payload)
+            : HTCondorCentralManagerServiceMessage("WAKE_UP", payload) {}
             
 }

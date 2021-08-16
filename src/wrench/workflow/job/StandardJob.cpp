@@ -48,44 +48,56 @@ namespace wrench {
             cleanup_file_deletions(cleanup_file_deletions),
             state(StandardJob::State::NOT_SUBMITTED) {
 
-      // Check that this is a ready sub-graph
-      for (auto t : tasks) {
-        if (t->getState() != WorkflowTask::State::READY) {
-          std::vector<WorkflowTask *> parents = t->getWorkflow()->getTaskParents(t);
-          for (auto parent : parents) {
-            if (parent->getState() != WorkflowTask::State::COMPLETED) {
-              if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
-                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
-                                            "' has non-completed parents not included in the job");
-              }
+        // Check that this is a ready sub-graph
+        for (auto t : tasks) {
+            if (t->getState() != WorkflowTask::State::READY) {
+                std::vector<WorkflowTask *> parents = t->getWorkflow()->getTaskParents(t);
+                for (auto parent : parents) {
+                    if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                        if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
+                            throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
+                                                        "' has non-completed parents not included in the job");
+                        }
+                    }
+                }
             }
-          }
         }
-      }
 
-      for (auto t : tasks) {
-        this->tasks.push_back(t);
-        t->setJob(this);
-        this->total_flops += t->getFlops();
-      }
-      this->workflow = workflow;
-      this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+        for (auto t : tasks) {
+            this->tasks.push_back(t);
+            t->setJob(this);
+            this->total_flops += t->getFlops();
+        }
+        this->workflow = workflow;
+        this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
     }
 
     /**
-     * @brief Returns the minimum number of cores required, over all tasks in the job (i.e., at least
+     * @brief Returns the minimum number of cores required to run the job (i.e., at least
      *        one task in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() {
-      unsigned long max_min_num_cores = 1;
-      for (auto t : tasks) {
-        if (max_min_num_cores < t->getMinNumCores()) {
-            max_min_num_cores = t->getMinNumCores();
+        unsigned long max_min_num_cores = 1;
+        for (auto t : tasks) {
+            max_min_num_cores = std::max<unsigned long>(max_min_num_cores, t->getMinNumCores());
         }
-      }
-      return max_min_num_cores;
+        return max_min_num_cores;
     }
+
+    /**
+     * @brief Returns the minimum RAM capacity required to run the job (i.e., at least
+     *        one task in the job cannot run if less ram than this minimum is available)
+     * @return the number of cores
+     */
+    unsigned long StandardJob::getMinimumRequiredMemory() {
+        unsigned long max_ram = 0;
+        for (auto t : tasks) {
+            max_ram = std::max<unsigned long>(max_ram, t->getMemoryRequirement());
+        }
+        return max_ram;
+    }
+
 
     /**
      * @brief Get the number of tasks in the job
@@ -93,14 +105,14 @@ namespace wrench {
      * @return the number of tasks
      */
     unsigned long StandardJob::getNumTasks() {
-      return this->tasks.size();
+        return this->tasks.size();
     }
 
     /**
      * @brief Increment "the number of completed tasks" counter
      */
     void StandardJob::incrementNumCompletedTasks() {
-      this->num_completed_tasks++;
+        this->num_completed_tasks++;
     }
 
     /**
@@ -109,7 +121,7 @@ namespace wrench {
      * @return the number of completed tasks
      */
     unsigned long StandardJob::getNumCompletedTasks() {
-      return this->num_completed_tasks;
+        return this->num_completed_tasks;
     }
 
     /**
@@ -118,7 +130,7 @@ namespace wrench {
      * @return a vector of workflow tasks
      */
     std::vector<WorkflowTask *> StandardJob::getTasks() {
-      return this->tasks;
+        return this->tasks;
     }
 
     /**
@@ -127,7 +139,7 @@ namespace wrench {
      * @return a map of files to storage services
      */
     std::map<WorkflowFile *, std::shared_ptr<FileLocation> > StandardJob::getFileLocations() {
-      return this->file_locations;
+        return this->file_locations;
     }
 
     /**
@@ -136,13 +148,13 @@ namespace wrench {
      * @return the job priority value
      */
     unsigned long StandardJob::getPriority() {
-      unsigned long max_priority = 0;
-      for (auto task : tasks) {
-        if (task->getPriority() > max_priority) {
-          max_priority = task->getPriority();
+        unsigned long max_priority = 0;
+        for (auto task : tasks) {
+            if (task->getPriority() > max_priority) {
+                max_priority = task->getPriority();
+            }
         }
-      }
-      return max_priority;
+        return max_priority;
     }
 
     /**
@@ -150,7 +162,7 @@ namespace wrench {
      * @return the state
      */
     StandardJob::State StandardJob::getState() {
-      return this->state;
+        return this->state;
     }
 
 }

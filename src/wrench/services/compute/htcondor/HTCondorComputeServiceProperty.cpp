@@ -11,6 +11,6 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(HTCondorComputeServiceProperty, SUPPORTS_GRID_UNIVERSE);
+    SET_PROPERTY_NAME(HTCondorComputeServiceProperty, NEGOTIATOR_OVERHEAD);
 
 }
