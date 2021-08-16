@@ -21,7 +21,6 @@ namespace wrench {
     * @brief Constructor
     * @param job: the job this workunit belongs to
     * @param sleep_time: a sleep time before the execution, in seconds
-    * @param post_overhead: a post overhead, in seconds
     * @param pre_file_copies: a vector of file copy actions to perform in sequence first
     * @param task: a WorkflowTask
     * @param file_locations: locations where tasks should read/write files

@@ -30,6 +30,7 @@ namespace wrench {
     struct VertexProperties {
 //    std::size_t index;
 //    boost::default_color_type color;
+        /** @brief Task attached to the vertex */
         const WorkflowTask *task;
     };
 
