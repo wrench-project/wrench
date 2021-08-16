@@ -165,6 +165,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_NO_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob*)666),
+                                             0.0,
                                              pre_file_copies, task, file_locations,
                                              post_file_copies, cleanup_file_deletions));
     }
@@ -180,6 +181,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -195,6 +197,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -210,6 +213,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -225,6 +229,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -240,6 +245,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -255,6 +261,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -270,6 +277,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -285,6 +293,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(nullptr, wrench::FileLocation::LOCATION(this->storage_service2)));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
@@ -300,12 +309,13 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         cleanup_file_deletions.push_back(std::make_tuple(input_file, nullptr));
 
         ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
                                           pre_file_copies, task, file_locations,
                                           post_file_copies, cleanup_file_deletions), std::invalid_argument);
     }
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -356,17 +366,18 @@ private:
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file,
-                                               wrench::FileLocation::LOCATION(this->test->storage_service1),
-                                               wrench::FileLocation::LOCATION(this->test->storage_service2)));
+                                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                  wrench::FileLocation::LOCATION(this->test->storage_service2)));
         file_locations[input_file] = wrench::FileLocation::LOCATION(this->test->storage_service2);
         post_file_copies.push_back(std::make_tuple(output_file,
-                                                wrench::FileLocation::LOCATION(this->test->storage_service2),
-                                                wrench::FileLocation::LOCATION(this->test->storage_service1)));
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service2),
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file,
-                                                      wrench::FileLocation::LOCATION(this->test->storage_service2)));
+                                                         wrench::FileLocation::LOCATION(this->test->storage_service2)));
 
         auto wu = std::shared_ptr<wrench::Workunit>(new wrench::Workunit(
                 job,
+                0.0,
                 pre_file_copies,
                 task,
                 file_locations,
@@ -464,7 +475,7 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 

@@ -725,9 +725,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     auto batch_service = simulation->add(new wrench::BatchComputeService("BatchHost1",
                                                                          {"BatchHost1", "BatchHost2"},
                                                                          "/scratch",
-                                                                         {
-                                                                                 {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
-                                                                         }));
+                                                                         {}));
 
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(batch_service);
