@@ -331,42 +331,42 @@ namespace wrench {
     }
 
     /**
-     * Check if page caching is activated
-     * @return
+     * @brief Method to check if page caching is activated
+     * @return true or false
      */
     bool Simulation::isPageCachingEnabled() {
         return Simulation::pagecache_enabled;
     }
 
     /**
-     * Check if host shutdown simulation is activated
-     * @return
+     * @brief Method to check if host shutdown simulation is activated
+     * @return true or false
      */
     bool Simulation::isHostShutdownSimulationEnabled() {
         return Simulation::host_shutdown_enabled;
     }
 
     /**
-     * Check if energy simulation is activated
-     * @return
+     * @brief Method to check if energy simulation is activated
+     * @return true or false
      */
     bool Simulation::isEnergySimulationEnabled() {
         return Simulation::energy_enabled;
     }
 
-/**
- * Retrieve MemoryManager by hostname
- * @param hostname
- * @return
- */
-//    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
-//        for (auto mem_mng: this->memory_managers) {
-//            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
-//                return mem_mng.get();
-//            }
-//        }
-//        return nullptr;
-//    }
+///**
+// * @brief Method to retrieve MemoryManager by hostname
+// * @param hostname
+// * @return
+// */
+////    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
+////        for (auto mem_mng: this->memory_managers) {
+////            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
+////                return mem_mng.get();
+////            }
+////        }
+////        return nullptr;
+////    }
 
 /**
  * @brief Get the list of names of all the hosts in each cluster composing the platform
