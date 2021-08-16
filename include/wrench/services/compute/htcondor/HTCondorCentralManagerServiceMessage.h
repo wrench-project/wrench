@@ -42,6 +42,16 @@ namespace wrench {
         std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
     };
 
+    /**
+     * @brief A message received by a HTCondorCentralManagerService so that it wakes up and
+     * tries to dispatch jobs again
+     */
+    class CentralManagerWakeUpMessage : public HTCondorCentralManagerServiceMessage {
+    public:
+        CentralManagerWakeUpMessage(double payload);
+
+    };
+
     /***********************/
     /** \endcond INTERNAL  */
     /***********************/

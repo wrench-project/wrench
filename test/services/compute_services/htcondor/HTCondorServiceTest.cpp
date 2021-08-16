@@ -722,11 +722,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(
                     hostname,  std::move(compute_services),
-                    {
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
-                    },
+                    {},
                     {})));
 
 
@@ -871,11 +867,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(
                     hostname, std::move(compute_services),
-                    {
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "false"},
-                    },
+                    {},
                     {})));
 
 
@@ -937,31 +929,23 @@ private:
 
 
         std::map<std::string, std::string> test_service_specs;
-        test_service_specs.insert(std::pair<std::string, std::string>("universe","grid"));
+        test_service_specs["universe"] = "grid";
+        test_service_specs["-N"] = "1";
+        test_service_specs["-c"] = "1";
+        test_service_specs["-t"] = "1";
 
         // Submit the 2-task job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
         } catch (wrench::WorkflowExecutionException &e) {
+            auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
+            if (not real_cause) {
+                throw std::runtime_error("Should have gotten a JobTypeNotSupported failure cause");
+            }
             return 0;
-            throw std::runtime_error(e.what());
         }
 
-        // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
-        try {
-            event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
-        }
-
-        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
-        }
-
-        this->test->compute_service->stop();
-
-        return 1;
+        throw std::runtime_error("Should not have been able to submit job successfully");
     }
 };
 
@@ -981,8 +965,7 @@ void HTCondorServiceTest::do_NoPilotJobSupportTest_test() {
 
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path1));
-
-
+    
     // Get a hostname
     std::string hostname = "DualCoreHost";
 
@@ -1008,18 +991,14 @@ void HTCondorServiceTest::do_NoPilotJobSupportTest_test() {
                                                                          {"BatchHost1", "BatchHost2"},
                                                                          "/scratch",
                                                                          {
-                                                                                 {wrench::BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "true"},
+                                                                                 {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
                                                                          }));
     compute_services.insert(batch_service);
 
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(
                     hostname, std::move(compute_services),
-                    {
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "false"},
-                    },
+                    {},
                     {})));
 
 

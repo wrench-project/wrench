@@ -57,6 +57,8 @@ namespace wrench {
 
         unsigned long getMinimumRequiredNumCores();
 
+        unsigned long getMinimumRequiredMemory();
+
         unsigned long getNumCompletedTasks();
 
         unsigned long getNumTasks();

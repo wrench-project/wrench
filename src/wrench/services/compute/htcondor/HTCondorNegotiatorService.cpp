@@ -28,6 +28,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which to start the service
+     * @param startup_overhead: a startup overhead, in seconds
      * @param compute_services: a set of 'child' compute services available to and via the HTCondor pool
      * @param running_jobs: a list of currently running jobs
      * @param pending_jobs: a list of pending jobs
@@ -35,6 +36,7 @@ namespace wrench {
      */
     HTCondorNegotiatorService::HTCondorNegotiatorService(
             std::string &hostname,
+            double startup_overhead,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -42,6 +44,7 @@ namespace wrench {
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
 
+        this->startup_overhead = startup_overhead;
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
@@ -80,6 +83,8 @@ namespace wrench {
 
         std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
 
+        // Simulate some overhead
+        S4U_Simulation::sleep(this->startup_overhead);
 
         // sort jobs by priority
         std::sort(this->pending_jobs.begin(), this->pending_jobs.end(), JobPriorityComparator());
@@ -239,178 +244,35 @@ namespace wrench {
                 throw std::invalid_argument("HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(): "
                                             "service-specific arguments for Non-Grid universe jobs are currently not supported");
             }
+            // Check on RAM constraints
+            auto ram_resources = cs->getPerHostAvailableMemoryCapacity();
+            unsigned long max_available_ram_capacity = 0;
+            for (auto const &entry: ram_resources) {
+                max_available_ram_capacity = std::max<unsigned long>(max_available_ram_capacity, entry.second);
+            }
+            if (max_available_ram_capacity < sjob->getMinimumRequiredMemory()) {
+                continue;
+            }
+
             // Check on idle resources
-            auto resources = cs->getPerHostNumIdleCores();
+            auto idle_core_resources = cs->getPerHostNumIdleCores();
             unsigned long max_num_idle_cores = 0;
-            for (auto const &entry : resources) {
+            for (auto const &entry : idle_core_resources) {
                 max_num_idle_cores = std::max<unsigned long>(max_num_idle_cores, entry.second);
             }
-            if (max_num_idle_cores >= sjob->getMinimumRequiredNumCores()) {
-                return cs;
+            if (max_num_idle_cores < sjob->getMinimumRequiredNumCores()) {
+                continue;
             }
+            // Return the first appropriate CS we found
+            return cs;
         }
 
        return nullptr;
     }
-}
 
 
-#if 0
-// If the job is not a grid universe
-
-// Determine the compute services that can possibly be used
-for (auto const &compute_service : this->compute_services) {
-// Check that job can run in principle based on what is supported
-if (is_standard_job and not compute_service->supportsStandardJobs()) {
-continue;
-}
-if (not is_standard_job and not compute_service->supportsPilotJobs()) {
-continue;
-}
-if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(compute_service) == nullptr)) {
-continue;
-}
-if ((not is_grid_universe) and (std::dynamic_pointer_cast<BatchComputeService>(compute_service) != nullptr)) {
-continue;
-}
-
-// For grid universe jobs, check that -N and -c arguments can work and that there is a service with the appropriate name
-if (is_grid_universe) {
-unsigned long required_num_hosts;
-unsigned long required_num_cores_per_host;
-try {
-required_num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-N", service_specific_arguments);
-required_num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-c", service_specific_arguments);
-} catch (std::invalid_argument &e) {
-throw std::invalid_argument(
-"HTCondorNegotiatorService::main(): invalid service-specific arguments to grid universe job");
-}
-bool found_service = false;
-for (auto const &cs : this->compute_services) {
-auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs);
-if (batch_cs and (batch_cs->getName() == service_specific_arguments["-service"])) {
-
-}
-}
 
 }
 
-// check that
-if (is_standard_job) {
-auto min_required_num_cores = std::dynamic_pointer_cast<StandardJob>(job)->getMinimumRequiredNumCores();
-auto per_host_num_idle_core = compute_service->getPerHostNumIdleCores();
-bool enough_cores = false;
-for (auto const &entry : per_host_num_idle_core) {
-if (entry.second >= min_required_num_cores) {
-enough_cores = true;
-break;
-}
-}
-if (not enough_cores) {
-continue;
-}
-}
-possible_compute_services.push_back(compute_service);
-}
 
 
-//GRID STANDARD JOB
-//Diverts grid jobs to batch service if it has been provided when initializing condor.
-if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-if (service_specific_arguments.find("universe") == service_specific_arguments.end()) {
-for (auto &item : *this->compute_resources) {
-if (not item.first->supportsStandardJobs()) {
-continue;
-}
-
-if (item.second >= sjob->getMinimumRequiredNumCores()) {
-
-WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
-            sjob->getTasks().size());
-
-for (auto task : sjob->getTasks()) {
-// temporary printing task IDs
-WRENCH_INFO("    Task ID: %s", task->getID().c_str());
-}
-
-WRENCH_INFO("---> %lu", service_specific_arguments.size());
-
-sjob->pushCallbackMailbox(this->reply_mailbox);
-item.first->submitStandardJob(sjob, service_specific_arguments);
-this->running_jobs->insert(std::make_pair(job, item.first));
-scheduled_jobs.push_back(job);
-item.second -= sjob->getMinimumRequiredNumCores();
-
-WRENCH_INFO("Dispatched job %s with %ld tasks", sjob->getName().c_str(),
-            sjob->getTasks().size());
-break;
-}
-}
-} else {
-if (service_specific_arguments["universe"].compare("grid") == 0) {
-auto num_tasks = std::to_string((int) std::min(sjob->getNumTasks(),this->grid_universe_batch_service->getNumHosts()));
-
-service_specific_arguments.insert(std::pair<std::string, std::string>("-N", num_tasks));
-service_specific_arguments.insert(std::pair<std::string, std::string>("-c", "1"));
-service_specific_arguments.insert(std::pair<std::string, std::string>("-t", "9999"));
-
-std::map<std::string, std::string> service_specs_copy;
-
-
-WRENCH_INFO("Dispatching job %s with %ld tasks", sjob->getName().c_str(),
-            sjob->getTasks().size());
-
-for (auto task : sjob->getTasks()) {
-// temporary printing task IDs
-WRENCH_INFO("    Task ID: %s", task->getID().c_str());
-}
-
-//S4U_Simulation::sleep(140.0);
-
-sjob->pushCallbackMailbox(this->reply_mailbox);
-this->grid_universe_batch_service->submitStandardJob(sjob, service_specific_arguments);
-this->running_jobs->insert(std::make_pair(job, this->grid_universe_batch_service));
-scheduled_jobs.push_back(job);
-sjob->getMinimumRequiredNumCores();
-
-WRENCH_INFO("Dispatched grid universe job %s with %ld tasks to batch service",
-            sjob->getName().c_str(),
-            sjob->getTasks().size());
-}
-}
-} else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) { // PILOT JOB
-
-
-for (auto &item : *this->compute_resources) {
-if (not item.first->supportsPilotJobs()) {
-continue;
-}
-
-pjob->pushCallbackMailbox(this->reply_mailbox);
-item.first->submitPilotJob(pjob, service_specific_arguments);
-this->running_jobs->insert(std::make_pair(job, item.first));
-scheduled_jobs.push_back(job);
-
-WRENCH_INFO("Dispatched pilot job %s", pjob->getName().c_str());
-break;
-}
-}
-}
-
-// Send the callback to the originator
-try {
-S4U_Mailbox::putMessage(
-this->reply_mailbox, new NegotiatorCompletionMessage(
-        scheduled_jobs, this->getMessagePayloadValue(
-        HTCondorCentralManagerServiceMessagePayload::HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD)));
-} catch (std::shared_ptr<NetworkError> &cause) {
-return 1;
-}
-
-WRENCH_INFO("HTCondorNegotiator Service on host %s cleanly terminating!",
-            S4U_Simulation::getHostName().c_str());
-return 0;
-}
-}
-
-#endif
