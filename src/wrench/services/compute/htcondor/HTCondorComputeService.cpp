@@ -10,6 +10,7 @@
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceProperty.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/workflow/failure_causes/NotEnoughResources.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
@@ -42,6 +43,16 @@ namespace wrench {
                                                    std::map<std::string, std::string> property_list,
                                                    std::map<std::string, double> messagepayload_list) :
             ComputeService(hostname, "htcondor_service", "htcondor_service", "") {
+
+        // Check the property list for things that the user should not specify
+        if (property_list.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != property_list.end()) {
+            std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): ComputeServiceProperty::SUPPORTS_STANDARD_JOBS cannot be set for "
+                                  "an HTCondorComputeService, as it is based on the capabilities of the child compute services");
+        }
+        if (property_list.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != property_list.end()) {
+            std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): ComputeServiceProperty::SUPPORTS_PILOT_JOBS cannot be set for "
+                                  "an HTCondorComputeService, as it is based on the capabilities of the child compute services");
+        }
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -90,15 +101,11 @@ namespace wrench {
             }
         }
 
-        // Do sanity checks
-        if (this->supportsGridUniverse() and (not at_least_one_batch_service)) {
-            throw std::invalid_argument(
-                    "HTCondorComputeService::HTCondorComputeService(): if this service is to support grid jobs, then it needs at least one batch 'child' compute service. (or change the HTCondorComputeServiceProperty::SUPPORTS_GRID_JOBS property)");
-        }
-
         // create central manager service
         this->central_manager = std::make_shared<HTCondorCentralManagerService>(
-                hostname, compute_services, property_list, messagepayload_list);
+                hostname,
+                getPropertyValueAsDouble(HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD),
+                compute_services, property_list, messagepayload_list);
     }
 
     /**
@@ -108,15 +115,6 @@ namespace wrench {
         this->central_manager = nullptr;
         this->default_property_values.clear();
         this->default_messagepayload_values.clear();
-    }
-
-    /**
-     * @brief Get whether Condor supports Grid Universe for jobs.
-     *
-     * @return true or false
-     */
-    bool HTCondorComputeService::supportsGridUniverse() {
-        return getPropertyValueAsBoolean(HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE);
     }
 
     /**
@@ -344,7 +342,8 @@ namespace wrench {
                                                           const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
-        if (not this->supportsStandardJobs()) {
+        // Check that the job kind is supported
+        if (not this->central_manager->jobKindIsSupported(job, service_specific_args)) {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
@@ -355,21 +354,18 @@ namespace wrench {
             return;
         }
 
-        // Checks if grid universe was requested in job service specific args.
-        // If so, must condor must support grid universe. If not send back negative answer.
-        if ((service_specific_args.find("universe") != service_specific_args.end()) and
-            (service_specific_args.at("universe").compare("grid") == 0) and
-            (not this->supportsGridUniverse())) {
+        // Check that the job can run on some child service
+        if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
                             job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
+                                    new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-
             return;
         }
+
 
         // Submit the job to the central manager
         this->central_manager->submitStandardJob(job, service_specific_args);
@@ -404,7 +400,8 @@ namespace wrench {
                                                        const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a pilot job");
-        if (not this->supportsPilotJobs()) {
+        // Check that the job kind is supported
+        if (not this->central_manager->jobKindIsSupported(job, service_specific_args)) {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -412,6 +409,18 @@ namespace wrench {
                                     new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            return;
+        }
+
+        // Check that the job can run on some child service
+        if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
+            S4U_Mailbox::dputMessage(
+                    answer_mailbox,
+                    new ComputeServiceSubmitPilotJobAnswerMessage(
+                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+                                    new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
+                            this->getMessagePayloadValue(
+                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
         }
 
@@ -427,14 +436,15 @@ namespace wrench {
         return;
     }
 
-/**
- * @brief Terminate the daemon.
- */
+    /**
+     * @brief Terminate the daemon.
+     */
     void HTCondorComputeService::terminate() {
         this->setStateToDown();
         this->central_manager->stop();
         this->default_property_values.clear();
         this->default_messagepayload_values.clear();
     }
+
 
 }

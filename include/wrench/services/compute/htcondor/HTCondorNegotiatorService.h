@@ -34,6 +34,7 @@ namespace wrench {
     public:
 
         HTCondorNegotiatorService(std::string &hostname,
+                                  double startup_overhead,
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
@@ -53,6 +54,8 @@ namespace wrench {
         std::shared_ptr<ComputeService> pickTargetComputeServiceGridUniverse(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
         std::shared_ptr<ComputeService> pickTargetComputeServiceNonGridUniverse(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
 
+        /** startup overhead **/
+        double startup_overhead;
         /** mailbox to reply **/
         std::string reply_mailbox;
         /** set of compute resources **/
