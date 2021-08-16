@@ -19,7 +19,7 @@ namespace wrench {
 
     CondorWMS::CondorWMS(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                         std::string &hostname) : WMS(
+                         std::string hostname) : WMS(
                     nullptr, nullptr,
                     compute_services,
                     storage_services,
@@ -55,10 +55,12 @@ namespace wrench {
         auto cloud_cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
         /* Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
+        WRENCH_INFO("Creating a 5-core VM instance on the cloud service");
         cloud_cs->createVM(5, 32.0*1000*1000*1000, "my_vm", {}, {});
         auto vm_cs = cloud_cs->startVM("my_vm");
 
         /* Add the VM's BareMetalComputeService to the HTCondor compute service */
+        WRENCH_INFO("Adding the VM instance to HTCondor");
         htcondor_cs->addComputeService(vm_cs);
 
         /* At this point, HTCondor has access to: .... */
@@ -95,10 +97,12 @@ namespace wrench {
         htcondor_service_specific_arguments["-c"] = "5";
         htcondor_service_specific_arguments["-t"] = "3600";
         htcondor_service_specific_arguments["-service"] = batch_cs->getName();
+        WRENCH_INFO("Submitting the first 5 tasks as a single grid-universe job to HTCondor (will run on the batch service)");
         job_manager->submitJob(grid_universe_job, htcondor_cs, htcondor_service_specific_arguments);
 
         /* Submit the next 5 tasks as individual non "grid universe" jobs to HTCondor */
         for (auto const &t : last_five_tasks) {
+            WRENCH_INFO("Submitting a task as a single non-grid-universe job to HTCondor (will run on the VM)");
             auto job = job_manager->createStandardJob(t, file_locations);
             job_manager->submitJob(job, htcondor_cs);
         }
