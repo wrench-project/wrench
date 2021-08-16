@@ -117,8 +117,8 @@ namespace wrench {
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
         State state;
-        double pre_overhead;
-        double post_overhead;
+        double pre_overhead = 0.0;
+        double post_overhead = 0.0;
 
     };
 
