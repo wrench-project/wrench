@@ -287,7 +287,9 @@ namespace wrench {
         double mem_req = 0;
 
         /** Sleep for the sleep time */
-        S4U_Simulation::sleep(work->sleep_time);
+        if (work->sleep_time > 0.0) {
+            S4U_Simulation::sleep(work->sleep_time);
+        }
 
         /** Perform all pre file copies operations */
         for (auto file_copy : work->pre_file_copies) {
