@@ -69,6 +69,7 @@ namespace wrench {
 
         unsigned long getPriority();
 
+
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
 
@@ -87,6 +88,20 @@ namespace wrench {
         /** @brief The ordered file deletion operations to perform at the end */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
 
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
+        double getPreJobOverheadInSeconds();
+        void setPreJobOverheadInSeconds(double overhead);
+        double getPostJobOverheadInSeconds();
+        void setPostJobOverheadInSeconds(double overhead);
+
+
     private:
 
         friend class StandardJobExecutor;
@@ -102,6 +117,8 @@ namespace wrench {
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
         State state;
+        double pre_overhead;
+        double post_overhead;
 
     };
 
