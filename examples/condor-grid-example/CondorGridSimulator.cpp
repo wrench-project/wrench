@@ -103,7 +103,10 @@ int main(int argc, char **argv) {
     }
 
     // Run the simulation
+    std::cerr << "Launching simulation of execution...\n";
     simulation->launch();
+    std::cerr << "Simulation execution finished at time " << workflow->getCompletionDate() << "\n";
+    std::cerr << "(run with --log=custom_wms.threshold=info to see WMS log)\n";
 
     return 0;
 }
