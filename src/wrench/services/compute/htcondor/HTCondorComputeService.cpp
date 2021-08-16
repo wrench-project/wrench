@@ -11,6 +11,7 @@
 #include <wrench/services/compute/batch/BatchComputeServiceProperty.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/workflow/failure_causes/NotEnoughResources.h>
+#include <wrench/workflow/failure_causes/NotAllowed.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
@@ -361,6 +362,28 @@ namespace wrench {
                     new ComputeServiceSubmitStandardJobAnswerMessage(
                             job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
                                     new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
+                            this->getMessagePayloadValue(
+                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            return;
+        }
+
+        // Check that, if the job is non-grid, then is has no service_specific args
+        bool service_specific_args_valid = true;
+        if (not service_specific_args.empty()) {
+            if (service_specific_args.find("universe") == service_specific_args.end()) {
+                service_specific_args_valid = false;
+            } else if (service_specific_args.at("universe") != "grid") {
+                service_specific_args_valid = false;
+            }
+        }
+
+        if (not service_specific_args_valid) {
+            std::string error_message = "Non-grid universe jobs submitted to HTCondor cannot have service-specific arguments";
+            S4U_Mailbox::dputMessage(
+                    answer_mailbox,
+                    new ComputeServiceSubmitStandardJobAnswerMessage(
+                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+                                    new NotAllowed(this->getSharedPtr<HTCondorComputeService>(), error_message)),
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
