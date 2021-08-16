@@ -56,7 +56,6 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
                 {BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
-                {BatchComputeServiceProperty::SUPPORTS_GRID_UNIVERSE,                      "false"},
                 {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
@@ -171,14 +170,6 @@ namespace wrench {
         std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
 
         bool clean_exit = false;
-
-        //Used to add appropriate overhead to grid universe jobs.
-        bool grid_execution = false;
-        bool grid_execution_start = false;
-        bool grid_execution_end = false;
-
-        //Configuration to create randomness in measurement period initially
-        unsigned long random_interval = 10;
 
         //create alarms for standard jobs
         std::map<std::string,std::shared_ptr<Alarm>> standard_job_alarms;
