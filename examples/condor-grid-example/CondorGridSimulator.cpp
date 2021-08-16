@@ -35,7 +35,6 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-
     /* Initialize the platform with the XML file */
     simulation->instantiatePlatform(argv[1]);
 
@@ -43,9 +42,9 @@ int main(int argc, char **argv) {
     long num_tasks = 10;
     auto workflow = new wrench::Workflow();
     for (int i=0; i < num_tasks; i++) {
-        auto task   = workflow->addTask("task_" + std::to_string(i), (i+1) * 1000.00, 5, 5, 0);
-        auto input  = workflow->addFile("task_" + std::to_string(i) + ".in", 1000);
-        auto output = workflow->addFile("task_" + std::to_string(i) + ".out", 1000);
+        auto task   = workflow->addTask("task_" + std::to_string(i), 1000.0 *1000.0*1000.00*1000.00, 5, 5, 0);
+        auto input  = workflow->addFile("task_" + std::to_string(i) + ".in", 0.0*1000*1000);
+        auto output = workflow->addFile("task_" + std::to_string(i) + ".out", 0.0*1000*1000);
         task->addInputFile(input);
         task->addOutputFile(output);
     }
@@ -54,41 +53,40 @@ int main(int argc, char **argv) {
     auto local_ss = simulation->add(new wrench::SimpleStorageService("WMSHost", {"/"}));
 
     /* Create a batch service */
-    std::vector<std::string> batch_nodes = {"BatchNode1", "BatchNode2", "BatchNode3", "BatchNode4"};
     auto batch_cs = simulation->add(new wrench::BatchComputeService(
             "BatchHeadNode",
-            batch_nodes,
-            "/scratch_batch"));
+            {"BatchNode1", "BatchNode2", "BatchNode3", "BatchNode4"},
+            "/scratch_batch",
+            {
+                    {wrench::BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "10.0"},
+                    {wrench::BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "5.0"},
+            },
+            {}));
 
     /* Create a cloud service */
-    std::vector<std::string> cloud_nodes = {"CloudNode1", "CloudNode2"};
     auto cloud_cs = simulation->add(new wrench::CloudComputeService(
             "CloudHeadNode",
-            cloud_nodes,
+            {"CloudNode1", "CloudNode2"},
             "/scratch_cloud"));
 
     /* Create a HTCondor service that has access to the BatchComputeService (the WMS
      * will create VMs on the CloudCompute Service, which will expose BareMetalComputeService instances
-     * that will be added to the HTCondor service */
-
-    std::set<std::shared_ptr<wrench::ComputeService>> condor_compute_resources;
-    condor_compute_resources.insert(batch_cs);
-
+     * that will be added to the HTCondor service. Set the HTCondor overhead to 1 second*/
     auto htcondor_cs = simulation->add(
             new wrench::HTCondorComputeService(
-                    "BatchHeadNode", std::move(condor_compute_resources),
+                    "BatchHeadNode",
+                    {batch_cs},
                     {
-                            {wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "1.0"}
+                            {wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "0.0"}
                     },
                     {}));
 
+    /* Set the default local storage service */
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(htcondor_cs)->setLocalStorageService(local_ss);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    std::string htcondor_host = "HTCondorHost";
-    wms = simulation->add(
-            new wrench::CondorWMS({htcondor_cs, batch_cs, cloud_cs}, {local_ss}, htcondor_host));
+    auto wms = simulation->add(
+            new wrench::CondorWMS({htcondor_cs, batch_cs, cloud_cs}, {local_ss}, "HTCondorHost"));
 
     wms->addWorkflow(workflow);
 
@@ -96,7 +94,6 @@ int main(int argc, char **argv) {
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging the input_file on the storage service
-
     for (auto const &f : workflow->getInputFiles()) {
         simulation->stageFile(f, local_ss);
     }

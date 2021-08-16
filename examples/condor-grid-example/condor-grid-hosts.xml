@@ -42,16 +42,16 @@
             </disk>
        </host>
 
-        <host id="BatchNode1" speed="50Gf" core="10">
+        <host id="BatchNode1" speed="50Gf" core="5">
             <prop id="ram" value="64GB" />
         </host>
-        <host id="BatchNode2" speed="50Gf" core="10">
+        <host id="BatchNode2" speed="50Gf" core="5">
             <prop id="ram" value="64GB" />
         </host>
-        <host id="BatchNode3" speed="50Gf" core="10">
+        <host id="BatchNode3" speed="50Gf" core="5">
             <prop id="ram" value="64GB" />
         </host>
-        <host id="BatchNode4" speed="50Gf" core="10">
+        <host id="BatchNode4" speed="50Gf" core="5">
             <prop id="ram" value="64GB" />
         </host>
 
