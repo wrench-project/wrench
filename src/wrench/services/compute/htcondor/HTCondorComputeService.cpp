@@ -391,6 +391,19 @@ namespace wrench {
 
 
         // Submit the job to the central manager
+        // Set the job's pre- and post- overhead and submit to the central manager
+        if (service_specific_args.find("universe") != service_specific_args.end() and
+        service_specific_args.at("universe") == "grid") {
+            job->setPreJobOverheadInSeconds(
+                    getPropertyValueAsDouble(HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY));
+            job->setPostJobOverheadInSeconds(
+                    getPropertyValueAsDouble(HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY));
+        } else {
+            job->setPreJobOverheadInSeconds(
+                    getPropertyValueAsDouble(HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY));
+            job->setPostJobOverheadInSeconds(
+                    getPropertyValueAsDouble(HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY));
+        }
         this->central_manager->submitStandardJob(job, service_specific_args);
 
         // send positive answer
