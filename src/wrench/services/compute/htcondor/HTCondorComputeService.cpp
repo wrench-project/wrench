@@ -120,6 +120,7 @@ namespace wrench {
 
     /**
      * @brief Add a new 'child' compute service
+     * @param compute_service: the compute service to add
      */
     void HTCondorComputeService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
         this->central_manager->addComputeService(compute_service);
