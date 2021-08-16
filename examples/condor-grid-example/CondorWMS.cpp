@@ -14,6 +14,12 @@
 
 WRENCH_LOG_CATEGORY(custom_wms, "Log category for Custom WMS");
 
+/**
+ ** This WMS submits n tasks for execution to HTCondor. The first ~n/2 are submitted together
+ *  as a single grid-universe job. The remaining tasks are submitted as individual non-grid-universe
+ *  jobs.
+ **/
+
 
 namespace wrench {
 
@@ -29,43 +35,40 @@ namespace wrench {
                     "condor-grid"){}
 
     /**
-     * @brief main method of the CondorWMS daemon
-     *
-     * @return 0 on completion
-     *
-     * @throw std::runtime_error
+     * Main method of the WMS
      */
     int CondorWMS::main() {
 
-        /* Set the logging output to GREEN */
+        // Set the logging output to GREEN
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        /* Create a data movement manager */
+        // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-        /* Create a job manager */
+        // Create a job manager
         auto job_manager = this->createJobManager();
 
-        /* Get reference to the storage service */
+        // Get reference to the storage service
         auto ss = *(this->getAvailableStorageServices().begin());
 
-        /* Get references to all compute services */
+        // Get references to all compute services (note that all jobs will be submitted to the htcondor_cs)
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
         auto batch_cs = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
         auto cloud_cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
 
-        /* Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
+        // Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
         WRENCH_INFO("Creating a 5-core VM instance on the cloud service");
         cloud_cs->createVM(5, 32.0*1000*1000*1000, "my_vm", {}, {});
+        WRENCH_INFO("Starting the VM instance, which exposes a usable bare-metal compute service");
         auto vm_cs = cloud_cs->startVM("my_vm");
 
         /* Add the VM's BareMetalComputeService to the HTCondor compute service */
-        WRENCH_INFO("Adding the VM instance to HTCondor");
+        WRENCH_INFO("Adding the VM's bare-metal compute service to HTCondor");
         htcondor_cs->addComputeService(vm_cs);
 
-        /* At this point, HTCondor has access to: .... */
+        WRENCH_INFO("At this point, HTCondor has access to one batch compute service and one bare-metal service (which runs on a VM)");
 
-        /* Create a map of files, which are all supposed to be on the local SS */
+        // Create a map of files, which are all supposed to be on the local SS
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
         for (auto const &t : this->getWorkflow()->getTasks()) {
             for (auto const &f : t->getInputFiles()) {
@@ -76,37 +79,43 @@ namespace wrench {
             }
         }
 
-        /* Split the 10 tasks into two groups of 5 tasks */
-        std::vector<wrench::WorkflowTask *> first_five_tasks;
-        std::vector<wrench::WorkflowTask *> last_five_tasks;
+        // Split the tasks into two groups
+        std::vector<wrench::WorkflowTask *> first_tasks;
+        std::vector<wrench::WorkflowTask *> last_tasks;
         int task_count = 0;
+        unsigned long num_tasks = this->getWorkflow()->getTasks().size();
         for (auto const &t : this->getWorkflow()->getTasks()) {
-            if (task_count < 5) {
-                first_five_tasks.push_back(t);
+            if (task_count < num_tasks / 2) {
+                first_tasks.push_back(t);
             } else {
-                last_five_tasks.push_back(t);
+                last_tasks.push_back(t);
             }
             task_count++;
         }
 
-        /* Submit the first 5 tasks as part of a single "grid universe" job to HTCondor */
-        auto grid_universe_job = job_manager->createStandardJob(first_five_tasks, file_locations);
+        // Submit the first tasks as part of a single "grid universe" job to HTCondor
+        WRENCH_INFO("Creating a standard job with the first %ld tasks", first_tasks.size());
+        auto grid_universe_job = job_manager->createStandardJob(first_tasks, file_locations);
+        WRENCH_INFO("Submitting the job as a grid-universe job to HTCondor, asking for 3 compute nodes");
         std::map<std::string, std::string> htcondor_service_specific_arguments;
         htcondor_service_specific_arguments["universe"] = "grid";
         htcondor_service_specific_arguments["-N"] = "3";
         htcondor_service_specific_arguments["-c"] = "5";
         htcondor_service_specific_arguments["-t"] = "3600";
+        // This argument below is not required, as there is a single batch service in this example
         htcondor_service_specific_arguments["-service"] = batch_cs->getName();
-        WRENCH_INFO("Submitting the first 5 tasks as a single grid-universe job to HTCondor (will run on the batch service)");
         job_manager->submitJob(grid_universe_job, htcondor_cs, htcondor_service_specific_arguments);
+        WRENCH_INFO("Job submitted!");
 
-        /* Submit the next 5 tasks as individual non "grid universe" jobs to HTCondor */
-        for (auto const &t : last_five_tasks) {
-            WRENCH_INFO("Submitting a task as a single non-grid-universe job to HTCondor (will run on the VM)");
-            auto job = job_manager->createStandardJob(t, file_locations);
+        /* Submit the last tasks as individual non "grid universe" jobs to HTCondor */
+        for (auto const &task : last_tasks) {
+            WRENCH_INFO("Creating and submitting a single-task job (for task %s) as a non-grid-universe job to HTCondor (will run on the VM)",
+                        task->getID().c_str());
+            auto job = job_manager->createStandardJob(task, file_locations);
             job_manager->submitJob(job, htcondor_cs);
         }
 
+        WRENCH_INFO("Waiting for Workflow Execution Events until the workflow execution is finished...");
         /* Wait for all execution events */
         while (not this->getWorkflow()->isDone()) {
             this->waitForAndProcessNextEvent();
@@ -124,12 +133,14 @@ namespace wrench {
     void CondorWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's tasks */
+        WRENCH_INFO("Notified that a standard job has completed: ");
         for (auto const &task : job->getTasks()) {
-            WRENCH_INFO("Notified that a standard job has completed task %s",
-                        task->getID().c_str())
+            WRENCH_INFO("    - Task %s ran on host %s (started at time %.2lf and finished at time %.2lf)",
+                        task->getID().c_str(),
+                        task->getPhysicalExecutionHost().c_str(),
+                        task->getStartDate(),
+                        task->getEndDate());
         }
-        simulation->getOutput().addTimestamp<CondorGridEndTimestamp>(new CondorGridEndTimestamp);
     }
 
 

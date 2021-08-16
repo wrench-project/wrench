@@ -165,4 +165,36 @@ namespace wrench {
         return this->state;
     }
 
+    /**
+     * @brief get the job's pre-overhead
+     * @return a number o seconds
+     */
+    double StandardJob::getPreJobOverheadInSeconds() {
+        return this->pre_overhead;
+    }
+
+    /**
+    * @brief get the job's post-overhead
+    * @return a number o seconds
+    */
+    double StandardJob::getPostJobOverheadInSeconds() {
+        return this->post_overhead;
+    }
+
+    /**
+    * @brief sets the job's pre-overhead
+    * @param overhead: the overhead in seconds
+    */
+    void StandardJob::setPreJobOverheadInSeconds(double overhead) {
+        this->pre_overhead = overhead;
+    }
+
+    /**
+    * @brief sets the job's post-overhead
+    * @param overhead: the overhead in seconds
+    */
+    void StandardJob::setPostJobOverheadInSeconds(double overhead) {
+        this->post_overhead = overhead;
+    }
+
 }

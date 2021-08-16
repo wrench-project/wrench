@@ -355,11 +355,6 @@ namespace wrench {
             username = batch_job_args.at("-u");
         }
 
-        //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
-        if ((job->getServiceSpecificArguments().find("universe") != job->getServiceSpecificArguments().end()) and (job->getServiceSpecificArguments()["universe"] == "grid")) {
-            S4U_Simulation::sleep(this->getPropertyValueAsDouble(BatchComputeServiceProperty::GRID_PRE_EXECUTION_DELAY));
-        }
-
         // Sanity check
         if ((num_hosts == 0) or (num_cores_per_host == 0) or  (time_asked_for_in_minutes == 0)) {
             throw std::invalid_argument("BatchComputeService::submitWorkflowJob(): service-specific arguments should have non-zero values");
@@ -1259,17 +1254,11 @@ namespace wrench {
         }
         this->finished_standard_job_executors.clear();
 
-        //sleep to match real world behavior in communication lag between HTCondor and Batch service (slurm)
-        //This flag should only be active for last grid job in sequence.
-        if ((job->getServiceSpecificArguments().find("universe") != job->getServiceSpecificArguments().end()) and (job->getServiceSpecificArguments()["universe"] == "grid")) {
-            S4U_Simulation::sleep(this->getPropertyValueAsDouble(BatchComputeServiceProperty::GRID_POST_EXECUTION_DELAY));
-        }
+
 
         if (not executor_on_the_list) {
             WRENCH_WARN("BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list - Likely getting wires crossed due to concurrent completion and time-outs.. ignoring")
             return;
-//            throw std::runtime_error(
-//                    "BatchComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
         }
 
         // Look for the corresponding batch job
@@ -1288,11 +1277,6 @@ namespace wrench {
 
         WRENCH_INFO("A standard job executor has completed job %s", job->getName().c_str());
 
-//        std::cerr << "BEFORE FREEING UP RES\n";
-//        for (auto r : this->compute_hosts) {
-//            std::cerr << "-----> " << this->available_nodes_to_cores[r]  << "\n";
-//        }
-
         // Free up resources (by finding the corresponding BatchJob)
         this->freeUpResources(batch_job->getResourcesAllocated());
 
@@ -1301,10 +1285,6 @@ namespace wrench {
 
 
 
-//        std::cerr << "AFTER FREEING UP RES\n";
-//        for (auto r : this->compute_hosts) {
-//            std::cerr << "-----> " << this->available_nodes_to_cores[r]  << "\n";
-//        }
         // notify the scheduled of the job completion
         this->scheduler->processJobCompletion(batch_job);
 
@@ -1404,7 +1384,7 @@ namespace wrench {
     }
 
 /**
- *
+ * @brief Starts a job on a set of resources
  * @param resources
  * @param workflow_job
  * @param batch_job

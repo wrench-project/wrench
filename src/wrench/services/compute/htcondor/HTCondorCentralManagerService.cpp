@@ -62,7 +62,6 @@ namespace wrench {
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
         this->pending_jobs.clear();
         this->compute_services.clear();
-//        this->compute_resources_map.clear();
         this->running_jobs.clear();
     }
 
@@ -257,7 +256,7 @@ namespace wrench {
             return false;
         }
 
-        WRENCH_DEBUG("HTCondor Central Manager got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             this->terminate();
@@ -404,13 +403,13 @@ namespace wrench {
         }
 
         // Send the callback to the originator
+        WRENCH_INFO("SENDING A CALLBACK TO ORIGINATOR: %s",callback_mailbox.c_str());
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceStandardJobDoneMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
-        auto cs = this->running_jobs.find(job);
         this->running_jobs.erase(job);
     }
 

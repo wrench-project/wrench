@@ -28,6 +28,10 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                 {HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "0.0"},
+                {HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "0.0"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
