@@ -41,6 +41,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
 
     void do_StandardJobTaskTest_test();
+    void do_StandardJobTaskAddComputeServiceTest_test();
     void do_PilotJobTaskTest_test();
     void do_SimpleServiceTest_test();
     void do_GridUniverseTest_test();
@@ -271,7 +272,7 @@ private:
             }
         }
 
-        // Submit the 2-task job for execution
+        // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
         } catch (wrench::WorkflowExecutionException &e) {
@@ -365,6 +366,142 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     free(argv);
 }
 
+
+
+/**********************************************************************/
+/**  STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
+/**  ADDING A COMPUTE SERVICE ON THE FLY                             **/
+/**********************************************************************/
+
+class HTCondorStandardJobAddComputeServiceTestWMS : public wrench::WMS {
+
+public:
+    HTCondorStandardJobAddComputeServiceTestWMS(HTCondorServiceTest *test,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                               std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    HTCondorServiceTest *test;
+
+    int main() {
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Get a reference to the CondorHT
+        auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
+        auto bm_cs = *(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin());
+
+        // Add the bm_cs to the htcondor_cs
+        htcondor_cs->addComputeService(bm_cs);
+
+        // Create a job
+        auto two_task_job = job_manager->createStandardJob(
+                {this->test->task1},
+                {},
+                {std::make_tuple(this->test->input_file,
+                                 wrench::FileLocation::LOCATION(this->test->storage_service),
+                                 wrench::FileLocation::SCRATCH)},
+                {}, {});
+
+
+        // Submit the job for execution
+        try {
+            job_manager->submitJob(two_task_job, this->test->compute_service);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error(e.what());
+        }
+
+        // Wait for a workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+            event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(HTCondorServiceTest, HTCondorStandardJobAddComputeServiceTest) {
+    DO_TEST_WITH_FORK(do_StandardJobTaskAddComputeServiceTest_test);
+}
+
+void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/"})));
+
+    // Create a BareMetalComputeService
+    std::string execution_host = wrench::Simulation::getHostnameList()[1];
+    std::shared_ptr<wrench::BareMetalComputeService> baremetal_compute_service;
+    ASSERT_NO_THROW(baremetal_compute_service = simulation->add(
+            new wrench::BareMetalComputeService(
+                    execution_host,
+                    {std::make_pair(
+                            execution_host,
+                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+                    "/scratch")));
+
+    // Create a HTCondor Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::HTCondorComputeService(
+                    hostname, {},
+                    {
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
+                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                    })));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new HTCondorStandardJobAddComputeServiceTestWMS(this, {compute_service, baremetal_compute_service}, {storage_service}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Create a file registry
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
 /**********************************************************************/
 /**  PILOT JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
 /**********************************************************************/
@@ -410,7 +547,7 @@ private:
             }
         }
 
-        // Create a 2-task job
+        // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
                 {},
@@ -419,7 +556,7 @@ private:
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, pilot_job->getComputeService());
         } catch (wrench::WorkflowExecutionException &e) {
@@ -540,7 +677,7 @@ private:
         auto job_manager = this->createJobManager();
 
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
-        // Create a 2-task job
+        // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1}, {},
                 {std::make_tuple(this->test->input_file,
@@ -548,7 +685,7 @@ private:
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
         } catch (wrench::WorkflowExecutionException &e) {
@@ -663,7 +800,7 @@ private:
         service_specific_arguments["-c"] = "1";
         service_specific_arguments["-t"] = "3600";
 
-        // Submit the 2-task job for execution
+        // Submit the job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, service_specific_arguments);
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1063,7 +1200,7 @@ private:
         test_service_specs["-c"] = "1";
         test_service_specs["-t"] = "1";
 
-        // Submit the 2-task job for execution
+        // Submit the job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
         } catch (wrench::WorkflowExecutionException &e) {
