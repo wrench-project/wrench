@@ -310,7 +310,7 @@ namespace wrench {
 /**
  * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
  *        simulation output if record_as_time_stamp is set to true
- * @param link_name: the link name
+ * @param link_name: the link's name
  * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
  * @return current bandwidth usage in Bps
  * @throws std::invalid_argument

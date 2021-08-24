@@ -241,12 +241,12 @@ namespace wrench {
 
     /**
      * @brief Get a task internal state as a string
-     * @param state: the internal state
+     * @param internal_state: the internal state
      *
      * @return an internal state as a string
      */
-    std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {
-        switch (state) {
+    std::string WorkflowTask::stateToString(WorkflowTask::InternalState internal_state) {
+        switch (internal_state) {
             case TASK_NOT_READY:
                 return "NOT READY";
             case TASK_READY:
