@@ -41,7 +41,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     CloudComputeService::CloudComputeService(const std::string &hostname,
-                                             std::vector<std::string> &execution_hosts,
+                                             std::vector<std::string> execution_hosts,
                                              std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list) :

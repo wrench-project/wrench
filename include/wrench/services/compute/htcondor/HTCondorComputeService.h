@@ -27,9 +27,11 @@ namespace wrench {
     class HTCondorComputeService : public ComputeService {
     private:
         std::map<std::string, std::string> default_property_values = {
-                {HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
-                {HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                {HTCondorComputeServiceProperty::SUPPORTS_GRID_UNIVERSE, "false"},
+                {HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "0.0"},
+                {HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "0.0"},
+                {HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "0.0"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -37,7 +39,7 @@ namespace wrench {
                 {HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  512000000},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      1024}
@@ -45,15 +47,15 @@ namespace wrench {
 
     public:
         HTCondorComputeService(const std::string &hostname,
-                               const std::string &pool_name,
-                               std::set<ComputeService *> compute_resources,
+                               std::set<std::shared_ptr<ComputeService>> compute_services,
                                std::map<std::string, std::string> property_list = {},
-                               std::map<std::string, double> messagepayload_list = {},
-                               ComputeService *grid_universe_batch_service = nullptr);
+                               std::map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
+
+        void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
         void submitStandardJob(std::shared_ptr<StandardJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override;
@@ -63,8 +65,6 @@ namespace wrench {
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
         void setLocalStorageService(std::shared_ptr<StorageService> local_storage_service);
-
-        bool supportsGridUniverse();
 
         /***********************/
         /** \endcond          **/

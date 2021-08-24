@@ -190,6 +190,34 @@ namespace wrench {
         return count;
     }
 
+    /**
+      * @brief Get the list of the compute service's compute host
+      * @return a vector of hostnames
+      *
+      * @throw WorkflowExecutionException
+      * @throw std::runtime_error
+      */
+    std::vector<std::string> ComputeService::getHosts() {
+
+        std::map<std::string, std::map<std::string, double>> dict;
+        try {
+            dict = this->getServiceResourceInformation();
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        }
+
+        std::vector<std::string> to_return;
+
+        if (dict.find("num_cores") != dict.end()) {
+            for (auto x : dict["num_cores"]) {
+                to_return.emplace_back(x.first);
+            }
+        }
+
+        return to_return;
+    }
+
+
 
     /**
       * @brief Get core counts for each of the compute service's host

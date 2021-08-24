@@ -16,6 +16,7 @@
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
 #include <wrench/workflow/failure_causes/FailureCause.h>
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include "wrench/logging/TerminalOutput.h"
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -120,15 +121,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of hostnames
+     * @brief Get the list of physical hostnames
      *
      * @return a vector of hostnames
      */
     std::vector<std::string> S4U_Simulation::getAllHostnames() {
         std::vector<simgrid::s4u::Host *> host_list = simgrid::s4u::Engine::get_instance()->get_all_hosts();
         std::vector<std::string> hostname_list;
-        hostname_list.reserve(host_list.size());
         for (auto h : host_list) {
+            // Ignore VMs!
+            if (S4U_VirtualMachine::vm_to_pm_map.find(h->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+                continue;
+            }
             hostname_list.push_back(h->get_name());
         }
         return hostname_list;

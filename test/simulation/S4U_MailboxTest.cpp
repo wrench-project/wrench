@@ -126,7 +126,7 @@ private:
             wrench::Simulation::turnOnLink("1");
             wrench::Simulation::sleep(10);
 
-            WRENCH_INFO("TWO ASYNCHRONOUS SENDS / NETWORK FAILURES");
+//            WRENCH_INFO("TWO ASYNCHRONOUS SENDS / NETWORK FAILURES");
 
             // Two asynchronous sends, network failure
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_failure;
@@ -134,9 +134,9 @@ private:
             sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
             wrench::Simulation::sleep(10);
             simgrid::s4u::Link::by_name("1")->turn_off();
-            WRENCH_INFO("SIZE= %ld", sends_failure.size());
+//            WRENCH_INFO("SIZE= %ld", sends_failure.size());
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_failure, 10000);
-            WRENCH_INFO("index = %ld", index);
+//            WRENCH_INFO("index = %ld", index);
             try {
                 sends_failure.at(index)->wait();
                 throw std::runtime_error("Should have gotten a NetworkError");
@@ -194,7 +194,7 @@ private:
                 e->toString();
             }
 
-            WRENCH_INFO("TWO ASYNCHRPNOUS RECV / NETWORK FAILURES");
+//            WRENCH_INFO("TWO ASYNCHRPNOUS RECV / NETWORK FAILURES");
 
             // Two synchronous recv, network failure
             try {
@@ -256,7 +256,6 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     this->wms1->addWorkflow(workflow.get());
     this->wms2->addWorkflow(workflow.get());
 
-    WRENCH_INFO("HERE3");
     simulation->launch();
 
     delete simulation;

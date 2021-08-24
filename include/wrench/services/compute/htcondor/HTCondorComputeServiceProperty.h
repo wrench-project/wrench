@@ -21,8 +21,25 @@ namespace wrench {
 
     public:
 
-        /** @brief Whether the condor service supports grid jobs that are offloaded to batch service **/
-        DECLARE_PROPERTY_NAME(SUPPORTS_GRID_UNIVERSE);
+        /** @brief Overhead, in seconds, of the HTCondor Negotiator, which is invoked each time a new job is submitted or
+         *  a running job completes and there are still pending jobs **/
+        DECLARE_PROPERTY_NAME(NEGOTIATOR_OVERHEAD);
+
+        /** @brief Overhead (in seconds) between condor and a batch compute service for the start of execution of grid-universe jobs
+         */
+        DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
+
+        /** @brief Overhead (in seconds) between condor and a batch compute service for the completion of execution of grid-universe jobs
+         */
+        DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
+
+        /** @brief Overhead (in seconds) between condor and a bare-metal compute service for the start of execution of non-grid-universe jobs
+         */
+        DECLARE_PROPERTY_NAME(NON_GRID_PRE_EXECUTION_DELAY);
+
+        /** @brief Overhead (in seconds) between condor and a bare-metal compute for the completion of execution of non-grid-universe jobs
+         */
+        DECLARE_PROPERTY_NAME(NON_GRID_POST_EXECUTION_DELAY);
 
     };
 }
