@@ -38,6 +38,7 @@ namespace wrench {
 
         Workunit(
                 std::shared_ptr<StandardJob> job,
+                double sleep_time,
                 std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
                 WorkflowTask *task,
                 std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
@@ -58,6 +59,8 @@ namespace wrench {
         /** @brief The number of Workunits this Workunit depends on */
         unsigned long num_pending_parents;
 
+        /** @brief A sleep time, in seconds **/
+        double sleep_time;
         /** @brief File copies to perform before computational tasks begin */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
         /** @brief Computational task to perform */

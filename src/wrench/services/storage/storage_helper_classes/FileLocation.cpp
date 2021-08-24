@@ -8,6 +8,7 @@
  */
 
 #include <memory>
+#include "wrench/logging/TerminalOutput.h"
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <boost/algorithm/string/split.hpp>
@@ -82,7 +83,6 @@ namespace wrench {
         if (absolute_path.empty()) {
             throw std::invalid_argument("FileLocation::LOCATION(): must specify a non-empty path");
         }
-
         absolute_path = FileLocation::sanitizePath(absolute_path);
 
         std::string mount_point = "";

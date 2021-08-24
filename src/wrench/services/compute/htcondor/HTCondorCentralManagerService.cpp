@@ -14,6 +14,7 @@
 #include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
 #include "wrench/services/compute/htcondor/HTCondorNegotiatorService.h"
@@ -29,7 +30,8 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which to start the service
-     * @param compute_resources: a set of compute resources available via the HTCondor pool
+     * @param negotiator_startup_overhead: negotiator startup overhead
+     * @param compute_services: a set of 'child' compute resources available to and via the HTCondor pool
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
@@ -37,25 +39,14 @@ namespace wrench {
      */
     HTCondorCentralManagerService::HTCondorCentralManagerService(
             const std::string &hostname,
-            std::set<ComputeService *> compute_resources,
+            double negotiator_startup_overhead,
+            std::set<shared_ptr<ComputeService>> compute_services,
             std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
-            ComputeService *grid_universe_batch_service)
+            std::map<std::string, double> messagepayload_list)
             : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", "") {
 
-        // Check compute_resource viability
-        if (compute_resources.empty()) {
-            throw std::invalid_argument("At least one compute service should be provided");
-        }
-        for (auto const &cs : compute_resources) {
-            if (dynamic_cast<CloudComputeService *>(cs) and
-                (not dynamic_cast<VirtualizedClusterComputeService *>(cs))) {
-                throw std::invalid_argument(
-                        "An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
-            }
-        }
-
-        this->compute_resources = compute_resources;
+        this->negotiator_startup_overhead = negotiator_startup_overhead;
+        this->compute_services = compute_services;
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -63,7 +54,6 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
-        this->grid_universe_batch_service = grid_universe_batch_service;
     }
 
     /**
@@ -71,9 +61,25 @@ namespace wrench {
      */
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
         this->pending_jobs.clear();
-        this->compute_resources.clear();
-        this->compute_resources_map.clear();
+        this->compute_services.clear();
         this->running_jobs.clear();
+    }
+
+    /**
+     * @brief Add a new 'child' compute service
+     *
+     * @param compute_service: the compute service to add
+     */
+    void HTCondorCentralManagerService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
+        this->compute_services.insert(compute_service);
+        //  send a "wake up" message to the daemon's mailbox_name
+        try {
+            S4U_Mailbox::putMessage(
+                    this->mailbox_name,
+                    new CentralManagerWakeUpMessage(0));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
     }
 
     /**
@@ -204,47 +210,6 @@ namespace wrench {
         WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
-
-        // start the compute resource services
-        try {
-            if(grid_universe_batch_service){
-                this->grid_universe_batch_service_shared_ptr = this->simulation->startNewService(grid_universe_batch_service);
-                //WRENCH_INFO("starting service---> %p", grid_universe_batch_service_shared_ptr.get());
-            }
-            for (auto cs : this->compute_resources) {
-                auto cs_shared_ptr = this->simulation->startNewService(cs);
-
-                unsigned long sum_num_idle_cores = 0;
-
-                if (auto virtualized_cluster = dynamic_cast<VirtualizedClusterComputeService *>(cs)) {
-                    // for cloud services, we must create/start VMs, each of which
-                    // is a bare_metal. Right now, we greedily use the whole Cloud!
-
-                    for (auto const &host : virtualized_cluster->getExecutionHosts()) {
-                        unsigned long num_cores = Simulation::getHostNumCores(host);
-                        double ram = Simulation::getHostMemoryCapacity(host);
-                        auto vm_name = virtualized_cluster->createVM(num_cores, ram);
-                        auto vm_cs = virtualized_cluster->startVM(vm_name, host);
-                        // set the number of idle cores
-                        sum_num_idle_cores = vm_cs->getTotalNumIdleCores();
-                        this->compute_resources_map.insert(std::make_pair(vm_cs, sum_num_idle_cores));
-                    }
-
-                } else if (auto cloud = dynamic_cast<CloudComputeService *>(cs)) {
-                    throw std::runtime_error(
-                            "An HTCondorCentralManagerService cannot use a CloudComputeService - use a VirtualizedClusterComputeService instead");
-                } else {
-
-                    // set the number of available cores
-                    sum_num_idle_cores = cs->getTotalNumIdleCores();
-                    this->compute_resources_map.insert(std::make_pair(cs_shared_ptr, sum_num_idle_cores));
-                }
-
-            }
-        } catch (WorkflowExecutionException &e) {
-            throw std::runtime_error("Unable to acquire compute resources: " + e.getCause()->toString());
-        }
-
         // main loop
         while (this->processNextMessage()) {
             if (not this->dispatching_jobs && not this->resources_unavailable) {
@@ -255,10 +220,8 @@ namespace wrench {
                     this->dispatching_jobs = true;
                     //WRENCH_INFO("adding batch service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
-                            new HTCondorNegotiatorService(this->hostname, this->compute_resources_map,
-                                                          this->running_jobs,
-                                                          this->pending_jobs, this->mailbox_name,
-                                                          this->grid_universe_batch_service_shared_ptr));
+                            new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead, this->compute_services,
+                                                          this->running_jobs, this->pending_jobs, this->mailbox_name));
                     negotiator->simulation = this->simulation;
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
 
@@ -289,12 +252,11 @@ namespace wrench {
         }
 
         if (message == nullptr) {
-
             WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
             return false;
         }
 
-        WRENCH_DEBUG("HTCondor Central Manager got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
             this->terminate();
@@ -305,10 +267,14 @@ namespace wrench {
                         new ServiceDaemonStoppedMessage(
                                 this->getMessagePayloadValue(
                                         HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr <NetworkError> &cause) {
+            } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
             return false;
+
+        } else if (auto msg = dynamic_cast<CentralManagerWakeUpMessage*>(message.get())) {
+            // Do nothing
+            return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage*>(message.get())) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
@@ -335,7 +301,7 @@ namespace wrench {
             return true;
 
         }else {
-                throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+            throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -352,7 +318,7 @@ namespace wrench {
             const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
             std::map<std::string, std::string> &service_specific_args) {
 
-        this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
+        this->pending_jobs.emplace_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
         S4U_Mailbox::dputMessage(
@@ -437,15 +403,13 @@ namespace wrench {
         }
 
         // Send the callback to the originator
+        WRENCH_INFO("SENDING A CALLBACK TO ORIGINATOR: %s",callback_mailbox.c_str());
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceStandardJobDoneMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(
                                 HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
-        auto cs = this->running_jobs.find(job);
-        auto cs_map = this->compute_resources_map.find(cs->second);
-        cs_map->second = cs_map->second + job->getMinimumRequiredNumCores();
         this->running_jobs.erase(job);
     }
 
@@ -481,13 +445,129 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::terminate() {
         this->setStateToDown();
-        for (auto cs : this->compute_resources) {
-            cs->stop();
-        }
-        this->compute_resources.clear();
-        this->compute_resources_map.clear();
+        this->compute_services.clear();
         this->pending_jobs.clear();
         this->running_jobs.clear();
+    }
+
+    /**
+   * @brief Helper function to check whether a job kind is supported
+   * @param job: the job
+   * @param service_specific_arguments: the service-specific argument
+   * @return true or false
+   */
+    bool HTCondorCentralManagerService::jobKindIsSupported(const std::shared_ptr<WorkflowJob>& job,
+                                                           std::map<std::string, std::string> service_specific_arguments) {
+
+        bool is_grid_universe =
+                (service_specific_arguments.find("universe") != service_specific_arguments.end()) and
+                (service_specific_arguments["universe"] == "grid");
+        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+
+        bool found_one = false;
+        for (auto const &cs : this->compute_services) {
+            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
+                continue;
+            }
+            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
+                continue;
+            }
+            if (is_standard_job and (not cs->supportsStandardJobs())) {
+                continue;
+            }
+            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
+                continue;
+            }
+            found_one = true;
+            break;
+        }
+
+        return found_one;
+    }
+
+    /**
+     * @brief Helper function to check whether a job can run on at least one child compute service
+     * @param job: the job
+     * @param service_specific_arguments: the service-specific argument
+     * @return true or false
+     */
+    bool HTCondorCentralManagerService::jobCanRunSomewhere(std::shared_ptr<WorkflowJob> job,
+                                                           std::map<std::string, std::string> service_specific_arguments) {
+
+        bool is_grid_universe =
+                (service_specific_arguments.find("universe") != service_specific_arguments.end()) and
+                (service_specific_arguments["universe"] == "grid");
+        bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+
+        bool found_one = false;
+        for (auto const &cs : this->compute_services) {
+            // Check for type appropriateness
+            if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
+                continue;
+            }
+            if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
+                continue;
+            }
+            if (is_standard_job and (not cs->supportsStandardJobs())) {
+                continue;
+            }
+            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
+                continue;
+            }
+            // Check for resources for a grid universe job
+            if (is_grid_universe) {
+                if (service_specific_arguments.find("-N") == service_specific_arguments.end()) {
+                    throw std::invalid_argument(
+                            "HTCondorCentralManagerService::jobCanRunSomewhere(): Grid universe job must have a '-N' service-specific argument");
+                }
+                if (service_specific_arguments.find("-c") == service_specific_arguments.end()) {
+                    throw std::invalid_argument(
+                            "HTCondorCentralManagerService::jobCanRunSomewhere(): Grid universe job must have a '-c' service-specific argument");
+                }
+                unsigned long num_hosts = 0;
+                unsigned long num_cores_per_host = 0;
+                try {
+                    num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-N",
+                                                                                              service_specific_arguments);
+                    num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-c",
+                                                                                                       service_specific_arguments);
+                } catch (std::invalid_argument &e) {
+                    throw;
+                }
+                if (cs->getNumHosts() < num_hosts) {
+                    continue;
+                }
+                if ((*(cs->getPerHostNumCores().begin())).second < num_cores_per_host) {
+                    continue;
+                }
+            }
+
+            if (!is_grid_universe) {
+                auto sjob = std::dynamic_pointer_cast<StandardJob>(job);
+                auto core_resources = cs->getPerHostNumCores();
+                unsigned long max_cores = 0;
+                for (auto const &entry : core_resources) {
+                    max_cores = std::max<unsigned long>(max_cores, entry.second);
+                }
+                if (max_cores < sjob->getMinimumRequiredNumCores()) {
+                    continue;
+                }
+                auto ram_resources = cs->getMemoryCapacity();
+                double max_ram = 0;
+                for (auto const &entry : ram_resources) {
+                    max_ram = std::max<unsigned long>(max_ram, entry.second);
+                }
+                if (max_ram < sjob->getMinimumRequiredMemory()) {
+                    continue;
+                }
+            }
+
+            found_one = true;
+            break;
+        }
+
+        return found_one;
+
     }
 
 }

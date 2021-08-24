@@ -252,7 +252,7 @@ namespace wrench {
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
      *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
-     *           - If no value is not provided for a task, then the service will choose a host and use as many cores as possible on that host.
+     *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
      *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
      *           - If a "hostname" value is provided for a task, then the service will run the task on that
      *             host, using as many of its cores as possible
@@ -263,6 +263,10 @@ namespace wrench {
      *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
+     *      - to a HTCondorComputeService:
+     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}, {"-u":"<string>" (username)}]}
+     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
+     *
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException

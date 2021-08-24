@@ -38,6 +38,9 @@ WRENCH_LOG_CATEGORY(wrench_core_batsched_batch_scheduler, "Log category for Bats
 namespace wrench {
 
 
+    /**
+     * @brief Initialization method
+     */
     void BatschedBatchScheduler::init() {
 #ifdef ENABLE_BATSCHED
 
@@ -178,6 +181,9 @@ namespace wrench {
 #endif
     }
 
+    /**
+     * @brief Method to launch Batsched
+     */
     void BatschedBatchScheduler::launch() {
 #ifdef ENABLE_BATSCHED
         // Start the Batsched Network Listener
@@ -260,6 +266,9 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Method to shutdown Batsched
+     */
     void BatschedBatchScheduler::shutdown() {
 
 #ifdef ENABLE_BATSCHED
@@ -360,6 +369,7 @@ namespace wrench {
     }
 
 
+
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
@@ -373,6 +383,7 @@ namespace wrench {
 #endif
     }
 
+
     void BatschedBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob>batch_job) {
 
 #ifdef ENABLE_BATSCHED
@@ -382,6 +393,7 @@ namespace wrench {
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
+
 
 
     void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob>batch_job) {
@@ -394,6 +406,7 @@ namespace wrench {
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
+
 
     void BatschedBatchScheduler::processUnknownJobTermination(std::string job_id) {
 

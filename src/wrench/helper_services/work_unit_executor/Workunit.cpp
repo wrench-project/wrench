@@ -20,6 +20,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param job: the job this workunit belongs to
+    * @param sleep_time: a sleep time before the execution, in seconds
     * @param pre_file_copies: a vector of file copy actions to perform in sequence first
     * @param task: a WorkflowTask
     * @param file_locations: locations where tasks should read/write files
@@ -28,6 +29,7 @@ namespace wrench {
     */
     Workunit::Workunit(
             std::shared_ptr<StandardJob> job,
+            double sleep_time,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
             WorkflowTask *task,
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
@@ -72,6 +74,7 @@ namespace wrench {
         }
 
         this->job = job;
+        this->sleep_time = sleep_time;
         this->pre_file_copies = pre_file_copies;
         this->task = task;
         this->file_locations = file_locations;
@@ -114,6 +117,8 @@ namespace wrench {
      */
     std::set<std::shared_ptr<Workunit>> Workunit::createWorkunits(std::shared_ptr<StandardJob> job) {
 
+        std::shared_ptr<Workunit> pre_overhead_work_unit = nullptr;
+        std::shared_ptr<Workunit> post_overhead_work_unit = nullptr;
         std::shared_ptr<Workunit> pre_file_copies_work_unit = nullptr;
         std::vector<std::shared_ptr<Workunit>> task_work_units;
         std::shared_ptr<Workunit> post_file_copies_work_unit = nullptr;
@@ -121,9 +126,33 @@ namespace wrench {
 
         std::set<std::shared_ptr<Workunit>> all_work_units;
 
+        // Create pre- and post-overhead work units
+        if (job->getPreJobOverheadInSeconds() > 0.0) {
+            pre_overhead_work_unit = std::make_shared<Workunit>(job,
+                                                                job->getPreJobOverheadInSeconds(),
+                                                                (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                nullptr,
+                                                                (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                                (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>>) {}
+            );
+        }
+
+        if (job->getPostJobOverheadInSeconds() > 0.0) {
+            post_overhead_work_unit = std::make_shared<Workunit>(job,
+                                                                 job->getPostJobOverheadInSeconds(),
+                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                 nullptr,
+                                                                 (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
+                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>>) {}
+            );
+        }
+
         // Create the cleanup workunit, if any
         if (not job->cleanup_file_deletions.empty()) {
             cleanup_workunit = std::make_shared<Workunit>(job,
+                                                          0.0,
                                                           (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                           nullptr,
                                                           (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
@@ -134,6 +163,7 @@ namespace wrench {
         // Create the pre_file_copies work unit, if any
         if (not job->pre_file_copies.empty()) {
             pre_file_copies_work_unit = std::make_shared<Workunit>(job,
+                                                                   0.0,
                                                                    job->pre_file_copies,
                                                                    nullptr,
                                                                    (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
@@ -144,6 +174,7 @@ namespace wrench {
         // Create the post_file_copies work unit, if any
         if (not job->post_file_copies.empty()) {
             post_file_copies_work_unit = std::make_shared<Workunit>(job,
+                                                                    0.0,
                                                                     (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                     nullptr,
                                                                     (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
@@ -154,6 +185,7 @@ namespace wrench {
         // Create the task work units, if any
         for (auto const &task : job->tasks) {
             task_work_units.push_back(std::make_shared<Workunit>(job,
+                                                                 0.0,
                                                                  (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                  task,
                                                                  job->file_locations,
@@ -206,6 +238,7 @@ namespace wrench {
             }
         }
 
+
         // Create a list of all work units
         if (pre_file_copies_work_unit) all_work_units.insert(pre_file_copies_work_unit);
         for (auto const &twu : task_work_units) {
@@ -213,6 +246,21 @@ namespace wrench {
         }
         if (post_file_copies_work_unit) all_work_units.insert(post_file_copies_work_unit);
         if (cleanup_workunit) all_work_units.insert(cleanup_workunit);
+
+
+        // Create dependencies between pre- and post-overhead work units
+        if (pre_overhead_work_unit != nullptr) {
+            for (auto const &wu: all_work_units) {
+                Workunit::addDependency(pre_overhead_work_unit, wu);
+            }
+            all_work_units.insert(pre_overhead_work_unit);
+        }
+        if (post_overhead_work_unit != nullptr) {
+            for (auto const &wu: all_work_units) {
+                Workunit::addDependency(wu, post_overhead_work_unit);
+            }
+            all_work_units.insert(post_overhead_work_unit);
+        }
 
         task_work_units.clear();
 
