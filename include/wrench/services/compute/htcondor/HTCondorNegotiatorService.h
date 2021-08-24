@@ -18,7 +18,7 @@
 namespace wrench {
 
     /***********************/
-    /** \cond DEVELOPER    */
+    /** \cond INTERNAL     */
     /***********************/
     /**
      * @brief A HTCondor negotiator service
