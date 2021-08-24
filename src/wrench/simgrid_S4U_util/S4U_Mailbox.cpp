@@ -46,7 +46,7 @@ namespace wrench {
         auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg = nullptr;
         try {
-            msg = static_cast<SimulationMessage *>(mailbox->get());
+            msg = mailbox->get<SimulationMessage>();
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
                     new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
@@ -77,10 +77,10 @@ namespace wrench {
 
         WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
         auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
-        void *data = nullptr;
+        wrench::SimulationMessage *msg;
 
         try {
-            data = mailbox->get(timeout);
+            msg = mailbox->get<SimulationMessage>(timeout);
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
                     new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
@@ -89,7 +89,6 @@ namespace wrench {
                     new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         }
 
-        auto msg = static_cast<SimulationMessage *>(data);
 
 #ifdef MESSAGE_MANAGER
         MessageManager::removeReceivedMessage(mailbox_name, msg);
