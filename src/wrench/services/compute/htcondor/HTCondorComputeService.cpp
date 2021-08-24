@@ -75,6 +75,7 @@ namespace wrench {
             }
         }
 
+#if 0
         // Determine pilot job support
         bool at_least_one_service_supports_pilot_jobs = false;
         for (auto const &cs: compute_services) {
@@ -101,6 +102,7 @@ namespace wrench {
                 break;
             }
         }
+#endif
 
         // create central manager service
         this->central_manager = std::make_shared<HTCondorCentralManagerService>(
