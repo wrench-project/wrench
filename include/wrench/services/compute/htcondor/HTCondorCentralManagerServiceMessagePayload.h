@@ -14,6 +14,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /**
      * @brief Configurable message payloads for an HTCondor Central Manager service
      */
@@ -22,6 +26,10 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the daemon to state that the negotiator has been completed **/
         DECLARE_MESSAGEPAYLOAD_NAME(HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);
     };
+
+    /***********************/
+    /** \endcond INTERNAL  */
+    /***********************/
 }
 
 #endif //WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGEPAYLOAD_H
