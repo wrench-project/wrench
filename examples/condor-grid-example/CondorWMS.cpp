@@ -82,7 +82,7 @@ namespace wrench {
         // Split the tasks into two groups
         std::vector<wrench::WorkflowTask *> first_tasks;
         std::vector<wrench::WorkflowTask *> last_tasks;
-        int task_count = 0;
+        unsigned long task_count = 0;
         unsigned long num_tasks = this->getWorkflow()->getTasks().size();
         for (auto const &t : this->getWorkflow()->getTasks()) {
             if (task_count < num_tasks / 2) {
