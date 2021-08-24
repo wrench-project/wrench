@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         include:
-           - build: "Ubuntu Bionic - g++-7"
+          - build: "Ubuntu Bionic - g++-7"
             DIST: ubuntu-bionic
             COMPILER: gcc7
             batsched: off
