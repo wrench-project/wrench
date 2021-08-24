@@ -63,7 +63,7 @@ namespace wrench {
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set <std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
+        std::set<std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
 
         std::map<double, std::shared_ptr<FileLocation>> lookupEntry(
                 WorkflowFile *file, std::string reference_host,
