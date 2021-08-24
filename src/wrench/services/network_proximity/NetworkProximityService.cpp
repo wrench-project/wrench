@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,12 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <random>
-#include <fstream>
-#include <limits>
-#include <iomanip>
-
 #include <boost/algorithm/string.hpp>
+#include <fstream>
+#include <iomanip>
+#include <limits>
+#include <random>
 
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/network_proximity/NetworkProximityService.h"
@@ -50,9 +49,7 @@ namespace wrench {
                                                      std::vector<std::string> hosts_in_network,
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
-    ) :
-            Service(hostname, "network_proximity", "network_proximity") {
-
+    ) : Service(hostname, "network_proximity", "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
         if (this->hosts_in_network.size() < 2) {
@@ -81,7 +78,6 @@ namespace wrench {
      */
     std::pair<std::pair<double, double>, double>
     NetworkProximityService::getHostCoordinate(std::string requested_host) {
-
         assertServiceIsUp();
 
         if (boost::iequals(
@@ -96,10 +92,12 @@ namespace wrench {
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_get_coordinate_entry");
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new CoordinateLookupRequestMessage(answer_mailbox, requested_host,
-                                                                       this->getMessagePayloadValue(
-                                                                               NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    this->mailbox_name,
+                    new CoordinateLookupRequestMessage(
+                            answer_mailbox, requested_host,
+                            this->getMessagePayloadValue(
+                                    NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -112,7 +110,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
             return std::make_pair(msg->xy_coordinate, msg->timestamp);
         } else {
             throw std::runtime_error(
@@ -131,26 +129,26 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getHostPairDistance(std::pair<std::string, std::string> hosts) {
-
         assertServiceIsUp();
 
         std::string network_service_type = this->getPropertyValueAsString(
                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
 
-        if (boost::iequals(network_service_type, "alltoall")) {
-            WRENCH_INFO("Obtaining the proximity value between %s and %s", hosts.first.c_str(), hosts.second.c_str());
-        } else {
-            WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first.c_str(),
-                        hosts.second.c_str());
+        if (boost::iequals(network_service_type, "alltoall")) { WRENCH_INFO(
+                    "Obtaining the proximity value between %s and %s", hosts.first.c_str(), hosts.second.c_str());
+        } else { WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first.c_str(),
+                             hosts.second.c_str());
         }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
-                                                                             this->getMessagePayloadValue(
-                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    this->mailbox_name,
+                    new NetworkProximityLookupRequestMessage(
+                            answer_mailbox, std::move(hosts),
+                            this->getMessagePayloadValue(
+                                    NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -163,7 +161,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
             return std::make_pair(msg->proximity_value, msg->timestamp);
         } else {
             throw std::runtime_error(
@@ -178,14 +176,12 @@ namespace wrench {
      */
     void NetworkProximityService::addEntryToDatabase(std::pair<std::string, std::string> pair_hosts,
                                                      double proximity_value) {
-
         WRENCH_INFO("Received new measurement: %s-%s prox=%lf", pair_hosts.first.c_str(), pair_hosts.second.c_str(),
                     proximity_value);
         if (this->entries.find(pair_hosts) == this->entries.end()) {
-            std::pair<std::pair<std::string, std::string>, std::pair<double, double>> value = std::make_pair(pair_hosts,
-                                                                                                             std::make_pair(
-                                                                                                                     proximity_value,
-                                                                                                                     Simulation::getCurrentSimulatedDate()));
+            std::pair<std::pair<std::string, std::string>, std::pair<double, double>> value = std::make_pair(
+                    pair_hosts,
+                    std::make_pair(proximity_value, Simulation::getCurrentSimulatedDate()));
             this->entries.insert(value);
         } else {
             this->entries[pair_hosts] = std::make_pair(proximity_value, Simulation::getCurrentSimulatedDate());
@@ -198,7 +194,6 @@ namespace wrench {
      * @return 0 on success, non 0 otherwise
      */
     int NetworkProximityService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
         WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
@@ -206,24 +201,23 @@ namespace wrench {
         // Create  and start network daemons
         for (auto h : this->hosts_in_network) {
             std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
-                    new NetworkProximityDaemon(this->simulation, h, this->mailbox_name,
-                                               this->getPropertyValueAsDouble(
-                                                       NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
-                                               this->getPropertyValueAsDouble(
-                                                       NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
-                                               this->getPropertyValueAsDouble(
-                                                       NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
-                                               this->messagepayload_list));
+                    new NetworkProximityDaemon(
+                            this->simulation, h, this->mailbox_name,
+                            this->getPropertyValueAsDouble(
+                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
+                            this->getPropertyValueAsDouble(
+                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
+                            this->getPropertyValueAsDouble(
+                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
+                            this->messagepayload_list));
             this->network_daemons.push_back(np_daemon);
 
             // if this network service type is 'vivaldi', setup the coordinate lookup table
             if (boost::iequals(
                     this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
                     "vivaldi")) {
-//          this->coordinate_lookup_table.insert(std::pair<std::string, std::complex<double>>(h, (0.0)));
                 this->coordinate_lookup_table.insert(
                         std::make_pair(h, std::make_pair((0.0), Simulation::getCurrentSimulatedDate())));
-
             }
         }
 
@@ -237,9 +231,7 @@ namespace wrench {
         }
 
         /** Main loop **/
-        while (this->processNextMessage()) {
-
-        }
+        while (this->processNextMessage()) {}
 
         WRENCH_INFO("Network Proximity Service on host %s cleanly terminating!", S4U_Simulation::getHostName().c_str());
         return 0;
@@ -250,7 +242,6 @@ namespace wrench {
      * @return
      */
     bool NetworkProximityService::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -262,15 +253,13 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+        if (message == nullptr) { WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
             return false;
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
-
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // This is Synchronous
             try {
                 //Stop the network daemons
@@ -282,17 +271,17 @@ namespace wrench {
                 }
                 this->network_daemons.clear();
                 this->hosts_in_network.clear();
-                S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                S4U_Mailbox::putMessage(
+                        msg->ack_mailbox,
+                        new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
 
-        } else if (auto msg = dynamic_cast<NetworkProximityLookupRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
             double proximity_value = NetworkProximityService::NOT_AVAILABLE;
             double timestamp = NetworkProximityService::NOT_AVAILABLE;
-
 
             std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
@@ -317,20 +306,15 @@ namespace wrench {
                 }
             }
 
-//            try {
-            S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                     new NetworkProximityLookupAnswerMessage(msg->hosts, proximity_value, timestamp,
-                                                                             this->getMessagePayloadValue(
-                                                                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-//            }
-//            catch (std::shared_ptr<NetworkError> &cause) {
-//                return true;
-//            }
+            S4U_Mailbox::dputMessage(
+                    msg->answer_mailbox,
+                    new NetworkProximityLookupAnswerMessage(
+                            msg->hosts, proximity_value, timestamp,
+                            this->getMessagePayloadValue(
+                                    NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = dynamic_cast<NetworkProximityComputeAnswerMessage*>(message.get())) {
-//            WRENCH_INFO(
-//                    "NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database", msg->hosts.first.c_str(), msg->hosts.second.c_str());
+        } else if (auto msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
             this->addEntryToDatabase(msg->hosts, msg->proximity_value);
 
             if (boost::iequals(
@@ -338,54 +322,49 @@ namespace wrench {
                     "vivaldi")) {
                 vivaldiUpdate(msg->proximity_value, msg->hosts.first, msg->hosts.second);
             }
-
             return true;
 
-        } else if (auto msg = dynamic_cast<NextContactDaemonRequestMessage*>(message.get())) {
-
+        } else if (auto msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
             std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
                     msg->daemon);
 
-//            unsigned long randNum = (std::rand()%(this->hosts_in_network.size()));
-
-//            try {
-            S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
-                                     new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
-                                                                        chosen_peer,
-                                                                        chosen_peer->mailbox_name,
-                                                                        this->getMessagePayloadValue(
-                                                                                NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
-//            } catch (std::shared_ptr<NetworkError> &cause) {
-//                return true;
-//            }
+            S4U_Mailbox::dputMessage(
+                    msg->daemon->mailbox_name,
+                    new NextContactDaemonAnswerMessage(
+                            chosen_peer->getHostname(),
+                            chosen_peer,
+                            chosen_peer->mailbox_name,
+                            this->getMessagePayloadValue(
+                                    NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
-        } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage*>(message.get())) {
+
+        } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *>(message.get())) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
             CoordinateLookupAnswerMessage *msg_to_send_back = nullptr;
 
             if (coordinate_itr != this->coordinate_lookup_table.cend()) {
-                msg_to_send_back  = new CoordinateLookupAnswerMessage(requested_host,
-                                                                      true,
-                                                                      std::make_pair(
-                                                                              coordinate_itr->second.first.real(),
-                                                                              coordinate_itr->second.first.imag()),
-                                                                      coordinate_itr->second.second,
-                                                                      this->getMessagePayloadValue(
-                                                                              NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+                msg_to_send_back = new CoordinateLookupAnswerMessage(
+                        requested_host,
+                        true,
+                        std::make_pair(
+                                coordinate_itr->second.first.real(),
+                                coordinate_itr->second.first.imag()),
+                        coordinate_itr->second.second,
+                        this->getMessagePayloadValue(
+                                NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             } else {
-                msg_to_send_back = new CoordinateLookupAnswerMessage(requested_host,
-                                                                     false,
-                                                                     std::make_pair(
-                                                                             0,
-                                                                             0),
-                                                                     0,
-                                                                     this->getMessagePayloadValue(
-                                                                             NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+                msg_to_send_back = new CoordinateLookupAnswerMessage(
+                        requested_host,
+                        false,
+                        std::make_pair(0, 0),
+                        0,
+                        this->getMessagePayloadValue(
+                                NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
             }
-
-            S4U_Mailbox::dputMessage(msg->answer_mailbox,                     msg_to_send_back);
+            S4U_Mailbox::dputMessage(msg->answer_mailbox, msg_to_send_back);
             return true;
+
         } else {
             throw std::runtime_error(
                     "NetworkProximityService::processNextMessage(): Unexpected [" + message->getName() + "] message");
@@ -400,9 +379,6 @@ namespace wrench {
      */
     std::shared_ptr<NetworkProximityDaemon>
     NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon> sender_daemon) {
-
-//        WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name.c_str());
-
         // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
         // else if it is an 'alltoall' network service, coverage is set at 1.0
         double coverage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_COVERAGE");
@@ -410,7 +386,7 @@ namespace wrench {
 
         // if the network_service type is 'alltoall', sender_daemon selects from a pool of all other network daemons
         // if the network_service type is 'vivaldi', sender_daemon selects from a subset of the max_pool_size
-        unsigned long pool_size = (unsigned long) (std::ceil(coverage * max_pool_size));
+        auto pool_size = (unsigned long) (std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
         std::default_random_engine sender_rng;
@@ -447,7 +423,6 @@ namespace wrench {
      */
     void NetworkProximityService::vivaldiUpdate(double proximity_value, std::string sender_hostname,
                                                 std::string peer_hostname) {
-
         const std::complex<double> sensitivity(0.25, 0.25);
 
         std::complex<double> sender_coordinates, peer_coordinates;
@@ -496,19 +471,6 @@ namespace wrench {
         WRENCH_DEBUG("Vivaldi updated coordinates of %s from (%f,%f) to (%f,%f)", sender_hostname.c_str(),
                      sender_coordinates.real(), sender_coordinates.imag(), updated_sender_coordinates.real(),
                      updated_sender_coordinates.imag());
-
-        // WRITING VIVALDI RESULTS FOR DEBUGGING
-//        std::ofstream output("/home/ryan/Dropbox/Spring18/GRAD_PROJECT/vivaldi_visual/coordinate_table.txt", std::ofstream::app);
-//
-//        std::map<std::string, std::complex<double>>::iterator it;
-//        output.precision(std::numeric_limits<double>::max_digits10);
-//        for (it = this->coordinate_lookup_table.begin(); it != this->coordinate_lookup_table.end(); ++it) {
-//            output << std::setw(15) << it->first + " | " << std::fixed << it->second.real() << " | " << std::fixed << it->second.imag() << std::endl;
-//        }
-//        output << "*" << std::endl;
-//        output.close();
-        // END WRITING VIVALDI RESULTS
-
     }
 
     /**
@@ -519,7 +481,6 @@ namespace wrench {
         return this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
     }
 
-    // ADD TEST
     /**
      * @brief Internal method to validate Network Proximity Service Properties
      * @throw std::invalid_argument
@@ -555,50 +516,6 @@ namespace wrench {
                                             " for NETWORK_PROXIMITY_SERVICE_TYPE: " + network_service_type);
             }
         }
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD) < 0) {
-//        throw std::invalid_argument(error_prefix + "Invalid STOP_DAEMON_MESSAGE_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
-//      }
-//
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD) < 0) {
-//        throw std::invalid_argument(error_prefix + "Invalid DAEMON_STOPPED_MESSAGE_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD));
-//      }
-//
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD) < 0) {
-//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD));
-//      }
-//
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD) < 0) {
-//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
-//      }
-//
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD) <
-//          0) {
-//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD));
-//      }
-//
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD) <
-//          0) {
-//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD));
-//      }
-//
-//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD) <
-//          0) {
-//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD value " +
-//                                    this->getMessagePayloadValueAsString(
-//                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD));
-//      }
 
         if (this->getPropertyValueAsDouble(NetworkProximityServiceProperty::LOOKUP_OVERHEAD) < 0) {
             throw std::invalid_argument(error_prefix + "Invalid LOOKUP_OVERHEAD value " +

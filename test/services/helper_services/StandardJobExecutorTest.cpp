@@ -2965,6 +2965,7 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     // Create two WorkUnits
     std::shared_ptr<wrench::Workunit> wu1 = std::make_shared<wrench::Workunit>(
             nullptr,
+            0.0,
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             nullptr,
             (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
@@ -2972,6 +2973,7 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
     std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(
             nullptr,
+            0.0,
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             nullptr,
             (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},

@@ -379,22 +379,42 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief No-op method
+     * @param batch_job: a batch job
+     */
     void FCFSBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
+    /**
+     * @brief No-op method
+     * @param batch_job: a batch job
+     */
     void FCFSBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
+    /**
+     * @brief No-op method
+     * @param batch_job: a batch job
+     */
     void FCFSBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
+    /**
+     * @brief No-op method
+     * @param job_id: a batch job id
+     */
     void processUnknownJobTermination(std::string job_id) {
         // Do nothing
     }
 
+    /**
+     * @brief No-op method
+     * @param batch_job: a batch job
+     */
     void FCFSBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
