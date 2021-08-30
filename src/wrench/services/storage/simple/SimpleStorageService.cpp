@@ -580,21 +580,21 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (not answer_mailbox_if_read.empty()) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Sending back an ack since this was a file read and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
         }
 
         // Send back the relevant ack if this was a write
         if (not answer_mailbox_if_write.empty()) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Sending back an ack since this was a file write and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
         }
 
         // Send back the relevant ack if this was a copy
         if (not answer_mailbox_if_copy.empty()) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
                 throw std::runtime_error("SimpleStorageService::processFileTransferThreadNotification(): "
