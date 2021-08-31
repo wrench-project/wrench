@@ -490,9 +490,11 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
-        WRENCH_INFO("Asynchronously copying file %s from location %s",
+        WRENCH_INFO("Starting a thread to copy file %s from %s to %s",
                     file->getID().c_str(),
-                    src_location->toString().c_str());
+                    src_location->toString().c_str(),
+                    dst_location->toString().c_str()
+                    );
 
         // Create a file transfer thread
         auto ftt = std::shared_ptr<FileTransferThread>(
@@ -562,6 +564,7 @@ namespace wrench {
         // Was the destination me?
         if (dst_location and (dst_location->getStorageService().get() == this)) {
             if (success) {
+                WRENCH_INFO("File %s stored!", file->getID().c_str());
                 this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
                         file, dst_location->getAbsolutePathAtMountPoint());
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
