@@ -277,6 +277,10 @@ private:
             }
         }
 
+
+        // Coverage
+        one_task_jobs[0]->getEndDate();
+
         for (int i = 0; i < 5; i++) {
             if (one_task_jobs[i]->getNumCompletedTasks() != 1) {
                 throw std::runtime_error("A job with one completed task should say it has one completed task");
