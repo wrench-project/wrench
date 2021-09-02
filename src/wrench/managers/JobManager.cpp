@@ -606,6 +606,9 @@ namespace wrench {
         // update job state
         job->state = StandardJob::State::COMPLETED;
 
+        // Set the job end date
+        job->end_date = Simulation::getCurrentSimulatedDate();
+
         // Determine all task state changes
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
         for (auto task : job->tasks) {
@@ -707,6 +710,9 @@ namespace wrench {
 
         // update job state
         job->state = StandardJob::State::FAILED;
+
+        // Set the job end date
+        job->end_date = Simulation::getCurrentSimulatedDate();
 
         // Determine all task state changes and failure count updates
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
