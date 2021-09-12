@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,8 @@
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
+
+#include <memory>
 #include "wrench/workflow/job/PilotJob.h"
 
 #include "../../../include/TestWithFork.h"
@@ -72,9 +74,8 @@ public:
 
 protected:
     BatchServiceTest() {
-
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = std::make_unique<wrench::Workflow>();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -195,7 +196,6 @@ private:
     BatchServiceTest *test;
 
     int main() {
-
         // Do nothing
         return 0;
     }
@@ -253,7 +253,7 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -265,8 +265,8 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 class JobTypeNotSupportedTestWMS : public wrench::WMS {
 public:
     JobTypeNotSupportedTestWMS(BatchServiceTest *test,
-                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                    std::string hostname) :
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
@@ -283,7 +283,7 @@ private:
         auto bs_does_not_support_pilot = *(++this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
 
         if (bs_does_not_support_standard->supportsStandardJobs()) {
-            auto tmp  = bs_does_not_support_standard;
+            auto tmp = bs_does_not_support_standard;
             bs_does_not_support_standard = bs_does_not_support_pilot;
             bs_does_not_support_pilot = tmp;
         }
@@ -307,8 +307,10 @@ private:
                 auto cause = e.getCause();
                 auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
                 real_cause->toString();
-                if (not real_cause)  {
-                    throw std::runtime_error("Should have gotten a JobTypeNotSupported error cause as Standard Jobs are not supported (instead got a " + cause->toString() + " error cause");
+                if (not real_cause) {
+                    throw std::runtime_error(
+                            "Should have gotten a JobTypeNotSupported error cause as Standard Jobs are not supported "
+                            "(instead got a " + cause->toString() + " error cause");
                 }
             }
         }
@@ -329,13 +331,13 @@ private:
                 auto cause = e.getCause();
                 auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
                 real_cause->toString();
-                if (not real_cause)  {
-                    throw std::runtime_error("Should have gotten a JobTypeNotSupported error cause as Pilot Jobs are not supported (instead got a " + cause->toString() + " error cause");
+                if (not real_cause) {
+                    throw std::runtime_error(
+                            "Should have gotten a JobTypeNotSupported error cause as Pilot Jobs are not supported "
+                            "(instead got a " + cause->toString() + " error cause");
                 }
             }
         }
-
-
 
         return 0;
     }
@@ -367,7 +369,7 @@ void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                             {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
                                              {wrench::BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"},
-                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "true"}}
+                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "true"}}
             )));
 
     // Create a Batch Service that does not support Pilot Jobs
@@ -375,7 +377,7 @@ void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
                                             {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
                                              {wrench::BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}
+                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "false"}}
             )));
 
     // Create a WMS
@@ -390,7 +392,7 @@ void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -429,7 +431,6 @@ private:
             task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 0);
             task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 
-
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
             job1 = job_manager->createStandardJob(
@@ -458,7 +459,6 @@ private:
                         "Exception: " + std::string(e.what())
                 );
             }
-
         }
 
         // Submit job2 that will be stuck in the queue
@@ -495,7 +495,6 @@ private:
                         "Exception: " + std::string(e.what())
                 );
             }
-
         }
 
         // Submit job3 that will be stuck in the queue
@@ -532,11 +531,9 @@ private:
                         "Exception: " + std::string(e.what())
                 );
             }
-
         }
 
-        this->simulation->sleep(1);
-
+        wrench::Simulation::sleep(1);
 
         // Terminate job2 (which is pending)
         job_manager->terminateJob(job2);
@@ -574,7 +571,6 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 #else
-
 TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 #endif
 {
@@ -605,11 +601,11 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     ASSERT_NO_THROW(storage_service2 = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
-
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
-                                            "",{{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}, {})));
+                                            "", {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}},
+                                            {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -635,7 +631,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -648,8 +644,8 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 class TerminateOnePilotJobSubmissionTestWMS : public wrench::WMS {
 public:
     TerminateOnePilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                             std::string hostname) :
+                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                          std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
@@ -665,20 +661,20 @@ private:
         auto pjob1 = job_manager->createPilotJob();
         auto pjob2 = job_manager->createPilotJob();
 
-            std::map<std::string, std::string> batch_job_args;
-            batch_job_args["-N"] = "4";
-            batch_job_args["-t"] = "5"; //time in minutes
-            batch_job_args["-c"] = "10"; //number of cores per node
-            try {
-                job_manager->submitJob(pjob1, this->test->compute_service, batch_job_args);
-                job_manager->submitJob(pjob2, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
-                throw std::runtime_error(
-                        "Exception: " + std::string(e.what())
-                );
-            }
+        std::map<std::string, std::string> batch_job_args;
+        batch_job_args["-N"] = "4";
+        batch_job_args["-t"] = "5"; //time in minutes
+        batch_job_args["-c"] = "10"; //number of cores per node
+        try {
+            job_manager->submitJob(pjob1, this->test->compute_service, batch_job_args);
+            job_manager->submitJob(pjob2, this->test->compute_service, batch_job_args);
+        } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error(
+                    "Exception: " + std::string(e.what())
+            );
+        }
 
-        this->simulation->sleep(1);
+        wrench::Simulation::sleep(1);
 
         // Terminate job 2 (which is pending)
         job_manager->terminateJob(pjob2);
@@ -686,10 +682,12 @@ private:
         job_manager->terminateJob(pjob1);
 
         if (pjob1->getState() != wrench::PilotJob::State::TERMINATED) {
-            throw std::runtime_error("Pilot job #1's state should be TERMINATED (instead: " + std::to_string(pjob1->getState()) + ")");
+            throw std::runtime_error(
+                    "Pilot job #1's state should be TERMINATED (instead: " + std::to_string(pjob1->getState()) + ")");
         }
         if (pjob2->getState() != wrench::PilotJob::State::TERMINATED) {
-            throw std::runtime_error("Pilot job #2's state should be TERMINATED (instead: " + std::to_string(pjob2->getState()) + ")");
+            throw std::runtime_error(
+                    "Pilot job #2's state should be TERMINATED (instead: " + std::to_string(pjob2->getState()) + ")");
         }
 
         return 0;
@@ -759,7 +757,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -826,7 +824,6 @@ private:
                         "Exception: " + std::string(e.what())
                 );
             }
-
 
             // Wait for a workflow execution event
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
@@ -919,7 +916,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -932,8 +929,8 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 class StandardJobFailureTestWMS : public wrench::WMS {
 public:
     StandardJobFailureTestWMS(BatchServiceTest *test,
-                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                    std::string hostname) :
+                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                              std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
@@ -983,7 +980,6 @@ private:
                 );
             }
 
-
             // Wait for a workflow execution event
             std::shared_ptr<wrench::WorkflowExecutionEvent> event;
             try {
@@ -996,7 +992,6 @@ private:
             }
 
             this->getWorkflow()->removeTask(task);
-
         }
 
         return 0;
@@ -1065,7 +1060,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1242,7 +1237,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1327,9 +1322,7 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
-
         }
-
         return 0;
     }
 };
@@ -1394,8 +1387,8 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -1436,7 +1429,8 @@ private:
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>,
+                            std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"),
                             wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
@@ -1570,7 +1564,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1599,11 +1593,11 @@ private:
         // Standard Job
         {
             // Create a sequential task that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 50, 2, 12,  0);
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 50, 2, 12, 0);
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            auto job = job_manager->createStandardJob(task,{});
+            auto job = job_manager->createStandardJob(task, {});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -1645,7 +1639,6 @@ private:
                                              e.getCause()->toString() + " (expected: NotEnoughResources)");
                 }
             }
-
         }
 
         return 0;
@@ -1702,7 +1695,6 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-
     // Running a "run a single task" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
@@ -1710,7 +1702,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1752,7 +1744,8 @@ private:
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>,
+                            std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"),
                             wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
@@ -1833,7 +1826,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1982,7 +1975,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -2109,7 +2102,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -2272,7 +2265,6 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, DISABLED_BestFitStandardJobSubmissionTest)
 #else
-
 TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest)
 #endif
 {
@@ -2304,9 +2296,10 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+            new wrench::BatchComputeService(
+                    hostname,
+                    {"Host1", "Host2", "Host3", "Host4"}, "",
+                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2338,7 +2331,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -2431,7 +2424,6 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, DISABLED_FirstFitStandardJobSubmissionTest)
 #else
-
 TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest)
 #endif
 {
@@ -2463,9 +2455,10 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+            new wrench::BatchComputeService(
+                    hostname,
+                    {"Host1", "Host2", "Host3", "Host4"}, "",
+                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2497,7 +2490,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -2695,7 +2688,6 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, DISABLED_RoundRobinTaskTest)
 #else
-
 TEST_F(BatchServiceTest, RoundRobinTaskTest)
 #endif
 {
@@ -2728,9 +2720,10 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
+            new wrench::BatchComputeService(
+                    hostname,
+                    {"Host1", "Host2", "Host3", "Host4"}, "",
+                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2762,7 +2755,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -2773,10 +2766,11 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
 class StandardJobInsidePilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
 public:
-    StandardJobInsidePilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
-                                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                      std::string hostname) :
+    StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
+            BatchServiceTest *test,
+            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+            std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -2934,8 +2928,8 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -3004,7 +2998,8 @@ private:
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>,
+                            std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"),
                             wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
@@ -3096,21 +3091,22 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
-/**********************************************************************/
-/**  INSUFFICIENT CORES INSIDE PILOT JOB SIMULATION TEST ON ONE-ONE HOST                **/
-/**********************************************************************/
+/**************************************************************************/
+/**  INSUFFICIENT CORES INSIDE PILOT JOB SIMULATION TEST ON ONE-ONE HOST **/
+/**************************************************************************/
 
 class InsufficientCoresInsidePilotJobSubmissionTestWMS : public wrench::WMS {
 public:
-    InsufficientCoresInsidePilotJobSubmissionTestWMS(BatchServiceTest *test,
-                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                     std::string hostname) :
+    InsufficientCoresInsidePilotJobSubmissionTestWMS(
+            BatchServiceTest *test,
+            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+            std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -3166,7 +3162,8 @@ private:
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>,
+                            std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"),
                             wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
@@ -3247,14 +3244,14 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
-/**********************************************************************/
-/**  MULTIPLE STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST                **/
-/**********************************************************************/
+/***********************************************************************/
+/** MULTIPLE STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST **/
+/***********************************************************************/
 
 class MultipleStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
@@ -3382,14 +3379,14 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
-/**********************************************************************/
-/**  DIFFERENT BATCHSERVICE ALGORITHMS SUBMISSION TASK SIMULATION TEST **/
-/**********************************************************************/
+/***********************************************************************/
+/** DIFFERENT BATCHSERVICE ALGORITHMS SUBMISSION TASK SIMULATION TEST **/
+/***********************************************************************/
 
 class DifferentBatchAlgorithmsSubmissionTestWMS : public wrench::WMS {
 public:
@@ -3529,8 +3526,8 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -3578,13 +3575,13 @@ private:
         }
 
         // Sleep 5 seconds
-        this->simulation->sleep(5);
+        wrench::Simulation::sleep(5);
 
         // Terminate the service
         this->test->compute_service->stop();
 
         // Sleep 5 seconds
-        this->simulation->sleep(5);
+        wrench::Simulation::sleep(5);
 
         // Wait for workflow execution events
         for (int i = 0; i < 3; i++) {
@@ -3655,7 +3652,7 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
 
     delete simulation;
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
