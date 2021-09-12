@@ -620,7 +620,7 @@ namespace wrench {
                     case WorkflowTask::InternalState::TASK_NOT_READY:
                         if (child->getState() != WorkflowTask::State::NOT_READY) {
                             throw std::runtime_error(
-                                    "JobManager::main(): Child's internal state if NOT READY, but child's visible " +
+                                    "JobManager::main(): Child's internal state if NOT READY, but child's visible "
                                     "state is " + WorkflowTask::stateToString(child->getState()));
                         }
                     case WorkflowTask::InternalState::TASK_COMPLETED:
