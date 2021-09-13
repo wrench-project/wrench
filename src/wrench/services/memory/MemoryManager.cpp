@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
 WRENCH_LOG_CATEGORY(wrench_periodic_flush, "Log category for Periodic Flush");
 
 namespace wrench {
-
     /**
      * @brief Constructor
      *
@@ -26,11 +25,13 @@ namespace wrench {
      * @param expired_time: the expired time of dirty data to be flushed in second
      * @param hostname: name of the host on which periodical flushing starts
      */
-    MemoryManager::MemoryManager(simgrid::s4u::Disk *memory, double dirty_ratio,
-                                 int interval, int expired_time, std::string hostname) :
+    MemoryManager::MemoryManager(simgrid::s4u::Disk *memory,
+                                 double dirty_ratio,
+                                 int interval,
+                                 int expired_time,
+                                 std::string hostname) :
             Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
-
         // Get RAM disk size
         this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");
         this->free = total;
@@ -49,19 +50,20 @@ namespace wrench {
      * @param hostname: name of the host on which periodical flushing starts
      * @return
      */
-    std::shared_ptr<MemoryManager> MemoryManager::initAndStart(wrench::Simulation *simulation, simgrid::s4u::Disk *memory,
-                                                               double dirty_ratio, int interval, int expired_time,
-                                                               std::string hostname) {
-
+    std::shared_ptr<MemoryManager>
+    MemoryManager::initAndStart(wrench::Simulation *simulation,
+                                simgrid::s4u::Disk *memory,
+                                double dirty_ratio,
+                                int interval,
+                                int expired_time,
+                                std::string hostname) {
         auto memory_manager = simulation->add(new MemoryManager(memory, dirty_ratio, interval, expired_time, hostname));
         memory_manager->start(memory_manager, true, false);
         return memory_manager;
     }
 
     int MemoryManager::main() {
-
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
-        WRENCH_INFO(
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
                 "Periodic Flush starting with interval = %d , expired time = %d",
                 this->interval, this->expired_time);
 
@@ -198,15 +200,15 @@ namespace wrench {
      * @param amount: the amount requested to flush
      * @return flushed amount
      */
-    double MemoryManager::flushLruList(std::vector<Block *> &list, double amount, std::string excluded_filename) {
-
+    double MemoryManager::flushLruList(std::vector<Block *> &list,
+                                       double amount,
+                                       std::string excluded_filename) {
         if (amount <= 0) return 0;
         double flushed = 0;
 
         std::map<std::string, double> flushing_map;
 
         for (auto blk : list) {
-
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
             }
@@ -258,7 +260,8 @@ namespace wrench {
      * @param excluded_filename: name of file to exclude
      * @return flushed amount
      */
-    double MemoryManager::flush(double amount, std::string excluded_filename) {
+    double MemoryManager::flush(double amount,
+                                std::string excluded_filename) {
         if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);
@@ -283,10 +286,9 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flushExpiredData(std::vector<Block *> &list) {
-
         double flushed = 0;
 
-        while(true) {
+        while (true) {
             this->acquireDaemonLock();
             Block *block_to_deal_with = nullptr;
             for (auto blk : list) {
@@ -306,7 +308,6 @@ namespace wrench {
 
             this->dirty -= block_to_deal_with->getSize();
             flushed += block_to_deal_with->getSize();
-
         }
 
         return flushed;
@@ -330,8 +331,8 @@ namespace wrench {
      * @param excluded_filename: name of file that cannot be evicted
      * @return evicted amount
      */
-    double MemoryManager::evict(double amount, std::string excluded_filename) {
-
+    double MemoryManager::evict(double amount,
+                                std::string excluded_filename) {
         if (amount <= 0) return 0;
 
         double evicted = evictLruList(this->inactive_list, amount, excluded_filename);
@@ -349,8 +350,9 @@ namespace wrench {
      * @param excluded_filename: name of file that cannot be evicted
      * @return evicted amount
      */
-    double MemoryManager::evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename) {
-
+    double MemoryManager::evictLruList(std::vector<Block *> &lru_list,
+                                       double amount,
+                                       std::string excluded_filename) {
         if (amount <= 0) return 0;
 
         double evicted = 0;
@@ -393,8 +395,10 @@ namespace wrench {
      * @param async: tue if operation is asynchronous
      * @return a simgrid pointer to a pending I/O operation, or nullptr
      */
-    simgrid::s4u::IoPtr MemoryManager::readToCache(std::string filename, std::shared_ptr<FileLocation> location,
-                                                   double amount, bool async) {
+    simgrid::s4u::IoPtr MemoryManager::readToCache(std::string filename,
+                                                   std::shared_ptr<FileLocation> location,
+                                                   double amount,
+                                                   bool async) {
         // Change stats
         free -= amount;
         cached += amount;
@@ -416,8 +420,8 @@ namespace wrench {
      * @param filename: name of the file read
      * @param amount: number of bytes
      */
-    void MemoryManager::readChunkFromCache(std::string filename, double amount) {
-
+    void MemoryManager::readChunkFromCache(std::string filename,
+                                           double amount) {
         std::shared_ptr<FileLocation> location = nullptr;
         double dirty_reaccessed = 0;
         double clean_reaccessed = 0;
@@ -462,7 +466,6 @@ namespace wrench {
         }
 
         for (unsigned int i = 0; i < active_list.size(); i++) {
-
             if (read >= amount) {
                 break;
             }
@@ -497,7 +500,6 @@ namespace wrench {
                         clean_reaccessed += blk_read_amt;
                     }
                 }
-
             }
         }
 
@@ -523,9 +525,10 @@ namespace wrench {
      * @param amount: amount of data written
      * @param is_dirty: true or false
      */
-    void MemoryManager::writebackToCache(std::string filename, std::shared_ptr<FileLocation> location,
-                                         double amount, bool is_dirty) {
-
+    void MemoryManager::writebackToCache(std::string filename,
+                                         std::shared_ptr<FileLocation> location,
+                                         double amount,
+                                         bool is_dirty) {
         this->addToCache(filename, location, amount, is_dirty);
         memory->write(amount);
     }
@@ -538,8 +541,12 @@ namespace wrench {
      * @param amount: number of bytes
      * @param is_dirty: true or false
      */
-    void MemoryManager::addToCache(std::string filename, std::shared_ptr<FileLocation> location, double amount, bool is_dirty) {
-        Block *bl = new Block(filename, location, amount, S4U_Simulation::getClock(), is_dirty, S4U_Simulation::getClock());
+    void MemoryManager::addToCache(std::string filename,
+                                   std::shared_ptr<FileLocation> location,
+                                   double amount,
+                                   bool is_dirty) {
+        auto *bl = new Block(filename, location, amount, S4U_Simulation::getClock(), is_dirty,
+                             S4U_Simulation::getClock());
         inactive_list.push_back(bl);
 
         this->cached += amount;
@@ -565,14 +572,13 @@ namespace wrench {
      * move blocks from the active list to the inactive list to make their sizes equal.
      */
     void MemoryManager::balanceLruLists() {
-
         double inactive_size = 0;
-        for (unsigned int i=0; i < inactive_list.size(); i++) {
+        for (unsigned int i = 0; i < inactive_list.size(); i++) {
             inactive_size += inactive_list[i]->getSize();
         }
 
         double active_size = 0;
-        for (unsigned int i=0; i < active_list.size(); i++) {
+        for (unsigned int i = 0; i < active_list.size(); i++) {
             active_size += active_list[i]->getSize();
         }
 
@@ -604,7 +610,6 @@ namespace wrench {
                     break;
                 }
             }
-
         }
     }
 
@@ -614,7 +619,6 @@ namespace wrench {
      * @return the amount of cached data
      */
     double MemoryManager::getCachedAmount(std::string filename) {
-
         double amt = 0;
 
         for (unsigned int i = 0; i < inactive_list.size(); i++) {
@@ -638,7 +642,6 @@ namespace wrench {
      * @return a vector of cached blocks of the file
      */
     std::vector<Block *> MemoryManager::getCachedBlocks(std::string filename) {
-
         std::vector<Block *> block_list;
 
         for (unsigned int i = 0; i < inactive_list.size(); i++) {
@@ -663,8 +666,8 @@ namespace wrench {
      * @param hostname: host at which the file is stored
      * @return
      */
-    simgrid::s4u::Disk *MemoryManager::getDisk(std::string mountpoint, std::string hostname) {
-
+    simgrid::s4u::Disk *MemoryManager::getDisk(std::string mountpoint,
+                                               std::string hostname) {
         mountpoint = FileLocation::sanitizePath(mountpoint);
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -703,7 +706,7 @@ namespace wrench {
         fprintf(log_file, "time, total_mem, dirty, cache, used_mem\n");
 
         double start = this->time_log.at(0);
-        for (unsigned int i=0; i<this->time_log.size(); i++) {
+        for (unsigned int i = 0; i < this->time_log.size(); i++) {
             fprintf(log_file, "%lf, %lf, %lf, %lf, %lf\n",
                     this->time_log.at(i) - start,
                     total / 1000000.0,
