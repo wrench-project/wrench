@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/storage/StorageService.h"
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/job/PilotJob.h"
@@ -29,7 +27,6 @@
 #include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
 #include <wrench/workflow/failure_causes/HostError.h>
 
-
 #include <exception>
 
 #include "wrench/util/PointerUtil.h"
@@ -37,7 +34,6 @@
 WRENCH_LOG_CATEGORY(wrench_core_standard_job_executor, "Log category for Standard Job Executor");
 
 namespace wrench {
-
     /**
      * @brief Destructor
      */
@@ -75,9 +71,9 @@ namespace wrench {
                                              PilotJob *parent_pilot_job,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list
-    ) :
-            Service(hostname, "standard_job_executor", "standard_job_executor") {
-
+    ) : Service(hostname,
+                "standard_job_executor",
+                "standard_job_executor") {
         if ((job == nullptr) || (compute_resources.empty())) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): invalid arguments");
         }
@@ -98,9 +94,10 @@ namespace wrench {
             }
             if (std::get<0>(host.second) < ComputeService::ALL_CORES) {
                 if (std::get<0>(host.second) > S4U_Simulation::getHostNumCores(host.first)) {
-                    throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + host.first +
-                                                " has only " +
-                                                std::to_string(S4U_Simulation::getHostNumCores(host.first)) + " cores");
+                    throw std::invalid_argument(
+                            "StandardJobExecutor::StandardJobExecutor(): host " + host.first +
+                            " has only " +
+                            std::to_string(S4U_Simulation::getHostNumCores(host.first)) + " cores");
                 }
             } else {
                 // Set the num_cores to the maximum
@@ -112,7 +109,8 @@ namespace wrench {
         for (auto host : compute_resources) {
             if (std::get<1>(host.second) < 0) {
                 throw std::invalid_argument(
-                        "StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
+                        "StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should "
+                        "be non-negative");
             }
             if (std::get<1>(host.second) < ComputeService::ALL_RAM) {
                 double host_memory_capacity = S4U_Simulation::getHostMemoryCapacity(host.first);
@@ -127,12 +125,12 @@ namespace wrench {
             }
         }
 
-
         // Check that there are enough cores to run the computational tasks
         unsigned long max_min_required_num_cores = 0;
         for (auto task : job->tasks) {
-            max_min_required_num_cores = (max_min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores()
-                                                                                              : max_min_required_num_cores);
+            max_min_required_num_cores = (
+                    max_min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores()
+                                                                        : max_min_required_num_cores);
         }
 
         bool enough_cores = false;
@@ -153,14 +151,12 @@ namespace wrench {
                     "StandardJobExecutor::StandardJobExecutor(): insufficient core resources to run the job");
         }
 
-
         // Check that there is enough RAM to run the computational tasks
         double max_required_ram = 0.0;
         for (auto task : job->tasks) {
             max_required_ram = (max_required_ram < task->getMemoryRequirement() ? task->getMemoryRequirement()
                                                                                 : max_required_ram);
         }
-
 
         bool enough_ram = false;
         for (auto host : compute_resources) {
@@ -169,7 +165,6 @@ namespace wrench {
                 break;
             }
         }
-
 
         if (!enough_ram) {
             throw std::invalid_argument(
@@ -185,7 +180,6 @@ namespace wrench {
         this->files_stored_in_scratch = {};
         this->part_of_pilot_job = part_of_pilot_job;
         this->parent_pilot_job = parent_pilot_job;
-
 
         // set properties
         this->setProperties(this->default_property_values, property_list);
@@ -225,7 +219,6 @@ namespace wrench {
             }
             this->compute_resources.insert(std::make_pair(host.first, std::make_tuple(num_cores, ram)));
         }
-
     }
 
     /**
@@ -235,7 +228,6 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void StandardJobExecutor::cleanup(bool has_returned_from_main, int return_value) {
-
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
@@ -255,9 +247,6 @@ namespace wrench {
         this->ready_workunits.clear();
         this->running_workunits.clear();
         this->completed_workunits.clear();
-
-
-
     }
 
 
@@ -266,9 +255,7 @@ namespace wrench {
      * @param job_termination: true if the job was terminated by the submitted, false otherwise
      */
     void StandardJobExecutor::kill(bool job_termination) {
-
         this->acquireDaemonLock();
-
 
         // Kill all Workunit executors
         for (auto const &wue : this->running_workunit_executors) {
@@ -279,7 +266,6 @@ namespace wrench {
         this->killActor();
 
         this->releaseDaemonLock();
-
     }
 
     /**
@@ -288,12 +274,15 @@ namespace wrench {
      * @return 0 on termination
      */
     int StandardJobExecutor::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
-        WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
-                    this->mailbox_name.c_str(), this->total_num_cores, this->total_ram,
-                    this->core_availabilities.size());
+
+        WRENCH_INFO(
+                "New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
+                this->mailbox_name.c_str(), this->total_num_cores, this->total_ram,
+                this->core_availabilities.size());
+
         for (auto h : this->core_availabilities) {
+
             WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
         }
 
@@ -329,7 +318,6 @@ namespace wrench {
 
         /** Main loop **/
         while (true) {
-
             S4U_Simulation::computeZeroFlop();
 
             /** Dispatch currently ready workunits, as much as possible  **/
@@ -340,13 +328,11 @@ namespace wrench {
                 break;
             }
 
-
             /** Detect Termination **/
             if (this->non_ready_workunits.empty() and this->ready_workunits.empty() and
                 this->running_workunits.empty()) {
                 break;
             }
-
         }
 
         StoreListOfFilesInScratch();
@@ -396,7 +382,8 @@ namespace wrench {
                 desired_num_cores = wu->task->getMinNumCores();
             } else {
                 throw std::runtime_error(
-                        "StandardjobExecutor::computeWorkUnitDesiredNumCores(): Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
+                        "StandardjobExecutor::computeWorkUnitDesiredNumCores(): Unknown "
+                        "StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
                         + core_allocation_algorithm + "'");
             }
         }
@@ -417,7 +404,6 @@ namespace wrench {
      * @brief Dispatch ready work units to hosts/cores, while possible
      */
     void StandardJobExecutor::dispatchReadyWorkunits() {
-
         // If there is no ready work unit, there is nothing to dispatch
         if (this->ready_workunits.empty()) {
             return;
@@ -434,7 +420,6 @@ namespace wrench {
 //        }
 //      }
 
-
         // Get an ordered (by the task selection algorithm) list of the ready workunits
         std::vector<std::shared_ptr<Workunit>> sorted_ready_workunits = sortReadyWorkunits();
 
@@ -449,7 +434,6 @@ namespace wrench {
         // Go through the workunits in order of priority and dispatch each them to
         // hosts/cores, if possible
         for (auto wu : sorted_ready_workunits) {
-
             // Compute the workunit's minimum number of cores, desired number of cores, and minimum amount of ram
             unsigned long minimum_num_cores;
             unsigned long desired_num_cores;
@@ -469,7 +453,8 @@ namespace wrench {
             unsigned long target_num_cores = 0;
 
             WRENCH_INFO(
-                    "Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
+                    "Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, "
+                    "and requires %.2ef bytes of RAM",
                     minimum_num_cores, desired_num_cores, required_ram);
             std::string host_selection_algorithm =
                     this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
@@ -503,8 +488,7 @@ namespace wrench {
 
                     // Does the host have enough RAM?
                     double available_ram = this->ram_availabilities[hostname];
-                    if (available_ram < required_ram) {
-                        WRENCH_INFO("Not enough RAM!");
+                    if (available_ram < required_ram) { WRENCH_INFO("Not enough RAM!");
                         continue;
                     }
 
@@ -528,15 +512,13 @@ namespace wrench {
                                          + host_selection_algorithm + "'");
             }
 
-
-            if (target_host == "") { // didn't find a suitable host
+            if (target_host.empty()) { // didn't find a suitable host
                 WRENCH_INFO("Didn't find a suitable host");
 //          std::cerr << "DID NOT FIND A HOST, GOING TO NEXT WORK UNIT\n";
                 continue;
             }
 
 //        std::cerr << "FOUND A HOST!!\n";
-
 
             // Create a workunit executor!
             WRENCH_INFO("Starting a work unit executor with %ld cores on host %s",
@@ -578,7 +560,6 @@ namespace wrench {
             // Update RAM availabilities
             this->ram_availabilities[target_host] -= required_ram;
 
-
             // Update data structures
             this->running_workunit_executors.insert(workunit_executor);
 
@@ -590,13 +571,11 @@ namespace wrench {
                     break;
                 }
             }
-
         }
 
         sorted_ready_workunits.clear();
 
         this->releaseDaemonLock();
-
     }
 
     /**
@@ -609,7 +588,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool StandardJobExecutor::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -619,32 +597,31 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
-        } catch (std::shared_ptr<FatalFailure> &cause) {
-            WRENCH_INFO("Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
+        } catch (std::shared_ptr<FatalFailure> &cause) { WRENCH_INFO(
+                    "Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
             return false;
         }
 
-        if (message == nullptr) {
-            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
+        if (message == nullptr) { WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
             return false;
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<HostHasTurnedOnMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = dynamic_cast<HostHasChangedSpeedMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<HostHasChangedSpeedMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
-        } else if (auto msg = dynamic_cast<WorkunitExecutorDoneMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorDoneMessage *>(message.get())) {
             processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit);
             return true;
-        } else if (auto msg = dynamic_cast<WorkunitExecutorFailedMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<WorkunitExecutorFailedMessage *>(message.get())) {
             processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
             return false; // We should exit since we've killed everything
 
-        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<ServiceHasCrashedMessage *>(message.get())) {
             auto service = msg->service;
             auto workunit_executor = std::dynamic_pointer_cast<WorkunitExecutor>(service);
             if (not workunit_executor) {
@@ -659,17 +636,15 @@ namespace wrench {
     }
 
 
-/**
- * @brief Process a workunit completion
- * @param workunit_executor: the workunit executor that completed the work unit
- * @param workunit: the workunit
- *
- * @throw std::runtime_error
- */
-    void StandardJobExecutor::processWorkunitExecutorCompletion(
-            std::shared_ptr<WorkunitExecutor> workunit_executor,
-            std::shared_ptr<Workunit> workunit) {
-
+    /**
+     * @brief Process a workunit completion
+     * @param workunit_executor: the workunit executor that completed the work unit
+     * @param workunit: the workunit
+     *
+     * @throw std::runtime_error
+     */
+    void StandardJobExecutor::processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor,
+                                                                std::shared_ptr<Workunit> workunit) {
         // Don't kill me while I am doing this
         this->acquireDaemonLock();
 
@@ -700,18 +675,19 @@ namespace wrench {
         }
         if (!found_it) {
             throw std::runtime_error(
-                    "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently completed workunit in the running workunit list");
+                    "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently completed "
+                    "workunit in the running workunit list");
         }
 
         // Process task completions, if any
-        if (workunit->task != nullptr) {
-            WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", workunit->task->getID().c_str(),
-                        WorkflowTask::stateToString(workunit->task->getInternalState()).c_str());
+        if (workunit->task != nullptr) { WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)",
+                                                     workunit->task->getID().c_str(),
+                                                     WorkflowTask::stateToString(
+                                                             workunit->task->getInternalState()).c_str());
 
             // Increase the "completed tasks" count of the job
             this->job->incrementNumCompletedTasks();
         }
-
 
         // Send the callback to the originator if the job has completed
         if ((this->non_ready_workunits.empty()) &&
@@ -720,13 +696,14 @@ namespace wrench {
 
 //            WRENCH_INFO("NOTIFYING BACK SAYING  'COMPLETED' for job %s:", this->job->getName().c_str());
             try {
-                S4U_Mailbox::putMessage(this->callback_mailbox,
-                                        new StandardJobExecutorDoneMessage(this->job,
-                                                                           this->getSharedPtr<StandardJobExecutor>(),
-                                                                           this->getMessagePayloadValue(
-                                                                                   StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                WRENCH_INFO("Failed to send the callback... oh well");
+                S4U_Mailbox::putMessage(
+                        this->callback_mailbox,
+                        new StandardJobExecutorDoneMessage(
+                                this->job,
+                                this->getSharedPtr<StandardJobExecutor>(),
+                                this->getMessagePayloadValue(
+                                        StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) { WRENCH_INFO("Failed to send the callback... oh well");
                 this->releaseDaemonLock();
                 return;
             }
@@ -769,21 +746,16 @@ namespace wrench {
         this->releaseDaemonLock();
     }
 
-
     /**
      * @brief Process a work failure
      * @param worker_thread: the worker thread that did the work
      * @param workunit: the workunit
      * @param cause: the cause of the failure
      */
-    void StandardJobExecutor::processWorkunitExecutorFailure(
-            std::shared_ptr<WorkunitExecutor> workunit_executor,
-            std::shared_ptr<Workunit> workunit,
-            std::shared_ptr<FailureCause> cause) {
-
-
+    void StandardJobExecutor::processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor,
+                                                             std::shared_ptr<Workunit> workunit,
+                                                             std::shared_ptr<FailureCause> cause) {
         // Don't kill me while I am doing this
-
         this->acquireDaemonLock();
 
         WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'",
@@ -815,16 +787,17 @@ namespace wrench {
         if (!found_it) {
             this->releaseDaemonLock();
             throw std::runtime_error(
-                    "StandardJobExecutor::processWorkunitExecutorFailure(): couldn't find a recently failed workunit in the running workunit list");
+                    "StandardJobExecutor::processWorkunitExecutorFailure(): couldn't find a recently failed "
+                    "workunit in the running workunit list");
         }
-
 
         // Deal with running work units!
         for (auto const &wu : this->running_workunits) {
             if ((not wu->post_file_copies.empty()) || (not wu->pre_file_copies.empty())) {
                 this->releaseDaemonLock();
                 throw std::runtime_error(
-                        "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit that's doing some file copy operations - not supported (for now)");
+                        "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit "
+                        "that's doing some file copy operations - not supported (for now)");
             }
             // find the workunit executor  that's doing the work and kill it (lame iteration)
             for (auto const &wue : this->running_workunit_executors) {
@@ -839,18 +812,18 @@ namespace wrench {
 
         // Send the notification back
         try {
-            S4U_Mailbox::putMessage(this->callback_mailbox,
-                                    new StandardJobExecutorFailedMessage(this->job,
-                                                                         this->getSharedPtr<StandardJobExecutor>(),
-                                                                         cause,
-                                                                         this->getMessagePayloadValue(
-                                                                                 StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    this->callback_mailbox,
+                    new StandardJobExecutorFailedMessage(
+                            this->job,
+                            this->getSharedPtr<StandardJobExecutor>(),
+                            cause,
+                            this->getMessagePayloadValue(
+                                    StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             // do nothing
         }
-
     }
-
 
     /**
      * @brief Process a WorkunitExecutor crash
@@ -872,7 +845,8 @@ namespace wrench {
         }
         if (not found_it) {
             throw std::runtime_error(
-                    "StandardJobExecutor::processWorkunitExecutorCrash(): Received a WorkunitExecutorCrash message for a non-running WorkunitExecutor!");
+                    "StandardJobExecutor::processWorkunitExecutorCrash(): Received a WorkunitExecutorCrash message "
+                    "for a non-running WorkunitExecutor!");
         }
 
         // Get the scratch files that executor may have generated
@@ -897,14 +871,12 @@ namespace wrench {
         this->ready_workunits.insert(workunit);
     }
 
-
     /**
      * @brief Sort the a list of ready workunits based on the TASK_SELECTION_ALGORITHM property
      *
      * @return a sorted vector of ready tasks
      */
     std::vector<std::shared_ptr<Workunit>> StandardJobExecutor::sortReadyWorkunits() {
-
 //      std::cerr << "In sortReadyWorkunits()\n";
 
         std::vector<std::shared_ptr<Workunit>> sorted_workunits;
@@ -966,7 +938,6 @@ namespace wrench {
         return sorted_workunits;
     }
 
-
     /**
      * @brief Clears the scratch space
      */
@@ -975,14 +946,14 @@ namespace wrench {
             /** Perform scratch cleanup */
             for (auto f : files_stored_in_scratch) {
                 try {
-                    StorageService::deleteFile(f, FileLocation::LOCATION(this->scratch_space, "/scratch/"+job->getName()));
+                    StorageService::deleteFile(f, FileLocation::LOCATION(this->scratch_space,
+                                                                         "/scratch/" + job->getName()));
                 } catch (WorkflowExecutionException &e) {
                     throw;
                 }
             }
         }
     }
-
 
     /**
      * @brief Store the list of files available in scratch
@@ -1028,6 +999,4 @@ namespace wrench {
         return this->compute_resources;
     }
 
-
-};
-
+}
