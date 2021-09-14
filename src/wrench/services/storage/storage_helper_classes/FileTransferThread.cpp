@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ WRENCH_LOG_CATEGORY(wrench_core_file_transfer_thread, "Log category for File Tra
 
 
 namespace wrench {
-
-
     /**
      * @brief Constructor
      * @param hostname: host on which to run
@@ -54,8 +52,7 @@ namespace wrench {
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size)
-    {
+            buffer_size(buffer_size) {
         this->src_mailbox = src_mailbox;
         this->src_location = nullptr;
         this->dst_mailbox = "";
@@ -92,8 +89,7 @@ namespace wrench {
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size)
-    {
+            buffer_size(buffer_size) {
         this->src_mailbox = "";
         this->src_location = src_location;
         this->dst_mailbox = dst_mailbox;
@@ -130,8 +126,7 @@ namespace wrench {
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size)
-    {
+            buffer_size(buffer_size) {
         this->src_mailbox = "";
         this->src_location = src_location;
         this->dst_mailbox = "";
@@ -153,23 +148,23 @@ namespace wrench {
      * @return 0 on success, non-zero otherwise
      */
     int FileTransferThread::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
         FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
-        WRENCH_INFO("New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
-                    "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%lu",
-                    file->getID().c_str(),
-                    (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
-                    (src_location == nullptr ? "none" : src_location->toString().c_str()),
-                    (dst_mailbox.empty() ? "none" : dst_mailbox.c_str()),
-                    (dst_location == nullptr ? "none" : dst_location->toString().c_str()),
-                    (answer_mailbox_if_read.empty() ? "none" : answer_mailbox_if_read.c_str()),
-                    (answer_mailbox_if_write.empty() ? "none" : answer_mailbox_if_write.c_str()),
-                    (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str()),
-                    this->buffer_size
+        WRENCH_INFO(
+                "New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
+                "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%lu",
+                file->getID().c_str(),
+                (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
+                (src_location == nullptr ? "none" : src_location->toString().c_str()),
+                (dst_mailbox.empty() ? "none" : dst_mailbox.c_str()),
+                (dst_location == nullptr ? "none" : dst_location->toString().c_str()),
+                (answer_mailbox_if_read.empty() ? "none" : answer_mailbox_if_read.c_str()),
+                (answer_mailbox_if_write.empty() ? "none" : answer_mailbox_if_write.c_str()),
+                (answer_mailbox_if_copy.empty() ? "none" : answer_mailbox_if_copy.c_str()),
+                this->buffer_size
         );
 
         // Create a message to send back (some field of which may be overwritten below)
@@ -185,14 +180,15 @@ namespace wrench {
                 this->answer_mailbox_if_copy,
                 true, nullptr);
 
-
         if ((this->src_location) and (this->src_location->getStorageService() == this->parent) and
             (not dst_mailbox.empty())) {
             /** Sending a local file to the network **/
             try {
                 sendLocalFileToNetwork(this->file, this->src_location, this->dst_mailbox);
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
-                WRENCH_INFO("FileTransferThread::main(): Network error (%s)", failure_cause->toString().c_str());
+
+                WRENCH_INFO(
+                        "FileTransferThread::main(): Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -203,7 +199,9 @@ namespace wrench {
             try {
                 receiveFileFromNetwork(this->file, this->src_mailbox, this->dst_location);
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
-                WRENCH_INFO("FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
+
+                WRENCH_INFO(
+                        "FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
                 msg_to_send_back->failure_cause = failure_cause;
             }
@@ -229,7 +227,6 @@ namespace wrench {
             throw std::runtime_error("FileTransferThread::main(): Invalid src/dst combination");
         }
 
-
         try {
             // Send report back to the service
             // (a dput() right before death is always dicey, so this is a put())
@@ -249,11 +246,11 @@ namespace wrench {
     *
     * @throw shared_ptr<FailureCause>
     */
-    void FileTransferThread::receiveFileFromNetwork(WorkflowFile *file, std::string mailbox, std::shared_ptr<FileLocation> location) {
-
+    void FileTransferThread::receiveFileFromNetwork(WorkflowFile *file,
+                                                    std::string mailbox,
+                                                    std::shared_ptr<FileLocation> location) {
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
-
             throw std::runtime_error(
                     "FileTransferThread::receiveFileFromNetwork(): Zero buffer size not implemented yet");
 
@@ -263,7 +260,7 @@ namespace wrench {
 
             // Receive the first chunk
             auto msg = S4U_Mailbox::getMessage(mailbox);
-            if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
+            if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                 done = file_content_chunk_msg->last_chunk;
             } else {
                 throw std::runtime_error("FileTransferThread::receiveFileFromNetwork() : Received an unexpected [" +
@@ -271,7 +268,6 @@ namespace wrench {
             }
 
             try {
-
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
@@ -286,7 +282,7 @@ namespace wrench {
                     // If the current host is file server, write to disk directly
                     if (Simulation::isPageCachingEnabled()) {
 
-                        bool write_locally = location->getServerStorageService() == nullptr ;
+                        bool write_locally = location->getServerStorageService() == nullptr;
 
                         if (write_locally) {
                             simulation->writebackWithMemoryCache(file, msg->payload, location, true);
@@ -302,7 +298,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -313,7 +309,7 @@ namespace wrench {
 
                 // I/O for the last chunk
                 if (Simulation::isPageCachingEnabled()) {
-                    bool write_locally = location->getServerStorageService() == nullptr ;
+                    bool write_locally = location->getServerStorageService() == nullptr;
 
                     if (write_locally) {
                         simulation->writebackWithMemoryCache(file, msg->payload, location, true);
@@ -335,9 +331,7 @@ namespace wrench {
                 throw;
             }
         }
-
     }
-
 
     /**
      * @brief Method to send a file from the local disk to the network
@@ -347,16 +341,15 @@ namespace wrench {
      *
      * @throw shared_ptr<FailureCause>
      */
-    void FileTransferThread::sendLocalFileToNetwork(WorkflowFile *file, std::shared_ptr<FileLocation> location, std::string mailbox) {
-
+    void FileTransferThread::sendLocalFileToNetwork(WorkflowFile *file,
+                                                    std::shared_ptr<FileLocation> location,
+                                                    std::string mailbox) {
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
-
             throw std::runtime_error(
                     "FileTransferThread::sendLocalFileToNetwork(): Zero buffer size not implemented yet");
 
         } else {
-
             try {
                 /** Non-zero buffer size */
                 std::shared_ptr<S4U_PendingCommunication> req = nullptr;
@@ -372,13 +365,12 @@ namespace wrench {
 
                     if (Simulation::isPageCachingEnabled()) {
                         simulation->readWithMemoryCache(file, chunk_size, location);
-                    } else {
-                        WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
+                    } else { WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                         simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
                     }
 
-                    remaining -= (double)(this->buffer_size);
+                    remaining -= (double) (this->buffer_size);
                     if (req) {
                         req->wait();
 //                        WRENCH_INFO("Bytes sent over the network were received");
@@ -387,21 +379,18 @@ namespace wrench {
                     req = S4U_Mailbox::iputMessage(mailbox,
                                                    new StorageServiceFileContentChunkMessage(
                                                            this->file,
-                                                           (unsigned long)chunk_size, (remaining <= 0)));
+                                                           (unsigned long) chunk_size, (remaining <= 0)));
                 }
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
-                req->wait();
-                WRENCH_INFO("Bytes sent over the network were received");
+                req->wait();WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }
-
         }
     }
-
 
     /**
      * @brief Method to copy a file localy
@@ -416,22 +405,21 @@ namespace wrench {
         double to_send = std::min<double>(this->buffer_size, remaining);
 
         if ((src_location->getStorageService() == dst_location->getStorageService()) and
-                (src_location->getFullAbsolutePath() == dst_location->getFullAbsolutePath())) {
-            WRENCH_INFO("FileTransferThread::copyFileLocally(): Copying file %s onto itself at location %s... ignoring",
+            (src_location->getFullAbsolutePath() == dst_location->getFullAbsolutePath())) { WRENCH_INFO(
+                    "FileTransferThread::copyFileLocally(): Copying file %s onto itself at location %s... ignoring",
                     file->getID().c_str(), src_location->toString().c_str());
             return;
         }
 
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
-
             throw std::runtime_error(
                     "FileTransferThread::copyFileLocally(): Zero buffer size not implemented yet");
 
         } else {
             // Read the first chunk
             simulation->readFromDisk(to_send, src_location->getStorageService()->hostname,
-                                         src_location->getMountPoint());
+                                     src_location->getMountPoint());
             // start the pipeline
             while (remaining > this->buffer_size) {
 
@@ -449,11 +437,9 @@ namespace wrench {
             }
             // Write the last chunk
             simulation->writeToDisk(remaining, dst_location->getStorageService()->hostname,
-                                        dst_location->getMountPoint());
+                                    dst_location->getMountPoint());
         }
-
     }
-
 
     /**
      * @brief Download a file to a local partition/disk
@@ -465,7 +451,6 @@ namespace wrench {
     void FileTransferThread::downloadFileFromStorageService(WorkflowFile *file,
                                                             std::shared_ptr<FileLocation> src_location,
                                                             std::shared_ptr<FileLocation> dst_location) {
-
         if (file == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
@@ -482,17 +467,21 @@ namespace wrench {
 
         // Send a message to the source
         std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file_request");
-        std::string mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailboxName("read_file_chunks");
+        std::string mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailboxName(
+                "read_file_chunks");
 
         try {
-            S4U_Mailbox::putMessage(src_location->getStorageService()->mailbox_name,
-                                    new StorageServiceFileReadRequestMessage(request_answer_mailbox,
-                                                                             mailbox_that_should_receive_file_content,
-                                                                             file,
-                                                                             src_location,
-                                                                             std::min<unsigned long>(this->buffer_size, this->buffer_size),
-                                                                             src_location->getStorageService()->getMessagePayloadValue(
-                                                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    src_location->getStorageService()->mailbox_name,
+                    new StorageServiceFileReadRequestMessage(
+                            request_answer_mailbox,
+                            mailbox_that_should_receive_file_content,
+                            file,
+                            src_location,
+                            std::min<unsigned long>(this->buffer_size,
+                                                    this->buffer_size),
+                            src_location->getStorageService()->getMessagePayloadValue(
+                                    StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw;
         }
@@ -506,8 +495,7 @@ namespace wrench {
             throw;
         }
 
-
-        if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 throw msg->failure_cause;
@@ -521,21 +509,21 @@ namespace wrench {
                     mailbox_that_should_receive_file_content.c_str());
 
         if (this->buffer_size == 0) {
-
-            throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Zero buffer size not implemented yet");
+            throw std::runtime_error(
+                    "FileTransferThread::downloadFileFromStorageService(): Zero buffer size not implemented yet");
 
         } else {
-
             try {
                 bool done = false;
                 // Receive the first chunk
                 auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
                 if (auto file_content_chunk_msg =
-                        dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
+                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
-                    throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
-                                             msg->getName() + "] message!");
+                    throw std::runtime_error(
+                            "FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
+                            msg->getName() + "] message!");
                 }
 
                 // Receive chunks and write them to disk
@@ -557,11 +545,12 @@ namespace wrench {
 //                    WRENCH_INFO("Wrote of %f of file  %s", msg->payload, file->getID().c_str());
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage*>(msg.get())) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
-                        throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
-                                                 msg->getName() + "] message!");
+                        throw std::runtime_error(
+                                "FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
+                                msg->getName() + "] message!");
                     }
                 }
                 // Do the I/O for the last chunk
@@ -577,7 +566,6 @@ namespace wrench {
                 throw;
             }
         }
-
     }
 
-};
+}
