@@ -59,7 +59,7 @@ namespace wrench {
 
         virtual ~S4U_Daemon();
 
-        void startDaemon(bool daemonized, bool auto_restart);
+        void startDaemon(bool _daemonized, bool _auto_restart);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
 
