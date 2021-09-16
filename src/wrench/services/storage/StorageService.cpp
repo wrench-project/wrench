@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ WRENCH_LOG_CATEGORY(wrench_core_storage_service, "Log category for Storage Servi
 #define GB (1000.0 * 1000.0 * 1000.0)
 
 namespace wrench {
-
     /**
      * @brief Constructor
      *
@@ -42,7 +41,6 @@ namespace wrench {
                                    const std::string &service_name,
                                    const std::string &mailbox_name_prefix) :
             Service(hostname, service_name, mailbox_name_prefix) {
-
         if (mount_points.empty()) {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
         }
@@ -84,7 +82,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void StorageService::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
-
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
@@ -96,7 +93,6 @@ namespace wrench {
      * @param directory: a directory
      */
     void StorageService::stageFile(WorkflowFile *file, std::string mountpoint, std::string directory) {
-
         auto fs = this->file_systems[mountpoint].get();
 
         try {
@@ -110,7 +106,6 @@ namespace wrench {
      * @brief Stop the service
      */
     void StorageService::stop() {
-
         // Call the super class's method
         Service::stop();
     }
@@ -130,7 +125,6 @@ namespace wrench {
      *
      */
     std::map<std::string, double> StorageService::getFreeSpace() {
-
         assertServiceIsUp();
 
         // Send a message to the daemon
@@ -152,7 +146,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
             return msg->free_space;
         } else {
             throw std::runtime_error("StorageService::getFreeSpace(): Unexpected [" + msg->getName() + "] message");
@@ -172,7 +166,6 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     bool StorageService::lookupFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
-
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
         }
@@ -184,13 +177,14 @@ namespace wrench {
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_file");
         try {
-            S4U_Mailbox::putMessage(location->getStorageService()->mailbox_name,
-                                    new StorageServiceFileLookupRequestMessage(
-                                            answer_mailbox,
-                                            file,
-                                            location,
-                                            storage_service->getMessagePayloadValue(
-                                                    StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+            S4U_Mailbox::putMessage(
+                    location->getStorageService()->mailbox_name,
+                    new StorageServiceFileLookupRequestMessage(
+                            answer_mailbox,
+                            file,
+                            location,
+                            storage_service->getMessagePayloadValue(
+                                    StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -203,13 +197,12 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
             return msg->file_is_available;
         } else {
             throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + msg->getName() + "] message");
         }
     }
-
 
     /**
      * @brief Synchronously read a file from the storage service
@@ -221,22 +214,17 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
-
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
 
-
         auto storage_service = location->getStorageService();
         StorageService *service = storage_service.get();
-
 
         assertServiceIsUp(storage_service);
 
         // Send a message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
-
-
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
@@ -261,7 +249,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 std::shared_ptr<FailureCause> &cause = msg->failure_cause;
@@ -269,11 +257,9 @@ namespace wrench {
             }
 
             if (storage_service->buffer_size == 0) {
-
                 throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 
             } else {
-
                 // Otherwise, retrieve the file chunks until the last one is received
                 while (true) {
                     std::shared_ptr<SimulationMessage> file_content_message = nullptr;
@@ -283,7 +269,7 @@ namespace wrench {
                         throw WorkflowExecutionException(cause);
                     }
 
-                    if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage*>(
+                    if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
                             file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
                             break;
@@ -300,19 +286,16 @@ namespace wrench {
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     throw WorkflowExecutionException(cause);
                 }
-                if (not dynamic_cast<StorageServiceAckMessage*>(message.get())) {
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                              message->getName() + "] message!");
                 }
-
             }
 
         } else {
             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
-
-
     }
 
     /**
@@ -324,7 +307,6 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void StorageService::writeFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
-
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
@@ -336,7 +318,6 @@ namespace wrench {
 
         // Send a  message to the daemon
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
-
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox_name,
@@ -360,7 +341,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
             // If not a success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -391,20 +372,16 @@ namespace wrench {
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     throw WorkflowExecutionException(cause);
                 }
-                if (not dynamic_cast<StorageServiceAckMessage*>(message.get())) {
+                if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                              message->getName() + "] message!");
                 }
             }
 
-
         } else {
             throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
-
-
-
     }
 
     /**
@@ -442,7 +419,6 @@ namespace wrench {
      */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations) {
-
         for (auto const &f : locations) {
             if ((f.first == nullptr) or (f.second == nullptr)) {
                 throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid argument");
@@ -460,21 +436,25 @@ namespace wrench {
             auto location = locations[file];
 
             if (action == READ) {
+
                 WRENCH_INFO("Reading file %s from location %s",
                             file->getID().c_str(),
                             location->toString().c_str());
                 StorageService::readFile(file, location);
+
                 WRENCH_INFO("File %s read", file->getID().c_str());
+
             } else {
+
                 WRENCH_INFO("Writing file %s to location %s",
                             file->getID().c_str(),
                             location->toString().c_str());
                 StorageService::writeFile(file, location);
+
                 WRENCH_INFO("File %s written", file->getID().c_str());
             }
         }
     }
-
 
     /**
      * @brief Synchronously delete a file at a location
@@ -488,9 +468,9 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(WorkflowFile *file, std::shared_ptr<FileLocation> location,
+    void StorageService::deleteFile(WorkflowFile *file,
+                                    std::shared_ptr<FileLocation> location,
                                     std::shared_ptr<FileRegistryService> file_registry_service) {
-
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
         }
@@ -523,13 +503,12 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
             // On failure, throw an exception
             if (!msg->success) {
                 throw WorkflowExecutionException(std::move(msg->failure_cause));
-            }
-            WRENCH_INFO("Deleted file %s at location %s",
-                        file->getID().c_str(), location->toString().c_str());
+            }WRENCH_INFO("Deleted file %s at location %s",
+                         file->getID().c_str(), location->toString().c_str());
 
             if (unregister) {
                 file_registry_service->removeEntry(file, location);
@@ -539,7 +518,6 @@ namespace wrench {
             throw std::runtime_error("StorageService::deleteFile(): Unexpected [" + message->getName() + "] message");
         }
     }
-
 
     /**
      * @brief Synchronously ask the storage service to read a file from another storage service
@@ -554,7 +532,6 @@ namespace wrench {
     void StorageService::copyFile(WorkflowFile *file,
                                   std::shared_ptr<FileLocation> src_location,
                                   std::shared_ptr<FileLocation> dst_location) {
-
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
             throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
         }
@@ -562,10 +539,11 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
-
         // Send a message to the daemon of the dst service
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
-        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(file, src_location, dst_location);
+        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(file,
+                                                                                             src_location,
+                                                                                             dst_location);
 
         try {
             S4U_Mailbox::putMessage(
@@ -576,7 +554,8 @@ namespace wrench {
                             src_location,
                             dst_location,
                             nullptr,
-                            dst_location->getStorageService()->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                            dst_location->getStorageService()->getMessagePayloadValue(
+                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -590,7 +569,7 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
             if (msg->failure_cause) {
                 throw WorkflowExecutionException(std::move(msg->failure_cause));
             }
@@ -611,20 +590,19 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-
     void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file,
                                           std::shared_ptr<FileLocation> src_location,
                                           std::shared_ptr<FileLocation> dst_location) {
-
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
             throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
         }
 
-
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
-        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(file, src_location, dst_location);
+        src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(file,
+                                                                                             src_location,
+                                                                                             dst_location);
 
         // Send a message to the daemon on the dst location
         try {
@@ -636,12 +614,12 @@ namespace wrench {
                             src_location,
                             dst_location,
                             nullptr,
-                            dst_location->getStorageService()->getMessagePayloadValue(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                            dst_location->getStorageService()->getMessagePayloadValue(
+                                    StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
     }
-
 
     /**
      * @brief Get the total static capacity of the storage service (in zero simulation time)
@@ -661,11 +639,11 @@ namespace wrench {
      */
     std::string StorageService::getMountPoint() {
         if (this->hasMultipleMountPoints()) {
-            throw std::invalid_argument("StorageService::getMountPoint(): The storage service has more than one mount point");
+            throw std::invalid_argument(
+                    "StorageService::getMountPoint(): The storage service has more than one mount point");
         }
         return wrench::FileLocation::sanitizePath(this->file_systems.begin()->first);
     }
-
 
     /**
      * @brief Get the set of mount points
@@ -697,6 +675,4 @@ namespace wrench {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
 
-
-
-};
+}
