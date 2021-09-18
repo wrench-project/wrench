@@ -93,7 +93,7 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename: the path to an XML platform description file
+     * @param filename the path to an XML platform description file
      *
      * @throw std::invalid_argument
      */
@@ -109,6 +109,24 @@ namespace wrench {
 
         this->platform_setup = true;
     }
+
+
+    /**
+     * @brief Initialize the simulated platform. Must only be called once.
+     *
+     * @param creation_function void() function to create the platform
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::setupPlatform(const std::function<void()>& creation_function) {
+        try {
+            creation_function();
+        } catch (std::exception &e) {
+            throw;
+        }
+        this->platform_setup = true;
+    }
+
 
     /**
      * @brief Get the hostname on which the calling actor is running
