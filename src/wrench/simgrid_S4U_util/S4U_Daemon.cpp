@@ -137,7 +137,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::shared_ptr<HostError>
      */
-    void S4U_Daemon::startDaemon(bool _daemonized, bool _auto_restart) {
+    void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
 
         // Check that there is a lifesaver
         if (not this->life_saver) {
@@ -157,8 +157,8 @@ namespace wrench {
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
 
-        this->daemonized = _daemonized;
-        this->auto_restart = _auto_restart;
+        this->daemonized = daemonized;
+        this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
         this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
