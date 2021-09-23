@@ -664,7 +664,7 @@ namespace wrench {
                                         std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
-            host->set_pstate(pstate);
+            host->set_pstate((unsigned long)pstate);
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
