@@ -104,45 +104,45 @@ namespace wrench {
 
         unsigned long getBytesWritten() const;
 
-        std::vector<WorkflowFile *> getInputFiles();
+        std::vector<WorkflowFile *> getInputFiles() const;
 
-        std::vector<WorkflowFile *> getOutputFiles();
+        std::vector<WorkflowFile *> getOutputFiles() const;
 
-        unsigned long getTopLevel();
+        unsigned long getTopLevel() const;
 
-        double getStartDate();
+        double getStartDate() const;
 
-        double getEndDate();
+        double getEndDate() const;
 
-        double getFailureDate();
+        double getFailureDate() const;
 
-        double getTerminationDate();
+        double getTerminationDate() const;
 
-        double getReadInputStartDate();
+        double getReadInputStartDate() const;
 
-        double getReadInputEndDate();
+        double getReadInputEndDate() const;
 
-        double getComputationStartDate();
+        double getComputationStartDate() const;
 
-        double getComputationEndDate();
+        double getComputationEndDate() const;
 
-        double getWriteOutputStartDate();
+        double getWriteOutputStartDate() const;
 
-        double getWriteOutputEndDate();
+        double getWriteOutputEndDate() const;
 
-        unsigned long getNumCoresAllocated();
+        unsigned long getNumCoresAllocated() const;
 
         struct WorkflowTaskExecution;
 
-        std::stack<WorkflowTaskExecution> getExecutionHistory();
+        std::stack<WorkflowTaskExecution> getExecutionHistory() const;
 
-        std::string getExecutionHost();
+        std::string getExecutionHost() const;
 
-        std::string getPhysicalExecutionHost();
+        std::string getPhysicalExecutionHost()const ;
 
         WorkflowTask::State getState() const;
 
-        std::string getColor();
+        std::string getColor() const;
 
         void setColor(std::string);
 
