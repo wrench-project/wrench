@@ -830,7 +830,7 @@ namespace wrench {
      * @brief Get the task's parallel model
      * @return the parallel model
      */
-    std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() {
+    std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() const {
         return this->parallel_model;
     }
 
