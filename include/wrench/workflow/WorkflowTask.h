@@ -39,7 +39,7 @@ namespace wrench {
 
         unsigned long getMaxNumCores() const;
 
-        std::shared_ptr<ParallelModel> getParallelModel();
+        std::shared_ptr<ParallelModel> getParallelModel() const;
 
         void setParallelModel(std::shared_ptr<ParallelModel> model);
 
