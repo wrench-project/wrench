@@ -47,3 +47,6 @@ install(TARGETS wrenchpegasusworkflowparser DESTINATION lib)
 install(FILES "${PEGASUS_WORKFLOW_PARSER_HEADER_FILES}"
         DESTINATION include/wrench/tools/pegasus/
         )
+
+# compile/install the wrench-daemon
+add_subdirectory("${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon")
