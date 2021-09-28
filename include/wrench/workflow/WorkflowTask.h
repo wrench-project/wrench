@@ -233,7 +233,7 @@ namespace wrench {
 
             /** @brief Task's execution host (could be a virtual host)**/
             std::string execution_host = "";
-            /** @brief Task's execution physucal host **/
+            /** @brief Task's execution physical host **/
             std::string physical_execution_host = "";
             /** @brief Task's number of allocated cores **/
             unsigned long num_cores_allocated = 0;
