@@ -598,13 +598,13 @@ namespace wrench {
                                 {"task_id",             task->getID()},
                                 {"color",               task->getColor()},
                                 {"execution_host",      {
-                                                                {"hostname", current_task_execution.execution_host},
+                                                                {"hostname", current_task_execution.physical_execution_host},
                                                                 {"flop_rate", Simulation::getHostFlopRate(
-                                                                        current_task_execution.execution_host)},
+                                                                        current_task_execution.physical_execution_host)},
                                                                 {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                                                        current_task_execution.execution_host)},
+                                                                        current_task_execution.physical_execution_host)},
                                                                 {"cores", Simulation::getHostNumCores(
-                                                                        current_task_execution.execution_host)}
+                                                                        current_task_execution.physical_execution_host)}
                                                         }},
                                 {"num_cores_allocated", current_task_execution.num_cores_allocated},
                                 {"whole_task",          {
