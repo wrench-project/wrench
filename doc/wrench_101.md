@@ -9,7 +9,6 @@ for instructions on how to [install WRENCH](@ref install) and how to
 
 [TOC]
 
----
 
 # 10,000-ft view of a WRENCH simulator #      {#wrench-101-simulator-10000ft}
 
