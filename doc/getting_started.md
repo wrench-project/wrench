@@ -127,5 +127,3 @@ recommend that you go through the [WRENCH 101](@ref wrench-101) and
 [WRENCH 102](@ref wrench-102) pages first. These pages make direct references to the
 examples, a description of which is available in `examples/README.md`
 in the WRENCH distribution.
-
----
