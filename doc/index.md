@@ -3,10 +3,6 @@ Overview                        {#mainpage}
 
 [TOC]
 
-![Workflow Management System Simulation Workbench](images/logo-vertical.png)
-
-<br /><br />
-
 [WRENCH](http://wrench-project.org) enables novel avenues for scientific workflow use, 
 research, development, and education.
 WRENCH capitalizes on recent and critical advances in the state of the art of distributed 
