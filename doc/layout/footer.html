@@ -1,69 +1,49 @@
-<!-- HTML footer for doxygen 1.8.8-->
-<!-- start footer part -->
-<!--BEGIN GENERATE_TREEVIEW-->
-<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
-    <ul>
-        $navpath
-        <li class="footer">$generatedby
-            <a href="http://www.doxygen.org/index.html">
-                <img class="footer" src="$relpath^doxygen.png" alt="doxygen"/></a> $doxygenversion
-        </li>
-    </ul>
-</div>
-<!--END GENERATE_TREEVIEW-->
-</div>
-</div>
-</div>
-</div>
-</div>
-<!--BEGIN !GENERATE_TREEVIEW-->
 <div class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-4">
-                <p>
-                    <strong>&copy;2017-2020 WRENCH. All Rights Reserved.</strong><br />
+    <div style="float: left; width: 40%; padding-left: 2em; padding-bottom: 4em !important;">
+        <p style="font-size: 0.8em"><strong>&copy;2017-2021 WRENCH. All Rights Reserved.</strong><br/></p>
+        <p style="padding-top: 1em">
+            <a href="mailto:support@wrench-project.org" class="fa-stack fa-2x" style="font-size: 1.5em">
+                <i class="fa fa-circle fa-stack-2x icon-background"></i>
+                <i class="fa fa-envelope fa-stack-1x"></i>
+            </a>
+            <a href="https://twitter.com/wrenchproject" target="_blank" class="fa-stack fa-2x"
+               style="font-size: 1.5em">
+                <i class="fa fa-circle fa-stack-2x icon-background"></i>
+                <i class="fab fa-twitter fa-stack-1x"></i>
+            </a>
+            <a href="https://github.com/wrench-project/wrench" target="_blank" class="fa-stack fa-2x"
+               style="font-size: 1.5em">
+                <i class="fa fa-circle fa-stack-2x icon-background"></i>
+                <i class="fab fa-github fa-stack-1x"></i>
+            </a>
+        </p>
+    </div>
 
-                </p>
-                <p style="padding-top: 1em">
-                    <a href="mailto:support@wrench-project.org" class="fa-stack fa-2x" style="font-size: 1.5em">
-                        <i class="fa fa-circle fa-stack-2x" style="color: #fff"></i>
-                        <i class="fa fa-envelope fa-stack-1x"></i>
-                    </a>
-                    <a href="http://twitter.com/wrenchproject" target="_blank" class="fa-stack fa-2x"
-                       style="font-size: 1.5em">
-                        <i class="fa fa-circle fa-stack-2x" style="color: #fff"></i>
-                        <i class="fab fa-twitter fa-stack-1x"></i>
-                    </a>
-                    <a href="https://github.com/wrench-project/wrench" target="_blank" class="fa-stack fa-2x"
-                       style="font-size: 1.5em">
-                        <i class="fa fa-circle fa-stack-2x" style="color: #fff"></i>
-                        <i class="fab fa-github fa-stack-1x"></i>
-                    </a>
-                </p>
-            </div>
-
-            <div class="col-sm-4 text-center">
-            </div>
-
-            <div class="col-sm-4">
-                <p>WRENCH is funded by the National Science Foundation (NSF) under grants number <a
-                        href="https://nsf.gov/awardsearch/showAward?AWD_ID=1642369" target="_blank">1642369</a>,
-                    <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1642335" target="_blank">1642335</a>,
-                    <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1923539" target="_blank">1923539</a>, and
-                    <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1923621" target="_blank">1923621</a>;
-                    and the National Center for Scientific Research (CNRS) under grant number PICS07239.
-                </p>
-                <p style="font-weight: normal; font-size: 0.8em; margin-top: 1em">
-                    Any opinions, findings, and conclusions or recommendations expressed in this material are those
-                    of the author(s) and do not necessarily reflect the views of the National Science Foundation.
-                </p>
-            </div>
-        </div>
+    <div style="float: right; width: 40%; padding-right: 2em">
+        <p style="font-size: 0.8em">
+            WRENCH is funded by the National Science Foundation (NSF) under grants number <a
+                href="https://nsf.gov/awardsearch/showAward?AWD_ID=2103489" target="_blank">2103489</a>,
+            <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2103508" target="_blank">2103508</a>,
+            <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1923539" target="_blank">1923539</a>, and
+            <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=1923621" target="_blank">1923621</a>;
+            and the National Center for Scientific Research (CNRS) under grant number PICS07239.
+        </p>
+        <p style="font-weight: normal; font-size: 0.7em; margin-top: 1em">
+            Any opinions, findings, and conclusions or recommendations expressed in this material are those
+            of the author(s) and do not necessarily reflect the views of the National Science Foundation.
+        </p>
     </div>
 </div>
-<!--END !GENERATE_TREEVIEW-->
 
+<!-- add the button to toggle the theme -->
+<script>
+    $(document).ready(function () {
+        toggleButton = document.createElement('doxygen-awesome-dark-mode-toggle')
+        toggleButton.title = "Toggle Light/Dark Mode"
+        document.getElementById("MSearchBox").parentNode.appendChild(toggleButton)
+    })
+</script>
+<!-- Google Analytics -->
 <script>
     (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
@@ -82,5 +62,4 @@
 
 </script>
 </body>
-<script type="text/javascript" src="$relpath^doxy-boot.js"></script>
 </html>
