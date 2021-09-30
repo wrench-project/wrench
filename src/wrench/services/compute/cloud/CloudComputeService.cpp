@@ -662,6 +662,11 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
+
+        } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
+            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
+            return true;
+
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
@@ -1307,6 +1312,19 @@ namespace wrench {
             }
         }
     }
+
+    /**
+     * @brief Process a host available resource request
+     * @param answer_mailbox: the answer mailbox
+     * @param num_cores: the desired number of cores
+     * @param ram: the desired RAM
+     */
+    void CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(
+            const std::string &answer_mailbox, unsigned long num_cores, double ram) {
+        throw std::runtime_error(
+                "CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A Cloud service does not support this operation");
+    }
+
 
     /**
      * @brief Process a termination by a previously started bare_metal on a VM
