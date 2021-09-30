@@ -826,6 +826,10 @@ namespace wrench {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
 
+        } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
+            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
+            return true;
+
         } else if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
             processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
@@ -1428,6 +1432,28 @@ namespace wrench {
     }
 
     /**
+     * @brief Process a host available resource request
+     * @param answer_mailbox: the answer mailbox
+     * @param num_cores: the desired number of cores
+     * @param ram: the desired RAM
+     */
+    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
+        bool answer = false;
+        for (auto r : this->compute_resources) {
+            if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
+                answer = true;
+                break;
+            }
+        }
+        S4U_Mailbox::dputMessage(
+                answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
+                        answer,
+                        this->getMessagePayloadValue(
+                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+        return;
+    }
+
+    /**
      * @brief Process a "get resource description message"
      * @param answer_mailbox: the mailbox to which the description message should be sent
      */
@@ -1478,13 +1504,13 @@ namespace wrench {
         }
         dict.insert(std::make_pair("ram_availabilities", ram_availabilities_to_return));
 
-        std::map<std::string, double> ttl;
+        std::map<std::string, double> _ttl;
         if (this->has_ttl) {
-            ttl.insert(std::make_pair(this->getName(), this->death_date - S4U_Simulation::getClock()));
+            _ttl.insert(std::make_pair(this->getName(), this->death_date - S4U_Simulation::getClock()));
         } else {
-            ttl.insert(std::make_pair(this->getName(), DBL_MAX));
+            _ttl.insert(std::make_pair(this->getName(), DBL_MAX));
         }
-        dict.insert(std::make_pair("ttl", ttl));
+        dict.insert(std::make_pair("ttl", _ttl));
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(

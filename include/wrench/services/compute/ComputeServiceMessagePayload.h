@@ -56,6 +56,10 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state information on its resources **/
         DECLARE_MESSAGEPAYLOAD_NAME(RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the daemon to ask is one host has some resources available **/
+        DECLARE_MESSAGEPAYLOAD_NAME(IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message by the the daemon to state whether one host has some resources available **/
+        DECLARE_MESSAGEPAYLOAD_NAME(IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD);
     };
 };
 
