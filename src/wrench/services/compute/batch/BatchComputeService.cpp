@@ -957,9 +957,15 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
             processAlarmJobTimeout(msg->job);
             return true;
+
         } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
             processExecuteJobFromBatSched(msg->batsched_decision_reply);
             return true;
+
+        } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
+            processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
+            return true;
+
         } else {
             throw std::runtime_error(
                     "BatchComputeService::processNextMessage(): Unexpected [" + message->getName() + "] message");
@@ -1800,6 +1806,17 @@ namespace wrench {
 
         startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,
                  cores_per_node_asked_for);
+    }
+
+
+    /**
+     * @brief Process a host available resource request
+     * @param answer_mailbox: the answer mailbox
+     * @param num_cores: the desired number of cores
+     * @param ram: the desired RAM
+     */
+    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
+        throw std::runtime_error("BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A batch compute service does not support this operation");
     }
 
 }
