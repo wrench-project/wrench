@@ -6,9 +6,8 @@
 [![CII Best Practices][cii-badge]][cii-link]
 [![Slack][slack-badge]][slack-link]
 
-<img src="doc/images/logo-vertical.png" width="100" />
-
-**_Workflow Management System Simulation Workbench_**
+<a href="https://wrench-project.org" target="_blank"><img src="https://wrench-project.org/images/logo-horizontal.png" width="350" alt="WRENCH Project" /></a>
+<br/>_Cyberinfrastructure Simulation Workbench_
 
 WRENCH is an _open-source library_ for developing workflow simulators. WRENCH exposes several high-level simulation 
 abstractions to provide the **building blocks** for developing custom simulators.
