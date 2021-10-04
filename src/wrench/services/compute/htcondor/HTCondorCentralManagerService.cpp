@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,8 @@
 #include <wrench/workflow/failure_causes/NetworkError.h>
 
 
-WRENCH_LOG_CATEGORY(wrench_core_HTCondorCentralManager, "Log category for HTCondorCentralManagerService");
+WRENCH_LOG_CATEGORY(wrench_core_HTCondorCentralManager,
+"Log category for HTCondorCentralManagerService");
 
 namespace wrench {
 
@@ -40,11 +41,10 @@ namespace wrench {
     HTCondorCentralManagerService::HTCondorCentralManagerService(
             const std::string &hostname,
             double negotiator_startup_overhead,
-            std::set<shared_ptr<ComputeService>> compute_services,
-            std::map<std::string, std::string> property_list,
+            std::set <shared_ptr<ComputeService>> compute_services,
+            std::map <std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list)
             : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", "") {
-
         this->negotiator_startup_overhead = negotiator_startup_overhead;
         this->compute_services = compute_services;
 
@@ -53,7 +53,6 @@ namespace wrench {
 
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
     }
 
     /**
@@ -70,14 +69,14 @@ namespace wrench {
      *
      * @param compute_service: the compute service to add
      */
-    void HTCondorCentralManagerService::addComputeService(std::shared_ptr<ComputeService> compute_service) {
+    void HTCondorCentralManagerService::addComputeService(std::shared_ptr <ComputeService> compute_service) {
         this->compute_services.insert(compute_service);
         //  send a "wake up" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(
                     this->mailbox_name,
                     new CentralManagerWakeUpMessage(0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr <NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
     }
@@ -92,9 +91,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::submitStandardJob(
-            std::shared_ptr<StandardJob> job,
-            const std::map<std::string, std::string> &service_specific_args) {
-
+            std::shared_ptr <StandardJob> job,
+            const std::map <std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
@@ -107,19 +105,19 @@ namespace wrench {
                             answer_mailbox, job, service_specific_args,
                             this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr <NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr <SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr <NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -131,7 +129,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Asynchronously submit a pilot job to the cloud service
      *
@@ -141,8 +138,9 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::submitPilotJob(std::shared_ptr<PilotJob> job,
-                                                       const std::map<std::string, std::string> &service_specific_args) {
+    void HTCondorCentralManagerService::submitPilotJob(
+            std::shared_ptr <PilotJob> job,
+            const std::map <std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
@@ -155,19 +153,19 @@ namespace wrench {
                             answer_mailbox, job, service_specific_args,
                             this->getMessagePayloadValue(
                                     HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr <NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
         // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
+        std::unique_ptr <SimulationMessage> message = nullptr;
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr <NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw WorkflowExecutionException(msg->failure_cause);
@@ -184,7 +182,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
+    void HTCondorCentralManagerService::terminateStandardJob(std::shared_ptr <StandardJob> job) {
         throw std::runtime_error("HTCondorCentralManagerService::terminateStandardJob(): Not implemented yet!");
     }
 
@@ -194,7 +192,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
+    void HTCondorCentralManagerService::terminatePilotJob(std::shared_ptr <PilotJob> job) {
         throw std::runtime_error("HTCondorCentralManagerService::terminatePilotJob(): Not implemented yet!");
     }
 
@@ -204,7 +202,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int HTCondorCentralManagerService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
         WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
@@ -213,18 +210,16 @@ namespace wrench {
         // main loop
         while (this->processNextMessage()) {
             if (not this->dispatching_jobs && not this->resources_unavailable) {
-
                 // dispatching standard or pilot jobs
                 if (not this->pending_jobs.empty()) {
-
                     this->dispatching_jobs = true;
                     //WRENCH_INFO("adding batch service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
-                            new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead, this->compute_services,
+                            new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead,
+                                                          this->compute_services,
                                                           this->running_jobs, this->pending_jobs, this->mailbox_name));
                     negotiator->simulation = this->simulation;
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
-
                 }
             }
         }
@@ -243,11 +238,11 @@ namespace wrench {
      */
     bool HTCondorCentralManagerService::processNextMessage() {
         // Wait for a message
-        std::shared_ptr<SimulationMessage> message;
+        std::shared_ptr <SimulationMessage> message;
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        } catch (std::shared_ptr <NetworkError> &cause) {
             return true;
         }
 
@@ -258,7 +253,7 @@ namespace wrench {
 
         WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->terminate();
             // This is Synchronous
             try {
@@ -267,40 +262,40 @@ namespace wrench {
                         new ServiceDaemonStoppedMessage(
                                 this->getMessagePayloadValue(
                                         HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
+            } catch (std::shared_ptr <NetworkError> &cause) {
                 return false;
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<CentralManagerWakeUpMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<CentralManagerWakeUpMessage *>(message.get())) {
             // Do nothing
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
             processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
             processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
             processPilotJobStarted(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
             processPilotJobCompletion(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
             processStandardJobCompletion(msg->job);
             return true;
 
-        } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage *>(message.get())) {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
 
-        }else {
+        } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
     }
@@ -315,9 +310,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitStandardJob(
-            const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
-            std::map<std::string, std::string> &service_specific_args) {
-
+            const std::string &answer_mailbox, std::shared_ptr <StandardJob> job,
+            std::map <std::string, std::string> &service_specific_args) {
         this->pending_jobs.emplace_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
@@ -329,7 +323,6 @@ namespace wrench {
                                 HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
     }
 
-
     /**
      * @brief Process a submit pilot job request
      *
@@ -340,9 +333,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitPilotJob(
-            const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
-            std::map<std::string, std::string> &service_specific_args) {
-
+            const std::string &answer_mailbox, std::shared_ptr <PilotJob> job,
+            std::map <std::string, std::string> &service_specific_args) {
         this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
@@ -361,13 +353,14 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr<PilotJob> job) {
+    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr <PilotJob> job) {
         // Forward the notification
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                 new ComputeServicePilotJobStartedMessage(
-                                         job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                                         this->getMessagePayloadValue(
-                                                 HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::dputMessage(
+                job->popCallbackMailbox(),
+                new ComputeServicePilotJobStartedMessage(
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                        this->getMessagePayloadValue(
+                                HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
     }
 
     /**
@@ -377,13 +370,14 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr<PilotJob> job) {
+    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr <PilotJob> job) {
         // Forward the notification
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                 new ComputeServicePilotJobExpiredMessage(
-                                         job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                                         this->getMessagePayloadValue(
-                                                 HTCondorComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::dputMessage(
+                job->popCallbackMailbox(),
+                new ComputeServicePilotJobExpiredMessage(
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                        this->getMessagePayloadValue(
+                                HTCondorComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
     }
 
     /**
@@ -393,17 +387,16 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processStandardJobCompletion(std::shared_ptr<StandardJob> job) {
+    void HTCondorCentralManagerService::processStandardJobCompletion(std::shared_ptr <StandardJob> job) {
         WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
         std::string callback_mailbox = job->popCallbackMailbox();
 
         for (auto task : job->getTasks()) {
-
             WRENCH_INFO("    Task completed: %s (%s)", task->getID().c_str(), callback_mailbox.c_str());
         }
 
         // Send the callback to the originator
-        WRENCH_INFO("SENDING A CALLBACK TO ORIGINATOR: %s",callback_mailbox.c_str());
+        WRENCH_INFO("SENDING A CALLBACK TO ORIGINATOR: %s", callback_mailbox.c_str());
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceStandardJobDoneMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(
@@ -419,8 +412,7 @@ namespace wrench {
      * @param scheduled_jobs: list of scheduled jobs upon negotiator cycle completion
      */
     void HTCondorCentralManagerService::processNegotiatorCompletion(
-            std::vector<std::shared_ptr<WorkflowJob>> &scheduled_jobs) {
-
+            std::vector <std::shared_ptr<WorkflowJob>> &scheduled_jobs) {
         if (scheduled_jobs.empty()) {
             this->resources_unavailable = true;
             this->dispatching_jobs = false;
@@ -436,7 +428,6 @@ namespace wrench {
                 }
             }
         }
-
         this->dispatching_jobs = false;
     }
 
@@ -456,9 +447,9 @@ namespace wrench {
    * @param service_specific_arguments: the service-specific argument
    * @return true or false
    */
-    bool HTCondorCentralManagerService::jobKindIsSupported(const std::shared_ptr<WorkflowJob>& job,
-                                                           std::map<std::string, std::string> service_specific_arguments) {
-
+    bool HTCondorCentralManagerService::jobKindIsSupported(
+            const std::shared_ptr <WorkflowJob> &job,
+            std::map <std::string, std::string> service_specific_arguments) {
         bool is_grid_universe =
                 (service_specific_arguments.find("universe") != service_specific_arguments.end()) and
                 (service_specific_arguments["universe"] == "grid");
@@ -491,9 +482,9 @@ namespace wrench {
      * @param service_specific_arguments: the service-specific argument
      * @return true or false
      */
-    bool HTCondorCentralManagerService::jobCanRunSomewhere(std::shared_ptr<WorkflowJob> job,
-                                                           std::map<std::string, std::string> service_specific_arguments) {
-
+    bool HTCondorCentralManagerService::jobCanRunSomewhere(
+            std::shared_ptr <WorkflowJob> job,
+            std::map <std::string, std::string> service_specific_arguments) {
         bool is_grid_universe =
                 (service_specific_arguments.find("universe") != service_specific_arguments.end()) and
                 (service_specific_arguments["universe"] == "grid");
@@ -527,10 +518,10 @@ namespace wrench {
                 unsigned long num_hosts = 0;
                 unsigned long num_cores_per_host = 0;
                 try {
-                    num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-N",
-                                                                                              service_specific_arguments);
-                    num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-c",
-                                                                                                       service_specific_arguments);
+                    num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
+                            "-N", service_specific_arguments);
+                    num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument(
+                            "-c", service_specific_arguments);
                 } catch (std::invalid_argument &e) {
                     throw;
                 }
@@ -567,7 +558,6 @@ namespace wrench {
         }
 
         return found_one;
-
     }
 
 }
