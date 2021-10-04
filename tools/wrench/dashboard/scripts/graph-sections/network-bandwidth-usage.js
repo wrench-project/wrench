@@ -52,7 +52,7 @@ function generateBandwidthUsage(rawData,
     let ctx = document.getElementById(containerId);
 
     // prepare data
-    let data = {labels: [], datasets: []}
+    let charData = {labels: [], datasets: []}
     let zoomMaxRange = 0;
     let labels = [];
 
@@ -76,15 +76,15 @@ function generateBandwidthUsage(rawData,
             }
         }
 
-        data.datasets.push({
+        chartData.datasets.push({
             label: link.linkname,
             fill: true,
             backgroundColor: getRandomColor(),
-            steppedLine: "before",
+            stepped: true,
             data: bytes
         });
     });
-    data.labels = labels;
+    chartData.labels = labels;
 
     // zoom properties
     let pluginsProperties = definePluginsProperties(zoom, zoomMaxRange);

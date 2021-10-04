@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2021. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 #include "httplib.h"
 #include "SimulationLauncher.h"
 #include "SimulationController.h"
@@ -18,19 +27,17 @@
  * @param controller_host: hostname of the host that will run the controller
  * @param sleep_us: number of microseconds to sleep at each iteration of the main loop
  */
-void SimulationLauncher::createSimulation(
-        bool full_log,
-        const std::string& platform_xml,
-        const std::string& controller_host,
-        int sleep_us) {
-
+void SimulationLauncher::createSimulation(bool full_log,
+                                          const std::string &platform_xml,
+                                          const std::string &controller_host,
+                                          int sleep_us) {
     // Set the error flag to "no error"
     this->launch_error = false;
 
     try {
         // Set up command-line arguments
         int argc = (full_log ? 2 : 1);
-        char **argv = (char **) calloc((size_t)argc, sizeof(char *));
+        char **argv = (char **) calloc((size_t) argc, sizeof(char *));
         argv[0] = strdup("wrench-daemon-simulation");
         if (argc > 1) {
             argv[1] = strdup("--wrench-full-log");
@@ -82,6 +89,3 @@ void SimulationLauncher::createSimulation(
 void SimulationLauncher::launchSimulation() {
     this->simulation.launch();
 }
-
-
-
