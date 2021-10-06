@@ -149,11 +149,7 @@ private:
                 auto task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores, ram);
 
                 auto standard_job = job_manager->createStandardJob(
-                        {task},
-                        {},
-                        {},
-                        {},
-                        {});
+                        {task});
 
 
                 std::map<std::string, std::string> batch_job_args;
@@ -467,7 +463,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
@@ -491,7 +487,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_4_nodes = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args.clear();
@@ -847,7 +843,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
@@ -1011,7 +1007,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
@@ -1201,7 +1197,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
@@ -1226,7 +1222,7 @@ private:
 
 
         // Create a Standard Job with only the tasks
-        auto standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
+        auto standard_job_4_nodes = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args.clear();

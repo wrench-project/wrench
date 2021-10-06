@@ -252,7 +252,7 @@ private:
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
@@ -405,7 +405,7 @@ private:
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
@@ -550,7 +550,7 @@ private:
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
@@ -679,7 +679,7 @@ private:
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
-                {this->test->task1}, {},
+                {this->test->task1}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -787,7 +787,7 @@ private:
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
         std::shared_ptr<wrench::StandardJob>grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -932,7 +932,7 @@ private:
 
         auto grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -1064,7 +1064,7 @@ private:
 
         auto grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -1329,7 +1329,7 @@ private:
             // Submit a grid universe job that asks for too much
             auto grid_job = job_manager->createStandardJob(
                     {this->test->task1},
-                    {},
+                    (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(this->test->input_file,
                                      wrench::FileLocation::LOCATION(this->test->storage_service),
                                      wrench::FileLocation::SCRATCH)},
@@ -1355,11 +1355,7 @@ private:
 
         {
             auto big_task = this->getWorkflow()->addTask("big_task", 1000.0, 100, 100, 0);
-            auto ngrid_job = job_manager->createStandardJob(
-                    {big_task},
-                    {},
-                    {},
-                    {}, {});
+            auto ngrid_job = job_manager->createStandardJob({big_task});
             // Submit the job for execution
             try {
                 job_manager->submitJob(ngrid_job, this->test->compute_service, {});

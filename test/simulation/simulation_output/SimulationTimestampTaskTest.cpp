@@ -108,12 +108,12 @@ private:
         auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
-        auto job1 = job_manager->createStandardJob(this->test->task1, {});
+        auto job1 = job_manager->createStandardJob(this->test->task1);
         job_manager->submitJob(job1, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
         this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 0);
-        auto job2 = job_manager->createStandardJob(this->test->task2, {});
+        auto job2 = job_manager->createStandardJob(this->test->task2);
         job_manager->submitJob(job2, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
@@ -303,7 +303,7 @@ private:
             this->test->task1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
             this->test->task1->setState(wrench::WorkflowTask::State::READY);
 
-            auto job1 = job_manager->createStandardJob(this->test->task1, {});
+            auto job1 = job_manager->createStandardJob(this->test->task1);
             job_manager->submitJob(job1, this->test->compute_service);
             this->waitForAndProcessNextEvent();
         }
@@ -513,14 +513,14 @@ private:
         auto job_manager = this->createJobManager();
 
         this->test->task1 = this->getWorkflow()->addTask("terminated_task", 1000.0, 1, 1, 0);
-        auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1, {});
+        auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1);
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
         // should a StandardJobTerminated event be sent? (if terminateJob is called then waitForAndProcessNextEvent() we get stuck)
 
         this->test->task2 = this->getWorkflow()->addTask("failed_task", 1000.0, 1, 1, 0);
-        auto job_that_will_fail = job_manager->createStandardJob(this->test->task2, {});
+        auto job_that_will_fail = job_manager->createStandardJob(this->test->task2);
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         this->test->compute_service->stop();

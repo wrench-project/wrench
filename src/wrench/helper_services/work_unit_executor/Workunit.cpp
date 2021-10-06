@@ -32,7 +32,7 @@ namespace wrench {
             double sleep_time,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
             WorkflowTask *task,
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
+            std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
 
@@ -49,9 +49,9 @@ namespace wrench {
         }
 
         for (auto const &fl : file_locations) {
-            auto file = std::get<0>(fl);
-            auto location = std::get<1>(fl);
-            if ((file == nullptr)  || (location == nullptr)) {
+            auto file = fl.first;
+            auto locations = fl.second;
+            if ((file == nullptr)  || (locations.empty())) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid file location spec");
             }
         }
@@ -132,7 +132,7 @@ namespace wrench {
                                                                 job->getPreJobOverheadInSeconds(),
                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                 nullptr,
-                                                                (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                                (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                 (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>>) {}
             );
@@ -143,7 +143,7 @@ namespace wrench {
                                                                  job->getPostJobOverheadInSeconds(),
                                                                  (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                  nullptr,
-                                                                 (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                                 (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
                                                                  (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                  (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>>) {}
             );
@@ -155,7 +155,7 @@ namespace wrench {
                                                           0.0,
                                                           (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                           nullptr,
-                                                          (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                          (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
                                                           (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                           job->cleanup_file_deletions);
         }
@@ -166,7 +166,7 @@ namespace wrench {
                                                                    0.0,
                                                                    job->pre_file_copies,
                                                                    nullptr,
-                                                                   (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                                   (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
                                                                    (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                    (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
         }
@@ -177,7 +177,7 @@ namespace wrench {
                                                                     0.0,
                                                                     (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation> >>) {},
                                                                     nullptr,
-                                                                    (std::map<WorkflowFile *, std::shared_ptr<FileLocation> >) {},
+                                                                    (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
                                                                     job->post_file_copies,
                                                                     (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
         }

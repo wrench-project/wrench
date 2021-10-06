@@ -210,7 +210,7 @@ private:
         auto job_manager = this->createJobManager();
 
         try {
-            job_manager->createStandardJob(nullptr, {});
+            job_manager->createStandardJob(nullptr);
             throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
         } catch (std::invalid_argument &e) {
         }
@@ -218,7 +218,7 @@ private:
 
         // Create a job with a nullptr task in it
         try {
-            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
+            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr});
             throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
         } catch (std::invalid_argument &e) {
         }
@@ -227,7 +227,7 @@ private:
         // Create a job  with nothing in it
         try {
             std::vector<wrench::WorkflowTask *> tasks; // empty
-            job_manager->createStandardJob(tasks, {});
+            job_manager->createStandardJob(tasks);
             throw std::runtime_error("Should not be able to create a standard job with nothing in it");
         } catch (std::invalid_argument &e) {
         }
@@ -243,21 +243,21 @@ private:
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple((wrench::WorkflowFile *)nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (nullptr, *, *) pre file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple(f, nullptr, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) pre file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, nullptr));
-            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, *, nullptr) pre file copy");
         } catch (std::invalid_argument &e) {
         }
@@ -267,21 +267,21 @@ private:
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple((wrench::WorkflowFile *)nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (nullptr, *, *) post file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple(f, nullptr, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) post file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, nullptr));
-            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, *, nullptr) post file copy");
         } catch (std::invalid_argument &e) {
         }
@@ -290,7 +290,7 @@ private:
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, {}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a pre file copy that has SCRATCH has both dst and src");
         } catch (std::invalid_argument &e) {
         }
@@ -298,14 +298,14 @@ private:
         try {
             std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, {}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a post file copy that has SCRATCH has both dst and src");
         } catch (std::invalid_argument &e) {
         }
         
         // Create a job with not ok task dependencies
         try {
-            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2}, {});
+            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2});
             throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
         } catch (std::invalid_argument &e) {
         }
@@ -313,7 +313,7 @@ private:
 
         // Create an "ok" job
         try {
-            job_manager->createStandardJob({t1, t2}, {});
+            job_manager->createStandardJob({t1, t2});
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Should be able to create a standard job with two dependent tasks");
         }
@@ -485,7 +485,7 @@ private:
         }
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks());
 
         // Try to submit a standard job to the wrong service
         try {
@@ -647,7 +647,7 @@ private:
         t3->setPriority(42);
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks());
         job->getMinimumRequiredNumCores(); // coverage
         job->getPriority(); // coverage
 

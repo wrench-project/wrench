@@ -141,7 +141,8 @@ private:
         }
 
         // Create a 2-task job
-        auto two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {},
+        auto two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(),
+                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                            pre_copies,
                                                            {}, {});
 

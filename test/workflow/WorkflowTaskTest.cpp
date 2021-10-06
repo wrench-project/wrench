@@ -303,12 +303,12 @@ private:
         this->waitForAndProcessNextEvent();
 
 
-        auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, {});
+        auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>){});
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         job_manager->terminateJob(job_that_will_be_terminated);
 
-        auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, {});
+        auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>){});
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
         this->test->compute_service->stop();
