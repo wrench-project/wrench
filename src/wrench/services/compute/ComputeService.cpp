@@ -363,7 +363,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "info request" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("at_least_one_core_with_idle_resources");
 
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
