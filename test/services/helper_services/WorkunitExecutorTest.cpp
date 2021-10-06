@@ -223,6 +223,23 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> >> post_file_copies;
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
+        file_locations[input_file] = {nullptr};
+        pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
+        post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
+        cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
+
+        ASSERT_THROW(new wrench::Workunit(std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)666, [](void *ptr){}),
+                                          0.0,
+                                          pre_file_copies, task, file_locations,
+                                          post_file_copies, cleanup_file_deletions), std::invalid_argument);
+    }
+    {
+        std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_file_copies;
+        std::map<wrench::WorkflowFile *, std::vector<std::shared_ptr<wrench::FileLocation>>> file_locations;
+        std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> >> post_file_copies;
+        std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
+
+        file_locations[input_file] = {};
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
