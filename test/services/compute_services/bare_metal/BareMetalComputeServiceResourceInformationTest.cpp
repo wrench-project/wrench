@@ -182,7 +182,7 @@ private:
       std::vector<wrench::WorkflowTask *> tasks;
       tasks.push_back(t1);
       tasks.push_back(t2);
-      auto job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
+      auto job = job_manager->createStandardJob(tasks);
 
       job_manager->submitJob(job, this->test->compute_service1, {{"task1", "Host1:3"},
                                                                  {"task2", "Host2:2"}});

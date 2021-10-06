@@ -972,7 +972,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        auto job = job_manager->createStandardJob(test->task, {});
+        auto job = job_manager->createStandardJob(test->task);
 
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
@@ -1246,18 +1246,18 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob({},
-                                                                  {}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file,
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service1),
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service2))},
-                                                                  {std::make_tuple(test->input_file,
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service2),
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service3))},
-                                                                  {});
+                                                  (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                  {std::make_tuple(test->input_file,
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service1),
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service2))},
+                                                  {std::make_tuple(test->input_file,
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service2),
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service3))},
+                                                  {});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1379,16 +1379,16 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob({},
-                                                                  {}, //changed this since we don't have default storage now
-                                                                  {std::make_tuple(test->input_file,
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service1),
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service2))},
-                                                                  {},
-                                                                  {std::make_tuple(test->input_file,
-                                                                                   wrench::FileLocation::LOCATION(
-                                                                                           test->storage_service2))});
+                                                  (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                  {std::make_tuple(test->input_file,
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service1),
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service2))},
+                                                  {},
+                                                  {std::make_tuple(test->input_file,
+                                                                   wrench::FileLocation::LOCATION(
+                                                                           test->storage_service2))});
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1475,7 +1475,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1505,11 +1505,7 @@ private:
 //                                           wrench::FileLocation::LOCATION(test->storage_service1));
 
         // Create a job (that doesn't say where the file should come from!)
-        auto job = job_manager->createStandardJob({test->task},
-                                                                  {},
-                                                                  {},
-                                                                  {},
-                                                                  {});
+        auto job = job_manager->createStandardJob(test->task);
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1602,7 +1598,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1631,9 +1627,7 @@ private:
         wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
-        auto job = job_manager->createStandardJob({task_big},
-                                                                  {},
-                                                                  {}, {}, {});
+        auto job = job_manager->createStandardJob(task_big);
         // Submit the job
         try {
             job_manager->submitJob(job, test->compute_service, {{"task2", "OneCoreHost:2"}});
@@ -1720,7 +1714,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1748,9 +1742,7 @@ private:
         wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
-        auto job = job_manager->createStandardJob({task_big},
-                                                                  {},
-                                                                  {}, {}, {});
+        auto job = job_manager->createStandardJob(task_big);
         // Submit the job
         try {
             job_manager->submitJob(job, test->compute_service);
@@ -1837,7 +1829,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1950,7 +1942,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2077,6 +2069,6 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }

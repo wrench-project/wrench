@@ -35,7 +35,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(Workflow *workflow, std::vector<WorkflowTask *> tasks,
-                             std::map<WorkflowFile *, std::shared_ptr<FileLocation> > &file_locations,
+                             std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
@@ -138,7 +138,7 @@ namespace wrench {
      *
      * @return a map of files to storage services
      */
-    std::map<WorkflowFile *, std::shared_ptr<FileLocation> > StandardJob::getFileLocations() {
+    std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> StandardJob::getFileLocations() {
         return this->file_locations;
     }
 

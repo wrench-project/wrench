@@ -548,7 +548,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -745,7 +745,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -926,7 +926,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1108,7 +1108,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1160,24 +1160,14 @@ private:
 
             // Create a BOGUS StandardJob (just for testing)
             try {
-                auto job = job_manager->createStandardJob(
-                        {t1, t2, t4},
-                        {},
-                        {},
-                        {},
-                        {});
+                auto job = job_manager->createStandardJob({t1, t2, t4});
                 throw std::runtime_error("Should not be able to create a standard job with t1, t2, t3 only");
             } catch (std::invalid_argument &e) {
             }
 
 
             // Create a StandardJob
-            auto job = job_manager->createStandardJob(
-                    {t1, t2, t3, t4},
-                    {},
-                    {},
-                    {},
-                    {});
+            auto job = job_manager->createStandardJob({t1, t2, t3, t4});
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -1297,7 +1287,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1449,7 +1439,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1610,7 +1600,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1768,7 +1758,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2154,7 +2144,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2445,7 +2435,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2604,7 +2594,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2761,7 +2751,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2938,7 +2928,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2968,15 +2958,16 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
             0.0,
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             nullptr,
-            (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
+            (std::map<wrench::WorkflowFile *, std::vector<std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
+
     std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(
             nullptr,
             0.0,
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             nullptr,
-            (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
+            (std::map<wrench::WorkflowFile *, std::vector<std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
 
@@ -2990,7 +2981,7 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -3019,7 +3010,7 @@ private:
         // Create a StandardJob
         auto job = job_manager->createStandardJob(
                 {},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                         this->getWorkflow()->getFileByID("input_file"),
                         wrench::FileLocation::LOCATION(this->test->storage_service1),
@@ -3129,6 +3120,6 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
