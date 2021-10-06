@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2021. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 #include <string>
 #include <utility>
@@ -16,13 +24,12 @@ using json = nlohmann::json;
  * @brief The Simulation Daemon's "main" method
  */
 void SimulationDaemon::run() {
-
     // Set up GET request handler for the (likely useless) "alive" path
     this->server.Get("/api/alive", [this](const Request &req, Response &res) { alive(req, res); });
 
     // Set up POST request handler for terminating simulation
     this->server.Post("/api/terminateSimulation",
-                [this](const Request &req, Response &res) { terminateSimulation(req, res); });
+                      [this](const Request &req, Response &res) { terminateSimulation(req, res); });
 
     // Set up ALL POST request handlers for API calls
     REST_API rest_api(this->server,
@@ -32,6 +39,7 @@ void SimulationDaemon::run() {
     if (daemon_logging) {
         std::cerr << " PID " << getpid() << " listening on port " << simulation_port_number << "\n";
     }
+
     while (true) {
         // This is in a while loop because, on Linux, it seems that sometimes the
         // server returns from the listen() call below, not sure why...
@@ -51,14 +59,13 @@ void SimulationDaemon::run() {
 SimulationDaemon::SimulationDaemon(
         bool daemon_logging,
         int simulation_port_number,
-        std::shared_ptr<wrench::SimulationController> simulation_controller,
+        std::shared_ptr <wrench::SimulationController> simulation_controller,
         std::thread &simulation_thread) :
         daemon_logging(daemon_logging),
         simulation_port_number(simulation_port_number),
         simulation_controller(std::move(std::move(std::move(simulation_controller)))),
         simulation_thread(simulation_thread) {
 }
-
 
 /**
  * @brief Helper method for logging

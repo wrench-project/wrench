@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2021. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 #include "SimulationLauncher.h"
 
 #include <cstdio>
@@ -36,8 +45,7 @@ WRENCHDaemon::WRENCHDaemon(bool simulation_logging,
         simulation_logging(simulation_logging),
         daemon_logging(daemon_logging),
         port_number(port_number),
-        sleep_us(sleep_us) {
-}
+        sleep_us(sleep_us) {}
 
 /**
  * @brief Helper method to check whether a port is available for binding/listening
@@ -49,8 +57,8 @@ bool WRENCHDaemon::isPortTaken(int port) {
     struct sockaddr_in address{};
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons( port );
-    auto ret_value = ::bind(sock, (struct sockaddr *)&address, sizeof(address));
+    address.sin_port = htons(port);
+    auto ret_value = ::bind(sock, (struct sockaddr *) &address, sizeof(address));
 
     if (ret_value == 0) {
         close(sock);
@@ -68,7 +76,7 @@ bool WRENCHDaemon::isPortTaken(int port) {
  * @param res the response object to update
  * @param port_number the port_number on which simulation client will need to connect
  */
-void setSuccessAnswer(Response& res, int port_number) {
+void setSuccessAnswer(Response &res, int port_number) {
     json answer;
     answer["wrench_api_request_success"] = true;
     answer["port_number"] = port_number;
@@ -81,7 +89,7 @@ void setSuccessAnswer(Response& res, int port_number) {
  * @param res res the response object to update
  * @param failure_cause a human-readable error message
  */
-void setFailureAnswer(Response& res, const std::string& failure_cause) {
+void setFailureAnswer(Response &res, const std::string &failure_cause) {
     json answer;
     answer["wrench_api_request_success"] = false;
     answer["failure_cause"] = failure_cause;
@@ -94,9 +102,9 @@ void setFailureAnswer(Response& res, const std::string& failure_cause) {
  * @param shm_segment_id shared-memory segment ID
  * @param content string to write
  */
-void writeStringToSharedMemorySegment(int shm_segment_id, const std::string& content) {
-    auto shm_segment = (char *)shmat(shm_segment_id, nullptr, 0);
-    if ((long)shm_segment == -1) {
+void writeStringToSharedMemorySegment(int shm_segment_id, const std::string &content) {
+    auto shm_segment = (char *) shmat(shm_segment_id, nullptr, 0);
+    if ((long) shm_segment == -1) {
         perror("WARNING: shmat(): ");
         return;
     }
@@ -113,8 +121,8 @@ void writeStringToSharedMemorySegment(int shm_segment_id, const std::string& con
  * @return string read
  */
 std::string readStringFromSharedMemorySegment(int shm_segment_id) {
-    auto shm_segment = (char *)shmat(shm_segment_id, nullptr, 0);
-    if ((long)shm_segment == -1) {
+    auto shm_segment = (char *) shmat(shm_segment_id, nullptr, 0);
+    if ((long) shm_segment == -1) {
         perror("WARNING: shmat(): ");
         return "n/a";
     }
@@ -147,8 +155,7 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
  * }
  * END_REST_API_DOCUMENTATION
  */
-void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
-
+void WRENCHDaemon::startSimulation(const Request &req, Response &res) {
     // Print some logging
     unsigned long max_line_length = 120;
     if (daemon_logging) {
@@ -161,7 +168,7 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
     try {
         body = json::parse(req.body);
     } catch (std::exception &e) {
-        setFailureAnswer(res,"Internal error: malformed json in request");
+        setFailureAnswer(res, "Internal error: malformed json in request");
         return;
     }
 
@@ -232,7 +239,7 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
             // Create AND launch the simulation in a separate thread (it is tempting to
             // do the creation here and the launch in a thread, but it seems that SimGrid
             // does not like that - likely due to the maestro business)
-            auto simulation_thread = std::thread([simulation_launcher, this, body, &guard, &signal] () {
+            auto simulation_thread = std::thread([simulation_launcher, this, body, &guard, &signal]() {
                 // Create simulation
                 simulation_launcher->createSimulation(this->simulation_logging,
                                                       body["platform_xml"],
@@ -240,7 +247,7 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
                                                       this->sleep_us);
                 // Signal the parent thread that simulation creation has been done, successfully or not
                 {
-                    std::unique_lock<std::mutex> lock(guard);
+                    std::unique_lock <std::mutex> lock(guard);
                     signal.notify_one();
                 }
                 // If no failure, then proceed with the launch!
@@ -251,7 +258,7 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
 
             // Waiting for the simulation thread to have created the simulation, successfully or not
             {
-                std::unique_lock<std::mutex> lock(guard);
+                std::unique_lock <std::mutex> lock(guard);
                 signal.wait(lock);
             }
 
@@ -274,7 +281,6 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
                 exit(1);
 
             } else {
-
                 // Write to the pipe that everything's ok and close it
                 bool success = true;
                 if (write(fd[1], &success, sizeof(bool)) == -1) {
@@ -298,7 +304,6 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
             }
 
         } else {
-
             // close the write-end of the pipe
             close(fd[1]);
 
@@ -314,7 +319,6 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
         }
 
     } else { // The parent process
-
         // Wait for the child to finish and get its exit code
         int stat_loc;
         if (waitpid(child_pid, &stat_loc, 0) == -1) {
@@ -348,7 +352,7 @@ void WRENCHDaemon::startSimulation(const Request& req, Response& res) {
  * @param req the HTTP request
  * @param res the HTTP response
  */
-void WRENCHDaemon::error_handling(const Request& req, Response& res) {
+void WRENCHDaemon::error_handling(const Request &req, Response &res) {
     std::cerr << "[" << res.status << "]: " << req.path << " " << req.body << "\n";
 }
 
@@ -356,13 +360,12 @@ void WRENCHDaemon::error_handling(const Request& req, Response& res) {
  * @brief The WRENCH daemon's "main" method
  */
 void WRENCHDaemon::run() {
-
     // Only set up POST request handler for "/api/startSimulation" since
     // all other API paths will be handled by a simulation daemon instead
-    server.Post("/api/startSimulation", [this] (const Request& req, Response& res) { this->startSimulation(req, res); });
+    server.Post("/api/startSimulation", [this](const Request &req, Response &res) { this->startSimulation(req, res); });
 
     // Set some generic error handler
-    server.set_error_handler([] (const Request& req, Response& res) { WRENCHDaemon::error_handling(req, res); });
+    server.set_error_handler([](const Request &req, Response &res) { WRENCHDaemon::error_handling(req, res); });
 
     // Start the web server
     if (daemon_logging) {

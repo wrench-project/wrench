@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
 #include "wrench/workflow/Workflow.h"
@@ -29,7 +28,8 @@
 
 #define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
 
-WRENCH_LOG_CATEGORY(wrench_core_simulation_output, "Log category for Simulation Output");
+WRENCH_LOG_CATEGORY(wrench_core_simulation_output,
+"Log category for Simulation Output");
 
 namespace wrench {
     /******************/
@@ -63,9 +63,9 @@ namespace wrench {
         std::pair<double, double> write;
 
         /* @brief file read operations */
-        std::vector<std::tuple<double, double, string>> reads;
+        std::vector <std::tuple<double, double, string>> reads;
         /* @brief file write operations */
-        std::vector<std::tuple<double, double, string>> writes;
+        std::vector <std::tuple<double, double, string>> writes;
 
         /* @brief whether the task has failed */
         double failed;
@@ -100,8 +100,8 @@ namespace wrench {
      */
     static std::vector<simgrid::s4u::Host *> get_all_physical_hosts() {
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-        std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
-        std::vector<simgrid::s4u::Host *> to_return;
+        std::vector < simgrid::s4u::Host * > hosts = simgrid_engine->get_all_hosts();
+        std::vector < simgrid::s4u::Host * > to_return;
 
         for (auto const &h : hosts) {
             // Ignore VMs
@@ -339,7 +339,7 @@ namespace wrench {
      * @param index: the index of the workflow execution data up to where we would like to check for a valid layout
      * @return bool
      */
-    bool searchForLayout(std::vector<WorkflowTaskExecutionInstance> &data, std::size_t index) {
+    bool searchForLayout(std::vector <WorkflowTaskExecutionInstance> &data, std::size_t index) {
         const unsigned long long PRECISION = 1000 * 1000 * 1000;
 
         WorkflowTaskExecutionInstance &current_execution_instance = data.at(index);
@@ -382,7 +382,6 @@ namespace wrench {
              */
             bool has_overlap = false;
             for (std::size_t i = 0; i < index; ++i) {
-
                 WorkflowTaskExecutionInstance other_execution_instance = data.at(i);
 
                 // Evaluate the current event's position only against others that occurred on the same host.
@@ -413,6 +412,7 @@ namespace wrench {
             if (not has_overlap and index >= data.size() - 1) {
                 host_utilization_layout[current_execution_instance.task_id] = vertical_position;
                 return true;
+
             } else if (not has_overlap) {
                 bool found_layout = searchForLayout(data, index + 1);
 
@@ -437,7 +437,7 @@ namespace wrench {
      *
      * @throws std::runtime_error
      */
-    void generateHostUtilizationGraphLayout(std::vector<WorkflowTaskExecutionInstance> &data) {
+    void generateHostUtilizationGraphLayout(std::vector <WorkflowTaskExecutionInstance> &data) {
         if (not searchForLayout(data, 0)) {
             throw std::runtime_error(
                     "SimulationOutput::generateHostUtilizationGraphLayout() could not find a valid layout.");
@@ -544,7 +544,7 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteFailure>();
 
-        std::vector<WorkflowTaskExecutionInstance> data;
+        std::vector <WorkflowTaskExecutionInstance> data;
 
         for (auto const &task : tasks) {
             auto execution_history = task->getExecutionHistory();
@@ -881,7 +881,7 @@ namespace wrench {
         }
 
         try {
-            std::vector<simgrid::s4u::Host *> hosts = get_all_physical_hosts();
+            std::vector < simgrid::s4u::Host * > hosts = get_all_physical_hosts();
 
             nlohmann::json hosts_energy_consumption_information;
             for (const auto &host : hosts) {
@@ -895,11 +895,11 @@ namespace wrench {
                                              " does not have a wattage_per_state property!");
                 }
                 std::string watts_per_state_property_string = std::string(property_string);
-                std::vector<std::string> watts_per_state;
+                std::vector <std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
                 for (size_t pstate = 0; pstate < watts_per_state.size(); ++pstate) {
-                    std::vector<std::string> current_state_watts;
+                    std::vector <std::string> current_state_watts;
                     boost::split(current_state_watts, watts_per_state.at(pstate), boost::is_any_of(":"));
 
                     if (current_state_watts.size() == 2) {
@@ -1043,10 +1043,10 @@ namespace wrench {
         auto hosts = get_all_physical_hosts();
 
         // get the by-cluster host information
-        std::map<std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
+        std::map <std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
 
         // Build a host-to-cluster map initialized with hostnames as cluster_ids
-        std::map<std::string, std::string> host_to_cluster;
+        std::map <std::string, std::string> host_to_cluster;
         for (auto const &h : hosts) {
             host_to_cluster[h->get_name()] = h->get_name();
         }
@@ -1073,7 +1073,7 @@ namespace wrench {
         }
 
         // add all network links to the list of vertices
-        std::vector<simgrid::s4u::Link *> links = get_all_links();
+        std::vector < simgrid::s4u::Link * > links = get_all_links();
         for (const auto &link : links) {
             if (not(link->get_name() == "__loopback__")) { // Ignore loopback link
                 platform_graph_json["vertices"].push_back(
@@ -1087,8 +1087,8 @@ namespace wrench {
         }
 
         // add each route to the list of routes
-        std::vector<simgrid::s4u::Link *> route_forward;
-        std::vector<simgrid::s4u::Link *> route_backward;
+        std::vector < simgrid::s4u::Link * > route_forward;
+        std::vector < simgrid::s4u::Link * > route_backward;
         double route_forward_latency = 0;
         double route_backward_latency = 0;
 
@@ -1164,7 +1164,7 @@ namespace wrench {
 
         // maintain a unique list of edges where edges are represented using the following string format:
         // <source_type>:<source_id>-<target_type>:<target_id> where type could be 'host' or 'link'
-        std::unordered_set<std::string> edges;
+        std::unordered_set <std::string> edges;
         const std::string HOST("host");
         const std::string LINK("link");
 
@@ -1177,7 +1177,6 @@ namespace wrench {
         // for each route, add "host<-->link" and "link<-->link" connections
         for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin();
              route_itr != platform_graph_json["routes"].end(); ++route_itr) {
-
             source_id = (*route_itr)["source"].get<std::string>();
             source_string = HOST + ":" + source_id;
 
@@ -1187,7 +1186,6 @@ namespace wrench {
             // check that the undirected edge doesn't already exist in set of edges
             if (edges.find(source_string + "-" + target_string) == edges.end() and
                 edges.find(target_string + "-" + source_string) == edges.end()) {
-
                 edges.insert(source_string + "-" + target_string);
 
                 // add a graph link from the source host to the first network link
@@ -1212,7 +1210,6 @@ namespace wrench {
                 auto next_link_itr = link_itr + 1;
 
                 if (next_link_itr != (*route_itr)["route"].end()) {
-
                     source_id = (*link_itr).get<std::string>();
                     source_string = LINK + ":" + source_id;
 
@@ -1222,7 +1219,6 @@ namespace wrench {
                     // check that the undirected edge doesn't already exist in set of edges
                     if (edges.find(source_string + "-" + target_string) == edges.end() and
                         edges.find(target_string + "-" + source_string) == edges.end()) {
-
                         edges.insert(source_string + "-" + target_string);
 
                         platform_graph_json["edges"].push_back(
@@ -1251,7 +1247,6 @@ namespace wrench {
             // check that the undirected edge doesn't already exist in set of edges
             if (edges.find(source_string + "-" + target_string) == edges.end() and
                 edges.find(target_string + "-" + source_string) == edges.end()) {
-
                 edges.insert(source_string + "-" + target_string);
 
                 // add a graph link from the last link to the target host
@@ -1345,7 +1340,7 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteFailure>();
 
-        std::set<std::string> hostnames;
+        std::set <std::string> hostnames;
 
         //std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
         std::tuple<double, double, double> disk_operation;
@@ -1362,7 +1357,7 @@ namespace wrench {
         }
 
         for (auto &host : hostnames) {
-            std::set<std::string> mounts;
+            std::set <std::string> mounts;
             if (!read_start_timestamps.empty()) {
                 for (auto &timestamp : read_start_timestamps) {
                     if (timestamp->getContent()->getHostname().compare(host) == 0) {
@@ -1378,8 +1373,8 @@ namespace wrench {
                 }
             }
             for (auto &mount : mounts) {
-                std::vector<std::tuple<double, double, double>> reads;
-                std::vector<std::tuple<double, double, double>> writes;
+                std::vector <std::tuple<double, double, double>> reads;
+                std::vector <std::tuple<double, double, double>> writes;
 
                 if (!read_start_timestamps.empty()) {
                     for (auto &read_start_timestamp : read_start_timestamps) {
@@ -1504,7 +1499,7 @@ namespace wrench {
 
         try {
             auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector<simgrid::s4u::Link *> links = get_all_links();
+            std::vector < simgrid::s4u::Link * > links = get_all_links();
 
             for (const auto &link: links) {
                 nlohmann::json datum;
@@ -1538,7 +1533,6 @@ namespace wrench {
             throw;
         }
     }
-
 
     /**
      * @brief Destructor
@@ -1737,7 +1731,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Add a file copy start timestamp
      * @param file: a workflow file
@@ -1745,8 +1738,8 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyStart(WorkflowFile *file,
-                                                     std::shared_ptr<FileLocation> src,
-                                                     std::shared_ptr<FileLocation> dst) {
+                                                     std::shared_ptr <FileLocation> src,
+                                                     std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
             this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(file, src, dst));
         }
@@ -1759,8 +1752,8 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyFailure(WorkflowFile *file,
-                                                       std::shared_ptr<FileLocation> src,
-                                                       std::shared_ptr<FileLocation> dst) {
+                                                       std::shared_ptr <FileLocation> src,
+                                                       std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
             this->addTimestamp<SimulationTimestampFileCopyFailure>(
                     new SimulationTimestampFileCopyFailure(file, src, dst));
@@ -1774,8 +1767,8 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyCompletion(WorkflowFile *file,
-                                                          std::shared_ptr<FileLocation> src,
-                                                          std::shared_ptr<FileLocation> dst) {
+                                                          std::shared_ptr <FileLocation> src,
+                                                          std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(
                     new SimulationTimestampFileCopyCompletion(file, src, dst));
@@ -1903,7 +1896,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampEnergyConsumption(std::string hostname,
                                                          double joules) {
-        static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
+        static std::unordered_map <std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
 
         if (not this->isEnabled<SimulationTimestampEnergyConsumption>()) {
             return;
@@ -1940,7 +1933,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampLinkUsage(std::string linkname,
                                                  double bytes_per_second) {
-        static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
+        static std::unordered_map <std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
 
         if (not this->isEnabled<SimulationTimestampLinkUsage>()) {
             return;
