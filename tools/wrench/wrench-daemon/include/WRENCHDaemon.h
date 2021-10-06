@@ -1,7 +1,17 @@
+/**
+ * Copyright (c) 2021. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 #ifndef WRENCH_DAEMON_H
 #define WRENCH_DAEMON_H
 
 #include "httplib.h"
+
 using httplib::Request;
 using httplib::Response;
 
@@ -29,7 +39,6 @@ public:
     void run();
 
 private:
-
     httplib::Server server;
 
     bool simulation_logging;
@@ -37,11 +46,12 @@ private:
     int port_number;
     int sleep_us;
 
-    void startSimulation(const Request& req, Response& res);
+    void startSimulation(const Request &req, Response &res);
+
     static bool isPortTaken(int port);
-    static void error_handling(const Request& req, Response& res);
 
-    };
+    static void error_handling(const Request &req, Response &res);
 
+};
 
 #endif // WRENCH_DAEMON_H
