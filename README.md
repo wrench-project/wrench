@@ -66,7 +66,7 @@ sudo make install
 
 To use a non-standard SimGrid installation path:
 ```bash
-cmake -DSIMGRID_INSTALL_PATH=/my/simgrid/path/ .
+cmake -DSimGrid_PATH=/my/simgrid/path/ .
 make
 sudo make install 
 ```
