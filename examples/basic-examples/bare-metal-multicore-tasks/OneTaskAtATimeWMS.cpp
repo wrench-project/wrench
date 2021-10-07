@@ -70,7 +70,7 @@ namespace wrench {
             WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
             /* Create the job  */
-            auto standard_job = job_manager->createStandardJob(ready_task, {});
+            auto standard_job = job_manager->createStandardJob(ready_task);
 
             /* No need to use service specific arguments to specify a number of cores for the task.
              * By default, the compute service will run the task with the largest possible number of
