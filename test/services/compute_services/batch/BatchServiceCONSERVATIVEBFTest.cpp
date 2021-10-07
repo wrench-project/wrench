@@ -103,7 +103,7 @@ private:
         std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
-            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
         std::map<std::string, std::string>
@@ -273,7 +273,7 @@ private:
         for (int i=0; i < NUM_JOBS; i++) {
             random = random  * 17 + 4123451;
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60 + 60*(random % 30), 1, 1, 0);
-            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
         // Submit jobs
@@ -447,7 +447,7 @@ private:
         std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
-            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
         std::map<std::string, std::string>
@@ -616,7 +616,7 @@ private:
         std::shared_ptr<wrench::StandardJob> jobs[5];
         for (int i=0; i < 5; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
-            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
         std::map<std::string, std::string>
@@ -787,7 +787,7 @@ private:
         std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
-            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
         std::map<std::string, std::string>
@@ -967,7 +967,7 @@ private:
         for (int i=0; i < NUM_JOBS_CORE_LEVEL; i++) {
             random = random  * 17 + 4123451;
             tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60 + 60*(random % 30), 1, 1, 0);
-            jobs[i] = job_manager->createStandardJob(tasks[i], {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
         // Submit jobs

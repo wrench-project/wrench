@@ -65,7 +65,7 @@ namespace wrench {
 
         StandardJob::State getState();
 
-        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> getFileLocations();
+        std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
 
         unsigned long getPriority();
 
@@ -78,8 +78,8 @@ namespace wrench {
         /** @brief The number of computational tasks that have completed */
         unsigned long num_completed_tasks;
 
-        /** @brief The file locations that tasks should read/write files from/to */
-        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+        /** @brief The file locations that tasks should read/write files from/to. Each file is given a list of locations, in preferred order */
+        std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations;
 
         /** @brief The ordered file copy operations to perform before computational tasks */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies;
@@ -111,9 +111,9 @@ namespace wrench {
         friend class JobManager;
 
         StandardJob(Workflow *workflow,
-                    std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::shared_ptr<FileLocation>  > &file_locations,
-                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> &pre_file_copies,
-                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> &post_file_copies,
+                    std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
+                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &pre_file_copies,
+                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &post_file_copies,
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
         State state;

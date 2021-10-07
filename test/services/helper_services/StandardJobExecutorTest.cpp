@@ -1160,24 +1160,14 @@ private:
 
             // Create a BOGUS StandardJob (just for testing)
             try {
-                auto job = job_manager->createStandardJob(
-                        {t1, t2, t4},
-                        {},
-                        {},
-                        {},
-                        {});
+                auto job = job_manager->createStandardJob({t1, t2, t4});
                 throw std::runtime_error("Should not be able to create a standard job with t1, t2, t3 only");
             } catch (std::invalid_argument &e) {
             }
 
 
             // Create a StandardJob
-            auto job = job_manager->createStandardJob(
-                    {t1, t2, t3, t4},
-                    {},
-                    {},
-                    {},
-                    {});
+            auto job = job_manager->createStandardJob({t1, t2, t3, t4});
 
             std::string my_mailbox = "test_callback_mailbox";
 
@@ -2968,15 +2958,16 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
             0.0,
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             nullptr,
-            (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
+            (std::map<wrench::WorkflowFile *, std::vector<std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
+
     std::shared_ptr<wrench::Workunit> wu2 = std::make_shared<wrench::Workunit>(
             nullptr,
             0.0,
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             nullptr,
-            (std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>) {},
+            (std::map<wrench::WorkflowFile *, std::vector<std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>>) {},
             (std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>>) {});
 
@@ -3019,7 +3010,7 @@ private:
         // Create a StandardJob
         auto job = job_manager->createStandardJob(
                 {},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                         this->getWorkflow()->getFileByID("input_file"),
                         wrench::FileLocation::LOCATION(this->test->storage_service1),

@@ -41,7 +41,7 @@ namespace wrench {
                 double sleep_time,
                 std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
                 WorkflowTask *task,
-                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
+                std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations,
                 std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
                 std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>>> cleanup_file_deletions);
 
@@ -66,7 +66,7 @@ namespace wrench {
         /** @brief Computational task to perform */
         WorkflowTask *task = nullptr;
         /** @brief Locations where computational tasks should read/write files */
-        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+        std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations;
         /** @brief File copies to perform after computational tasks completes */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
         /** @brief File deletions to perform last */
