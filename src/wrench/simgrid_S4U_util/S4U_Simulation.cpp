@@ -849,6 +849,7 @@ namespace wrench {
             throw std::invalid_argument("S4U_Simulation::hostHasMountPoint(): Unknown host " + hostname);
         }
 
+
         std::set<std::string> mount_points;
         for (auto const &d : host->get_disks()) {
             // Get the disk's mount point
