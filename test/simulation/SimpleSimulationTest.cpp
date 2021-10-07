@@ -173,7 +173,7 @@ private:
 
         // Create a bogus standard job with an empty task list for coverage
         try {
-            job_manager->createStandardJob({}, {});
+            job_manager->createStandardJob({});
             throw std::runtime_error("Should not be able to create a job with an empty task list");
         } catch (std::invalid_argument &e) {
         }
@@ -243,7 +243,7 @@ private:
         }
 
         // Try to create and submit a job with tasks that are pending, which should fail
-        auto bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
+        auto bogus_job = job_manager->createStandardJob(*(tasks.begin()));
         try {
             job_manager->submitJob(bogus_job, vm_cs);
             throw std::runtime_error("Should not be able to create a job with PENDING tasks");
@@ -289,7 +289,7 @@ private:
 
         {
             // Try to create and submit a job with tasks that are completed, which should fail
-            auto bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
+            auto bogus_job = job_manager->createStandardJob(*(++tasks.begin()));
             try {
                 job_manager->submitJob(bogus_job, vm_cs);
                 throw std::runtime_error("Should not be able to create a job with PENDING tasks");
