@@ -293,7 +293,7 @@ private:
             auto task = this->getWorkflow()->addTask("task", 60, 2, 2, 0);
 
             // Create a StandardJob
-            auto job = job_manager->createStandardJob(task, {});
+            auto job = job_manager->createStandardJob(task);
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "2";
@@ -1102,7 +1102,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_1 = job_manager->createStandardJob(tasks, {});
+        auto standard_job_1 = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
@@ -1126,7 +1126,7 @@ private:
         }
 
         // Create a Standard Job with only the tasks
-        auto standard_job_2 = job_manager->createStandardJob(tasks, {});
+        auto standard_job_2 = job_manager->createStandardJob(tasks);
 
         // Create the batch-specific argument
         batch_job_args.clear();
@@ -1597,7 +1597,7 @@ private:
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-            auto job = job_manager->createStandardJob(task, {});
+            auto job = job_manager->createStandardJob(task);
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
@@ -2372,8 +2372,7 @@ private:
             for (int i = 0; i < num_tasks; i++) {
                 tasks.push_back(this->getWorkflow()->addTask("task" + std::to_string(i), 59, num_cores_in_each_task,
                                                              num_cores_in_each_task, 0));
-                jobs.push_back(job_manager->createStandardJob(
-                        {tasks[i]}, {}, {}, {}, {}));
+                jobs.push_back(job_manager->createStandardJob(tasks[i]));
                 std::map<std::string, std::string> args;
                 args["-N"] = "1";
                 args["-t"] = "1";
@@ -2528,17 +2527,13 @@ private:
             //Create another sequential task that lasts one min and requires 10 cores
             wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 0);
 
-            auto job = job_manager->createStandardJob(
-                    {task1}, {}, {}, {}, {});
+            auto job = job_manager->createStandardJob(task1);
 
-            auto job2 = job_manager->createStandardJob(
-                    {task2}, {}, {}, {}, {});
+            auto job2 = job_manager->createStandardJob(task2);
 
-            auto job3 = job_manager->createStandardJob(
-                    {task3}, {}, {}, {}, {});
+            auto job3 = job_manager->createStandardJob(task3);
 
-            auto job4 = job_manager->createStandardJob(
-                    {task4}, {}, {}, {}, {});
+            auto job4 = job_manager->createStandardJob(task4);
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "2";
@@ -2636,8 +2631,7 @@ private:
             std::vector<std::shared_ptr<wrench::StandardJob>> jobs = {};
             for (int i = 0; i < num_tasks; i++) {
                 tasks.push_back(this->getWorkflow()->addTask("task" + std::to_string(i), 59, 1, 1, 0));
-                jobs.push_back(job_manager->createStandardJob(
-                        {tasks[i]}, {}, {}, {}, {}));
+                jobs.push_back(job_manager->createStandardJob(tasks[i]));
                 std::map<std::string, std::string> args;
                 args["-N"] = "1";
                 args["-t"] = "1";
@@ -3279,8 +3273,7 @@ private:
                 // Create a sequential task that lasts for random minutes and requires 2 cores
                 wrench::WorkflowTask *task = this->getWorkflow()->addTask("task" + std::to_string(i), each_task_time, 2,
                                                                           2, 0);
-                auto job = job_manager->createStandardJob(
-                        {task}, {}, {}, {}, {});
+                auto job = job_manager->createStandardJob(task);
                 tasks.push_back(task);
                 jobs.push_back(job);
             }
@@ -3561,7 +3554,7 @@ private:
         std::shared_ptr<wrench::StandardJob> jobs[3];
 
         for (int i = 0; i < 3; i++) {
-            jobs[i] = job_manager->createStandardJob({tasks[i]}, {}, {}, {}, {});
+            jobs[i] = job_manager->createStandardJob(tasks[i]);
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "1";
