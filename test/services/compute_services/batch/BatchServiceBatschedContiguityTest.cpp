@@ -114,7 +114,7 @@ private:
             double start_time = wrench::Simulation::getCurrentSimulatedDate();
 
             // Submit a sequential task that lasts one min and requires 1 host
-            job = job_manager->createStandardJob(task1, {});
+            job = job_manager->createStandardJob(task1);
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "1";
             batch_job_args1["-t"] = "1"; //time in minutes
@@ -126,7 +126,7 @@ private:
             }
 
             // Submit a sequential task that lasts one min and requires 2 host
-            job = job_manager->createStandardJob(task2, {});
+            job = job_manager->createStandardJob(task2);
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "2";
             batch_job_args2["-t"] = "2"; //time in minutes
@@ -138,7 +138,7 @@ private:
             }
 
             // Submit a sequential task that lasts one min and requires 2 host
-            job = job_manager->createStandardJob(task3, {});
+            job = job_manager->createStandardJob(task3);
             std::map<std::string, std::string> batch_job_args3;
             batch_job_args3["-N"] = "1";
             batch_job_args3["-t"] = "1"; //time in minutes
@@ -150,7 +150,7 @@ private:
             }
 
             // Submit a sequential task that lasts one min and requires 2 host
-            job = job_manager->createStandardJob(task4, {});
+            job = job_manager->createStandardJob(task4);
             std::map<std::string, std::string> batch_job_args4;
             batch_job_args4["-N"] = "2";
             batch_job_args4["-t"] = "1"; //time in minutes
