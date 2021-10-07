@@ -54,7 +54,7 @@ namespace wrench {
             if ((file == nullptr)  || (locations.empty())) {
                 throw std::invalid_argument("Workunit::Workunit(): invalid file location spec");
             }
-            for (auto const &fl_l : fl.second) {
+            for (auto const &fl_l : locations) {
                 if (fl_l == nullptr) {
                     throw std::invalid_argument("Workunit::Workunit(): invalid file location spec");
                 }

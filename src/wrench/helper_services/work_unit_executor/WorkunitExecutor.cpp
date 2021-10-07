@@ -145,6 +145,78 @@ namespace wrench {
     }
 
     /**
+     * @brief Helper method determine whether scratch-space use is correct
+     * @return true if OK, false if not
+     */
+    bool WorkunitExecutor::isUseOfScratchSpaceOK() {
+        if (this->scratch_space == nullptr) {
+            for (auto const &pfc : workunit->pre_file_copies) {
+                auto src = std::get<1>(pfc);
+                auto dst = std::get<2>(pfc);
+
+                if ((src == FileLocation::SCRATCH) ||
+                    (dst == FileLocation::SCRATCH)) {
+                    return false;
+                }
+            }
+            for (auto const &fl : workunit->file_locations) {
+                for (auto const &fl_l : fl.second) {
+                    if (fl_l == FileLocation::SCRATCH) {
+                        return false;
+                    }
+                }
+            }
+            for (auto const &pfc : workunit->post_file_copies) {
+                auto src = std::get<1>(pfc);
+                auto dst = std::get<2>(pfc);
+                if ((src == FileLocation::SCRATCH) ||
+                    (dst == FileLocation::SCRATCH)) {
+                    return false;
+                }
+            }
+            for (auto const &cd : workunit->cleanup_file_deletions) {
+                auto location = std::get<1>(cd);
+                if (location == FileLocation::SCRATCH) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @brief Helper method to determine whether file locations are OK
+     * @param offending_file: set to the (first) offending file
+     * @return true if OK, false otherwise
+     */
+    bool WorkunitExecutor::areFileLocationsOK(WorkflowFile **offending_file) {
+        for (const auto &fl : workunit->file_locations) {
+            if (fl.second.empty()) {
+                *offending_file = fl.first;
+                return false;
+                break;
+            }
+            if (fl.second.size() > 1) {
+                bool found_a_storage_service = false;
+                for (auto const &fl_l : fl.second) {
+                    if (fl_l->getStorageService()->lookupFile(fl.first, fl_l)) {
+                        found_a_storage_service = true;
+                        workunit->file_locations[fl.first].clear();
+                        workunit->file_locations[fl.first].emplace_back(fl_l);
+                        break;
+                    }
+                }
+                if (not found_a_storage_service) {
+                    *offending_file = fl.first;
+                    return false;
+                }
+            }
+        }
+        *offending_file = nullptr;
+        return true;
+    }
+
+    /**
     * @brief Main method of the worker thread daemon
     *
     * @return 1 if a task failure timestamp should be generated, 0 otherwise
@@ -165,44 +237,7 @@ namespace wrench {
         bool success;
 
         // Check that there is no Scratch Space weirdness
-        bool scratch_space_ok = true;
-        if (this->scratch_space == nullptr) {
-            for (auto const &pfc : workunit->pre_file_copies) {
-                auto src = std::get<1>(pfc);
-                auto dst = std::get<2>(pfc);
-
-                if ((src == FileLocation::SCRATCH) ||
-                    (dst == FileLocation::SCRATCH)) {
-                    scratch_space_ok = false;
-                    break;
-                }
-            }
-            for (auto const &fl : workunit->file_locations) {
-                for (auto const &fl_l : fl.second) {
-                    if (fl_l == FileLocation::SCRATCH) {
-                        scratch_space_ok = false;
-                        break;
-                    }
-                }
-            }
-            for (auto const &pfc : workunit->post_file_copies) {
-                auto src = std::get<1>(pfc);
-                auto dst = std::get<2>(pfc);
-                if ((src == FileLocation::SCRATCH) ||
-                    (dst == FileLocation::SCRATCH)) {
-                    scratch_space_ok = false;
-                    break;
-                }
-            }
-            for (auto const &cd : workunit->cleanup_file_deletions) {
-                auto location = std::get<1>(cd);
-                if (location == FileLocation::SCRATCH) {
-                    scratch_space_ok = false;
-                    break;
-                }
-            }
-        }
-        if (not scratch_space_ok) {
+        if (not isUseOfScratchSpaceOK()) {
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
                     this->getSharedPtr<WorkunitExecutor>(),
@@ -212,63 +247,40 @@ namespace wrench {
 
         }
 
-        // Check that there is no file location weirdness, and brutally make the file_location 1-element
-        bool file_locations_ok = true;
         WorkflowFile *offending_file = nullptr;
-        for (const auto &fl : workunit->file_locations) {
-            if (fl.second.empty()) {
-                file_locations_ok = false;
-                offending_file = fl.first;
-                break;
-            }
-            if (fl.second.size() > 1) {
-                bool found_a_storage_service = false;
-                for (auto const &fl_l : fl.second) {
-                    if (fl_l->getStorageService()->lookupFile(fl.first, fl_l)) {
-                        found_a_storage_service = true;
-                        workunit->file_locations[fl.first].clear();
-                        workunit->file_locations[fl.first].emplace_back(fl_l);
-                        break;
-                    }
-                }
-                if (not found_a_storage_service) {
-                    file_locations_ok = false;
-                    offending_file = fl.first;
-                    break;
-                }
-            }
-        }
-        if (not file_locations_ok) {
+        if (not areFileLocationsOK(&offending_file)) {
             success = false;
             msg_to_send_back = new WorkunitExecutorFailedMessage(
                     this->getSharedPtr<WorkunitExecutor>(),
                     this->workunit,
                     std::shared_ptr<FileNotFound>(new FileNotFound(offending_file, nullptr)),
                     0.0);
-
         }
 
-        try {
-            S4U_Simulation::computeZeroFlop();
+        if (msg_to_send_back == nullptr) {
 
-            performWork(this->workunit.get());
+            try {
+                S4U_Simulation::computeZeroFlop();
 
-            // build "success!" message
-            success = true;
-            msg_to_send_back = new WorkunitExecutorDoneMessage(
-                    this->getSharedPtr<WorkunitExecutor>(),
-                    this->workunit,
-                    0.0);
+                performWork(this->workunit.get());
 
-        } catch (WorkflowExecutionException &e) {
-            // build "failed!" message
-            WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
-            success = false;
-            msg_to_send_back = new WorkunitExecutorFailedMessage(
-                    this->getSharedPtr<WorkunitExecutor>(),
-                    this->workunit,
-                    e.getCause(),
-                    0.0);
+                // build "success!" message
+                success = true;
+                msg_to_send_back = new WorkunitExecutorDoneMessage(
+                        this->getSharedPtr<WorkunitExecutor>(),
+                        this->workunit,
+                        0.0);
+
+            } catch (WorkflowExecutionException &e) {
+                // build "failed!" message
+                WRENCH_DEBUG("Got an exception while performing work: %s", e.getCause()->toString().c_str());
+                success = false;
+                msg_to_send_back = new WorkunitExecutorFailedMessage(
+                        this->getSharedPtr<WorkunitExecutor>(),
+                        this->workunit,
+                        e.getCause(),
+                        0.0);
+            }
         }
 
         WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
@@ -328,6 +340,7 @@ namespace wrench {
                 S4U_Simulation::sleep(this->thread_startup_overhead);
                 if (dst_location == FileLocation::SCRATCH) {
                     // Always use the job's name as directory if necessary
+                    this->scratch_space->getMountPoint();
                     auto augmented_dst_location = FileLocation::LOCATION(
                             this->scratch_space,
                             this->scratch_space->getMountPoint() + "/" +
