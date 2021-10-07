@@ -36,6 +36,8 @@ public:
 
     void do_ExecutionWithLocationMap_test();
 
+    void do_ExecutionWithLocationMapMultiple_test();
+
     void do_ExecutionWithDefaultStorageService_test();
 
     void do_ExecutionWithPrePostCopiesTaskCleanup_test();
@@ -53,6 +55,7 @@ public:
     void do_ExecutionWithDownService_test();
 
     void do_ExecutionWithSuspendedService_test();
+
 
 protected:
     BareMetalComputeServiceOneTaskTest() {
@@ -912,6 +915,174 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ExecutionWithLocationMapTestWMS(
+                    this, {
+                            compute_service
+                    }, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    // Check that the output trace makes sense
+    ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
+    ASSERT_EQ(task->getFailureCount(), 0);
+    ASSERT_GT(task->getStartDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), task->getStartDate());
+    ASSERT_LT(std::abs(workflow->getCompletionDate() - task->getEndDate()), 0.01);
+
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
+            simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+    ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
+    ASSERT_LT(std::abs(
+            simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate() -
+            task->getEndDate()), 0.01);
+    ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
+              task);
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
+/** EXECUTION WITH LOCATION_MAP MULTIPLE SIMULATION TEST             **/
+/**********************************************************************/
+
+class ExecutionWithLocationMapMultipleTestWMS : public wrench::WMS {
+public:
+    ExecutionWithLocationMapMultipleTestWMS(BareMetalComputeServiceOneTaskTest *test,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                    std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceOneTaskTest *test;
+
+    int main() {
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a job
+        std::map<wrench::WorkflowFile*, std::vector<std::shared_ptr<wrench::FileLocation>>> file_locations;
+        file_locations[test->input_file] = {};
+        // First location won't work, but second will
+        file_locations[test->input_file].push_back(wrench::FileLocation::LOCATION(test->storage_service2, "/disk2"));
+        file_locations[test->input_file].push_back(wrench::FileLocation::LOCATION(test->storage_service1, "/disk1"));
+        file_locations[test->output_file] = {};
+        file_locations[test->output_file].push_back(wrench::FileLocation::LOCATION(test->storage_service1, "/disk1"));
+
+        auto job = job_manager->createStandardJob(test->task,file_locations);
+
+        // Submit the job
+        job_manager->submitJob(job, test->compute_service);
+
+        // Wait for the workflow execution event
+        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        // bogus lookup #1
+        try {
+            wrench::StorageService::lookupFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service1));
+            throw std::runtime_error("Should not have been able to lookup a nullptr file");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // bogus lookup #2
+        try {
+            wrench::StorageService::lookupFile(this->test->output_file, nullptr);
+            throw std::runtime_error("Should not have been able to lookup a nullptr location");
+        } catch (std::invalid_argument &e) {
+        }
+
+
+        if (!wrench::StorageService::lookupFile(this->test->output_file,
+                                                wrench::FileLocation::LOCATION(this->test->storage_service1))) {
+            throw std::runtime_error("Output file not written to storage service");
+        }
+
+
+        /* Do a bogus lookup of the file registry service */
+        try {
+            this->getAvailableFileRegistryService()->lookupEntry(nullptr);
+            throw std::runtime_error("Shouldn't be able to lookup a nullptr entry in the File Registry Service");
+        } catch (std::invalid_argument &e) {
+        }
+
+        /* Do a bogus add entry of the file registry service */
+        try {
+            this->getAvailableFileRegistryService()->addEntry(nullptr, nullptr);
+            throw std::runtime_error("Shouldn't be able to add nullptr entry in the File Registry Service");
+        } catch (std::invalid_argument &e) {
+        }
+
+        /* Do a bogus remove entry of the file registry service */
+        try {
+            this->getAvailableFileRegistryService()->removeEntry(nullptr, nullptr);
+            throw std::runtime_error("Shouldn't be able to remove nullptr entry in the File Registry Service");
+        } catch (std::invalid_argument &e) {
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithLocationMapMultiple) {
+    DO_TEST_WITH_FORK(do_ExecutionWithLocationMapMultiple_test);
+}
+
+void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_test() {
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create a Compute Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname,
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                "")));
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("OneCoreHost", {"/disk1"})));
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service2 = simulation->add(
+            new wrench::SimpleStorageService("OneCoreHost", {"/disk2"})));
+
+    // Create a File Registry Service
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ExecutionWithLocationMapMultipleTestWMS(
                     this, {
                             compute_service
                     }, {
