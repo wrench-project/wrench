@@ -1,0 +1,94 @@
+html {
+    --box-shadow-color: #f7f7f7;
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        --box-shadow-color: #333;
+    }
+}
+
+#top {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    border-bottom: 1px solid var(--separator-color);
+    z-index: 999;
+}
+
+#main-menu {
+    display: none !important;
+}
+
+#MSearchBox {
+    float: left !important;
+}
+
+.link:link {
+    font-size: 0.9em !important;
+}
+
+.dropbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5em 1em;
+    border: none;
+    cursor: pointer;
+    border-radius: 0.5em;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: var(--page-background-color);
+    min-width: 160px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: var(--primary-light-color);
+    color: #fff !important;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: #3e8e41;
+}
+
+.PageDoc {
+    margin-top: 7em !important;
+}
+
+.footer {
+    margin-top: 4em;
+    padding-top: 1em;
+    border-top: 1px solid var(--separator-color);
+    font-size: 0.9em !important;
+    margin-bottom: 4em;
+}
+
+.footer .icon-background {
+    color: var(--separator-color);
+}

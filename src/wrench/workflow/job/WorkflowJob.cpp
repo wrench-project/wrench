@@ -33,6 +33,7 @@ namespace wrench {
     WorkflowJob::WorkflowJob() {
       this->parent_compute_service = nullptr;
       this->submit_date = -1.0;
+      this->end_date = -1.0;
     }
 
     /**
@@ -125,6 +126,14 @@ namespace wrench {
      */
     double WorkflowJob::getSubmitDate() {
       return this->submit_date;
+    }
+
+    /**
+    * @brief Get the date at which the job ended (<0 means "never submitted")
+    * @return the end date
+    */
+    double WorkflowJob::getEndDate() {
+        return this->end_date;
     }
 
     /**

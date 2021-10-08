@@ -353,6 +353,48 @@ namespace wrench {
     }
 
     /**
+     * @brief Method to find out if, right now, the compute service has at least one host
+     *        with some idle number of cores and some available RAM
+     * @param num_cores: the desired number of cores
+     * @param ram: the desired RAM
+     * @return true if idle resources are available, false otherwise
+     */
+    bool ComputeService::isThereAtLeastOneHostWithIdleResources(unsigned long num_cores, double ram) {
+        assertServiceIsUp();
+
+        // send a "info request" message to the daemon's mailbox_name
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+                    answer_mailbox,
+                    num_cores,
+                    ram,
+                    this->getMessagePayloadValue(
+                            ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        // Get the reply
+        std::unique_ptr<SimulationMessage> message = nullptr;
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage*>(message.get())) {
+            return msg->answer;
+
+        } else {
+            throw std::runtime_error(
+                    "bare_metal::isThereAtLeastOneHostWithIdleResources(): unexpected [" + msg->getName() +
+                    "] message");
+        }
+    }
+
+    /**
     * @brief Get the per-core flop rate of the compute service's hosts
     * @return a list of flop rates in flop/sec
     *

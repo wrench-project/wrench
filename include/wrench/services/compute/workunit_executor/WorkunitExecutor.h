@@ -78,6 +78,9 @@ namespace wrench {
 
         void runMulticoreComputationForTask(WorkflowTask *task, bool simulate_computation_as_sleep);
 
+        bool isUseOfScratchSpaceOK();
+        bool areFileLocationsOK(WorkflowFile **offending_file);
+
         std::string callback_mailbox;
         unsigned long num_cores;
         double ram_utilization;
