@@ -114,7 +114,7 @@ namespace wrench {
      *
      * @return an id as a string
      */
-    std::string WorkflowTask::getID() const {
+    const std::string& WorkflowTask::getID() const {
         return this->id;
     }
 
