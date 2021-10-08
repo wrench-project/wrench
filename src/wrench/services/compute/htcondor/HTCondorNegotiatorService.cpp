@@ -244,6 +244,10 @@ namespace wrench {
                 throw std::invalid_argument("HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(): "
                                             "service-specific arguments for Non-Grid universe jobs are currently not supported");
             }
+
+            bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(sjob->getMinimumRequiredNumCores(),
+                                                                                    sjob->getMinimumRequiredMemory());
+#if 0
             // Check on RAM constraints
             auto ram_resources = cs->getPerHostAvailableMemoryCapacity();
             unsigned long max_available_ram_capacity = 0;
@@ -263,11 +267,14 @@ namespace wrench {
             if (max_num_idle_cores < sjob->getMinimumRequiredNumCores()) {
                 continue;
             }
-            // Return the first appropriate CS we found
-            return cs;
+#endif
+            if (enough_idle_resources) {
+                // Return the first appropriate CS we found
+                return cs;
+            }
         }
 
-       return nullptr;
+        return nullptr;
     }
 
 
