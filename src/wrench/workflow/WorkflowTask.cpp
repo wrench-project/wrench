@@ -114,7 +114,7 @@ namespace wrench {
      *
      * @return an id as a string
      */
-    std::string WorkflowTask::getID() const {
+    const std::string& WorkflowTask::getID() const {
         return this->id;
     }
 
@@ -241,6 +241,7 @@ namespace wrench {
 
     /**
      * @brief Get a task internal state as a string
+     *
      * @param internal_state: the internal state
      *
      * @return an internal state as a string
