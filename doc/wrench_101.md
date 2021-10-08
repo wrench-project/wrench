@@ -80,14 +80,13 @@ an extensive SimGrid help message.
 
 ## Step 2: Instantiate a simulated platform #     {#wrench-101-simulator-1000ft-step-2}
 
-This is done with the `wrench::Simulation::instantiatePlatform()`
-member function which takes as argument a [SimGrid virtual platform description
-file](https://simgrid.org/doc/latest/platform.html).  Any SimGrid
-simulation, and thus any WRENCH simulation, must be provided with the
-description of the simulated hardware platform (compute hosts, clusters 
+This is done with the `wrench::Simulation::instantiatePlatform()` method. There are two
+versions of this method. The **first version** takes as argument a [SimGrid virtual platform description
+file](https://simgrid.org/doc/latest/platform.html), we defines all the 
+simulated hardware (compute hosts, clusters 
 of hosts, storage resources, network links, routers, routes between 
 hosts, etc.). The bare-metal-chain simulator comes with a platform 
-description file, `examples/basic-examples/bare-metal-chain/two_hosts.xml`, 
+description file, `examples/basic-examples/bare-metal-bag-of-tasks/two_hosts.xml`, 
 which we include here:
 
 ~~~~~~~~~~~~~{.xml}
@@ -144,12 +143,11 @@ The other two links (`loopback_WMSHost` and `loopback_ComputeHost`) are used to 
 inter-process communication (IPC) performance within each host.   Last, network routes are declared.
 The route from host `WMSHost` and `ComputeHost` is through `network_link`. Then, there
 is a route from each host to itself using each loopback link. Note that these loopback routes
-are optional. By default SimGrid includes a loopback route for each host, with bandwidths and
+are optional. By default, SimGrid includes a loopback route for each host, with bandwidths and
 latencies based on measurements obtained on actual computers. The above XML file  does not
 use these defaults, and instead declare loop routes through much faster loopback links (zero latency
 and extremely high bandwidth). This is because, for this simulation, we want to model a platform
 in  which IPC on a host is essentially free. 
- 
 
 We refer the reader 
 to platform description files in other examples in the  `examples` directory 
@@ -162,6 +160,15 @@ its 2nd command-line argument and thus instantiates the simulated platform as:
 ~~~~~~~~~~~~~{.cpp}
 simulation.instantiatePlatform(argv[2]);
 ~~~~~~~~~~~~~
+
+The **second version** of the `wrench::Simulation::instantiatePlatform()` method takes as input 
+a function that creates the platform description programmatically using the 
+[SimGrid platform description API](https://simgrid.org/doc/latest/Platform_cpp.html). The 
+example in `examples/basic-examples/bare-metal-bag-of-tasks-programmatic-platform` shows how
+the XML platform description in `examples/basic-examples/bare-metal-bag-of-tasks/two_hosts.xml` can
+be implemented programmatically. (Note that this example passes a functor to `wrench::Simulation::instantiatePlatform()`
+rather than a plain method.)
+
 
 ## Step 3: Instantiate services on the platform #    {#wrench-101-simulator-1000ft-step-3}
 

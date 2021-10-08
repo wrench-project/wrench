@@ -360,4 +360,42 @@ namespace wrench {
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
             std::map<std::string, std::map<std::string, double>> info, double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
+
+
+    /**
+    * @brief Constructor
+    *
+    * @param answer_mailbox: the mailbox to which to send the answer
+    * @param num_cores: the desired number of cores
+    * @param ram: the desired RAM
+    * @param payload: the message size in bytes
+    *
+    * @throw std::invalid_argument
+    */
+    ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+            const std::string &answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
+            "DOES_AT_LEAST_ONE_HOST_HAVE_THIS_MANY_IDLE_CORES_REQUEST",
+            payload) {
+
+        if (answer_mailbox.empty()) {
+            throw std::invalid_argument(
+                    "ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(): "
+                    "Invalid arguments");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->num_cores = num_cores;
+        this->ram = ram;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param execution_hosts: the hosts available for running virtual machines
+     * @param answer: true/false
+     * @param payload: the message size in bytes
+     */
+    ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
+            bool answer, double payload) : ComputeServiceMessage(
+            "DOES_AT_LEAST_ONE_HOST_HAVE_THIS_MANY_IDLE_CORES_ANSWER", payload), answer(answer) {}
+
 };

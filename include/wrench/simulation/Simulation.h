@@ -53,6 +53,7 @@ namespace wrench {
         void init(int *, char **);
 
         void instantiatePlatform(std::string);
+        void instantiatePlatform(const std::function<void()>&);
 
         static std::vector<std::string> getHostnameList();
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
@@ -203,6 +204,8 @@ namespace wrench {
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 
         bool is_running = false;
+
+        bool already_setup = false;
 
         unsigned int on_state_change_callback_id;
 

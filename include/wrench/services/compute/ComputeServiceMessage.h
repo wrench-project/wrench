@@ -262,6 +262,34 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> info;
     };
 
+    /**
+     * @brief A message sent to a ComputeService to asks if at least one host has some available resources right now
+     */
+    class ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(const std::string &answer_mailbox,
+                                                                                         unsigned long num_cores,
+                                                                                         double ram, double payload);
+
+        /** @brief The mailbox to which a reply should be sent */
+        std::string answer_mailbox;
+        /** @brief The number of cores desired */
+        unsigned long num_cores;
+        /** @brief The RAM desired */
+        double ram;
+    };
+
+    /**
+     * @brief A message sent by a ComputeService in answer to a "does at least one host have these available resources" request
+     */
+    class ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(bool answer, double payload);
+
+        /** @brief The true/false answer */
+        bool answer;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/
