@@ -222,7 +222,7 @@ provides a `wrench::JobManager::createPilotJob()` member function and several
 versions of a `wrench::JobManager::createStandardJob()` member function.  Briefly
 put, the job manager is a job factory.
 
-The job manager provides the following expected member functions:
+In addition to member functions for job creation, the job manager also provides the following:
 
   - `wrench::JobManager::submitJob()`: asynchronous submission of a job to a compute service.
 
