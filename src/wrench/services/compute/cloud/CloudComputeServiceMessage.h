@@ -259,37 +259,6 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
     };
 
-    /**
-    * @brief Top-level class for messages received/sent by a CloudComputeService
-    */
-    class BareMetalComputeServiceMessage : public ComputeServiceMessage {
-    protected:
-        BareMetalComputeServiceMessage(const std::string &name, double payload);
-    };
-
-    /**
-     * @brief A message sent to a BareMetalComputeService to asks if at least one host has some number of cores idle right now
-     */
-    class BareMetalComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage : public BareMetalComputeServiceMessage {
-    public:
-        BareMetalComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(const std::string &answer_mailbox,
-                                                                                         unsigned long num_cores,
-                                                                                         double ram, double payload);
-
-        /** @brief The mailbox to which a reply should be sent */
-        std::string answer_mailbox;
-    };
-
-    /**
-     * @brief A message sent by a BareMetalComputeService in answer to a "does at least one host have this many idle cores" request
-     */
-    class BareMetalComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage : public BareMetalComputeServiceMessage {
-    public:
-        BareMetalComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(bool answer, double payload);
-
-        /** @brief The true/false answer */
-        bool answer;
-    };
     /***********************/
     /** \endcond           */
     /***********************/
