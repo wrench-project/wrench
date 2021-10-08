@@ -433,6 +433,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   int argc = 1;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
+//  argv[1] = strdup("--wrench-full-log");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -922,7 +923,7 @@ private:
       //   - copies file "input" to the scratch space
       //   - runs task1
       auto job1 = job_manager->createStandardJob(
-              {task1}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+              {task1}, (std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(file1,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},
