@@ -35,7 +35,7 @@ vm2_cs cloud_cs->startVM(vm2);
 auto job_manager = this->createJobManager();
 
 // Create a job
-auto job = job_manager->createStandardJob({... some tasks ...}, {});
+auto job = job_manager->createStandardJob({... some tasks ...});
 
 // Submit the job to the 1st VM (i.e., to its bare-metal compute service)
 job_manager->submitJob(job, vm1_cs);

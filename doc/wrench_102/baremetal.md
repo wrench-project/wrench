@@ -16,7 +16,7 @@ auto job = job_manager->createStandardJob(
                  {this->getWorklow()->getTaskByID("task1"),
                   this->getWorklow()->getTaskByID("task2"),
                   this->getWorklow()->getTaskByID("task3"),
-                  this->getWorklow()->getTaskByID("task4")}, {});
+                  this->getWorklow()->getTaskByID("task4")});
 
 // Submit the job to the bare-metal service
 job_manager->submitJob(job, baremetal_cs);
