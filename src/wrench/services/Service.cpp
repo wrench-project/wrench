@@ -75,7 +75,6 @@ namespace wrench {
 
     }
 
-
     /**
      * @brief Destructor
      */
@@ -250,17 +249,22 @@ namespace wrench {
         try {
             // Setting the state to UP
             this->state = Service::UP;
+
             // Creating the life saver so that the the actor will never see the
             // Service object deleted from under its feet
             this->createLifeSaver(this_service);
+
             // Keep track of the master share_ptr reference to this service
             Service::service_shared_ptr_map[this] = this_service;
+
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
+
             // Print some information a out the currently tracked daemons
             WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
                          Service::service_shared_ptr_map.size(), Service::num_terminated_services);
-            if ((Service::service_shared_ptr_map.size() > 1000) or
+
+            if ((Service::service_shared_ptr_map.size() > 5000) or
                 (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
                 Service::cleanupTrackedServices();
                 Service::num_terminated_services = 0;
