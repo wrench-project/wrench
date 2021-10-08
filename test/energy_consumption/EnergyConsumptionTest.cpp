@@ -163,10 +163,7 @@ private:
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            auto job = job_manager->createStandardJob(
-                    task,
-                    {
-                    });
+            auto job = job_manager->createStandardJob(task);
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
@@ -371,10 +368,7 @@ private:
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            auto job = job_manager->createStandardJob(
-                    task,
-                    {
-                    });
+            auto job = job_manager->createStandardJob(task);
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
@@ -567,10 +561,7 @@ private:
             wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            auto job = job_manager->createStandardJob(
-                    task,
-                    {
-                    });
+            auto job = job_manager->createStandardJob(task);
             //sleep for 10 seconds
             wrench::S4U_Simulation::sleep(10);
             //let's execute the job, this should take ~100 sec based on the 100MF speed
@@ -879,19 +870,13 @@ private:
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            auto job1 = job_manager->createStandardJob(
-                    task1,
-                    {
-                    });
+            auto job1 = job_manager->createStandardJob(task1);
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
             wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
-            auto job2 = job_manager->createStandardJob(
-                    task2,
-                    {
-                    });
+            auto job2 = job_manager->createStandardJob(task2);
 
 
             //First energy consumption test

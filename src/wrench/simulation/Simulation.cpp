@@ -239,7 +239,6 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void Simulation::instantiatePlatform(std::string filename) {
-        static bool already_setup = false;
 
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
@@ -256,10 +255,37 @@ namespace wrench {
             throw;
         }
 
-        already_setup = true;
+        this->already_setup = true;
     }
 
-/**
+
+    /**
+     * @brief Instantiate a simulated platform
+     *
+     * @param creation_function void() function to create the platform
+     */
+    void Simulation::instantiatePlatform(const std::function<void()>& creation_function) {
+
+        if (not this->s4u_simulation->isInitialized()) {
+            throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
+        }
+        if (already_setup) {
+            throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
+        }
+
+        this->s4u_simulation->setupPlatform(creation_function);
+
+        try {
+            this->platformSanityCheck();
+        } catch (std::exception &e) {
+            throw;
+        }
+
+        this->already_setup = true;
+    }
+
+
+    /**
  * @brief Get the list of names of all the physical hosts in the platform
  *
  * @return a vector of hostnames
@@ -310,7 +336,7 @@ namespace wrench {
 /**
  * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
  *        simulation output if record_as_time_stamp is set to true
- * @param link_name: the link name
+ * @param link_name: the link's name
  * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
  * @return current bandwidth usage in Bps
  * @throws std::invalid_argument

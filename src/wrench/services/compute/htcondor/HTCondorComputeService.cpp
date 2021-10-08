@@ -475,6 +475,18 @@ namespace wrench {
         return;
     }
 
+
+    /**
+      * @brief Process a host available resource request
+      * @param answer_mailbox: the answer mailbox
+      * @param num_cores: the desired number of cores
+      * @param ram: the desired RAM
+      */
+    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
+        throw std::runtime_error("HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A HTCondor service does not support this operation");
+    }
+
+
     /**
      * @brief Terminate the daemon.
      */

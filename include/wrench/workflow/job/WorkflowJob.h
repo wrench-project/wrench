@@ -51,6 +51,7 @@ namespace wrench {
         std::string getName();
 
         double getSubmitDate();
+        double getEndDate();
 
         /***********************/
         /** \cond INTERNAL     */
@@ -93,6 +94,8 @@ namespace wrench {
         std::string name;
         /** @brief The date at which the job was last submitted */
         double submit_date;
+        /** @brief The date at which the job ended (with success or failure) */
+        double end_date;
         /** @brief The compute service to which the job was submitted */
         std::shared_ptr<ComputeService> parent_compute_service;
 

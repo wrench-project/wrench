@@ -104,7 +104,6 @@ public:
         this->test = test;
     }
 
-
 private:
 
     BareMetalComputeServiceTestScheduling *test;
@@ -123,7 +122,7 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-            auto j = job_manager->createStandardJob(t, {});
+            auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), "Host1:1"));
             job_manager->submitJob(j, this->test->cs, cs_specific_args);
@@ -274,7 +273,7 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-            auto j = job_manager->createStandardJob(t, {});
+            auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), ""));
             job_manager->submitJob(j, this->test->cs, cs_specific_args);
@@ -409,7 +408,7 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-            auto j = job_manager->createStandardJob(t, {});
+            auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), ""));
             job_manager->submitJob(j, this->test->cs, cs_specific_args);

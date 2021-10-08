@@ -1,6 +1,18 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.9
+
+(August 24, 2021) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
+
+- Performance improvement ([#221](https://github.com/wrench-project/wrench/issues/221))
+- Updates to HTCondor component and API ([#220](https://github.com/wrench-project/wrench/issues/220))
+- Enhancement ([#225](https://github.com/wrench-project/wrench/issues/225))
+
+**Note**: WRENCH 1.9 requires [SimGrid 3.27](https://simgrid.org)
+
+---
+
 ### WRENCH 1.8
 
 (February 18, 2021) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:

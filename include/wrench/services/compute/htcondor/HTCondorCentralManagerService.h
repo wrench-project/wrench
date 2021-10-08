@@ -16,6 +16,9 @@
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h"
 
 namespace wrench {
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
     /**
      * @brief A HTCondor central manager service implementation
@@ -40,9 +43,6 @@ namespace wrench {
 
     public:
 
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
 
         HTCondorCentralManagerService(const std::string &hostname,
                                       double negotiator_startup_overhead,
@@ -68,10 +68,6 @@ namespace wrench {
 
         bool jobCanRunSomewhere(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
 
-
-        /***********************/
-        /** \endcond          **/
-        /***********************/
 
     private:
         int main() override;
@@ -109,6 +105,10 @@ namespace wrench {
         double negotiator_startup_overhead = 0.0;
 
     };
+
+    /***********************/
+    /** \endcond          **/
+    /***********************/
 
 }
 
