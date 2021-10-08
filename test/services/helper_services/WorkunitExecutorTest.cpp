@@ -160,10 +160,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -180,10 +177,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(nullptr, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -200,10 +194,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, nullptr, wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -220,10 +211,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), nullptr));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -241,10 +229,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
 
         file_locations[input_file] = {nullptr};
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
@@ -261,11 +246,8 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
 
         file_locations[input_file] = {};
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
         file_locations[input_file].push_back(nullptr);
->>>>>>> simgrid-3.28
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
 
@@ -281,10 +263,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(nullptr, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -301,10 +280,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, nullptr, wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -321,10 +297,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), nullptr));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -341,10 +314,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(nullptr, wrench::FileLocation::LOCATION(this->storage_service2)));
@@ -361,10 +331,7 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation> >> cleanup_file_deletions;
 
         pre_file_copies.push_back(std::make_tuple(input_file, wrench::FileLocation::LOCATION(this->storage_service1), wrench::FileLocation::LOCATION(this->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file, wrench::FileLocation::LOCATION(this->storage_service2), wrench::FileLocation::LOCATION(this->storage_service1)));
         cleanup_file_deletions.push_back(std::make_tuple(input_file, nullptr));
@@ -424,10 +391,7 @@ private:
         pre_file_copies.push_back(std::make_tuple(input_file,
                                                   wrench::FileLocation::LOCATION(this->test->storage_service1),
                                                   wrench::FileLocation::LOCATION(this->test->storage_service2)));
-<<<<<<< HEAD
-=======
         file_locations[input_file] = {};
->>>>>>> simgrid-3.28
         file_locations[input_file].push_back(wrench::FileLocation::LOCATION(this->test->storage_service2));
         post_file_copies.push_back(std::make_tuple(output_file,
                                                    wrench::FileLocation::LOCATION(this->test->storage_service2),
