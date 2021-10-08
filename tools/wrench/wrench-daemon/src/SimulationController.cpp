@@ -386,7 +386,7 @@ namespace wrench {
             tasks.push_back(this->getWorkflow()->getTaskByID(name));
         }
 
-        auto job = this->job_manager->createStandardJob(tasks, {});
+        auto job = this->job_manager->createStandardJob(tasks);
         this->job_registry.insert(job->getName(), job);
         json answer;
         answer["job_name"] = job->getName();
