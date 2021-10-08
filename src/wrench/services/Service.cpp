@@ -48,6 +48,7 @@ namespace wrench {
      * @brief Go through the tracked services and remove all entries with a refcount of 1!
      */
     void Service::cleanupTrackedServices() {
+#if 0
         std::set<Service *> to_cleanup;
 
         // TODO: Perhaps do this as one step?
@@ -61,6 +62,17 @@ namespace wrench {
         for (auto const &x : to_cleanup) {
             Service::service_shared_ptr_map.erase(x);
         }
+#endif
+
+        auto it = Service::service_shared_ptr_map.begin();
+        while (it != Service::service_shared_ptr_map.end()) {
+            if (it->second.use_count() == 1) {
+                it = Service::service_shared_ptr_map.erase(it);
+            } else {
+                it++;
+            }
+        }
+
     }
 
 
