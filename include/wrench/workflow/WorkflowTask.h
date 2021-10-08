@@ -31,7 +31,7 @@ namespace wrench {
     class WorkflowTask {
 
     public:
-        std::string getID() const;
+        const std::string& getID() const;
 
         double getFlops() const;
 

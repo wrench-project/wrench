@@ -48,6 +48,7 @@ namespace wrench {
      * @brief Go through the tracked services and remove all entries with a refcount of 1!
      */
     void Service::cleanupTrackedServices() {
+#if 0
         std::set<Service *> to_cleanup;
 
         // TODO: Perhaps do this as one step?
@@ -61,8 +62,18 @@ namespace wrench {
         for (auto const &x : to_cleanup) {
             Service::service_shared_ptr_map.erase(x);
         }
-    }
+#endif
 
+        auto it = Service::service_shared_ptr_map.begin();
+        while (it != Service::service_shared_ptr_map.end()) {
+            if (it->second.use_count() == 1) {
+                it = Service::service_shared_ptr_map.erase(it);
+            } else {
+                it++;
+            }
+        }
+
+    }
 
     /**
      * @brief Destructor
@@ -238,17 +249,22 @@ namespace wrench {
         try {
             // Setting the state to UP
             this->state = Service::UP;
+
             // Creating the life saver so that the the actor will never see the
             // Service object deleted from under its feet
             this->createLifeSaver(this_service);
+
             // Keep track of the master share_ptr reference to this service
             Service::service_shared_ptr_map[this] = this_service;
+
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
+
             // Print some information a out the currently tracked daemons
             WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
                          Service::service_shared_ptr_map.size(), Service::num_terminated_services);
-            if ((Service::service_shared_ptr_map.size() > 1000) or
+
+            if ((Service::service_shared_ptr_map.size() > 5000) or
                 (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
                 Service::cleanupTrackedServices();
                 Service::num_terminated_services = 0;
