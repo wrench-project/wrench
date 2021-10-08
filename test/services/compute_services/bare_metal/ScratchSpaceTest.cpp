@@ -176,7 +176,7 @@ private:
         // Create a StandardJob with some pre-copies
         auto job = job_manager->createStandardJob(
                 {task},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -314,7 +314,7 @@ private:
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         auto job1 = job_manager->createStandardJob(
                 {task1},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -325,7 +325,7 @@ private:
         // Create a StandardJob with NO pre-copies from public storage to scratch
         auto job2 = job_manager->createStandardJob(
                 {task2},
-                {},
+                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -433,6 +433,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   int argc = 1;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
+//  argv[1] = strdup("--wrench-full-log");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -568,7 +569,7 @@ private:
       // Create a StandardJob with SOME pre-copies from public storage to scratch
       auto job1 = job_manager->createStandardJob(
               {task1},
-              {},
+              (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"),
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},
@@ -578,7 +579,7 @@ private:
       // Create a StandardJob with SOME pre-copies from public storage to scratch
       auto job2 = job_manager->createStandardJob(
               {task2},
-              {},
+              (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"),
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},
@@ -588,7 +589,7 @@ private:
       // Create a StandardJob with SOME pre-copies from public storage to scratch
       auto job3 = job_manager->createStandardJob(
               {task3},
-              {},
+              (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(this->getWorkflow()->getFileByID("input_file3"),
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},
@@ -765,7 +766,7 @@ private:
       //   - runs task1 and then task2 (10 second each)
       //   - (task 2 needs "input")
       auto job1 = job_manager->createStandardJob(
-              {task1, task2}, {},
+              {task1, task2}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(file,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},
@@ -775,7 +776,7 @@ private:
       //    - copies file "input" to the scratch space
       //    - runs task3 (1 second)
       auto job2 = job_manager->createStandardJob(
-              {task3}, {},
+              {task3}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(file,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},
@@ -922,7 +923,7 @@ private:
       //   - copies file "input" to the scratch space
       //   - runs task1
       auto job1 = job_manager->createStandardJob(
-              {task1}, {},
+              {task1}, (std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(file1,
                                wrench::FileLocation::LOCATION(this->test->storage_service1),
                                wrench::FileLocation::SCRATCH)},

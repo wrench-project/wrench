@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "1")
-set(WRENCH_VERSION_MINOR "9")
+set(WRENCH_VERSION_MINOR "10")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -40,7 +40,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR}/include ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/simgrid/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/simgrid/include)
 
 
 # For MacOS's MacPorts

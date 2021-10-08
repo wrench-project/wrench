@@ -110,7 +110,8 @@ namespace wrench {
         WRENCH_INFO("Waiting and event");
         this->waitForAndProcessNextEvent();
 
-        /*  Submit a job that runs both tasks to the pilot job  */
+        /* At this point, we know (in this simple example) the pilot job has started */
+        /* Submit a job that runs both tasks to the pilot job  */
         WRENCH_INFO("Creating a standard job for both tasks");
         auto cs = pilot_job->getComputeService();
 

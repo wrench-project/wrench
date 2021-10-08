@@ -2,13 +2,12 @@
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
 [![Coverage Status][codecov-badge]][codecov-link]
-[![Codacy Badge][codacy-badge]][codacy-link]
+[![CodeFactor Badge][codefactor-badge]][codefactor-link]
 [![CII Best Practices][cii-badge]][cii-link]
 [![Slack][slack-badge]][slack-link]
 
-<img src="doc/images/logo-vertical.png" width="100" />
-
-**_Workflow Management System Simulation Workbench_**
+<a href="https://wrench-project.org" target="_blank"><img src="https://wrench-project.org/images/logo-horizontal.png" width="350" alt="WRENCH Project" /></a>
+<br/>_Cyberinfrastructure Simulation Workbench_
 
 WRENCH is an _open-source library_ for developing workflow simulators. WRENCH exposes several high-level simulation 
 abstractions to provide the **building blocks** for developing custom simulators.
@@ -38,7 +37,7 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.27
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.29
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
@@ -67,7 +66,7 @@ sudo make install
 
 To use a non-standard SimGrid installation path:
 ```bash
-cmake -DSIMGRID_INSTALL_PATH=/my/simgrid/path/ .
+cmake -DSimGrid_PATH=/my/simgrid/path/ .
 make
 sudo make install 
 ```
@@ -125,8 +124,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [coveralls-link]:           https://coveralls.io/github/wrench-project/wrench?branch=master
 [release-badge]:            https://img.shields.io/github/release/wrench-project/wrench/all.svg
 [release-link]:             https://github.com/wrench-project/wrench/releases
-[codacy-badge]:             https://api.codacy.com/project/badge/Grade/212b95f0b0954fb8b49ab3b90ed0df60
-[codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
+[codefactor-badge]:         https://www.codefactor.io/repository/github/wrench-project/wrench/badge/master
+[codefactor-link]:          https://www.codefactor.io/repository/github/wrench-project/wrench/overview/master
 [sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
 [cii-badge]:                https://bestpractices.coreinfrastructure.org/projects/2357/badge

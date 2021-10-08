@@ -490,9 +490,11 @@ namespace wrench {
             fs->reserveSpace(file, dst_location->getAbsolutePathAtMountPoint());
         }
 
-        WRENCH_INFO("Asynchronously copying file %s from location %s",
+        WRENCH_INFO("Starting a thread to copy file %s from %s to %s",
                     file->getID().c_str(),
-                    src_location->toString().c_str());
+                    src_location->toString().c_str(),
+                    dst_location->toString().c_str()
+                    );
 
         // Create a file transfer thread
         auto ftt = std::shared_ptr<FileTransferThread>(
@@ -562,6 +564,7 @@ namespace wrench {
         // Was the destination me?
         if (dst_location and (dst_location->getStorageService().get() == this)) {
             if (success) {
+                WRENCH_INFO("File %s stored!", file->getID().c_str());
                 this->file_systems[dst_location->getMountPoint()]->storeFileInDirectory(
                         file, dst_location->getAbsolutePathAtMountPoint());
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
@@ -580,21 +583,21 @@ namespace wrench {
 
         // Send back the relevant ack if this was a read
         if (not answer_mailbox_if_read.empty()) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Sending back an ack since this was a file read and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
         }
 
         // Send back the relevant ack if this was a write
         if (not answer_mailbox_if_write.empty()) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Sending back an ack since this was a file write and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
         }
 
         // Send back the relevant ack if this was a copy
         if (not answer_mailbox_if_copy.empty()) {
-            WRENCH_INFO(
+            WRENCH_DEBUG(
                     "Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
                 throw std::runtime_error("SimpleStorageService::processFileTransferThreadNotification(): "

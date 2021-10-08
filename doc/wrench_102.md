@@ -11,7 +11,6 @@ are provided in the [Developer API Reference](./developer/annotated.html).
 
 [TOC]
 
----
 
 # Basic blueprint for a WMS implementation #        {#wrench-102-WMS-10000ft}
 
