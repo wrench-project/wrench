@@ -93,7 +93,7 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename: the path to an XML platform description file
+     * @param filename the path to an XML platform description file
      *
      * @throw std::invalid_argument
      */
@@ -109,6 +109,24 @@ namespace wrench {
 
         this->platform_setup = true;
     }
+
+
+    /**
+     * @brief Initialize the simulated platform. Must only be called once.
+     *
+     * @param creation_function void() function to create the platform
+     *
+     * @throw std::invalid_argument
+     */
+    void S4U_Simulation::setupPlatform(const std::function<void()>& creation_function) {
+        try {
+            creation_function();
+        } catch (std::exception &e) {
+            throw;
+        }
+        this->platform_setup = true;
+    }
+
 
     /**
      * @brief Get the hostname on which the calling actor is running
@@ -646,7 +664,7 @@ namespace wrench {
                                         std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
-            host->set_pstate(pstate);
+            host->set_pstate((unsigned long)pstate);
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
@@ -830,6 +848,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::hostHasMountPoint(): Unknown host " + hostname);
         }
+
 
         std::set<std::string> mount_points;
         for (auto const &d : host->get_disks()) {

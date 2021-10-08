@@ -103,11 +103,11 @@ protected:
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1000000B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "          <disk id=\"other_other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1000000B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch2\"/>"
                           "          </disk>"
@@ -117,11 +117,11 @@ protected:
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "          <disk id=\"other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1000000B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "          <disk id=\"other_other_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"1000000B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch2\"/>"
                           "          </disk>"
@@ -148,7 +148,7 @@ protected:
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
-                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "          <disk id=\"other_scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch2\"/>"
                            "          </disk>"
@@ -162,7 +162,7 @@ protected:
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
-                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "          <disk id=\"other_scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch2\"/>"
                            "          </disk>"
@@ -176,7 +176,7 @@ protected:
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
-                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "          <disk id=\"other_scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch2\"/>"
                            "          </disk>"
@@ -190,7 +190,7 @@ protected:
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch\"/>"
                            "          </disk>"
-                           "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                           "          <disk id=\"other_scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                            "             <prop id=\"size\" value=\"1000000GB\"/>"
                            "             <prop id=\"mount\" value=\"/scratch2\"/>"
                            "          </disk>"
@@ -1355,7 +1355,7 @@ private:
 
         {
             auto big_task = this->getWorkflow()->addTask("big_task", 1000.0, 100, 100, 0);
-            auto ngrid_job = job_manager->createStandardJob({big_task});
+            auto ngrid_job = job_manager->createStandardJob(big_task);
             // Submit the job for execution
             try {
                 job_manager->submitJob(ngrid_job, this->test->compute_service, {});

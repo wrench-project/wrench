@@ -1620,7 +1620,7 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob(
-                {this->test->task1}, (std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>>){},
+                {this->test->task1}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(
                         this->test->input_file,
                         wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -1751,7 +1751,7 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob(
-                {this->test->task1}, (std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>>){},
+                {this->test->task1}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},

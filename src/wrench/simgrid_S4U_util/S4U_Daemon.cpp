@@ -233,7 +233,6 @@ namespace wrench {
         return this->auto_restart;
     }
 
-
 /**
  * @brief Return the daemonized status of the daemon
  * @return true or false
