@@ -104,7 +104,6 @@ public:
         this->test = test;
     }
 
-
 private:
 
     BareMetalComputeServiceTestScheduling *test;

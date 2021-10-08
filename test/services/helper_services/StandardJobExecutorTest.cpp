@@ -548,7 +548,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -745,7 +745,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -926,7 +926,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1108,7 +1108,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1287,7 +1287,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1439,7 +1439,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1600,7 +1600,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1758,7 +1758,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2144,7 +2144,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2435,7 +2435,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2594,7 +2594,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2751,7 +2751,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2928,7 +2928,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -2981,7 +2981,7 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -3120,6 +3120,6 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     delete simulation;
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }

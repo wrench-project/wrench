@@ -209,7 +209,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, UnsupportedStandardJobs) {
-DO_TEST_WITH_FORK(do_UnsupportedStandardJobs_test);
+    DO_TEST_WITH_FORK(do_UnsupportedStandardJobs_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() {
@@ -258,7 +258,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -319,7 +319,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, BogusNumCores) {
-DO_TEST_WITH_FORK(do_BogusNumCores_test);
+    DO_TEST_WITH_FORK(do_BogusNumCores_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
@@ -368,7 +368,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -445,7 +445,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, TwoSingleCoreTasks) {
-DO_TEST_WITH_FORK(do_TwoSingleCoreTasks_test);
+    DO_TEST_WITH_FORK(do_TwoSingleCoreTasks_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
@@ -496,7 +496,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -532,10 +532,10 @@ private:
         // Create a 2-task job
         auto two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                                                                           {std::make_tuple(this->test->input_file,
-                                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::SCRATCH)},
-                                                                           {}, {});
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {}, {});
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -573,7 +573,7 @@ private:
 
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, TwoDualCoreTasksCase1) {
-DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase1_test);
+    DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase1_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
@@ -621,7 +621,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -658,10 +658,10 @@ private:
         // Create a 2-task job
         auto two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                                                                           {std::make_tuple(this->test->input_file,
-                                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::SCRATCH)},
-                                                                           {}, {});
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {}, {});
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -713,7 +713,7 @@ private:
 
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, TwoDualCoreTasksCase2) {
-DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase2_test);
+    DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase2_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
@@ -763,7 +763,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -895,10 +895,10 @@ private:
         // both tasks should run in parallel, use 4 cores each, thus oversubscribing
         auto two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8},
                                                              (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                                                                             {std::make_tuple(this->test->input_file,
-                                                                                              wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                              wrench::FileLocation::SCRATCH)},
-                                                                             {}, {});
+                                                             {std::make_tuple(this->test->input_file,
+                                                                              wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                              wrench::FileLocation::SCRATCH)},
+                                                             {}, {});
 
         job_manager->submitJob(two_task_job_2, this->test->compute_service,
                                {{"task_7_8s_1_to_4_cores","QuadCoreHost"},{"task_8_8s_2_to_4_cores",""}});
@@ -939,7 +939,7 @@ private:
 
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, TwoDualCoreTasksCase3) {
-DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase3_test);
+    DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase3_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
@@ -988,7 +988,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1025,10 +1025,10 @@ private:
         // Create a 2-task job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                                                                           {std::make_tuple(this->test->input_file,
-                                                                                   wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                   wrench::FileLocation::SCRATCH)},
-                                                                           {}, {});
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {}, {});
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1058,7 +1058,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, JobTermination) {
-DO_TEST_WITH_FORK(do_JobTermination_test);
+    DO_TEST_WITH_FORK(do_JobTermination_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
@@ -1113,7 +1113,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1174,7 +1174,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, NonSubmittedJobTermination) {
-DO_TEST_WITH_FORK(do_NonSubmittedJobTermination_test);
+    DO_TEST_WITH_FORK(do_NonSubmittedJobTermination_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test() {
@@ -1230,7 +1230,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1267,10 +1267,10 @@ private:
         // Create a 2-task job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                                                                           {std::make_tuple(this->test->input_file,
-                                                                                   wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                   wrench::FileLocation::SCRATCH)},
-                                                                           {}, {});
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {}, {});
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1298,7 +1298,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, CompletedJobTermination) {
-DO_TEST_WITH_FORK(do_CompletedJobTermination_test);
+    DO_TEST_WITH_FORK(do_CompletedJobTermination_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() {
@@ -1325,7 +1325,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname,
-                                                        std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch", {})));
 
     // Create a WMS
@@ -1355,7 +1355,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1393,10 +1393,10 @@ private:
         // Create a 2-task job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                                                                           {std::make_tuple(this->test->input_file,
-                                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
-                                                                                            wrench::FileLocation::SCRATCH)},
-                                                                           {}, {});
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {}, {});
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1436,7 +1436,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, ShutdownComputeServiceWhileJobIsRunning) {
-DO_TEST_WITH_FORK(do_ShutdownComputeServiceWhileJobIsRunning_test);
+    DO_TEST_WITH_FORK(do_ShutdownComputeServiceWhileJobIsRunning_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobIsRunning_test() {
@@ -1492,7 +1492,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -1563,7 +1563,7 @@ private:
 };
 
 TEST_F(BareMetalComputeServiceTestStandardJobs, ShutdownStorageServiceBeforeJobIsSubmitted) {
-DO_TEST_WITH_FORK(do_ShutdownStorageServiceBeforeJobIsSubmitted_test);
+    DO_TEST_WITH_FORK(do_ShutdownStorageServiceBeforeJobIsSubmitted_test);
 }
 
 void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
@@ -1618,6 +1618,6 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
 
     delete simulation;
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
