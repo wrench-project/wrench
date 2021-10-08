@@ -679,8 +679,7 @@ private:
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
-                {this->test->task1},
-                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                {this->test->task1}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
