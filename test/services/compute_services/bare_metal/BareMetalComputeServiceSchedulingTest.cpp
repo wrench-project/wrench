@@ -122,7 +122,6 @@ private:
 
         // Submit them in order
         for (auto const & t : tasks) {
-
             auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), "Host1:1"));

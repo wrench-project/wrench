@@ -1347,11 +1347,11 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
                             "time": 0.0
                         },
                         {
-                            "bytes per second": 121250000.0,
+                            "bytes per second": 125000000.00000001,
                             "time": 2.0
                         },
                         {
-                            "bytes per second": 121250000.0,
+                            "bytes per second": 125000000.00000001,
                             "time": 86.0
                         }
                     ],

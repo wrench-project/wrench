@@ -49,7 +49,7 @@ protected:
               "             <prop id=\"size\" value=\"10000000000000B\"/>"
               "             <prop id=\"mount\" value=\"/otherdisk\"/>"
               "          </disk>"
-              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+              "          <disk id=\"scratch_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
               "             <prop id=\"size\" value=\"100B\"/>"
               "             <prop id=\"mount\" value=\"/scratch\"/>"
               "          </disk>"
@@ -59,7 +59,7 @@ protected:
               "             <prop id=\"size\" value=\"10000000000000B\"/>"
               "             <prop id=\"mount\" value=\"/\"/>"
               "          </disk>"
-              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+              "          <disk id=\"scratch_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
               "             <prop id=\"size\" value=\"100B\"/>"
               "             <prop id=\"mount\" value=\"/scratch\"/>"
               "          </disk>"
@@ -69,7 +69,7 @@ protected:
               "             <prop id=\"size\" value=\"10000000000000B\"/>"
               "             <prop id=\"mount\" value=\"/\"/>"
               "          </disk>"
-              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+              "          <disk id=\"scratch_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
               "             <prop id=\"size\" value=\"100B\"/>"
               "             <prop id=\"mount\" value=\"/scratch\"/>"
               "          </disk>"
@@ -79,7 +79,7 @@ protected:
               "             <prop id=\"size\" value=\"100B\"/>"
               "             <prop id=\"mount\" value=\"/\"/>"
               "          </disk>"
-              "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+              "          <disk id=\"scratch_large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
               "             <prop id=\"size\" value=\"100B\"/>"
               "             <prop id=\"mount\" value=\"/scratch\"/>"
               "          </disk>"
@@ -451,15 +451,16 @@ void FileRegistryTest::do_lookupEntry_Test() {
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
+//  argv[1] = strdup("--wrench-full-log");
 
   simulation->init(&argc, argv);
 
   simulation->instantiatePlatform(platform_file_path);
 
-  std::string host1 = wrench::Simulation::getHostnameList()[0];
-  std::string host2 = wrench::Simulation::getHostnameList()[1];
-  std::string host3 = wrench::Simulation::getHostnameList()[2];
-  std::string host4 = wrench::Simulation::getHostnameList()[3];
+  std::string host1 = "Host1";
+  std::string host2 = "Host2";
+  std::string host3 = "Host3";
+  std::string host4 = "Host4";
 
   auto network_proximity_service = simulation->add(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
 

@@ -104,7 +104,7 @@ namespace wrench {
             // Create a Standard Job with only the tasks
             std::shared_ptr<StandardJob> standard_job;
             try {
-                standard_job = job_manager->createStandardJob(to_submit, (std::map<WorkflowFile *, std::shared_ptr<FileLocation>>){});
+                standard_job = job_manager->createStandardJob(to_submit);
             } catch (std::invalid_argument &e) {
                 WRENCH_INFO("Couldn't create a standard job: %s (ignoring)", e.what());
                 continue;

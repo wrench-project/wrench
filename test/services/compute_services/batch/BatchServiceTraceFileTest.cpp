@@ -148,9 +148,7 @@ private:
                 // TODO: Should we use the "requested_ram" instead of 0 below?
                 auto task = this->getWorkflow()->addTask(username + "_" + std::to_string(counter++), flops, min_num_cores, max_num_cores, ram);
 
-                auto standard_job = job_manager->createStandardJob(
-                        {task});
-
+                auto standard_job = job_manager->createStandardJob(task);
 
                 std::map<std::string, std::string> batch_job_args;
                 batch_job_args["-N"] = std::to_string(num_nodes);

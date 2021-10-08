@@ -79,6 +79,8 @@ namespace wrench {
                 {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
                 {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     1024},
                 {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      1024},
+                {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
 
     public:
@@ -98,7 +100,6 @@ namespace wrench {
                                 std::map<std::string, std::string> property_list = {},
                                 std::map<std::string, double> messagepayload_list = {}
         );
-
 
         /***********************/
         /** \cond INTERNAL     */
@@ -217,10 +218,10 @@ namespace wrench {
         /** @brief Reasons why a standard job could be terminated */
         enum JobTerminationCause {
             /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
-                    TERMINATED,
+            TERMINATED,
 
             /** @brief The compute service was directed to stop, and any running StandardJob will fail */
-                    COMPUTE_SERVICE_KILLED
+            COMPUTE_SERVICE_KILLED
         };
 
         void terminateRunningStandardJob(std::shared_ptr<StandardJob> job, JobTerminationCause termination_cause);
@@ -233,6 +234,9 @@ namespace wrench {
 
         void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
+
+        void processIsThereAtLeastOneHostWithAvailableResources(
+                const std::string &answer_mailbox, unsigned long num_cores, double ram);
 
         std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
                                                               std::string required_host, unsigned long required_num_cores, double required_ram,
