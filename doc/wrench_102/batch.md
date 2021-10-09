@@ -25,7 +25,7 @@ auto batch_service = *(this->getAvailableComputeServices<wrench::BatchComputeSer
 auto job_manager = this->createJobManager();
 
 // Create a job
-auto job = job_manager->createStandardJob(tasks, {});
+auto job = job_manager->createStandardJob(tasks);
 
 // Create service-specific arguments
 std::map<std::string, std::string> service_specific_args;
