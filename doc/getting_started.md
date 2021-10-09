@@ -108,13 +108,18 @@ target_link_libraries(unit_tests
 
 The examples in the `examples` directory provide good starting points
 for developing your own simulators.  Typing `make` in the top-level
-directory compiles the examples in the `examples` directory.
+directory compiles the examples in the `examples` directory (note
+that examples are already installed as executables programs in the
+container, so there is no need to compile them).
 
 Let us run the `examples/basic-examples/bare-metal-bag-of-tasks` by 
 navigating to that directory and typing:
 
 ~~~~~~~~~~~~~{.sh}
-./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --log=custom_wms.threshold=info
+$ ./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --log=custom_wms.threshold=info
+
+# or if in the container just call the executable directly:
+$ wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --log=custom_wms.threshold=info
 ~~~~~~~~~~~~~
 
 You should see some output in the terminal. The output in white is
