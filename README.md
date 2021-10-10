@@ -126,8 +126,6 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [release-link]:             https://github.com/wrench-project/wrench/releases
 [codefactor-badge]:         https://www.codefactor.io/repository/github/wrench-project/wrench/badge/master
 [codefactor-link]:          https://www.codefactor.io/repository/github/wrench-project/wrench/overview/master
-[sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
-[sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
 [cii-badge]:                https://bestpractices.coreinfrastructure.org/projects/2357/badge
 [cii-link]:                 https://bestpractices.coreinfrastructure.org/projects/2357
 [slack-badge]:              https://img.shields.io/badge/slack-%40wrench--project-yellow?logo=slack
