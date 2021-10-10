@@ -39,21 +39,31 @@ namespace wrench {
     int SimulationController::main() {
         // Initial setup
         wrench::TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
+
         WRENCH_INFO("Starting");
         this->job_manager = this->createJobManager();
         this->data_movement_manager = this->createDataMovementManager();
 
         // Main control loop
         while (keep_going) {
-            // Start compute compute services that should be started, if any
+            // Starting compute and storage services that should be started, if any
             while (true) {
                 wrench::ComputeService *new_compute_service = nullptr;
+                wrench::StorageService *new_storage_service = nullptr;
 
                 if (this->compute_services_to_start.tryPop(new_compute_service)) {
+                    // start compute service
                     WRENCH_INFO("Starting a new compute service...");
                     auto new_service_shared_ptr = this->simulation->startNewService(new_compute_service);
                     // Add the new service to the registry of existing services, so that later we can look it up by name
                     this->compute_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
+
+                } else if (this->storage_services_to_start.tryPop(new_storage_service)) {
+                    // start compute service
+                    WRENCH_INFO("Starting a new storage service...");
+                    auto new_service_shared_ptr = this->simulation->startNewService(new_storage_service);
+                    // Add the new service to the registry of existing services, so that later we can look it up by name
+                    this->storage_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
 
                 } else {
                     break;
@@ -62,9 +72,8 @@ namespace wrench {
 
             // Submit jobs that should be submitted
             while (true) {
-                std::pair <std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>> submission_to_do;
-                if (this->submissions_to_do.tryPop(submission_to_do)) {
-                    WRENCH_INFO("Submitting a job...");
+                std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>> submission_to_do;
+                if (this->submissions_to_do.tryPop(submission_to_do)) { WRENCH_INFO("Submitting a job...");
                     this->job_manager->submitJob(submission_to_do.first, submission_to_do.second, {});
 
                 } else {
@@ -83,8 +92,7 @@ namespace wrench {
             // And then add all events that occurred to the event queue
             double time_to_sleep = std::max<double>(0, time_horizon_to_reach -
                                                        wrench::Simulation::getCurrentSimulatedDate());
-            if (time_to_sleep > 0.0) {
-                WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
+            if (time_to_sleep > 0.0) { WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
                 S4U_Simulation::sleep(time_to_sleep);
                 while (auto event = this->waitForNextEvent(10 * JOB_MANAGER_COMMUNICATION_TIMEOUT_VALUE)) {
                     // Add job onto the event queue
@@ -166,9 +174,9 @@ namespace wrench {
      * @param event workflow execution event
      * @return json description of the event
      */
-    json SimulationController::eventToJSON(double date, const std::shared_ptr <wrench::WorkflowExecutionEvent> &event) {
+    json SimulationController::eventToJSON(double date, const std::shared_ptr<wrench::WorkflowExecutionEvent> &event) {
         // Construct the json event description
-        std::shared_ptr <wrench::StandardJob> job;
+        std::shared_ptr<wrench::StandardJob> job;
         json event_desc;
 
         event_desc["event_date"] = date;
@@ -217,7 +225,7 @@ namespace wrench {
         this->event_queue.waitAndPop(event);
 
         // Construct the json event description
-        std::shared_ptr <wrench::StandardJob> job;
+        std::shared_ptr<wrench::StandardJob> job;
         json event_desc = eventToJSON(event.first, event.second);
 
         // Construct the json answer
@@ -250,7 +258,7 @@ namespace wrench {
         // Deal with all events
         std::pair<double, std::shared_ptr<wrench::WorkflowExecutionEvent>> event;
 
-        std::vector <json> json_events;
+        std::vector<json> json_events;
 
         while (this->event_queue.tryPop(event)) {
             json event_desc = eventToJSON(event.first, event.second);
@@ -282,7 +290,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getAllHostnames(json data) {
-        std::vector <std::string> hostname_list = Simulation::getHostnameList();
+        std::vector<std::string> hostname_list = Simulation::getHostnameList();
         json answer = {};
         answer["hostnames"] = hostname_list;
         return answer;
@@ -309,13 +317,13 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getStandardJobTasks(json data) {
-        std::shared_ptr <StandardJob> job;
+        std::shared_ptr<StandardJob> job;
         std::string job_name = data["job_name"];
         if (not job_registry.lookup(job_name, job)) {
             throw std::runtime_error("Unknown job '" + job_name + "'");
         }
         json answer;
-        std::vector <std::string> task_names;
+        std::vector<std::string> task_names;
         for (const auto &t : job->getTasks()) {
             task_names.push_back(t->getID());
         }
@@ -348,10 +356,46 @@ namespace wrench {
 
         // Create the new service
         auto new_service = new BareMetalComputeService(head_host, {head_host}, "", {}, {});
-        // Put in in the list of services to start (this is because this method is called
+        // Put in the list of services to start (this is because this method is called
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
         this->compute_services_to_start.push(new_service);
+
+        // Return the expected answer
+        json answer;
+        answer["service_name"] = new_service->getName();
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "addSimpleStorageService",
+     *   "documentation":
+     *     {
+     *       "purpose": "Create and start a simple storage service",
+     *       "json_input": {
+     *         "head_host": ["string", "The service's head host"]
+     *       },
+     *       "json_output": {
+     *         "service_name": ["string", "The new service's name"]
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::addSimpleStorageService(json data) {
+        std::string head_host = data["head_host"];
+
+        // Create the new service
+        auto new_service = new SimpleStorageService(head_host, {"/"}, {}, {});
+        // Put in the list of services to start (this is because this method is called
+        // by the server thread, and therefore, it will segfault horribly if it calls any
+        // SimGrid simulation methods, e.g., to start a service)
+        this->storage_services_to_start.push(new_service);
 
         // Return the expected answer
         json answer;
@@ -380,7 +424,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::createStandardJob(json data) {
-        std::vector < WorkflowTask * > tasks;
+        std::vector<WorkflowTask *> tasks;
 
         for (auto const &name : data["tasks"]) {
             tasks.push_back(this->getWorkflow()->getTaskByID(name));
@@ -417,12 +461,12 @@ namespace wrench {
         std::string job_name = data["job_name"];
         std::string cs_name = data["compute_service_name"];
 
-        std::shared_ptr <StandardJob> job;
+        std::shared_ptr<StandardJob> job;
         if (not this->job_registry.lookup(job_name, job)) {
             throw std::runtime_error("Unknown job " + job_name);
         }
 
-        std::shared_ptr <ComputeService> cs;
+        std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
             throw std::runtime_error("Unknown service " + cs_name);
         }
