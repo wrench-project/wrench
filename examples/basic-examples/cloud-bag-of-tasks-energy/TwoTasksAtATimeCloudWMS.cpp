@@ -135,17 +135,17 @@ namespace wrench {
             WRENCH_INFO("Sleeping for 10 seconds");
             Simulation::sleep(10);
 
-            /* Change the pstate of CloudHost1  */
-            WRENCH_INFO("Changing the pstate of CloudHost1 to the lower pstate to save on energy temporarily");
-            this->simulation->setPstate("CloudHost1", 0);
+            /* Change the pstate of large VM  */
+            WRENCH_INFO("Changing the pstate of the large VM to the lower pstate to save on energy temporarily");
+            this->simulation->setPstate(large_vm, 0);
 
             /* Sleep 10 seconds */
             WRENCH_INFO("Sleeping for 10 seconds");
             Simulation::sleep(10);
 
             /* Change the pstate of CloudHost1  */
-            WRENCH_INFO("Changing the pstate of CloudHost1 back to the higher pstate");
-            this->simulation->setPstate("CloudHost1", 1);
+            WRENCH_INFO("Changing the pstate of the large VM back to the higher pstate");
+            this->simulation->setPstate(large_vm, 1);
 
             /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
