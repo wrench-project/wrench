@@ -61,6 +61,12 @@ cmake_minimum_required(VERSION 2.8...3.13)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (NOT "$ENV{SimGrid_PATH}" STREQUAL "")
+    set(SimGrid_PATH "$ENV{SimGrid_PATH}" CACHE INTERNAL "Copied from environment variable")
+endif()
+
+set(CMAKE_PREFIX_PATH ${SimGrid_PATH})
+
 find_path(SimGrid_INCLUDE_DIR
   NAMES simgrid/config.h
   NAMES simgrid/version.h
