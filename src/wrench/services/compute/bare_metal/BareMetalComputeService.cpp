@@ -1438,13 +1438,32 @@ namespace wrench {
      * @param ram: the desired RAM
      */
     void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
-        bool answer = false;
-        for (auto r : this->compute_resources) {
-            if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
-                answer = true;
+
+        bool enough_ram = false;
+        bool enough_cores = false;
+
+        // First check RAM
+        for (auto const &r : this->ram_availabilities) {
+            if (r.second >= ram) {
+                enough_ram = true;
                 break;
             }
         }
+
+        // Then check Cores
+        if (enough_ram) {
+            for (auto const &r : this->running_thread_counts) {
+                unsigned long cores = std::get<0>(this->compute_resources[r.first]);
+                unsigned long running_threads = r.second;
+                auto num_idle_cores = std::max<unsigned long>(cores - running_threads, 0);
+                if (num_idle_cores >= num_cores) {
+                    enough_cores = true;
+                    break;
+                }
+            }
+        }
+
+        bool answer = enough_ram and enough_cores;
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
                         answer,
