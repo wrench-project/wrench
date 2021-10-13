@@ -5,6 +5,7 @@
 	request_handlers["getAllHostnames"] = [sc](json data) { return sc->getAllHostnames(std::move(data)); };
 	request_handlers["standardJobGetTasks"] = [sc](json data) { return sc->getStandardJobTasks(std::move(data)); };
 	request_handlers["addBareMetalComputeService"] = [sc](json data) { return sc->addBareMetalComputeService(std::move(data)); };
+	request_handlers["addSimpleStorageService"] = [sc](json data) { return sc->addSimpleStorageService(std::move(data)); };
 	request_handlers["createStandardJob"] = [sc](json data) { return sc->createStandardJob(std::move(data)); };
 	request_handlers["submitStandardJob"] = [sc](json data) { return sc->submitStandardJob(std::move(data)); };
 	request_handlers["createTask"] = [sc](json data) { return sc->createTask(std::move(data)); };
