@@ -108,7 +108,6 @@ namespace wrench {
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
-
         // Transform the non-vector file location map into a vector file location map
         std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations_vector;
         for (auto const &e : file_locations) {
@@ -117,38 +116,38 @@ namespace wrench {
             file_locations_vector[e.first] = v;
         }
 
-        // Call the vector-ized method
-        return createStandardJob(tasks, file_locations_vector, pre_file_copies, post_file_copies, cleanup_file_deletions);
+        // Call the vectorized method
+        return createStandardJob(tasks, file_locations_vector, pre_file_copies, post_file_copies,
+                                 cleanup_file_deletions);
     }
 
-
     /**
- * @brief Create a standard job
- *
- * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
- *                                   of tasks also included in the standard job)
- * @param file_locations: a map that specifies, for each file, a list of locations, in preference order, where input/output files should be read/written.
- *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
- * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
- *                         before task executions begin. The ComputeService::SCRATCH constant can be
- *                         used to mean "the scratch storage space of the ComputeService".
- * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
- *                         after task executions end. The ComputeService::SCRATCH constant can be
- *                         used to mean "the scratch storage space of the ComputeService".
- * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be completed
- *                                at the end of the job. The ComputeService::SCRATCH constant can be
- *                         used to mean "the scratch storage space of the ComputeService".
- * @return the standard job
- *
- * @throw std::invalid_argument
- */
+     * @brief Create a standard job
+     *
+     * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
+     *               of tasks also included in the standard job)
+     * @param file_locations: a map that specifies, for each file, a list of locations, in preference order, where
+     *                        input/output files should be read/written.
+     *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
+     * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
+     *                         before task executions begin. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
+     * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
+     *                         after task executions end. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
+     * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be
+     *                                completed at the end of the job. The ComputeService::SCRATCH constant can be
+     *                                used to mean "the scratch storage space of the ComputeService".
+     * @return the standard job
+     *
+     * @throw std::invalid_argument
+     */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             std::vector<WorkflowTask *> tasks,
             std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
-
         // Do a sanity check of everything (looking for nullptr)
         for (auto t : tasks) {
             if (t == nullptr) {
@@ -291,7 +290,8 @@ namespace wrench {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments (empty tasks argument!)");
         }
 
-        return this->createStandardJob(tasks, (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>){}, {}, {}, {});
+        return this->createStandardJob(tasks, (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
+                                       {}, {}, {});
     }
 
     /**
@@ -317,17 +317,18 @@ namespace wrench {
         return this->createStandardJob(tasks, file_locations);
     }
 
- /**
-  * @brief Create a standard job
-  *
-  * @param task: a task (which must be ready)
-  * @param file_locations: a map that specifies, for each file, a list of locations, in preference order, where input/output files should be read/written.
-  *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
-  *
-  * @return the standard job
-  *
-  * @throw std::invalid_argument
-  */
+    /**
+     * @brief Create a standard job
+     *
+     * @param task: a task (which must be ready)
+     * @param file_locations: a map that specifies, for each file, a list of locations, in preference order, where
+     *                input/output files should be read/written.
+     *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
+     *
+     * @return the standard job
+     *
+     * @throw std::invalid_argument
+     */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             WorkflowTask *task,
             std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations) {
@@ -340,15 +341,15 @@ namespace wrench {
         return this->createStandardJob(tasks, file_locations);
     }
 
- /**
-  * @brief Create a standard job
-  *
-  * @param task: a task (which must be ready)
-  *
-  * @return the standard job
-  *
-  * @throw std::invalid_argument
-  */
+    /**
+     * @brief Create a standard job
+     *
+     * @param task: a task (which must be ready)
+     *
+     * @return the standard job
+     *
+     * @throw std::invalid_argument
+     */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             WorkflowTask *task) {
         if (task == nullptr) {
@@ -464,7 +465,6 @@ namespace wrench {
             job->setParentComputeService(compute_service);
 
         } catch (WorkflowExecutionException &e) {
-
             // "Undo" everything
             job->popCallbackMailbox();
             if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
@@ -478,6 +478,7 @@ namespace wrench {
                 this->pending_pilot_jobs.erase(pjob);
             }
             throw;
+
         } catch (std::invalid_argument &e) {
             // "Undo" everything
             job->popCallbackMailbox();
@@ -731,7 +732,6 @@ namespace wrench {
         // Determine all task state changes
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
         for (auto task : job->tasks) {
-
             if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
                 if (task->getUpcomingState() != WorkflowTask::State::COMPLETED) {
                     if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
@@ -951,7 +951,6 @@ namespace wrench {
         S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(job, compute_service, 0.0));
     }
-
 
 
 }
