@@ -50,20 +50,28 @@ namespace wrench {
             while (true) {
                 wrench::ComputeService *new_compute_service = nullptr;
                 wrench::StorageService *new_storage_service = nullptr;
+                wrench::FileRegistryService *new_file_service = nullptr;
 
                 if (this->compute_services_to_start.tryPop(new_compute_service)) {
-                    // start compute service
+                    // starting compute service
                     WRENCH_INFO("Starting a new compute service...");
                     auto new_service_shared_ptr = this->simulation->startNewService(new_compute_service);
                     // Add the new service to the registry of existing services, so that later we can look it up by name
                     this->compute_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
 
                 } else if (this->storage_services_to_start.tryPop(new_storage_service)) {
-                    // start compute service
+                    // starting storage service
                     WRENCH_INFO("Starting a new storage service...");
                     auto new_service_shared_ptr = this->simulation->startNewService(new_storage_service);
                     // Add the new service to the registry of existing services, so that later we can look it up by name
                     this->storage_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
+                
+                } else if (this->file_service_to_start.tryPop(new_file_service)) {
+                    // start file registry service
+                    WRENCH_INFO("Starting a new file registry service...");
+                    auto new_service_shared_ptr = this->simulation->startNewService(new_file_service);
+                    // Add the new service to the registry of existing services, so that later we can look it up by name
+                    this->file_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
 
                 } else {
                     break;
@@ -396,6 +404,42 @@ namespace wrench {
         // by the server thread, and therefore, it will segfault horribly if it calls any
         // SimGrid simulation methods, e.g., to start a service)
         this->storage_services_to_start.push(new_service);
+
+        // Return the expected answer
+        json answer;
+        answer["service_name"] = new_service->getName();
+        return answer;
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "addFileRegistryService",
+     *   "documentation":
+     *     {
+     *       "purpose": "Create and start a file registery service",
+     *       "json_input": {
+     *         "head_host": ["string", "The service's head host"]
+     *       },
+     *       "json_output": {
+     *         "service_name": ["string", "The new service's name"]
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::addFileRegistryService(json data) {
+        std::string head_host = data["head_host"];
+
+        // Create the new service
+        auto new_service = new FileRegistryService(head_host, {}, {});
+        // Put in the list of services to start (this is because this method is called
+        // by the server thread, and therefore, it will segfault horribly if it calls any
+        // SimGrid simulation methods, e.g., to start a service)
+        this->file_service_to_start.push(new_service);
 
         // Return the expected answer
         json answer;
