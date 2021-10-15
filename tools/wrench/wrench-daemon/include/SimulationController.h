@@ -66,6 +66,8 @@ namespace wrench {
 
         json addSimpleStorageService(json data);
 
+        json addFileRegistryService(json data);
+
         json createTask(json data);
 
     private:
@@ -73,11 +75,13 @@ namespace wrench {
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
         KeyValueStore<std::shared_ptr<ComputeService>> compute_service_registry;
         KeyValueStore<std::shared_ptr<StorageService>> storage_service_registry;
+        KeyValueStore<std::shared_ptr<FileRegistryService>> file_service_registry;
 
         // Thread-safe queues for the server thread and the simulation thread to communicate
         BlockingQueue<std::pair<double, std::shared_ptr<wrench::WorkflowExecutionEvent>>> event_queue;
         BlockingQueue<wrench::ComputeService *> compute_services_to_start;
         BlockingQueue<wrench::StorageService *> storage_services_to_start;
+        BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
         BlockingQueue<std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>>> submissions_to_do;
 
         // The two managers
