@@ -167,6 +167,26 @@
 <tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
 
 
+</table><br><hr><h2>/api/addFileRegistryService</h2>
+
+<b>Purpose</b>: Create and start a file registery service<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "head_host"</td><td style="padding:5px"> string</td><td style="padding:5px">The service's head host </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "service_name"</td><td style="padding:5px"> string</td><td style="padding:5px">The new service's name </td></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
 </table><br><hr><h2>/api/createStandardJob</h2>
 
 <b>Purpose</b>: Create a new standard job<br><br>
