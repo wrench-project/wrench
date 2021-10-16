@@ -5,14 +5,14 @@ Installing WRENCH                  {#install}
 
 # Prerequisites #                 {#install-prerequisites}
 
-WRENCH is developed in `C++`. The code follows the C++11 standard, and thus older 
+WRENCH is developed in `C++`. The code follows the C++14 standard, and thus older 
 compilers may fail to compile it. Therefore, we strongly recommend
 users to satisfy the following requirements:
 
-- **CMake** - version 3.5 or higher
+- **CMake** - version 3.7 or higher
   
 And, one of the following:
-- **g++** - version 5.4 or higher
+- **g++** - version 6.3 or higher
 - **clang** - version 3.8 or higher
 
 ## Required Dependencies ##                  {#install-prerequisites-dependencies}
