@@ -1,6 +1,18 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.10
+
+(October 16, 2021) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
+
+- Support for programmatic platform description ([#228](https://github.com/wrench-project/wrench/issues/228))
+- Enable a job to check locations for a file in some order of preference ([#229](https://github.com/wrench-project/wrench/issues/229))
+- Enhancement ([#226](https://github.com/wrench-project/wrench/issues/226))
+
+**Note**: WRENCH 1.10 requires [SimGrid 3.29](https://simgrid.org)
+
+---
+
 ### WRENCH 1.9
 
 (August 24, 2021) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
