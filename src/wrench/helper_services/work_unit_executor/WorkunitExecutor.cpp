@@ -384,7 +384,7 @@ namespace wrench {
                         if (work->file_locations[f].size() == 1) {
                             files_to_read.push_back(std::make_pair(f, work->file_locations[f].at(0)));
                         } else {
-                            throw std::runtime_error("WorkunitExecutor::PerformWork(): At thi stage, there should be a single file location for each file");
+                            throw std::runtime_error("WorkunitExecutor::PerformWork(): At this stage, there should be a single file location for each file");
                         }
                     } else {
                         if (this->scratch_space == nullptr) { // File should be in scratch, but there is no scratch
