@@ -5,14 +5,14 @@ Installing WRENCH                  {#install}
 
 # Prerequisites #                 {#install-prerequisites}
 
-WRENCH is developed in `C++`. The code follows the C++11 standard, and thus older 
+WRENCH is developed in `C++`. The code follows the C++14 standard, and thus older 
 compilers may fail to compile it. Therefore, we strongly recommend
 users to satisfy the following requirements:
 
-- **CMake** - version 3.5 or higher
+- **CMake** - version 3.7 or higher
   
 And, one of the following:
-- **g++** - version 5.4 or higher
+- **g++** - version 6.3 or higher
 - **clang** - version 3.8 or higher
 
 ## Required Dependencies ##                  {#install-prerequisites-dependencies}
@@ -33,22 +33,22 @@ And, one of the following:
 
 ## Building WRENCH ##               {#install-source-build}
 
-You can download the _@WRENCHRelease.tar.gz_ archive from the 
+You can download the `@WRENCHRelease.tar.gz` archive from the 
 [GitHub releases](https://github.com/wrench-project/wrench/releases) page. Once you have
 installed dependencies (see above), you can install WRENCH as follows:
 
-~~~~~~~~~~~~~{.sh}
-tar xf @WRENCHRelease.tar.gz
-cd @WRENCHRelease
-cmake .
-make
-make install # try "sudo make install" if you do not have write privileges
-~~~~~~~~~~~~~
+<div class="fragment">
+<div class="line">tar xf @WRENCHRelease.tar.gz</div>
+<div class="line">cd @WRENCHRelease</div>
+<div class="line">cmake .</div>
+<div class="line">make -j8</div>
+<div class="line">make install # try "sudo make install" if you do not have write privileges</div>
+</div>
 
 If you want to see actual compiler and linker invocations, add VERBOSE=1 to the compilation command:
 
 ~~~~~~~~~~~~~{.sh}
-make VERBOSE=1
+make -j8 VERBOSE=1
 ~~~~~~~~~~~~~
 
 To enable the use of Batsched (provided you have installed that package, see above):
@@ -67,7 +67,7 @@ git clone https://github.com/wrench-project/wrench
 Building and running the unit tests, which requires Google Test, is done as:
 
 ~~~~~~~~~~~~~{.sh}
-make unit_tests      
+make -j8 unit_tests      
 ./unit_tests
 ~~~~~~~~~~~~~
  
