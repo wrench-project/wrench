@@ -119,7 +119,6 @@ namespace wrench {
             }
             // RAM
             if (std::abs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
-
                 throw std::invalid_argument(
                         "BatchComputeService::BatchComputeService(): Compute hosts for a batch service need "
                         "to be homogeneous (different RAM capacities detected)");
@@ -149,7 +148,6 @@ namespace wrench {
                 BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE);
         if (not workload_file.empty()) {
             try {
-
                 this->workload_trace = TraceFileLoader::loadFromTraceFile(
                         workload_file,
                         this->getPropertyValueAsBoolean(
@@ -713,6 +711,7 @@ namespace wrench {
                             throw std::runtime_error(
                                     "BatchComputeService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
                                     "after a StandardJobExecutor was killed!");
+
                         case WorkflowTask::InternalState::TASK_FAILED:
                             // Making failed task READY again
                             task->setInternalState(WorkflowTask::InternalState::TASK_READY);
@@ -721,7 +720,6 @@ namespace wrench {
                         default:
                             throw std::runtime_error(
                                     "bare_metal::terminateRunningStandardJob(): unexpected task state");
-
                     }
                 }
                 PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
@@ -920,7 +918,6 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
                                                 BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
@@ -1033,7 +1030,6 @@ namespace wrench {
                  Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) or
                 (required_ram_per_host >
                  Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
-
                 {
                     S4U_Mailbox::dputMessage(
                             answer_mailbox,
@@ -1074,7 +1070,6 @@ namespace wrench {
 
         // SUCCESS!
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job->getWorkflowJob())) {
-
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new ComputeServiceSubmitStandardJobAnswerMessage(
                                              sjob,
@@ -1393,7 +1388,7 @@ namespace wrench {
             unsigned long allocated_time,
             unsigned long cores_per_node_asked_for) {
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
-
+            // standard job
             WRENCH_INFO(
                     "Creating a StandardJobExecutor for a standard job on %ld nodes with %ld cores per node",
                     num_nodes_allocated, cores_per_node_asked_for);
@@ -1441,7 +1436,7 @@ namespace wrench {
             return;
 
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(workflow_job)) {
-
+            // pilot job
             WRENCH_INFO(
                     "Allocating %ld nodes with %ld cores per node to a pilot job for %lu seconds",
                     num_nodes_allocated, cores_per_node_asked_for, allocated_time);
@@ -1699,7 +1694,7 @@ namespace wrench {
      */
     void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> job) {
         if (this->running_jobs.find(job) == this->running_jobs.end()) {
-
+            // time out
             WRENCH_INFO(
                     "BatchComputeService::processAlarmJobTimeout(): Received a time out message for an unknown "
                     "batch job (%ld)... ignoring",
@@ -1718,7 +1713,7 @@ namespace wrench {
             return;
 
         } else if (auto pilot_job = std::dynamic_pointer_cast<PilotJob>(job->getWorkflowJob())) {
-
+            // terminate pilot job
             WRENCH_INFO("Terminating pilot job %s", job->getWorkflowJob()->getName().c_str());
             auto cs = pilot_job->getComputeService();
             try {
@@ -1815,8 +1810,10 @@ namespace wrench {
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */
-    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
-        throw std::runtime_error("BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A batch compute service does not support this operation");
+    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox,
+                                                                                 unsigned long num_cores, double ram) {
+        throw std::runtime_error(
+                "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A batch compute service does not support this operation");
     }
 
 }

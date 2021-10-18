@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <vector>
 #include <cmath>
-#include <string>
 #include <unordered_set>
 
 #define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
@@ -63,9 +62,9 @@ namespace wrench {
         std::pair<double, double> write;
 
         /* @brief file read operations */
-        std::vector <std::tuple<double, double, string>> reads;
+        std::vector <std::tuple<double, double, std::string>> reads;
         /* @brief file write operations */
-        std::vector <std::tuple<double, double, string>> writes;
+        std::vector <std::tuple<double, double, std::string>> writes;
 
         /* @brief whether the task has failed */
         double failed;

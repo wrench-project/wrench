@@ -144,7 +144,6 @@ namespace wrench {
 
         // Check that service-specific args that are provided are well-formatted
         for (auto t : job->getTasks()) {
-
             if ((service_specific_args.find(t->getID()) != service_specific_args.end()) and
                 (not service_specific_args.at(t->getID()).empty())) {
                 std::tuple<std::string, unsigned long> parsed_spec;
@@ -433,7 +432,6 @@ namespace wrench {
                     "bare_metal::initiateInstance(): the resource list is empty");
         }
         for (auto host : compute_resources) {
-
             std::string hname = host.first;
             unsigned long requested_cores = std::get<0>(host.second);
             unsigned long available_cores;
@@ -545,7 +543,6 @@ namespace wrench {
         if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
             this->host_state_change_monitor->kill();
             this->host_state_change_monitor = nullptr; // Which will release the pointer to this service!
-
         }
 
         WRENCH_INFO("bare_metal on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
@@ -573,7 +570,6 @@ namespace wrench {
         std::string new_host_to_avoid = "";
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r : this->compute_resources) {
-
             // If there is a required host, then don't even look at others
             if (not required_host.empty() and (r.first != required_host)) {
                 continue;
@@ -855,8 +851,8 @@ namespace wrench {
             if (this->getPropertyValueAsString(
                     BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
-            } else {
 
+            } else {
                 // If not all resources are down or somebody is still running, nevermind
                 // we may have gotten the "Host down" message before the "This WUE has crashed" message.
                 // So we don't want to just quit right now. We'll
@@ -1017,9 +1013,8 @@ namespace wrench {
             cleanUpScratch();
         }
 
-        // Am I myself a pilot job?
         if (notify_pilot_job_submitters && this->containing_pilot_job) {
-
+            // pilot job
             WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox_name %s",
                         this->containing_pilot_job->getCallbackMailbox().c_str());
             // NOTE: This is synchronous so that the process doesn't fall off the end
@@ -1173,7 +1168,6 @@ namespace wrench {
                 job->popCallbackMailbox(), new ComputeServiceStandardJobDoneMessage(
                         job, this->getSharedPtr<BareMetalComputeService>(), this->getMessagePayloadValue(
                                 BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
-
     }
 
     /**
@@ -1437,14 +1431,34 @@ namespace wrench {
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */
-    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
-        bool answer = false;
-        for (auto r : this->compute_resources) {
-            if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
-                answer = true;
+    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox,
+                                                                                     unsigned long num_cores,
+                                                                                     double ram) {
+        bool enough_ram = false;
+        bool enough_cores = false;
+
+        // First check RAM
+        for (auto const &r : this->ram_availabilities) {
+            if (r.second >= ram) {
+                enough_ram = true;
                 break;
             }
         }
+
+        // Then check Cores
+        if (enough_ram) {
+            for (auto const &r : this->running_thread_counts) {
+                unsigned long cores = std::get<0>(this->compute_resources[r.first]);
+                unsigned long running_threads = r.second;
+                auto num_idle_cores = std::max<unsigned long>(cores - running_threads, 0);
+                if (num_idle_cores >= num_cores) {
+                    enough_cores = true;
+                    break;
+                }
+            }
+        }
+
+        bool answer = enough_ram and enough_cores;
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
                         answer,
