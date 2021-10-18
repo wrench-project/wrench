@@ -238,14 +238,7 @@ TAB_SIZE               = 4
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                = "WRENCHRelease=wrench-@WRENCH_RELEASE_VERSION@" \
-                         "WRENCHUserDoc=\if (USER && !DEVELOPER && !INTERNAL)" \
-                         "WRENCHDeveloperDoc=\if (DEVELOPER && USER && !INTERNAL)" \
-                         "WRENCHInternalDoc=\if (INTERNAL && USER && DEVELOPER)" \
-                         "WRENCHNotUserDoc=\if (DEVELOPER || INTERNAL)" \
-                         "WRENCHNotDeveloperDoc=\if (!DEVELOPER || INTERNAL)" \
-                         "WRENCHNotInternalDoc=\ifnot INTERNAL" \
-                         "endWRENCHDoc=\endif"
+ALIASES                = WRENCHRelease="wrench-@WRENCH_RELEASE_VERSION@"
 
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
