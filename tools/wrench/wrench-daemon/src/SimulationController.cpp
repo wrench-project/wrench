@@ -417,6 +417,48 @@ namespace wrench {
      * @return JSON output
      * BEGIN_REST_API_DOCUMENTATION
      * {
+     *   "REST_func": "createFileCopyAtStorageService",
+     *   "documentation":
+     *     {
+     *       "purpose": "Create, ex nihilo, a copy of a file copy at a storage service",
+     *       "json_input": {
+     *         "storage_service_name": ["string", "The storage service's head host"],
+     *         "filename": ["string", "The file name"]
+     *       },
+     *       "json_output": {
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::createFileCopyAtStorageService(json data) {
+        std::string ss_name = data["storage_service_name"];
+        std::string filename = data["filename"];
+
+        std::shared_ptr<StorageService> ss;
+        if (not this->storage_service_registry.lookup(ss_name, ss)) {
+            throw std::runtime_error("Unknown storage service " + ss_name);
+        }
+
+        WorkflowFile *file;
+        try {
+            file = this->getWorkflow()->getFileByID(filename);
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Unknown file " + filename);
+        }
+
+        ss->createFile(file, FileLocation::LOCATION(ss));
+
+        // Return the expected answer
+        return {};
+    }
+
+    /**
+     * REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
      *   "REST_func": "addFileRegistryService",
      *   "documentation":
      *     {
@@ -512,7 +554,7 @@ namespace wrench {
 
         std::shared_ptr<ComputeService> cs;
         if (not this->compute_service_registry.lookup(cs_name, cs)) {
-            throw std::runtime_error("Unknown service " + cs_name);
+            throw std::runtime_error("Unknown compute service " + cs_name);
         }
 
         this->submissions_to_do.push(std::make_pair(job, cs));

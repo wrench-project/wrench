@@ -296,7 +296,12 @@ namespace wrench {
             this->content[absolute_path] = {};
         }
 
-        this->content[absolute_path].insert(file);
-        this->occupied_space += file->getSize();
+        // If file does  not already exist, create it
+        if (this->content.find(absolute_path) != this->content.end()) {
+            this->content[absolute_path].insert(file);
+            this->occupied_space += file->getSize();
+        } else {
+            return;
+        }
     }
 }
