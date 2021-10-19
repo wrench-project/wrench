@@ -350,4 +350,137 @@
 <tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
 
 
+</table><br><hr><h2>/api/addFile</h2>
+
+<b>Purpose</b>: Add a file to the workflow<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "name"</td><td style="padding:5px"> string</td><td style="padding:5px">The file's name </td></tr>
+<tr><td style="padding:5px">  "size"</td><td style="padding:5px"> int</td><td style="padding:5px">The file's size in bytes </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/fileGetSize</h2>
+
+<b>Purpose</b>: Get a file size<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "name"</td><td style="padding:5px"> string</td><td style="padding:5px">The file's name </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "size"</td><td style="padding:5px"> int</td><td style="padding:5px">The file's size in bytes </td></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/addInputFile</h2>
+
+<b>Purpose</b>: Add an input file to a task<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "task"</td><td style="padding:5px"> string</td><td style="padding:5px">The task's ID </td></tr>
+<tr><td style="padding:5px">  "file"</td><td style="padding:5px"> string</td><td style="padding:5px">The input file's ID </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/addOutputFile</h2>
+
+<b>Purpose</b>: Add an output file to a task<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "task"</td><td style="padding:5px"> string</td><td style="padding:5px">The task's ID </td></tr>
+<tr><td style="padding:5px">  "file"</td><td style="padding:5px"> string</td><td style="padding:5px">The output file's ID </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/getTaskInputFiles</h2>
+
+<b>Purpose</b>: Return the list of input files for a given task<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "task"</td><td style="padding:5px"> string</td><td style="padding:5px">The task's ID </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "files"</td><td style="padding:5px"> list<string></td><td style="padding:5px">A list of input files </td></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/getInputFiles</h2>
+
+<b>Purpose</b>: Return the list of input files of the workflow<br><br>
+
+<b>JSON input:</b> {} (empty JSON)<br><br>
+<b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "files"</td><td style="padding:5px"> list<string></td><td style="padding:5px">A list of input files </td></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/stageInputFiles</h2>
+
+<b>Purpose</b>: Stage all input files of a workflow on a given storage service<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "storage"</td><td style="padding:5px"> string</td><td style="padding:5px">Storage service on which stage the file </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
 </table><br><hr>

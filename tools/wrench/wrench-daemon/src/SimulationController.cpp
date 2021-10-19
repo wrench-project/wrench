@@ -700,4 +700,204 @@ namespace wrench {
         return answer;
     }
 
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "addFile",
+     *   "documentation":
+     *     {
+     *       "purpose": "Add a file to the workflow",
+     *       "json_input": {
+     *         "name": ["string", "The file's name"],
+     *         "size": ["int", "The file's size in bytes"]
+     *       },
+     *       "json_output": {
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::addFile(json data) {
+        auto file = this->getWorkflow()->addFile(data["name"], data["size"]);
+        return {};
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "fileGetSize",
+     *   "documentation":
+     *     {
+     *       "purpose": "Get a file size",
+     *       "json_input": {
+     *         "name": ["string", "The file's name"]
+     *       },
+     *       "json_output": {
+     *         "size": ["int", "The file's size in bytes"]
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::getFileSize(json data) {
+        auto file = this->getWorkflow()->getFileByID(data["name"]);
+        json answer;
+        answer["size"] = file->getSize();
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "addInputFile",
+     *   "documentation":
+     *     {
+     *       "purpose": "Add an input file to a task",
+     *       "json_input": {
+     *         "task": ["string", "The task's ID"],
+     *         "file": ["string", "The input file's ID"]
+     *       },
+     *       "json_output": {
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::addInputFile(json data) {
+        auto task = this->getWorkflow()->getTaskByID(data["task"]);
+        auto file = this->getWorkflow()->getFileByID(data["file"]);
+        task->addInputFile(file);
+        return {};
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "addOutputFile",
+     *   "documentation":
+     *     {
+     *       "purpose": "Add an output file to a task",
+     *       "json_input": {
+     *         "task": ["string", "The task's ID"],
+     *         "file": ["string", "The output file's ID"]
+     *       },
+     *       "json_output": {
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::addOutputFile(json data) {
+        auto task = this->getWorkflow()->getTaskByID(data["task"]);
+        auto file = this->getWorkflow()->getFileByID(data["file"]);
+        task->addOutputFile(file);
+        return {};
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "getTaskInputFiles",
+     *   "documentation":
+     *     {
+     *       "purpose": "Return the list of input files for a given task",
+     *       "json_input": {
+     *         "task": ["string", "The task's ID"]
+     *       },
+     *       "json_output": {
+     *         "files": ["list<string>", "A list of input files"]
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::getTaskInputFiles(json data) {
+        auto task = this->getWorkflow()->getTaskByID(data["task"]);
+        auto files = task->getInputFiles();
+        json answer;
+        std::vector<std::string> file_names;
+        for (const auto &f : files) {
+            file_names.push_back(f->getID());
+        }
+        answer["files"] = file_names;
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "getInputFiles",
+     *   "documentation":
+     *     {
+     *       "purpose": "Return the list of input files of the workflow",
+     *       "json_input": {
+     *       },
+     *       "json_output": {
+     *         "files": ["list<string>", "A list of input files"]
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::getInputFiles(json data) {
+        auto files = this->getWorkflow()->getInputFiles();
+        json answer;
+        std::vector<std::string> file_names;
+        for (const auto &f : files) {
+            file_names.push_back(f->getID());
+        }
+        answer["files"] = file_names;
+        return answer;
+    }
+
+    /**
+     * @brief REST API Handler
+     * @param data JSON input
+     * @return JSON output
+     * BEGIN_REST_API_DOCUMENTATION
+     * {
+     *   "REST_func": "stageInputFiles",
+     *   "documentation":
+     *     {
+     *       "purpose": "Stage all input files of a workflow on a given storage service",
+     *       "json_input": {
+     *         "storage": ["string", "Storage service on which stage the file"]
+     *       },
+     *       "json_output": {
+     *       }
+     *     }
+     * }
+     * END_REST_API_DOCUMENTATION
+     */
+    json SimulationController::stageInputFiles(json data) {
+        std::shared_ptr<StorageService> storage_service;
+        std::string service_name = data["storage"];
+        if (not this->storage_service_registry.lookup(service_name, storage_service)) {
+            throw std::runtime_error("Unknown storage service " + service_name);
+        }
+
+        for (auto const &f : this->getWorkflow()->getInputFiles()) {
+            this->simulation->stageFile(f, storage_service);
+        }
+        return {};
+    }
+
 }
