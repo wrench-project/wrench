@@ -58,6 +58,7 @@ namespace wrench {
                 std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
         static void readFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
         static void writeFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        static void createFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
 
 
         /***********************/
@@ -101,8 +102,6 @@ namespace wrench {
         std::map<std::string, std::unique_ptr<LogicalFileSystem>> file_systems;
 
         /***********************/
-
-
         /** \endcond          **/
         /***********************/
 
