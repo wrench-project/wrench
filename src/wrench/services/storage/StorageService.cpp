@@ -74,6 +74,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Store a file at a particular mount point ex nihilo (this instantly creates the file at the
+     * storage service - zero simulation time). Will do nothing (and won't complain) if the file already exists
+     * at that location.
+     *
+     * @param file: a file
+     * @param location: a file location
+     *
+     * @throw std::invalid_argument
+     */
+    void StorageService::createFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+        location->getStorageService()->stageFile(file, location->getMountPoint(),
+                                                 location->getAbsolutePathAtMountPoint());
+    }
+
+
+    /**
      * @brief Store a file at a particular mount point BEFORE the simulation is launched
      *
      * @param file: a file

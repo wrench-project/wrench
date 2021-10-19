@@ -66,6 +66,8 @@ namespace wrench {
 
         json addSimpleStorageService(json data);
 
+        json createFileCopyAtStorageService(json data);
+
         json addFileRegistryService(json data);
 
         json createTask(json data);
