@@ -14,3 +14,10 @@
 	request_handlers["taskGetMinNumCores"] = [sc](json data) { return sc->getTaskMinNumCores(std::move(data)); };
 	request_handlers["taskGetMaxNumCores"] = [sc](json data) { return sc->getTaskMaxNumCores(std::move(data)); };
 	request_handlers["taskGetMemory"] = [sc](json data) { return sc->getTaskMemory(std::move(data)); };
+	request_handlers["addFile"] = [sc](json data) { return sc->addFile(std::move(data)); };
+	request_handlers["fileGetSize"] = [sc](json data) { return sc->getFileSize(std::move(data)); };
+	request_handlers["addInputFile"] = [sc](json data) { return sc->addInputFile(std::move(data)); };
+	request_handlers["addOutputFile"] = [sc](json data) { return sc->addOutputFile(std::move(data)); };
+	request_handlers["getTaskInputFiles"] = [sc](json data) { return sc->getTaskInputFiles(std::move(data)); };
+	request_handlers["getInputFiles"] = [sc](json data) { return sc->getInputFiles(std::move(data)); };
+	request_handlers["stageInputFiles"] = [sc](json data) { return sc->stageInputFiles(std::move(data)); };
