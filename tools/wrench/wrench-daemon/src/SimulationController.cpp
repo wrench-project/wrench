@@ -435,6 +435,8 @@ namespace wrench {
         std::string ss_name = data["storage_service_name"];
         std::string filename = data["filename"];
 
+        std::cerr << "ADSADA" << data << "\n";
+
         std::shared_ptr<StorageService> ss;
         if (not this->storage_service_registry.lookup(ss_name, ss)) {
             throw std::runtime_error("Unknown storage service " + ss_name);
