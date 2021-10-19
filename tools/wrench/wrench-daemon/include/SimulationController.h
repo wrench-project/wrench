@@ -72,6 +72,20 @@ namespace wrench {
 
         json createTask(json data);
 
+        json addFile(json data);
+
+        json getFileSize(json data);
+
+        json addInputFile(json data);
+
+        json addOutputFile(json data);
+
+        json getTaskInputFiles(json data);
+
+        json getInputFiles(json data);
+
+        json stageInputFiles(json data);
+
     private:
         // Thread-safe key value stores
         KeyValueStore<std::shared_ptr<wrench::StandardJob>> job_registry;
