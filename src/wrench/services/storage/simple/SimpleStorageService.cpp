@@ -9,10 +9,10 @@
 
 #include <climits>
 #include <services/storage/storage_helper_classes/FileTransferThreadMessage.h>
-#include <wrench/workflow/failure_causes/InvalidDirectoryPath.h>
-#include <wrench/workflow/failure_causes/FileNotFound.h>
-#include <wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/InvalidDirectoryPath.h>
+#include <wrench/failure_causes/FileNotFound.h>
+#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/ServiceMessage.h"

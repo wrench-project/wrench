@@ -14,7 +14,7 @@
 #include <stack>
 #include <set>
 
-#include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/job/WorkflowJob.h"
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/parallel_model/ParallelModel.h"
 #include "wrench/workflow/parallel_model/AmdahlParallelModel.h"

@@ -381,7 +381,7 @@ private:
 
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -881,7 +881,7 @@ private:
         }
 
         // Wait for the next execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -1201,7 +1201,7 @@ private:
         }
 
         // Wait for the next execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -1412,7 +1412,7 @@ private:
         }
 
         // Wait for the next execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();

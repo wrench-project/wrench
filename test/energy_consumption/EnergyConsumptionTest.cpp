@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 #include <algorithm>
 #include <simgrid/plugins/energy.h>
 

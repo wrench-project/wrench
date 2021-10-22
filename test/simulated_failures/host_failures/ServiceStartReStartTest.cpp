@@ -14,7 +14,7 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/SleeperVictim.h"
-#include <wrench/workflow/failure_causes/HostError.h>
+#include <wrench/failure_causes/HostError.h>
 
 WRENCH_LOG_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 

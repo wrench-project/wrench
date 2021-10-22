@@ -124,7 +124,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
 
-        } catch (wrench::WorkflowExecutionEvent &e)  {
+        } catch (wrench::ExecutionEvent &e)  {
             throw std::runtime_error("Synchronous file copy failed");
         }
 
@@ -164,7 +164,7 @@ private:
 
 
         // try asynchronous copy and register
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event;
+        std::shared_ptr<wrench::ExecutionEvent> async_copy_event;
 
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_1,
@@ -200,7 +200,7 @@ private:
 
         // try 2 asynchronous copies of the same file
         bool double_copy_failed = false;
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event;
+        std::shared_ptr<wrench::ExecutionEvent> async_dual_copy_event;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_2,
                                                             wrench::FileLocation::LOCATION(this->test->src_storage_service),
@@ -242,7 +242,7 @@ private:
         // try 1 asynchronous and 1 synchronous copy of the same file
         double_copy_failed = false;
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event2;
+        std::shared_ptr<wrench::ExecutionEvent> async_dual_copy_event2;
 
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_3,
@@ -292,7 +292,7 @@ private:
         }
 
         // try 1 asynchronous copy and then kill the file registry service right after the copy is instantiated
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
+        std::shared_ptr<wrench::ExecutionEvent> async_copy_event2;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_2,
                                                             wrench::FileLocation::LOCATION(this->test->src2_storage_service),

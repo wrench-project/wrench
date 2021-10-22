@@ -18,13 +18,13 @@
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/workflow/execution_events/StandardJobCompletedEvent.h"
-#include "wrench/workflow/execution_events/StandardJobFailedEvent.h"
-#include "wrench/workflow/execution_events/PilotJobStartedEvent.h"
-#include "wrench/workflow/execution_events/PilotJobExpiredEvent.h"
-#include "wrench/workflow/execution_events/FileCopyCompletedEvent.h"
-#include "wrench/workflow/execution_events/FileCopyFailedEvent.h"
-#include "wrench/workflow/execution_events/TimerEvent.h"
+#include "wrench/execution_events/StandardJobCompletedEvent.h"
+#include "wrench/execution_events/StandardJobFailedEvent.h"
+#include "wrench/execution_events/PilotJobStartedEvent.h"
+#include "wrench/execution_events/PilotJobExpiredEvent.h"
+#include "wrench/execution_events/FileCopyCompletedEvent.h"
+#include "wrench/execution_events/FileCopyFailedEvent.h"
+#include "wrench/execution_events/TimerEvent.h"
 #include "wrench/workflow/Workflow.h"
 
 namespace wrench {
@@ -138,8 +138,8 @@ namespace wrench {
 
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
-        std::shared_ptr<WorkflowExecutionEvent>  waitForNextEvent();
-        std::shared_ptr<WorkflowExecutionEvent>  waitForNextEvent(double timeout);
+        std::shared_ptr<ExecutionEvent>  waitForNextEvent();
+        std::shared_ptr<ExecutionEvent>  waitForNextEvent(double timeout);
         virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
 
         virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);

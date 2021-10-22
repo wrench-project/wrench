@@ -133,7 +133,7 @@ private:
                                            this->test->file_registry_service);
 
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
+        std::shared_ptr<wrench::ExecutionEvent> workflow_execution_event;
         try {
             workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {

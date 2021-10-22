@@ -170,7 +170,7 @@ private:
             job_manager->submitJob(job, test->compute_service);
 
             // Wait for the workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+            std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
             if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 // do nothing
             } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {

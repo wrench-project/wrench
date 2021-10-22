@@ -20,8 +20,8 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowTask.h"
-#include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/PilotJob.h"
 #include "wrench/wms/WMS.h"
 #include "JobManagerMessage.h"
 

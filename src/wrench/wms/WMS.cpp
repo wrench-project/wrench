@@ -19,7 +19,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_wms, "Log category for WMS");
 
@@ -171,7 +171,7 @@ namespace wrench {
      */
     bool WMS::waitForAndProcessNextEvent(double timeout) {
 
-        std::shared_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent(timeout);
+        std::shared_ptr<ExecutionEvent> event = workflow->waitForNextExecutionEvent(timeout);
         if (event == nullptr) {
             return false;
         }
@@ -202,7 +202,7 @@ namespace wrench {
      * @param timeout: a timeout value in seconds
      * @return the event
      */
-    std::shared_ptr<WorkflowExecutionEvent> WMS::waitForNextEvent(double timeout) {
+    std::shared_ptr<ExecutionEvent> WMS::waitForNextEvent(double timeout) {
         return workflow->waitForNextExecutionEvent(timeout);
     }
 
@@ -210,7 +210,7 @@ namespace wrench {
      * @brief  Wait for a workflow execution event
      * @return the event
      */
-    std::shared_ptr<WorkflowExecutionEvent> WMS::waitForNextEvent() {
+    std::shared_ptr<ExecutionEvent> WMS::waitForNextEvent() {
         return workflow->waitForNextExecutionEvent();
     }
 

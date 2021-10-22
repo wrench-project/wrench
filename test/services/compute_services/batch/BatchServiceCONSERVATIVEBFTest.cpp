@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -158,7 +158,7 @@ private:
         double actual_completion_times[4];
         for (int i=0; i < 4; i++) {
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -296,7 +296,7 @@ private:
         std::map<std::string, std::pair<std::shared_ptr<wrench::StandardJob>, double>>  actual_completion_times;
         for (int i=0; i < NUM_JOBS; i++) {
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -662,7 +662,7 @@ private:
         std::map<std::string, std::pair<std::shared_ptr<wrench::StandardJob>, double>>  actual_completion_times;
         for (int i=0; i < num_jobs_submitted; i++) {
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -844,7 +844,7 @@ private:
         double actual_completion_times[4];
         for (int i=0; i < num_jobs_to_submit; i++) {
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -990,7 +990,7 @@ private:
         std::map<std::string, std::pair<std::shared_ptr<wrench::StandardJob>, double>>  actual_completion_times;
         for (int i=0; i < NUM_JOBS_CORE_LEVEL; i++) {
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {

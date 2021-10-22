@@ -13,7 +13,7 @@
 
 #include <memory>
 #include <vector>
-#include "wrench/workflow/failure_causes/FailureCause.h"
+#include "wrench/failure_causes/FailureCause.h"
 #include "wrench/services/ServiceMessage.h"
 
 namespace wrench {

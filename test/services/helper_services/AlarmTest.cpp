@@ -14,7 +14,7 @@
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include <wrench/workflow/failure_causes/HostError.h>
+#include <wrench/failure_causes/HostError.h>
 
 class AlarmTest : public ::testing::Test {
 

@@ -12,7 +12,7 @@
 
 #include <wrench/simulation/SimulationMessage.h>
 #include "wrench/services/compute/ComputeService.h"
-#include <wrench/workflow/job/StandardJob.h>
+#include <wrench/job/StandardJob.h>
 #include <wrench-dev.h>
 
 namespace wrench {

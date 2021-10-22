@@ -162,7 +162,7 @@ private:
                 file, source, destination, this->test->file_registry_service);
 
         // Wait for the eventm (with a timeout)
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent(100);
         } catch (wrench::WorkflowExecutionException &e) {

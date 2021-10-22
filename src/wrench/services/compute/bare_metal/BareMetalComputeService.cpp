@@ -24,12 +24,12 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
-#include "wrench/workflow/job/PilotJob.h"
-#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/job/StandardJob.h"
 #include "wrench/services/helpers/ServiceTerminationDetector.h"
 #include "wrench/services/helpers/HostStateChangeDetector.h"
-#include "wrench/workflow/failure_causes/JobTypeNotSupported.h"
-#include "wrench/workflow/failure_causes/HostError.h"
+#include "wrench/failure_causes/JobTypeNotSupported.h"
+#include "wrench/failure_causes/HostError.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal");
 

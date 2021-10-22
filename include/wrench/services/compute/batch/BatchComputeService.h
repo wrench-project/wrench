@@ -18,8 +18,8 @@
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessagePayload.h"
 #include "wrench/services/helpers/Alarm.h"
-#include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/WorkflowJob.h"
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 
 #include <deque>

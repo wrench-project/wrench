@@ -11,8 +11,8 @@
 #define WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H
 
 #include "wrench/services/ServiceMessage.h"
-#include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/WorkflowJob.h"
 
 #include <vector>
 
