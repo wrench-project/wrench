@@ -7,7 +7,7 @@ on:
       - '**.md'
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,14 +36,3 @@ jobs:
           cmake -DENABLE_BATSCHED=off -DCMAKE_VERBOSE_MAKEFILE=ON .
           make -j4 all unit_tests
           ./unit_tests
-
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_CHANNEL: github
-          SLACK_ICON: https://github.com/wrench-project.png?size=48
-          SLACK_USERNAME: wrench-builds
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          MSG_MINIMAL: ref,actions url, commit
-          SLACK_TITLE: Build "macOS latest - clang 12"
-          SLACK_FOOTER: ''
