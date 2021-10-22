@@ -136,35 +136,35 @@ set(HEADER_FILES
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
-        include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
-        include/wrench/workflow/execution_events/StandardJobCompletedEvent.h
-        include/wrench/workflow/execution_events/StandardJobFailedEvent.h
-        include/wrench/workflow/execution_events/PilotJobStartedEvent.h
-        include/wrench/workflow/execution_events/PilotJobExpiredEvent.h
-        include/wrench/workflow/execution_events/FileCopyCompletedEvent.h
-        include/wrench/workflow/execution_events/FileCopyFailedEvent.h
-        include/wrench/workflow/execution_events/TimerEvent.h
-        include/wrench/workflow/failure_causes/ComputeThreadHasDied.h
-        include/wrench/workflow/failure_causes/FailureCause.h
-        include/wrench/workflow/failure_causes/FatalFailure.h
-        include/wrench/workflow/failure_causes/FileAlreadyBeingCopied.h
-        include/wrench/workflow/failure_causes/FileNotFound.h
-        include/wrench/workflow/failure_causes/FunctionalityNotAvailable.h
-        include/wrench/workflow/failure_causes/HostError.h
-        include/wrench/workflow/failure_causes/InvalidDirectoryPath.h
-        include/wrench/workflow/failure_causes/JobKilled.h
-        include/wrench/workflow/failure_causes/JobTimeout.h
-        include/wrench/workflow/failure_causes/JobTypeNotSupported.h
-        include/wrench/workflow/failure_causes/NetworkError.h
-        include/wrench/workflow/failure_causes/NoScratchSpace.h
-        include/wrench/workflow/failure_causes/NotAllowed.h
-        include/wrench/workflow/failure_causes/NotEnoughResources.h
-        include/wrench/workflow/failure_causes/ServiceIsDown.h
-        include/wrench/workflow/failure_causes/ServiceIsSuspended.h
-        include/wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h
-        include/wrench/workflow/job/PilotJob.h
-        include/wrench/workflow/job/StandardJob.h
-        include/wrench/workflow/job/WorkflowJob.h
+        include/wrench/execution_events/ExecutionEvent.h
+        include/wrench/execution_events/StandardJobCompletedEvent.h
+        include/wrench/execution_events/StandardJobFailedEvent.h
+        include/wrench/execution_events/PilotJobStartedEvent.h
+        include/wrench/execution_events/PilotJobExpiredEvent.h
+        include/wrench/execution_events/FileCopyCompletedEvent.h
+        include/wrench/execution_events/FileCopyFailedEvent.h
+        include/wrench/execution_events/TimerEvent.h
+        include/wrench/failure_causes/ComputeThreadHasDied.h
+        include/wrench/failure_causes/FailureCause.h
+        include/wrench/failure_causes/FatalFailure.h
+        include/wrench/failure_causes/FileAlreadyBeingCopied.h
+        include/wrench/failure_causes/FileNotFound.h
+        include/wrench/failure_causes/FunctionalityNotAvailable.h
+        include/wrench/failure_causes/HostError.h
+        include/wrench/failure_causes/InvalidDirectoryPath.h
+        include/wrench/failure_causes/JobKilled.h
+        include/wrench/failure_causes/JobTimeout.h
+        include/wrench/failure_causes/JobTypeNotSupported.h
+        include/wrench/failure_causes/NetworkError.h
+        include/wrench/failure_causes/NoScratchSpace.h
+        include/wrench/failure_causes/NotAllowed.h
+        include/wrench/failure_causes/NotEnoughResources.h
+        include/wrench/failure_causes/ServiceIsDown.h
+        include/wrench/failure_causes/ServiceIsSuspended.h
+        include/wrench/failure_causes/StorageServiceNotEnoughSpace.h
+        include/wrench/job/PilotJob.h
+        include/wrench/job/StandardJob.h
+        include/wrench/job/WorkflowJob.h
         include/wrench/workflow/DagOfTasks.h
         include/wrench/workflow/parallel_model/ParallelModel.h
         include/wrench/workflow/parallel_model/AmdahlParallelModel.h
@@ -305,28 +305,28 @@ set(SOURCE_FILES
         src/wrench/workflow/parallel_model/AmdahlParallelModel.cpp
         src/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.cpp
         src/wrench/workflow/parallel_model/CustomParallelModel.cpp
-        src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
-        src/wrench/workflow/failure_causes/ComputeThreadHasDied.cpp
-        src/wrench/workflow/failure_causes/FailureCause.cpp
-        src/wrench/workflow/failure_causes/FatalFailure.cpp
-        src/wrench/workflow/failure_causes/FileAlreadyBeingCopied.cpp
-        src/wrench/workflow/failure_causes/FileNotFound.cpp
-        src/wrench/workflow/failure_causes/FunctionalityNotAvailable.cpp
-        src/wrench/workflow/failure_causes/HostError.cpp
-        src/wrench/workflow/failure_causes/InvalidDirectoryPath.cpp
-        src/wrench/workflow/failure_causes/JobKilled.cpp
-        src/wrench/workflow/failure_causes/JobTimeout.cpp
-        src/wrench/workflow/failure_causes/JobTypeNotSupported.cpp
-        src/wrench/workflow/failure_causes/NetworkError.cpp
-        src/wrench/workflow/failure_causes/NoScratchSpace.cpp
-        src/wrench/workflow/failure_causes/NotAllowed.cpp
-        src/wrench/workflow/failure_causes/NotEnoughResources.cpp
-        src/wrench/workflow/failure_causes/ServiceIsDown.cpp
-        src/wrench/workflow/failure_causes/ServiceIsSuspended.cpp
-        src/wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.cpp
-        src/wrench/workflow/job/PilotJob.cpp
-        src/wrench/workflow/job/StandardJob.cpp
-        src/wrench/workflow/job/WorkflowJob.cpp
+        src/wrench/execution_events/ExecutionEvent.cpp
+        src/wrench/failure_causes/ComputeThreadHasDied.cpp
+        src/wrench/failure_causes/FailureCause.cpp
+        src/wrench/failure_causes/FatalFailure.cpp
+        src/wrench/failure_causes/FileAlreadyBeingCopied.cpp
+        src/wrench/failure_causes/FileNotFound.cpp
+        src/wrench/failure_causes/FunctionalityNotAvailable.cpp
+        src/wrench/failure_causes/HostError.cpp
+        src/wrench/failure_causes/InvalidDirectoryPath.cpp
+        src/wrench/failure_causes/JobKilled.cpp
+        src/wrench/failure_causes/JobTimeout.cpp
+        src/wrench/failure_causes/JobTypeNotSupported.cpp
+        src/wrench/failure_causes/NetworkError.cpp
+        src/wrench/failure_causes/NoScratchSpace.cpp
+        src/wrench/failure_causes/NotAllowed.cpp
+        src/wrench/failure_causes/NotEnoughResources.cpp
+        src/wrench/failure_causes/ServiceIsDown.cpp
+        src/wrench/failure_causes/ServiceIsSuspended.cpp
+        src/wrench/failure_causes/StorageServiceNotEnoughSpace.cpp
+        src/wrench/job/PilotJob.cpp
+        src/wrench/job/StandardJob.cpp
+        src/wrench/job/WorkflowJob.cpp
         )
 
 # test files

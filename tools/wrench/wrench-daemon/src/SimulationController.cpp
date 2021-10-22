@@ -182,7 +182,7 @@ namespace wrench {
      * @param event workflow execution event
      * @return json description of the event
      */
-    json SimulationController::eventToJSON(double date, const std::shared_ptr<wrench::WorkflowExecutionEvent> &event) {
+    json SimulationController::eventToJSON(double date, const std::shared_ptr<wrench::ExecutionEvent> &event) {
         // Construct the json event description
         std::shared_ptr<wrench::StandardJob> job;
         json event_desc;
@@ -229,7 +229,7 @@ namespace wrench {
         // Set the time horizon to -1, to signify the "wait for next event" to the controller
         time_horizon_to_reach = -1.0;
         // Wait for and grab the next event
-        std::pair<double, std::shared_ptr<wrench::WorkflowExecutionEvent>> event;
+        std::pair<double, std::shared_ptr<wrench::ExecutionEvent>> event;
         this->event_queue.waitAndPop(event);
 
         // Construct the json event description
@@ -264,7 +264,7 @@ namespace wrench {
      */
     json SimulationController::getSimulationEvents(json data) {
         // Deal with all events
-        std::pair<double, std::shared_ptr<wrench::WorkflowExecutionEvent>> event;
+        std::pair<double, std::shared_ptr<wrench::ExecutionEvent>> event;
 
         std::vector<json> json_events;
 

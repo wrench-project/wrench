@@ -155,7 +155,7 @@ private:
         job_manager->submitJob(job, vm_cs);
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
@@ -466,7 +466,7 @@ private:
             // Create a VM
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
 
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event = nullptr;
+            std::shared_ptr<wrench::ExecutionEvent> event = nullptr;
             unsigned long total_num_vm_start_attempts = 0;
             unsigned long num_vm_start_attempts = 0;
             unsigned long num_job_submission_attempts = 0;

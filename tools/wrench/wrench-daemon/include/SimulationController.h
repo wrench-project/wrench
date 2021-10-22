@@ -94,7 +94,7 @@ namespace wrench {
         KeyValueStore<std::shared_ptr<FileRegistryService>> file_service_registry;
 
         // Thread-safe queues for the server thread and the simulation thread to communicate
-        BlockingQueue<std::pair<double, std::shared_ptr<wrench::WorkflowExecutionEvent>>> event_queue;
+        BlockingQueue<std::pair<double, std::shared_ptr<wrench::ExecutionEvent>>> event_queue;
         BlockingQueue<wrench::ComputeService *> compute_services_to_start;
         BlockingQueue<wrench::StorageService *> storage_services_to_start;
         BlockingQueue<wrench::FileRegistryService *> file_service_to_start;
@@ -110,7 +110,7 @@ namespace wrench {
 
         int main() override;
 
-        static json eventToJSON(double date, const std::shared_ptr<wrench::WorkflowExecutionEvent> &event);
+        static json eventToJSON(double date, const std::shared_ptr<wrench::ExecutionEvent> &event);
     };
 }
 

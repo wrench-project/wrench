@@ -22,7 +22,7 @@
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_registry_service,
                     "Log category for File Registry Service");

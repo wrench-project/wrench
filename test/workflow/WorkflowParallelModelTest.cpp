@@ -69,7 +69,7 @@ private:
         auto job = job_manager->createStandardJob(this->getWorkflow()->getTaskByID("task"));
         job_manager->submitJob(job, this->test->compute_service);
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {

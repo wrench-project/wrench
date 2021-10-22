@@ -171,7 +171,7 @@ private:
                                                             wrench::FileLocation::LOCATION(this->test->storage_service_1),
                                                             wrench::FileLocation::LOCATION(this->test->storage_service_2));
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
         double event1_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
         // Now do 2 of them in parallel
@@ -186,10 +186,10 @@ private:
                                                             wrench::FileLocation::LOCATION(this->test->storage_service_2));
 
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event2 = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event2 = this->getWorkflow()->waitForNextExecutionEvent();
         double event2_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event3 = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event3 = this->getWorkflow()->waitForNextExecutionEvent();
         double event3_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
 

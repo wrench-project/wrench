@@ -18,8 +18,8 @@
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/wms/WMS.h>
 #include <wrench/managers/DataMovementManager.h>
-#include  <wrench/workflow/failure_causes/FileAlreadyBeingCopied.h>
-#include  <wrench/workflow/failure_causes/NetworkError.h>
+#include  <wrench/failure_causes/FileAlreadyBeingCopied.h>
+#include  <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_data_movement_manager, "Log category for Data Movement Manager");
 

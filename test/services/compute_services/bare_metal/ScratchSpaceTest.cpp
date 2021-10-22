@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -187,7 +187,7 @@ private:
         job_manager->submitJob(job, this->test->compute_service);
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -336,7 +336,7 @@ private:
         job_manager->submitJob(job1, this->test->compute_service);
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -542,7 +542,7 @@ private:
       }
 
       // Wait for the pilot job start
-      std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+      std::shared_ptr<wrench::ExecutionEvent> event;
       try {
         event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
@@ -790,7 +790,7 @@ private:
 
       // Wait for workflow execution events
       for (auto job : {job1, job2}) {
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -934,7 +934,7 @@ private:
 
       // Wait for workflow execution events
       for (auto job : {job1}) {
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {

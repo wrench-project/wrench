@@ -19,7 +19,7 @@
 #include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 
 
 namespace wrench {

@@ -281,7 +281,7 @@ private:
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {

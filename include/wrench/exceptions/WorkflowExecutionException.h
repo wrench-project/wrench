@@ -16,7 +16,7 @@
 #include <string>
 #include <string.h>
 
-#include "wrench/workflow/failure_causes/FailureCause.h"
+#include "wrench/failure_causes/FailureCause.h"
 
 namespace wrench {
 

@@ -14,7 +14,7 @@
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
 #include <memory>
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -543,7 +543,7 @@ private:
 
         // Check that job 3 completes
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -826,7 +826,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -981,7 +981,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -1141,7 +1141,7 @@ private:
         // Wait for the two execution events
         for (auto job : {standard_job_1, standard_job_2}) {
             // Wait for the workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
                 auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
@@ -1303,7 +1303,7 @@ private:
             }
 
             // Wait for a workflow execution event (pilot job started)
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -1451,7 +1451,7 @@ private:
                 );
             }
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -1482,7 +1482,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -1890,7 +1890,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -2020,7 +2020,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -2235,7 +2235,7 @@ private:
             //wait for three standard job completion events
             int num_events = 0;
             while (num_events < 3) {
-                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
@@ -2389,7 +2389,7 @@ private:
             //wait for two standard job completion events
             int num_events = 0;
             while (num_events < num_tasks) {
-                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
@@ -2586,7 +2586,7 @@ private:
             //wait for two standard job completion events
             int num_events = 0;
             while (num_events < 4) {
-                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
@@ -2648,7 +2648,7 @@ private:
             //wait for two standard job completion events
             int num_events = 0;
             while (num_events < num_tasks) {
-                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
@@ -2803,7 +2803,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -2973,7 +2973,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -3137,7 +3137,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -3295,7 +3295,7 @@ private:
             for (int i = 0; i < num_standard_jobs; i++) {
 
                 // Wait for a workflow execution event
-                std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+                std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
                 } catch (wrench::WorkflowExecutionException &e) {
@@ -3436,7 +3436,7 @@ private:
             }
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -3578,7 +3578,7 @@ private:
 
         // Wait for workflow execution events
         for (int i = 0; i < 3; i++) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {

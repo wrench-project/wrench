@@ -374,7 +374,7 @@ private:
         }
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -510,7 +510,7 @@ private:
         }
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -664,7 +664,7 @@ private:
         }
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1084,7 +1084,7 @@ private:
         job_manager->submitJob(job, std::get<1>(vm_list[3]));
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1128,7 +1128,7 @@ private:
 
         // Wait for a workflow execution event
         WRENCH_INFO("Waiting for job completion");
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event2;
+        std::shared_ptr<wrench::ExecutionEvent> event2;
         try {
             event2 = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1421,7 +1421,7 @@ private:
         }
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1636,7 +1636,7 @@ private:
         cloud_service->shutdownVM(vm_name);
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
@@ -1766,7 +1766,7 @@ private:
         vm_cs->stop();
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {

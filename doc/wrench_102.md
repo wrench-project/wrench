@@ -331,7 +331,7 @@ calling the `wrench::WMS::waitForAndProcessNextEvent()` member function implemen
 by the base `wrench::WMS` class. A call to this member function blocks until some
 event occurs  and then calls a callback member function. 
 The possible event classes all derive from the
-`wrench::WorkflowExecutionEvent` class, and a WMS can override the callback member 
+`wrench::ExecutionEvent` class, and a WMS can override the callback member 
 function for each possible event (the default member function does nothing but print
 some log message). These overridable callback member functions are:
 

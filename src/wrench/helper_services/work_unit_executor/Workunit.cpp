@@ -8,7 +8,7 @@
  */
 
 #include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/job/StandardJob.h>
+#include <wrench/job/StandardJob.h>
 #include "wrench/services/compute/workunit_executor/Workunit.h"
 #include <wrench-dev.h>
 

@@ -266,7 +266,7 @@ private:
 
         // Wait for workflow execution events
         for (auto const & task : tasks) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
