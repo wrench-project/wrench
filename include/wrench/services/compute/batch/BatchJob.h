@@ -1,7 +1,7 @@
 #ifndef WRENCH_BATCHJOB_H
 #define WRENCH_BATCHJOB_H
 
-#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/job/StandardJob.h"
 
 namespace wrench {
 

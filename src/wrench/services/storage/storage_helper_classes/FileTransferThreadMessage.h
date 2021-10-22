@@ -15,7 +15,7 @@
 #include <memory>
 
 #include <wrench/services/ServiceMessage.h>
-#include <wrench/workflow/failure_causes/FailureCause.h>
+#include <wrench/failure_causes/FailureCause.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>

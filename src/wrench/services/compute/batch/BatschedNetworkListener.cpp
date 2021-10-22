@@ -16,7 +16,7 @@
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/failure_causes/NetworkError.h"
 
 #ifdef ENABLE_BATSCHED // Only include these files below if Batsched is enabled
 

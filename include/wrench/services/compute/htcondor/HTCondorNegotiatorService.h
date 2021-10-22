@@ -13,7 +13,7 @@
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h"
-#include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/job/WorkflowJob.h"
 
 namespace wrench {
 

@@ -120,7 +120,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_FAILURE
+     * @brief Process a ExecutionEvent::STANDARD_JOB_FAILURE
      *
      * @param event: a workflow execution event
      */

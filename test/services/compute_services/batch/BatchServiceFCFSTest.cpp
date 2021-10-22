@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -159,7 +159,7 @@ private:
         double actual_completion_times[8];
         for (int i=0; i < 8; i++) {
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {

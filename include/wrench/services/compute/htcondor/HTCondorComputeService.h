@@ -15,8 +15,8 @@
 #include "wrench/services/compute/htcondor/HTCondorCentralManagerService.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h"
-#include "wrench/workflow/job/PilotJob.h"
-#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/job/StandardJob.h"
 
 namespace wrench {
 

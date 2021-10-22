@@ -13,7 +13,7 @@
 #include <map>
 #include <set>
 
-#include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
+#include "wrench/execution_events/ExecutionEvent.h"
 #include "WorkflowFile.h"
 #include "WorkflowTask.h"
 #include "DagOfTasks.h"
@@ -106,8 +106,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
-        std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(double timeout);
+        std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent();
+        std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(double timeout);
 
         std::string getCallbackMailbox();
 

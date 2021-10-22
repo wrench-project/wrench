@@ -13,25 +13,25 @@
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/workflow/Workflow.h>
-#include <wrench/workflow/execution_events/WorkflowExecutionEvent.h>
+#include <wrench/execution_events/ExecutionEvent.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/workunit_executor/WorkunitExecutor.h>
 #include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/job/StandardJob.h>
+#include <wrench/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/compute/workunit_executor/Workunit.h>
-#include <wrench/workflow//failure_causes/NoScratchSpace.h>
+#include <wrench//failure_causes/NoScratchSpace.h>
 #include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 #include <wrench/services/memory/MemoryManager.h>
 #include "wrench/logging/TerminalOutput.h"
 #include <wrench/services/compute/ComputeService.h>
-#include <wrench/workflow/failure_causes/FileNotFound.h>
-#include <wrench/workflow/failure_causes/NetworkError.h>
-#include <wrench/workflow/failure_causes/FatalFailure.h>
-#include <wrench/workflow/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/failure_causes/FileNotFound.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/FatalFailure.h>
+#include <wrench/failure_causes/ComputeThreadHasDied.h>
 #include <wrench/services/memory/MemoryManager.h>
 
 
@@ -451,7 +451,7 @@ namespace wrench {
                 task->setComputationStartDate(S4U_Simulation::getClock());
                 runMulticoreComputationForTask(task, this->simulate_computation_as_sleep);
                 task->setComputationEndDate(S4U_Simulation::getClock());
-            } catch (WorkflowExecutionEvent &e) {
+            } catch (ExecutionEvent &e) {
                 this->failure_timestamp_should_be_generated = true;
                 throw;
             }

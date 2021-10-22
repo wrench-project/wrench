@@ -30,7 +30,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
+#include "wrench/failure_causes/NetworkError.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_batsched_batch_scheduler, "Log category for BatschedBatchScheduler");
 

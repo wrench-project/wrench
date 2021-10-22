@@ -31,7 +31,7 @@ namespace wrench {
 
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion...");
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
 

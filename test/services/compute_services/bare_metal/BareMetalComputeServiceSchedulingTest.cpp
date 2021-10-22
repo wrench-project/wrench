@@ -12,7 +12,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -138,7 +138,7 @@ private:
         // Wait for completions
         std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
         for (int i=0; i < 4; i++) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -282,7 +282,7 @@ private:
         // Wait for completions
         std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
         for (int i=0; i < 4; i++) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
@@ -417,7 +417,7 @@ private:
         // Wait for completions
         std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
         for (int i=0; i < 4; i++) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
             } catch (wrench::WorkflowExecutionException &e) {
