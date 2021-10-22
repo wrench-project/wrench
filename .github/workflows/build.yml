@@ -1,6 +1,14 @@
 name: Build
 
-on: [ push ]
+on:
+  push:
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
