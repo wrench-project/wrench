@@ -116,8 +116,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 [![NSF Funding 20162][nsf-20162-badge]][nsf-20162-link]
 ![CNRS Funding 2015][cnrs-2015-badge]
 
-[build-badge]:              https://github.com/wrench-project/wrench/workflows/Build/badge.svg
-[build-link]:               https://github.com/wrench-project/wrench/actions
+[build-badge]:              https://github.com/wrench-project/wrench/actions/workflows/build.yml/badge.svg
+[build-link]:               https://github.com/wrench-project/wrench/actions/workflows/build.yml
 [build-macos-badge]:        https://github.com/wrench-project/wrench/actions/workflows/build-macos.yml/badge.svg
 [build-macos-link]:         https://github.com/wrench-project/wrench/actions/workflows/build-macos.yml
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
