@@ -1,4 +1,5 @@
 [![Build Status][build-badge]][build-link]
+[![Build-macOS Status][build-macos-badge]][build-macos-link]
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
 [![Coverage Status][codecov-badge]][codecov-link]
@@ -117,6 +118,8 @@ WRENCH has been funded by the National Science Foundation (NSF), and the Nationa
 
 [build-badge]:              https://github.com/wrench-project/wrench/workflows/Build/badge.svg
 [build-link]:               https://github.com/wrench-project/wrench/actions
+[build-macos-badge]:        https://github.com/wrench-project/wrench/actions/workflows/build-macos.yml/badge.svg
+[build-macos-link]:         https://github.com/wrench-project/wrench/actions/workflows/build-macos.yml
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
 [codecov-badge]:            https://codecov.io/gh/wrench-project/wrench/branch/master/graph/badge.svg
 [codecov-link]:             https://codecov.io/gh/wrench-project/wrench
