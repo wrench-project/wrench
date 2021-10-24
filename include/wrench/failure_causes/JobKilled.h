@@ -18,7 +18,7 @@
 
 namespace wrench {
 
-    class WorkflowJob;
+    class Job;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -32,17 +32,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobKilled(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service);
+        JobKilled(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<WorkflowJob> getJob();
+        std::shared_ptr<Job> getJob();
         std::shared_ptr<ComputeService> getComputeService();
         std::string toString();
 
     private:
-        std::shared_ptr<WorkflowJob> job;
+        std::shared_ptr<Job> job;
         std::shared_ptr<ComputeService> compute_service;
     };
 

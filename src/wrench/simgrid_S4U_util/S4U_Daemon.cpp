@@ -201,7 +201,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets up the on_exit functionf for the actor
+     * @brief Sets up the on_exit function for the actor
      */
     void S4U_Daemon::setupOnExitFunction() {
 

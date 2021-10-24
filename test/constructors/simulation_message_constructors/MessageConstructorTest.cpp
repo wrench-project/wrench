@@ -11,17 +11,17 @@
 #include <map>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/Workflow.h"
+#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/workflow/Workflow.h>
 #include "services/file_registry/FileRegistryMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
+#include <wrench/services/compute/ComputeServiceMessage.h>
 #include "services/storage/StorageServiceMessage.h"
 #include "services/compute/cloud/CloudComputeServiceMessage.h"
 #include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 #include "services/network_proximity/NetworkProximityMessage.h"
-#include "wrench/failure_causes/FileNotFound.h"
-#include "wrench/services/compute/batch/BatchJob.h"
-#include "wrench/managers/JobManager.h"
+#include <wrench/failure_causes/FileNotFound.h>
+#include <wrench/services/compute/batch/BatchJob.h>
+#include <wrench/managers/JobManager.h>
 
 class MessageConstructorTest : public ::testing::Test {
 protected:

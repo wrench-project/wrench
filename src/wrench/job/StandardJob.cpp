@@ -40,7 +40,7 @@ namespace wrench {
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
             :
-            WorkflowJob(),
+            Job("", nullptr),
             num_completed_tasks(0),
             file_locations(file_locations),
             pre_file_copies(pre_file_copies),
@@ -69,7 +69,7 @@ namespace wrench {
             this->total_flops += t->getFlops();
         }
         this->workflow = workflow;
-        this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+        this->name = "standard_job_" + std::to_string(Job::getNewUniqueNumber());
     }
 
     /**

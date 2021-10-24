@@ -11,7 +11,7 @@
 #define WRENCH_TRACEFILELOADER_H
 
 #include <string>
-#include <wrench/workflow/WorkflowTask.h>
+#include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
 

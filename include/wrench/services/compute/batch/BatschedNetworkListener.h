@@ -10,7 +10,7 @@
 #ifndef WRENCH_BATSCHEDNETWORKLISTENER_H
 #define WRENCH_BATSCHEDNETWORKLISTENER_H
 
-#include <wrench/services/Service.h>
+#include "wrench/services/Service.h"
 #include "BatchComputeServiceProperty.h"
 
 namespace wrench {

@@ -114,6 +114,7 @@ namespace wrench {
 
         std::vector<std::string> cleanedup_args;
 
+
         for (i = 0; i < *argc; i++) {
             if (not strcmp(argv[i], "--help")) {
                 simulator_help_requested = true;
@@ -148,14 +149,14 @@ namespace wrench {
         sg_vm_live_migration_plugin_init();
 
         // Register a callback on host state changes to warn users
-        // that the --activate-host-shutdown flag should have been passed
+        // that the --wrench-host-shutdown-simulation flag should have been passed
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_state_change.connect(
                 [](simgrid::s4u::Host const &h) {
                     if (not Simulation::host_shutdown_enabled) {
                         throw std::runtime_error(
                                 "It looks like you are simulating host failures/shutdowns during the simulated execution."
-                                " Please restart your simulation passing it the --activate-host-shutdown command-line flag.");
+                                " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
                     }
                 });
 

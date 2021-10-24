@@ -128,7 +128,7 @@ namespace wrench {
                         batch_job_args["-u"].c_str());
             try {
                 job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
-            } catch (WorkflowExecutionException &e) {
+            } catch (ExecutionException &e) {
                 WRENCH_INFO("Couldn't submit a replayed job: %s (ignoring)", e.getCause()->toString().c_str());
             }
 

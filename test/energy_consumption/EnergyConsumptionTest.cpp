@@ -10,11 +10,10 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/job/PilotJob.h"
 #include <algorithm>
 #include <simgrid/plugins/energy.h>
 

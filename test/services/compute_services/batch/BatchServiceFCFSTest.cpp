@@ -10,11 +10,11 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -150,7 +150,7 @@ private:
             for (int i=0; i < 8; i++) {
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_args[i]);
             }
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Unexpected exception while submitting job"
             );
@@ -162,7 +162,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -321,7 +321,7 @@ private:
             for (int i=0; i < 9; i++) {
                 job_manager->submitJob(jobs[i], this->test->compute_service, job_args[i]);
             }
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Unexpected exception while submitting job"
             );
@@ -463,7 +463,7 @@ private:
             std::map<std::string,double> jobs_estimated_start_times =
                     (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->getStartTimeEstimates(set_of_jobs);
             throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FunctionalityNotAvailable>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got expected exception, but unexpected failure cause: " +

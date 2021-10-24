@@ -88,7 +88,7 @@ namespace wrench {
 
 
             // Get the workflow job associated to the picked batch job
-            std::shared_ptr<WorkflowJob> workflow_job = batch_job->getWorkflowJob();
+            std::shared_ptr<Job> workflow_job = batch_job->getWorkflowJob();
 
             // Find on which resources to actually run the job
             unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();

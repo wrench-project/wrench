@@ -3,13 +3,13 @@
 	request_handlers["waitForNextSimulationEvent"] = [sc](json data) { return sc->waitForNextSimulationEvent(std::move(data)); };
 	request_handlers["getSimulationEvents"] = [sc](json data) { return sc->getSimulationEvents(std::move(data)); };
 	request_handlers["getAllHostnames"] = [sc](json data) { return sc->getAllHostnames(std::move(data)); };
-	request_handlers["standardJobGetTasks"] = [sc](json data) { return sc->getStandardJobTasks(std::move(data)); };
+	request_handlers["standardJobGetTasks"] = [sc](json data) { return sc->getCompoundJobTasks(std::move(data)); };
 	request_handlers["addBareMetalComputeService"] = [sc](json data) { return sc->addBareMetalComputeService(std::move(data)); };
 	request_handlers["addSimpleStorageService"] = [sc](json data) { return sc->addSimpleStorageService(std::move(data)); };
 	request_handlers["createFileCopyAtStorageService"] = [sc](json data) { return sc->createFileCopyAtStorageService(std::move(data)); };
 	request_handlers["addFileRegistryService"] = [sc](json data) { return sc->addFileRegistryService(std::move(data)); };
-	request_handlers["createStandardJob"] = [sc](json data) { return sc->createStandardJob(std::move(data)); };
-	request_handlers["submitStandardJob"] = [sc](json data) { return sc->submitStandardJob(std::move(data)); };
+	request_handlers["createCompoundJob"] = [sc](json data) { return sc->createCompoundJob(std::move(data)); };
+	request_handlers["submitCompoundJob"] = [sc](json data) { return sc->submitCompoundJob(std::move(data)); };
 	request_handlers["createTask"] = [sc](json data) { return sc->createTask(std::move(data)); };
 	request_handlers["taskGetFlops"] = [sc](json data) { return sc->getTaskFlops(std::move(data)); };
 	request_handlers["taskGetMinNumCores"] = [sc](json data) { return sc->getTaskMinNumCores(std::move(data)); };

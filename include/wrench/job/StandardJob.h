@@ -15,8 +15,9 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <wrench/workflow/Workflow.h>
 
-#include "WorkflowJob.h"
+#include "Job.h"
 
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 
@@ -34,10 +35,10 @@ namespace wrench {
      * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a ComputeService
      * by a WMS (via a JobManager)
      */
-    class StandardJob : public WorkflowJob {
+    class StandardJob : public Job {
 
     public:
-        /** @brief Standad job states */
+        /** @brief Standard job states */
         enum State {
             /** @brief Not submitted yet */
                     NOT_SUBMITTED,

@@ -154,7 +154,7 @@ private:
                         break;
                 }
 
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
 //                WRENCH_INFO("Got an exception");
                 num_failures++;
                 if (not std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {

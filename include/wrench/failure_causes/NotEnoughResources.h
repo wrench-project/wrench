@@ -13,12 +13,12 @@
 #include <set>
 #include <string>
 
-#include <wrench/failure_causes/FailureCause.h>
-#include <wrench/services/compute/ComputeService.h>
+#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
-    class WorkflowJob;
+    class Job;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -33,17 +33,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NotEnoughResources(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service);
+        NotEnoughResources(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<WorkflowJob> getJob();
+        std::shared_ptr<Job> getJob();
         std::shared_ptr<ComputeService> getComputeService();
         std::string toString();
 
     private:
-        std::shared_ptr<WorkflowJob> job;
+        std::shared_ptr<Job> job;
         std::shared_ptr<ComputeService> compute_service;
     };
 

@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
+#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../../include/TestWithFork.h"
 

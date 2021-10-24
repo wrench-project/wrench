@@ -15,8 +15,12 @@
 #include <set>
 
 #include "wrench/services/Service.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
+
 
 namespace wrench {
+
+    class FailureCause;
 
     class WMS;
 
@@ -26,9 +30,11 @@ namespace wrench {
 
     class WorkflowFile;
 
-    class WorkflowJob;
+    class Job;
 
     class PilotJob;
+
+    class CompoundJob;
 
     class StandardJob;
 
@@ -54,6 +60,7 @@ namespace wrench {
 
         void kill();
 
+        std::shared_ptr<CompoundJob> createCompoundJob(std::string name);
 
         std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
                                                        std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
@@ -86,12 +93,12 @@ namespace wrench {
 
         std::shared_ptr<PilotJob> createPilotJob();
 
-        void submitJob(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service,
+        void submitJob(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service,
                        std::map<std::string, std::string> service_specific_args = {});
 
-        void terminateJob(std::shared_ptr<WorkflowJob> job);
+        void terminateJob(std::shared_ptr<Job> job);
 
-//        void forgetJob(WorkflowJob *job);
+//        void forgetJob(Job *job);
 
         std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
 

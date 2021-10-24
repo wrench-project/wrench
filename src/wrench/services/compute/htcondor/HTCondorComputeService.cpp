@@ -12,7 +12,7 @@
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 #include <wrench/failure_causes/NotEnoughResources.h>
 #include <wrench/failure_causes/NotAllowed.h>
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/htcondor/HTCondorComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
@@ -134,7 +134,7 @@ namespace wrench {
      * @param job: a standard job
      * @param service_specific_args: service specific arguments
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void HTCondorComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
@@ -153,7 +153,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the answer
@@ -161,13 +161,13 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -183,7 +183,7 @@ namespace wrench {
      * @param job: a pilot job
      * @param service_specific_args: service specific arguments
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void HTCondorComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
@@ -201,7 +201,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the answer
@@ -209,13 +209,13 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(

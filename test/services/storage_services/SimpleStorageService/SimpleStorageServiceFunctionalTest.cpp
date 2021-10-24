@@ -188,7 +188,7 @@ private:
                                              wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error(
                     "Should not be able to store a file to a storage service that doesn't have enough capacity");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         // Make sure the copy didn't happen
@@ -201,7 +201,7 @@ private:
             wrench::StorageService::copyFile(this->test->file_10,
                                              wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                              wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
         }
 
@@ -209,7 +209,7 @@ private:
         std::map<std::string, double> free_space;
         try {
             free_space = this->test->storage_service_100->getFreeSpace();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
         if ((free_space.size() != 1) or (free_space["/disk100"] != 90.0)) {
@@ -227,7 +227,7 @@ private:
         // Read a file on a storage service
         try {
             wrench::StorageService::readFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to read a file available on a storage service");
         }
 
@@ -235,7 +235,7 @@ private:
         try {
             wrench::StorageService::readFile(this->test->file_100, wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to read a file unavailable a storage service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         { // Test using readFiles()
@@ -254,7 +254,7 @@ private:
                 std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
                 locations[this->test->file_10] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
                 wrench::StorageService::readFiles(locations);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Should be able to read a file available on a storage service");
             }
 
@@ -264,7 +264,7 @@ private:
                 locations[this->test->file_100] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
                 wrench::StorageService::readFiles(locations);
                 throw std::runtime_error("Should not be able to read a file unavailable a storage service");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
             }
         }
 
@@ -285,7 +285,7 @@ private:
         try {
             wrench::StorageService::deleteFile(this->test->file_100, wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected exception, but unexpected failure cause: " +
@@ -307,7 +307,7 @@ private:
             wrench::StorageService::deleteFile(this->test->file_100,
                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100/bogus"));
             throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected 'file not found' exception, but unexpected failure cause: " +
@@ -328,14 +328,14 @@ private:
         try {
             wrench::StorageService::deleteFile(this->test->file_10,
                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  be able to delete a file available a storage service");
         }
 
         // Check that the storage capacity is back to what it should be
         try {
             free_space = this->test->storage_service_100->getFreeSpace();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
 
@@ -375,7 +375,7 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while submitting a file copy operations");
         }
 
@@ -384,7 +384,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -400,7 +400,7 @@ private:
         // Check that the free space has been updated at the destination
         try {
             free_space = this->test->storage_service_100->getFreeSpace();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to get a storage's service free space");
         }
         if ((free_space.size() != 1) or (free_space["/disk100"] != 99.0)) {
@@ -413,14 +413,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while submitting a file copy operations");
         }
 
         // Wait for a workflow execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -439,14 +439,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while submitting a file copy operations");
         }
 
         // Wait for a workflow execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -477,7 +477,7 @@ private:
             wrench::StorageService::lookupFile(this->test->file_1,
                                                wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -496,7 +496,7 @@ private:
             wrench::StorageService::lookupFile(this->test->file_1,
                                                wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
             throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -515,7 +515,7 @@ private:
             wrench::StorageService::readFile(this->test->file_1,
                                              wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to read a file from a down service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -533,7 +533,7 @@ private:
             wrench::StorageService::writeFile(this->test->file_1,
                                               wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should not be able to write a file from a DOWN service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -550,7 +550,7 @@ private:
         try {
             this->test->storage_service_100->getFreeSpace();
             throw std::runtime_error("Should not be able to get free space info from a DOWN service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -713,7 +713,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/whatever/"),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should not be able to do a file copy with a bogus path");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = e.getCause();
             if (auto real_cause = std::dynamic_pointer_cast<wrench::InvalidDirectoryPath>(e.getCause())) {
                 real_cause->toString();         // Coverage
@@ -731,7 +731,7 @@ private:
             data_movement_manager->doSynchronousFileCopy(this->test->file_500,
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while doing a synchronous file copy: " + std::string(e.what()));
         }
 
@@ -741,7 +741,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/"));
             throw std::runtime_error("Should not be able to write a file beyond the storage capacity");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         // Do another file copy with empty src dir and empty dst dir
@@ -749,7 +749,7 @@ private:
             data_movement_manager->doSynchronousFileCopy(this->test->file_1,
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while doing a synchronous file copy: " + std::string(e.what()));
         }
 
@@ -850,7 +850,7 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to initiate a file copy: " + std::string(e.what()));
         }
 
@@ -860,7 +860,7 @@ private:
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("A duplicate asynchronous file copy should fail!");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
@@ -885,7 +885,7 @@ private:
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -991,7 +991,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_100));
             throw std::runtime_error("Should have gotten a 'not enough space' exception");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
             if (not cause) {
@@ -1030,7 +1030,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'file not found' exception");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(e.getCause());
             if (not cause) {
@@ -1056,7 +1056,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -1080,7 +1080,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_100),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -1196,7 +1196,7 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
@@ -1205,7 +1205,7 @@ private:
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1234,14 +1234,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_100));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
         // Wait for the next execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1273,7 +1273,7 @@ private:
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
 
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
 
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -1293,7 +1293,7 @@ private:
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000));
             throw std::runtime_error("Should have gotten a 'service is down' exception");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -1407,7 +1407,7 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000"),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
@@ -1416,7 +1416,7 @@ private:
 
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1430,14 +1430,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/"),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
         // Wait for the next execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1448,7 +1448,7 @@ private:
         // Remove the file at storage_service_510:/:file_10
         try {
             wrench::StorageService::deleteFile(this->test->file_10, wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to delete file storage_service_510:/:file_10");
         }
 
@@ -1459,14 +1459,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
         // Wait for the next execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1479,14 +1479,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_1000, "/disk1000/foo"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
         // Wait for the next execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1499,14 +1499,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo/../foo"),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/bar"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
         // Wait for the next execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -1556,14 +1556,14 @@ private:
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10,
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/foo"),
                                                                 wrench::FileLocation::LOCATION(this->test->storage_service_510, "/disk510/faa"));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an unexpected exception");
         }
 
         // Wait for the next execution event
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event)) {
@@ -1668,7 +1668,7 @@ private:
         try {
             wrench::StorageService::writeFile(this->test->file_500, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
             throw std::runtime_error("Should not be able to write to a storage service with not enough space");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::StorageServiceNotEnoughSpace>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got an expected exception but unexpected cause type: " +

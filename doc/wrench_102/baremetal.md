@@ -85,7 +85,7 @@ job_manager->submitJob(job, baremetal_cs, service_specific_args);
 
 If the service-specific arguments are invalid (e.g., invalid hostname, unknown task, 
 number of cores too large), the `wrench::JobManager::submitJob()` method 
-throws a `wrench::WorkflowExecutionException`.
+throws a `wrench::ExecutionException`.
 
 See the WMS implementation in `examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp` for a more complete example.
 

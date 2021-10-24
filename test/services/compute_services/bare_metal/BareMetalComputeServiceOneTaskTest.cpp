@@ -1803,7 +1803,7 @@ private:
         try {
             job_manager->submitJob(job, test->compute_service, {{"task2", "OneCoreHost:2"}});
             throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
@@ -1918,7 +1918,7 @@ private:
         try {
             job_manager->submitJob(job, test->compute_service);
             throw std::runtime_error("Should not be able to submit a job to a service without enough RAM");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Received the expected exception, but unexpected failure cause: " +
@@ -2041,7 +2041,7 @@ private:
         try {
             job_manager->submitJob(job, test->compute_service);
             throw std::runtime_error("Should not be able to submit a job to a service that is down");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got the expected exception, but an expected failure cause: " +
@@ -2155,7 +2155,7 @@ private:
         try {
             job_manager->submitJob(job, test->compute_service);
             throw std::runtime_error("Should not be able to submit a job to a service that is down");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got the expected exception, but an expected failure cause: " +
@@ -2177,7 +2177,7 @@ private:
         // Submit the job again
         try {
             job_manager->submitJob(job, test->compute_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  be able to submit a job to a service that has been resumed");
         }
 

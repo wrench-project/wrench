@@ -28,7 +28,7 @@
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
 #include "wrench/failure_causes/NetworkError.h"
 
@@ -246,7 +246,7 @@ namespace wrench {
             try {
                 message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             } catch (std::shared_ptr<NetworkError> &cause) {
-                throw WorkflowExecutionException(cause);
+                throw ExecutionException(cause);
             }
 
             if (auto msg = dynamic_cast<BatchQueryAnswerMessage*>(message.get())) {

@@ -9,11 +9,10 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
@@ -127,13 +126,13 @@ private:
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
 
@@ -152,13 +151,13 @@ private:
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
 

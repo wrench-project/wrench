@@ -10,7 +10,7 @@
 #include <wrench/failure_causes/JobTimeout.h>
 
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_job_timeout, "Log category for JobTimeout");
 
@@ -21,7 +21,7 @@ namespace wrench {
     *
     * @param job: the job that has timed out
     */
-    JobTimeout::JobTimeout(std::shared_ptr<WorkflowJob> job) {
+    JobTimeout::JobTimeout(std::shared_ptr<Job> job) {
         this->job = job;
     }
 
@@ -30,7 +30,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    std::shared_ptr<WorkflowJob> JobTimeout::getJob() {
+    std::shared_ptr<Job> JobTimeout::getJob() {
         return this->job;
     }
 

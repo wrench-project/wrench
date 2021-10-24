@@ -8,7 +8,7 @@
  */
 
 
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
@@ -114,7 +114,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data, 0));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        throw ExecutionException(cause);
       }
     }
 
@@ -127,7 +127,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchQueryAnswerMessage(estimated_waiting_time,0));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        throw ExecutionException(cause);
       }
     }
 

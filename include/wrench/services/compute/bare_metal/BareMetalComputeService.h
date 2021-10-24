@@ -14,11 +14,11 @@
 #include <queue>
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
+#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h"
 #include "BareMetalComputeServiceProperty.h"
 #include "BareMetalComputeServiceMessagePayload.h"
-#include "wrench/services/compute/workunit_executor/Workunit.h"
-#include "wrench/services/helpers/HostStateChangeDetector.h"
+#include "wrench/services/helper_services/work_unit_executor/Workunit.h"
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
 
 
 

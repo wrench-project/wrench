@@ -12,7 +12,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
@@ -141,7 +141,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -285,7 +285,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
             }
 
@@ -420,7 +420,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
             }
             auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);

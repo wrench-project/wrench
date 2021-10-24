@@ -10,7 +10,7 @@
 #ifndef WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
 #define WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
 
-#include <wrench/services/ServiceProperty.h>
+#include "wrench/services/ServiceProperty.h"
 
 namespace wrench {
 

@@ -13,7 +13,7 @@
 #include "wrench.h"
 
 // Exceptions and Failure Causes
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/failure_causes/FailureCause.h"
 #include "wrench/failure_causes/ComputeThreadHasDied.h"
 #include "wrench/failure_causes/FatalFailure.h"
@@ -59,7 +59,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 
 // Job
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 #include "wrench/job/StandardJob.h"
 #include "wrench/job/PilotJob.h"
 

@@ -17,10 +17,10 @@ namespace wrench {
      * @param workflow: a workflow
      */
     PilotJob::PilotJob(Workflow *workflow) :
-            WorkflowJob(), state(PilotJob::State::NOT_SUBMITTED) {
+            Job("", nullptr), state(PilotJob::State::NOT_SUBMITTED) {
 
       this->workflow = workflow;
-      this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+      this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
     }
 
     /**

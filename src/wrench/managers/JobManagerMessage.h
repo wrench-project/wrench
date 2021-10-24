@@ -10,10 +10,10 @@
 #ifndef WRENCH_JOBMANAGERMESSAGE_H
 #define WRENCH_JOBMANAGERMESSAGE_H
 
-#include <wrench/simulation/SimulationMessage.h>
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/compute/ComputeService.h"
-#include <wrench/job/StandardJob.h>
-#include <wrench-dev.h>
+#include "wrench/job/StandardJob.h"
+#include "wrench-dev.h"
 
 namespace wrench {
 

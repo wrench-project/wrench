@@ -9,12 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
@@ -201,7 +201,7 @@ private:
                     this->vms[vm_name] = vm_cs;
                     this->vm_used[vm_cs] = false;
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Should be able to create VMs!!");
             }
         }
@@ -234,7 +234,7 @@ private:
                 if (this->test->cloud_service->isVMDown(vm.first)) {
                     try {
                         this->test->cloud_service->startVM(vm.first);
-                    } catch (wrench::WorkflowExecutionException &e) {
+                    } catch (wrench::ExecutionException &e) {
                         auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                         if (cause) {
                             // oh well

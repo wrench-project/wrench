@@ -14,7 +14,7 @@
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
 #include <memory>
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -303,7 +303,7 @@ private:
             try {
                 job_manager->submitJob(job, bs_does_not_support_standard, batch_job_args);
                 throw std::runtime_error("Should have gotten an exception as Standard Jobs are not supported");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 auto cause = e.getCause();
                 auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
                 real_cause->toString();
@@ -327,7 +327,7 @@ private:
             try {
                 job_manager->submitJob(job, bs_does_not_support_pilot, batch_job_args);
                 throw std::runtime_error("Should have gotten an exception as Pilot Jobs are not supported");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 auto cause = e.getCause();
                 auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
                 real_cause->toString();
@@ -454,7 +454,7 @@ private:
             batch_job_args["-c"] = "10"; //number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -490,7 +490,7 @@ private:
             batch_job_args["-c"] = "10"; //number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -526,7 +526,7 @@ private:
             batch_job_args["-c"] = "10"; //number of cores per node
             try {
                 job_manager->submitJob(job3, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -546,7 +546,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -668,7 +668,7 @@ private:
         try {
             job_manager->submitJob(pjob1, this->test->compute_service, batch_job_args);
             job_manager->submitJob(pjob2, this->test->compute_service, batch_job_args);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Exception: " + std::string(e.what())
             );
@@ -819,7 +819,7 @@ private:
             batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -829,7 +829,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -839,7 +839,7 @@ private:
             // Try to terminate the already terminated job
             try {
                 job_manager->terminateJob(job);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (not std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause())) {
                     throw std::runtime_error("Got an expected exception, but the failure cause is not NotAllowed");
                 }
@@ -974,7 +974,7 @@ private:
             batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -984,7 +984,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
@@ -1155,7 +1155,7 @@ private:
                     throw std::runtime_error(
                             "Unexpected workflow execution event: " + event->toString());
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
             }
 
@@ -1296,7 +1296,7 @@ private:
             // Submit a pilot job
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -1306,7 +1306,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
@@ -1316,7 +1316,7 @@ private:
             // Wait for another workflow execution event (pilot job terminated)
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
@@ -1445,7 +1445,7 @@ private:
             batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -1454,7 +1454,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -1475,7 +1475,7 @@ private:
             // Submit a pilot job
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -1485,7 +1485,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
@@ -1494,7 +1494,7 @@ private:
 
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
@@ -1607,7 +1607,7 @@ private:
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
                 throw std::runtime_error("Job Submission should have generated an exception");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
@@ -1632,7 +1632,7 @@ private:
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
                 throw std::runtime_error("Job Submission should have generated an exception");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not cause) {
                     throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
@@ -1883,7 +1883,7 @@ private:
             batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -1893,7 +1893,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
@@ -2013,7 +2013,7 @@ private:
             // Submit a pilot job
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2023,7 +2023,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
@@ -2032,7 +2032,7 @@ private:
 
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
 
@@ -2168,7 +2168,7 @@ private:
             batch_job_args["-c"] = "8"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2197,7 +2197,7 @@ private:
             task1_batch_job_args["-c"] = "9"; //number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, task1_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2226,7 +2226,7 @@ private:
             task2_batch_job_args["-c"] = "1"; //number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2238,7 +2238,7 @@ private:
                 std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
                 if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -2379,7 +2379,7 @@ private:
                 args["-c"] = std::to_string(num_cores_in_each_task);
                 try {
                     job_manager->submitJob(jobs[i], this->test->compute_service, args);
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error(
                             "Got some exception"
                     );
@@ -2392,7 +2392,7 @@ private:
                 std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
                 if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -2541,7 +2541,7 @@ private:
             batch_job_args["-c"] = "2"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2553,7 +2553,7 @@ private:
             task2_batch_job_args["-c"] = "9"; //number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2565,7 +2565,7 @@ private:
             task3_batch_job_args["-c"] = "1"; //number of cores per node
             try {
                 job_manager->submitJob(job3, this->test->compute_service, task3_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2577,7 +2577,7 @@ private:
             task4_batch_job_args["-c"] = "10"; //number of cores per node
             try {
                 job_manager->submitJob(job4, this->test->compute_service, task4_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2589,7 +2589,7 @@ private:
                 std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
                 if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -2638,7 +2638,7 @@ private:
                 args["-c"] = "1";
                 try {
                     job_manager->submitJob(jobs[i], this->test->compute_service, args);
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error(
                             "Exception: " + std::string(e.what())
                     );
@@ -2651,7 +2651,7 @@ private:
                 std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
                 if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -2796,7 +2796,7 @@ private:
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service,
                                        pilot_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Got some exception " + std::string(e.what())
                 );
@@ -2806,7 +2806,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
@@ -2819,7 +2819,7 @@ private:
 
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {});
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -2835,7 +2835,7 @@ private:
             // Wait for the standard job failure notification
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
@@ -2966,7 +2966,7 @@ private:
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service,
                                        pilot_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Got some exception " + std::string(e.what())
                 );
@@ -2976,7 +2976,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
@@ -3004,7 +3004,7 @@ private:
 
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {});
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -3013,7 +3013,7 @@ private:
             // Wait for the standard job success notification
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Error while getting and execution event: " + e.getCause()->toString());
             }
@@ -3130,7 +3130,7 @@ private:
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service,
                                        pilot_batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Got some exception " + std::string(e.what())
                 );
@@ -3140,7 +3140,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
@@ -3171,7 +3171,7 @@ private:
                 throw std::runtime_error(
                         "Expected a runtime error of insufficient cores in pilot job"
                 );
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
             }
 
             this->getWorkflow()->removeTask(task);
@@ -3285,7 +3285,7 @@ private:
             for (auto standard_jobs:jobs) {
                 try {
                     job_manager->submitJob(standard_jobs, this->test->compute_service, batch_job_args);
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error(
                             "Exception: " + std::string(e.what())
                     );
@@ -3298,7 +3298,7 @@ private:
                 std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
                 if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -3429,7 +3429,7 @@ private:
             batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what())
                 );
@@ -3439,7 +3439,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -3562,7 +3562,7 @@ private:
             batch_job_args["-c"] = "10"; //number of cores per node
             try {
                 job_manager->submitJob(jobs[i], this->test->compute_service, batch_job_args);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Exception: " + std::string(e.what()));
             }
         }
@@ -3581,7 +3581,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {

@@ -9,13 +9,11 @@
 
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -121,7 +119,7 @@ private:
             batch_job_args1["-c"] = "10"; // Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args1);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got some exception");
             }
 
@@ -133,7 +131,7 @@ private:
             batch_job_args2["-c"] = "10"; // Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args2);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got some exception");
             }
 
@@ -145,7 +143,7 @@ private:
             batch_job_args3["-c"] = "10"; // Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args3);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got some exception");
             }
 
@@ -157,7 +155,7 @@ private:
             batch_job_args4["-c"] = "10"; // Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args4);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Got some exception");
             }
 
@@ -169,7 +167,7 @@ private:
                 std::shared_ptr<wrench::ExecutionEvent> event;
                 try {
                     event = this->getWorkflow()->waitForNextExecutionEvent();
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
                 }
 
