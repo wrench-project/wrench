@@ -12,10 +12,10 @@
 
 #include <set>
 
-#include <wrench/services/Service.h>
-#include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
+#include "wrench/services/Service.h"
+#include "wrench/services/network_proximity/NetworkProximityService.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 #include "FileRegistryServiceProperty.h"
 #include "FileRegistryServiceMessagePayload.h"

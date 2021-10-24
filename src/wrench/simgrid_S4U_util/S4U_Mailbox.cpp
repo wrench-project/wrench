@@ -17,7 +17,7 @@
 #include <wrench/util/MessageManager.h>
 #endif
 
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/failure_causes/FailureCause.h"
 
 #include "wrench/logging/TerminalOutput.h"

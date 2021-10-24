@@ -21,7 +21,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/WorkflowFile.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/services/memory/MemoryManager.h"

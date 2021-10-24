@@ -17,7 +17,7 @@
 
 namespace wrench {
 
-    class WorkflowJob;
+    class Job;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -31,16 +31,16 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobTimeout(std::shared_ptr<WorkflowJob> job);
+        JobTimeout(std::shared_ptr<Job> job);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<WorkflowJob> getJob();
+        std::shared_ptr<Job> getJob();
         std::string toString();
 
     private:
-        std::shared_ptr<WorkflowJob> job;
+        std::shared_ptr<Job> job;
     };
 
 

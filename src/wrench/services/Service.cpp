@@ -14,7 +14,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/Service.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/services/ServiceMessagePayload.h"
 #include "wrench/failure_causes/ServiceIsDown.h"
 #include "wrench/failure_causes/ServiceIsSuspended.h"
@@ -279,7 +279,7 @@ namespace wrench {
     /**
      * @brief Synchronously stop the service (does nothing if the service is already stopped)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void Service::stop() {
@@ -303,7 +303,7 @@ namespace wrench {
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             this->shutting_down = false;
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Wait for the ack
@@ -313,7 +313,7 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             this->shutting_down = false;
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
@@ -344,12 +344,12 @@ namespace wrench {
     /**
       * @brief Resume the service
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       */
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
             std::string what = "Service cannot be resumed because it is not in the suspended state";
-            throw WorkflowExecutionException(std::shared_ptr<NotAllowed>(
+            throw ExecutionException(std::shared_ptr<NotAllowed>(
                     new NotAllowed(this->getSharedPtr<Service>(), what)));
         }
         this->resumeActor();
@@ -444,15 +444,15 @@ namespace wrench {
 
     /**
      * @brief Throws an exception if the service is not up
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(
+            throw ExecutionException(
                     std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr<Service>())));
         }
         if (this->state == Service::SUSPENDED) {
-            throw WorkflowExecutionException(
+            throw ExecutionException(
                     std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }

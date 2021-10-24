@@ -13,10 +13,10 @@
 
 
 #include <iostream>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/workflow/WorkflowFile.h>
-#include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/services/storage/StorageService.h>
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/workflow/WorkflowFile.h"
+#include "wrench/services/network_proximity/NetworkProximityService.h"
+#include "wrench/services/storage/StorageService.h"
 
 namespace wrench {
 

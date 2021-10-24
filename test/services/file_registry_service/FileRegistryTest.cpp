@@ -244,7 +244,7 @@ private:
       try {
         frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
         throw std::runtime_error("Should not be able to remove an entry from a service that is down");
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         // Check Exception
         auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
@@ -405,7 +405,7 @@ private:
       try {
         frs->lookupEntry(file1);
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         // Check Exception
         auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
@@ -422,7 +422,7 @@ private:
       try {
         file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps);
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         // Check Exception
         auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {

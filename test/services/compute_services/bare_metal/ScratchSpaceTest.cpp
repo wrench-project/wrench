@@ -10,11 +10,10 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
@@ -190,7 +189,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -339,7 +338,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -360,7 +359,7 @@ private:
         // Wait for a workflow execution event
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -387,7 +386,7 @@ private:
         while (i < 2) {
           try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-          } catch (wrench::WorkflowExecutionException &e) {
+          } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
 
@@ -537,7 +536,7 @@ private:
       // Submit a pilot job
       try {
         job_manager->submitJob(pilot_job, this->test->compute_service, {{"-N","1"}, {"-c","1"}, {"-t","60"}});
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
@@ -545,7 +544,7 @@ private:
       std::shared_ptr<wrench::ExecutionEvent> event;
       try {
         event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         throw std::runtime_error(
                 "Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -612,7 +611,7 @@ private:
         // Wait for the standard job completion
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error(
                   "Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -632,7 +631,7 @@ private:
       // Wait for the pilot job expiration
       try {
         event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         throw std::runtime_error(
                 "Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -793,7 +792,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -937,7 +936,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
           event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -964,7 +963,7 @@ private:
         throw std::runtime_error(
                 "Non-scratch space have / partition unless created by copying something into a new partition name"
         );
-      } catch(wrench::WorkflowExecutionException &e) {
+      } catch(wrench::ExecutionException &e) {
       }
 
       //try to copy file1 from / partition of storage service1 into storage service2 in job1's partition, this should succeed
@@ -974,7 +973,7 @@ private:
                                          wrench::FileLocation::LOCATION(this->test->storage_service2,
                                                                         this->test->storage_service2->getMountPoint() + job1->getName()));
 
-      } catch(wrench::WorkflowExecutionException &e) {
+      } catch(wrench::ExecutionException &e) {
         throw std::runtime_error(
                 "We should have been able to copy from / partition of non-scratch to a new partition into another non-scratch space"
         );
@@ -986,7 +985,7 @@ private:
                                          wrench::FileLocation::LOCATION(this->test->storage_service2),
                                          wrench::FileLocation::LOCATION(this->test->storage_service1));
 
-      } catch(wrench::WorkflowExecutionException &e) {
+      } catch(wrench::ExecutionException &e) {
         throw std::runtime_error(
                 "We should have been able to copy from / of one non-scratch space to / of another non-scratch space"
         );
@@ -999,7 +998,7 @@ private:
                                          wrench::FileLocation::LOCATION(this->test->storage_service2,
                                                                         this->test->storage_service2->getMountPoint() + "/test"));
 
-      } catch(wrench::WorkflowExecutionException  &e) {
+      } catch(wrench::ExecutionException  &e) {
         throw std::runtime_error(
                 "We should have been able to copy from one partition to another partition of the same storage service"
         );

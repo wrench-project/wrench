@@ -51,7 +51,7 @@ namespace wrench {
                 unsigned long num_idle_cores;
                 try {
                     num_idle_cores = vm_cs->getTotalNumIdleCores();
-                } catch (WorkflowExecutionException &e) {
+                } catch (ExecutionException &e) {
                     // The service has some problem, forget it
                     throw std::runtime_error("Unable to get the number of idle cores: " + e.getCause()->toString());
                 }
@@ -68,7 +68,7 @@ namespace wrench {
                 unsigned long num_idle_cores;
                 try {
                     num_idle_cores = cloud_service->getTotalNumIdleCores();
-                } catch (WorkflowExecutionException &e) {
+                } catch (ExecutionException &e) {
                     // The service has some problem, forget it
                     throw std::runtime_error("Unable to get the number of idle cores: " + e.getCause()->toString());
                 }
@@ -80,7 +80,7 @@ namespace wrench {
                                                           task->getMemoryRequirement());
                         picked_vm_cs = cloud_service->startVM(vm);
                         this->compute_services_running_on_vms.push_back(picked_vm_cs);
-                    } catch (WorkflowExecutionException &e) {
+                    } catch (ExecutionException &e) {
                         throw std::runtime_error("Unable to create/start a VM: " + e.getCause()->toString());
                     }
                 } else {

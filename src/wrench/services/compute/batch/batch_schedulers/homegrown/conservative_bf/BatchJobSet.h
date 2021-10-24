@@ -10,7 +10,7 @@
 #ifndef WRENCH_BATCHJOBSET_H
 #define WRENCH_BATCHJOBSET_H
 
-#include <wrench/services/compute/batch/BatchJob.h>
+#include "wrench/services/compute/batch/BatchJob.h"
 
 namespace wrench {
 

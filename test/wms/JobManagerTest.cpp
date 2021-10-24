@@ -10,12 +10,11 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
@@ -394,7 +393,7 @@ private:
         }
 
         try {
-            job_manager->submitJob(std::shared_ptr<wrench::WorkflowJob>((wrench::WorkflowJob *) (1234), [](void *ptr){}), nullptr, {});
+            job_manager->submitJob(std::shared_ptr<wrench::Job>((wrench::Job *) (1234), [](void *ptr){}), nullptr, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
         } catch (std::invalid_argument &e) {
         }
@@ -491,7 +490,7 @@ private:
         try {
             job_manager->submitJob(job, cs_does_not_support_standard_jobs);
             throw std::runtime_error("Should not be able to submit a standard job to a service that does not support them");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Got expected exception but unexpected failure cause: " +
@@ -522,7 +521,7 @@ private:
         // Resubmit the SAME job to the right service
         try {
             job_manager->submitJob(job, cs_does_support_standard_jobs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to subkmit a standard job to a service that supports them");
         }
 
@@ -530,7 +529,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -654,7 +653,7 @@ private:
         // Submit the standard job
         try {
             job_manager->submitJob(job, cs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Should be able to submit the job");
         }
@@ -665,7 +664,7 @@ private:
         // Terminate the job
         try {
             job_manager->terminateJob(job);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Should be able to terminate job");
         }

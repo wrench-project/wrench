@@ -8,9 +8,8 @@
  */
 
 #include "wrench/wms/WMS.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/helpers/Alarm.h"
+#include "wrench/services/helper_services/alarm/Alarm.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
 #include "wms/WMSMessage.h"
@@ -167,7 +166,7 @@ namespace wrench {
      * @param timeout: a timeout value in seconds
      *
      * @return false if a timeout occurred (in which case no event was received/processed)
-     * @throw wrench::WorkflowExecutionException
+     * @throw wrench::ExecutionException
      */
     bool WMS::waitForAndProcessNextEvent(double timeout) {
 

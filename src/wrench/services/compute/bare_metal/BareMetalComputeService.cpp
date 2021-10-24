@@ -14,20 +14,20 @@
 #include <boost/algorithm/string/classification.hpp>
 
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/helpers/HostStateChangeDetectorMessage.h"
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h"
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
-#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
+#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/job/PilotJob.h"
 #include "wrench/job/StandardJob.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "wrench/services/helpers/HostStateChangeDetector.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
 #include "wrench/failure_causes/JobTypeNotSupported.h"
 #include "wrench/failure_causes/HostError.h"
 
@@ -117,7 +117,7 @@ namespace wrench {
      *      - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *        task with this many cores on that host.
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
@@ -199,7 +199,7 @@ namespace wrench {
                                             this->getMessagePayloadValue(
                                                     ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the answer
@@ -207,13 +207,13 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -224,12 +224,12 @@ namespace wrench {
 
     /**
      * @brief Asynchronously submit a pilot job to the compute service. This will raise
-     *        a WorkflowExecutionException as this service does not support pilot jobs.
+     *        a ExecutionException as this service does not support pilot jobs.
      *
      * @param job: a pilot job
      * @param service_specific_args: service specific arguments (only {} is supported)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void BareMetalComputeService::submitPilotJob(
@@ -247,7 +247,7 @@ namespace wrench {
                             answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
                                     BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Wait for a reply
@@ -256,13 +256,13 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             } else {
                 return;
             }
@@ -976,7 +976,7 @@ namespace wrench {
                                                                       this->getScratch()->getMountPoint() +
                                                                       "/" + job->getName()),
                                                nullptr);
-                } catch (WorkflowExecutionException &e) {
+                } catch (ExecutionException &e) {
                     // ignore (perhaps it was never written)
                 }
             }
@@ -1037,7 +1037,7 @@ namespace wrench {
      *
      * @param job: a standard job
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void BareMetalComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
@@ -1052,7 +1052,7 @@ namespace wrench {
                                             answer_mailbox, job, this->getMessagePayloadValue(
                                                     BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the answer
@@ -1060,13 +1060,13 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -1546,7 +1546,7 @@ namespace wrench {
                             this->getScratch(),
                             this->getScratch()->getMountPoint() +
                             j.first->getName()));
-                } catch (WorkflowExecutionException &e) {
+                } catch (ExecutionException &e) {
                     throw;
                 }
             }

@@ -141,7 +141,7 @@ private:
         try {
             this->test->cloud_service_first_fit->startVM("vm_2");
             throw std::runtime_error("FirstFit Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_first_fit->shutdownVM("vm_1");
@@ -159,7 +159,7 @@ private:
         try {
             this->test->cloud_service_first_fit->startVM("vm_3");
             throw std::runtime_error("FirstFit Fail Case #2: Starting the 3rd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_first_fit->shutdownVM("vm_1");
@@ -177,7 +177,7 @@ private:
         try {
             this->test->cloud_service_best_fit_cores_first->startVM("vm_2");
             throw std::runtime_error("BestFitCoresFirst Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_best_fit_cores_first->shutdownVM("vm_1");
@@ -193,7 +193,7 @@ private:
         try {
             this->test->cloud_service_best_fit_ram_first->startVM("vm_2");
             throw std::runtime_error("BestFitRAMFirst Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_best_fit_ram_first->shutdownVM("vm_1");

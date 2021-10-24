@@ -48,7 +48,7 @@ this->waitForAndProcessNextEvent();
 
 If the service-specific arguments are invalid (e.g., number of nodes too
 large), `wrench::JobManager::submitJob()` method throws a
-`wrench::WorkflowExecutionException`.
+`wrench::ExecutionException`.
 
 See the WMS implementation in `examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp` for a more complete example.
 

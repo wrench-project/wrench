@@ -153,7 +153,7 @@ private:
                                                          file_registry_service);
 
             throw std::runtime_error("Synchronous file copy failed");
-        } catch (wrench::WorkflowExecutionException &e)  {
+        } catch (wrench::ExecutionException &e)  {
         }
 
         // Create a new file registry service to resume normal testing
@@ -171,13 +171,13 @@ private:
                                                                 wrench::FileLocation::LOCATION(this->test->src2_storage_service),
                                                                 wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                                 file_registry_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to instantiate a file copy: " + std::string(e.what()));
         }
 
         try {
             async_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -212,7 +212,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->src_storage_service),
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             double_copy_failed = true;
         }
 
@@ -255,7 +255,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->src_storage_service),
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             if (std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause())) {
                 double_copy_failed = true;
             }

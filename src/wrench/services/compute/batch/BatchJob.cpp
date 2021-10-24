@@ -24,7 +24,7 @@ namespace wrench {
      * @param ending_time_stamp: the job's end date
      * @param arrival_time_stamp: the job's arrival date
      */
-    BatchJob::BatchJob(std::shared_ptr<WorkflowJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
+    BatchJob::BatchJob(std::shared_ptr<Job> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
                        unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
@@ -88,7 +88,7 @@ namespace wrench {
      * @return a size in bytes
      */
     double BatchJob::getMemoryRequirement() {
-        std::shared_ptr<WorkflowJob> workflow_job = this->job;
+        std::shared_ptr<Job> workflow_job = this->job;
         double memory_requirement = 0.0;
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
             for (auto const &t : sjob->getTasks()) {
@@ -112,7 +112,7 @@ namespace wrench {
      * @brief Get the workflow job corresponding to this batch job
      * @return a workflow job
      */
-    std::shared_ptr<WorkflowJob> BatchJob::getWorkflowJob() {
+    std::shared_ptr<Job> BatchJob::getWorkflowJob() {
         return this->job;
     }
 

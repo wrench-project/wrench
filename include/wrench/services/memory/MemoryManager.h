@@ -12,8 +12,8 @@
 #define WRENCH_MEMORYMANAGER_H
 
 #include <string>
-#include <wrench/services/Service.h>
-#include <wrench/simulation/Simulation.h>
+#include "wrench/services/Service.h"
+#include "wrench/simulation/Simulation.h"
 #include "Block.h"
 
 namespace wrench {

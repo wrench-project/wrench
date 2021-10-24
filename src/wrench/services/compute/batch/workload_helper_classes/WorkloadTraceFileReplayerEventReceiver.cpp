@@ -8,7 +8,7 @@
  */
 
 
-#include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <wrench-dev.h>
 #include "WorkloadTraceFileReplayerEventReceiver.h"
 
@@ -47,7 +47,7 @@ namespace wrench {
                     throw std::runtime_error(
                             "WorkloadTraceFileReplayerEventReceiver::main(): Unexpected workflow execution event");
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
                 continue;
 

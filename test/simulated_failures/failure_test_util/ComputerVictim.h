@@ -10,8 +10,8 @@
 #ifndef WRENCH_COMPUTER_H
 #define WRENCH_COMPUTER_H
 
-#include <wrench/services/Service.h>
-#include <wrench/simulation/SimulationMessage.h>
+#include "wrench/services/Service.h"
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {

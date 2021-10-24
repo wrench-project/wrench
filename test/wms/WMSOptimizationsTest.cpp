@@ -148,7 +148,7 @@ private:
         for (unsigned int i=0; i < job_count; i++) {
           try {
             this->waitForAndProcessNextEvent();
-          } catch (wrench::WorkflowExecutionException &e) {
+          } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
         }
@@ -289,7 +289,7 @@ private:
         // Wait for a workflow execution event, and process it
         try {
           this->waitForAndProcessNextEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (this->getWorkflow()->isDone()) {

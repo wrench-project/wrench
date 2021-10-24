@@ -12,14 +12,14 @@
 #define WRENCH_BATCH_SERVICE_H
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
+#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessagePayload.h"
-#include "wrench/services/helpers/Alarm.h"
+#include "wrench/services/helper_services/alarm/Alarm.h"
 #include "wrench/job/StandardJob.h"
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 
 #include <deque>
@@ -149,7 +149,7 @@ namespace wrench {
         );
 
         // helper function
-        void submitWorkflowJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &batch_job_args);
+        void submitWorkflowJob(std::shared_ptr<Job> job, const std::map<std::string, std::string> &batch_job_args);
 
         //submits a standard job
         void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &batch_job_args) override;
@@ -158,7 +158,7 @@ namespace wrench {
         void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
         // helper function
-        void terminateWorkflowJob(std::shared_ptr<WorkflowJob> job);
+        void terminateWorkflowJob(std::shared_ptr<Job> job);
 
         // terminate a standard job
         void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
@@ -301,7 +301,7 @@ namespace wrench {
         void processJobSubmission(std::shared_ptr<BatchJob>job, std::string answer_mailbox);
 
         //start a job
-        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<WorkflowJob> ,
+        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<Job> ,
                       std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
 
 

@@ -20,7 +20,7 @@
 #include "FileRegistryMessage.h"
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/workflow/WorkflowFile.h>
-#include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
 #include <wrench/failure_causes/NetworkError.h>
 
@@ -54,7 +54,7 @@ namespace wrench {
      * @param file: the file to lookup
      * @return The list locations for the file
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
@@ -73,7 +73,7 @@ namespace wrench {
                     this->getMessagePayloadValue(
                             FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -82,7 +82,7 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
 
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage*>(message.get())) {
@@ -135,7 +135,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -143,7 +143,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage*>(message.get())) {
@@ -159,7 +159,7 @@ namespace wrench {
      * @param file: a file
      * @param location: a file location
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
@@ -180,7 +180,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -188,7 +188,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage*>(message.get())) {
@@ -203,7 +203,7 @@ namespace wrench {
      * @param file: a file
      * @param location: a file location
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
@@ -224,7 +224,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -232,7 +232,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage*>(message.get())) {

@@ -11,11 +11,11 @@
 #include <random>
 #include <wrench-dev.h>
 
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/services/compute/workunit_executor/Workunit.h"
-#include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/services/helper_services/work_unit_executor/Workunit.h>
+#include <wrench/services/helper_services/work_unit_executor/WorkunitExecutor.h>
 
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
 
 
 #include "../../include/TestWithFork.h"

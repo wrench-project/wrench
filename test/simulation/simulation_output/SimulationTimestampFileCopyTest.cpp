@@ -123,7 +123,7 @@ protected:
                                        wrench::FileLocation::LOCATION(this->test->destination_storage_service));
 
             throw std::runtime_error("file copy should have failed");
-        } catch(wrench::WorkflowExecutionException &e) {
+        } catch(wrench::ExecutionException &e) {
         }
 
         // wait for xl_file file copy to complete

@@ -13,10 +13,10 @@
 #include <wrench/failure_causes/JobTypeNotSupported.h>
 
 #include "CloudComputeServiceMessage.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
-#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
@@ -81,7 +81,7 @@ namespace wrench {
      *
      * @return a list of hostnames
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     std::vector<std::string> CloudComputeService::getExecutionHosts() {
         assertServiceIsUp();
@@ -115,7 +115,7 @@ namespace wrench {
      *
      * @return A VM name
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::string CloudComputeService::createVM(unsigned long num_cores,
@@ -136,7 +136,7 @@ namespace wrench {
      *
      * @return A VM name
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::string CloudComputeService::createVM(unsigned long num_cores,
@@ -168,7 +168,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceCreateVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             } else {
                 return msg->vm_name;
             }
@@ -183,7 +183,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name) {
@@ -205,7 +205,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -220,7 +220,7 @@ namespace wrench {
      *
      * @return A bare_metal that runs on the VM
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService> CloudComputeService::startVM(const std::string &vm_name) {
@@ -241,7 +241,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
             return msg->cs;
         } else {
@@ -257,7 +257,7 @@ namespace wrench {
      *
      * @return A bare_metal that runs on the VM, or nullptr if none
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService> CloudComputeService::getVMComputeService(const std::string &vm_name) {
@@ -274,7 +274,7 @@ namespace wrench {
      *
      * @return physical host name
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     std::string CloudComputeService::getVMPhysicalHostname(const std::string &vm_name) {
@@ -289,7 +289,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     void CloudComputeService::suspendVM(const std::string &vm_name) {
@@ -311,7 +311,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceSuspendVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -324,7 +324,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     void CloudComputeService::resumeVM(const std::string &vm_name) {
@@ -346,7 +346,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceResumeVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
             // Got the expected reply
         } else {
@@ -360,7 +360,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     void CloudComputeService::destroyVM(const std::string &vm_name) {
@@ -382,7 +382,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -396,7 +396,7 @@ namespace wrench {
      * @param job: a standard job
      * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
@@ -416,7 +416,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(answer_message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
@@ -430,7 +430,7 @@ namespace wrench {
      * @param job: a pilot job
      * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void CloudComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
@@ -448,7 +448,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             } else {
                 return;
             }
@@ -568,7 +568,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, message);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Wait for a reply
@@ -577,7 +577,7 @@ namespace wrench {
         try {
             answer_message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         return answer_message;

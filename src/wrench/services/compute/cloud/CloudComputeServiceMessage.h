@@ -12,7 +12,7 @@
 #define WRENCH_CLOUDSERVICEMESSAGE_H
 
 #include <vector>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
 
 #include "wrench/services/compute/ComputeServiceMessage.h"
 

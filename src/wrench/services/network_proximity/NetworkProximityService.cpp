@@ -21,7 +21,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
-#include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Network Proximity Service");
@@ -99,7 +99,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -107,7 +107,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
@@ -125,7 +125,7 @@ namespace wrench {
      *           - The proximity value between the pair of hosts (or DBL_MAX if none)
      *           - The timestamp of the oldest measurement use to compute the proximity value (or -1.0 if none)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getHostPairDistance(std::pair<std::string, std::string> hosts) {
@@ -150,7 +150,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -158,7 +158,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {

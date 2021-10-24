@@ -14,7 +14,7 @@
 #include <stack>
 #include <set>
 
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/parallel_model/ParallelModel.h"
 #include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
@@ -80,7 +80,7 @@ namespace wrench {
 
         static std::string stateToString(WorkflowTask::State state);
 
-        WorkflowJob *getJob() const;
+        Job *getJob() const;
 
         Workflow *getWorkflow() const;
 
@@ -178,7 +178,7 @@ namespace wrench {
 
         WorkflowTask::InternalState getInternalState() const;
 
-        void setJob(WorkflowJob *job);
+        void setJob(Job *job);
 
         void setStartDate(double date);
 
@@ -288,7 +288,7 @@ namespace wrench {
                      double memory_requirement);
 
         // Containing job
-        WorkflowJob *job;
+        Job *job;
 
         std::stack<WorkflowTaskExecution> execution_history;
 

@@ -38,8 +38,8 @@ namespace wrench {
             std::string &hostname,
             double startup_overhead,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
-            std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
-            std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
+            std::map<std::shared_ptr<Job>, std::shared_ptr<ComputeService>> &running_jobs,
+            std::vector<std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>>> &pending_jobs,
             std::string &reply_mailbox)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
@@ -64,8 +64,8 @@ namespace wrench {
      * @return whether the priority of the left-hand-side workflow job is higher
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(
-            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &lhs,
-            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &rhs) {
+            std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>> &lhs,
+            std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>> &rhs) {
         return std::get<0>(lhs)->getPriority() > std::get<0>(rhs)->getPriority();
     }
 
@@ -81,7 +81,7 @@ namespace wrench {
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(), this->mailbox_name.c_str());
 
-        std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
+        std::vector<std::shared_ptr<Job>> scheduled_jobs;
 
         // Simulate some overhead
         S4U_Simulation::sleep(this->startup_overhead);
@@ -134,7 +134,7 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
-            std::shared_ptr<WorkflowJob> job, std::map<std::string,
+            std::shared_ptr<Job> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         bool is_grid_universe = (service_specific_arguments.find("universe") != service_specific_arguments.end());
@@ -154,7 +154,7 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(
-            std::shared_ptr<WorkflowJob> job, std::map<std::string,
+            std::shared_ptr<Job> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
@@ -217,7 +217,7 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
-            std::shared_ptr<WorkflowJob> job, std::map<std::string,
+            std::shared_ptr<Job> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;

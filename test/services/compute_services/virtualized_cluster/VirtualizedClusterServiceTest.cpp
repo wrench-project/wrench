@@ -291,7 +291,7 @@ private:
         try {
             job_manager->submitJob(two_task_job, cs);
             throw std::runtime_error("Should not be able to submit a standard job directly to the Cloud service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
@@ -305,7 +305,7 @@ private:
         try {
             job_manager->submitJob(pilot_job, cs, {});
             throw std::runtime_error("Should not be able to submit a pilot job directly to the Cloud service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
@@ -335,7 +335,7 @@ private:
         try {
             cs->shutdownVM(vm_name);
             throw std::runtime_error("Should not be able to shutdown a non-running VM");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
@@ -369,7 +369,7 @@ private:
         // Submit the 2-task job for execution
         try {
             job_manager->submitJob(two_task_job, vm_cs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -377,7 +377,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -488,7 +488,7 @@ private:
         try {
             auto bogus_vm_name = cs->createVM(2, 10, "my_custom_name");
             throw std::runtime_error("Should not be able to create a VM with an existing name!");
-        } catch (wrench::WorkflowExecutionException &e) {}
+        } catch (wrench::ExecutionException &e) {}
 
         // Start the VM
         auto vm_cs = cs->startVM(vm_name);
@@ -505,7 +505,7 @@ private:
         // Submit the 2-task job for execution
         try {
             job_manager->submitJob(two_task_job, vm_cs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -513,7 +513,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -630,7 +630,7 @@ private:
             try {
                 cs->startVM(vm_name, src_host);
                 throw std::runtime_error("Shouldn't be able to start a VM that is not DOWN");
-            } catch (wrench::WorkflowExecutionException &e) {}
+            } catch (wrench::ExecutionException &e) {}
 
             job_manager->submitJob(two_task_job, vm_cs);
 
@@ -645,7 +645,7 @@ private:
             try { // try a bogus one for coverage
                 cs->migrateVM(vm_name, "TinyHost");
                 throw std::runtime_error("Should not be able to migrate a VM to a host without sufficient resources");
-            } catch (wrench::WorkflowExecutionException &e) {}
+            } catch (wrench::ExecutionException &e) {}
 
             // Get the runnin physical hostname
             auto hostname_pre = cs->getVMPhysicalHostname(vm_name);
@@ -659,7 +659,7 @@ private:
                 throw std::runtime_error("VM should, after migration, be running on physical host " + dst_host);
             }
 
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -667,7 +667,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -793,7 +793,7 @@ private:
                         std::to_string(sum_num_idle_cores) + ")");
             }
 
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -894,7 +894,7 @@ private:
             cs->startVM(cs->createVM(1, 10), execution_host);
             cs->startVM(cs->createVM(1, 10), execution_host);
 
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1007,7 +1007,7 @@ private:
                 auto vm_cs = cs->startVM(vm_name);
                 vm_list.push_back(std::make_tuple(vm_name, vm_cs));
             }
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1017,7 +1017,7 @@ private:
             for (auto &vm : vm_list) {
                 cs->shutdownVM(std::get<0>(vm));
             }
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1031,7 +1031,7 @@ private:
         try {
             job_manager->submitJob(job, std::get<1>(*(vm_list.begin())));
             throw std::runtime_error("should have thrown an exception since there are no resources available");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // do nothing, should have thrown an exception since there are no resources available
         }
 
@@ -1049,7 +1049,7 @@ private:
             }
             job_manager->submitJob(job, std::get<1>(vm_list[3]));
             throw std::runtime_error("should have thrown an exception since there are no resources available");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // do nothing, should have thrown an exception since there are no resources available
         }
 
@@ -1057,7 +1057,7 @@ private:
         try {
             cs->suspendVM(std::get<0>(vm_list[3]));
             throw std::runtime_error("Should not be able to suspend a non-running VM");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString() +
@@ -1077,7 +1077,7 @@ private:
         try {
             cs->resumeVM(std::get<0>(vm_list[3]));
             throw std::runtime_error("VM was already resumed, so an exception was expected!");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Expected
         }
 
@@ -1087,7 +1087,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -1103,7 +1103,7 @@ private:
 
         try {
             job_manager->submitJob(other_job, std::get<1>(vm_list[3]));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to submit the other job");
         }
         double job_start_date = wrench::Simulation::getCurrentSimulatedDate();
@@ -1113,7 +1113,7 @@ private:
 
         try { WRENCH_INFO("Suspending the one running VM (which is thus running the job)");
             cs->suspendVM(std::get<0>(vm_list[3]));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to suspend VM");
         }
 
@@ -1122,7 +1122,7 @@ private:
 
         try { WRENCH_INFO("Resuming the VM");
             cs->resumeVM(std::get<0>(vm_list[3]));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to resume VM");
         }
 
@@ -1131,7 +1131,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event2;
         try {
             event2 = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event2)) {
@@ -1255,7 +1255,7 @@ private:
                 vm_list.push_back(std::make_tuple(vm_name, vm_cs));
             }
 
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1263,7 +1263,7 @@ private:
         try {
             cs->shutdownVM(std::get<0>(vm_list.at(0)));
             cs->shutdownVM(std::get<0>(vm_list.at(2)));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1375,7 +1375,7 @@ private:
                 vm_list.push_back(std::make_tuple(vm_name, vm_cs));
             }
 
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1392,7 +1392,7 @@ private:
             // Trying to submit to a VM that has been shutdown
             job_manager->submitJob(job1, std::get<1>(vm_list[0]));
             throw std::runtime_error("Should not be able to run job since VMs are stopped");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() +
@@ -1403,7 +1403,7 @@ private:
 
         try {
             cs->startVM(std::get<0>(vm_list[1]));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Couldn't start VM: " + e.getCause()->toString());
         }
 
@@ -1416,7 +1416,7 @@ private:
 
         try {
             job_manager->submitJob(job1, std::get<1>(vm_list[1]));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -1424,7 +1424,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -1639,7 +1639,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -1769,7 +1769,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 

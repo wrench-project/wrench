@@ -13,7 +13,7 @@
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
-#include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <services/storage/StorageServiceMessage.h>
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/wms/WMS.h>
@@ -49,14 +49,14 @@ namespace wrench {
     /**
      * @brief Stop the manager
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void DataMovementManager::stop() {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
     }
 
@@ -68,7 +68,7 @@ namespace wrench {
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
                                                            std::shared_ptr<FileLocation> src,
@@ -83,11 +83,11 @@ namespace wrench {
         try {
             for (auto const &p : this->pending_file_copies) {
                 if (*p == request) {
-                    throw WorkflowExecutionException(
+                    throw ExecutionException(
                             std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
                 }
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -97,7 +97,7 @@ namespace wrench {
                     new CopyRequestSpecs(file, src, dst, file_registry_service)));
             wrench::StorageService::initiateFileCopy(this->mailbox_name, file,
                                                        src, dst);
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -110,7 +110,7 @@ namespace wrench {
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
                                                     std::shared_ptr<FileLocation> src,
@@ -125,13 +125,13 @@ namespace wrench {
         try {
             for (auto const &p : this->pending_file_copies) {
                 if (*p == request) {
-                    throw WorkflowExecutionException(
+                    throw ExecutionException(
                             std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
                 }
             }
 
             StorageService::copyFile(file, src, dst);
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -139,7 +139,7 @@ namespace wrench {
             if (file_registry_service) {
                 file_registry_service->addEntry(file, dst);
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -208,7 +208,7 @@ namespace wrench {
                 try {
                     request.file_registry_service->addEntry(request.file, request.dst);
                     file_registry_service_updated = true;
-                } catch (WorkflowExecutionException &e) {
+                } catch (ExecutionException &e) {
                     WRENCH_INFO("Oops, couldn't do it");
                     // don't throw, just keep file_registry_service_update to false
                 }

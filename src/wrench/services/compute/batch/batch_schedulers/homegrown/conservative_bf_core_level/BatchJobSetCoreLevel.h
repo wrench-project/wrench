@@ -10,7 +10,7 @@
 #ifndef WRENCH_BATCHJOBSETCORELEVEL_H
 #define WRENCH_BATCHJOBSETCORELEVEL_H
 
-#include <wrench/services/compute/batch/BatchJob.h>
+#include "wrench/services/compute/batch/BatchJob.h"
 
 
 namespace wrench {

@@ -11,9 +11,9 @@
 #define WRENCH_FILETRANSFERTHREAD_H
 
 #include <string>
-#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
-#include <wrench/services/Service.h>
-#include <wrench/services/storage/StorageService.h>
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/Service.h"
+#include "wrench/services/storage/StorageService.h"
 
 namespace wrench {
 
