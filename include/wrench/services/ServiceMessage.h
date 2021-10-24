@@ -12,7 +12,7 @@
 #define WRENCH_SERVICEMESSAGE_H
 
 
-#include <wrench/simulation/SimulationMessage.h>
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 

@@ -112,7 +112,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox,
-                                                                               WorkflowJob *job,
+                                                                               Job *job,
                                                                                std::string job_args_to_scheduler,
                                                                                double payload)
             : BatchComputeServiceMessage("BATCH_JOB_SUBMISSION_TO_SCHEDULER", payload) {

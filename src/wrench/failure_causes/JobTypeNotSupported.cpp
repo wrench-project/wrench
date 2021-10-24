@@ -14,7 +14,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/failure_causes/FailureCause.h"
 #include "wrench/workflow/WorkflowFile.h"
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 
@@ -27,7 +27,7 @@ namespace wrench {
      * @param job: the job that wasn't supported
      * @param compute_service: the compute service that did not support it
      */
-    JobTypeNotSupported::JobTypeNotSupported(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service) {
+    JobTypeNotSupported::JobTypeNotSupported(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service) {
         this->job = job;
         this->compute_service = compute_service;
     }
@@ -36,7 +36,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    std::shared_ptr<WorkflowJob> JobTypeNotSupported::getJob() {
+    std::shared_ptr<Job> JobTypeNotSupported::getJob() {
         return this->job;
     }
 

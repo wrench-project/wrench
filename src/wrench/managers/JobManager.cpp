@@ -10,7 +10,7 @@
 #include <string>
 #include <wrench/wms/WMS.h>
 
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/managers/JobManager.h"
 #include "wrench/services/compute/ComputeService.h"
@@ -21,6 +21,7 @@
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/job/StandardJob.h"
+#include "wrench/job/CompoundJob.h"
 #include "wrench/job/PilotJob.h"
 #include "wrench/wms/WMS.h"
 #include "JobManagerMessage.h"
@@ -71,14 +72,14 @@ namespace wrench {
     /**
      * @brief Stop the job manager
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void JobManager::stop() {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
     }
 
@@ -398,9 +399,9 @@ namespace wrench {
      *
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
-    void JobManager::submitJob(std::shared_ptr<WorkflowJob> job,
+    void JobManager::submitJob(std::shared_ptr<Job> job,
                                std::shared_ptr<ComputeService> compute_service,
                                std::map<std::string, std::string> service_specific_args) {
         if ((job == nullptr) || (compute_service == nullptr)) {
@@ -464,7 +465,7 @@ namespace wrench {
             compute_service->submitJob(job, service_specific_args);
             job->setParentComputeService(compute_service);
 
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             // "Undo" everything
             job->popCallbackMailbox();
             if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
@@ -500,18 +501,18 @@ namespace wrench {
      * @brief Terminate a job (standard or pilot) that hasn't completed/expired/failed yet
      * @param job: the job to be terminated
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void JobManager::terminateJob(std::shared_ptr<WorkflowJob> job) {
+    void JobManager::terminateJob(std::shared_ptr<Job> job) {
         if (job == nullptr) {
             throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
         }
 
         if (job->getParentComputeService() == nullptr) {
             std::string err_msg = "Job cannot be terminated because it doesn't  have a parent compute service";
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+            throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
         try {
@@ -581,9 +582,9 @@ namespace wrench {
      * @param job: a job to forget
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
-    void JobManager::forgetJob(WorkflowJob *job) {
+    void JobManager::forgetJob(Job *job) {
         if (job == nullptr) {
             throw std::invalid_argument("JobManager::forgetJob(): invalid argument");
         }
@@ -593,12 +594,12 @@ namespace wrench {
             throw std::invalid_argument("JobManager::forgetJob(): unknown job");
         }
 
-        if (job->getType() == WorkflowJob::STANDARD) {
+        if (job->getType() == Job::STANDARD) {
 
             if ((this->pending_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->pending_standard_jobs.end()) ||
                 (this->running_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->running_standard_jobs.end())) {
                 std::string msg = "Job cannot be forgotten because it is pending or running";
-                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
+                throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
             }
             if (this->completed_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->completed_standard_jobs.end()) {
                 this->completed_standard_jobs.erase((std::shared_ptr<StandardJob> ) job);
@@ -618,11 +619,11 @@ namespace wrench {
             throw std::invalid_argument("JobManager::forgetJob(): unknown standard job");
         }
 
-        if (job->getType() == WorkflowJob::PILOT) {
+        if (job->getType() == Job::PILOT) {
             if ((this->pending_pilot_jobs.find((std::shared_ptr<PilotJob> ) job) != this->pending_pilot_jobs.end()) ||
                 (this->running_pilot_jobs.find((std::shared_ptr<PilotJob> ) job) != this->running_pilot_jobs.end())) {
                 std::string msg = "Job cannot be forgotten because it is running or pending";
-                throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
+                throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(job->getParentComputeService(), msg)));
             }
             if (this->completed_pilot_jobs.find((std::shared_ptr<PilotJob> ) job) != this->completed_pilot_jobs.end()) {
                 this->jobs.erase(job);
@@ -950,6 +951,17 @@ namespace wrench {
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
         S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(job, compute_service, 0.0));
+    }
+
+    /**
+     * @brief Create a Compound job
+     * @param name: the job's name (if empty, a unique job name will be picked for you)
+     * @return the job
+     */
+    std::shared_ptr<CompoundJob> JobManager::createCompoundJob(std::string name) {
+        auto job = std::shared_ptr<CompoundJob>(new CompoundJob(name, this->getSharedPtr<JobManager>()));
+        job->shared_this = job;
+        return job;
     }
 
 

@@ -19,7 +19,7 @@
 #include "DagOfTasks.h"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <wrench/workflow/parallel_model/ParallelModel.h>
+#include "wrench/workflow/parallel_model/ParallelModel.h"
 
 class WorkflowTask;
 

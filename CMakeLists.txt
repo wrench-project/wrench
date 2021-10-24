@@ -51,7 +51,7 @@ include_directories(/opt/local/include)
 set(HEADER_FILES
         include/wrench-dev.h
         include/wrench.h
-        include/wrench/exceptions/WorkflowExecutionException.h
+        include/wrench/exceptions/ExecutionException.h
         include/wrench/logging/TerminalOutput.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/managers/JobManager.h
@@ -82,23 +82,27 @@ set(HEADER_FILES
         include/wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h
         include/wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h
         include/wrench/services/compute/htcondor/HTCondorNegotiatorService.h
-        include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
-        include/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h
-        include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
+        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h
+        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.h
+        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h
-        include/wrench/services/compute/workunit_executor/Workunit.h
-        include/wrench/services/compute/workunit_executor/WorkunitExecutor.h
+        include/wrench/services/helper_services/work_unit_executor/Workunit.h
+        include/wrench/services/helper_services/work_unit_executor/WorkunitExecutor.h
+        include/wrench/services/helper_services/action_executor/ActionExecutor.h
+        include/wrench/services/helper_services/action_executor/ActionExecutorMessage.h
+        include/wrench/services/helper_services/action_executor/SleepActionExecutor.h
+        include/wrench/services/helper_services/action_executor/ComputeActionExecutor.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
-        include/wrench/services/helpers/Alarm.h
-        include/wrench/services/helpers/HostStateChangeDetector.h
-        include/wrench/services/helpers/HostStateChangeDetectorMessage.h
-        include/wrench/services/helpers/HostStateChangeDetectorProperty.h
-        include/wrench/services/helpers/ServiceTerminationDetector.h
-        include/wrench/services/helpers/ServiceTerminationDetectorMessage.h
+        include/wrench/services/helper_services/alarm/Alarm.h
+        include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h
+        include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h
+        include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.h
+        include/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h
+        include/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h
         include/wrench/services/network_proximity/NetworkProximityDaemon.h
         include/wrench/services/network_proximity/NetworkProximityService.h
         include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
@@ -164,7 +168,11 @@ set(HEADER_FILES
         include/wrench/failure_causes/StorageServiceNotEnoughSpace.h
         include/wrench/job/PilotJob.h
         include/wrench/job/StandardJob.h
-        include/wrench/job/WorkflowJob.h
+        include/wrench/job/CompoundJob.h
+        include/wrench/action/Action.h
+        include/wrench/action/SleepAction.h
+        include/wrench/action/ComputeAction.h
+        include/wrench/job/Job.h
         include/wrench/workflow/DagOfTasks.h
         include/wrench/workflow/parallel_model/ParallelModel.h
         include/wrench/workflow/parallel_model/AmdahlParallelModel.h
@@ -178,21 +186,25 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
-        src/wrench/helper_services/alarm/Alarm.cpp
-        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
-        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
-        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
-        src/wrench/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
-        src/wrench/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutor.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessage.h
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorProperty.cpp
-        src/wrench/helper_services/work_unit_executor/ComputeThread.cpp
-        src/wrench/helper_services/work_unit_executor/ComputeThread.h
-        src/wrench/helper_services/work_unit_executor/Workunit.cpp
-        src/wrench/helper_services/work_unit_executor/WorkunitExecutor.cpp
+        src/wrench/services/helper_services/alarm/Alarm.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
+        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
+        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
+        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.cpp
+        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
+        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h
+        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.cpp
+        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.cpp
+        src/wrench/services/helper_services/compute_thread/ComputeThread.cpp
+        include/wrench/services/helper_services/compute_thread/ComputeThread.h
+        src/wrench/services/helper_services/work_unit_executor/Workunit.cpp
+        src/wrench/services/helper_services/work_unit_executor/WorkunitExecutor.cpp
+        src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
+        src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
+        src/wrench/services/helper_services/action_executor/SleepActionExecutor.cpp
+        src/wrench/services/helper_services/action_executor/ComputeActionExecutor.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/metering/EnergyMeterService.cpp
@@ -326,7 +338,11 @@ set(SOURCE_FILES
         src/wrench/failure_causes/StorageServiceNotEnoughSpace.cpp
         src/wrench/job/PilotJob.cpp
         src/wrench/job/StandardJob.cpp
-        src/wrench/job/WorkflowJob.cpp
+        src/wrench/job/CompoundJob.cpp
+        src/wrench/action/Action.cpp
+        src/wrench/action/SleepAction.cpp
+        src/wrench/action/ComputeAction.cpp
+        src/wrench/job/Job.cpp
         )
 
 # test files
@@ -356,6 +372,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal/BareMetalComputeServiceTestPilotJobs.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/StandardJobExecutorTest.cpp
+        test/services/helper_services/action_executors/SleepActionExecutorTest.cpp
         test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceResourceInformationTest.cpp
@@ -429,7 +446,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp)
+        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
+        )
 
 find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(GTEST_LIBRARY NAMES gtest)

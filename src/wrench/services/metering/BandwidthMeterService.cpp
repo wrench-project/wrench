@@ -79,14 +79,14 @@ namespace wrench {
     /**
      * @brief Stop the bandwidth meter
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void BandwidthMeterService::stop() {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
     }
 

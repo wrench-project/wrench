@@ -140,12 +140,12 @@ namespace wrench{
      */
     class BatchJobSubmissionToSchedulerMessage : public BatchComputeServiceMessage {
     public:
-        BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox, WorkflowJob* job, std::string job_args_to_scheduler, double payload);
+        BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox, Job* job, std::string job_args_to_scheduler, double payload);
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
         /** @brief The batch job */
-        WorkflowJob *job;
+        Job *job;
         /** @brief JSON data arguments to the scheduler */
         std::string job_args_to_scheduler;
     };

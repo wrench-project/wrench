@@ -216,7 +216,7 @@ private:
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
 
@@ -229,7 +229,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {

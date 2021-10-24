@@ -14,8 +14,8 @@
 
 #include <unordered_set>
 
-#include <wrench/services/Service.h>
-#include <wrench/simulation/SimulationMessage.h>
+#include "wrench/services/Service.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 

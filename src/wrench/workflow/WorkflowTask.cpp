@@ -345,7 +345,7 @@ namespace wrench {
      *
      * @param job: the job
      */
-    void WorkflowTask::setJob(WorkflowJob *job) {
+    void WorkflowTask::setJob(Job *job) {
         this->job = job;
     }
 
@@ -353,7 +353,7 @@ namespace wrench {
      * @brief Get the task's containing job
      * @return job: the job
      */
-    WorkflowJob *WorkflowTask::getJob() const {
+    Job *WorkflowTask::getJob() const {
         return this->job;
     }
 

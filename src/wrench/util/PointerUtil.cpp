@@ -8,7 +8,7 @@
  */
 
 
-#include <wrench/services/compute/standard_job_executor/StandardJobExecutor.h>
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h>
 #include "wrench/util/PointerUtil.h"
 
 namespace wrench {

@@ -8,7 +8,7 @@
  */
 
 #include <wrench/services/storage/simple/SimpleStorageService.h>
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/ComputeServiceProperty.h"
@@ -50,11 +50,11 @@ namespace wrench {
      *         - "-u": username (optional)
      *      - to a CloudComputeService: {}
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &service_specific_args) {
+    void ComputeService::submitJob(std::shared_ptr<Job> job, const std::map<std::string, std::string> &service_specific_args) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
@@ -68,7 +68,7 @@ namespace wrench {
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 this->submitPilotJob(pjob, service_specific_args);
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -79,10 +79,10 @@ namespace wrench {
      * @param job: the job to terminate
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void ComputeService::terminateJob(std::shared_ptr<WorkflowJob> job) {
+    void ComputeService::terminateJob(std::shared_ptr<Job> job) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
@@ -96,7 +96,7 @@ namespace wrench {
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 this->terminatePilotJob(pjob);
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -171,7 +171,7 @@ namespace wrench {
      * @brief Get the number of hosts that the compute service manages
      * @return the host count
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumHosts() {
@@ -179,7 +179,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -194,7 +194,7 @@ namespace wrench {
       * @brief Get the list of the compute service's compute host
       * @return a vector of hostnames
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       * @throw std::runtime_error
       */
     std::vector<std::string> ComputeService::getHosts() {
@@ -202,7 +202,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -223,7 +223,7 @@ namespace wrench {
       * @brief Get core counts for each of the compute service's host
       * @return a map of core counts, indexed by hostnames
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       * @throw std::runtime_error
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
@@ -231,7 +231,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -250,7 +250,7 @@ namespace wrench {
       * @brief Get the total core counts for all hosts of the compute service
       * @return total core counts
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       * @throw std::runtime_error
       */
     unsigned long ComputeService::getTotalNumCores() {
@@ -258,7 +258,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -276,7 +276,7 @@ namespace wrench {
      * @brief Get idle core counts for each of the compute service's host
      * @return the idle core counts (could be empty)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
@@ -284,7 +284,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -303,7 +303,7 @@ namespace wrench {
      * @brief Get ram availability for each of the compute service's host
      * @return the ram availability map (could be empty)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
@@ -311,7 +311,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -330,7 +330,7 @@ namespace wrench {
      * @brief Get the total idle core count for all hosts of the compute service
      * @return total idle core count
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getTotalNumIdleCores() {
@@ -338,7 +338,7 @@ namespace wrench {
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -373,7 +373,7 @@ namespace wrench {
                     this->getMessagePayloadValue(
                             ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the reply
@@ -381,7 +381,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage*>(message.get())) {
@@ -398,14 +398,14 @@ namespace wrench {
     * @brief Get the per-core flop rate of the compute service's hosts
     * @return a list of flop rates in flop/sec
     *
-    * @throw WorkflowExecutionException
+    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
 
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -423,14 +423,14 @@ namespace wrench {
     * @brief Get the RAM capacities for each of the compute service's hosts
     * @return a map of RAM capacities, indexed by hostname
     *
-    * @throw WorkflowExecutionException
+    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
 
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -449,14 +449,14 @@ namespace wrench {
      * @brief Get the time-to-live of the compute service
      * @return the ttl in seconds
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     double ComputeService::getTTL() {
 
         std::map<std::string, std::map<std::string, double>> dict;
         try {
             dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -467,7 +467,7 @@ namespace wrench {
      * @brief Get information about the compute service as a dictionary of vectors
      * @return service information
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
@@ -483,7 +483,7 @@ namespace wrench {
                     this->getMessagePayloadValue(
                             ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the reply
@@ -491,7 +491,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage*>(message.get())) {

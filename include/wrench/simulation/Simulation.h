@@ -15,7 +15,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "Version.h"
-#include <wrench/simulation/SimulationOutput.h>
+#include "wrench/simulation/SimulationOutput.h"
 
 
 namespace wrench {

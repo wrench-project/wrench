@@ -9,10 +9,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/Workflow.h"
+#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/workflow/Workflow.h>
 #include "../include/UniqueTmpPathPrefix.h"
-#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
+#include <wrench/tools/pegasus/PegasusWorkflowParser.h>
 
 class WorkflowLoadFromJSONTest : public ::testing::Test {
 protected:

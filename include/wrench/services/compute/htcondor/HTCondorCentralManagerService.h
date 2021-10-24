@@ -64,9 +64,9 @@ namespace wrench {
 
         void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
-        bool jobKindIsSupported(const std::shared_ptr<WorkflowJob>& job, std::map<std::string, std::string> service_specific_arguments);
+        bool jobKindIsSupported(const std::shared_ptr<Job>& job, std::map<std::string, std::string> service_specific_arguments);
 
-        bool jobCanRunSomewhere(std::shared_ptr<WorkflowJob> job, std::map<std::string, std::string> service_specific_arguments);
+        bool jobCanRunSomewhere(std::shared_ptr<Job> job, std::map<std::string, std::string> service_specific_arguments);
 
 
     private:
@@ -86,7 +86,7 @@ namespace wrench {
 
         void processStandardJobCompletion(std::shared_ptr<StandardJob>job);
 
-        void processNegotiatorCompletion(std::vector<std::shared_ptr<WorkflowJob>> &pending_jobs);
+        void processNegotiatorCompletion(std::vector<std::shared_ptr<Job>> &pending_jobs);
 
         void terminate();
 
@@ -94,9 +94,9 @@ namespace wrench {
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/
-        std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> pending_jobs;
+        std::vector<std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>>> pending_jobs;
         /** running workflow jobs **/
-        std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> running_jobs;
+        std::map<std::shared_ptr<Job>, std::shared_ptr<ComputeService>> running_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispatch jobs **/

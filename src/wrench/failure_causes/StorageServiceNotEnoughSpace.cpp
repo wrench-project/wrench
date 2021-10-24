@@ -10,7 +10,7 @@
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/WorkflowFile.h"
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>

@@ -134,7 +134,7 @@ private:
                 wrench::Simulation::sleep(1.0);
                 this->test->file_registry_service->lookupEntry(files.at(dist_files(rng)));
 
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
             }
         }
 

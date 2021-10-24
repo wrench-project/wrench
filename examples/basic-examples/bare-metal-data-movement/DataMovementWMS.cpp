@@ -135,7 +135,7 @@ namespace wrench {
             } else {
                 throw std::runtime_error("Unexpected event (" + event->toString() + ")");
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw std::runtime_error("Unexpected workflow execution exception (" +
                                      std::string(e.what()) + ")");
         }

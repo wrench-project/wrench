@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"

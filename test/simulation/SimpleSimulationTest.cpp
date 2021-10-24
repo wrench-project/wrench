@@ -185,7 +185,7 @@ private:
         try {
             cs->createVM(1000,10000000);
             throw std::runtime_error("Should not be able to create a VM that exceeds the capacity of all hosts on the service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString() +
@@ -202,7 +202,7 @@ private:
         try {
             cs->startVM(vm_name);
             throw std::runtime_error("Should not be able to start an already-started VM");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected Failure Cause " + e.getCause()->toString() +
@@ -226,7 +226,7 @@ private:
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
 
@@ -269,7 +269,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -320,7 +320,7 @@ private:
         try {
             cs->resume();
             throw std::runtime_error("Should not be able to resume a service that's down");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         data_movement_manager->kill();

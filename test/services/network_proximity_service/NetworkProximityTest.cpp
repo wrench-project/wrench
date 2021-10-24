@@ -177,7 +177,7 @@ private:
         try {
             (*network_proximity_service)->getHostPairDistance(hosts_to_compute_proximity);
             throw std::runtime_error("Should not be able to query a service that is down");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {
@@ -555,7 +555,7 @@ private:
         try {
             coordinates = vivaldi_service->getHostCoordinate(target_host).first;
             throw std::runtime_error("Should not be able to get coordinates from a service that is down");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Check Exception
             auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
             if (not cause) {

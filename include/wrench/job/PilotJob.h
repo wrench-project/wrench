@@ -10,8 +10,7 @@
 #ifndef WRENCH_PILOTJOB_H
 #define WRENCH_PILOTJOB_H
 
-//#include "wrench/services/compute/ComputeService.h"
-#include "WorkflowJob.h"
+#include "Job.h"
 
 namespace wrench {
 
@@ -24,7 +23,7 @@ namespace wrench {
      * @brief A pilot (i.e., non-standard) workflow job that can be submitted to a ComputeService
      * by a WMS (via a JobManager)
      */
-    class PilotJob : public WorkflowJob {
+    class PilotJob : public Job {
 
     public:
 

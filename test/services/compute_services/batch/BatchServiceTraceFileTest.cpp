@@ -10,12 +10,12 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
-#include "wrench/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 #include <unistd.h>
 
 #include "../../../include/TestWithFork.h"
@@ -156,7 +156,7 @@ private:
                 batch_job_args["-c"] = std::to_string(max_num_cores); //use all cores
                 try {
                     job_manager->submitJob(standard_job, this->test->compute_service, batch_job_args);
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     throw std::runtime_error("Failed to submit a job");
                 }
 
@@ -171,7 +171,7 @@ private:
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -514,7 +514,7 @@ private:
                     throw std::runtime_error(
                             "Unexpected workflow execution event: " + event->toString());
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
             }
 
@@ -869,7 +869,7 @@ private:
                     throw std::runtime_error(
                             "Unexpected workflow execution event: " + event->toString());
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
             }
 
@@ -1033,7 +1033,7 @@ private:
                     throw std::runtime_error(
                             "Unexpected workflow execution event: " + event->toString());
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
             }
 
@@ -1249,7 +1249,7 @@ private:
                     throw std::runtime_error(
                             "Unexpected workflow execution event: " + event->toString());
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
             }
 

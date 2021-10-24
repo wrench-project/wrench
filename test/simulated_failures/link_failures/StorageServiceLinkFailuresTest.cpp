@@ -165,7 +165,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent(100);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (event == nullptr) {
@@ -175,7 +175,7 @@ private:
             return;
         }
         if (auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event)) {
-            throw wrench::WorkflowExecutionException(real_event->failure_cause);
+            throw wrench::ExecutionException(real_event->failure_cause);
         }
 
     }
@@ -258,7 +258,7 @@ private:
             // Do a random synchronous file copy
             try {
                 this->doRandomSynchronousFileCopy();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_1++;
                 }
@@ -269,7 +269,7 @@ private:
             // Do a random asynchronous copy
             try {
                 this->doRandomAsynchronousFileCopy();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     e.getCause()->toString();
                 }
@@ -280,7 +280,7 @@ private:
             // Do a random delete
             try {
                 this->doRandomFileDelete();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_3++;
                 }
@@ -291,7 +291,7 @@ private:
             // Do a random file read
             try {
                 this->doRandomFileRead();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_4++;
                 }
@@ -302,7 +302,7 @@ private:
             // Do a random file write
             try {
                 this->doRandomFileWrite();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_5++;
                 }

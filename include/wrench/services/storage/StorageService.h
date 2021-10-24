@@ -15,12 +15,12 @@
 #include <string>
 #include <set>
 
-#include <wrench/services/Service.h>
-#include <wrench/failure_causes/FailureCause.h>
-#include <wrench/services/file_registry/FileRegistryService.h>
-#include <wrench/job/StandardJob.h>
-#include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
+#include "wrench/services/Service.h"
+#include "wrench/failure_causes/FailureCause.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 
 namespace wrench {

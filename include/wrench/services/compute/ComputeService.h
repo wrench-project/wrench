@@ -17,7 +17,7 @@
 #include <climits>
 
 #include "wrench/services/Service.h"
-#include "wrench/job/WorkflowJob.h"
+#include "wrench/job/Job.h"
 #include "wrench/job/StandardJob.h"
 #include "wrench/job/PilotJob.h"
 
@@ -64,9 +64,9 @@ namespace wrench {
 
         void stop() override;
 
-//        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
+//        void submitJob(Job *job, const std::map<std::string, std::string>& = {});
 
-        void terminateJob(std::shared_ptr<WorkflowJob> job);
+        void terminateJob(std::shared_ptr<Job> job);
 
         bool supportsStandardJobs();
 
@@ -154,7 +154,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        void submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string>& = {});
+        void submitJob(std::shared_ptr<Job> job, const std::map<std::string, std::string>& = {});
 
         ComputeService(const std::string &hostname,
                        std::string service_name,

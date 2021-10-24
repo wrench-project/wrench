@@ -10,8 +10,8 @@
 #ifndef WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
 #define WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
 
-#include <wrench/services/compute/batch/BatchComputeService.h>
-#include <wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h>
+#include "wrench/services/compute/batch/BatchComputeService.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h"
 #include <services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h>
 
 namespace wrench {

@@ -152,7 +152,7 @@ private:
             auto vm_name = cs->createVM(2, 100);
             auto vm_cs = cs->startVM(vm_name);
             job_manager->submitJob(two_task_job, vm_cs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -160,7 +160,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {

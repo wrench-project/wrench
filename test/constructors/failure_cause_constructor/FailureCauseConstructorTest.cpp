@@ -11,10 +11,10 @@
 #include <gtest/gtest.h>
 #include <map>
 
-#include "wrench/failure_causes/HostError.h"
-#include "wrench/failure_causes/NetworkError.h"
-#include "wrench/failure_causes/ComputeThreadHasDied.h"
-#include "wrench/failure_causes/FatalFailure.h"
+#include <wrench/failure_causes/HostError.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/failure_causes/FatalFailure.h>
 
 class FailureCauseConstructorTest : public ::testing::Test {
 protected:

@@ -14,9 +14,9 @@
 #include "VirtualizedClusterComputeServiceMessage.h"
 #include "../cloud/CloudComputeServiceMessage.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
+#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
@@ -58,7 +58,7 @@ namespace wrench {
      * @param pm_name: the physical host on which to start the VM
      *
      * @return The compute service running on the VM
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService>
@@ -86,7 +86,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
             return msg->cs;
         } else {
@@ -123,7 +123,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(
                 answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(

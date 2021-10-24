@@ -265,7 +265,7 @@ private:
             service_specific_args[this->test->task1->getID()] = "2";
             job_manager->submitJob(two_task_job, this->test->compute_service, service_specific_args);
             throw std::runtime_error("Should not have been able to submit a job with service-specific args");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto real_cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (real_cause == nullptr) {
                 throw std::runtime_error("Should have gotten a NotAllowed failure cause due to service-specific arguments");
@@ -275,7 +275,7 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -283,7 +283,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -415,7 +415,7 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -423,7 +423,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -559,7 +559,7 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, pilot_job->getComputeService());
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -567,7 +567,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -688,7 +688,7 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -696,7 +696,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -803,7 +803,7 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, service_specific_arguments);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -811,7 +811,7 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
             event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -945,7 +945,7 @@ private:
         // Submit the  job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (real_cause == nullptr) {
                 throw std::runtime_error("Was expecting a JobTypeNotSupported failure cause");
@@ -1076,7 +1076,7 @@ private:
         // Submit the  job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (real_cause == nullptr) {
                 throw std::runtime_error("Was expecting a JobTypeNotSupported failure cause");
@@ -1203,7 +1203,7 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
             if (not real_cause) {
                 throw std::runtime_error("Should have gotten a JobTypeNotSupported failure cause");
@@ -1345,7 +1345,7 @@ private:
             try {
                 job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
                 throw std::runtime_error("Should not have been able to submit job successfully");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not real_cause) {
                     throw std::runtime_error("Should have gotten a NotEnoughResources failure cause");
@@ -1360,7 +1360,7 @@ private:
             try {
                 job_manager->submitJob(ngrid_job, this->test->compute_service, {});
                 throw std::runtime_error("Should not have been able to submit job successfully");
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not real_cause) {
                     throw std::runtime_error("Should have gotten a NotEnoughResources failure cause");

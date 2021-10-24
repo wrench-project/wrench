@@ -16,7 +16,7 @@
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/storage/StorageServiceMessage.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/ExecutionException.h"
 #include "wrench.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_execution_event, "Log category for Workflow Execution Event");
@@ -31,7 +31,7 @@ namespace wrench {
      * @param mailbox: the name of the receiving mailbox
      * @return a workflow execution event
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::shared_ptr<ExecutionEvent> ExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
@@ -46,7 +46,7 @@ namespace wrench {
      * @param timeout: a timeout value in seconds (-1 means: no timeout)
      * @return a workflow execution event (or nullptr in case of a timeout)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::shared_ptr<ExecutionEvent>
@@ -60,7 +60,7 @@ namespace wrench {
             if (cause->isTimeout()) {
                 return nullptr;
             }
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto m = dynamic_cast<JobManagerStandardJobDoneMessage*>(message.get())) {

@@ -10,12 +10,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
@@ -180,7 +180,7 @@ private:
         try {
             cloud_service->startVM(vm_name);
             throw std::runtime_error("Should not be able to restart VM since the CloudComputeService no longer has resources!");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // expected
         }
 
@@ -323,7 +323,7 @@ private:
         try {
             cloud_service->startVM(vm_name);
             throw std::runtime_error("Should not be able to restart VM since the CloudComputeService no longer has resources!");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // expected
         }
 
@@ -479,7 +479,7 @@ private:
                     num_vm_start_attempts++;
                     total_num_vm_start_attempts++;
                     vm_cs = cloud_service->startVM(vm_name);
-                } catch (wrench::WorkflowExecutionException &e) {
+                } catch (wrench::ExecutionException &e) {
                     wrench::Simulation::sleep(10);
                     continue;
                 }
