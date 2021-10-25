@@ -18,17 +18,17 @@ namespace wrench {
      * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param job: the job this action belongs to
      * @param flops: the number of flops to perform
+     * @param ram: the ram that is required
      * @param min_num_cores: the minimum number of cores that can be used
      * @param max_num_cores: the maximum number of cores that can be used
-     * @param ram: the ram that is required
      * @param parallel_model: the parallel model (to determine speedup vs. number of cores)
      */
     ComputeAction::ComputeAction(std::string name,
                                  std::shared_ptr<CompoundJob> job,
                                  double flops,
+                                 double ram,
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
-                                 double ram,
                                  std::shared_ptr<ParallelModel> parallel_model) : Action(name, job) {
         if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
             throw std::invalid_argument("ComputeAction::ComputeAction(): invalid arguments");

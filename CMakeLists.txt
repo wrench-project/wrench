@@ -373,6 +373,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/StandardJobExecutorTest.cpp
         test/services/helper_services/action_executors/SleepActionExecutorTest.cpp
+        test/services/helper_services/action_executors/ComputeActionExecutorTest.cpp
         test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceResourceInformationTest.cpp

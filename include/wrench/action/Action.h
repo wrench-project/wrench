@@ -49,6 +49,7 @@ namespace wrench {
 
     protected:
 
+        friend class ActionExecutor;
         friend class SleepActionExecutor;
         friend class ComputeActionExecutor;
 

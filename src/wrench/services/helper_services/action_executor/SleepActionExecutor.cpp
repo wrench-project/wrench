@@ -36,18 +36,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Kill the executor
-     *
-     * @param job_termination: if the reason for being killed is that the job was terminated by the submitter
-     * (as opposed to being terminated because the above service was also terminated).
-     */
-    void ActionExecutor::kill(bool job_termination) {
-        this->acquireDaemonLock();
-        this->killActor();
-        this->releaseDaemonLock();
-    }
-
-    /**
     * @brief Main method of the action exedcutor
     *
     * @return 1 if a failure timestamp should be generated, 0 otherwise
@@ -108,10 +96,8 @@ namespace wrench {
      * (as opposed to being terminated because the above service was also terminated).
      */
     void SleepActionExecutor::kill(bool job_termination) {
-        this->acquireDaemonLock();
         this->killed_on_purpose = job_termination;
         this->killActor();
-        this->releaseDaemonLock();
     }
 
 
@@ -122,25 +108,8 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void SleepActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_DEBUG(
-                "In on_exit.cleanup(): SleepActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_pupose = %d)",
-                this->getName().c_str(), has_returned_from_main, return_value,
-                this->killed_on_purpose);
-
-        // Handle brutal failure or termination
-        if (not has_returned_from_main and this->action->getState() == Action::State::STARTED) {
-            this->action->setEndDate(S4U_Simulation::getClock());
-            if (this->killed_on_purpose) {
-                this->action->setState(Action::State::KILLED);
-            } else {
-                this->action->setState(Action::State::FAILED);
-                // If no failure cause was set, then it's a host failure
-                if (not this->action->getFailureCause()) {
-                    this->action->setFailureCause(
-                            std::shared_ptr<HostError>(new HostError(this->hostname)));
-                }
-            }
-        }
+        // Just do the basics
+        commonCleanup(has_returned_from_main, return_value);
     }
 
 }

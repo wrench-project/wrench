@@ -12,13 +12,14 @@
 
 #include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 #include "wrench/services/helper_services/action_executor/ComputeActionExecutor.h"
+#include "wrench/services/helper_services/compute_thread/ComputeThread.h"
 #include "wrench/action/ComputeAction.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/helper_services/action_executor/ActionExecutorMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_compute_action_executor,"Log category for Compute Action Executor");
 
-//#define S4U_JOIN_WORKS
+#define S4U_JOIN_WORKS
 
 namespace wrench {
 
@@ -77,13 +78,13 @@ namespace wrench {
      * (as opposed to being terminated because the above service was also terminated).
      */
     void ComputeActionExecutor::kill(bool job_termination) {
+        this->killed_on_purpose = job_termination;
         this->acquireDaemonLock();
         for (auto const &ct : this->compute_threads) {
             // Should work even if already dead
             ct->kill();
         }
         this->killActor();
-        this->killed_on_purpose = job_termination;
         this->releaseDaemonLock();
     }
 
@@ -109,18 +110,22 @@ namespace wrench {
         std::vector<double> work_per_thread = compute_action->getParallelModel()->getWorkPerThread(
                 compute_action->getFlops(), num_cores);
 
-        // Simulate as sleep?
         try {
+            this->action->setState(Action::State::STARTED);
+            this->action->setStartDate(Simulation::getCurrentSimulatedDate());
             if (simulate_computation_as_sleep) {
                 simulateComputationAsSleep(work_per_thread);
             } else {
                 simulateComputationWithComputeThreads(work_per_thread);
             }
+            this->action->setState(Action::State::COMPLETED);
             msg_to_send_back = new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>());
         } catch (ExecutionException &e) {
+            this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
             msg_to_send_back = new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>());
         }
+        this->action->setEndDate(Simulation::getCurrentSimulatedDate());
 
         // Send callback
         try {
@@ -152,9 +157,7 @@ namespace wrench {
      */
     void ComputeActionExecutor::simulateComputationWithComputeThreads(vector<double> &work_per_thread) {
 
-        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
-
-
+//        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
 
         WRENCH_INFO("Launching %ld compute threads", this->num_cores);
         // Create a compute thread to run the computation on each core
@@ -171,7 +174,7 @@ namespace wrench {
                 // Nobody kills me while I am starting a compute threads!
                 this->acquireDaemonLock();
                 compute_thread = std::shared_ptr<ComputeThread>(
-                        new ComputeThread(S4U_Simulation::getHostName(), work, tmp_mailbox));
+                        new ComputeThread(S4U_Simulation::getHostName(), work, ""));
                 compute_thread->simulation = this->simulation;
                 compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 this->releaseDaemonLock();
@@ -195,33 +198,14 @@ namespace wrench {
 
         success = true;
         // Wait for all compute threads to complete
-#ifndef S4U_JOIN_WORKS
-        for (unsigned long i = 0; i < this->compute_threads.size(); i++) {
-            WRENCH_INFO("Waiting for message from a compute threads...");
+        for (unsigned long i=0; i < this->compute_threads.size(); i++) {
             try {
-                S4U_Mailbox::getMessage(tmp_mailbox);
-            } catch (std::shared_ptr <NetworkError> &e) {
-                WRENCH_INFO("Got a network error when trying to get completion message from compute thread");
-                // Do nothing, perhaps the child has died
+                this->compute_threads[i]->join();
+            } catch (std::shared_ptr<FatalFailure> &e) {
                 success = false;
                 continue;
             }
-            WRENCH_INFO("Got it...");
         }
-#else
-        for (unsigned long i=0; i < this->compute_threads.size(); i++) {
-            WRENCH_INFO("JOINING WITH A COMPUTE THREAD %s", this->compute_threads[i]->process_name.c_str());
-          try {
-            this->compute_threads[i]->join();
-          } catch (std::shared_ptr<FatalFailure> &e) {
-            WRENCH_INFO("EXCEPTION WHILE JOINED");
-            // Do nothing, perhaps the child has died...
-            continue;
-          }
-          WRENCH_INFO("JOINED with COMPUTE THREAD %s", this->compute_threads[i]->process_name.c_str());
-
-        }
-#endif
         WRENCH_INFO("All compute threads have completed");
         this->compute_threads.clear();
 
@@ -237,23 +221,8 @@ namespace wrench {
      * @param return_value: the return value (if main() returned)
      */
     void ComputeActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_DEBUG(
-                "In on_exit.cleanup(): ComputeActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_pupose = %d)",
-                this->getName().c_str(), has_returned_from_main, return_value,
-                this->killed_on_purpose);
-
-        this->action->setEndDate(S4U_Simulation::getClock());
-
-        // Check if it's a failure/termination!
-        if (not has_returned_from_main) {
-            if (this->killed_on_purpose) {
-                this->action->setState(Action::State::KILLED);
-            } else {
-                this->action->setState(Action::State::FAILED);
-            }
-        } else {
-            this->action->setState(Action::State::COMPLETED);
-        }
+        // Just do the basics
+        commonCleanup(has_returned_from_main, return_value);
     }
 
 }

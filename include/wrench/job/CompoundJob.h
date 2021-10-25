@@ -13,7 +13,6 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <wrench/action/SleepAction.h>
 
 
 #include "Job.h"
@@ -25,6 +24,8 @@ namespace wrench {
     /***********************/
 
     class Action;
+    class SleepAction;
+    class ComputeAction;
 
     /**
      * @brief A compound job
@@ -55,6 +56,12 @@ namespace wrench {
         void setPriority(unsigned long priority);
 
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
+        std::shared_ptr<ComputeAction> addComputeAction(std::string name,
+                                                      double flops,
+                                                      double ram,
+                                                      int min_num_cores,
+                                                      int max_num_cores,
+                                                      std::shared_ptr<ParallelModel> parallel_model);
 
 
         /***********************/
