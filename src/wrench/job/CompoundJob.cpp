@@ -13,6 +13,7 @@
 #include "wrench/workflow/Workflow.h"
 #include "wrench/job/CompoundJob.h"
 #include "wrench/action/SleepAction.h"
+#include "wrench/action/ComputeAction.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
@@ -71,13 +72,36 @@ namespace wrench {
      * @brief Add a sleep action to the job
      * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param sleep_time: the time to sleep, in seconds
-     * @return
+     * @return a sleep action
      */
     std::shared_ptr<SleepAction> CompoundJob::addSleepAction(std::string name, double sleep_time) {
         if (name.empty()) name = "sleep_";
         auto new_action = std::shared_ptr<SleepAction>(new SleepAction(name, this->shared_this, sleep_time));
         this->actions.insert(new_action);
         return new_action;
+    }
+
+    /**
+     * @brief Add a compute action to the job
+     * @param name: the action's name
+     * @param flops: the number of flops to perform
+     * @param ram: the amount of RAM required
+     * @param min_num_cores: the minimum number of cores needed
+     * @param max_num_cores: the maximum number of cores allowed
+     * @param parallel_model: the parallel speedup model
+     * @return a compute action
+     */
+    std::shared_ptr<ComputeAction> CompoundJob::addComputeAction(std::string name,
+                                                               double flops,
+                                                               double ram,
+                                                               int min_num_cores,
+                                                               int max_num_cores,
+                                                               std::shared_ptr<ParallelModel> parallel_model) {
+        if (name.empty()) name = "compute_";
+        auto new_action = std::shared_ptr<ComputeAction>(new ComputeAction(name, this->shared_this, flops, ram, min_num_cores, max_num_cores, parallel_model));
+        this->actions.insert(new_action);
+        return new_action;
+
     }
 
 }
