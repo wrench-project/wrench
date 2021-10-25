@@ -10,31 +10,33 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include <wrench/action/SleepAction.h>
-#include <wrench/services/helper_services/action_executor/SleepActionExecutor.h>
+#include <wrench/action/FileReadAction.h>
+#include <wrench/services/helper_services/action_executor/FileReadActionExecutor.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes//HostError.h>
 
+#include <memory>
+
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(sleep_action_executor_test, "Log category for SleepActionExecutorTest");
+WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadActionExecutorTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 
-class SleepActionExecutorTest : public ::testing::Test {
+class FileReadActionExecutorTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
 
-    void do_SleepActionExecutorSuccessTest_test();
-    void do_SleepActionExecutorKillTest_test(double sleep_before_kill);
-    void do_SleepActionExecutorFailureTest_test(double sleep_before_fail);
+    void do_FileReadActionExecutorSuccessTest_test();
+    void do_FileReadActionExecutorKillTest_test(double sleep_before_kill);
+    void do_FileReadActionExecutorFailureTest_test(double sleep_before_fail);
 
 
 protected:
-    SleepActionExecutorTest() {
+    FileReadActionExecutorTest() {
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -89,6 +91,7 @@ protected:
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
                           "   </zone> "
@@ -103,19 +106,23 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
 
+public:
+    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::StorageService> ss;
+
 };
 
 
 /**********************************************************************/
-/**  DO SLEEP ACTION EXECUTOR SUCCESS TEST                           **/
+/**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
 
 
-class SleepActionExecutorSuccessTestWMS : public wrench::WMS {
+class FileReadActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
-    SleepActionExecutorSuccessTestWMS(SleepActionExecutorTest *test,
-                                      std::string hostname) :
+    FileReadActionExecutorSuccessTestWMS(FileReadActionExecutorTest *test,
+                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -123,7 +130,7 @@ public:
 
 private:
 
-    SleepActionExecutorTest *test;
+    FileReadActionExecutorTest *test;
 
     int main() {
 
@@ -132,14 +139,15 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
-        // Add a sleep_action
-        auto sleep_action = job->addSleepAction("", 10.0);
+        // Add a file_read_action
+        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss));
         // Create a sleep action executor
-        auto sleep_action_executor = std::shared_ptr<wrench::SleepActionExecutor>(
-                new wrench::SleepActionExecutor("Host2", this->mailbox_name, sleep_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
+                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
         // Start it
-        sleep_action_executor->simulation = this->simulation;
-        sleep_action_executor->start(sleep_action_executor, true, false);
+        file_read_action_executor->simulation = this->simulation;
+        file_read_action_executor->start(file_read_action_executor, true, false);
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
@@ -155,30 +163,30 @@ private:
         }
 
         // Is the start-date sensible?
-        if (sleep_action->getStartDate() < 0.0 or sleep_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(sleep_action->getEndDate()));
+        if (file_read_action->getStartDate() < 0.0 or file_read_action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getEndDate()));
         }
 
         // Is the end-date sensible?
-        if (sleep_action->getEndDate() + EPSILON < 10.0 or sleep_action->getEndDate() > 10.0 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
+        if (file_read_action->getEndDate() + EPSILON < 10.0 or file_read_action->getEndDate() > 11.0 + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
         }
 
         // Is the state sensible?
-        if (sleep_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
+        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
         }
 
         return 0;
     }
 };
 
-TEST_F(SleepActionExecutorTest, SuccessTest) {
-    DO_TEST_WITH_FORK(do_SleepActionExecutorSuccessTest_test);
+TEST_F(FileReadActionExecutorTest, SuccessTest) {
+    DO_TEST_WITH_FORK(do_FileReadActionExecutorSuccessTest_test);
 }
 
 
-void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
+void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -191,12 +199,22 @@ void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a workflow
+    workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(
-            new SleepActionExecutorSuccessTestWMS(this, "Host1")));
+    wms = simulation->add(new FileReadActionExecutorSuccessTestWMS(this, "Host1"));
 
-    ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
+    wms->addWorkflow(workflow.get());
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -208,16 +226,17 @@ void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
 }
 
 
+#if 0
 
 /**********************************************************************/
-/**  DO SLEEP ACTION EXECUTOR KILL TEST                              **/
+/**  DO FILE_READ ACTION EXECUTOR KILL TEST                          **/
 /**********************************************************************/
 
 
-class SleepActionExecutorKillTestWMS : public wrench::WMS {
+class FileReadActionExecutorKillTestWMS : public wrench::WMS {
 
 public:
-    SleepActionExecutorKillTestWMS(SleepActionExecutorTest *test,
+    FileReadActionExecutorKillTestWMS(FileReadActionExecutorTest *test,
                                    std::string hostname,
                                    double sleep_before_kill) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
@@ -228,7 +247,7 @@ public:
 
 private:
 
-    SleepActionExecutorTest *test;
+    FileReadActionExecutorTest *test;
     double sleep_before_kill;
 
     int main() {
@@ -238,61 +257,61 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
-        // Add a sleep_action
-        auto sleep_action = job->addSleepAction("", 10.0);
+        // Add a file_read_action
+        auto file_read_action = job->addFileReadAction("", 10.0);
         // Create a sleep action executor
-        auto sleep_action_executor = std::shared_ptr<wrench::SleepActionExecutor>(
-                new wrench::SleepActionExecutor("Host2", this->mailbox_name, sleep_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
+                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
         // Start it
-        sleep_action_executor->simulation = this->simulation;
-        sleep_action_executor->start(sleep_action_executor, true, false);
+        file_read_action_executor->simulation = this->simulation;
+        file_read_action_executor->start(file_read_action_executor, true, false);
 
         // Sleep
         wrench::Simulation::sleep(this->sleep_before_kill);
 
         // Kill it
-        sleep_action_executor->kill(true);
+        file_read_action_executor->kill(true);
 
         // Is the start date sensible?
-        if (sleep_action->getStartDate() < 0.0 || sleep_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(sleep_action->getStartDate()));
+        if (file_read_action->getStartDate() < 0.0 || file_read_action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getStartDate()));
         }
 
         // Is the end date sensible?
-        if (sleep_action->getEndDate() + EPSILON < this->sleep_before_kill || sleep_action->getEndDate() > this->sleep_before_kill + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
+        if (file_read_action->getEndDate() + EPSILON < this->sleep_before_kill || file_read_action->getEndDate() > this->sleep_before_kill + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
         }
 
         // Is the state sensible?
-        if ((this->sleep_before_kill  + EPSILON < 10.0 and sleep_action->getState() != wrench::Action::State::KILLED) or
-            (this->sleep_before_kill > 10.0 + EPSILON  and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
-            throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
+        if ((this->sleep_before_kill  + EPSILON < 10.0 and file_read_action->getState() != wrench::Action::State::KILLED) or
+            (this->sleep_before_kill > 10.0 + EPSILON  and file_read_action->getState() != wrench::Action::State::COMPLETED)) {
+            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
         }
 
         return 0;
     }
 };
 
-TEST_F(SleepActionExecutorTest, KillTest) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.0);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.000001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.00001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.0001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.01);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 0.1);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 5.0);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 9.90);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 9.99);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 9.999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 9.9999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 9.99999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 9.999999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorKillTest_test, 10.000);
+TEST_F(FileReadActionExecutorTest, KillTest) {
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.0);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.000001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.00001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.0001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.01);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.1);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 5.0);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.90);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.99);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.9999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.99999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.999999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.000);
 }
 
 
-void SleepActionExecutorTest::do_SleepActionExecutorKillTest_test(double sleep_before_kill) {
+void FileReadActionExecutorTest::do_FileReadActionExecutorKillTest_test(double sleep_before_kill) {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -308,7 +327,7 @@ void SleepActionExecutorTest::do_SleepActionExecutorKillTest_test(double sleep_b
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SleepActionExecutorKillTestWMS(this, "Host1", sleep_before_kill)));
+            new FileReadActionExecutorKillTestWMS(this, "Host1", sleep_before_kill)));
 
     ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
 
@@ -325,14 +344,14 @@ void SleepActionExecutorTest::do_SleepActionExecutorKillTest_test(double sleep_b
 
 
 /**********************************************************************/
-/**  DO SLEEP ACTION EXECUTOR FAILURE TEST                           **/
+/**  DO FILE_READ ACTION EXECUTOR FAILURE TEST                           **/
 /**********************************************************************/
 
 
-class SleepActionExecutorFailureTestWMS : public wrench::WMS {
+class FileReadActionExecutorFailureTestWMS : public wrench::WMS {
 
 public:
-    SleepActionExecutorFailureTestWMS(SleepActionExecutorTest *test,
+    FileReadActionExecutorFailureTestWMS(FileReadActionExecutorTest *test,
                                       std::string hostname, double sleep_before_fail) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -342,7 +361,7 @@ public:
 
 private:
 
-    SleepActionExecutorTest *test;
+    FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
     int main() {
@@ -352,14 +371,14 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
-        // Add a sleep_action
-        auto sleep_action = job->addSleepAction("", 10.0);
+        // Add a file_read_action
+        auto file_read_action = job->addFileReadAction("", 10.0);
         // Create a sleep action executor
-        auto sleep_action_executor = std::shared_ptr<wrench::SleepActionExecutor>(
-                new wrench::SleepActionExecutor("Host2", this->mailbox_name, sleep_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
+                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
         // Start it
-        sleep_action_executor->simulation = this->simulation;
-        sleep_action_executor->start(sleep_action_executor, true, false);
+        file_read_action_executor->simulation = this->simulation;
+        file_read_action_executor->start(file_read_action_executor, true, false);
 
         // Sleep
         wrench::Simulation::sleep(this->sleep_before_fail);
@@ -368,26 +387,26 @@ private:
         simgrid::s4u::Host::by_name("Host2")->turn_off();
 
         // Is the start date sensible?
-        if (sleep_action->getStartDate() < 0.0 || sleep_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(sleep_action->getStartDate()));
+        if (file_read_action->getStartDate() < 0.0 || file_read_action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getStartDate()));
         }
 
         // Is the end date sensible?
-        if (sleep_action->getEndDate() + EPSILON < this->sleep_before_fail || sleep_action->getEndDate() > this->sleep_before_fail + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
+        if (file_read_action->getEndDate() + EPSILON < this->sleep_before_fail || file_read_action->getEndDate() > this->sleep_before_fail + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
         }
 
         // Is the state sensible?
-        if ((this->sleep_before_fail + EPSILON < 10.0  and sleep_action->getState() != wrench::Action::State::FAILED) or
-            (this->sleep_before_fail > 10.0 + EPSILON and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
-            throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
+        if ((this->sleep_before_fail + EPSILON < 10.0  and file_read_action->getState() != wrench::Action::State::FAILED) or
+            (this->sleep_before_fail > 10.0 + EPSILON and file_read_action->getState() != wrench::Action::State::COMPLETED)) {
+            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
         }
 
-        if (sleep_action->getState() == wrench::Action::State::FAILED) {
-            if (not sleep_action->getFailureCause()) {
+        if (file_read_action->getState() == wrench::Action::State::FAILED) {
+            if (not file_read_action->getFailureCause()) {
                 throw std::runtime_error("Missing failure cause");
-            } else if (not std::dynamic_pointer_cast<wrench::HostError>(sleep_action->getFailureCause())) {
-                throw std::runtime_error("Unexpected failure cause: " + sleep_action->getFailureCause()->toString());
+            } else if (not std::dynamic_pointer_cast<wrench::HostError>(file_read_action->getFailureCause())) {
+                throw std::runtime_error("Unexpected failure cause: " + file_read_action->getFailureCause()->toString());
             }
         }
 
@@ -395,25 +414,25 @@ private:
     }
 };
 
-TEST_F(SleepActionExecutorTest, FailureTest) {
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.0);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.000001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.00001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.0001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.001);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.01);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 0.1);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 5.0);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 9.90);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 9.99);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 9.999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 9.9999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 9.99999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 9.999999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_SleepActionExecutorFailureTest_test, 10.000);
+TEST_F(FileReadActionExecutorTest, FailureTest) {
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.0);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.000001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.00001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.0001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.001);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.01);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.1);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 5.0);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.90);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.99);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.9999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.99999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.999999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.000);
 }
 
-void SleepActionExecutorTest::do_SleepActionExecutorFailureTest_test(double sleep_before_fail) {
+void FileReadActionExecutorTest::do_FileReadActionExecutorFailureTest_test(double sleep_before_fail) {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -433,7 +452,7 @@ void SleepActionExecutorTest::do_SleepActionExecutorFailureTest_test(double slee
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SleepActionExecutorFailureTestWMS(this, "Host1", sleep_before_fail)));
+            new FileReadActionExecutorFailureTestWMS(this, "Host1", sleep_before_fail)));
 
     ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
 
@@ -447,4 +466,4 @@ void SleepActionExecutorTest::do_SleepActionExecutorFailureTest_test(double slee
 }
 
 
-
+#endif

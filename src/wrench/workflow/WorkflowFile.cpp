@@ -8,10 +8,10 @@
  */
 
 #include <map>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/WorkflowTask.h"
+#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/workflow/WorkflowTask.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflowFile, "Log category for WorkflowFile");
 

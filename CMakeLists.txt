@@ -93,6 +93,7 @@ set(HEADER_FILES
         include/wrench/services/helper_services/action_executor/ActionExecutor.h
         include/wrench/services/helper_services/action_executor/ActionExecutorMessage.h
         include/wrench/services/helper_services/action_executor/SleepActionExecutor.h
+        include/wrench/services/helper_services/action_executor/FileReadActionExecutor.h
         include/wrench/services/helper_services/action_executor/ComputeActionExecutor.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
@@ -171,6 +172,7 @@ set(HEADER_FILES
         include/wrench/job/CompoundJob.h
         include/wrench/action/Action.h
         include/wrench/action/SleepAction.h
+        include/wrench/action/FileReadAction.h
         include/wrench/action/ComputeAction.h
         include/wrench/job/Job.h
         include/wrench/workflow/DagOfTasks.h
@@ -204,6 +206,7 @@ set(SOURCE_FILES
         src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
         src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
         src/wrench/services/helper_services/action_executor/SleepActionExecutor.cpp
+        src/wrench/services/helper_services/action_executor/FileReadActionExecutor.cpp
         src/wrench/services/helper_services/action_executor/ComputeActionExecutor.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
@@ -341,6 +344,7 @@ set(SOURCE_FILES
         src/wrench/job/CompoundJob.cpp
         src/wrench/action/Action.cpp
         src/wrench/action/SleepAction.cpp
+        src/wrench/action/FileReadAction.cpp
         src/wrench/action/ComputeAction.cpp
         src/wrench/job/Job.cpp
         )
@@ -373,6 +377,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/StandardJobExecutorTest.cpp
         test/services/helper_services/action_executors/SleepActionExecutorTest.cpp
+        test/services/helper_services/action_executors/FileReadActionExecutorTest.cpp
         test/services/helper_services/action_executors/ComputeActionExecutorTest.cpp
         test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp

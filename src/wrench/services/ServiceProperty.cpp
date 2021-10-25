@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/ServiceProperty.h"
+#include <wrench/services/ServiceProperty.h>
 
 
 namespace wrench {

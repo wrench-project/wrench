@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
+#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 
 namespace wrench {
 

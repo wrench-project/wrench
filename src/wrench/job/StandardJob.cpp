@@ -9,8 +9,8 @@
 
 #include <set>
 #include <wrench-dev.h>
-#include "wrench/workflow/Workflow.h"
-#include "wrench/job/StandardJob.h"
+#include <wrench/workflow/Workflow.h>
+#include <wrench/job/StandardJob.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_standard_job, "Log category for StandardJob");
 

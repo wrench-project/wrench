@@ -9,12 +9,12 @@
 
 #include <wrench/failure_causes/InvalidDirectoryPath.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/failure_causes/FailureCause.h"
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/job/Job.h"
-#include "wrench/services/storage/StorageService.h"
-#include "wrench/services/compute/ComputeService.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/failure_causes/FailureCause.h>
+#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/job/Job.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/services/compute/ComputeService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_invalid_directory_path, "Log category for InvalidDirectoryPath");
 

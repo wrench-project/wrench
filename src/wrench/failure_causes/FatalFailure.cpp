@@ -9,7 +9,7 @@
 
 #include <wrench/failure_causes/FatalFailure.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_fatal_failure, "Log category for FatalFailure");
 

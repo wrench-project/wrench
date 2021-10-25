@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 #include <wrench/failure_causes/ComputeThreadHasDied.h>
 

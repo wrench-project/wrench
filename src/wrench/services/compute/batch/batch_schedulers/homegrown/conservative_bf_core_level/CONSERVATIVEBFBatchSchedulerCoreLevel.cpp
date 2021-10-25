@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simulation/Simulation.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simulation/Simulation.h>
 
 #include "CONSERVATIVEBFBatchSchedulerCoreLevel.h"
 

@@ -9,8 +9,8 @@
 
 #include <wrench/failure_causes/ServiceIsDown.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/ComputeService.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/compute/ComputeService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service_is_down, "Log category for ServiceIsDown");
 

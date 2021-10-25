@@ -13,10 +13,10 @@
 #include <managers/JobManagerMessage.h>
 #include <wms/WMSMessage.h>
 
-#include "wrench/simulation/SimulationMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
+#include <wrench/simulation/SimulationMessage.h>
+#include <wrench/services/compute/ComputeServiceMessage.h>
 #include "services/storage/StorageServiceMessage.h"
-#include "wrench/exceptions/ExecutionException.h"
+#include <wrench/exceptions/ExecutionException.h>
 #include "wrench.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_execution_event, "Log category for Workflow Execution Event");
