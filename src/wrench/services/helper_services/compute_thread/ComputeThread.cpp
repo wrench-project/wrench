@@ -21,7 +21,7 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the host on which the compute thread should run
      * @param flops: the number of flops to perform
-     * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent
+     * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent (if empty, no message is sent)
      */
     ComputeThread::ComputeThread(std::string hostname, double flops, std::string reply_mailbox)
             :
@@ -35,17 +35,19 @@ namespace wrench {
      * @return
      */
     int ComputeThread::main() {
-        WRENCH_INFO("New compute thread (%.2f flops) on core (%.2f flop/sec) will report to %s)",
+        WRENCH_INFO("New compute thread (%.2f flops) on core (%.2f flop/sec)",
                     this->flops,
-                    S4U_Simulation::getFlopRate(),
-                    reply_mailbox.c_str());
+                    S4U_Simulation::getFlopRate());
         S4U_Simulation::compute(this->flops);
-        try {
-            S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
-        } catch (std::shared_ptr<NetworkError> &e) {
-            WRENCH_INFO("Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
-            return 0;
+        WRENCH_INFO("-----------");
+        if (not this->reply_mailbox.empty()) {
+            try {
+                S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
+            } catch (std::shared_ptr<NetworkError> &e) { WRENCH_INFO(
+                        "Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
+            }
         }
+        WRENCH_INFO("Compute thread finished");
         return 0;
     }
 

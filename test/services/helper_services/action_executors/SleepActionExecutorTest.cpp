@@ -8,9 +8,9 @@
  */
 
 #include <gtest/gtest.h>
-#include <random>
 #include <wrench-dev.h>
 
+#include <wrench/action/SleepAction.h>
 #include <wrench/services/helper_services/action_executor/SleepActionExecutor.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/job/CompoundJob.h>
@@ -21,13 +21,11 @@
 
 WRENCH_LOG_CATEGORY(sleep_action_executor_test, "Log category for Simple SleepActionExecutorTest");
 
-#define EPSILON 0.005
+#define EPSILON (std::numeric_limits<double>::epsilon())
 
 class SleepActionExecutorTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
-    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     wrench::Simulation *simulation;
 
     void do_SleepActionExecutorSuccessTest_test();
@@ -157,18 +155,18 @@ private:
         }
 
         // Is the start-date sensible?
-        if (sleep_action->getStartDate() < 0.0 or sleep_action->getStartDate() > 0.5) {
+        if (sleep_action->getStartDate() < 0.0 or sleep_action->getStartDate() > EPSILON) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(sleep_action->getEndDate()));
         }
 
         // Is the end-date sensible?
-        if (sleep_action->getEndDate() < 10.0 or sleep_action->getEndDate() > 10.5) {
+        if (sleep_action->getEndDate() + EPSILON < 10.0 or sleep_action->getEndDate() > 10.0 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
         }
 
         // Is the state sensible?
         if (sleep_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state");
+            throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
         }
 
         return 0;
@@ -249,7 +247,7 @@ private:
         sleep_action_executor->simulation = this->simulation;
         sleep_action_executor->start(sleep_action_executor, true, false);
 
-        // Sleep 5 seconds
+        // Sleep
         wrench::Simulation::sleep(this->sleep_before_kill);
 
         // Kill it
@@ -261,14 +259,14 @@ private:
         }
 
         // Is the end date sensible?
-        if (sleep_action->getEndDate() < this->sleep_before_kill || sleep_action->getEndDate() > this->sleep_before_kill + EPSILON) {
+        if (sleep_action->getEndDate() + EPSILON < this->sleep_before_kill || sleep_action->getEndDate() > this->sleep_before_kill + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
         }
 
         // Is the state sensible?
-        if ((this->sleep_before_kill < 10.0 and sleep_action->getState() != wrench::Action::State::KILLED) or
-            (this->sleep_before_kill >= 10.0 and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
-            throw std::runtime_error("Unexpected action state");
+        if ((this->sleep_before_kill  + EPSILON < 10.0 and sleep_action->getState() != wrench::Action::State::KILLED) or
+            (this->sleep_before_kill > 10.0 + EPSILON  and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
+            throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
         }
 
         return 0;
@@ -363,8 +361,7 @@ private:
         sleep_action_executor->simulation = this->simulation;
         sleep_action_executor->start(sleep_action_executor, true, false);
 
-        // Sleep 5 seconds
-        WRENCH_INFO("Sleeping %lf seconds", this->sleep_before_fail);
+        // Sleep
         wrench::Simulation::sleep(this->sleep_before_fail);
 
         // Turn off the hosts
@@ -376,13 +373,13 @@ private:
         }
 
         // Is the end date sensible?
-        if (sleep_action->getEndDate() < this->sleep_before_fail || sleep_action->getEndDate() > this->sleep_before_fail + EPSILON) {
+        if (sleep_action->getEndDate() + EPSILON < this->sleep_before_fail || sleep_action->getEndDate() > this->sleep_before_fail + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
         }
 
         // Is the state sensible?
-        if ((this->sleep_before_fail < 10.0  and sleep_action->getState() != wrench::Action::State::FAILED) or
-            (this->sleep_before_fail >= 10.0  and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
+        if ((this->sleep_before_fail + EPSILON < 10.0  and sleep_action->getState() != wrench::Action::State::FAILED) or
+            (this->sleep_before_fail > 10.0 + EPSILON and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
         }
 

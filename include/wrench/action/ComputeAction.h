@@ -16,6 +16,8 @@
 
 namespace wrench {
 
+    class ParallelModel;
+
     class ComputeAction : public Action {
 
     public:
@@ -31,9 +33,9 @@ namespace wrench {
         ComputeAction(std::string name,
                       std::shared_ptr<CompoundJob> job,
                       double flops,
+                      double ram,
                       unsigned long min_core,
                       unsigned long max_core,
-                      double ram,
                       std::shared_ptr<ParallelModel> parallel_model);
 
 

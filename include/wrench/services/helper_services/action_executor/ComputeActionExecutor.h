@@ -11,16 +11,16 @@
 #define WRENCH_COMPUTE_ACTION_EXECUTOR_H
 
 #include <set>
-#include <wrench/services/helper_services/compute_thread/ComputeThread.h>
+//#include <wrench/services/helper_services/compute_thread/ComputeThread.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
-#include "wrench/services/Service.h"
-#include "wrench/action/Action.h"
 
 namespace wrench {
 
     class Simulation;
     class Action;
     class ComputeAction;
+    class ComputeThread;
 
     /***********************/
     /** \cond INTERNAL     */
