@@ -207,8 +207,6 @@ void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
 
 }
 
-
-
 /**********************************************************************/
 /**  DO SLEEP ACTION EXECUTOR KILL TEST                              **/
 /**********************************************************************/
@@ -258,12 +256,7 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(sleep_action->getStartDate()));
         }
 
-        // Is the end date sensible?
-        if (sleep_action->getEndDate() + EPSILON < this->sleep_before_kill || sleep_action->getEndDate() > this->sleep_before_kill + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
-        }
-
-        // Is the state sensible?
+        // Is the state and end date sensible?
         if ((this->sleep_before_kill  + EPSILON < 10.0 and sleep_action->getState() != wrench::Action::State::KILLED) or
             (this->sleep_before_kill > 10.0 + EPSILON  and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
@@ -372,12 +365,7 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(sleep_action->getStartDate()));
         }
 
-        // Is the end date sensible?
-        if (sleep_action->getEndDate() + EPSILON < this->sleep_before_fail || sleep_action->getEndDate() > this->sleep_before_fail + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(sleep_action->getEndDate()));
-        }
-
-        // Is the state sensible?
+        // Is the state and end date sensible?
         if ((this->sleep_before_fail + EPSILON < 10.0  and sleep_action->getState() != wrench::Action::State::FAILED) or
             (this->sleep_before_fail > 10.0 + EPSILON and sleep_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state: " + sleep_action->getStateAsString());
