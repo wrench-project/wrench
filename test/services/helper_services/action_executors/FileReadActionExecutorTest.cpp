@@ -24,6 +24,7 @@
 WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadActionExecutorTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
+//#define EPSILON (0.0000001)
 
 class FileReadActionExecutorTest : public ::testing::Test {
 
@@ -33,6 +34,8 @@ public:
     void do_FileReadActionExecutorSuccessTest_test();
     void do_FileReadActionExecutorKillTest_test(double sleep_before_kill);
     void do_FileReadActionExecutorFailureTest_test(double sleep_before_fail);
+    void do_FileReadActionExecutorMissingFileTest_test();
+    void do_FileReadActionExecutorKillingStorageServiceTest_test();
 
 
 protected:
@@ -142,12 +145,13 @@ private:
         // Add a file_read_action
         auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
                                                        wrench::FileLocation::LOCATION(this->test->ss));
-        // Create a sleep action executor
+        // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
                 new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
         // Start it
         file_read_action_executor->simulation = this->simulation;
         file_read_action_executor->start(file_read_action_executor, true, false);
+
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
@@ -168,7 +172,7 @@ private:
         }
 
         // Is the end-date sensible?
-        if (file_read_action->getEndDate() + EPSILON < 10.0 or file_read_action->getEndDate() > 11.0 + EPSILON) {
+        if (file_read_action->getEndDate() + EPSILON < 10.84743174020618639020 or file_read_action->getEndDate() > 10.84743174020618639020 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
         }
 
@@ -193,6 +197,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -226,7 +231,6 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 }
 
 
-#if 0
 
 /**********************************************************************/
 /**  DO FILE_READ ACTION EXECUTOR KILL TEST                          **/
@@ -258,8 +262,9 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", 10.0);
-        // Create a sleep action executor
+        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
                 new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
         // Start it
@@ -277,14 +282,9 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getStartDate()));
         }
 
-        // Is the end date sensible?
-        if (file_read_action->getEndDate() + EPSILON < this->sleep_before_kill || file_read_action->getEndDate() > this->sleep_before_kill + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
-        }
-
-        // Is the state sensible?
-        if ((this->sleep_before_kill  + EPSILON < 10.0 and file_read_action->getState() != wrench::Action::State::KILLED) or
-            (this->sleep_before_kill > 10.0 + EPSILON  and file_read_action->getState() != wrench::Action::State::COMPLETED)) {
+        // Is the state and end date sensible?
+        if ((this->sleep_before_kill  + EPSILON < 10.84743174020618639020 and file_read_action->getState() != wrench::Action::State::KILLED) or
+            (this->sleep_before_kill > 10.84743174020618639020 + EPSILON  and file_read_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
         }
 
@@ -301,13 +301,17 @@ TEST_F(FileReadActionExecutorTest, KillTest) {
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.01);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 0.1);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 5.0);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.90);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.99);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.9999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.99999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 9.999999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.847);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.8474);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.84743);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.847431);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.84743174020618639020);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.847432);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.84744);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.8475);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.848);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.85);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorKillTest_test, 10.9);
 }
 
 
@@ -318,11 +322,23 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillTest_test(double s
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a workflow
+    workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -340,11 +356,8 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillTest_test(double s
 
 }
 
-
-
-
 /**********************************************************************/
-/**  DO FILE_READ ACTION EXECUTOR FAILURE TEST                           **/
+/**  DO FILE_READ ACTION EXECUTOR FAILURE TEST                       **/
 /**********************************************************************/
 
 
@@ -352,7 +365,8 @@ class FileReadActionExecutorFailureTestWMS : public wrench::WMS {
 
 public:
     FileReadActionExecutorFailureTestWMS(FileReadActionExecutorTest *test,
-                                      std::string hostname, double sleep_before_fail) :
+                                      std::string hostname,
+                                      double sleep_before_fail) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->sleep_before_fail = sleep_before_fail;
@@ -372,8 +386,9 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", 10.0);
-        // Create a sleep action executor
+        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
                 new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
         // Start it
@@ -383,7 +398,7 @@ private:
         // Sleep
         wrench::Simulation::sleep(this->sleep_before_fail);
 
-        // Turn off the hosts
+        // Fail it
         simgrid::s4u::Host::by_name("Host2")->turn_off();
 
         // Is the start date sensible?
@@ -391,23 +406,10 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(file_read_action->getStartDate()));
         }
 
-        // Is the end date sensible?
-        if (file_read_action->getEndDate() + EPSILON < this->sleep_before_fail || file_read_action->getEndDate() > this->sleep_before_fail + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_read_action->getEndDate()));
-        }
-
-        // Is the state sensible?
-        if ((this->sleep_before_fail + EPSILON < 10.0  and file_read_action->getState() != wrench::Action::State::FAILED) or
-            (this->sleep_before_fail > 10.0 + EPSILON and file_read_action->getState() != wrench::Action::State::COMPLETED)) {
+        // Is the state and end date sensible?
+        if ((this->sleep_before_fail  + EPSILON < 10.84743174020618639020 and file_read_action->getState() != wrench::Action::State::FAILED) or
+            (this->sleep_before_fail > 10.84743174020618639020 + EPSILON  and file_read_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
-        }
-
-        if (file_read_action->getState() == wrench::Action::State::FAILED) {
-            if (not file_read_action->getFailureCause()) {
-                throw std::runtime_error("Missing failure cause");
-            } else if (not std::dynamic_pointer_cast<wrench::HostError>(file_read_action->getFailureCause())) {
-                throw std::runtime_error("Unexpected failure cause: " + file_read_action->getFailureCause()->toString());
-            }
         }
 
         return 0;
@@ -423,14 +425,19 @@ TEST_F(FileReadActionExecutorTest, FailureTest) {
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.01);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 0.1);
     DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 5.0);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.90);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.99);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.9999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.99999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 9.999999);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.000);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.847);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.8474);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.84743);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.847431);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.84743174020618639020);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.847432);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.84744);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.8475);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.848);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.85);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileReadActionExecutorFailureTest_test, 10.9);
 }
+
 
 void FileReadActionExecutorTest::do_FileReadActionExecutorFailureTest_test(double sleep_before_fail) {
 
@@ -440,14 +447,23 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorFailureTest_test(doubl
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    // Get a hostname
-    std::string hostname = wrench::Simulation::getHostnameList()[0];
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a workflow
+    workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -466,4 +482,244 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorFailureTest_test(doubl
 }
 
 
-#endif
+
+
+/**********************************************************************/
+/**  DO FILE_READ ACTION MISSING FILE TEST                       **/
+/**********************************************************************/
+
+
+class FileReadActionExecutorMissingFileTestWMS : public wrench::WMS {
+
+public:
+    FileReadActionExecutorMissingFileTestWMS(FileReadActionExecutorTest *test,
+                                         std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    FileReadActionExecutorTest *test;
+    double sleep_before_fail;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("");
+        // Add a file_read_action
+        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        // Create a file read action executor
+        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
+                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        // Start it
+        file_read_action_executor->simulation = this->simulation;
+        file_read_action_executor->start(file_read_action_executor, true, false);
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutorDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        // Do we have the expected action state
+        if (file_read_action->getState() != wrench::Action::State::FAILED) {
+            throw std::runtime_error("Unexpected state: " + file_read_action->getStateAsString());
+        }
+
+        // Do we have a failure cause
+        if (file_read_action->getFailureCause() == nullptr) {
+            throw std::runtime_error("Failure cause should not be null");
+        }
+
+        // Do we have the expected failure cause
+        if (not std::dynamic_pointer_cast<wrench::FileNotFound>(file_read_action->getFailureCause())) {
+            throw std::runtime_error("Unexpected failure cause: " + file_read_action->getFailureCause()->toString());
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(FileReadActionExecutorTest, MissingFileTest) {
+    DO_TEST_WITH_FORK(do_FileReadActionExecutorMissingFileTest_test);
+}
+
+void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a workflow
+    workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000.0);
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
+
+
+
+/**********************************************************************/
+/**  DO FILE_READ ACTION KILLING SS TEST                             **/
+/**********************************************************************/
+
+
+class FileReadActionExecutorKillingStorageServiceTestWMS : public wrench::WMS {
+
+public:
+    FileReadActionExecutorKillingStorageServiceTestWMS(FileReadActionExecutorTest *test,
+                                             std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    FileReadActionExecutorTest *test;
+    double sleep_before_fail;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("");
+        // Add a file_read_action
+        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        // Create a file read action executor
+        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
+                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        // Start it
+        file_read_action_executor->simulation = this->simulation;
+        file_read_action_executor->start(file_read_action_executor, true, false);
+
+        // Sleep 1 sec
+        wrench::Simulation::sleep(1.0);
+
+        // Kill the SS
+        simgrid::s4u::Host::by_name("Host3")->turn_off();
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutorDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        // Do we have the expected action state
+        if (file_read_action->getState() != wrench::Action::State::FAILED) {
+            throw std::runtime_error("Unexpected state: " + file_read_action->getStateAsString());
+        }
+
+        // Do we have a failure cause
+        if (file_read_action->getFailureCause() == nullptr) {
+            throw std::runtime_error("Failure cause should not be null");
+        }
+
+        // Do we have the expected failure cause
+        if (not std::dynamic_pointer_cast<wrench::NetworkError>(file_read_action->getFailureCause())) {
+            throw std::runtime_error("Unexpected failure cause: " + file_read_action->getFailureCause()->toString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(FileReadActionExecutorTest, KillingStorageServiceTest) {
+    DO_TEST_WITH_FORK(do_FileReadActionExecutorKillingStorageServiceTest_test);
+}
+
+void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a workflow
+    workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
