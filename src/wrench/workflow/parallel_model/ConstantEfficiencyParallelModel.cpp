@@ -10,7 +10,7 @@
 
 #include <wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_constant_efficiency_parallel_model, "Log category for ConstantEfficiencyParallelModel");
 

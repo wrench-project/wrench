@@ -17,13 +17,13 @@
 #include <wrench/util/MessageManager.h>
 #endif
 
-#include "wrench/exceptions/ExecutionException.h"
-#include "wrench/failure_causes/FailureCause.h"
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/failure_causes/FailureCause.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
-#include "wrench/simulation/SimulationMessage.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
+#include <wrench/simulation/SimulationMessage.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_mailbox, "Mailbox");
 

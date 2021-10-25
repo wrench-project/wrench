@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 namespace wrench {
 

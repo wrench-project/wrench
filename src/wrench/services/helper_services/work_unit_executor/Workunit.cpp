@@ -9,7 +9,7 @@
 
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/job/StandardJob.h>
-#include "wrench/services/helper_services/work_unit_executor/Workunit.h"
+#include <wrench/services/helper_services/work_unit_executor/Workunit.h>
 #include <wrench-dev.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workunit, "Log category for Workunit");

@@ -14,7 +14,7 @@
 #include <boost/icl/interval_map.hpp>
 #include <wrench/services/compute/batch/BatchJob.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_core_availability_time_line, "Log category for CoreAvailabilityTimeLine");
 

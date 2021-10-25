@@ -52,10 +52,11 @@ namespace wrench {
         friend class ActionExecutor;
         friend class SleepActionExecutor;
         friend class ComputeActionExecutor;
+        friend class FileReadActionExecutor;
 
         void setState(Action::State state);
         virtual ~Action() = default;
-        Action(std::string name, std::shared_ptr<CompoundJob> job);
+        Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
         std::shared_ptr<CompoundJob> job;
 
         void setStartDate(double date);

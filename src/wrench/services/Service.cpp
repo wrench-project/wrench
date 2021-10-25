@@ -10,17 +10,17 @@
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
-#include "wrench/services/Service.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/exceptions/ExecutionException.h"
-#include "wrench/services/ServiceMessagePayload.h"
-#include "wrench/failure_causes/ServiceIsDown.h"
-#include "wrench/failure_causes/ServiceIsSuspended.h"
-#include "wrench/failure_causes/HostError.h"
-#include "wrench/failure_causes/NetworkError.h"
-#include "wrench/failure_causes/NotAllowed.h"
+#include <wrench/services/ServiceMessage.h>
+#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
+#include <wrench/services/Service.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/ServiceMessagePayload.h>
+#include <wrench/failure_causes/ServiceIsDown.h>
+#include <wrench/failure_causes/ServiceIsSuspended.h>
+#include <wrench/failure_causes/HostError.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NotAllowed.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 

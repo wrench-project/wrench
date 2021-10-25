@@ -9,8 +9,8 @@
 
 
 #include <wrench/logging/TerminalOutput.h>
-#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
-#include "wrench/failure_causes/NetworkError.h"
+#include <wrench/services/network_proximity/NetworkProximityDaemon.h>
+#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>

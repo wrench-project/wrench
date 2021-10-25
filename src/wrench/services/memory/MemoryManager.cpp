@@ -8,9 +8,9 @@
  *
  */
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/failure_causes/HostError.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/failure_causes/HostError.h>
 #include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_periodic_flush, "Log category for Periodic Flush");

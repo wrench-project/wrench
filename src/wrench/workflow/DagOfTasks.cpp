@@ -8,8 +8,8 @@
  */
 
 #include <vector>
-#include "wrench/workflow/DagOfTasks.h"
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/workflow/DagOfTasks.h>
+#include <wrench/logging/TerminalOutput.h>
 #include <boost/property_map/property_map.hpp>
 
 

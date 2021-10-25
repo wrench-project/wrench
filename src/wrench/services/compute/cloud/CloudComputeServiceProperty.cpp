@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
+#include <wrench/services/compute/cloud/CloudComputeServiceProperty.h>
 
 
 namespace wrench {

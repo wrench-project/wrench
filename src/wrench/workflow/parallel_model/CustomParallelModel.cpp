@@ -10,7 +10,7 @@
 
 #include <wrench/workflow/parallel_model/CustomParallelModel.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_custom_parallel_model, "Log category for CustomParallelModel");
 

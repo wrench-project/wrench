@@ -9,8 +9,8 @@
 
 #include <wrench/failure_causes/JobTimeout.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/job/Job.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/job/Job.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_job_timeout, "Log category for JobTimeout");
 

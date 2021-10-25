@@ -7,15 +7,15 @@
  * (at your option) any later version.
  */
 
-#include "wrench/simulation/Simulation.h"
-#include "wrench/action/Action.h"
-#include "wrench/action/ComputeAction.h"
+#include <wrench/simulation/Simulation.h>
+#include <wrench/action/Action.h>
+#include <wrench/action/ComputeAction.h>
 
 namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: the action's name (if empty, a unique name will be picked for you)
+     * @param name: the action's name (if empty, a unique name will be picked)
      * @param job: the job this action belongs to
      * @param flops: the number of flops to perform
      * @param ram: the ram that is required
@@ -29,7 +29,7 @@ namespace wrench {
                                  double ram,
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
-                                 std::shared_ptr<ParallelModel> parallel_model) : Action(name, job) {
+                                 std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_",job) {
         if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
             throw std::invalid_argument("ComputeAction::ComputeAction(): invalid arguments");
         }

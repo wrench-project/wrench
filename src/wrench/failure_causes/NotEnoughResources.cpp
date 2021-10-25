@@ -9,9 +9,9 @@
 
 #include <wrench/failure_causes/NotEnoughResources.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/job/Job.h"
-#include "wrench/services/compute/ComputeService.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/job/Job.h>
+#include <wrench/services/compute/ComputeService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_not_enough_resources, "Log category for NotEnoughResources");
 
