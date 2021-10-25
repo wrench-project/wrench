@@ -274,13 +274,7 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(compute_action->getStartDate()));
         }
 
-        // Is the end date sensible?
-        if (compute_action->getEndDate() + EPSILON < this->sleep_before_kill or
-            compute_action->getEndDate() > this->sleep_before_kill + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(compute_action->getEndDate()));
-        }
-
-        // Is the state sensible?
+        // Is the state and end date sensible?
         if ((this->sleep_before_kill + EPSILON < 10.2 and compute_action->getState() != wrench::Action::State::KILLED) or
             (this->sleep_before_kill > 10.2  + EPSILON and compute_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state : " + compute_action->getStateAsString());
@@ -426,13 +420,7 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(compute_action->getStartDate()));
         }
 
-        // Is the end date sensible?
-        if (compute_action->getEndDate() + EPSILON < this->sleep_before_fail or
-            compute_action->getEndDate() > this->sleep_before_fail + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(compute_action->getEndDate()));
-        }
-
-        // Is the state sensible?
+        // Is the state and end date sensible?
         if ((this->sleep_before_fail + EPSILON < 10.2 and compute_action->getState() != wrench::Action::State::FAILED) or
             (this->sleep_before_fail > 10.2  + EPSILON and compute_action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state : " + compute_action->getStateAsString());
