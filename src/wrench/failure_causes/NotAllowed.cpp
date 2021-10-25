@@ -9,7 +9,7 @@
 
 #include <wrench/failure_causes/NotAllowed.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_not_allowed, "Log category for NotAllowed");
 

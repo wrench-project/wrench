@@ -10,7 +10,7 @@
 
 #include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_amdahl_parallel_model, "Log category for AmdahlParallelModel");
 

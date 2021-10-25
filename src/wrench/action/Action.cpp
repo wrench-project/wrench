@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/action/Action.h"
+#include <wrench/action/Action.h>
 
 #include <utility>
 
@@ -15,12 +15,13 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: the action's name (if empty, a unique name will be picked for you)
+     * @param name: the action's name (if empty, a unique name will be picked)
+     * @param prefix: the action's name prefix (if name is empty)
      * @param job: the job that contains this action
      */
-    Action::Action(std::string name, std::shared_ptr<CompoundJob> job) {
+    Action::Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job) {
         if (name.empty()) {
-            this->name = "action_" + std::to_string(Action::getNewUniqueNumber());
+            this->name = prefix + std::to_string(Action::getNewUniqueNumber());
         } else {
             this->name = name;
         }

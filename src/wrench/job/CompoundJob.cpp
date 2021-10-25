@@ -10,10 +10,11 @@
 #include <set>
 #include <utility>
 #include <wrench-dev.h>
-#include "wrench/workflow/Workflow.h"
-#include "wrench/job/CompoundJob.h"
-#include "wrench/action/SleepAction.h"
-#include "wrench/action/ComputeAction.h"
+#include <wrench/workflow/Workflow.h>
+#include <wrench/job/CompoundJob.h>
+#include <wrench/action/SleepAction.h>
+#include <wrench/action/ComputeAction.h>
+#include <wrench/action/FileReadAction.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
@@ -75,7 +76,6 @@ namespace wrench {
      * @return a sleep action
      */
     std::shared_ptr<SleepAction> CompoundJob::addSleepAction(std::string name, double sleep_time) {
-        if (name.empty()) name = "sleep_";
         auto new_action = std::shared_ptr<SleepAction>(new SleepAction(name, this->shared_this, sleep_time));
         this->actions.insert(new_action);
         return new_action;
@@ -83,7 +83,7 @@ namespace wrench {
 
     /**
      * @brief Add a compute action to the job
-     * @param name: the action's name
+     * @param name: the action's name (if empty, a unique name will be picked for you)
      * @param flops: the number of flops to perform
      * @param ram: the amount of RAM required
      * @param min_num_cores: the minimum number of cores needed
@@ -97,11 +97,28 @@ namespace wrench {
                                                                int min_num_cores,
                                                                int max_num_cores,
                                                                std::shared_ptr<ParallelModel> parallel_model) {
-        if (name.empty()) name = "compute_";
-        auto new_action = std::shared_ptr<ComputeAction>(new ComputeAction(name, this->shared_this, flops, ram, min_num_cores, max_num_cores, parallel_model));
+        auto new_action = std::shared_ptr<ComputeAction>(
+                new ComputeAction(name, this->shared_this, flops, ram, min_num_cores, max_num_cores, parallel_model));
         this->actions.insert(new_action);
         return new_action;
 
+    }
+
+
+    /**
+     * @brief Add a file read action to the job
+     * @param name: the action's name (if empty, a unique name will be picked for you)
+     * @param file: the file
+     * @param file_location: the file's location
+     * @return a file read action
+     */
+    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
+                                                                std::shared_ptr<WorkflowFile> file,
+                                                                std::shared_ptr<FileLocation> file_location) {
+        auto new_action = std::shared_ptr<FileReadAction>(
+                new FileReadAction(name, this->shared_this, std::move(file), std::move(file_location)));
+        this->actions.insert(new_action);
+        return new_action;
     }
 
 }

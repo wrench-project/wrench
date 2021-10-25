@@ -7,17 +7,17 @@
  * (at your option) any later version.
  */
 
-#include "wrench/wms/WMS.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/helper_services/alarm/Alarm.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/simulation/Simulation.h"
+#include <wrench/wms/WMS.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/helper_services/alarm/Alarm.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simulation/Simulation.h>
 #include "wms/WMSMessage.h"
-#include "wrench/managers/JobManager.h"
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/compute/batch/BatchComputeService.h"
+#include <wrench/managers/JobManager.h>
+#include <wrench/managers/DataMovementManager.h>
+#include <wrench/services/compute/ComputeService.h>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_wms, "Log category for WMS");

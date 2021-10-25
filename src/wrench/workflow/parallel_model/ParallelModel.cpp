@@ -8,12 +8,12 @@
  */
 
 
-#include "wrench/workflow/parallel_model/ParallelModel.h"
-#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
-#include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
-#include "wrench/workflow/parallel_model/CustomParallelModel.h"
+#include <wrench/workflow/parallel_model/ParallelModel.h>
+#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
+#include <wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h>
+#include <wrench/workflow/parallel_model/CustomParallelModel.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_parallel_model, "Log category for ParallelModel");
 

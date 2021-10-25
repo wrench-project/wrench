@@ -13,13 +13,13 @@
 #include <wrench/failure_causes/JobTypeNotSupported.h>
 
 #include "CloudComputeServiceMessage.h"
-#include "wrench/exceptions/ExecutionException.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
-#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
+#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_cloud_service, "Log category for Cloud Service");

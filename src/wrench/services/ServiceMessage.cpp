@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/ServiceMessage.h"
+#include <wrench/services/ServiceMessage.h>
 
 namespace wrench {
 

@@ -17,9 +17,9 @@
 #include <simgrid/plugins/file_system.h>
 #include <wrench/failure_causes/FailureCause.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
 

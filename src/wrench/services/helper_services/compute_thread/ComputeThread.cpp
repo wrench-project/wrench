@@ -8,9 +8,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench-dev.h>
-#include "wrench/services/helper_services/compute_thread/ComputeThread.h"
+#include <wrench/services/helper_services/compute_thread/ComputeThread.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compute_thread, "Log category for ComputeThread");
 

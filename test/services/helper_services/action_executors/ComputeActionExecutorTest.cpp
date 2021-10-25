@@ -19,7 +19,7 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(compute_action_executor_test, "Log category for Simple ComputeActionExecutorTest");
+WRENCH_LOG_CATEGORY(compute_action_executor_test, "Log category for ComputeActionExecutorTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 

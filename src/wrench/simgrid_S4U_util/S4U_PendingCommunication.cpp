@@ -15,10 +15,10 @@
 #include <wrench/util/MessageManager.h>
 #endif
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
-#include "wrench/simulation/SimulationMessage.h"
-#include "wrench/failure_causes/FailureCause.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
+#include <wrench/simulation/SimulationMessage.h>
+#include <wrench/failure_causes/FailureCause.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_pending_communication, "Log category for Pending Communication");
 

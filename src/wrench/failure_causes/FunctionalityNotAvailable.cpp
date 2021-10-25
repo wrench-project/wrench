@@ -8,8 +8,8 @@
  */
 
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/Service.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/Service.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_functionality_not_available, "Log category for FunctionalityNotAvailable");
 

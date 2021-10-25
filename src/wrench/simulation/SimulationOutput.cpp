@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/simulation/Simulation.h"
-#include "wrench/simulation/SimulationOutput.h"
-#include "wrench/workflow/Workflow.h"
+#include <wrench/simulation/Simulation.h>
+#include <wrench/simulation/SimulationOutput.h>
+#include <wrench/workflow/Workflow.h>
 #include "simgrid/s4u.hpp"
 #include "simgrid/plugins/energy.h"
 

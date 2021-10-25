@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/failure_causes/ServiceIsSuspended.h"
-#include "wrench/services/Service.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/failure_causes/ServiceIsSuspended.h>
+#include <wrench/services/Service.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service_is_suspended, "Log category for ServiceIsSuspended");
 

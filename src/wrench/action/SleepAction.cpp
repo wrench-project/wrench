@@ -7,9 +7,11 @@
  * (at your option) any later version.
  */
 
-#include "wrench/simulation/Simulation.h"
-#include "wrench/action/Action.h"
-#include "wrench/action/SleepAction.h"
+#include <wrench/simulation/Simulation.h>
+#include <wrench/action/Action.h>
+#include <wrench/action/SleepAction.h>
+
+#include <utility>
 
 namespace wrench {
 
@@ -19,11 +21,12 @@ namespace wrench {
     * @param job: the job this action belongs to
     * @param sleep: the time to sleep, in seconds
     */
-    SleepAction::SleepAction(std::string name, std::shared_ptr<CompoundJob> job, double sleep_time) : Action(name, job), sleep_time(sleep_time) {
+    SleepAction::SleepAction(const std::string& name, std::shared_ptr<CompoundJob> job, double sleep_time) :
+            Action(name, "sleep_", std::move(job)), sleep_time(sleep_time) {
     }
 
     /**
-     * Returns the action's sleep time
+     * @brief Returns the action's sleep time
      * @return the sleep time (in sec)
      */
     double SleepAction::getSleepTime() {

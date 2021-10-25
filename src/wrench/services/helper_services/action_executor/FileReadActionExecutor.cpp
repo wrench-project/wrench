@@ -9,15 +9,15 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
-#include <wrench/action/SleepAction.h>
+#include <wrench/action/FileReadAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
-#include <wrench/services/helper_services/action_executor/SleepActionExecutor.h>
+#include <wrench/services/helper_services/action_executor/FileReadActionExecutor.h>
 #include <wrench/failure_causes/HostError.h>
 
 #include <utility>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 
-WRENCH_LOG_CATEGORY(wrench_core_sleep_action_executor,"Log category for Sleep Action Executor");
+WRENCH_LOG_CATEGORY(wrench_core_file_read_action_executor,"Log category for File Read Action Executor");
 
 namespace wrench {
 
@@ -28,10 +28,10 @@ namespace wrench {
      * @param callback_mailbox: the callback mailbox to which a "work done" or "work failed" message will be sent
      * @param action: the action to perform
      */
-    SleepActionExecutor::SleepActionExecutor(
+    FileReadActionExecutor::FileReadActionExecutor(
             std::string hostname,
             std::string callback_mailbox,
-            std::shared_ptr<SleepAction> action) :
+            std::shared_ptr<FileReadAction> action) :
             ActionExecutor(std::move(hostname), callback_mailbox, action) {
     }
 
@@ -42,17 +42,17 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    int SleepActionExecutor::main() {
+    int FileReadActionExecutor::main() {
 
         S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-        WRENCH_INFO("New Sleep Action Executor starting (%s) to do action %s",
+        WRENCH_INFO("New FileRead Action Executor starting (%s) to do action %s",
                     this->getName().c_str(), this->action->getName().c_str());
 
-        auto sleep_action = std::dynamic_pointer_cast<SleepAction>(this->action);
-        if (not sleep_action) {
-            throw std::runtime_error("SleepActionExecutor::main(): invalid action");
+        auto file_read_action = std::dynamic_pointer_cast<FileReadAction>(this->action);
+        if (not file_read_action) {
+            throw std::runtime_error("FileReadActionExecutor::main(): invalid action");
         }
 
         SimulationMessage *msg_to_send_back = nullptr;
@@ -60,7 +60,7 @@ namespace wrench {
         try {
             this->action->setStartDate(S4U_Simulation::getClock());
             this->action->setState(Action::State::STARTED);
-            S4U_Simulation::sleep(sleep_action->getSleepTime());
+            StorageService::readFile(file_read_action->getFile().get(), file_read_action->getFileLocation());
             this->action->setEndDate(S4U_Simulation::getClock());
             this->action->setState(Action::State::COMPLETED);
 
@@ -95,7 +95,7 @@ namespace wrench {
      * @param job_termination: if the reason for being killed is that the job was terminated by the submitter
      * (as opposed to being terminated because the above service was also terminated).
      */
-    void SleepActionExecutor::kill(bool job_termination) {
+    void FileReadActionExecutor::kill(bool job_termination) {
         this->killed_on_purpose = job_termination;
         this->killActor();
     }
@@ -107,7 +107,7 @@ namespace wrench {
      * @param has_returned_from_main: whether main() returned
      * @param return_value: the return value (if main() returned)
      */
-    void SleepActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
+    void FileReadActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
         // Just do the basics
         commonCleanup(has_returned_from_main, return_value);
     }

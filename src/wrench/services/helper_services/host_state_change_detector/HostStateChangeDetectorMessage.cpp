@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h"
+#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 
 namespace wrench {
 

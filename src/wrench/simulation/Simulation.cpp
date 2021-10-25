@@ -13,18 +13,18 @@
 #include <simgrid/plugins/live_migration.h>
 
 #include <wrench/wms/WMS.h>
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/Service.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/file_registry/FileRegistryService.h"
-#include "wrench/services/storage/StorageService.h"
-#include "wrench/simulation/Simulation.h"
+#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/Service.h>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/file_registry/FileRegistryService.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
-#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
-#include "wrench/services/memory/MemoryManager.h"
-#include "wrench/workflow/WorkflowFile.h"
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+#include <wrench/services/memory/MemoryManager.h>
+#include <wrench/workflow/WorkflowFile.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>

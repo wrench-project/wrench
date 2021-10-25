@@ -26,6 +26,7 @@ namespace wrench {
     class Action;
     class SleepAction;
     class ComputeAction;
+    class FileReadAction;
 
     /**
      * @brief A compound job
@@ -56,6 +57,9 @@ namespace wrench {
         void setPriority(unsigned long priority);
 
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
+        std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
+                                                       std::shared_ptr<WorkflowFile> file,
+                                                       std::shared_ptr<FileLocation> file_location);
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,
                                                       double flops,
                                                       double ram,

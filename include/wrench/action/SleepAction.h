@@ -24,10 +24,9 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        explicit SleepAction(std::string name, std::shared_ptr<CompoundJob> job, double sleep_time);
+        SleepAction(const std::string& name, std::shared_ptr<CompoundJob> job, double sleep_time);
 
     private:
-
         double sleep_time;
 
     };

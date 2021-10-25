@@ -8,10 +8,10 @@
  */
 
 #include <fstream>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench-dev.h>
 #include <nlohmann/json.hpp>
-#include "wrench/util/TraceFileLoader.h"
+#include <wrench/util/TraceFileLoader.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_trace_file_loader, "Log category for Trace File Loader");
 

@@ -13,23 +13,23 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h"
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
-#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h"
-#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/exceptions/ExecutionException.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/storage/StorageService.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/job/PilotJob.h"
-#include "wrench/job/StandardJob.h"
-#include "wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h"
-#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
-#include "wrench/failure_causes/JobTypeNotSupported.h"
-#include "wrench/failure_causes/HostError.h"
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
+#include <wrench/services/ServiceMessage.h>
+#include <wrench/services/compute/ComputeServiceMessage.h>
+#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/simulation/Simulation.h>
+#include <wrench/job/PilotJob.h>
+#include <wrench/job/StandardJob.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
+#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
+#include <wrench/failure_causes/JobTypeNotSupported.h>
+#include <wrench/failure_causes/HostError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal");
 

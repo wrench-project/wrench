@@ -8,8 +8,8 @@
  */
 
 #include <iostream>
-#include "wrench/services/compute/batch/BatchJob.h"
-#include "wrench/workflow/WorkflowTask.h"
+#include <wrench/services/compute/batch/BatchJob.h>
+#include <wrench/workflow/WorkflowTask.h>
 
 namespace wrench {
     /**

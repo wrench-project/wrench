@@ -16,7 +16,7 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/ServiceMessage.h>
 
-#include "wrench/services/file_registry/FileRegistryService.h"
+#include <wrench/services/file_registry/FileRegistryService.h>
 #include "FileRegistryMessage.h"
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/workflow/WorkflowFile.h>

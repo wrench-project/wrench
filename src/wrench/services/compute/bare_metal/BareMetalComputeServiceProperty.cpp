@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h"
+#include <wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h>
 
 namespace wrench {
 

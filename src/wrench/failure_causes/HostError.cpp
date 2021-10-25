@@ -9,8 +9,8 @@
 
 #include <wrench/failure_causes/HostError.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/failure_causes/FailureCause.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/failure_causes/FailureCause.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_host_error, "Log category for HostError");
 
