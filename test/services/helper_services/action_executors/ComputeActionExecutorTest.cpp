@@ -11,7 +11,6 @@
 #include <wrench-dev.h>
 
 #include <wrench/action/ComputeAction.h>
-#include <wrench/services/helper_services/action_executor/ComputeActionExecutor.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes//HostError.h>
@@ -134,21 +133,21 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a compute action
         auto compute_action = job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0));
-        // Create a compute action executor
         double thread_startup_overhead = 0.1;
+        compute_action->setThreadCreationOverhead(thread_startup_overhead);
+        // Create a compute action executor
         unsigned long num_cores = 2;
-        auto compute_action_executor = std::shared_ptr<wrench::ComputeActionExecutor>(
-                new wrench::ComputeActionExecutor("Host2",
-                                                  num_cores,
-                                                  200.0,
-                                                  this->mailbox_name,
-                                                  compute_action,
-                                                  thread_startup_overhead,
-                                                  false));
+
+        auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2",
+                                           num_cores,
+                                           200.0,
+                                           this->mailbox_name,
+                                           compute_action));
 
         // Start it
-        compute_action_executor->simulation = this->simulation;
-        compute_action_executor->start(compute_action_executor, true, false);
+        action_executor->simulation = this->simulation;
+        action_executor->start(action_executor, true, false);
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
@@ -250,24 +249,26 @@ private:
         // Create a compute action executor
         double thread_startup_overhead = 0.1;
         unsigned long num_cores = 2;
-        auto compute_action_executor = std::shared_ptr<wrench::ComputeActionExecutor>(
-                new wrench::ComputeActionExecutor("Host2",
-                                                  num_cores,
-                                                  200.0,
-                                                  this->mailbox_name,
-                                                  compute_action,
-                                                  thread_startup_overhead,
-                                                  false));
+        compute_action->setThreadCreationOverhead(thread_startup_overhead);
+
+        auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2",
+                                           num_cores,
+                                           200.0,
+                                           this->mailbox_name,
+                                           compute_action));
+
 
         // Start it
-        compute_action_executor->simulation = this->simulation;
-        compute_action_executor->start(compute_action_executor, true, false);
+        action_executor->simulation = this->simulation;
+        action_executor->start(action_executor, true, false);
 
         // Sleep
+//        WRENCH_INFO("TEST SLEEP %.20lf", this->sleep_before_kill);
         wrench::Simulation::sleep(this->sleep_before_kill);
 
         // Kill it
-        compute_action_executor->kill(true);
+        action_executor->kill(true);
 
         // Is the start date sensible?
         if (compute_action->getStartDate() < 0.0 || compute_action->getStartDate() > EPSILON) {
@@ -301,6 +302,7 @@ TEST_F(ComputeActionExecutorTest, KillTest) {
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.9999999);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.99999999);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.1);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.10000001);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.1000001);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.100001);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.10001);
@@ -313,7 +315,9 @@ TEST_F(ComputeActionExecutorTest, KillTest) {
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.19999);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.199999);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.1999999);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.19999999);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.2);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.20000001);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.2000001);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.200001);
     DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorKillTest_test, 0.20001);
@@ -371,8 +375,8 @@ class ComputeActionExecutorFailureTestWMS : public wrench::WMS {
 
 public:
     ComputeActionExecutorFailureTestWMS(ComputeActionExecutorTest *test,
-                                     std::string hostname,
-                                     double sleep_before_fail) :
+                                        std::string hostname,
+                                        double sleep_before_fail) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->sleep_before_fail = sleep_before_fail;
@@ -393,17 +397,16 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a compute action
         auto compute_action = job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0));
-        // Create a compute action executor
         double thread_startup_overhead = 0.1;
+        compute_action->setThreadCreationOverhead(thread_startup_overhead);
+        // Create a compute action executor
         unsigned long num_cores = 2;
-        auto compute_action_executor = std::shared_ptr<wrench::ComputeActionExecutor>(
-                new wrench::ComputeActionExecutor("Host2",
-                                                  num_cores,
-                                                  200.0,
-                                                  this->mailbox_name,
-                                                  compute_action,
-                                                  thread_startup_overhead,
-                                                  false));
+        auto compute_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2",
+                                           num_cores,
+                                           200.0,
+                                           this->mailbox_name,
+                                           compute_action));
 
         // Start it
         compute_action_executor->simulation = this->simulation;

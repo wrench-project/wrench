@@ -11,7 +11,6 @@
 #include <wrench-dev.h>
 
 #include <wrench/action/FileReadAction.h>
-#include <wrench/services/helper_services/action_executor/FileReadActionExecutor.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes//HostError.h>
@@ -146,8 +145,8 @@ private:
         auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
-        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
-                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_read_action));
         // Start it
         file_read_action_executor->simulation = this->simulation;
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -265,8 +264,8 @@ private:
         auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
-        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
-                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_read_action));
         // Start it
         file_read_action_executor->simulation = this->simulation;
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -389,8 +388,8 @@ private:
         auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
-        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
-                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_read_action));
         // Start it
         file_read_action_executor->simulation = this->simulation;
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -515,8 +514,8 @@ private:
         auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
-        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
-                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, file_read_action));
         // Start it
         file_read_action_executor->simulation = this->simulation;
         file_read_action_executor->start(file_read_action_executor, true, false);
@@ -632,8 +631,8 @@ private:
         auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
-        auto file_read_action_executor = std::shared_ptr<wrench::FileReadActionExecutor>(
-                new wrench::FileReadActionExecutor("Host2", this->mailbox_name, file_read_action));
+        auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, file_read_action));
         // Start it
         file_read_action_executor->simulation = this->simulation;
         file_read_action_executor->start(file_read_action_executor, true, false);

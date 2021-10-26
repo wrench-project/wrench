@@ -103,6 +103,13 @@ namespace wrench {
 
         /** @brief a pointer to the simulation object */
         Simulation *simulation;
+
+        /** @brief Method to acquire the daemon's lock */
+        void acquireDaemonLock();
+
+        /** @brief Method to release the daemon's lock */
+        void releaseDaemonLock();
+
     protected:
 
         /** @brief The service's state */
@@ -113,9 +120,7 @@ namespace wrench {
 
         void killActor();
 
-        void acquireDaemonLock();
 
-        void releaseDaemonLock();
 
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;

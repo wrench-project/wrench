@@ -29,7 +29,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FatalFailure();
+        FatalFailure(std::string message);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -37,6 +37,7 @@ namespace wrench {
         std::string toString();
 
     private:
+        std::string message;
     };
 
 

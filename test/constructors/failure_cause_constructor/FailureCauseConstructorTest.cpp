@@ -54,11 +54,10 @@ TEST_F(FailureCauseConstructorTest, ComputeThreadHasDied) {
     }
 }
 
-
 TEST_F(FailureCauseConstructorTest, FatalFailure) {
 
     wrench::FatalFailure *cause = nullptr;
-    ASSERT_NO_THROW(cause = new wrench::FatalFailure());
+    ASSERT_NO_THROW(cause = new wrench::FatalFailure(""));
     if (cause) {
       cause->toString(); // Coverage
     }

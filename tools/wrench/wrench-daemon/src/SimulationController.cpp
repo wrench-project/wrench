@@ -81,9 +81,9 @@ namespace wrench {
             // Submit jobs that should be submitted
             while (true) {
                 std::pair<std::shared_ptr<StandardJob>, std::shared_ptr<ComputeService>> submission_to_do;
-                if (this->submissions_to_do.tryPop(submission_to_do)) { WRENCH_INFO("Submitting a job...");
+                if (this->submissions_to_do.tryPop(submission_to_do)) {
+                    WRENCH_INFO("Submitting a job...");
                     this->job_manager->submitJob(submission_to_do.first, submission_to_do.second, {});
-
                 } else {
                     break;
                 }

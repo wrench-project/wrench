@@ -19,7 +19,8 @@ namespace wrench {
     * @brief Constructor
     *
     */
-    FatalFailure::FatalFailure() {
+    FatalFailure::FatalFailure(std::string message) {
+        this->message = message;
     }
 
     /**
@@ -27,7 +28,11 @@ namespace wrench {
      * @return the message
      */
     std::string FatalFailure::toString() {
-        return std::string("Internal implementation, likely a WRENCH bug");
+        if (this->message.empty()) {
+            return std::string("Internal implementation failure, likely a WRENCH bug");
+        } else {
+            return std::string(this->message + " (internal implementation failure)");
+        }
     }
 
 }
