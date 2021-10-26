@@ -12,8 +12,9 @@
 
 #include <wrench/action/FileReadAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/job/CompoundJob.h>
-#include <wrench/failure_causes//HostError.h>
+#include <wrench/failure_causes/HostError.h>
 
 #include <memory>
 
