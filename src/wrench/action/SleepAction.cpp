@@ -33,4 +33,25 @@ namespace wrench {
         return this->sleep_time;
     }
 
+    /**
+     * @brief Method to execute the action
+     * @param action_executor: the executor that executes this action
+     * @param num_threads: number of threads to use
+     * @param ram_footprint: ram footprint necessary
+     */
+    void SleepAction::execute(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint) {
+        // Thread creation overhead
+        Simulation::sleep(this->thread_creation_overhead);
+        // Sleeping
+        S4U_Simulation::sleep(this->sleep_time);
+    }
+
+    /**
+     * @brief Method to terminate the action
+     * @param action_executor: the executor that executes this action
+     */
+    void SleepAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+        // Nothing to do for a Sleep Action
+    }
+
 }

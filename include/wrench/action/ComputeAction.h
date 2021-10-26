@@ -16,6 +16,7 @@
 
 namespace wrench {
 
+    class ComputeThread;
     class ParallelModel;
 
     class ComputeAction : public Action {
@@ -38,6 +39,8 @@ namespace wrench {
                       unsigned long max_core,
                       std::shared_ptr<ParallelModel> parallel_model);
 
+        void execute(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint) override;
+        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
         double flops;
@@ -45,6 +48,11 @@ namespace wrench {
         unsigned long max_num_cores;
         double ram;
         std::shared_ptr<ParallelModel> parallel_model;
+
+        void simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, std::vector<double> &work_per_thread);
+        void simulateComputationWithComputeThreads(std::shared_ptr<ActionExecutor> action_executor, std::vector<double> &work_per_thread);
+
+        std::vector<std::shared_ptr<ComputeThread>> compute_threads;
 
 
     };

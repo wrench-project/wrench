@@ -11,7 +11,11 @@
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/action/Action.h>
 #include <wrench/simulation/Simulation.h>
-#include <wrench/failure_causes//HostError.h>
+#include <wrench/failure_causes/HostError.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_action_executor, "Log category for  Action Executor");
 
@@ -22,11 +26,15 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the action executor will run
+     * @param num_cores: the number of cores
+     * @param ram_footprint: the RAM footprint
      * @param callback_mailbox: the callback mailbox to which a "action done" or "action failed" message will be sent
      * @param action: the action to perform
      */
     ActionExecutor::ActionExecutor(
             std::string hostname,
+            unsigned long num_cores,
+            double ram_footprint,
             std::string callback_mailbox,
             std::shared_ptr <Action> action) :
             Service(hostname, "action_executor", "action_executor") {
@@ -37,6 +45,8 @@ namespace wrench {
 
         this->callback_mailbox = callback_mailbox;
         this->action = action;
+        this->num_cores = num_cores;
+        this->ram_footprint = ram_footprint;
     }
 
     /**
@@ -52,7 +62,7 @@ namespace wrench {
      * @param has_returned_from_main: true if main has returned
      * @param return_value: main's return value
      */
-    void ActionExecutor::commonCleanup(bool has_returned_from_main, int return_value) {
+    void ActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
         WRENCH_DEBUG(
                 "In on_exit.cleanup(): ActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_pupose = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value,
@@ -75,4 +85,54 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Main method of the action executor
+     *
+     * @return 1 if a failure timestamp should be generated, 0 otherwise
+     *
+     * @throw std::runtime_error
+     */
+    int ActionExecutor::main() {
+
+        S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
+
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
+        WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());
+
+        this->action->setStartDate(S4U_Simulation::getClock());
+        this->action->setState(Action::State::STARTED);
+        try {
+            this->action->execute(this->getSharedPtr<ActionExecutor>(), this->num_cores, this->ram_footprint);
+            this->action->setState(Action::State::COMPLETED);
+        } catch (ExecutionException &e) {
+            this->action->setState(Action::State::FAILED);
+            this->action->setFailureCause(e.getCause());
+        }
+        this->action->setEndDate(S4U_Simulation::getClock());
+
+        auto msg_to_send_back = new ActionExecutorDoneMessage(this->getSharedPtr<ActionExecutor>());
+
+        try {
+            S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
+        } catch (std::shared_ptr <NetworkError> &cause) {
+            WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
+        }
+        WRENCH_INFO("Action executor for action %s terminating!", this->action->getName().c_str());
+
+        return 0;
+    }
+
+    /**
+    * @brief Kill the worker thread
+    *
+    * @param job_termination: if the reason for being killed is that the job was terminated by the submitter
+    * (as opposed to being terminated because the above service was also terminated).
+    */
+    void ActionExecutor::kill(bool job_termination) {
+        this->killed_on_purpose = job_termination;
+        this->acquireDaemonLock();
+        this->killActor();
+        this->releaseDaemonLock();
+        this->action->terminate(this->getSharedPtr<ActionExecutor>());
+    }
 }

@@ -9,6 +9,8 @@
 
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -28,7 +30,7 @@ namespace wrench {
      */
     ServiceHasCrashedMessage::ServiceHasCrashedMessage(std::shared_ptr<Service> service) :
             ServiceTerminationDetectorMessage("ServiceHasCrashedMessage") {
-        this->service = service;
+        this->service = std::move(service);
     }
 
     /**
@@ -39,7 +41,7 @@ namespace wrench {
      */
     ServiceHasTerminatedMessage::ServiceHasTerminatedMessage(std::shared_ptr<Service> service, int exit_code) :
             ServiceTerminationDetectorMessage("ServiceHasTerminatedMessage") {
-        this->service = service;
+        this->service = std::move(service);
         this->exit_code = exit_code;
     }
 

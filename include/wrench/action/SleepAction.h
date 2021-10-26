@@ -26,6 +26,9 @@ namespace wrench {
 
         SleepAction(const std::string& name, std::shared_ptr<CompoundJob> job, double sleep_time);
 
+        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
+        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+
     private:
         double sleep_time;
 
