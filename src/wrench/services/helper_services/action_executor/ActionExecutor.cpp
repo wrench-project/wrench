@@ -47,6 +47,7 @@ namespace wrench {
         this->action = action;
         this->num_cores = num_cores;
         this->ram_footprint = ram_footprint;
+        this->killed_on_purpose = false;
     }
 
     /**
