@@ -23,13 +23,13 @@ namespace wrench {
 
     public:
         std::shared_ptr<WorkflowFile> getFile() const;
-        std::shared_ptr<FileLocation> getFileLocation() const;
+        std::vector<std::shared_ptr<FileLocation>> getFileLocations() const;
 
     protected:
         friend class CompoundJob;
 
         FileReadAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                std::shared_ptr<WorkflowFile> file, std::shared_ptr<FileLocation> file_location);
+                                std::shared_ptr<WorkflowFile> file, std::vector<std::shared_ptr<FileLocation>> file_locations);
 
 
         void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
@@ -37,7 +37,7 @@ namespace wrench {
 
     private:
         std::shared_ptr<WorkflowFile> file;
-        std::shared_ptr<FileLocation> file_location;
+        std::vector<std::shared_ptr<FileLocation>> file_locations;
 
     };
 }
