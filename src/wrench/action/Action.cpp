@@ -165,4 +165,22 @@ namespace wrench {
         this->thread_creation_overhead = overhead_in_seconds;
     }
 
+    /**
+     * @brief Update the action's readiness
+     */
+    void Action::updateReadiness() {
+        // Do nothing if task state is neither ready nor not ready
+        if (this->state != Action::State::NOT_READY and this->state != Action::State::READY) {
+            return;
+        }
+        bool ready = true;
+        for (auto const &p : this->parents) {
+            if (p->getState() != Action::State::COMPLETED) {
+                this->state = Action::State::NOT_READY;
+                return;
+            }
+        }
+        this->state = Action::State::READY;
+    }
+
 }

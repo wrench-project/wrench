@@ -73,6 +73,8 @@ namespace wrench {
                                                       int max_num_cores,
                                                       std::shared_ptr<ParallelModel> parallel_model);
 
+        void addDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
+        void removeDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
 
         /***********************/
         /** \endcond           */
