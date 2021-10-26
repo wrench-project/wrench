@@ -32,6 +32,7 @@ public:
     wrench::Simulation *simulation;
 
     void do_FileReadActionExecutorSuccessTest_test();
+    void do_FileReadActionExecutorMultipleAttemptsSuccessTest_test();
     void do_FileReadActionExecutorKillTest_test(double sleep_before_kill);
     void do_FileReadActionExecutorFailureTest_test(double sleep_before_fail);
     void do_FileReadActionExecutorMissingFileTest_test();
@@ -120,7 +121,6 @@ public:
 /**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
 
-
 class FileReadActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
@@ -129,7 +129,6 @@ public:
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
-
 
 private:
 
@@ -231,6 +230,108 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 }
 
 
+/**********************************************************************/
+/**  DO FILE_READ ACTION EXECUTOR MULTIPLE ATTEMPT SUCCESS TEST      **/
+/**********************************************************************/
+
+class FileReadActionExecutorMultipleAttemptsSuccessTestWMS : public wrench::WMS {
+
+public:
+    FileReadActionExecutorMultipleAttemptsSuccessTestWMS(FileReadActionExecutorTest *test,
+                                                         std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    FileReadActionExecutorTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("");
+        // Add a file_read_action
+        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/"),
+                                                        wrench::FileLocation::LOCATION(this->test->ss) });
+        // Create a file read action executor
+        auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_read_action));
+        // Start it
+        file_read_action_executor->simulation = this->simulation;
+        file_read_action_executor->start(file_read_action_executor, true, false);
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutorDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        // Is the state sensible?
+        if (file_read_action->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected action state: " + file_read_action->getStateAsString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(FileReadActionExecutorTest, MultipleAttemptsSuccessTest) {
+    DO_TEST_WITH_FORK(do_FileReadActionExecutorMultipleAttemptsSuccessTest_test);
+}
+
+
+void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSuccessTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a workflow
+    workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    wms = simulation->add(new FileReadActionExecutorMultipleAttemptsSuccessTestWMS(this, "Host1"));
+
+    wms->addWorkflow(workflow.get());
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
 
 /**********************************************************************/
 /**  DO FILE_READ ACTION EXECUTOR KILL TEST                          **/
@@ -241,8 +342,8 @@ class FileReadActionExecutorKillTestWMS : public wrench::WMS {
 
 public:
     FileReadActionExecutorKillTestWMS(FileReadActionExecutorTest *test,
-                                   std::string hostname,
-                                   double sleep_before_kill) :
+                                      std::string hostname,
+                                      double sleep_before_kill) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->sleep_before_kill = sleep_before_kill;
@@ -365,8 +466,8 @@ class FileReadActionExecutorFailureTestWMS : public wrench::WMS {
 
 public:
     FileReadActionExecutorFailureTestWMS(FileReadActionExecutorTest *test,
-                                      std::string hostname,
-                                      double sleep_before_fail) :
+                                         std::string hostname,
+                                         double sleep_before_fail) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->sleep_before_fail = sleep_before_fail;
@@ -493,7 +594,7 @@ class FileReadActionExecutorMissingFileTestWMS : public wrench::WMS {
 
 public:
     FileReadActionExecutorMissingFileTestWMS(FileReadActionExecutorTest *test,
-                                         std::string hostname) :
+                                             std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -610,7 +711,7 @@ class FileReadActionExecutorKillingStorageServiceTestWMS : public wrench::WMS {
 
 public:
     FileReadActionExecutorKillingStorageServiceTestWMS(FileReadActionExecutorTest *test,
-                                             std::string hostname) :
+                                                       std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
