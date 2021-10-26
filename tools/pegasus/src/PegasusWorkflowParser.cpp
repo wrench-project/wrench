@@ -23,7 +23,7 @@ WRENCH_LOG_CATEGORY(pegasus_workflow_parser, "Log category for PegasusWorkflowPa
 namespace wrench {
 
     /**
-     * Documention in .h file
+     * Documentation in .h file
      */
     Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename,
                                                             const std::string &reference_flop_rate,
@@ -188,7 +188,7 @@ namespace wrench {
 
 
     /**
-     * Documention in .h file
+     * Documentation in .h file
      */
     Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                       bool redundant_dependencies,
@@ -199,7 +199,7 @@ namespace wrench {
     }
 
     /**
-      * Documention in .h file
+      * Documentation in .h file
       */
     Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
                                                            bool redundant_dependencies,

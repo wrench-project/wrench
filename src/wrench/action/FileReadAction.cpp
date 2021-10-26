@@ -11,6 +11,7 @@
 #include <wrench/action/Action.h>
 #include <wrench/action/FileReadAction.h>
 #include <wrench/workflow/WorkflowFile.h>
+#include <wrench/services/storage/StorageService.h>
 
 #include <utility>
 
@@ -43,6 +44,30 @@ namespace wrench {
      */
     std::shared_ptr<FileLocation> FileReadAction::getFileLocation() const {
         return this->file_location;
+    }
+
+
+    /**
+     * @brief Method to execute the action
+     * @param action_executor: the executor that executes this action
+     * @param num_threads: the number of threads to use
+     * @param ram_footprint: the RAM foorprint to use
+     */
+    void FileReadAction::execute(std::shared_ptr<ActionExecutor> action_executor,
+                                 unsigned long num_threads,
+                                 double ram_footprint) {
+        // Thread overhead
+        Simulation::sleep(this->thread_creation_overhead);
+        // File read
+        StorageService::readFile(this->getFile().get(), this->getFileLocation());
+    }
+
+    /**
+     * @brief Method to terminate the action
+     * @param action_executor: the executor that executes this action
+     */
+    void FileReadAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+        // Nothing to do
     }
 
 }

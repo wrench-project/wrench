@@ -38,14 +38,17 @@ namespace wrench {
         WRENCH_INFO("New compute thread (%.2f flops) on core (%.2f flop/sec)",
                     this->flops,
                     S4U_Simulation::getFlopRate());
-        S4U_Simulation::compute(this->flops);
-        WRENCH_INFO("-----------");
-        if (not this->reply_mailbox.empty()) {
-            try {
-                S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
-            } catch (std::shared_ptr<NetworkError> &e) { WRENCH_INFO(
-                        "Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
+        try {
+            S4U_Simulation::compute(this->flops);
+            if (not this->reply_mailbox.empty()) {
+                try {
+                    S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
+                } catch (std::shared_ptr<NetworkError> &e) {
+                    WRENCH_INFO("Couldn't report on my completion to my parent [ignoring and returning as if everything's ok]");
+                }
             }
+        } catch (ExecutionException &e) {
+            WRENCH_INFO("Interrupted during my computation!");
         }
         WRENCH_INFO("Compute thread finished");
         return 0;

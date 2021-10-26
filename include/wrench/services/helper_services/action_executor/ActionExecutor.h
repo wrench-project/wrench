@@ -33,21 +33,25 @@ namespace wrench {
 
         ActionExecutor(
                 std::string hostname,
+                unsigned long num_cores,
+                double ram_footprint,
                 std::string callback_mailbox,
                 std::shared_ptr<Action> action);
 
-        virtual int main() = 0;
-        virtual void kill(bool job_termination) = 0;
-        void cleanup(bool has_returned_from_main, int return_value) = 0;
+        int main() override;
+        void kill(bool job_termination);
+        void cleanup(bool has_returned_from_main, int return_value) override;
 
         std::shared_ptr<Action> getAction();
 
     protected:
-        void commonCleanup(bool has_returned_from_main, int return_value);
 
         std::shared_ptr<Action> action;
         std::string callback_mailbox;
         bool killed_on_purpose;
+
+        unsigned long num_cores;
+        double ram_footprint;
 
     };
 

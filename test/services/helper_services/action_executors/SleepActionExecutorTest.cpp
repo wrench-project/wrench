@@ -11,7 +11,6 @@
 #include <wrench-dev.h>
 
 #include <wrench/action/SleepAction.h>
-#include <wrench/services/helper_services/action_executor/SleepActionExecutor.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes//HostError.h>
@@ -135,8 +134,8 @@ private:
         // Add a sleep_action
         auto sleep_action = job->addSleepAction("", 10.0);
         // Create a sleep action executor
-        auto sleep_action_executor = std::shared_ptr<wrench::SleepActionExecutor>(
-                new wrench::SleepActionExecutor("Host2", this->mailbox_name, sleep_action));
+        auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, sleep_action));
         // Start it
         sleep_action_executor->simulation = this->simulation;
         sleep_action_executor->start(sleep_action_executor, true, false);
@@ -239,8 +238,8 @@ private:
         // Add a sleep_action
         auto sleep_action = job->addSleepAction("", 10.0);
         // Create a sleep action executor
-        auto sleep_action_executor = std::shared_ptr<wrench::SleepActionExecutor>(
-                new wrench::SleepActionExecutor("Host2", this->mailbox_name, sleep_action));
+        auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, sleep_action));
         // Start it
         sleep_action_executor->simulation = this->simulation;
         sleep_action_executor->start(sleep_action_executor, true, false);
@@ -348,8 +347,8 @@ private:
         // Add a sleep_action
         auto sleep_action = job->addSleepAction("", 10.0);
         // Create a sleep action executor
-        auto sleep_action_executor = std::shared_ptr<wrench::SleepActionExecutor>(
-                new wrench::SleepActionExecutor("Host2", this->mailbox_name, sleep_action));
+        auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, sleep_action));
         // Start it
         sleep_action_executor->simulation = this->simulation;
         sleep_action_executor->start(sleep_action_executor, true, false);

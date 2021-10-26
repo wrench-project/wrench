@@ -92,9 +92,6 @@ set(HEADER_FILES
         include/wrench/services/helper_services/work_unit_executor/WorkunitExecutor.h
         include/wrench/services/helper_services/action_executor/ActionExecutor.h
         include/wrench/services/helper_services/action_executor/ActionExecutorMessage.h
-        include/wrench/services/helper_services/action_executor/SleepActionExecutor.h
-        include/wrench/services/helper_services/action_executor/FileReadActionExecutor.h
-        include/wrench/services/helper_services/action_executor/ComputeActionExecutor.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
@@ -205,9 +202,6 @@ set(SOURCE_FILES
         src/wrench/services/helper_services/work_unit_executor/WorkunitExecutor.cpp
         src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
         src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
-        src/wrench/services/helper_services/action_executor/SleepActionExecutor.cpp
-        src/wrench/services/helper_services/action_executor/FileReadActionExecutor.cpp
-        src/wrench/services/helper_services/action_executor/ComputeActionExecutor.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/metering/EnergyMeterService.cpp

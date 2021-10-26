@@ -613,7 +613,7 @@ namespace wrench {
                 } catch (std::exception &e) {
                     WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
                     this->releaseDaemonLock();
-                    throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure()));
+                    throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("")));
                 }
                 std::shared_ptr <ComputeThread> compute_thread;
                 try {

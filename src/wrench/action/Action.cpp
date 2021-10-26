@@ -7,9 +7,12 @@
  * (at your option) any later version.
  */
 
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench/action/Action.h>
 
 #include <utility>
+
+WRENCH_LOG_CATEGORY(wrench_action, "Log category for  Action");
 
 namespace wrench {
 
@@ -29,6 +32,9 @@ namespace wrench {
         this->state = Action::State::READY;
         this->start_date = -1.0;
         this->end_date = -1.0;
+
+        this->simulate_computation_as_sleep = false;
+        this->thread_creation_overhead = 0.0;
     }
 
     /**
@@ -141,6 +147,22 @@ namespace wrench {
      */
     void Action::setFailureCause(std::shared_ptr<FailureCause> failure_cause) {
         this->failure_cause = failure_cause;
+    }
+
+    /**
+     * @brief Set whether simulation should be simulated as sleep (default = false)
+     * @param simulate_computation_as_sleep: true or false
+     */
+    void Action::setSimulateComputationAsSleep(bool simulate_computation_as_sleep) {
+        this->simulate_computation_as_sleep = simulate_computation_as_sleep;
+    }
+
+    /**
+     * @brief Set the thread creation overhead (default = zero)
+     * @param overhead_in_seconds: overhead in seconds
+     */
+    void Action::setThreadCreationOverhead(double overhead_in_seconds) {
+        this->thread_creation_overhead = overhead_in_seconds;
     }
 
 }
