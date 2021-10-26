@@ -1,38 +1,4 @@
-<hr><h2>/api/terminateSimulation</h2>
-
-<b>Purpose</b>: Terminate the simulation<br><br>
-
-<b>JSON input:</b> {} (empty JSON)<br><br>
-<b>JSON output:</b> <br>
-<table border=1>
-
-<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
-<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
-<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
-
-
-</table><br><hr><h2>/api/startSimulation</h2>
-
-<b>Purpose</b>: Start a new simulation<br><br>
-
-<b>JSON input:</b> <br>
-<table border=1>
-
-<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
-<tr><td style="padding:5px">  "platform_xml"</td><td style="padding:5px"> string</td><td style="padding:5px">XML description of the simulated platform (using the SimGrid DTD) </td></tr>
-<tr><td style="padding:5px">  "controller_hostname"</td><td style="padding:5px"> string</td><td style="padding:5px">Name of the host in the simulated platform that runs the simulation controller </td></tr>
-
-
-</table><br><b>JSON output:</b> <br>
-<table border=1>
-
-<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
-<tr><td style="padding:5px">  "port_number"</td><td style="padding:5px"> int</td><td style="padding:5px">port number to which all subsequent HTTP Post requests should be sent </td></tr>
-<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
-<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
-
-
-</table><br><hr><h2>/api/advanceTime</h2>
+<hr><h2>/api/advanceTime</h2>
 
 <b>Purpose</b>: Advances current simulated time by some number of seconds<br><br>
 
@@ -476,6 +442,40 @@
 
 
 </table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/startSimulation</h2>
+
+<b>Purpose</b>: Start a new simulation<br><br>
+
+<b>JSON input:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "platform_xml"</td><td style="padding:5px"> string</td><td style="padding:5px">XML description of the simulated platform (using the SimGrid DTD) </td></tr>
+<tr><td style="padding:5px">  "controller_hostname"</td><td style="padding:5px"> string</td><td style="padding:5px">Name of the host in the simulated platform that runs the simulation controller </td></tr>
+
+
+</table><br><b>JSON output:</b> <br>
+<table border=1>
+
+<tr><th>name/key</th><th>type</th><th>meaning</th></tr>
+<tr><td style="padding:5px">  "port_number"</td><td style="padding:5px"> int</td><td style="padding:5px">port number to which all subsequent HTTP Post requests should be sent </td></tr>
+<tr><td style="padding:5px">  "wrench_api_request_success"</td><td style="padding:5px"> bool</td><td style="padding:5px">true if success, false if failure </td></tr>
+<tr><td style="padding:5px">  "failure_cause"</td><td style="padding:5px"> string</td><td style="padding:5px">human-readable error message (if failure) </td></tr>
+
+
+</table><br><hr><h2>/api/terminateSimulation</h2>
+
+<b>Purpose</b>: Terminate the simulation<br><br>
+
+<b>JSON input:</b> {} (empty JSON)<br><br>
+<b>JSON output:</b> <br>
 <table border=1>
 
 <tr><th>name/key</th><th>type</th><th>meaning</th></tr>
