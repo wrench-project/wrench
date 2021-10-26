@@ -7,13 +7,18 @@
  * (at your option) any later version.
  */
 
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/action/Action.h>
 #include <wrench/action/FileReadAction.h>
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/exceptions/ExecutionException.h>
 
 #include <utility>
+
+WRENCH_LOG_CATEGORY(wrench_core_file_read_action, "Log category for FileReadAction");
+
 
 namespace wrench {
 
@@ -22,12 +27,12 @@ namespace wrench {
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param job: the job this action belongs to
     * @param file: the file
-    * @param file_location: the location to read the file from
+    * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     */
     FileReadAction::FileReadAction(const std::string& name, std::shared_ptr<CompoundJob> job,
                                 std::shared_ptr<WorkflowFile> file,
-                                std::shared_ptr<FileLocation> file_location) : Action(name, "file_read_", job),
-                                file(std::move(file)), file_location(std::move(file_location)) {
+                                   std::vector<std::shared_ptr<FileLocation>> file_locations) : Action(name, "file_read_", job),
+                                file(std::move(file)), file_locations(std::move(file_locations)) {
     }
 
     /**
@@ -39,11 +44,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the action's file location
-     * @return the file location
+     * @brief Returns the action's file locations
+     * @return A vector of file locations
      */
-    std::shared_ptr<FileLocation> FileReadAction::getFileLocation() const {
-        return this->file_location;
+    std::vector<std::shared_ptr<FileLocation>> FileReadAction::getFileLocations() const {
+        return this->file_locations;
     }
 
 
@@ -51,7 +56,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      * @param num_threads: the number of threads to use
-     * @param ram_footprint: the RAM foorprint to use
+     * @param ram_footprint: the RAM footprint to use
      */
     void FileReadAction::execute(std::shared_ptr<ActionExecutor> action_executor,
                                  unsigned long num_threads,
@@ -59,7 +64,20 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(this->thread_creation_overhead);
         // File read
-        StorageService::readFile(this->getFile().get(), this->getFileLocation());
+        bool success = false;
+        for (int i=0; i < this->file_locations.size(); i++) {
+            try {
+                StorageService::readFile(this->getFile().get(), this->file_locations[i]);
+                success = true;
+                continue;
+            } catch (ExecutionException &e) {
+                if (i == this->file_locations.size() -1) {
+                    throw e;
+                } else {
+                    continue;
+                }
+            }
+        }
     }
 
     /**

@@ -16,9 +16,7 @@
 #include <wrench/action/ComputeAction.h>
 #include <wrench/action/FileReadAction.h>
 
-
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
-
 
 namespace wrench {
 
@@ -116,7 +114,23 @@ namespace wrench {
                                                                 std::shared_ptr<WorkflowFile> file,
                                                                 std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileReadAction>(
-                new FileReadAction(name, this->shared_this, std::move(file), std::move(file_location)));
+                new FileReadAction(name, this->shared_this, std::move(file), {std::move(file_location)}));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
+    /**
+    * @brief Add a file read action to the job
+    * @param name: the action's name (if empty, a unique name will be picked for you)
+    * @param file: the file
+    * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
+    * @return a file read action
+    */
+    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
+                                                                   std::shared_ptr<WorkflowFile> file,
+                                                                   std::vector<std::shared_ptr<FileLocation>> file_locations) {
+        auto new_action = std::shared_ptr<FileReadAction>(
+        new FileReadAction(name, this->shared_this, std::move(file), std::move(file_locations)));
         this->actions.insert(new_action);
         return new_action;
     }
