@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <string>
+#include <set>
 
 namespace wrench {
 
@@ -52,10 +53,8 @@ namespace wrench {
 
     protected:
 
+        friend class CompoundJob;
         friend class ActionExecutor;
-        friend class SleepActionExecutor;
-        friend class ComputeActionExecutor;
-        friend class FileReadActionExecutor;
 
         virtual ~Action() = default;
         Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
@@ -71,6 +70,11 @@ namespace wrench {
 
         bool simulate_computation_as_sleep;
         double thread_creation_overhead;
+
+        std::set<std::shared_ptr<Action>> parents;
+        std::set<std::shared_ptr<Action>> children;
+
+        void updateReadiness();
 
     private:
         std::string name;

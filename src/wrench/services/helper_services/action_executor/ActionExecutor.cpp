@@ -105,6 +105,9 @@ namespace wrench {
         try {
             this->action->execute(this->getSharedPtr<ActionExecutor>(), this->num_cores, this->ram_footprint);
             this->action->setState(Action::State::COMPLETED);
+            for (auto const &child : this->action->children) {
+                child->updateReadiness();
+            }
         } catch (ExecutionException &e) {
             this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
