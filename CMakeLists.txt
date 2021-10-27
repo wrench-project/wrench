@@ -169,6 +169,7 @@ set(HEADER_FILES
         include/wrench/job/CompoundJob.h
         include/wrench/action/Action.h
         include/wrench/action/SleepAction.h
+        include/wrench/action/CustomAction.h
         include/wrench/action/FileReadAction.h
         include/wrench/action/FileWriteAction.h
         include/wrench/action/FileCopyAction.h
@@ -341,6 +342,7 @@ set(SOURCE_FILES
         src/wrench/job/CompoundJob.cpp
         src/wrench/action/Action.cpp
         src/wrench/action/SleepAction.cpp
+        src/wrench/action/CustomAction.cpp
         src/wrench/action/FileReadAction.cpp
         src/wrench/action/FileWriteAction.cpp
         src/wrench/action/FileCopyAction.cpp
@@ -376,9 +378,9 @@ set(TEST_FILES
         test/services/compute_services/bare_metal/BareMetalComputeServiceTestPilotJobs.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/StandardJobExecutorTest.cpp
-        test/services/helper_services/action_executors/SleepActionExecutorTest.cpp
-        test/services/helper_services/action_executors/FileReadActionExecutorTest.cpp
-        test/services/helper_services/action_executors/ComputeActionExecutorTest.cpp
+        test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
+        test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
         test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceResourceInformationTest.cpp
