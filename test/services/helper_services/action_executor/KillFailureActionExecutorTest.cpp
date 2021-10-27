@@ -26,7 +26,7 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(generic_action_executor_test, "Log category for KillFailActionExecutorTest");
+WRENCH_LOG_CATEGORY(kill_fail_action_executor_test, "Log category for KillFailActionExecutorTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 

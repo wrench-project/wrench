@@ -26,7 +26,7 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(generic_action_executor_test, "Log category for ComputeActionExecutorTest");
+WRENCH_LOG_CATEGORY(compute_action_executor_test, "Log category for ComputeActionExecutorTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 
@@ -141,16 +141,12 @@ private:
 
         // Create an action executor
         std::shared_ptr<wrench::Action> action;
-        unsigned long num_cores = 0;
-        double ram = 0;
-        double expected_completion_date = -1;
-        double thread_overhead = 0;
+        unsigned long num_cores = 2;
+        double ram = 200;
 
         action = std::dynamic_pointer_cast<wrench::Action>(job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
-        thread_overhead = 0.1;
-        expected_completion_date = 10.2;
-        num_cores = 2;
-        ram = 200;
+
+        action->setThreadCreationOverhead(0.1);
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2",
