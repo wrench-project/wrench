@@ -378,6 +378,7 @@ set(TEST_FILES
         test/services/compute_services/bare_metal/BareMetalComputeServiceTestPilotJobs.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/StandardJobExecutorTest.cpp
+        test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
         test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
