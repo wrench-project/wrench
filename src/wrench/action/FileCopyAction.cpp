@@ -64,7 +64,6 @@ namespace wrench {
         return this->dst_file_location;
     }
 
-
     /**
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action

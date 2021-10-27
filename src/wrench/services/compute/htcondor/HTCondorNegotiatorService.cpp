@@ -13,7 +13,6 @@
 #include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/workflow/WorkflowTask.h>
 #include <wrench/job/PilotJob.h>
 #include <wrench/job/StandardJob.h>
 #include <wrench/failure_causes/NetworkError.h>

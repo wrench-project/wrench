@@ -163,6 +163,7 @@ namespace wrench {
         /***********************/
 
     private:
+
         SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
