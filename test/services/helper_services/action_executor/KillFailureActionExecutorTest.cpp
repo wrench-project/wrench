@@ -35,6 +35,7 @@ class KillFailActionExecutorTest : public ::testing::Test {
 public:
     wrench::Simulation *simulation;
     wrench::WorkflowFile *file;
+    wrench::WorkflowFile *file_to_write;
     std::shared_ptr<wrench::StorageService> ss;
 
     void loopThroughTestCases(std::vector<double> points_of_interest, bool kill, std::string action_type) {
@@ -187,6 +188,12 @@ private:
             expected_completion_date = 10.84743174020618639020;
             num_cores = 0;
             ram = 0.0;
+        } else if (this->action_type == "file_write") {
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file_to_write),wrench::FileLocation::LOCATION(this->test->ss)));
+            thread_overhead = 0.1;
+            expected_completion_date = 10.84743174020618639020;
+            num_cores = 0;
+            ram = 0.0;
         }
 
         action->setThreadCreationOverhead(thread_overhead);
@@ -255,6 +262,15 @@ TEST_F(KillFailActionExecutorTest, FailFileRead) {
     loopThroughTestCases({0.0, 0.1, 10.14743174020618639020}, false, "file_read");
 }
 
+
+TEST_F(KillFailActionExecutorTest, KillFileWrite) {
+    loopThroughTestCases({0.0, 0.1, 10.14743174020618639020}, true, "file_write");
+}
+
+TEST_F(KillFailActionExecutorTest, FailFileWrite) {
+    loopThroughTestCases({0.0, 0.1, 10.14743174020618639020}, false, "file_write");
+}
+
 void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep_time, bool kill, std::string action_type) {
 
     // Create and initialize a simulation
@@ -275,10 +291,12 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
-    // Create a file
+    // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);
-
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a file to write
+    this->file_to_write = this->workflow->addFile("some_file_to_write", 1000000.0);
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
