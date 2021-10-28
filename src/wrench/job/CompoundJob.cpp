@@ -18,6 +18,8 @@
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
 #include <wrench/action/FileDeleteAction.h>
+#include <wrench/action/FileRegistryAddEntryAction.h>
+#include <wrench/action/FileRegistryDeleteEntryAction.h>
 #include <wrench/action/CustomAction.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
@@ -115,10 +117,10 @@ namespace wrench {
      * @return a file read action
      */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
-                                                                   std::shared_ptr<WorkflowFile> file,
+                                                                   WorkflowFile *file,
                                                                    std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileReadAction>(
-                new FileReadAction(name, this->shared_this, std::move(file), {std::move(file_location)}));
+                new FileReadAction(name, this->shared_this, file, {std::move(file_location)}));
         this->actions.insert(new_action);
         return new_action;
     }
@@ -131,10 +133,10 @@ namespace wrench {
     * @return a file read action
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
-                                                                   std::shared_ptr<WorkflowFile> file,
+                                                                   WorkflowFile *file,
                                                                    std::vector<std::shared_ptr<FileLocation>> file_locations) {
         auto new_action = std::shared_ptr<FileReadAction>(
-                new FileReadAction(name, this->shared_this, std::move(file), std::move(file_locations)));
+                new FileReadAction(name, this->shared_this, file, std::move(file_locations)));
         this->actions.insert(new_action);
         return new_action;
     }
@@ -147,10 +149,10 @@ namespace wrench {
     * @return a file write action
     */
     std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(std::string name,
-                                                                   std::shared_ptr<WorkflowFile> file,
+                                                                   WorkflowFile *file,
                                                                    std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileWriteAction>(
-                new FileWriteAction(name, this->shared_this, std::move(file), {std::move(file_location)}));
+                new FileWriteAction(name, this->shared_this, file, {std::move(file_location)}));
         this->actions.insert(new_action);
         return new_action;
     }
@@ -164,11 +166,11 @@ namespace wrench {
     * @return a file copy action
     */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(std::string name,
-                                                                     std::shared_ptr<WorkflowFile> file,
+                                                                     WorkflowFile *file,
                                                                      std::shared_ptr<FileLocation> src_file_location,
                                                                      std::shared_ptr<FileLocation> dst_file_location) {
         auto new_action = std::shared_ptr<FileCopyAction>(
-                new FileCopyAction(name, this->shared_this, std::move(file), std::move(src_file_location), std::move(dst_file_location)));
+                new FileCopyAction(name, this->shared_this, file, std::move(src_file_location), std::move(dst_file_location)));
         this->actions.insert(new_action);
         return new_action;
     }
@@ -181,10 +183,44 @@ namespace wrench {
     * @return a file delete action
     */
     std::shared_ptr<FileDeleteAction>
-    CompoundJob::addFileDeleteAction(std::string name, std::shared_ptr<WorkflowFile> file,
+    CompoundJob::addFileDeleteAction(std::string name, WorkflowFile *file,
                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
-                new FileDeleteAction(name, this->shared_this, std::move(file), std::move(file_location)));
+                new FileDeleteAction(name, this->shared_this, file, std::move(file_location)));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
+    /**
+     * @brief Add a file registry add entry action
+     * @param file_registry: the file registry
+     * @param file: the file
+     * @param file_location: the file location
+     * @return
+     */
+    std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
+            std::shared_ptr<FileRegistryService> file_registry,
+            WorkflowFile *file,
+            std::shared_ptr<FileLocation> file_location) {
+        auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
+                new FileRegistryAddEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
+    /**
+     * @brief Add a file registry add entry action
+     * @param file_registry: the file registry
+     * @param file: the file
+     * @param file_location: the file location
+     * @return
+     */
+    std::shared_ptr<FileRegistryDeleteEntryAction> CompoundJob::addFileRegistryDeleteEntryAction(
+            std::shared_ptr<FileRegistryService> file_registry,
+            WorkflowFile *file,
+            std::shared_ptr<FileLocation> file_location) {
+        auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
+                new FileRegistryDeleteEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
         this->actions.insert(new_action);
         return new_action;
     }
@@ -197,11 +233,8 @@ namespace wrench {
     * @return a custom action
     */
     std::shared_ptr<CustomAction> CompoundJob::addCustomAction(std::string name,
-                                                               const std::function<void(std::shared_ptr<ActionExecutor>,
-                                                                                   unsigned long,
-                                                                                   double)> &lambda_execute,
-                                                               const std::function<void(
-                                                                       std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
+                                                               const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
+                                                               const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
         auto new_action = std::shared_ptr<CustomAction>(
                 new CustomAction(name, this->shared_this, lambda_execute, lambda_terminate));
         this->actions.insert(new_action);
@@ -214,7 +247,7 @@ namespace wrench {
      * @param parent: the parent action
      * @param child: the child action
      */
-    void CompoundJob::addDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child) {
+    void CompoundJob::addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child) {
         if ((parent == nullptr) or (child == nullptr)) {
             throw std::invalid_argument("CompoundJob::addDependency(): arguments cannot be nullptr");
         }
@@ -227,24 +260,55 @@ namespace wrench {
     }
 
     /**
-    * @brief Removes a dependency between two actions (does nothing if dependency does not exist)
-    * @param parent: the parent action
-    * @param child: the child action
-    */
-    void CompoundJob::removeDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child) {
-        if ((parent == nullptr) or (child == nullptr)) {
-            throw std::invalid_argument("CompoundJob::removeDependency(): arguments cannot be nullptr");
+     * @brief Add a parent job to this job (be careful not to add circular dependencies, which may lead to deadlocks)
+     * @param parent: the parent job
+     */
+    void CompoundJob::addParentJob(std::shared_ptr<CompoundJob> parent) {
+        if (parent == nullptr) {
+            throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
-        if (parent->getJob() != this->shared_this or child->getJob() != this->shared_this) {
-            throw std::invalid_argument("CompoundJob::removeDependency(): Both actions must belong to this job");
-        }
-        if (child->parents.find(parent) != child->parents.end() and parent->children.find(child) != parent->children.end()) {
-            child->parents.erase(parent);
-            parent->children.erase(child);
-            child->updateReadiness();
-        }
+        this->parents.insert(std::move(parent));
     }
 
+    /**
+     * @brief Add a child job to this job (be careful not to add circular dependencies, which may lead to deadlocks)
+     * @param child: the child job
+     */
+    void CompoundJob::addChildJob(std::shared_ptr<CompoundJob> child) {
+        if (child == nullptr) {
+            throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
+        }
+        this->parents.insert(std::move(child));
+    }
 
+    /**
+     * @brief Get the job's parents
+     * @return the (possibly empty) set of parent jobs
+     */
+    std::set<std::shared_ptr<CompoundJob>> CompoundJob::getParentJobs() {
+        return this->parents;
+    }
+
+    /**
+     * @brief Get the job's children
+     * @return the (possibly empty) set of children jobs
+     */
+    std::set<std::shared_ptr<CompoundJob>> CompoundJob::getChildrenJobs() {
+        return this->children;
+    }
+
+    /**
+     * @brief Get the readiness of the job
+     *
+     * @return true if ready, false otherwise
+     */
+    bool CompoundJob::isReady() {
+        for (auto const &p : this->parents) {
+            if (p->getState() != CompoundJob::State::COMPLETED) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

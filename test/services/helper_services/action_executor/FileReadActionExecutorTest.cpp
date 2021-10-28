@@ -140,7 +140,7 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+        auto file_read_action = job->addFileReadAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
@@ -253,7 +253,7 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+        auto file_read_action = job->addFileReadAction("", this->test->file,
                                                        {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/"),
                                                         wrench::FileLocation::LOCATION(this->test->ss) });
         // Create a file read action executor
@@ -360,7 +360,7 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+        auto file_read_action = job->addFileReadAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
@@ -477,7 +477,7 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_read_action
-        auto file_read_action = job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+        auto file_read_action = job->addFileReadAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(

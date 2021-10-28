@@ -30,6 +30,8 @@ namespace wrench {
     class FileWriteAction;
     class FileCopyAction;
     class FileDeleteAction;
+    class FileRegistryAddEntryAction;
+    class FileRegistryDeleteEntryAction;
     class CustomAction;
     class ActionExecutor;
 
@@ -42,18 +44,17 @@ namespace wrench {
 
         /** @brief Compound job states */
         enum State {
-            /** @brief Not submitted yet */
+            /** @brief Job hasn't been submitted yet **/
             NOT_SUBMITTED,
-            /** @brief Submitted but not running yet */
-            PENDING,
-            /** @brief Running */
-            RUNNING,
-            /** @brief Completed successfully */
+            /** @brief Job has been submitted to a JobManager **/
+            SUBMITTED,
+            /** @brief Job has finished executing and all actions were successfully completed **/
             COMPLETED,
-            /** @brief Failed */
-            FAILED,
-            /** @brief Terminated by submitter */
-            TERMINATED
+            /** @brief Job has finished executing but not all actions were successfully completed.
+             * Actions may have failed, they job may have been terminated/killed, or parent
+             * jobs by have been discontinued.
+             */
+            DISCONTINUED
         };
 
         std::set<std::shared_ptr<Action>> getActions();
@@ -64,25 +65,31 @@ namespace wrench {
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          std::shared_ptr<WorkflowFile> file,
+                                                          WorkflowFile *file,
                                                           std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          std::shared_ptr<WorkflowFile> file,
+                                                          WorkflowFile *file,
                                                           std::vector<std::shared_ptr<FileLocation>> file_locations);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(std::string name,
-                                                            std::shared_ptr<WorkflowFile> file,
+                                                            WorkflowFile *file,
                                                             std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileCopyAction> addFileCopyAction(std::string name,
-                                                            std::shared_ptr<WorkflowFile> file,
+                                                            WorkflowFile *file,
                                                             std::shared_ptr<FileLocation> src_file_location,
                                                             std::shared_ptr<FileLocation> dst_file_location);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(std::string name,
-                                                          std::shared_ptr<WorkflowFile> file,
+                                                          WorkflowFile *file,
                                                           std::shared_ptr<FileLocation> file_location);
+
+        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::shared_ptr<FileRegistryService> file_registry, WorkflowFile *file,
+                                                                                std::shared_ptr<FileLocation> file_location);
+
+        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::shared_ptr<FileRegistryService> file_registry, WorkflowFile *file,
+                                                                                   std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,
                                                         double flops,
@@ -92,11 +99,16 @@ namespace wrench {
                                                         std::shared_ptr<ParallelModel> parallel_model);
 
         std::shared_ptr<CustomAction> addCustomAction(std::string name,
-                                                      const std::function<void (std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint)> &lambda_execute,
+                                                      const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                                                       const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
 
-        void addDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
-        void removeDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
+        void addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child);
+
+        void addParentJob(std::shared_ptr<CompoundJob> parent);
+        void addChildJob(std::shared_ptr<CompoundJob> child);
+
+        std::set<std::shared_ptr<CompoundJob>> getParentJobs();
+        std::set<std::shared_ptr<CompoundJob>> getChildrenJobs();
 
         /***********************/
         /** \endcond           */
@@ -110,14 +122,18 @@ namespace wrench {
 
         friend class JobManager;
 
-        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
-
         CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager);
 
-        std::set<std::shared_ptr<Action>> actions;
+        bool isReady();
 
+        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
+        std::set<std::shared_ptr<Action>> actions;
         State state;
         unsigned long priority;
+
+    private:
+        std::set<std::shared_ptr<CompoundJob>> parents;
+        std::set<std::shared_ptr<CompoundJob>> children;
 
     };
 

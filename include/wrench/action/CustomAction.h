@@ -24,14 +24,14 @@ namespace wrench {
         friend class CompoundJob;
 
         CustomAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                    const std::function<void (std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint)> &lambda_execute,
+                    const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                     const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
+        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
         void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
-        std::function<void (std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint)> lambda_execute;
+        std::function<void (std::shared_ptr<ActionExecutor> action_executor)> lambda_execute;
         std::function<void (std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate;
     };
 }

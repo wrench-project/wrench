@@ -138,7 +138,7 @@ private:
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
         // Add a file_copy_action
-        auto file_copy_action = job->addFileCopyAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+        auto file_copy_action = job->addFileCopyAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss1),
                                                        wrench::FileLocation::LOCATION(this->test->ss2));
         // Create a file copy action executor
