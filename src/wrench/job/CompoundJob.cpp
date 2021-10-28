@@ -18,6 +18,7 @@
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
 #include <wrench/action/FileDeleteAction.h>
+#include <wrench/action/CustomAction.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
 
@@ -187,6 +188,26 @@ namespace wrench {
         this->actions.insert(new_action);
         return new_action;
     }
+
+    /**
+    * @brief Add a custom action to the job
+    * @param name: the action's name (if empty, a unique name will be picked for you)
+    * @param lambda_execute: the action execution function
+    * @param lambda_terminate: the action termination function
+    * @return a custom action
+    */
+    std::shared_ptr<CustomAction> CompoundJob::addCustomAction(std::string name,
+                                                               const std::function<void(std::shared_ptr<ActionExecutor>,
+                                                                                   unsigned long,
+                                                                                   double)> &lambda_execute,
+                                                               const std::function<void(
+                                                                       std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
+        auto new_action = std::shared_ptr<CustomAction>(
+                new CustomAction(name, this->shared_this, lambda_execute, lambda_terminate));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
 
     /**
      * @brief Add a dependency between two actions (does nothing if dependency already exists)

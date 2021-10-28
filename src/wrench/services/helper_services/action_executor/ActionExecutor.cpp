@@ -136,9 +136,9 @@ namespace wrench {
     void ActionExecutor::kill(bool job_termination) {
         this->killed_on_purpose = job_termination;
         this->acquireDaemonLock();
-        bool killed = this->killActor();
+        bool i_killed_it = this->killActor();
         this->releaseDaemonLock();
-        if (killed) {
+        if (i_killed_it) {
             this->action->terminate(this->getSharedPtr<ActionExecutor>());
         }
     }

@@ -17,7 +17,7 @@
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
 #include <wrench/action/FileDeleteAction.h>
-#include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
+#include <wrench/action/CustomAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes/HostError.h>
@@ -208,7 +208,20 @@ private:
             expected_completion_date = 0.12242927216494845083;
             num_cores = 0;
             ram = 0.0;
+        } else if (this->action_type == "custom") {
+            auto storage_service = this->test->ss1;
+            auto file = this->test->file;
+            auto lambda_execute = [storage_service, file](std::shared_ptr<wrench::ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint) { storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service)); wrench::Simulation::sleep(10.0); };
+            auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) { std::cerr << "TERMINATE\n";};
+
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", lambda_execute, lambda_terminate));
+            action->setThreadCreationOverhead(0.0);
+            thread_overhead = 0.0;
+            expected_completion_date = 20.84743174020618639020;
+            num_cores = 0;
+            ram = 0.0;
         } else {
+
             throw std::runtime_error("Unknown action type");
         }
 
@@ -303,6 +316,14 @@ loopThroughTestCases({0.0, 0.02242927216494845083}, true, "file_delete");
 
 TEST_F(KillFailActionExecutorTest, FailFileDelete) {
     loopThroughTestCases({0.0, 0.02242927216494845083}, false, "file_delete");
+}
+
+TEST_F(KillFailActionExecutorTest, KillCustom) {
+    loopThroughTestCases({0.0, 20.84743174020618639020}, true, "custom");
+}
+
+TEST_F(KillFailActionExecutorTest, FailCustom) {
+    loopThroughTestCases({0.0, 20.84743174020618639020}, false, "custom");
 }
 
 
