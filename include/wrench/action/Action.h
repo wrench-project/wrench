@@ -59,7 +59,7 @@ namespace wrench {
         virtual ~Action() = default;
         Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
 
-        virtual void execute(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint) = 0;
+        virtual void execute(std::shared_ptr<ActionExecutor> action_executor) = 0;
         virtual void terminate(std::shared_ptr<ActionExecutor> action_executor) = 0;
 
 

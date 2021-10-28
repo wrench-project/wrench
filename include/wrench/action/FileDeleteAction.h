@@ -22,21 +22,21 @@ namespace wrench {
     class FileDeleteAction : public Action {
 
     public:
-        std::shared_ptr<WorkflowFile> getFile() const;
+        WorkflowFile *getFile() const;
         std::shared_ptr<FileLocation> getFileLocation() const;
 
     protected:
         friend class CompoundJob;
 
         FileDeleteAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                std::shared_ptr<WorkflowFile> file, std::shared_ptr<FileLocation> file_location);
+                                WorkflowFile *file, std::shared_ptr<FileLocation> file_location);
 
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
+        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
         void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
-        std::shared_ptr<WorkflowFile> file;
+        WorkflowFile *file;
         std::shared_ptr<FileLocation> file_location;
 
     };

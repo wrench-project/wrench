@@ -174,6 +174,9 @@ set(HEADER_FILES
         include/wrench/action/FileWriteAction.h
         include/wrench/action/FileCopyAction.h
         include/wrench/action/FileDeleteAction.h
+        include/wrench/action/FileRegistryAction.h
+        include/wrench/action/FileRegistryAddEntryAction.h
+        include/wrench/action/FileRegistryDeleteEntryAction.h
         include/wrench/action/ComputeAction.h
         include/wrench/job/Job.h
         include/wrench/workflow/DagOfTasks.h
@@ -347,6 +350,7 @@ set(SOURCE_FILES
         src/wrench/action/FileWriteAction.cpp
         src/wrench/action/FileCopyAction.cpp
         src/wrench/action/FileDeleteAction.cpp
+        src/wrench/action/FileRegistryAction.cpp
         src/wrench/action/ComputeAction.cpp
         src/wrench/job/Job.cpp
         )
