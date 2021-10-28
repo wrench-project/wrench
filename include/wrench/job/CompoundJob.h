@@ -30,6 +30,8 @@ namespace wrench {
     class FileWriteAction;
     class FileCopyAction;
     class FileDeleteAction;
+    class CustomAction;
+    class ActionExecutor;
 
     /**
      * @brief A compound job
@@ -88,6 +90,10 @@ namespace wrench {
                                                         int min_num_cores,
                                                         int max_num_cores,
                                                         std::shared_ptr<ParallelModel> parallel_model);
+
+        std::shared_ptr<CustomAction> addCustomAction(std::string name,
+                                                      const std::function<void (std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint)> &lambda_execute,
+                                                      const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
 
         void addDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
         void removeDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
