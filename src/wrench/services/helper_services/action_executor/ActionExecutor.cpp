@@ -104,6 +104,7 @@ namespace wrench {
         this->action->setState(Action::State::STARTED);
         try {
             this->action->execute(this->getSharedPtr<ActionExecutor>(), this->num_cores, this->ram_footprint);
+
             this->action->setState(Action::State::COMPLETED);
             for (auto const &child : this->action->children) {
                 child->updateReadiness();
@@ -135,8 +136,10 @@ namespace wrench {
     void ActionExecutor::kill(bool job_termination) {
         this->killed_on_purpose = job_termination;
         this->acquireDaemonLock();
-        this->killActor();
+        bool killed = this->killActor();
         this->releaseDaemonLock();
-        this->action->terminate(this->getSharedPtr<ActionExecutor>());
+        if (killed) {
+            this->action->terminate(this->getSharedPtr<ActionExecutor>());
+        }
     }
 }
