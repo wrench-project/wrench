@@ -16,6 +16,7 @@
 #include <wrench/action/FileReadAction.h>
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
+#include <wrench/action/FileDeleteAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/job/CompoundJob.h>
@@ -201,6 +202,14 @@ private:
             expected_completion_date = 10.97973091237113507646;
             num_cores = 0;
             ram = 0.0;
+        } else if (this->action_type == "file_delete") {
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileDeleteAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),wrench::FileLocation::LOCATION(this->test->ss1)));
+            thread_overhead = 0.1;
+            expected_completion_date = 0.12242927216494845083;
+            num_cores = 0;
+            ram = 0.0;
+        } else {
+            throw std::runtime_error("Unknown action type");
         }
 
         action->setThreadCreationOverhead(thread_overhead);
@@ -233,7 +242,7 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
-        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
+//        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
         // Is the state and end date sensible?
         if ((this->sleep_time + EPSILON < expected_completion_date and
              ((this->kill and action->getState() != wrench::Action::State::KILLED) or
@@ -287,6 +296,15 @@ TEST_F(KillFailActionExecutorTest, KillFileCopy) {
 TEST_F(KillFailActionExecutorTest, FailFileCopy) {
     loopThroughTestCases({0.0, 0.1, 10.87973091237113543173}, false, "file_copy");
 }
+
+TEST_F(KillFailActionExecutorTest, KillFileDelete) {
+loopThroughTestCases({0.0, 0.02242927216494845083}, true, "file_delete");
+}
+
+TEST_F(KillFailActionExecutorTest, FailFileDelete) {
+    loopThroughTestCases({0.0, 0.02242927216494845083}, false, "file_delete");
+}
+
 
 void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep_time, bool kill, std::string action_type) {
 

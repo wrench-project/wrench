@@ -118,7 +118,7 @@ namespace wrench {
         friend class S4U_DaemonActor;
         void runMainMethod();
 
-        void killActor();
+        bool killActor();
 
 
 

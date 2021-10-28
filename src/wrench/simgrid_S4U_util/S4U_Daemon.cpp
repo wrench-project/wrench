@@ -259,9 +259,10 @@ namespace wrench {
 /**
  * @brief Kill the daemon/actor (does nothing if already dead)
  *
+ * @return true if actor was killed, false if not (e.g., daemon was already dead)
  * @throw std::shared_ptr<FatalFailure>
  */
-    void S4U_Daemon::killActor() {
+    bool S4U_Daemon::killActor() {
 
         // Do the kill only if valid actor and not already done
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
@@ -271,6 +272,8 @@ namespace wrench {
                 throw std::runtime_error("simgrid::s4u::Actor::kill() failed... this shouldn't have happened");
             }
             this->has_returned_from_main = true;
+        } else {
+            return false;
         }
     }
 

@@ -33,8 +33,6 @@ public:
 
     void do_FileReadActionExecutorSuccessTest_test();
     void do_FileReadActionExecutorMultipleAttemptsSuccessTest_test();
-    void do_FileReadActionExecutorKillTest_test(double sleep_before_kill);
-    void do_FileReadActionExecutorFailureTest_test(double sleep_before_fail);
     void do_FileReadActionExecutorMissingFileTest_test();
     void do_FileReadActionExecutorKillingStorageServiceTest_test();
 
