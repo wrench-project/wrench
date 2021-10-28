@@ -15,6 +15,8 @@
 #include <wrench/action/SleepAction.h>
 #include <wrench/action/ComputeAction.h>
 #include <wrench/action/FileReadAction.h>
+#include <wrench/action/FileWriteAction.h>
+#include <wrench/action/FileCopyAction.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
 
@@ -131,6 +133,40 @@ namespace wrench {
                                                                    std::vector<std::shared_ptr<FileLocation>> file_locations) {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, std::move(file), std::move(file_locations)));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
+    /**
+    * @brief Add a file write action to the job
+    * @param name: the action's name (if empty, a unique name will be picked for you)
+    * @param file: the file
+    * @param file_location: the file's location where it should be written
+    * @return a file write action
+    */
+    std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(std::string name,
+                                                                   std::shared_ptr<WorkflowFile> file,
+                                                                   std::shared_ptr<FileLocation> file_location) {
+        auto new_action = std::shared_ptr<FileWriteAction>(
+                new FileWriteAction(name, this->shared_this, std::move(file), {std::move(file_location)}));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
+    /**
+    * @brief Add a file copy action to the job
+    * @param name: the action's name (if empty, a unique name will be picked for you)
+    * @param file: the file
+    * @param src_file_location: the file's location where it should be read
+    * @param dst_file_location: the file's location where it should be written
+    * @return a file copy action
+    */
+    std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(std::string name,
+                                                                     std::shared_ptr<WorkflowFile> file,
+                                                                     std::shared_ptr<FileLocation> src_file_location,
+                                                                     std::shared_ptr<FileLocation> dst_file_location) {
+        auto new_action = std::shared_ptr<FileCopyAction>(
+                new FileCopyAction(name, this->shared_this, std::move(file), std::move(src_file_location), std::move(dst_file_location)));
         this->actions.insert(new_action);
         return new_action;
     }
