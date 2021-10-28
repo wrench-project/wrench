@@ -30,7 +30,7 @@ namespace wrench {
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     */
     FileReadAction::FileReadAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                std::shared_ptr<WorkflowFile> file,
+                                WorkflowFile *file,
                                    std::vector<std::shared_ptr<FileLocation>> file_locations) : Action(name, "file_read_", job),
                                 file(std::move(file)), file_locations(std::move(file_locations)) {
     }
@@ -39,7 +39,7 @@ namespace wrench {
      * @brief Returns the action's file
      * @return the file
      */
-    std::shared_ptr<WorkflowFile> FileReadAction::getFile() const {
+    WorkflowFile *FileReadAction::getFile() const {
         return this->file;
     }
 
@@ -55,19 +55,15 @@ namespace wrench {
     /**
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
-     * @param num_threads: the number of threads to use
-     * @param ram_footprint: the RAM footprint to use
      */
-    void FileReadAction::execute(std::shared_ptr<ActionExecutor> action_executor,
-                                 unsigned long num_threads,
-                                 double ram_footprint) {
+    void FileReadAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread overhead
         Simulation::sleep(this->thread_creation_overhead);
         // File read
         bool success = false;
         for (int i=0; i < this->file_locations.size(); i++) {
             try {
-                StorageService::readFile(this->getFile().get(), this->file_locations[i]);
+                StorageService::readFile(this->getFile(), this->file_locations[i]);
                 success = true;
                 continue;
             } catch (ExecutionException &e) {

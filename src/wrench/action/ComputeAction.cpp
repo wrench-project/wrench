@@ -92,11 +92,10 @@ namespace wrench {
     /**
      * @brief Method to execute the task
      * @param action_executor: the executor that executes this action
-     * @param num_threads: number of threads to use
-     * @param ram_footprint: ram footprint to use
      */
-    void ComputeAction::execute(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double ram_footprint) {
-        if ((num_threads < this->min_num_cores) || (num_threads > this->max_num_cores) || (ram_footprint < this->ram)) {
+    void ComputeAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+        auto num_threads = action_executor->getNumCores();
+        if ((num_threads < this->min_num_cores) || (num_threads > this->max_num_cores) || (action_executor->getRAM() < this->ram)) {
             throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("Invalid resource specs for Action Executor")));
         }
 

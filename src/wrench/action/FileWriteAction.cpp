@@ -30,7 +30,7 @@ namespace wrench {
     * @param file_location: the location where the file should be written
     */
     FileWriteAction::FileWriteAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                     std::shared_ptr<WorkflowFile> file,
+                                     WorkflowFile *file,
                                      std::shared_ptr<FileLocation> file_location) :
             Action(name, "file_write_", job),
             file(std::move(file)), file_location(std::move(file_location)) {
@@ -40,7 +40,7 @@ namespace wrench {
      * @brief Returns the action's file
      * @return the file
      */
-    std::shared_ptr<WorkflowFile> FileWriteAction::getFile() const {
+    WorkflowFile *FileWriteAction::getFile() const {
         return this->file;
     }
 
@@ -56,16 +56,12 @@ namespace wrench {
     /**
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
-     * @param num_threads: the number of threads to use
-     * @param ram_footprint: the RAM footprint to use
      */
-    void FileWriteAction::execute(std::shared_ptr<ActionExecutor> action_executor,
-                                 unsigned long num_threads,
-                                 double ram_footprint) {
+    void FileWriteAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread overhead
         Simulation::sleep(this->thread_creation_overhead);
         // File write
-        StorageService::writeFile(this->getFile().get(), this->file_location);
+        StorageService::writeFile(this->getFile(), this->file_location);
     }
 
     /**

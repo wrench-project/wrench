@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_FILE_WRITE_ACTION_H
-#define WRENCH_FILE_WRITE_ACTION_H
+#ifndef WRENCH_FILE_REGISTRY_ACTION_H
+#define WRENCH_FILE_REGISTRY_ACTION_H
 
 #include <string>
 
@@ -18,28 +18,41 @@ namespace wrench {
 
     class WorkflowFile;
     class FileLocation;
+    class FileRegistryService;
 
-    class FileWriteAction : public Action {
+    class FileRegistryAction : public Action {
 
     public:
         WorkflowFile *getFile() const;
         std::shared_ptr<FileLocation> getFileLocation() const;
+        std::shared_ptr<FileRegistryService> getFileRegistryService() const;
 
     protected:
         friend class CompoundJob;
 
-        FileWriteAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                WorkflowFile *file, std::shared_ptr<FileLocation> file_location);
+        enum Type {
+            ADD,
+            DELETE
+        };
+
+        FileRegistryAction(FileRegistryAction::Type type,
+                           const std::string& name,
+                           std::shared_ptr<CompoundJob> job,
+                           std::shared_ptr<FileRegistryService> file_registry_service,
+                           WorkflowFile *file,
+                           std::shared_ptr<FileLocation> file_location);
 
 
         void execute(std::shared_ptr<ActionExecutor> action_executor) override;
         void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
+        FileRegistryAction::Type type;
+        std::shared_ptr<FileRegistryService> file_registry_service;
         WorkflowFile *file;
         std::shared_ptr<FileLocation> file_location;
 
     };
 }
 
-#endif //WRENCH_FILE_WRITE_ACTION_H
+#endif //WRENCH_FILE_REGISTRY_ACTION_H
