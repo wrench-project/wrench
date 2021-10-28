@@ -3250,11 +3250,11 @@ inline std::string message_digest(const std::string &s, Init init,
   update(&ctx, s.data(), s.size());
   final(md.data(), &ctx);
 
-  stringstream ss;
+  stringstream ss1;
   for (auto c : md) {
-    ss << setfill('0') << setw(2) << hex << (unsigned int)c;
+    ss1 << setfill('0') << setw(2) << hex << (unsigned int)c;
   }
-  return ss.str();
+  return ss1.str();
 }
 
 inline std::string MD5(const std::string &s) {
@@ -3356,9 +3356,9 @@ inline std::pair<std::string, std::string> make_digest_authentication_header(
 
   string nc;
   {
-    stringstream ss;
-    ss << setfill('0') << setw(8) << hex << cnonce_count;
-    nc = ss.str();
+    stringstream ss1;
+    ss1 << setfill('0') << setw(8) << hex << cnonce_count;
+    nc = ss1.str();
   }
 
   auto qop = auth.at("qop");

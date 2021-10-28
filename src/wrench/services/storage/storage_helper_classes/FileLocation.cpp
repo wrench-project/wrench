@@ -109,7 +109,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Give a <ss name>:<mount point>:<dir>" string for the location
+     * @brief Give a <ss1 name>:<mount point>:<dir>" string for the location
      *
      * @return A string
      */
