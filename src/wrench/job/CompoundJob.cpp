@@ -17,6 +17,7 @@
 #include <wrench/action/FileReadAction.h>
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
+#include <wrench/action/FileDeleteAction.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
 
@@ -172,6 +173,22 @@ namespace wrench {
     }
 
     /**
+    * @brief Add a file delete action to the job
+    * @param name: the action's name (if empty, a unique name will be picked for you)
+    * @param file: the file
+    * @param file_location: the location from which to delete the file
+    * @return a file delete action
+    */
+    std::shared_ptr<FileDeleteAction>
+    CompoundJob::addFileDeleteAction(std::string name, std::shared_ptr<WorkflowFile> file,
+                                     std::shared_ptr<FileLocation> file_location) {
+        auto new_action = std::shared_ptr<FileDeleteAction>(
+                new FileDeleteAction(name, this->shared_this, std::move(file), std::move(file_location)));
+        this->actions.insert(new_action);
+        return new_action;
+    }
+
+    /**
      * @brief Add a dependency between two actions (does nothing if dependency already exists)
      * @param parent: the parent action
      * @param child: the child action
@@ -206,5 +223,7 @@ namespace wrench {
             child->updateReadiness();
         }
     }
+
+
 
 }

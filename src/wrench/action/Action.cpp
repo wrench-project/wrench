@@ -122,7 +122,6 @@ namespace wrench {
      * @param date: the date
      */
     void Action::setEndDate(double date) {
-        WRENCH_INFO("DATE %.20lf", date);
         this->end_date = date;
     }
 

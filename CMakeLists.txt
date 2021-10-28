@@ -381,6 +381,7 @@ set(TEST_FILES
         test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
         test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp

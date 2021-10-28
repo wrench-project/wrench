@@ -29,6 +29,7 @@ namespace wrench {
     class FileReadAction;
     class FileWriteAction;
     class FileCopyAction;
+    class FileDeleteAction;
 
     /**
      * @brief A compound job
@@ -76,6 +77,10 @@ namespace wrench {
                                                             std::shared_ptr<WorkflowFile> file,
                                                             std::shared_ptr<FileLocation> src_file_location,
                                                             std::shared_ptr<FileLocation> dst_file_location);
+
+        std::shared_ptr<FileDeleteAction> addFileDeleteAction(std::string name,
+                                                          std::shared_ptr<WorkflowFile> file,
+                                                          std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,
                                                         double flops,

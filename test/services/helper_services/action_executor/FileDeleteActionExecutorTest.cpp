@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include <wrench/action/FileCopyAction.h>
+#include <wrench/action/FileDeleteAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/job/CompoundJob.h>
@@ -21,20 +21,20 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(file_copy_action_executor_test, "Log category for FileCopyActionExecutorTest");
+WRENCH_LOG_CATEGORY(file_delete_action_executor_test, "Log category for FileDeleteActionExecutorTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 
-class FileCopyActionExecutorTest : public ::testing::Test {
+class FileDeleteActionExecutorTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
 
-    void do_FileCopyActionExecutorSuccessTest_test();
+    void do_FileDeleteActionExecutorSuccessTest_test();
 
 
 protected:
-    FileCopyActionExecutorTest() {
+    FileDeleteActionExecutorTest() {
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -43,7 +43,7 @@ protected:
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100GB\"/>"
@@ -88,8 +88,7 @@ protected:
                           "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"2\"/> </route>"
-                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
@@ -107,8 +106,7 @@ protected:
 
 public:
     wrench::WorkflowFile *file;
-    std::shared_ptr<wrench::StorageService> ss1;
-    std::shared_ptr<wrench::StorageService> ss2;
+    std::shared_ptr<wrench::StorageService> ss;
 
 };
 
@@ -117,10 +115,10 @@ public:
 /**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
 
-class FileCopyActionExecutorSuccessTestWMS : public wrench::WMS {
+class FileDeleteActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
-    FileCopyActionExecutorSuccessTestWMS(FileCopyActionExecutorTest *test,
+    FileDeleteActionExecutorSuccessTestWMS(FileDeleteActionExecutorTest *test,
                                          std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -128,7 +126,7 @@ public:
 
 private:
 
-    FileCopyActionExecutorTest *test;
+    FileDeleteActionExecutorTest *test;
 
     int main() {
 
@@ -137,16 +135,15 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
-        // Add a file_copy_action
-        auto file_copy_action = job->addFileCopyAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
-                                                       wrench::FileLocation::LOCATION(this->test->ss1),
-                                                       wrench::FileLocation::LOCATION(this->test->ss2));
-        // Create a file copy action executor
-        auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_copy_action));
+        // Add a file_delete_action
+        auto file_delete_action = job->addFileDeleteAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),
+                                                       wrench::FileLocation::LOCATION(this->test->ss));
+        // Create a file read action executor
+        auto file_delete_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_delete_action));
         // Start it
-        file_copy_action_executor->simulation = this->simulation;
-        file_copy_action_executor->start(file_copy_action_executor, true, false);
+        file_delete_action_executor->simulation = this->simulation;
+        file_delete_action_executor->start(file_delete_action_executor, true, false);
 
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -163,37 +160,37 @@ private:
         }
 
         // Is the start-date sensible?
-        if (file_copy_action->getStartDate() < 0.0 or file_copy_action->getStartDate() > EPSILON) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_copy_action->getEndDate()));
+        if (file_delete_action->getStartDate() < 0.0 or file_delete_action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(file_delete_action->getEndDate()));
         }
 
         // Is the end-date sensible?
-        if (file_copy_action->getEndDate() + EPSILON < 10.87973091237113543173 or file_copy_action->getEndDate() > 10.87973091237113543173 + EPSILON) {
-            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_copy_action->getEndDate()));
+        if (file_delete_action->getEndDate() + EPSILON < 0.02242927216494845083 or file_delete_action->getEndDate() > 10.84743174020618639020 + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(file_delete_action->getEndDate()));
         }
 
         // Is the state sensible?
-        if (file_copy_action->getState() != wrench::Action::State::COMPLETED) {
-            throw std::runtime_error("Unexpected action state: " + file_copy_action->getStateAsString());
+        if (file_delete_action->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected action state: " + file_delete_action->getStateAsString());
         }
 
         return 0;
     }
 };
 
-TEST_F(FileCopyActionExecutorTest, SuccessTest) {
-    DO_TEST_WITH_FORK(do_FileCopyActionExecutorSuccessTest_test);
+TEST_F(FileDeleteActionExecutorTest, SuccessTest) {
+    DO_TEST_WITH_FORK(do_FileDeleteActionExecutorSuccessTest_test);
 }
 
 
-void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
+void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -201,23 +198,19 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a Storage Service
-    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
-
-    // Create another Storage Service
-    this->ss2 = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
     workflow = std::make_unique<wrench::Workflow>();
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
-    
-    // Put it on ss1
-    this->ss1->createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    wms = simulation->add(new FileCopyActionExecutorSuccessTestWMS(this, "Host1"));
+    wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, "Host1"));
 
     wms->addWorkflow(workflow.get());
 
