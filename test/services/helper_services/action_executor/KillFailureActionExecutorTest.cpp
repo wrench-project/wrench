@@ -36,7 +36,8 @@ public:
     wrench::Simulation *simulation;
     wrench::WorkflowFile *file;
     wrench::WorkflowFile *file_to_write;
-    std::shared_ptr<wrench::StorageService> ss;
+    std::shared_ptr<wrench::StorageService> ss1;
+    std::shared_ptr<wrench::StorageService> ss2;
 
     void loopThroughTestCases(std::vector<double> points_of_interest, bool kill, std::string action_type) {
         std::vector<double> deltas = {0.000000000, 0.000000001, 0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1};
@@ -64,7 +65,7 @@ protected:
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100GB\"/>"
-                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100GB\"/>"
@@ -107,9 +108,9 @@ protected:
                           "          </disk>"
                           "         <prop id=\"ram\" value=\"1024B\"/> "
                           "       </host>  "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
-                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
@@ -183,15 +184,21 @@ private:
             num_cores = 2;
             ram = 200;
         } else if (this->action_type == "file_read") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),wrench::FileLocation::LOCATION(this->test->ss)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileReadAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),wrench::FileLocation::LOCATION(this->test->ss1)));
             thread_overhead = 0.1;
             expected_completion_date = 10.84743174020618639020;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_write") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file_to_write),wrench::FileLocation::LOCATION(this->test->ss)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file_to_write),wrench::FileLocation::LOCATION(this->test->ss1)));
             thread_overhead = 0.1;
-            expected_completion_date = 10.84743174020618639020;
+            expected_completion_date = 10.85743174020618617703 ;
+            num_cores = 0;
+            ram = 0.0;
+        } else if (this->action_type == "file_copy") {
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileCopyAction("", std::shared_ptr<wrench::WorkflowFile>(this->test->file),wrench::FileLocation::LOCATION(this->test->ss1), wrench::FileLocation::LOCATION(this->test->ss2)));
+            thread_overhead = 0.1;
+            expected_completion_date = 10.97973091237113507646;
             num_cores = 0;
             ram = 0.0;
         }
@@ -226,6 +233,7 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
+        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
         // Is the state and end date sensible?
         if ((this->sleep_time + EPSILON < expected_completion_date and
              ((this->kill and action->getState() != wrench::Action::State::KILLED) or
@@ -271,6 +279,15 @@ TEST_F(KillFailActionExecutorTest, FailFileWrite) {
     loopThroughTestCases({0.0, 0.1, 10.14743174020618639020}, false, "file_write");
 }
 
+
+TEST_F(KillFailActionExecutorTest, KillFileCopy) {
+    loopThroughTestCases({0.0, 0.1, 10.87973091237113543173}, true, "file_copy");
+}
+
+TEST_F(KillFailActionExecutorTest, FailFileCopy) {
+    loopThroughTestCases({0.0, 0.1, 10.87973091237113543173}, false, "file_copy");
+}
+
 void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep_time, bool kill, std::string action_type) {
 
     // Create and initialize a simulation
@@ -289,11 +306,13 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     this->workflow = std::make_unique<wrench::Workflow>();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    // Create a Storage Service
+    this->ss2 = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
 
     // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    ss1->createFile(file, wrench::FileLocation::LOCATION(ss1));
 
     // Create a file to write
     this->file_to_write = this->workflow->addFile("some_file_to_write", 1000000.0);

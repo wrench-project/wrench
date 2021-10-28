@@ -27,6 +27,8 @@ namespace wrench {
     class SleepAction;
     class ComputeAction;
     class FileReadAction;
+    class FileWriteAction;
+    class FileCopyAction;
 
     /**
      * @brief A compound job
@@ -38,17 +40,17 @@ namespace wrench {
         /** @brief Compound job states */
         enum State {
             /** @brief Not submitted yet */
-                    NOT_SUBMITTED,
+            NOT_SUBMITTED,
             /** @brief Submitted but not running yet */
-                    PENDING,
+            PENDING,
             /** @brief Running */
-                    RUNNING,
+            RUNNING,
             /** @brief Completed successfully */
-                    COMPLETED,
+            COMPLETED,
             /** @brief Failed */
-                    FAILED,
+            FAILED,
             /** @brief Terminated by submitter */
-                    TERMINATED
+            TERMINATED
         };
 
         std::set<std::shared_ptr<Action>> getActions();
@@ -59,19 +61,28 @@ namespace wrench {
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                       std::shared_ptr<WorkflowFile> file,
-                                                       std::shared_ptr<FileLocation> file_location);
+                                                          std::shared_ptr<WorkflowFile> file,
+                                                          std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
                                                           std::shared_ptr<WorkflowFile> file,
                                                           std::vector<std::shared_ptr<FileLocation>> file_locations);
 
+        std::shared_ptr<FileWriteAction> addFileWriteAction(std::string name,
+                                                            std::shared_ptr<WorkflowFile> file,
+                                                            std::shared_ptr<FileLocation> file_location);
+
+        std::shared_ptr<FileCopyAction> addFileCopyAction(std::string name,
+                                                            std::shared_ptr<WorkflowFile> file,
+                                                            std::shared_ptr<FileLocation> src_file_location,
+                                                            std::shared_ptr<FileLocation> dst_file_location);
+
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,
-                                                      double flops,
-                                                      double ram,
-                                                      int min_num_cores,
-                                                      int max_num_cores,
-                                                      std::shared_ptr<ParallelModel> parallel_model);
+                                                        double flops,
+                                                        double ram,
+                                                        int min_num_cores,
+                                                        int max_num_cores,
+                                                        std::shared_ptr<ParallelModel> parallel_model);
 
         void addDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
         void removeDependency(std::shared_ptr<Action> parent, std::shared_ptr<Action> child);
