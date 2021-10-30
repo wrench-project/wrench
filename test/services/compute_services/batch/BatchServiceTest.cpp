@@ -2847,7 +2847,7 @@ private:
                                              real_event->failure_cause->toString() + " (expected: JobKilled)");
                 }
                 std::string error_msg = cause->toString();
-                if (cause->getComputeService() != this->test->compute_service) {
+                if (cause->getService() != this->test->compute_service) {
                     std::runtime_error(
                             "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
                 }

@@ -81,6 +81,7 @@ namespace wrench {
      */
     std::shared_ptr<SleepAction> CompoundJob::addSleepAction(std::string name, double sleep_time) {
         auto new_action = std::shared_ptr<SleepAction>(new SleepAction(name, this->shared_this, sleep_time));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -103,6 +104,7 @@ namespace wrench {
                                                                  std::shared_ptr<ParallelModel> parallel_model) {
         auto new_action = std::shared_ptr<ComputeAction>(
                 new ComputeAction(name, this->shared_this, flops, ram, min_num_cores, max_num_cores, parallel_model));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
 
@@ -121,6 +123,7 @@ namespace wrench {
                                                                    std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, file, {std::move(file_location)}));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -137,6 +140,7 @@ namespace wrench {
                                                                    std::vector<std::shared_ptr<FileLocation>> file_locations) {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, file, std::move(file_locations)));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -149,10 +153,11 @@ namespace wrench {
     * @return a file write action
     */
     std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(std::string name,
-                                                                   WorkflowFile *file,
-                                                                   std::shared_ptr<FileLocation> file_location) {
+                                                                     WorkflowFile *file,
+                                                                     std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileWriteAction>(
                 new FileWriteAction(name, this->shared_this, file, {std::move(file_location)}));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -166,11 +171,12 @@ namespace wrench {
     * @return a file copy action
     */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(std::string name,
-                                                                     WorkflowFile *file,
-                                                                     std::shared_ptr<FileLocation> src_file_location,
-                                                                     std::shared_ptr<FileLocation> dst_file_location) {
+                                                                   WorkflowFile *file,
+                                                                   std::shared_ptr<FileLocation> src_file_location,
+                                                                   std::shared_ptr<FileLocation> dst_file_location) {
         auto new_action = std::shared_ptr<FileCopyAction>(
                 new FileCopyAction(name, this->shared_this, file, std::move(src_file_location), std::move(dst_file_location)));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -187,6 +193,7 @@ namespace wrench {
                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, this->shared_this, file, std::move(file_location)));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -204,6 +211,7 @@ namespace wrench {
             std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
                 new FileRegistryAddEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -221,6 +229,7 @@ namespace wrench {
             std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
                 new FileRegistryDeleteEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -237,6 +246,7 @@ namespace wrench {
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
         auto new_action = std::shared_ptr<CustomAction>(
                 new CustomAction(name, this->shared_this, lambda_execute, lambda_terminate));
+        new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -256,7 +266,7 @@ namespace wrench {
         }
         child->parents.insert(parent);
         parent->children.insert(child);
-        child->updateReadiness();
+        child->updateState();
     }
 
     /**
@@ -309,6 +319,33 @@ namespace wrench {
             }
         }
         return true;
+    }
+
+    /**
+     * @brief Set the service-specific args
+     * @param service_specific_args: the args
+     */
+    void CompoundJob::setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args) {
+        this->service_specific_args = std::move(service_specific_args);
+    }
+
+    /**
+     * @brief Get the service-specific args
+     * @return the args
+     */
+    const std::map<std::string, std::string> & CompoundJob::getServiceSpecificArgs() {
+        return this->service_specific_args;
+    }
+
+    /**
+     * @brief Update the internal State-Action map
+     * @param action: the action
+     * @param old_state: the action's old state
+     * @param new_state: the action's new state
+     */
+    void CompoundJob::updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state) {
+        this->state_task_map[old_state].erase(action);
+        this->state_task_map[new_state].insert(action);
     }
 
 }

@@ -23,9 +23,9 @@ namespace wrench {
 
     public:
         double getFlops() const;
-        unsigned long getMinNumCores() const;
-        unsigned long getMaxNumCores() const;
-        double getRAM() const;
+        unsigned long getMinNumCores() const override;
+        unsigned long getMaxNumCores() const override;
+        double getMinRAMFootprint() const override;
         std::shared_ptr<ParallelModel> getParallelModel() const;
 
     protected:
