@@ -137,14 +137,17 @@ private:
 
         // Create an ActionScheduler
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host2"] = std::make_tuple(3, 100.0);
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             DBL_MAX, {}, {}));
 
+        WRENCH_INFO("SARTING SCHEDULER");
         // Start it
         action_scheduler->simulation = this->simulation;
         action_scheduler->start(action_scheduler, true, false);
+        WRENCH_INFO("SCHEDULER STARTED");
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -153,6 +156,7 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         // Submit the action to the action executor
+        WRENCH_INFO("SUBMITTING ACITON");
         action_scheduler->submitAction(action);
 
         // Wait for a message from it
@@ -196,11 +200,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
