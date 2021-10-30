@@ -257,23 +257,18 @@ namespace wrench {
             // Keep track of the master share_ptr reference to this service
             Service::service_shared_ptr_map[this] = this_service;
 
-            WRENCH_INFO("XXXXX1");
-
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
-            WRENCH_INFO("XXXXX2");
 
             // Print some information a out the currently tracked daemons
             WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
                          Service::service_shared_ptr_map.size(), Service::num_terminated_services);
-            WRENCH_INFO("XXXXX3");
 
             if ((Service::service_shared_ptr_map.size() > 5000) or
                 (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
                 Service::cleanupTrackedServices();
                 Service::num_terminated_services = 0;
             }
-            WRENCH_INFO("XXXXX4");
 
         } catch (std::shared_ptr<HostError> &e) {
             throw;
