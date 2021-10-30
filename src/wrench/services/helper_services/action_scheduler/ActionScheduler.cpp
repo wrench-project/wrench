@@ -12,6 +12,7 @@
 #include <wrench/util/PointerUtil.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <utility>
 
 #include <wrench/services/helper_services/action_scheduler/ActionScheduler.h>
 #include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
@@ -289,7 +290,7 @@ namespace wrench {
                         std::to_string(requested_ram) + " are requested");
             }
 
-            this->compute_resources.insert(std::make_pair(hname, std::make_tuple(requested_cores, requested_ram)));
+            this->compute_resources[hname] = std::make_tuple(requested_cores, requested_ram);
         }
 
 
@@ -305,7 +306,7 @@ namespace wrench {
         this->ttl = ttl;
         this->has_ttl = (this->ttl != DBL_MAX);
 
-        this->parent_service = parent_service;
+        this->parent_service = std::move(parent_service);
     }
 
 
@@ -347,6 +348,7 @@ namespace wrench {
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false); // Daemonized, no auto-restart
         }
+
 
         // Set an alarm for my timely death, if necessary
         if (this->has_ttl) {
@@ -481,7 +483,6 @@ namespace wrench {
 
         for (auto const &action : this->ready_actions) {
             std::string picked_host;
-//            std::shared_ptr<StandardJob> job = wu->getJob();
             std::string target_host;
             unsigned long target_num_cores;
             double required_ram;
@@ -505,6 +506,7 @@ namespace wrench {
             target_host = std::get<0>(allocation);
             target_num_cores = std::get<1>(allocation);
 //            }
+
 
             // If we didn't find a host, forget it
             if (target_host.empty()) {
@@ -900,6 +902,8 @@ namespace wrench {
             // At this point the desired num cores in non-zero
             if (not isThereAtLeastOneHostWithResources(desired_num_cores, action->getMinRAMFootprint())) {
                 return false;
+            } else {
+                return true;
             }
         }
 
@@ -912,6 +916,7 @@ namespace wrench {
         }
         unsigned long num_cores_on_desired_host = std::get<0>(this->compute_resources[desired_host]);
         double ram_on_desired_host = std::get<1>(this->compute_resources[desired_host]);
+
         if ((num_cores_on_desired_host < minimum_required_num_cores) or
             (ram_on_desired_host < action->getMinRAMFootprint())) {
             return false;
