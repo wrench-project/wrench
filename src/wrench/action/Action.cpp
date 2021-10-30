@@ -8,6 +8,7 @@
  */
 
 #include <wrench/logging/TerminalOutput.h>
+#include <wrench/job/CompoundJob.h>
 #include <wrench/action/Action.h>
 
 #include <utility>
@@ -97,8 +98,10 @@ namespace wrench {
      * @brief Sets the action's (visible) state
      * @param state: the state
      */
-    void Action::setState(Action::State state) {
-        this->state = state;
+    void Action::setState(Action::State new_state) {
+        auto old_state = this->state;
+        this->job->updateStateActionMap(this->shared_ptr_this, old_state, new_state);
+        this->state = new_state;
     }
 
     /**
@@ -166,21 +169,57 @@ namespace wrench {
     }
 
     /**
-     * @brief Update the action's readiness
+     * @brief Update the action's state
      */
-    void Action::updateReadiness() {
+    void Action::updateState() {
         // Do nothing if task state is neither ready nor not ready
         if (this->state != Action::State::NOT_READY and this->state != Action::State::READY) {
             return;
         }
+        // Ready?
         bool ready = true;
         for (auto const &p : this->parents) {
             if (p->getState() != Action::State::COMPLETED) {
-                this->state = Action::State::NOT_READY;
-                return;
+                ready = false;
             }
         }
-        this->state = Action::State::READY;
+        if (ready) {
+            this->state = Action::State::READY;
+        } else {
+            this->state = Action::State::NOT_READY;
+        }
+    }
+
+    /**
+     * @brief Get the minimum number of cores required to execute the action
+     * @return a number of cores
+     */
+    unsigned long Action::getMinNumCores() const {
+        return 0;
+    }
+
+    /**
+     * @brief Get the maximum number of cores that can be used to execute the action
+     * @return a number of cores
+     */
+    unsigned long Action::getMaxNumCores() const {
+        return ULONG_MAX;
+    }
+
+    /**
+     * @brief Get the minimum required amount of RAM to execute the action
+     * @return a number of bytes
+     */
+    double Action::getMinRAMFootprint() const {
+        return 0.0;
+    }
+
+    /**
+     * @brief Set the shared_ptr to this
+     * @param
+     */
+    void Action::setSharedPtrThis(std::shared_ptr<Action> shared_ptr_this) {
+        this->shared_ptr_this = shared_ptr_this;
     }
 
 }

@@ -1814,7 +1814,7 @@ private:
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right job");
             }
-            if (cause->getComputeService() != test->compute_service) {
+            if (cause->getService() != test->compute_service) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right compute service");
             }
@@ -1929,7 +1929,7 @@ private:
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right job");
             }
-            if (cause->getComputeService() != test->compute_service) {
+            if (cause->getService() != test->compute_service) {
                 throw std::runtime_error(
                         "Got the expected failure, but the failure cause does not point to the right compute service");
             }

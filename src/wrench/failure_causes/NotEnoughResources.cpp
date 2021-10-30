@@ -11,7 +11,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/job/Job.h>
-#include <wrench/services/compute/ComputeService.h>
+#include <wrench/services/Service.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_not_enough_resources, "Log category for NotEnoughResources");
 
@@ -21,11 +21,11 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param job: the job that could not be executed (or nullptr if no job was involved)
-     * @param compute_service: the compute service that didn't have enough cores or ram
+     * @param service: the compute service that didn't have enough cores or ram
      */
-    NotEnoughResources::NotEnoughResources(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service) {
+    NotEnoughResources::NotEnoughResources(std::shared_ptr<Job> job, std::shared_ptr<Service> service) {
         this->job = job;
-        this->compute_service = compute_service;
+        this->service = service;
     }
 
     /**
@@ -40,8 +40,8 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    std::shared_ptr<ComputeService> NotEnoughResources::getComputeService() {
-        return this->compute_service;
+    std::shared_ptr<Service> NotEnoughResources::getService() {
+        return this->service;
     }
 
     /**
@@ -49,8 +49,8 @@ namespace wrench {
      * @return the message
      */
     std::string NotEnoughResources::toString() {
-        std::string text_msg = "Compute service " + this->compute_service->getName() + " on host " +
-                               this->compute_service->getHostname() + " does not have enough compute resources";
+        std::string text_msg = "Compute service " + this->service->getName() + " on host " +
+                               this->service->getHostname() + " does not have enough compute resources";
         if (job) {
             text_msg += " to support job " + job->getName();
         }

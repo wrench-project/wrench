@@ -16,8 +16,8 @@
 #include <wrench/action/FileReadAction.h>
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
-#include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
-#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+#include <wrench/services/helper_services/action_scheduler/ActionScheduler.h>
+#include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes/HostError.h>
 
@@ -26,21 +26,21 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(custom_action_executor_test, "Log category for CustomActionExecutorTest");
+WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionSchedulerTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 
-class CustomActionExecutorTest : public ::testing::Test {
+class ActionSchedulerTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
     wrench::WorkflowFile *file;
     std::shared_ptr<wrench::StorageService> ss;
 
-    void do_CustomActionExecutorSuccessTest_test();
+    void do_ActionSchedulerOneActionSuccessTest_test();
 
 protected:
-    CustomActionExecutorTest() {
+    ActionSchedulerTest() {
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -113,58 +113,47 @@ protected:
 
 
 /**********************************************************************/
-/**  CUSTOM ACTION EXECUTOR SUCCESS TEST                             **/
+/**  ACTION SCHEDULER ONE ACTION SUCCESS TEST                        **/
 /**********************************************************************/
 
 
-class CustomActionExecutorTestWMS : public wrench::WMS {
+class ActionSchedulerOneActionSuccessTestWMS : public wrench::WMS {
 
 public:
-    CustomActionExecutorTestWMS(CustomActionExecutorTest *test,
-                                 std::string hostname) :
+    ActionSchedulerOneActionSuccessTestWMS(ActionSchedulerTest *test,
+                                           std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
-
 private:
 
-    CustomActionExecutorTest *test;
+    ActionSchedulerTest *test;
 
     int main() {
 
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create a compound job
-        auto job = job_manager->createCompoundJob("");
-
-        // Create an action executor
-        std::shared_ptr<wrench::Action> action;
-        unsigned long num_cores = 0;
-        double ram = 0;
-
-        auto storage_service = this->test->ss;
-        auto file = this->test->file;
-        auto lambda_execute = [storage_service, file](const std::shared_ptr<wrench::ActionExecutor>& action_executor) {
-            storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service));
-            wrench::Simulation::sleep(10.0);
-        };
-        auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor>& action_executor) { };
-
-        action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", lambda_execute, lambda_terminate));
-        action->setThreadCreationOverhead(0.0);
-
-        auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2",
-                                           num_cores,
-                                           ram,
-                                           this->mailbox_name,
-                                           action));
+        // Create an ActionScheduler
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
+                new wrench::ActionScheduler("Host2", compute_resources,
+                                            this->getSharedPtr<wrench::Service>(),
+                                            DBL_MAX, {}, {}));
 
         // Start it
-        action_executor->simulation = this->simulation;
-        action_executor->start(action_executor, true, false);
+        action_scheduler->simulation = this->simulation;
+        action_scheduler->start(action_scheduler, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add a sleep action to it
+        auto action = job->addSleepAction("my_sleep", 10.0);
+
+        // Submit the action to the action executor
+        action_scheduler->submitAction(action);
 
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -175,7 +164,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutorDoneMessage>(message);
+        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -186,7 +175,7 @@ private:
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < 20.84743174020618639020 or action->getEndDate() > 20.84743174020618639020 + EPSILON) {
+        if (action->getEndDate() + EPSILON < 10.0 or action->getEndDate() > 10.0 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -199,11 +188,11 @@ private:
     }
 };
 
-TEST_F(CustomActionExecutorTest, Success) {
-    DO_TEST_WITH_FORK(do_CustomActionExecutorSuccessTest_test);
+TEST_F(ActionSchedulerTest, OneActionSuccess) {
+    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionSuccessTest_test);
 }
 
-void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
+void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -231,7 +220,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CustomActionExecutorTestWMS(this, "Host1")));
+            new ActionSchedulerOneActionSuccessTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
