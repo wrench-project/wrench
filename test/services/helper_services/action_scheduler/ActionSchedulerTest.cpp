@@ -143,11 +143,9 @@ private:
                                             this->getSharedPtr<wrench::Service>(),
                                             DBL_MAX, {}, {}));
 
-        WRENCH_INFO("SARTING SCHEDULER");
         // Start it
         action_scheduler->simulation = this->simulation;
         action_scheduler->start(action_scheduler, true, false);
-        WRENCH_INFO("SCHEDULER STARTED");
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");

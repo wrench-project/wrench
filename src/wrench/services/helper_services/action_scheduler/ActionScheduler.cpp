@@ -304,6 +304,8 @@ namespace wrench {
 
         this->ttl = ttl;
         this->has_ttl = (this->ttl != DBL_MAX);
+
+        this->parent_service = parent_service;
     }
 
 
