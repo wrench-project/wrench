@@ -1658,7 +1658,7 @@ private:
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (cause->getComputeService() != vm_cs) {
+        if (cause->getService() != vm_cs) {
             throw std::runtime_error("Failure cause does not point to the correst compute service");
         }
 
@@ -1787,7 +1787,7 @@ private:
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (cause->getComputeService() != vm_cs) {
+        if (cause->getService() != vm_cs) {
             throw std::runtime_error("Failure cause does not point to the correct compute service");
         }
 

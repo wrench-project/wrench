@@ -74,10 +74,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the action's required RAM amount
+     * @brief Returns the action's minimum required memory footprint
      * @return a number of bytes
      */
-    double ComputeAction::getRAM() const {
+    double ComputeAction::getMinRAMFootprint() const {
         return this->ram;
     }
 
@@ -94,8 +94,8 @@ namespace wrench {
      * @param action_executor: the executor that executes this action
      */
     void ComputeAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
-        auto num_threads = action_executor->getNumCores();
-        if ((num_threads < this->min_num_cores) || (num_threads > this->max_num_cores) || (action_executor->getRAM() < this->ram)) {
+        auto num_threads = action_executor->getNumCoresAllocated();
+        if ((num_threads < this->min_num_cores) || (num_threads > this->max_num_cores) || (action_executor->getMemoryAllocated() < this->ram)) {
             throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("Invalid resource specs for Action Executor")));
         }
 

@@ -106,12 +106,12 @@ namespace wrench {
             this->action->execute(this->getSharedPtr<ActionExecutor>());
 
             this->action->setState(Action::State::COMPLETED);
-            for (auto const &child : this->action->children) {
-                child->updateReadiness();
-            }
         } catch (ExecutionException &e) {
             this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
+        }
+        for (auto const &child : this->action->children) {
+            child->updateState();
         }
         this->action->setEndDate(S4U_Simulation::getClock());
 
@@ -148,7 +148,7 @@ namespace wrench {
      * @brief Return the action executor's allocated RAM
      * @return a number of bytes
      */
-    double ActionExecutor::getRAM() {
+    double ActionExecutor::getMemoryAllocated() {
         return this->ram_footprint;
     }
 
@@ -156,7 +156,7 @@ namespace wrench {
      * @brief Return the action executor's allocated nuber of cores
      * @return a number of cores
      */
-    unsigned long ActionExecutor::getNumCores() {
+    unsigned long ActionExecutor::getNumCoresAllocated() {
         return this->num_cores;
     }
 }

@@ -85,6 +85,9 @@ set(HEADER_FILES
         include/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h
         include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.h
         include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.h
+        include/wrench/services/helper_services/action_scheduler/ActionSchedulerProperty.h
+        include/wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h
+        include/wrench/services/helper_services/action_scheduler/ActionScheduler.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h
@@ -200,6 +203,9 @@ set(SOURCE_FILES
         src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
         src/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.cpp
         src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
+        src/wrench/services/helper_services/action_scheduler/ActionScheduler.cpp
+        src/wrench/services/helper_services/action_scheduler/ActionSchedulerProperty.cpp
+        src/wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.cpp
         include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h
         src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.cpp
         src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.cpp
@@ -390,6 +396,7 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
+        test/services/helper_services/action_scheduler/ActionSchedulerTest.cpp
         test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceResourceInformationTest.cpp

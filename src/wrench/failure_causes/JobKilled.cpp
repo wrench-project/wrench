@@ -13,7 +13,7 @@
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/job/Job.h>
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/services/compute/ComputeService.h>
+#include <wrench/services/Service.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_job_killed, "Log category for JobKilled");
 
@@ -22,11 +22,11 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param job: the job that could not be executed
-    * @param compute_service: the compute service that didn't have enough cores
+    * @param service: the compute service that didn't have enough cores
     */
-    JobKilled::JobKilled(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service) {
+    JobKilled::JobKilled(std::shared_ptr<Job> job, std::shared_ptr<Service> service) {
         this->job = job;
-        this->compute_service = compute_service;
+        this->service = service;
     }
 
     /**
@@ -41,8 +41,8 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    std::shared_ptr<ComputeService> JobKilled::getComputeService() {
-        return this->compute_service;
+    std::shared_ptr<Service> JobKilled::getService() {
+        return this->service;
     }
 
     /**
@@ -51,7 +51,7 @@ namespace wrench {
      */
     std::string JobKilled::toString() {
         return "Job " + this->job->getName() + " on service " +
-               this->compute_service->getName() + " was killed (likely the service was stopped/terminated)";
+               this->service->getName() + " was killed (likely the service was stopped/terminated)";
     }
 
 

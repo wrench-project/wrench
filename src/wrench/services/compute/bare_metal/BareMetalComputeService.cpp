@@ -1217,7 +1217,7 @@ namespace wrench {
         }
         if (found_it == nullptr) {
             throw std::runtime_error(
-                    "bare_metal::processWorkunitExecutorCompletion(): Couldn't find workunit executor");
+                    "bare_metal::forgetWorkunitExecutor(): Couldn't find workunit executor");
         }
         this->workunit_executors[job].erase(found_it);
     }

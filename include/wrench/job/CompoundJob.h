@@ -14,6 +14,8 @@
 #include <set>
 #include <vector>
 
+#include <wrench/action/Action.h>
+
 
 #include "Job.h"
 
@@ -30,8 +32,10 @@ namespace wrench {
     class FileWriteAction;
     class FileCopyAction;
     class FileDeleteAction;
+    class FileRegistryService;
     class FileRegistryAddEntryAction;
     class FileRegistryDeleteEntryAction;
+    class ParallelModel;
     class CustomAction;
     class ActionExecutor;
 
@@ -110,6 +114,10 @@ namespace wrench {
         std::set<std::shared_ptr<CompoundJob>> getParentJobs();
         std::set<std::shared_ptr<CompoundJob>> getChildrenJobs();
 
+        void setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args);
+
+        const std::map<std::string, std::string> & getServiceSpecificArgs();
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -121,6 +129,7 @@ namespace wrench {
     protected:
 
         friend class JobManager;
+        friend class Action;
 
         CompoundJob(std::string name, std::shared_ptr<JobManager> job_manager);
 
@@ -131,9 +140,15 @@ namespace wrench {
         State state;
         unsigned long priority;
 
+        void updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state);
+
     private:
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
+
+        std::map<std::string, std::string> service_specific_args;
+
+        std::map<Action::State, std::set<std::shared_ptr<Action>>> state_task_map;
 
     };
 
@@ -144,4 +159,4 @@ namespace wrench {
 
 };
 
-#endif //WRENCH_MULTITASKJOB_H
+#endif //WRENCH_COMPOUNDJOB_H

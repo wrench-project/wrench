@@ -1418,7 +1418,7 @@ private:
                 throw std::runtime_error("Got a job failure event, but an unexpected failure cause: " +
                                          real_event->failure_cause->toString() + " (expected: JobKilled)");
             }
-            if (cause->getComputeService() != this->test->compute_service) {
+            if (cause->getService() != this->test->compute_service) {
                 std::runtime_error(
                         "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
             }
