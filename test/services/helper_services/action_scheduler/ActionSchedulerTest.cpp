@@ -154,7 +154,6 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         // Submit the action to the action executor
-        WRENCH_INFO("SUBMITTING ACITON");
         action_scheduler->submitAction(action);
 
         // Wait for a message from it
