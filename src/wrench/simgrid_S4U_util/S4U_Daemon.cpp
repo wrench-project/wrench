@@ -271,7 +271,10 @@ namespace wrench {
             } catch (simgrid::Exception &e) {
                 throw std::runtime_error("simgrid::s4u::Actor::kill() failed... this shouldn't have happened");
             }
+            // Really not sure why now we're setting this to true... but if we don't some tests fail.
+            // Something to investigate at some point
             this->has_returned_from_main = true;
+            return true;
         } else {
             return false;
         }
