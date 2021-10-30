@@ -162,8 +162,6 @@ namespace wrench {
         this->has_returned_from_main = false;
         this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
-        std::cerr << this->process_name << "\n";
-        std::cerr << simgrid::s4u::Host::by_name(hostname) << "\n";
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
                                                           simgrid::s4u::Host::by_name(hostname),
