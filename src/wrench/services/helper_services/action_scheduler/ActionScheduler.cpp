@@ -292,6 +292,7 @@ namespace wrench {
             this->compute_resources.insert(std::make_pair(hname, std::make_tuple(requested_cores, requested_ram)));
         }
 
+
         // Compute the total number of cores and set initial ram availabilities
         this->total_num_cores = 0;
         for (auto host : this->compute_resources) {
