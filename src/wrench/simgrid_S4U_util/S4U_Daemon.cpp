@@ -152,19 +152,16 @@ namespace wrench {
                     this->getName() + ")");
         }
 
-        WRENCH_INFO("HOSTON");
         // Check that the host is up!
         if (not S4U_Simulation::isHostOn(hostname)) {
             throw std::shared_ptr<HostError>(new HostError(hostname));
         }
-        WRENCH_INFO("HOSTON OK");
 
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
         this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
-        WRENCH_INFO("WTF");
         std::cerr << this->process_name << "\n";
         std::cerr << simgrid::s4u::Host::by_name(hostname) << "\n";
         try {
@@ -175,7 +172,6 @@ namespace wrench {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");
         }
 
-        WRENCH_INFO("WTF");
         // nullptr is returned if the host is off (not the current behavior in SimGrid... just paranoid here)
         if (this->s4u_actor == nullptr) {
             throw std::shared_ptr<HostError>(new HostError(hostname));
