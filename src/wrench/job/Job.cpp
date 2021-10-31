@@ -61,6 +61,7 @@ namespace wrench {
      * @return the next callback mailbox
      */
     std::string Job::getCallbackMailbox() {
+        WRENCH_INFO("===> %ld", this->callback_mailbox_stack.size());
         if (this->callback_mailbox_stack.empty()) {
             return this->workflow->getCallbackMailbox();
         }
