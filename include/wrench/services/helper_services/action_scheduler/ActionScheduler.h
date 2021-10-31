@@ -38,6 +38,7 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values = {
                 {ActionSchedulerProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
+                {ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH,     "false"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {

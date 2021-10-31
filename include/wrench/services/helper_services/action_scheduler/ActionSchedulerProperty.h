@@ -29,6 +29,8 @@ namespace wrench {
         /** @brief Whether the ActionScheduler should terminate if all its hosts are down **/
         DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
+        /** @brief Put back an action in READY state in case its action executor host has crashed  **/
+        DECLARE_PROPERTY_NAME(RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
     };
 
     /***********************/
