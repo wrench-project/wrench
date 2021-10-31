@@ -54,7 +54,6 @@ namespace wrench {
 
         // Clean up state in case of a restart
         for (auto host : this->compute_resources) {
-            this->total_num_cores += std::get<0>(host.second);
             this->ram_availabilities.insert(
                     std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
             this->running_thread_counts.insert(std::make_pair(host.first, 0));
@@ -295,12 +294,9 @@ namespace wrench {
 
 
         // Compute the total number of cores and set initial ram availabilities
-        this->total_num_cores = 0;
-        for (auto host : this->compute_resources) {
-            this->total_num_cores += std::get<0>(host.second);
-            this->ram_availabilities.insert(
-                    std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
-            this->running_thread_counts.insert(std::make_pair(host.first, 0));
+        for (auto const &host : this->compute_resources) {
+            this->ram_availabilities[host.first] = std::get<1>(this->compute_resources[host.first]);
+            this->running_thread_counts[host.first] = 0;
         }
 
         this->ttl = ttl;
@@ -321,8 +317,8 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         // Print some logging
-        WRENCH_INFO("New Action Scheduler started by %s on %ld hosts with a total of %ld cores",
-                    this->parent_service->getName().c_str(), this->compute_resources.size(), this->total_num_cores);
+        WRENCH_INFO("New Action Scheduler started by %s on %ld hosts",
+                    this->parent_service->getName().c_str(), this->compute_resources.size());
         std::string msg = "\n";
         for (auto cr : this->compute_resources) {
             auto host = cr.first;
@@ -487,16 +483,6 @@ namespace wrench {
             unsigned long target_num_cores;
             double required_ram;
 
-
-//            if (action->getMaxNumCores() == 0) {
-//                // Always run on the first host
-//                std::tuple<std::string, unsigned long> allocation =
-//                        pickAllocation(nullptr, "", 1, 0.0, no_longer_considered_hosts);
-//                required_ram = 0.0;
-//                target_host = std::get<0>(allocation);
-//                target_num_cores = std::get<1>(allocation);
-//
-//            } else {
             std::tuple<std::string, unsigned long> allocation =
                     pickAllocation(action,
                                    std::get<0>(this->action_run_specs[action]),
@@ -505,9 +491,8 @@ namespace wrench {
             required_ram = action->getMinRAMFootprint();
             target_host = std::get<0>(allocation);
             target_num_cores = std::get<1>(allocation);
-//            }
 
-
+//            WRENCH_INFO("ALLOC %s: %s %ld %lf", action->getName().c_str(), target_host.c_str(), target_num_cores, required_ram);
             // If we didn't find a host, forget it
             if (target_host.empty()) {
                 continue;
@@ -686,10 +671,11 @@ namespace wrench {
             std::shared_ptr<FailureCause> cause) {
         WRENCH_INFO("Failing running action %s", action->getName().c_str());
 
+        if (action)
         terminateRunningAction(action, false);
 
         // Send back an action failed message
-        WRENCH_INFO("Sending action failure notification to '%s'", action->getJob()->getCallbackMailbox().c_str());
+        WRENCH_INFO("Sending action failure notification to '%s'", this->parent_service->mailbox_name.c_str());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
             S4U_Mailbox::putMessage(
@@ -720,25 +706,17 @@ namespace wrench {
     }
 
     /**
-    * @brief Declare all current actions as failed (likely because the daemon is being terminated
-    * or has timed out.
-    */
-    void ActionScheduler::failCurrentActions() {
-        for (auto action : this->running_actions) {
-            this->failRunningAction(action, std::shared_ptr<FailureCause>(
-                    new JobKilled(action->getJob(), this->parent_service)));
-        }
-    }
-
-    /**
      * @brief Terminate the daemon, dealing with pending/running actions
      *
      */
     void ActionScheduler::terminate() {
         this->setStateToDown();
 
-        WRENCH_INFO("Failing current actions");
-        this->failCurrentActions();
+        WRENCH_INFO("Failing currently running actions");
+        for (auto const &action : this->running_actions) {
+            this->failRunningAction(action, std::shared_ptr<FailureCause>(
+                    new JobKilled(action->getJob(), this->parent_service)));
+        }
 
     }
 
@@ -799,7 +777,7 @@ namespace wrench {
         // Forget the action executor
         this->action_executors.erase(executor->getAction());
 
-        // Send the callback to the originator
+        // Send the notification to the originator
         S4U_Mailbox::dputMessage(
                 this->parent_service->mailbox_name, new ActionSchedulerActionDoneMessage(
                         executor->getAction(), 0.0));
@@ -821,9 +799,16 @@ namespace wrench {
         // Forget the action executor
         this->action_executors.erase(action);
 
-        // Fail the action
-        this->failRunningAction(action, std::move(cause));
-
+        // Send the notification
+        WRENCH_INFO("Sending action failure notification to '%s'", parent_service->mailbox_name.c_str());
+        // NOTE: This is synchronous so that the process doesn't fall off the end
+        try {
+            S4U_Mailbox::putMessage(
+                    this->parent_service->mailbox_name,
+                    new ActionSchedulerActionFailedMessage(action, 0));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            return;
+        }
     }
 
     /**
