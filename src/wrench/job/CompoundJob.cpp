@@ -70,6 +70,7 @@ namespace wrench {
     * @param priority: the job's priority
     */
     void CompoundJob::setPriority(unsigned long priority) {
+        assertJobNotSubmitted();
         this->priority = priority;
     }
 
@@ -80,6 +81,7 @@ namespace wrench {
      * @return a sleep action
      */
     std::shared_ptr<SleepAction> CompoundJob::addSleepAction(std::string name, double sleep_time) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<SleepAction>(new SleepAction(name, this->shared_this, sleep_time));
         new_action->setSharedPtrThis(new_action);
         this->actions.insert(new_action);
@@ -102,6 +104,7 @@ namespace wrench {
                                                                  int min_num_cores,
                                                                  int max_num_cores,
                                                                  std::shared_ptr<ParallelModel> parallel_model) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<ComputeAction>(
                 new ComputeAction(name, this->shared_this, flops, ram, min_num_cores, max_num_cores, parallel_model));
         new_action->setSharedPtrThis(new_action);
@@ -121,6 +124,7 @@ namespace wrench {
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
                                                                    WorkflowFile *file,
                                                                    std::shared_ptr<FileLocation> file_location) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, file, {std::move(file_location)}));
         new_action->setSharedPtrThis(new_action);
@@ -138,6 +142,7 @@ namespace wrench {
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
                                                                    WorkflowFile *file,
                                                                    std::vector<std::shared_ptr<FileLocation>> file_locations) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, file, std::move(file_locations)));
         new_action->setSharedPtrThis(new_action);
@@ -155,6 +160,7 @@ namespace wrench {
     std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(std::string name,
                                                                      WorkflowFile *file,
                                                                      std::shared_ptr<FileLocation> file_location) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileWriteAction>(
                 new FileWriteAction(name, this->shared_this, file, {std::move(file_location)}));
         new_action->setSharedPtrThis(new_action);
@@ -174,6 +180,7 @@ namespace wrench {
                                                                    WorkflowFile *file,
                                                                    std::shared_ptr<FileLocation> src_file_location,
                                                                    std::shared_ptr<FileLocation> dst_file_location) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileCopyAction>(
                 new FileCopyAction(name, this->shared_this, file, std::move(src_file_location), std::move(dst_file_location)));
         new_action->setSharedPtrThis(new_action);
@@ -191,6 +198,7 @@ namespace wrench {
     std::shared_ptr<FileDeleteAction>
     CompoundJob::addFileDeleteAction(std::string name, WorkflowFile *file,
                                      std::shared_ptr<FileLocation> file_location) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, this->shared_this, file, std::move(file_location)));
         new_action->setSharedPtrThis(new_action);
@@ -209,6 +217,7 @@ namespace wrench {
             std::shared_ptr<FileRegistryService> file_registry,
             WorkflowFile *file,
             std::shared_ptr<FileLocation> file_location) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
                 new FileRegistryAddEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
         new_action->setSharedPtrThis(new_action);
@@ -227,6 +236,7 @@ namespace wrench {
             std::shared_ptr<FileRegistryService> file_registry,
             WorkflowFile *file,
             std::shared_ptr<FileLocation> file_location) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
                 new FileRegistryDeleteEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
         new_action->setSharedPtrThis(new_action);
@@ -244,6 +254,7 @@ namespace wrench {
     std::shared_ptr<CustomAction> CompoundJob::addCustomAction(std::string name,
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
+        assertJobNotSubmitted();
         auto new_action = std::shared_ptr<CustomAction>(
                 new CustomAction(name, this->shared_this, lambda_execute, lambda_terminate));
         new_action->setSharedPtrThis(new_action);
@@ -258,6 +269,7 @@ namespace wrench {
      * @param child: the child action
      */
     void CompoundJob::addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child) {
+        assertJobNotSubmitted();
         if ((parent == nullptr) or (child == nullptr)) {
             throw std::invalid_argument("CompoundJob::addDependency(): arguments cannot be nullptr");
         }
@@ -274,6 +286,7 @@ namespace wrench {
      * @param parent: the parent job
      */
     void CompoundJob::addParentJob(std::shared_ptr<CompoundJob> parent) {
+        assertJobNotSubmitted();
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
@@ -285,6 +298,7 @@ namespace wrench {
      * @param child: the child job
      */
     void CompoundJob::addChildJob(std::shared_ptr<CompoundJob> child) {
+        assertJobNotSubmitted();
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
         }
@@ -346,6 +360,15 @@ namespace wrench {
     void CompoundJob::updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state) {
         this->state_task_map[old_state].erase(action);
         this->state_task_map[new_state].insert(action);
+    }
+
+    /**
+     * @brief Assert that the job has not been submitted
+     */
+    void CompoundJob::assertJobNotSubmitted() {
+        if (this->state != CompoundJob::State::NOT_SUBMITTED) {
+            throw std::runtime_error("CompoundJob::assertJobNotSubmitted(): Cannot modify a CompoundJob onces it has been submitted");
+        }
     }
 
 }

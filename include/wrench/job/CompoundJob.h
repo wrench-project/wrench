@@ -143,6 +143,9 @@ namespace wrench {
         void updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state);
 
     private:
+
+        void assertJobNotSubmitted();
+
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
 
