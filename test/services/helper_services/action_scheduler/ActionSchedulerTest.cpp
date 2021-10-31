@@ -38,6 +38,9 @@ public:
     std::shared_ptr<wrench::StorageService> ss;
 
     void do_ActionSchedulerOneActionSuccessTest_test();
+    void do_ActionSchedulerOneActionTerminateTest_test();
+    void do_ActionSchedulerOneActionCrashRestartTest_test();
+    void do_ActionSchedulerOneActionFailureTest_test();
 
 protected:
     ActionSchedulerTest() {
@@ -137,7 +140,7 @@ private:
 
         // Create an ActionScheduler
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host2"] = std::make_tuple(3, 100.0);
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
@@ -211,7 +214,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
     this->workflow = std::make_unique<wrench::Workflow>();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -222,6 +225,394 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionSchedulerOneActionSuccessTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
+
+/**********************************************************************/
+/**  ACTION SCHEDULER ONE ACTION TERMINATE TEST                      **/
+/**********************************************************************/
+
+
+class ActionSchedulerOneActionTerminateTestWMS : public wrench::WMS {
+
+public:
+    ActionSchedulerOneActionTerminateTestWMS(ActionSchedulerTest *test,
+                                           std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    ActionSchedulerTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionScheduler
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
+                new wrench::ActionScheduler("Host2", compute_resources,
+                                            this->getSharedPtr<wrench::Service>(),
+                                            DBL_MAX, {}, {}));
+
+        // Start it
+        action_scheduler->simulation = this->simulation;
+        action_scheduler->start(action_scheduler, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add a sleep action to it
+        auto action = job->addSleepAction("my_sleep", 10.0);
+
+        // Submit the action to the action executor
+        action_scheduler->submitAction(action);
+
+        // Sleep 5s
+        wrench::Simulation::sleep(5.0);
+
+        // Invalidly, submit the action to the action executor, for coverage
+        try {
+            action_scheduler->submitAction(action);
+            throw std::runtime_error("Should not be able to submit a non-ready action to the action_scheduler");
+        } catch (std::runtime_error &e) {
+            // expected
+        }
+
+        // Terminate the action
+        action_scheduler->terminateAction(action);
+
+        // Is the start-date sensible?
+        if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+        }
+
+        // Is the end-date sensible?
+        if (action->getEndDate() + EPSILON < 5.0 or action->getEndDate() > 5.0 + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
+        }
+
+        // Is the state sensible?
+        if (action->getState() != wrench::Action::State::KILLED) {
+            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ActionSchedulerTest, OneActionTerminate) {
+    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionTerminateTest_test);
+}
+
+void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 3;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host5", {"/"}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ActionSchedulerOneActionTerminateTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
+
+
+/**********************************************************************/
+/**  ACTION SCHEDULER ONE ACTION HOST CRASH TEST                      **/
+/**********************************************************************/
+
+
+class ActionSchedulerOneActionCrashRestartTestWMS : public wrench::WMS {
+
+public:
+    ActionSchedulerOneActionCrashRestartTestWMS(ActionSchedulerTest *test,
+                                             std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    ActionSchedulerTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionScheduler
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
+                new wrench::ActionScheduler("Host2", compute_resources,
+                                            this->getSharedPtr<wrench::Service>(),
+                                            DBL_MAX, {}, {}));
+
+        // Start it
+        action_scheduler->simulation = this->simulation;
+        action_scheduler->start(action_scheduler, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add a sleep action to it
+        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+
+        // Submit the action to the action executor
+        action_scheduler->submitAction(action);
+
+        // Sleep 1s
+        wrench::Simulation::sleep(1.0);
+
+        // Kill the Storage Service
+        wrench::Simulation::turnOffHost("Host3");
+
+        // Sleep 5s
+        wrench::Simulation::sleep(10.0);
+
+        // Make it restart
+        wrench::Simulation::turnOnHost("Host3");
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+        
+        // Is the start-date sensible?
+        if (action->getStartDate() < 15.0 or action->getStartDate() > 17.0) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+        }
+
+        // Is the end-date sensible?
+        if (action->getEndDate() + EPSILON < action->getStartDate() + 10.0 or action->getEndDate() > action->getStartDate() + 10.0 + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
+        }
+
+        // Is the state sensible?
+        if (action->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ActionSchedulerTest, OneActionCrashRestart) {
+    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionCrashRestartTest_test);
+}
+
+void ActionSchedulerTest::do_ActionSchedulerOneActionCrashRestartTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 3;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 100000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ActionSchedulerOneActionCrashRestartTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
+
+
+
+
+/**********************************************************************/
+/**  ACTION SCHEDULER ONE ACTION FAILURE TEST                      **/
+/**********************************************************************/
+
+
+class ActionSchedulerOneActionFailureTestWMS : public wrench::WMS {
+
+public:
+    ActionSchedulerOneActionFailureTestWMS(ActionSchedulerTest *test,
+                                                        std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    ActionSchedulerTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionScheduler
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
+                new wrench::ActionScheduler("Host2", compute_resources,
+                                            this->getSharedPtr<wrench::Service>(),
+                                            DBL_MAX, {}, {}));
+
+        // Start it
+        action_scheduler->simulation = this->simulation;
+        action_scheduler->start(action_scheduler, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add a sleep action to it
+        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+
+        // Submit the action to the action executor
+        action_scheduler->submitAction(action);
+
+        // Sleep 1s
+        wrench::Simulation::sleep(1.0);
+
+        // Kill the storage service
+        wrench::Simulation::turnOffHost("Host4");
+        
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        // Is the start-date sensible?
+        if (action->getStartDate() < 15.0 or action->getStartDate() > 17.0) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+        }
+
+        // Is the end-date sensible?
+        if (action->getEndDate() + EPSILON < action->getStartDate() + 10.0 or action->getEndDate() > action->getStartDate() + 10.0 + EPSILON) {
+            throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
+        }
+
+        // Is the state sensible?
+        if (action->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ActionSchedulerTest, OneActionFailure) {
+    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionFailureTest_test);
+}
+
+void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 3;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ActionSchedulerOneActionFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 

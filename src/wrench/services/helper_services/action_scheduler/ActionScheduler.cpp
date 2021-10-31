@@ -125,7 +125,7 @@ namespace wrench {
         assertServiceIsUp();
 
         if (action->getState() != Action::State::READY) {
-            throw std::runtime_error("Cannot submit a non-ready action to the ActionScheduler");
+            throw std::runtime_error("Can only submit a ready action to the ActionScheduler");
         }
         // Check that service-specific args that are provided are well-formatted
         std::string action_name = action->getName();
@@ -584,7 +584,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
