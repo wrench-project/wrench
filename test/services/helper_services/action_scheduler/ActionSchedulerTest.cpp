@@ -12,6 +12,7 @@
 
 #include <wrench/action/Action.h>
 #include <wrench/action/SleepAction.h>
+#include <wrench/action/ComputeAction.h>
 #include <wrench/action/CustomAction.h>
 #include <wrench/action/FileReadAction.h>
 #include <wrench/action/FileWriteAction.h>
@@ -41,6 +42,7 @@ public:
     void do_ActionSchedulerOneActionTerminateTest_test();
     void do_ActionSchedulerOneActionCrashRestartTest_test();
     void do_ActionSchedulerOneActionFailureTest_test();
+    void do_ActionSchedulerThreeActionsInSequenceTest_test();
 
 protected:
     ActionSchedulerTest() {
@@ -96,7 +98,7 @@ protected:
                           "         <prop id=\"ram\" value=\"1024B\"/> "
                           "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"10us\"/>"
+                          "       <link id=\"2\" bandwidth=\"0.1MBps\" latency=\"0us\"/>"
                           "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
                           "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
                           "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
@@ -336,7 +338,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
     this->workflow = std::make_unique<wrench::Workflow>();
 
     // Create a Storage Service
-    this->ss = simulation->add(new wrench::SimpleStorageService("Host5", {"/"}));
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
 
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
@@ -431,12 +433,12 @@ private:
         }
         
         // Is the start-date sensible?
-        if (action->getStartDate() < 15.0 or action->getStartDate() > 17.0) {
-            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
+        if (action->getStartDate() < 12.0 or action->getStartDate() > 12.0) {
+            throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < action->getStartDate() + 10.0 or action->getEndDate() > action->getStartDate() + 10.0 + EPSILON) {
+        if (action->getEndDate() + EPSILON < action->getStartDate() + 10.0 or action->getEndDate() > action->getStartDate() + 10.01 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -474,7 +476,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashRestartTest_test() {
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a file
-    this->file = this->workflow->addFile("some_file", 100000000.0);
+    this->file = this->workflow->addFile("some_file", 1000000000.0);
 
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
@@ -546,7 +548,7 @@ private:
 
         // Kill the storage service
         wrench::Simulation::turnOffHost("Host4");
-        
+
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
@@ -556,24 +558,29 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionFailedMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
         // Is the start-date sensible?
-        if (action->getStartDate() < 15.0 or action->getStartDate() > 17.0) {
+        if (action->getStartDate() < 0.0 or action->getStartDate() > 0.0) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getEndDate()));
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < action->getStartDate() + 10.0 or action->getEndDate() > action->getStartDate() + 10.0 + EPSILON) {
+        if (action->getEndDate() + EPSILON < action->getStartDate() + 1.0 or action->getEndDate() > action->getStartDate() + 1.0 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
         // Is the state sensible?
-        if (action->getState() != wrench::Action::State::COMPLETED) {
+        if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
+        }
+
+        // Is the failure cause sensible?
+        if (not (std::dynamic_pointer_cast<wrench::NetworkError>(action->getFailureCause()))) {
+            throw std::runtime_error("Unexpected failure cause");
         }
 
         return 0;
@@ -613,6 +620,175 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionSchedulerOneActionFailureTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
+
+
+/**********************************************************************/
+/**  ACTION SCHEDULER THREE ACTIONS IN SEQUENCE FAILURE TEST         **/
+/**********************************************************************/
+
+
+class ActionSchedulerThreeActionsInSequenceTestWMS : public wrench::WMS {
+
+public:
+    ActionSchedulerThreeActionsInSequenceTestWMS(ActionSchedulerTest *test,
+                                           std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    ActionSchedulerTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionScheduler
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
+                new wrench::ActionScheduler("Host2", compute_resources,
+                                            this->getSharedPtr<wrench::Service>(),
+                                            DBL_MAX, {}, {}));
+
+        // Start it
+        action_scheduler->simulation = this->simulation;
+        action_scheduler->start(action_scheduler, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add 2-core compute action action that will start 1st
+        auto action1 = job->addComputeAction("compute_action_1", 20.0, 80.0, 2, 2, wrench::ParallelModel::AMDAHL(1.0));
+
+        // Add 2-core compute action action that will start 2nd
+        auto action2 = job->addComputeAction("compute_action_2", 90.0, 90.0, 2, 2, wrench::ParallelModel::AMDAHL(1.0));
+
+        // Add 1-core compute action action that will start 3rd
+        auto action3 = job->addComputeAction("compute_action_3", 10.0, 20.0, 2, 2, wrench::ParallelModel::AMDAHL(1.0));
+
+        // Submit the actions to the action executor
+        action_scheduler->submitAction(action1);
+        action_scheduler->submitAction(action2);
+        action_scheduler->submitAction(action3);
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg1 = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        if (!msg1) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        if (msg1->action != action1) {
+            throw std::runtime_error("Unexpected " + msg1->action->getName() + " action completion");
+        }
+
+        // Wait for a message from it
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg2 = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        if (!msg2) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        if (msg2->action != action2) {
+            throw std::runtime_error("Unexpected " + msg2->action->getName() + " action completion");
+        }
+
+        // Wait for a message from it
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg3 = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        if (!msg3) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        if (msg3->action != action3) {
+            throw std::runtime_error("Unexpected " + msg3->action->getName() + " action completion");
+        }
+
+        // Are the dates sensible?
+        if (action1->getStartDate() > EPSILON )
+            throw std::runtime_error("Unexpected action1 start date " + std::to_string(action1->getStartDate()));
+        if ((action1->getEndDate() < 10.0 - EPSILON) or (action1->getEndDate() > 10.0 + EPSILON))
+            throw std::runtime_error("Unexpected action1 end date " + std::to_string(action1->getEndDate()));
+        if ((action2->getStartDate() < 10.0 - EPSILON) or (action2->getStartDate() > 10.0 + EPSILON))
+            throw std::runtime_error("Unexpected action2 start date " + std::to_string(action2->getStartDate()));
+        if ((action2->getEndDate() < 55.0 - EPSILON) or (action2->getEndDate() > 55.0 + EPSILON))
+            throw std::runtime_error("Unexpected action2 end date " + std::to_string(action2->getEndDate()));
+        if ((action3->getStartDate() < 55.0 - EPSILON) or (action3->getStartDate() > 55.0 + EPSILON))
+            throw std::runtime_error("Unexpected action3 start date " + std::to_string(action3->getStartDate()));
+        if ((action3->getEndDate() < 60.0 - EPSILON) or (action3->getEndDate() > 60.0 + EPSILON))
+            throw std::runtime_error("Unexpected action3 end date " + std::to_string(action3->getEndDate()));
+
+
+        return 0;
+    }
+};
+
+TEST_F(ActionSchedulerTest, ThreeActionsInSequence) {
+    DO_TEST_WITH_FORK(do_ActionSchedulerThreeActionsInSequenceTest_test);
+}
+
+void ActionSchedulerTest::do_ActionSchedulerThreeActionsInSequenceTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 3;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ActionSchedulerThreeActionsInSequenceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
