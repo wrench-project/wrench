@@ -1089,11 +1089,25 @@ namespace wrench {
         // Forget the executor
         this->action_executors.erase(action);
 
-        // Reset the action state to READY)
-        action->setState(Action::State::READY);
-        // Put the action back in the ready list (at the end)
-        WRENCH_INFO("Putting action back in the ready queue");
-        this->ready_actions.push_back(action);
+        if (this->getPropertyValueAsBoolean(ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
+
+            // Reset the action state to READY)
+            action->setState(Action::State::READY);
+            // Put the action back in the ready list (at the end)
+            WRENCH_INFO("Putting action back in the ready queue");
+            this->ready_actions.push_back(action);
+        } else {
+            // Send the notification
+            WRENCH_INFO("Sending action failure notification to '%s'", parent_service->mailbox_name.c_str());
+            // NOTE: This is synchronous so that the process doesn't fall off the end
+            try {
+                S4U_Mailbox::putMessage(
+                        this->parent_service->mailbox_name,
+                        new ActionSchedulerActionFailedMessage(action, 0));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return;
+            }
+        }
     }
 
 /**
