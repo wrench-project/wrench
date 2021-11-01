@@ -14,7 +14,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <utility>
 
-#include <wrench/services/helper_services/action_scheduler/ActionScheduler.h>
+#include <wrench/services/helper_services/action_scheduler/ActionExecutionService.h>
 #include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
@@ -38,7 +38,7 @@ namespace wrench {
     /**
      * @brief Destructor
      */
-    ActionScheduler::~ActionScheduler() {
+    ActionExecutionService::~ActionExecutionService() {
         this->default_property_values.clear();
     }
 
@@ -48,7 +48,7 @@ namespace wrench {
      * @param has_returned_from_main: whether main() returned
      * @param return_value: the return value (if main() returned)
      */
-    void ActionScheduler::cleanup(bool has_returned_from_main, int return_value) {
+    void ActionExecutionService::cleanup(bool has_returned_from_main, int return_value) {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
@@ -119,12 +119,12 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ActionScheduler::submitAction(const std::shared_ptr<Action> &action) {
+    void ActionExecutionService::submitAction(const std::shared_ptr<Action> &action) {
 
         assertServiceIsUp();
 
         if (action->getState() != Action::State::READY) {
-            throw std::runtime_error("Can only submit a ready action to the ActionScheduler");
+            throw std::runtime_error("Can only submit a ready action to the ActionExecutionService");
         }
         // Check that service-specific args that are provided are well-formatted
         std::string action_name = action->getName();
@@ -199,7 +199,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "ActionScheduler::submitActions(): Received an unexpected [" + message->getName() +
+                    "ActionExecutionService::submitActions(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
     }
@@ -216,7 +216,7 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    ActionScheduler::ActionScheduler(
+    ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::shared_ptr<Service> parent_service,
@@ -238,7 +238,7 @@ namespace wrench {
         // Check that there is at least one core per host and that hosts have enough cores
         if (compute_resources.empty()) {
             throw std::invalid_argument(
-                    "ActionScheduler::ActionScheduler(): the resource list is empty");
+                    "ActionExecutionService::ActionExecutionService(): the resource list is empty");
         }
         for (auto host : compute_resources) {
             std::string hname = host.first;
@@ -248,18 +248,18 @@ namespace wrench {
                 available_cores = S4U_Simulation::getHostNumCores(hname);
             } catch (std::runtime_error &e) {
                 throw std::invalid_argument(
-                        "ActionScheduler::ActionScheduler(): Host '" + hname + "' does not exist");
+                        "ActionExecutionService::ActionExecutionService(): Host '" + hname + "' does not exist");
             }
             if (requested_cores == ComputeService::ALL_CORES) {
                 requested_cores = available_cores;
             }
             if (requested_cores == 0) {
                 throw std::invalid_argument(
-                        "ActionScheduler::ActionScheduler(): at least 1 core should be requested");
+                        "ActionExecutionService::ActionExecutionService(): at least 1 core should be requested");
             }
             if (requested_cores > available_cores) {
                 throw std::invalid_argument(
-                        "ActionScheduler::ActionScheduler(): " + hname + "only has " +
+                        "ActionExecutionService::ActionExecutionService(): " + hname + "only has " +
                         std::to_string(available_cores) + " cores but " +
                         std::to_string(requested_cores) + " are requested");
             }
@@ -268,7 +268,7 @@ namespace wrench {
             double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
             if (requested_ram < 0) {
                 throw std::invalid_argument(
-                        "ActionScheduler::ActionScheduler(): requested RAM should be non-negative");
+                        "ActionExecutionService::ActionExecutionService(): requested RAM should be non-negative");
             }
 
             if (requested_ram == ComputeService::ALL_RAM) {
@@ -277,7 +277,7 @@ namespace wrench {
 
             if (requested_ram > available_ram) {
                 throw std::invalid_argument(
-                        "ActionScheduler::ActionScheduler(): host " + hname + "only has " +
+                        "ActionExecutionService::ActionExecutionService(): host " + hname + "only has " +
                         std::to_string(available_ram) + " bytes of RAM but " +
                         std::to_string(requested_ram) + " are requested");
             }
@@ -301,7 +301,7 @@ namespace wrench {
      *
      * @return 0 on termination
      */
-    int ActionScheduler::main() {
+    int ActionExecutionService::main() {
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
@@ -347,7 +347,7 @@ namespace wrench {
             this->host_state_change_monitor = nullptr; // Which will release the pointer to this service!
         }
 
-        WRENCH_INFO("ActionScheduler on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("ActionExecutionService on host %s terminating cleanly!", S4U_Simulation::getHostName().c_str());
         return this->exit_code;
     }
 
@@ -360,7 +360,7 @@ namespace wrench {
      * @param hosts_to_avoid: a list of hosts to not even consider
      * @return an allocation
      */
-    std::tuple<std::string, unsigned long> ActionScheduler::pickAllocation(
+    std::tuple<std::string, unsigned long> ActionExecutionService::pickAllocation(
             std::shared_ptr<Action> action,
             std::string required_host,
             unsigned long required_num_cores,
@@ -451,7 +451,7 @@ namespace wrench {
     /**
      * @brief: Dispatch ready work units
      */
-    void ActionScheduler::dispatchReadyActions() {
+    void ActionExecutionService::dispatchReadyActions() {
         // Don't kill me while I am doing this
         this->acquireDaemonLock();
 
@@ -542,7 +542,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    bool ActionScheduler::processNextMessage() {
+    bool ActionExecutionService::processNextMessage() {
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -651,7 +651,7 @@ namespace wrench {
      * @param action: the action
      * @param cause: the failure cause
      */
-    void ActionScheduler::failRunningAction(
+    void ActionExecutionService::failRunningAction(
             std::shared_ptr<Action> action,
             std::shared_ptr<FailureCause> cause) {
         WRENCH_INFO("Failing running action %s", action->getName().c_str());
@@ -675,7 +675,7 @@ namespace wrench {
     * @brief terminate a running action
     * @param job: the job
     */
-    void ActionScheduler::terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancelation) {
+    void ActionExecutionService::terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancelation) {
 
         auto executor = this->action_executors[action];
         this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
@@ -694,7 +694,7 @@ namespace wrench {
      * @brief Terminate the daemon, dealing with pending/running actions
      *
      */
-    void ActionScheduler::terminate() {
+    void ActionExecutionService::terminate() {
         this->setStateToDown();
 
         WRENCH_INFO("Failing currently running actions");
@@ -713,7 +713,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void ActionScheduler::terminateAction(std::shared_ptr<Action> action) {
+    void ActionExecutionService::terminateAction(std::shared_ptr<Action> action) {
         assertServiceIsUp();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_action");
@@ -742,7 +742,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "ActionScheduler::terminateAction(): Received an unexpected [" +
+                    "ActionExecutionService::terminateAction(): Received an unexpected [" +
                     message->getName() + "] message!");
         }
     }
@@ -752,7 +752,7 @@ namespace wrench {
      * @param executor: the action executor
      * @param action: the action
      */
-    void ActionScheduler::processActionExecutorCompletion(
+    void ActionExecutionService::processActionExecutorCompletion(
             std::shared_ptr<ActionExecutor> executor) {
 
         // Update RAM availabilities and running thread counts
@@ -772,7 +772,7 @@ namespace wrench {
     * @brief Process an action executor failure
     * @param executor: the action executor
     */
-    void ActionScheduler::processActionExecutorFailure(std::shared_ptr<ActionExecutor> executor) {
+    void ActionExecutionService::processActionExecutorFailure(std::shared_ptr<ActionExecutor> executor) {
 
         auto action = executor->getAction();
         auto cause = action->getFailureCause();
@@ -802,7 +802,7 @@ namespace wrench {
      * @param action: the action to terminate
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
-    void ActionScheduler::processActionTerminationRequest(std::shared_ptr<Action> action,
+    void ActionExecutionService::processActionTerminationRequest(std::shared_ptr<Action> action,
                                                           const std::string &answer_mailbox) {
 
         // If the job doesn't exit, we reply right away
@@ -812,7 +812,7 @@ namespace wrench {
             std::string error_message = "Action cannot be terminated because it is not running";
             auto answer_message = new ActionSchedulerTerminateActionAnswerMessage(
                     false,
-                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ActionScheduler>(), error_message)),
+                    std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ActionExecutionService>(), error_message)),
                     0.0);
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
             return;
@@ -833,7 +833,7 @@ namespace wrench {
      * @param ram: ram capacity
      * @return true is a host was found
      */
-    bool ActionScheduler::isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram) {
+    bool ActionExecutionService::isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram) {
         for (auto const &r : this->compute_resources) {
             if ((std::get<0>(r.second) >= num_cores) and (std::get<1>(r.second) >= ram)) {
                 return true;
@@ -850,7 +850,7 @@ namespace wrench {
      * @param service_specific_arguments: the service-specific arguments
      * @return true if the action can run
      */
-    bool ActionScheduler::actionCanRun(std::shared_ptr<Action> action) {
+    bool ActionExecutionService::actionCanRun(std::shared_ptr<Action> action) {
 
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
 
@@ -902,7 +902,7 @@ namespace wrench {
      * @param action: the action
      *
      */
-    void ActionScheduler::processSubmitAction(
+    void ActionExecutionService::processSubmitAction(
             const std::string &answer_mailbox, std::shared_ptr<Action> action) {
         WRENCH_INFO("Asked to run action %s", action->getName().c_str());
 
@@ -950,7 +950,7 @@ namespace wrench {
  * @param num_cores: the desired number of cores
  * @param ram: the desired RAM
  */
-    bool ActionScheduler::IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
+    bool ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
                                                                       double ram) {
         bool enough_ram = false;
         bool enough_cores = false;
@@ -983,7 +983,7 @@ namespace wrench {
      * @brief Process a "get resource description message"
      * @param answer_mailbox: the mailbox to which the description message should be sent
      */
-    std::map<std::string, std::map<std::string, double>> ActionScheduler::getResourceInformation() {
+    std::map<std::string, std::map<std::string, double>> ActionExecutionService::getResourceInformation() {
         // Build a dictionary
         std::map<std::string, std::map<std::string, double>> dict;
 
@@ -1038,12 +1038,12 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void ActionScheduler::validateProperties() {
+    void ActionExecutionService::validateProperties() {
         bool success = true;
 
         // TODO: Or perhaps no properties?
         if (not success) {
-            throw std::invalid_argument("ActionScheduler: Invalid properties");
+            throw std::invalid_argument("ActionExecutionService: Invalid properties");
         }
     }
 
@@ -1054,7 +1054,7 @@ namespace wrench {
      *
      * @param executor: the action executor that has crashed
      */
-    void ActionScheduler::processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor) {
+    void ActionExecutionService::processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor) {
         std::shared_ptr<Action> action = executor->getAction();
 
         WRENCH_INFO("Handling an ActionExecutor crash!");
@@ -1092,7 +1092,7 @@ namespace wrench {
  * @brief A helper method to checks if all compute resources are down
  * @return true or false
  */
-    bool ActionScheduler::areAllComputeResourcesDownWithNoActionExecutorRunning() {
+    bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() {
         bool all_resources_down = true;
         for (auto const &h : this->compute_resources) {
             if (Simulation::isHostOn(h.first)) {
