@@ -87,7 +87,7 @@ namespace wrench {
 
         friend class CompoundJob;
         friend class ActionExecutor;
-        friend class ActionScheduler;
+        friend class ActionExecutionService;
 
         void newExecution();
 

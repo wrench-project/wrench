@@ -30,9 +30,14 @@ namespace wrench {
 
 
     /**
-     * @brief TODO
+     * @brief An action execution service that:
+     *   - Accepts only ready actions
+     *   - Run actions FCFS w.r.t to memory constraints without backfilling
+     *   - Will oversubscribe cores in whatever way
+     *   - Attempts some load balancing
+     *   - Tries to execute actions with as many cores as possible
      */
-    class ActionScheduler : public Service {
+    class ActionExecutionService : public Service {
 
     private:
 
@@ -47,8 +52,8 @@ namespace wrench {
     public:
 
         // Public Constructor
-        ActionScheduler(const std::string &hostname,
-                        const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+        ActionExecutionService(const std::string &hostname,
+                        std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                         std::shared_ptr<Service> parent_service,
                         std::map<std::string, std::string> property_list = {},
                         std::map<std::string, double> messagepayload_list = {}
@@ -62,7 +67,7 @@ namespace wrench {
 
         void terminateAction(std::shared_ptr<Action> action);
 
-        ~ActionScheduler();
+        ~ActionExecutionService();
 
         /***********************/
         /** \endcond           */

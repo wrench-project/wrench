@@ -20,13 +20,13 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Configurable properties for a ActionScheduler
+     * @brief Configurable properties for a ActionExecutionService
      */
     class ActionSchedulerProperty {
 
     public:
 
-        /** @brief Whether the ActionScheduler should terminate if all its hosts are down **/
+        /** @brief Whether the ActionExecutionService should terminate if all its hosts are down **/
         DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
         /** @brief Put back an action in READY state in case its action executor host has crashed  **/
