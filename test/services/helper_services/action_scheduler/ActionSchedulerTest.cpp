@@ -17,7 +17,7 @@
 #include <wrench/action/FileReadAction.h>
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
-#include <wrench/services/helper_services/action_scheduler/ActionScheduler.h>
+#include <wrench/services/helper_services/action_scheduler/ActionExecutionService.h>
 #include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes/HostError.h>
@@ -142,11 +142,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                              {}, {}));
 
@@ -264,11 +264,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
 
@@ -387,11 +387,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(4, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
 
@@ -556,11 +556,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
 
@@ -685,11 +685,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
 
@@ -819,11 +819,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
 
@@ -928,11 +928,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create an ActionScheduler
+        // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
-                new wrench::ActionScheduler("Host2", compute_resources,
+        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+                new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
 

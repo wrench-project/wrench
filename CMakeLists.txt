@@ -87,7 +87,7 @@ set(HEADER_FILES
         include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.h
         include/wrench/services/helper_services/action_scheduler/ActionSchedulerProperty.h
         include/wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h
-        include/wrench/services/helper_services/action_scheduler/ActionScheduler.h
+        include/wrench/services/helper_services/action_scheduler/ActionExecutionService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h
@@ -203,7 +203,7 @@ set(SOURCE_FILES
         src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
         src/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.cpp
         src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
-        src/wrench/services/helper_services/action_scheduler/ActionScheduler.cpp
+        src/wrench/services/helper_services/action_scheduler/ActionExecutionService.cpp
         src/wrench/services/helper_services/action_scheduler/ActionSchedulerProperty.cpp
         src/wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.cpp
         include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h

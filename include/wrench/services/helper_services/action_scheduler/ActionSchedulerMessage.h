@@ -13,7 +13,7 @@
 
 #include <vector>
 
-#include "wrench/services/helper_services/action_scheduler/ActionScheduler.h"
+#include "wrench/services/helper_services/action_scheduler/ActionExecutionService.h"
 #include "wrench/services/ServiceMessage.h"
 
 namespace wrench {
@@ -27,7 +27,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level class for messages received/sent by a ActionScheduler
+     * @brief Top-level class for messages received/sent by a ActionExecutionService
      */
     class ActionSchedulerMessage : public SimulationMessage {
     protected:
@@ -35,7 +35,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to an ActionScheduler to submit an Action
+     * @brief A message sent to an ActionExecutionService to submit an Action
      */
     class ActionSchedulerSubmitActionRequestMessage : public ActionSchedulerMessage {
     public:
@@ -51,7 +51,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent by an ActionScheduler in answer to an Action submission
+     * @brief A message sent by an ActionExecutionService in answer to an Action submission
      */
     class ActionSchedulerSubmitActionAnswerMessage : public ActionSchedulerMessage {
     public:
@@ -67,7 +67,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to an ActionScheduler to terminate an Action
+     * @brief A message sent to an ActionExecutionService to terminate an Action
      */
     class ActionSchedulerTerminateActionRequestMessage : public ActionSchedulerMessage {
     public:
@@ -83,7 +83,7 @@ namespace wrench {
     };
 
     /**
-   * @brief A message sent by an ActionScheduler in response to an action termination
+   * @brief A message sent by an ActionExecutionService in response to an action termination
    */
     class ActionSchedulerTerminateActionAnswerMessage : public ActionSchedulerMessage {
     public:
@@ -99,7 +99,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent by an ActionScheduler to notify of an action's failure
+     * @brief A message sent by an ActionExecutionService to notify of an action's failure
      */
     class ActionSchedulerActionFailedMessage : public ActionSchedulerMessage {
     public:
@@ -112,7 +112,7 @@ namespace wrench {
     };
 
     /**
- * @brief A message sent by an ActionScheduler to notify of an action's completion
+ * @brief A message sent by an ActionExecutionService to notify of an action's completion
  */
     class ActionSchedulerActionDoneMessage : public ActionSchedulerMessage {
     public:
