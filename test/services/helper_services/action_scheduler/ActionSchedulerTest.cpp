@@ -204,11 +204,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -326,11 +326,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -495,11 +495,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashRestartTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -624,11 +624,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashNoRestartTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -758,11 +758,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -868,11 +868,11 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionNotEnoughResourcesTest_test
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -1036,11 +1036,11 @@ void ActionSchedulerTest::do_ActionSchedulerThreeActionsInSequenceTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
