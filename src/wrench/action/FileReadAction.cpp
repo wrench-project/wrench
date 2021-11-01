@@ -60,11 +60,9 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(this->thread_creation_overhead);
         // File read
-        bool success = false;
-        for (int i=0; i < this->file_locations.size(); i++) {
+        for (unsigned long i=0; i < this->file_locations.size(); i++) {
             try {
                 StorageService::readFile(this->getFile(), this->file_locations[i]);
-                success = true;
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() -1) {
