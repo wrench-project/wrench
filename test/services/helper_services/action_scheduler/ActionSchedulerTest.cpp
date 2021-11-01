@@ -43,6 +43,7 @@ public:
     void do_ActionSchedulerOneActionCrashRestartTest_test();
     void do_ActionSchedulerOneActionCrashNoRestartTest_test();
     void do_ActionSchedulerOneActionFailureTest_test();
+    void do_ActionSchedulerOneActionNotEnoughResourcesTest_test();
     void do_ActionSchedulerThreeActionsInSequenceTest_test();
 
 protected:
@@ -147,7 +148,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            DBL_MAX, {}, {}));
+                                             {}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -269,7 +270,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            DBL_MAX, {}, {}));
+                                            {}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -392,7 +393,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            DBL_MAX, {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
+                                            {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -561,7 +562,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            DBL_MAX, {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
+                                            {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -690,7 +691,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            DBL_MAX, {}, {}));
+                                            {}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -796,7 +797,116 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
 
 
 /**********************************************************************/
-/**  ACTION SCHEDULER THREE ACTIONS IN SEQUENCE FAILURE TEST         **/
+/**  ACTION SCHEDULER ONE ACTION NOT ENOUGH RESOURCES  TEST          **/
+/**********************************************************************/
+
+
+class ActionSchedulerOneActionNotEnoughResourcesTestWMS : public wrench::WMS {
+
+public:
+    ActionSchedulerOneActionNotEnoughResourcesTestWMS(ActionSchedulerTest *test,
+                                           std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    ActionSchedulerTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create an ActionScheduler
+        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
+                new wrench::ActionScheduler("Host2", compute_resources,
+                                            this->getSharedPtr<wrench::Service>(),
+                                            {}, {}));
+
+        // Start it
+        action_scheduler->simulation = this->simulation;
+        action_scheduler->start(action_scheduler, true, false);
+
+        // Create a Compound Job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        // Add two compute actions with too high requirements to it
+        auto action1 = job->addComputeAction("my_compute_1", 100.0, 200.0, 1,1, wrench::ParallelModel::AMDAHL(1.0));
+        auto action2 = job->addComputeAction("my_compute_2", 100.0, 80.0, 5,5, wrench::ParallelModel::AMDAHL(1.0));
+
+        // Submit the actions to the action executor
+        try {
+            action_scheduler->submitAction(action1);
+            throw std::runtime_error("Should not have been able to submit action 1");
+        } catch (wrench::ExecutionException &e) {
+            if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
+               throw std::runtime_error("Unexpected failure cause");
+            }
+        }
+        try {
+            action_scheduler->submitAction(action2);
+            throw std::runtime_error("Should not have been able to submit action 2");
+        } catch (wrench::ExecutionException &e) {
+            if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
+                throw std::runtime_error("Unexpected failure cause");
+            }
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ActionSchedulerTest, OneActionNotEnoughResources) {
+    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionNotEnoughResourcesTest_test);
+}
+
+void ActionSchedulerTest::do_ActionSchedulerOneActionNotEnoughResourcesTest_test() {
+
+    // Create and initialize a simulation
+    simulation = new wrench::Simulation();
+    int argc = 3;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = std::make_unique<wrench::Workflow>();
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ActionSchedulerOneActionNotEnoughResourcesTestWMS(this, "Host1")));
+
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+
+}
+
+/**********************************************************************/
+/**  ACTION SCHEDULER THREE ACTIONS IN SEQUENCE TEST                 **/
 /**********************************************************************/
 
 
@@ -824,7 +934,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            DBL_MAX, {}, {}));
+                                            {}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;

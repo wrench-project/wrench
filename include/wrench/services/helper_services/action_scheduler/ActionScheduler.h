@@ -50,7 +50,6 @@ namespace wrench {
         ActionScheduler(const std::string &hostname,
                         const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                         std::shared_ptr<Service> parent_service,
-                        double ttl,
                         std::map<std::string, std::string> property_list = {},
                         std::map<std::string, double> messagepayload_list = {}
         );
@@ -81,13 +80,6 @@ namespace wrench {
         // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
         std::map<std::string, double> ram_availabilities;
         std::map<std::string, unsigned long> running_thread_counts;
-
-        unsigned long total_num_cores;
-
-        double ttl;
-        bool has_ttl;
-        double death_date;
-        std::shared_ptr<Alarm> death_alarm = nullptr;
 
         std::shared_ptr<Service> parent_service;
 
