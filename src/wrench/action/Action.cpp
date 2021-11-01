@@ -12,6 +12,7 @@
 #include <wrench/action/Action.h>
 
 #include <utility>
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 WRENCH_LOG_CATEGORY(wrench_action, "Log category for  Action");
 
@@ -30,9 +31,9 @@ namespace wrench {
             this->name = name;
         }
         this->job = std::move(job);
-        this->state = Action::State::READY;
-        this->start_date = -1.0;
-        this->end_date = -1.0;
+
+        this->execution_history.push(Action::ActionExecution());
+        this->execution_history.top().state = Action::State::READY;
 
         this->simulate_computation_as_sleep = false;
         this->thread_creation_overhead = 0.0;
@@ -60,15 +61,16 @@ namespace wrench {
      * @return the state
      */
     Action::State Action::getState() const {
-        return this->state;
+        return this->execution_history.top().state;
     }
 
     /**
-    * @brief Returns the action's state as a string
-    * @return the state
-    */
-    std::string Action::getStateAsString() const {
-        switch(this->state) {
+     * @brief Convert an action state to a human-readable string
+     * @param state: an action state
+     * @return a string
+     */
+    std::string Action::stateToString(Action::State state) {
+        switch(state) {
             case Action::State::NOT_READY:
                 return "NOT READY";
             case Action::State::READY:
@@ -86,6 +88,15 @@ namespace wrench {
         }
     }
 
+
+    /**
+    * @brief Returns the action's state as a human-readable string
+    * @return a string
+    */
+    std::string Action::getStateAsString() const {
+        return Action::stateToString(this->execution_history.top().state);
+    }
+
     /**
      * @brief Returns the job this action belongs to
      * @return the job
@@ -99,9 +110,10 @@ namespace wrench {
      * @param state: the state
      */
     void Action::setState(Action::State new_state) {
-        auto old_state = this->state;
+        auto old_state = this->execution_history.top().state;
+//        std::cerr << "STATE " + Action::stateToString(old_state) + " -> " + Action::stateToString(new_state) << "\n";
         this->job->updateStateActionMap(this->shared_ptr_this, old_state, new_state);
-        this->state = new_state;
+        this->execution_history.top().state = new_state;
     }
 
     /**
@@ -109,7 +121,7 @@ namespace wrench {
      * @return an internal state
      */
     std::shared_ptr<FailureCause> Action::getFailureCause() const {
-        return this->failure_cause;
+        return this->execution_history.top().failure_cause;
     }
 
     /**
@@ -117,7 +129,7 @@ namespace wrench {
      * @param date: the date 
      */
     void Action::setStartDate(double date) {
-        this->start_date = date;
+        this->execution_history.top().start_date = date;
     }
 
     /**
@@ -125,7 +137,7 @@ namespace wrench {
      * @param date: the date
      */
     void Action::setEndDate(double date) {
-        this->end_date = date;
+        this->execution_history.top().end_date = date;
     }
 
     /**
@@ -133,15 +145,15 @@ namespace wrench {
      * @return a data
      */
     double Action::getStartDate() const {
-        return this->start_date;
+        return this->execution_history.top().start_date;
     }
 
     /**
-     * @brief Returns ths action's killed date (-1.0 if not ended)
+     * @brief Returns this action's end date (-1.0 if not ended)
      * @return a data
      */
     double Action::getEndDate() const {
-        return this->end_date;
+        return this->execution_history.top().end_date;
     }
 
     /**
@@ -149,7 +161,40 @@ namespace wrench {
      * @param failure_cause: the failure cause
      */
     void Action::setFailureCause(std::shared_ptr<FailureCause> failure_cause) {
-        this->failure_cause = failure_cause;
+        this->execution_history.top().failure_cause = std::move(failure_cause);
+    }
+
+    /**
+    * @brief Sets the action's execution hosts (and the action's physical execution host)
+    * @param host: a hostname
+    */
+    void Action::setExecutionHost(std::string host) {
+        std::string physical_host;
+
+        this->execution_history.top().execution_host = host;
+
+        if (S4U_VirtualMachine::vm_to_pm_map.find(host) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            physical_host = S4U_VirtualMachine::vm_to_pm_map[host];
+        } else {
+            physical_host = host;
+        }
+        this->execution_history.top().physical_execution_host = physical_host;
+    }
+
+    /**
+     * @brief Sets the action's allocated number of cores
+     * @param num_cores: a number of cores
+     */
+    void Action::setNumCoresAllocated(unsigned long num_cores) {
+        this->execution_history.top().num_cores_allocated = num_cores;
+    }
+
+    /**
+     * @brief Sets the action's allocated RAM
+     * @param ram: a number of bytes
+     */
+    void Action::setRAMAllocated(double ram) {
+        this->execution_history.top().ram_allocated = ram;
     }
 
     /**
@@ -158,6 +203,13 @@ namespace wrench {
      */
     void Action::setSimulateComputationAsSleep(bool simulate_computation_as_sleep) {
         this->simulate_computation_as_sleep = simulate_computation_as_sleep;
+    }
+
+    /**
+     * @brief Creat a new execution datastructure (e.g., after a restart)
+     */
+    void Action::newExecution() {
+        this->execution_history.push(Action::ActionExecution());
     }
 
     /**
@@ -173,7 +225,7 @@ namespace wrench {
      */
     void Action::updateState() {
         // Do nothing if task state is neither ready nor not ready
-        if (this->state != Action::State::NOT_READY and this->state != Action::State::READY) {
+        if (this->execution_history.top().state != Action::State::NOT_READY and this->execution_history.top().state != Action::State::READY) {
             return;
         }
         // Ready?
@@ -184,9 +236,9 @@ namespace wrench {
             }
         }
         if (ready) {
-            this->state = Action::State::READY;
+            this->execution_history.top().state = Action::State::READY;
         } else {
-            this->state = Action::State::NOT_READY;
+            this->execution_history.top().state = Action::State::NOT_READY;
         }
     }
 
@@ -203,7 +255,7 @@ namespace wrench {
      * @return a number of cores
      */
     unsigned long Action::getMaxNumCores() const {
-        return ULONG_MAX;
+        return 0;
     }
 
     /**
@@ -218,8 +270,18 @@ namespace wrench {
      * @brief Set the shared_ptr to this
      * @param
      */
-    void Action::setSharedPtrThis(std::shared_ptr<Action> shared_ptr_this) {
-        this->shared_ptr_this = shared_ptr_this;
+    void Action::setSharedPtrThis(std::shared_ptr<Action> shared_ptr) {
+        this->shared_ptr_this = std::move(shared_ptr);
     }
+
+    /**
+     * @brief Retrieve the execution history
+     * @return the execution history
+     */
+    std::stack<Action::ActionExecution> Action::getExecutionHistory() {
+        return this->execution_history;
+    }
+
+
 
 }
