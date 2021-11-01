@@ -213,7 +213,6 @@ namespace wrench {
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
      * @param parent_service: the service that started this service
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
@@ -221,17 +220,11 @@ namespace wrench {
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::shared_ptr<Service> parent_service,
-            double ttl,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : Service(hostname,
                 "action_scheduler",
                 "action_scheduler") {
-
-        if (ttl <= 0) {
-            throw std::invalid_argument(
-                    "ActionScheduler::ActionScheduler(): invalid TTL value (must be >0)");
-        }
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -299,9 +292,6 @@ namespace wrench {
             this->running_thread_counts[host.first] = 0;
         }
 
-        this->ttl = ttl;
-        this->has_ttl = (this->ttl != DBL_MAX);
-
         this->parent_service = std::move(parent_service);
     }
 
@@ -343,12 +333,6 @@ namespace wrench {
             this->host_state_change_monitor->simulation = this->simulation;
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false); // Daemonized, no auto-restart
-        }
-
-
-        // Set an alarm for my timely death, if necessary
-        if (this->has_ttl) {
-            this->death_date = S4U_Simulation::getClock() + this->ttl;
         }
 
         /** Main loop **/
@@ -1045,14 +1029,6 @@ namespace wrench {
             ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
         }
         dict.insert(std::make_pair("ram_availabilities", ram_availabilities_to_return));
-
-        std::map<std::string, double> _ttl;
-        if (this->has_ttl) {
-            _ttl.insert(std::make_pair(this->getName(), this->death_date - S4U_Simulation::getClock()));
-        } else {
-            _ttl.insert(std::make_pair(this->getName(), DBL_MAX));
-        }
-        dict.insert(std::make_pair("ttl", _ttl));
 
         return dict;
     }
