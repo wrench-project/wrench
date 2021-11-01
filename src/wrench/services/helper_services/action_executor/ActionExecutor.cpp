@@ -43,11 +43,15 @@ namespace wrench {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");
         }
 
-        this->callback_mailbox = callback_mailbox;
+        this->callback_mailbox = std::move(callback_mailbox);
         this->action = action;
         this->num_cores = num_cores;
         this->ram_footprint = ram_footprint;
         this->killed_on_purpose = false;
+
+        this->action->setNumCoresAllocated(this->num_cores);
+        this->action->setRAMAllocated(this->ram_footprint);
+        this->action->setExecutionHost(this->hostname);
     }
 
     /**
@@ -104,7 +108,6 @@ namespace wrench {
         this->action->setState(Action::State::STARTED);
         try {
             this->action->execute(this->getSharedPtr<ActionExecutor>());
-
             this->action->setState(Action::State::COMPLETED);
         } catch (ExecutionException &e) {
             this->action->setState(Action::State::FAILED);
@@ -148,7 +151,7 @@ namespace wrench {
      * @brief Return the action executor's allocated RAM
      * @return a number of bytes
      */
-    double ActionExecutor::getMemoryAllocated() {
+    double ActionExecutor::getMemoryAllocated() const {
         return this->ram_footprint;
     }
 
@@ -156,7 +159,7 @@ namespace wrench {
      * @brief Return the action executor's allocated nuber of cores
      * @return a number of cores
      */
-    unsigned long ActionExecutor::getNumCoresAllocated() {
+    unsigned long ActionExecutor::getNumCoresAllocated() const {
         return this->num_cores;
     }
 }

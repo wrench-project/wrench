@@ -145,6 +145,7 @@ namespace wrench {
 
 //        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
 
+        this->compute_threads.clear();
         WRENCH_INFO("Launching %ld compute threads", work_per_thread.size());
         // Create a compute thread to run the computation on each core
         bool success = true;
@@ -192,10 +193,13 @@ namespace wrench {
                 success = false;
                 continue;
             }
-            if (not std::get<0>(thread_status)) {
+            bool has_returned_from_main = std::get<0>(thread_status);
+            if (not has_returned_from_main) {
                 success = false;
+            } else {
             }
         }
+
         this->compute_threads.clear();
 
         if (!success) {

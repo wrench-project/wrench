@@ -364,7 +364,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
 
 
 /**********************************************************************/
-/**  ACTION SCHEDULER ONE ACTION HOST CRASH TEST                      **/
+/**  ACTION SCHEDULER ONE ACTION HOST CRASH RESTART TEST             **/
 /**********************************************************************/
 
 
@@ -388,7 +388,7 @@ private:
 
         // Create an ActionScheduler
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-        compute_resources["Host3"] = std::make_tuple(3, 100.0);
+        compute_resources["Host3"] = std::make_tuple(4, 100.0);
         auto action_scheduler = std::shared_ptr<wrench::ActionScheduler>(
                 new wrench::ActionScheduler("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
@@ -402,7 +402,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         // Add a sleep action to it
-        auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
+        auto action = job->addComputeAction("my_compute", 100.0, 80.0, 2, 3, wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit the action to the action executor
         action_scheduler->submitAction(action);
@@ -410,7 +410,7 @@ private:
         // Sleep 1s
         wrench::Simulation::sleep(1.0);
 
-        // Kill the Storage Service
+        // Kill the Host
         wrench::Simulation::turnOffHost("Host3");
 
         // Sleep 5s
@@ -439,7 +439,7 @@ private:
         }
 
         // Is the end-date sensible?
-        if (action->getEndDate() + EPSILON < action->getStartDate() + 10.0 or action->getEndDate() > action->getStartDate() + 10.01 + EPSILON) {
+        if (action->getEndDate() + EPSILON < 45.333333333333335701810 or action->getEndDate() > 45.33333333333333570181 + EPSILON) {
             throw std::runtime_error("Unexpected action end date: " + std::to_string(action->getEndDate()));
         }
 
@@ -447,6 +447,40 @@ private:
         if (action->getState() != wrench::Action::State::COMPLETED) {
             throw std::runtime_error("Unexpected action state: " + action->getStateAsString());
         }
+
+        // Check out the history
+        auto history = action->getExecutionHistory();
+        // Most recent
+        if (history.top().ram_allocated != 80.0)
+            throw std::runtime_error("Action history most recent: unexpected ram " + std::to_string(history.top().ram_allocated));
+        if (history.top().num_cores_allocated != 3)
+            throw std::runtime_error("Action history most recent: unexpected num cores " + std::to_string(history.top().num_cores_allocated));
+        if (history.top().execution_host != "Host3")
+            throw std::runtime_error("Action history most recent: unexpected execution host " + history.top().execution_host);
+        if (history.top().physical_execution_host != "Host3")
+            throw std::runtime_error("Action history most recent: unexpected physical execution host " + history.top().physical_execution_host);
+        if (history.top().failure_cause != nullptr)
+            throw std::runtime_error("Action history most recent: unexpected failure cause: " + history.top().failure_cause->toString());
+        if (history.top().start_date < 12.0 - EPSILON or history.top().start_date > 12.0 + EPSILON)
+            throw std::runtime_error("Action history most recent: unexpected start date: " + std::to_string(history.top().start_date));
+        if (history.top().end_date + EPSILON < 45.33333333333333570181 or history.top().end_date > 45.33333333333333570181 + EPSILON)
+            throw std::runtime_error("Action history most recent: unexpected end date: " + std::to_string(history.top().end_date));
+        // Older
+        history.pop();
+        if (history.top().ram_allocated != 80.0)
+            throw std::runtime_error("Action history older: unexpected ram " + std::to_string(history.top().ram_allocated));
+        if (history.top().num_cores_allocated != 3)
+            throw std::runtime_error("Action history older: unexpected num cores " + std::to_string(history.top().num_cores_allocated));
+        if (history.top().execution_host != "Host3")
+            throw std::runtime_error("Action history older: unexpected execution host " + history.top().execution_host);
+        if (history.top().physical_execution_host != "Host3")
+            throw std::runtime_error("Action history older: unexpected physical execution host " + history.top().physical_execution_host);
+        if (history.top().failure_cause == nullptr)
+            throw std::runtime_error("Action history older: There should be a failure cause: " + history.top().failure_cause->toString());
+        if (history.top().start_date > EPSILON)
+            throw std::runtime_error("Action history older: unexpected start date: " + std::to_string(history.top().start_date));
+        if (history.top().end_date + EPSILON < 1.0 or history.top().end_date > 1.0 + EPSILON)
+            throw std::runtime_error("Action history older: unexpected end date: " + std::to_string(history.top().end_date));
 
         return 0;
     }
@@ -628,7 +662,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashNoRestartTest_test() {
 
 
 /**********************************************************************/
-/**  ACTION SCHEDULER ONE ACTION FAILURE TEST                      **/
+/**  ACTION SCHEDULER ONE ACTION FAILURE TEST                        **/
 /**********************************************************************/
 
 
