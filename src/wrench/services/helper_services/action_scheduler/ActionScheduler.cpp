@@ -460,6 +460,7 @@ namespace wrench {
                 picked_num_cores = used_num_cores;
             }
         }
+
         return std::make_tuple(picked_host, picked_num_cores);
     }
 
@@ -492,11 +493,11 @@ namespace wrench {
             target_host = std::get<0>(allocation);
             target_num_cores = std::get<1>(allocation);
 
-//            WRENCH_INFO("ALLOC %s: %s %ld %lf", action->getName().c_str(), target_host.c_str(), target_num_cores, required_ram);
             // If we didn't find a host, forget it
             if (target_host.empty()) {
                 continue;
             }
+//            WRENCH_INFO("ALLOC %s: %s %ld %lf", action->getName().c_str(), target_host.c_str(), target_num_cores, required_ram);
 
             /** Dispatch it **/
             // Create an action executor on the target host
@@ -1092,6 +1093,7 @@ namespace wrench {
         if (this->getPropertyValueAsBoolean(ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
 
             // Reset the action state to READY)
+            action->newExecution();
             action->setState(Action::State::READY);
             // Put the action back in the ready list (at the end)
             WRENCH_INFO("Putting action back in the ready queue");

@@ -43,8 +43,8 @@ namespace wrench {
         void cleanup(bool has_returned_from_main, int return_value) override;
 
         std::shared_ptr<Action> getAction();
-        unsigned long getNumCoresAllocated();
-        double getMemoryAllocated();
+        unsigned long getNumCoresAllocated() const;
+        double getMemoryAllocated() const;
 
     protected:
 
