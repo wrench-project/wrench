@@ -214,7 +214,7 @@ private:
             auto lambda_execute = [storage_service, file](std::shared_ptr<wrench::ActionExecutor> action_executor) {
                 storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service));
                 wrench::Simulation::sleep(10.0); };
-            auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) { std::cerr << "TERMINATE\n";};
+            auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) { };
 
             action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", lambda_execute, lambda_terminate));
             action->setThreadCreationOverhead(0.0);
