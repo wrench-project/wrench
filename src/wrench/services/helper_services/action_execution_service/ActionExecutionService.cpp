@@ -14,8 +14,9 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <utility>
 
-#include <wrench/services/helper_services/action_scheduler/ActionExecutionService.h>
-#include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/job/CompoundJob.h>
@@ -177,7 +178,7 @@ namespace wrench {
         //  send a "run a standard job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new ActionSchedulerSubmitActionRequestMessage(
+                                    new ActionExecutionServiceSubmitActionRequestMessage(
                                             answer_mailbox, action,
                                             0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -192,7 +193,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ActionSchedulerSubmitActionAnswerMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionAnswerMessage *>(message.get())) {
             // If not a success, throw an exception
             if (not msg->success) {
                 throw ExecutionException(msg->cause);
@@ -223,8 +224,8 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : Service(hostname,
-                "action_scheduler",
-                "action_scheduler") {
+                "action_execution_service",
+                "action_execution_service") {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -566,7 +567,7 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<HostHasTurnedOffMessage *>(message.get())) {
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                    ActionSchedulerProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -597,11 +598,11 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<ActionSchedulerSubmitActionRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ActionExecutionServiceSubmitActionRequestMessage *>(message.get())) {
             processSubmitAction(msg->reply_mailbox, msg->action);
             return true;
 
-        } else if (auto msg = dynamic_cast<ActionSchedulerTerminateActionRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionRequestMessage *>(message.get())) {
             processActionTerminationRequest(msg->action, msg->reply_mailbox);
             return true;
 
@@ -624,7 +625,7 @@ namespace wrench {
             processActionExecutorCrash(action_executor);
             // If all hosts being off should not cause the service to terminate, then nevermind
             if (this->getPropertyValueAsString(
-                    ActionSchedulerProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
+                    ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN) == "false") {
                 return true;
 
             } else {
@@ -665,7 +666,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(
                     this->parent_service->mailbox_name,
-                    new ActionSchedulerActionFailedMessage(action, 0));
+                    new ActionExecutionServiceActionDoneMessage(action, 0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
         }
@@ -721,7 +722,7 @@ namespace wrench {
         //  send a "terminate action" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new ActionSchedulerTerminateActionRequestMessage(
+                                    new ActionExecutionServiceTerminateActionRequestMessage(
                                             answer_mailbox, action, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
@@ -735,7 +736,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ActionSchedulerTerminateActionAnswerMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw ExecutionException(msg->cause);
@@ -764,7 +765,7 @@ namespace wrench {
 
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
-                this->parent_service->mailbox_name, new ActionSchedulerActionDoneMessage(
+                this->parent_service->mailbox_name, new ActionExecutionServiceActionDoneMessage(
                         executor->getAction(), 0.0));
     }
 
@@ -790,7 +791,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(
                     this->parent_service->mailbox_name,
-                    new ActionSchedulerActionFailedMessage(action, 0));
+                    new ActionExecutionServiceActionDoneMessage(action, 0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             return;
         }
@@ -810,7 +811,7 @@ namespace wrench {
             WRENCH_INFO(
                     "Trying to terminate an action that's not (no longer?) running!");
             std::string error_message = "Action cannot be terminated because it is not running";
-            auto answer_message = new ActionSchedulerTerminateActionAnswerMessage(
+            auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<ActionExecutionService>(), error_message)),
                     0.0);
@@ -821,7 +822,7 @@ namespace wrench {
         terminateRunningAction(action, true);
 
         // reply
-        auto answer_message = new ActionSchedulerTerminateActionAnswerMessage(
+        auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
                 true, nullptr, 0);
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
     }
@@ -912,7 +913,7 @@ namespace wrench {
         if (not actionCanRun(action)) {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
-                    new ActionSchedulerSubmitActionAnswerMessage(
+                    new ActionExecutionServiceSubmitActionAnswerMessage(
                             false,
                             std::shared_ptr<FailureCause>(
                                     new NotEnoughResources(action->getJob(), this->parent_service)),
@@ -940,7 +941,7 @@ namespace wrench {
         // And send a reply!
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
-                new ActionSchedulerSubmitActionAnswerMessage(true, nullptr, 0.0));
+                new ActionExecutionServiceSubmitActionAnswerMessage(true, nullptr, 0.0));
     }
 
 
@@ -1066,7 +1067,7 @@ namespace wrench {
         // Forget the executor
         this->action_executors.erase(action);
 
-        if (this->getPropertyValueAsBoolean(ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
+        if (this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
 
             // Reset the action state to READY)
             action->newExecution();
@@ -1081,7 +1082,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(
                         this->parent_service->mailbox_name,
-                        new ActionSchedulerActionFailedMessage(action, 0));
+                        new ActionExecutionServiceActionDoneMessage(action, 0));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return;
             }

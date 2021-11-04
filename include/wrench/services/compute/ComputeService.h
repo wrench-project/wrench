@@ -70,6 +70,8 @@ namespace wrench {
 
         bool supportsStandardJobs();
 
+        bool supportsCompoundJobs();
+
         bool supportsPilotJobs();
 
         bool hasScratch();
@@ -119,6 +121,15 @@ namespace wrench {
         submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
+         * @brief Method to submit a compound job to the service
+         *
+         * @param job: The job being submitted
+         * @param service_specific_arguments: the set of service-specific arguments
+         */
+        virtual void
+        submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+
+        /**
          * @brief Method to submit a pilot job to the service
          *
          * @param job: The job being submitted
@@ -127,10 +138,16 @@ namespace wrench {
         virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
-         * @brief Method to terminate a running standard job
+         * @brief Method to terminate a  standard job
          * @param job: the standard job
          */
         virtual void terminateStandardJob(std::shared_ptr<StandardJob> job) = 0;
+
+        /**
+         * @brief Method to terminate a compound job
+         * @param job: the standard job
+         */
+        virtual void terminateCompoundJob(std::shared_ptr<CompoundJob> job) = 0;
 
         /**
          * @brief Method to terminate a running pilot job

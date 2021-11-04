@@ -25,12 +25,11 @@
 namespace wrench {
 
     class Simulation;
-
     class StorageService;
-
     class FailureCause;
-
     class Alarm;
+    class Action;
+    class ActionExecutionService;
 
 
     /**
@@ -53,8 +52,9 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
+                {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "false"},
                 {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
+                {BareMetalComputeServiceProperty::SUPPORTS_COMPOUND_JOBS,                         "true"},
                 {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
         };
@@ -105,11 +105,15 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override {} ;
+
+        void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
         void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
+        void terminateStandardJob(std::shared_ptr<StandardJob> job) override {};
+
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
         void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
@@ -168,20 +172,19 @@ namespace wrench {
         std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
 
         // Set of running jobs
-        std::set<std::shared_ptr<StandardJob> > running_jobs;
+//        std::set<std::shared_ptr<StandardJob> > running_jobs;
 
         // Job task execution specs
-        std::map<std::shared_ptr<StandardJob> , std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
+//        std::map<std::shared_ptr<StandardJob> , std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
 
         // Map of all Workunits
         std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> all_workunits;
 
-        std::deque<std::shared_ptr<Workunit>> ready_workunits;
-//        std::map<std::shared_ptr<StandardJob> , std::set<Workunit *>> running_workunits;
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> completed_workunits;
+        std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
-        // Set of running WorkunitExecutors
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
+        std::set<std::shared_ptr<Action>> not_ready_actions;
+        std::deque<std::shared_ptr<Action>> ready_actions;
+        std::set<std::shared_ptr<Action>> dispatched_actions;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
@@ -193,23 +196,17 @@ namespace wrench {
 
         // Helper functions to make main() a bit more palatable
 
-        void terminate(bool notify_pilot_job_submitters);
+        void terminate();
 
         void failCurrentStandardJobs();
 
-        void processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor, std::shared_ptr<Workunit> workunit);
+        void processActionDone(std::shared_ptr<Action> action);
 
-        void processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor, std::shared_ptr<Workunit> workunit, std::shared_ptr<FailureCause> cause);
-
-        void processWorkunitExecutorCrash(std::shared_ptr<WorkunitExecutor> workunit_executor);
-
-        void forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor);
-
-        void processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job, const std::string &answer_mailbox);
+        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, const std::string &answer_mailbox);
 
         bool processNextMessage();
 
-        void dispatchReadyWorkunits();
+        void dispatchReadyAction();
 
 //        void someHostIsBackOn(simgrid::s4u::Host const &h);
 //        bool host_back_on = false;
@@ -224,15 +221,15 @@ namespace wrench {
             COMPUTE_SERVICE_KILLED
         };
 
-        void terminateRunningStandardJob(std::shared_ptr<StandardJob> job, JobTerminationCause termination_cause);
+        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, JobTerminationCause termination_cause);
 
-        void failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause);
+//        void failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause);
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
         void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 
-        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+        void processSubmitCompoundJob(const std::string &answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
@@ -254,6 +251,8 @@ namespace wrench {
         int exit_code = 0;
 
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
+
+        std::shared_ptr<ActionExecutionService> action_execution_service;
 
     };
 };

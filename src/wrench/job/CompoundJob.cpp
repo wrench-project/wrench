@@ -371,4 +371,20 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Return whether the job has terminated and has done so successfully
+     * @return true or false
+     */
+    bool CompoundJob::hasSuccessfullyCompleted() {
+        return (this->actions.size() == this->state_task_map[Action::State::COMPLETED].size());
+    }
+
+    /**
+     * @brief Return whether the job has terminated and has done so with some tasks having failed
+     * @return true or false
+     */
+    bool CompoundJob::hasFailed() {
+        return (not this->state_task_map[Action::State::FAILED].empty());
+    }
+
 }

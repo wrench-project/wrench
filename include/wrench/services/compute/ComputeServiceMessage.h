@@ -34,9 +34,10 @@ namespace wrench {
         ComputeServiceMessage(std::string name, double payload);
     };
 
+
     /**
-     * @brief A message sent to a ComputeService to submit a StandardJob for execution
-     */
+    * @brief A message sent to a ComputeService to submit a StandardJob for execution
+    */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitStandardJobRequestMessage(const std::string answer_mailbox, std::shared_ptr<StandardJob> ,
@@ -122,6 +123,99 @@ namespace wrench {
 
         /** @brief The standard job to terminate */
         std::shared_ptr<StandardJob> job;
+        /** @brief The compute service to which the job had been submitted */
+        std::shared_ptr<ComputeService> compute_service;
+        /** @brief Whether to job termination was successful */
+        bool success;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
+    };
+
+    /**
+     * @brief A message sent to a ComputeService to submit a CompoundJob for execution
+     */
+    class ComputeServiceSubmitCompoundJobRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceSubmitCompoundJobRequestMessage(const std::string answer_mailbox, std::shared_ptr<CompoundJob> ,
+                                                      const std::map<std::string, std::string> service_specific_args,
+                                                      double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The submitted job */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief Service specific arguments */
+        std::map<std::string, std::string> service_specific_args;
+    };
+
+    /**
+     * @brief  A message sent by a ComputeService in answer to a CompoundJob submission request
+     */
+    class ComputeServiceSubmitCompoundJobAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceSubmitCompoundJobAnswerMessage(std::shared_ptr<CompoundJob> , std::shared_ptr<ComputeService>, bool success,
+                                                     std::shared_ptr<FailureCause> failure_cause, double payload);
+
+        /** @brief The standard job that was submitted */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief The compute service to which the job was submitted */
+        std::shared_ptr<ComputeService> compute_service;
+        /** @brief Whether to job submission was successful */
+        bool success;
+        /** @brief The cause of the failure, or nullptr on success */
+        std::shared_ptr<FailureCause> failure_cause;
+    };
+
+    /**
+     * @brief A message sent by a ComputeService when a CompoundJob has completed execution
+     */
+    class ComputeServiceCompoundJobDoneMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceCompoundJobDoneMessage(std::shared_ptr<CompoundJob> , std::shared_ptr<ComputeService>, double payload);
+
+        /** @brief The job that has completed */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief The compute service on which the job has completed */
+        std::shared_ptr<ComputeService> compute_service;
+    };
+
+    /**
+     * @brief A message sent by a ComputeService when a CompoundJob has failed to execute
+     */
+    class ComputeServiceCompoundJobFailedMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceCompoundJobFailedMessage(std::shared_ptr<CompoundJob> , std::shared_ptr<ComputeService>,
+                                               double payload);
+
+        /** @brief The job that has failed */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief The compute service on which the job has failed */
+        std::shared_ptr<ComputeService> compute_service;
+    };
+
+    /**
+    * @brief A message sent to a ComputeService to terminate a CompoundJob previously submitted for execution
+    */
+    class ComputeServiceTerminateCompoundJobRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceTerminateCompoundJobRequestMessage(std::string answer_mailbox, std::shared_ptr<CompoundJob> , double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The job to terminate*/
+        std::shared_ptr<CompoundJob> job;
+    };
+
+    /**
+     * @brief A message sent by a ComputeService in answer to a CompoundJob termination request
+     */
+    class ComputeServiceTerminateCompoundJobAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceTerminateCompoundJobAnswerMessage(std::shared_ptr<CompoundJob> , std::shared_ptr<ComputeService>, bool success,
+                                                        std::shared_ptr<FailureCause> failure_cause, double payload);
+
+        /** @brief The standard job to terminate */
+        std::shared_ptr<CompoundJob> job;
         /** @brief The compute service to which the job had been submitted */
         std::shared_ptr<ComputeService> compute_service;
         /** @brief Whether to job termination was successful */

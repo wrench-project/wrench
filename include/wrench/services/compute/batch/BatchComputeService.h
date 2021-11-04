@@ -154,6 +154,9 @@ namespace wrench {
         //submits a standard job
         void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
+        //submits a compound job
+        void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &batch_job_args) override {};
+
         //submits a standard job
         void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
@@ -162,6 +165,9 @@ namespace wrench {
 
         // terminate a standard job
         void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
+
+        // terminate a compound job
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override {} ;
 
         // terminate a pilot job
         void terminatePilotJob(std::shared_ptr<PilotJob> job) override;

@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_ACTION_SCHEDULER_PROPERTY_H
-#define WRENCH_ACTION_SCHEDULER_PROPERTY_H
+#ifndef WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
+#define WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
 
 
 #include "wrench/services/ServiceProperty.h"
@@ -22,7 +22,7 @@ namespace wrench {
     /**
      * @brief Configurable properties for a ActionExecutionService
      */
-    class ActionSchedulerProperty {
+    class ActionExecutionServiceProperty {
 
     public:
 
@@ -40,4 +40,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_ACTION_SCHEDULER_PROPERTY_H
+#endif //WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H

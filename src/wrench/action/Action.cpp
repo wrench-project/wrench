@@ -283,5 +283,13 @@ namespace wrench {
     }
 
 
+    std::set<std::shared_ptr<Action>> &Action::getChildren() {
+        return this->children;
+    }
+
+    std::set<std::shared_ptr<Action>> &Action::getParents() {
+        return this->parents;
+    }
+
 
 }
