@@ -118,6 +118,9 @@ namespace wrench {
 
         const std::map<std::string, std::string> & getServiceSpecificArgs();
 
+        bool hasSuccessfullyCompleted();
+        bool hasFailed();
+
         /***********************/
         /** \endcond           */
         /***********************/

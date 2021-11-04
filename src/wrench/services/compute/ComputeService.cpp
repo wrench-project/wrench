@@ -168,6 +168,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get whether the compute service supports compound jobs or not
+     * @return true or false
+     */
+    bool ComputeService::supportsCompoundJobs() {
+        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_COMPOUND_JOBS);
+    }
+
+    /**
      * @brief Get the number of hosts that the compute service manages
      * @return the host count
      *

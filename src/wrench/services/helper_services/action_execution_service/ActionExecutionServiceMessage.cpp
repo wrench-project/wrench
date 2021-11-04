@@ -8,7 +8,7 @@
  */
 
 
-#include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
 #include <utility>
 
@@ -21,8 +21,8 @@ namespace wrench {
     * @param name: the message name
     * @param payload: the message size in bytes
     */
-    ActionSchedulerMessage::ActionSchedulerMessage(std::string name, double payload) :
-            SimulationMessage("ActionSchedulerMessage::" + name, payload) {
+    ActionExecutionServiceMessage::ActionExecutionServiceMessage(std::string name, double payload) :
+            SimulationMessage("ActionExecutionServiceMessage::" + name, payload) {
     }
 
 
@@ -31,11 +31,11 @@ namespace wrench {
      * @param action: the action to perform
      * @param payload: the message size in bytes
      */
-    ActionSchedulerSubmitActionRequestMessage::ActionSchedulerSubmitActionRequestMessage(
+    ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(
             const std::string &reply_mailbox,
             std::shared_ptr<Action> action,
             double payload) :
-            ActionSchedulerMessage("ACTION_SCHEDULER_SUBMIT_ACTION_REQUEST", payload) {
+            ActionExecutionServiceMessage("ACTION_EXECUTION_SERVICE_SUBMIT_ACTION_REQUEST", payload) {
         this->action = std::move(action);
         this->reply_mailbox = reply_mailbox;
     }
@@ -46,11 +46,11 @@ namespace wrench {
      * @param cause: the cause of the failure, if any
      * @param payload: the message size in bytes
      */
-    ActionSchedulerSubmitActionAnswerMessage::ActionSchedulerSubmitActionAnswerMessage(
+    ActionExecutionServiceSubmitActionAnswerMessage::ActionExecutionServiceSubmitActionAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> cause,
             double payload) :
-            ActionSchedulerMessage("ACTION_SCHEDULER_SUBMIT_ACTION_ANSWER", payload) {
+            ActionExecutionServiceMessage("ACTION_EXECUTION_SERVICE_SUBMIT_ACTION_ANSWER", payload) {
         this->success = success;
         this->cause = std::move(cause);
     }
@@ -60,10 +60,10 @@ namespace wrench {
      * @param action: the action to terminate
      * @param payload: the message size in bytes
      */
-    ActionSchedulerTerminateActionRequestMessage::ActionSchedulerTerminateActionRequestMessage(
+    ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(
             const std::string &reply_mailbox,
             std::shared_ptr<Action> action, double payload) :
-            ActionSchedulerMessage("ACTION_SCHEDULER_TERMINATE_ACTION_REQUEST", payload) {
+            ActionExecutionServiceMessage("ACTION_EXECUTION_SERVICE_TERMINATE_ACTION_REQUEST", payload) {
         this->reply_mailbox = reply_mailbox;
         this->action = std::move(action);
     }
@@ -74,25 +74,12 @@ namespace wrench {
      * @param cause: the failure cause, if any
      * @param payload: the message size in bytes
      */
-    ActionSchedulerTerminateActionAnswerMessage::ActionSchedulerTerminateActionAnswerMessage(
+    ActionExecutionServiceTerminateActionAnswerMessage::ActionExecutionServiceTerminateActionAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> cause, double payload) :
-            ActionSchedulerMessage("ACTION_SCHEDULER_TERMINATE_ACTION_ANSWER", payload) {
+            ActionExecutionServiceMessage("ACTION_EXECUTION_SERVICE_TERMINATE_ACTION_ANSWER", payload) {
         this->success = success;
         this->cause = std::move(cause);
-    }
-
-
-    /**
-     * @brief Constructor
-     * @param action: the action that failed
-     * @param payload: the message size in bytes
-     */
-    ActionSchedulerActionFailedMessage::ActionSchedulerActionFailedMessage(
-            std::shared_ptr<Action> action, double payload) :
-            ActionSchedulerMessage("ACTION_SCHEDULER_ACTION_FAILED", payload){
-        this->action = std::move(action);
-        this->payload = payload;
     }
 
     /**
@@ -100,9 +87,9 @@ namespace wrench {
   * @param action: the action that completed
   * @param payload: the message size in bytes
   */
-    ActionSchedulerActionDoneMessage::ActionSchedulerActionDoneMessage(
+    ActionExecutionServiceActionDoneMessage::ActionExecutionServiceActionDoneMessage(
             std::shared_ptr<Action> action, double payload) :
-            ActionSchedulerMessage("ACTION_SCHEDULER_ACTION_DONE", payload){
+            ActionExecutionServiceMessage("ACTION_EXECUTION_SERVICE_ACTION_DONE", payload){
         this->action = std::move(action);
         this->payload = payload;
     }

@@ -8,12 +8,12 @@
  */
 
 
-#ifndef WRENCH_ACTION_SCHEDULER_MESSAGE_H
-#define WRENCH_ACTION_SCHEDULER_MESSAGE_H
+#ifndef WRENCH_ACTION_ACTION_EXECUTION_SERVICE_MESSAGE_H
+#define WRENCH_ACTION_ACTION_EXECUTION_SERVICE_MESSAGE_H
 
 #include <vector>
 
-#include "wrench/services/helper_services/action_scheduler/ActionExecutionService.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionService.h"
 #include "wrench/services/ServiceMessage.h"
 
 namespace wrench {
@@ -29,17 +29,17 @@ namespace wrench {
     /**
      * @brief Top-level class for messages received/sent by a ActionExecutionService
      */
-    class ActionSchedulerMessage : public SimulationMessage {
+    class ActionExecutionServiceMessage : public SimulationMessage {
     protected:
-        ActionSchedulerMessage(std::string name, double payload);
+        ActionExecutionServiceMessage(std::string name, double payload);
     };
 
     /**
      * @brief A message sent to an ActionExecutionService to submit an Action
      */
-    class ActionSchedulerSubmitActionRequestMessage : public ActionSchedulerMessage {
+    class ActionExecutionServiceSubmitActionRequestMessage : public ActionExecutionServiceMessage {
     public:
-        ActionSchedulerSubmitActionRequestMessage(
+        ActionExecutionServiceSubmitActionRequestMessage(
                 const std::string &reply_mailbox,
                 std::shared_ptr<Action> action,
                 double payload);
@@ -53,9 +53,9 @@ namespace wrench {
     /**
      * @brief A message sent by an ActionExecutionService in answer to an Action submission
      */
-    class ActionSchedulerSubmitActionAnswerMessage : public ActionSchedulerMessage {
+    class ActionExecutionServiceSubmitActionAnswerMessage : public ActionExecutionServiceMessage {
     public:
-        ActionSchedulerSubmitActionAnswerMessage(
+        ActionExecutionServiceSubmitActionAnswerMessage(
                 bool success,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
@@ -69,9 +69,9 @@ namespace wrench {
     /**
      * @brief A message sent to an ActionExecutionService to terminate an Action
      */
-    class ActionSchedulerTerminateActionRequestMessage : public ActionSchedulerMessage {
+    class ActionExecutionServiceTerminateActionRequestMessage : public ActionExecutionServiceMessage {
     public:
-        ActionSchedulerTerminateActionRequestMessage(
+        ActionExecutionServiceTerminateActionRequestMessage(
                 const std::string &reply_mailbox,
                 std::shared_ptr<Action> action,
                 double payload);
@@ -85,9 +85,9 @@ namespace wrench {
     /**
    * @brief A message sent by an ActionExecutionService in response to an action termination
    */
-    class ActionSchedulerTerminateActionAnswerMessage : public ActionSchedulerMessage {
+    class ActionExecutionServiceTerminateActionAnswerMessage : public ActionExecutionServiceMessage {
     public:
-        ActionSchedulerTerminateActionAnswerMessage(
+        ActionExecutionServiceTerminateActionAnswerMessage(
                 bool success,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
@@ -99,24 +99,11 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent by an ActionExecutionService to notify of an action's failure
-     */
-    class ActionSchedulerActionFailedMessage : public ActionSchedulerMessage {
-    public:
-        ActionSchedulerActionFailedMessage(
-                std::shared_ptr<Action> action,
-                double payload);
-
-        /** @brief The action that failed  */
-        std::shared_ptr<Action> action;
-    };
-
-    /**
  * @brief A message sent by an ActionExecutionService to notify of an action's completion
  */
-    class ActionSchedulerActionDoneMessage : public ActionSchedulerMessage {
+    class ActionExecutionServiceActionDoneMessage : public ActionExecutionServiceMessage {
     public:
-        ActionSchedulerActionDoneMessage(
+        ActionExecutionServiceActionDoneMessage(
                 std::shared_ptr<Action> action,
                 double payload);
 
@@ -131,4 +118,4 @@ namespace wrench {
     /***********************/
 };
 
-#endif //WRENCH_ACTION_SCHEDULER_MESSAGE_H
+#endif //WRENCH_ACTION_ACTION_EXECUTION_SERVICE_MESSAGE_H

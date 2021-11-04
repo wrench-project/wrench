@@ -17,8 +17,8 @@
 #include <wrench/action/FileReadAction.h>
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/action/FileCopyAction.h>
-#include <wrench/services/helper_services/action_scheduler/ActionExecutionService.h>
-#include <wrench/services/helper_services/action_scheduler/ActionSchedulerMessage.h>
+#include <wrench/services/helper_services/action_execution_service//ActionExecutionService.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes/HostError.h>
 
@@ -172,7 +172,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -291,7 +291,7 @@ private:
         // Invalidly, submit the action to the action executor, for coverage
         try {
             action_scheduler->submitAction(action);
-            throw std::runtime_error("Should not be able to submit a non-ready action to the action_scheduler");
+            throw std::runtime_error("Should not be able to submit a non-ready action to the action_execution_service");
         } catch (std::runtime_error &e) {
             // expected
         }
@@ -393,7 +393,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
+                                            {{wrench::ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -429,7 +429,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -562,7 +562,7 @@ private:
         auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
                                             this->getSharedPtr<wrench::Service>(),
-                                            {{wrench::ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
+                                            {{wrench::ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
 
         // Start it
         action_scheduler->simulation = this->simulation;
@@ -592,7 +592,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionFailedMessage>(message);
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -721,7 +721,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg = std::dynamic_pointer_cast<wrench::ActionSchedulerActionFailedMessage>(message);
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -966,7 +966,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg1 = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        auto msg1 = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg1) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -983,7 +983,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg2 = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        auto msg2 = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg2) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
@@ -1000,7 +1000,7 @@ private:
         }
 
         // Did we get the expected message?
-        auto msg3 = std::dynamic_pointer_cast<wrench::ActionSchedulerActionDoneMessage>(message);
+        auto msg3 = std::dynamic_pointer_cast<wrench::ActionExecutionServiceActionDoneMessage>(message);
         if (!msg3) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }

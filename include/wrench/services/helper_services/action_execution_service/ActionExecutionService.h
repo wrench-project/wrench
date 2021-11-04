@@ -17,7 +17,7 @@
 #include "wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/helper_services/work_unit_executor/Workunit.h"
 #include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
-#include "wrench/services/helper_services/action_scheduler/ActionSchedulerProperty.h"
+#include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h"
 
 
 namespace wrench {
@@ -42,8 +42,8 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                {ActionSchedulerProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
-                {ActionSchedulerProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH,     "false"},
+                {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
+                {ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH,     "false"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -63,9 +63,15 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
+        bool actionCanRun(std::shared_ptr<Action> action);
+
         void submitAction(const std::shared_ptr<Action> &action);
 
         void terminateAction(std::shared_ptr<Action> action);
+
+        bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
+
+        std::map<std::string, std::map<std::string, double>> getResourceInformation();
 
         ~ActionExecutionService();
 
@@ -139,7 +145,6 @@ namespace wrench {
 
         void failRunningAction(std::shared_ptr<Action> action, std::shared_ptr<FailureCause> cause);
 
-        std::map<std::string, std::map<std::string, double>> getResourceInformation();
 
         void processSubmitAction(const std::string &answer_mailbox, std::shared_ptr<Action> action);
 
@@ -147,7 +152,6 @@ namespace wrench {
                                                               std::string required_host, unsigned long required_num_cores,
                                                               std::set<std::string> &hosts_to_avoid);
 
-        bool actionCanRun(std::shared_ptr<Action> action);
 
         bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
 
@@ -156,7 +160,6 @@ namespace wrench {
         bool areAllComputeResourcesDownWithNoActionExecutorRunning();
 
 
-        bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
 
         int exit_code = 0;
 

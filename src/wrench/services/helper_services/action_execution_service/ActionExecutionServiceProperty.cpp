@@ -7,12 +7,12 @@
  * (at your option) any later version.
  */
 
-#include <wrench/services/helper_services/action_scheduler/ActionSchedulerProperty.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(ActionSchedulerProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
-    SET_PROPERTY_NAME(ActionSchedulerProperty, RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
+    SET_PROPERTY_NAME(ActionExecutionServiceProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
+    SET_PROPERTY_NAME(ActionExecutionServiceProperty, RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
 
 };
 
