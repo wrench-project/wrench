@@ -24,6 +24,8 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(SUPPORTS_STANDARD_JOBS);
         /** @brief Whether the compute service supports pilot jobs (true or false) **/
         DECLARE_PROPERTY_NAME(SUPPORTS_PILOT_JOBS);
+        /** @brief Whether the compute service supports compound jobs (true or false) **/
+        DECLARE_PROPERTY_NAME(SUPPORTS_COMPOUND_JOBS);
     };
 };
 
