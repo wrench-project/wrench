@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
     auto client_storage_service = simulation.add(new wrench::SimpleStorageService(
             "compute_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
 
-    std::cerr << "Instantiating a bare_metal on compute_host..." << std::endl;
+    std::cerr << "Instantiating a bare_metal_standard_jobs on compute_host..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "compute_host", {"compute_host"}, "", {}, {}));
 

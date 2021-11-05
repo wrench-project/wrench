@@ -143,7 +143,7 @@ private:
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_write_action));
         // Start it
-        file_write_action_executor->simulation = this->simulation;
+        file_write_action_executor->setSimulation(this->simulation);
         file_write_action_executor->start(file_write_action_executor, true, false);
 
         // Wait for a message from it

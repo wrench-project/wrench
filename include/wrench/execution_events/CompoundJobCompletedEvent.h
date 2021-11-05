@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_STANDARD_JOB_COMPLETED_EVENT_H
-#define WRENCH_STANDARD_JOB_COMPLETED_EVENT_H
+#ifndef WRENCH_COMPOUND_JOB_COMPLETED_EVENT_H
+#define WRENCH_COMPOUND_JOB_COMPLETED_EVENT_H
 
 #include <string>
 #include <utility>
@@ -26,7 +26,7 @@ namespace wrench {
 
     class WorkflowFile;
 
-    class StandardJob;
+    class CompoundJob;
 
     class PilotJob;
 
@@ -41,9 +41,9 @@ namespace wrench {
 
 
     /**
-     * @brief A "standard job has completed" ExecutionEvent
+     * @brief A "compound job has completed" ExecutionEvent
      */
-    class StandardJobCompletedEvent : public ExecutionEvent {
+    class CompoundJobCompletedEvent : public ExecutionEvent {
 
     private:
 
@@ -51,24 +51,24 @@ namespace wrench {
 
         /**
          * @brief Constructor
-         * @param standard_job: a standard job
+         * @param compound_job: a compound job
          * @param compute_service: a compute service
          */
-        StandardJobCompletedEvent(std::shared_ptr<StandardJob> standard_job,
+        CompoundJobCompletedEvent(std::shared_ptr<CompoundJob> compound_job,
                                   std::shared_ptr<ComputeService>  compute_service)
-                : standard_job(std::move(standard_job)), compute_service(compute_service) {}
+                : job(std::move(compound_job)), compute_service(std::move(compute_service)) {}
     public:
 
-        /** @brief The standard job that has completed */
-        std::shared_ptr<StandardJob> standard_job;
-        /** @brief The compute service on which the standard job has completed */
+        /** @brief The compound job that has completed */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief The compute service on which the compound job has completed */
         std::shared_ptr<ComputeService>  compute_service;
 
         /** 
          * @brief Get a textual description of the event
          * @return a text string
          */
-        std::string toString() override { return "StandardJobCompletedEvent (job: " + this->standard_job->getName() + "; cs = " + this->compute_service->getName() + ")";}
+        std::string toString() override { return "CompoundJobCompletedEvent (job: " + this->job->getName() + "; cs = " + this->compute_service->getName() + ")";}
     };
 
 
@@ -80,4 +80,4 @@ namespace wrench {
 
 
 
-#endif //WRENCH_STANDARD_JOB_COMPLETED_EVENT_H
+#endif //WRENCH_COMPOUND_JOB_COMPLETED_EVENT_H

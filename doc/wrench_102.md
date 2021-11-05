@@ -365,7 +365,7 @@ WMS overrides the two corresponding member functions as follows:
 void TwoTasksAtATimeWMS::processEventStandardJobCompletion(
                std::shared_ptr<StandardJobCompletedEvent> event) {
   // Retrieve the job that this event is for 
-  auto job = event->standard_job;
+  auto job = event->job;
   // Print some message for each task in the job
   for (auto const &task : job->getTasks()) {
     std::cerr  << "Notified that a standard job has completed task " << task->getID() << std::endl;
@@ -375,7 +375,7 @@ void TwoTasksAtATimeWMS::processEventStandardJobCompletion(
 void TwoTasksAtATimeWMS::processEventStandardJobFailure(
                std::shared_ptr<StandardJobFailedEvent> event) {
   // Retrieve the job that this event is for 
-  auto job = event->standard_job;
+  auto job = event->job;
   std::cerr  << "Notified that a standard job has failed (failure cause: ";
   std::cerr << event->failure_cause->toString() << ")" <<  std::endl;
   // Print some message for each task in the job if it has failed

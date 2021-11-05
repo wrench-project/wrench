@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -184,7 +184,7 @@ private:
                                                          CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
                                                          CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
                                                          victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
-        switcher->simulation = this->simulation;
+        switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
     }
 

@@ -163,7 +163,7 @@ private:
                                            action));
 
         // Start it
-        action_executor->simulation = this->simulation;
+        action_executor->setSimulation(this->simulation);
         action_executor->start(action_executor, true, false);
 
         // Wait for a message from it

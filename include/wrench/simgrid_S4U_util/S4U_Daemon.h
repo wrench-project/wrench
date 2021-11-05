@@ -101,16 +101,20 @@ namespace wrench {
         /** @brief The daemon's life saver */
         LifeSaver *life_saver = nullptr;
 
-        /** @brief a pointer to the simulation object */
-        Simulation *simulation;
-
         /** @brief Method to acquire the daemon's lock */
         void acquireDaemonLock();
 
         /** @brief Method to release the daemon's lock */
         void releaseDaemonLock();
 
+        Simulation *getSimulation();
+
+        void setSimulation(Simulation *simulation);
+
     protected:
+        /** @brief a pointer to the simulation object */
+        Simulation *simulation;
+
 
         /** @brief The service's state */
         State state;

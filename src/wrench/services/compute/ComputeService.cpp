@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ namespace wrench {
      * @brief Submit a job to the compute service
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
-     *      - to a bare_metal: {}
+     *      - to a bare_metal_standard_jobs: {}
      *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
      *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
      *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
@@ -67,6 +67,8 @@ namespace wrench {
                 this->submitStandardJob(sjob, service_specific_args);
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 this->submitPilotJob(pjob, service_specific_args);
+            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+                this->submitCompoundJob(cjob, service_specific_args);
             }
         } catch (ExecutionException &e) {
             throw;
@@ -397,7 +399,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "bare_metal::isThereAtLeastOneHostWithIdleResources(): unexpected [" + msg->getName() +
+                    "bare_metal_standard_jobs::isThereAtLeastOneHostWithIdleResources(): unexpected [" + msg->getName() +
                     "] message");
         }
     }
@@ -507,7 +509,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "bare_metal::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                    "bare_metal_standard_jobs::getServiceResourceInformation(): unexpected [" + msg->getName() +
                     "] message");
         }
     }

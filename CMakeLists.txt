@@ -142,6 +142,8 @@ set(HEADER_FILES
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
         include/wrench/execution_events/ExecutionEvent.h
+        include/wrench/execution_events/CompoundJobCompletedEvent.h
+        include/wrench/execution_events/CompoundJobFailedEvent.h
         include/wrench/execution_events/StandardJobCompletedEvent.h
         include/wrench/execution_events/StandardJobFailedEvent.h
         include/wrench/execution_events/PilotJobStartedEvent.h
@@ -375,7 +377,8 @@ set(TEST_FILES
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/services/memory_manager_service/MemoryManagerTest.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceOneTaskTest.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
@@ -384,9 +387,9 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceTestStandardJobs.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceTestPilotJobs.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestStandardJobs.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestPilotJobs.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp
         test/services/helper_services/StandardJobExecutorTest.cpp
         test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
         test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
@@ -396,10 +399,10 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
-        test/services/helper_services/action_scheduler/ActionSchedulerTest.cpp
+        test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceResourceInformationTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
         test/services/compute_services/batch/HomeGrownTimeLineTest.cpp
         test/services/compute_services/batch/BatchServiceTest.cpp
         test/services/compute_services/batch/BatchServiceFCFSTest.cpp
@@ -431,7 +434,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/simulation/InvalidXMLTest.cpp
-        test/services/compute_services/bare_metal/ScratchSpaceTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
         test/simulation/S4U_VirtualMachineTest.cpp
         test/simulation/S4U_SimulationTest.cpp
@@ -439,7 +442,7 @@ set(TEST_FILES
         test/misc/PointerUtilTest.cpp
         test/misc/BogusMessageTest.cpp
         examples/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/services/compute_services/bare_metal/ScratchSpaceTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/services/compute_services/htcondor/HTCondorServiceTest.cpp

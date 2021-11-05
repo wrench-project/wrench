@@ -54,7 +54,6 @@ namespace wrench {
         // Public Constructor
         ActionExecutionService(const std::string &hostname,
                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                        std::shared_ptr<Service> parent_service,
                         std::map<std::string, std::string> property_list = {},
                         std::map<std::string, double> messagepayload_list = {}
         );
@@ -68,6 +67,8 @@ namespace wrench {
         void submitAction(const std::shared_ptr<Action> &action);
 
         void terminateAction(std::shared_ptr<Action> action);
+
+        void setParentService(std::shared_ptr<Service> service);
 
         bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
 
@@ -92,7 +93,7 @@ namespace wrench {
         std::map<std::string, double> ram_availabilities;
         std::map<std::string, unsigned long> running_thread_counts;
 
-        std::shared_ptr<Service> parent_service;
+        std::shared_ptr<Service> parent_service = nullptr;
 
         std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
 

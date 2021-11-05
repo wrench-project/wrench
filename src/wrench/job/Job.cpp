@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,11 +147,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Return the service-specific arguments that were used during job submission
+     * @brief Return the service-specific arguments that are used during job submission
      * @return a map of argument name/values
      */
     std::map<std::string, std::string> Job::getServiceSpecificArguments() {
         return this->service_specific_args;
+    }
+
+    /**
+     * @brief Sets the service-specific arguments that are used during job submission
+     * @param args: a map of argument name/values
+     */
+     void Job::setServiceSpecificArguments(std::map<std::string, std::string> args) {
+        this->service_specific_args = args;
     }
 
     /**

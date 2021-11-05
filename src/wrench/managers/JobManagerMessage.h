@@ -31,12 +31,48 @@ namespace wrench {
     };
 
     /**
+   * @brief A message sent to a JobManager to wake it up
+   */
+    class JobManagerWakeupMessage : public JobManagerMessage {
+    public:
+        JobManagerWakeupMessage();
+    };
+
+    /**
+    * @brief A message sent by the JobManager to notify some submitter that a CompoundJob has completed
+    */
+    class JobManagerCompoundJobCompletedMessage : public JobManagerMessage {
+    public:
+        JobManagerCompoundJobCompletedMessage(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service);
+
+        /** @brief The job that is done */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief The compute service on which the job ran */
+        std::shared_ptr<ComputeService> compute_service;
+    };
+
+    /**
+     * @brief A message sent by the JobManager to notify some submitter that a CompoundJob has failed
+     */
+    class JobManagerCompoundJobFailedMessage : public JobManagerMessage {
+    public:
+        JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service);
+
+
+        /** @brief The job that has failed */
+        std::shared_ptr<CompoundJob> job;
+        /** @brief The compute service on which the job has failed */
+        std::shared_ptr<ComputeService> compute_service;
+    };
+    
+    
+    /**
      * @brief A message sent by the JobManager to notify some submitter that a StandardJob has completed
      */
-    class JobManagerStandardJobDoneMessage : public JobManagerMessage {
+    class JobManagerStandardJobCompletedMessage : public JobManagerMessage {
     public:
-        JobManagerStandardJobDoneMessage(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
-                                         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes);
+        JobManagerStandardJobCompletedMessage(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
+                                              std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes);
 
 
         /** @brief The job that is done */

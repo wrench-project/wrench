@@ -27,27 +27,27 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionSchedulerTest");
+WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionExecutionServiceTest");
 
 #define EPSILON (std::numeric_limits<double>::epsilon())
 
-class ActionSchedulerTest : public ::testing::Test {
+class ActionExecutionServiceTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
     wrench::WorkflowFile *file;
     std::shared_ptr<wrench::StorageService> ss;
 
-    void do_ActionSchedulerOneActionSuccessTest_test();
-    void do_ActionSchedulerOneActionTerminateTest_test();
-    void do_ActionSchedulerOneActionCrashRestartTest_test();
-    void do_ActionSchedulerOneActionCrashNoRestartTest_test();
-    void do_ActionSchedulerOneActionFailureTest_test();
-    void do_ActionSchedulerOneActionNotEnoughResourcesTest_test();
-    void do_ActionSchedulerThreeActionsInSequenceTest_test();
+    void do_ActionExecutionServiceOneActionSuccessTest_test();
+    void do_ActionExecutionServiceOneActionTerminateTest_test();
+    void do_ActionExecutionServiceOneActionCrashRestartTest_test();
+    void do_ActionExecutionServiceOneActionCrashNoRestartTest_test();
+    void do_ActionExecutionServiceOneActionFailureTest_test();
+    void do_ActionExecutionServiceOneActionNotEnoughResourcesTest_test();
+    void do_ActionExecutionServiceThreeActionsInSequenceTest_test();
 
 protected:
-    ActionSchedulerTest() {
+    ActionExecutionServiceTest() {
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -124,10 +124,10 @@ protected:
 /**********************************************************************/
 
 
-class ActionSchedulerOneActionSuccessTestWMS : public wrench::WMS {
+class ActionExecutionServiceOneActionSuccessTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerOneActionSuccessTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceOneActionSuccessTestWMS(ActionExecutionServiceTest *test,
                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -135,7 +135,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -145,14 +145,15 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                              {}, {}));
 
+        action_execution_service->setParentService(this->getSharedPtr<Service>());
+
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -161,7 +162,7 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         // Submit the action to the action executor
-        action_scheduler->submitAction(action);
+        action_execution_service->submitAction(action);
 
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -196,11 +197,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, OneActionSuccess) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionSuccessTest_test);
+TEST_F(ActionExecutionServiceTest, OneActionSuccess) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionSuccessTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -228,7 +229,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerOneActionSuccessTestWMS(this, "Host1")));
+            new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
@@ -246,10 +247,10 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionSuccessTest_test() {
 /**********************************************************************/
 
 
-class ActionSchedulerOneActionTerminateTestWMS : public wrench::WMS {
+class ActionExecutionServiceOneActionTerminateTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerOneActionTerminateTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceOneActionTerminateTestWMS(ActionExecutionServiceTest *test,
                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -257,7 +258,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -267,14 +268,14 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
+        action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -283,21 +284,21 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         // Submit the action to the action executor
-        action_scheduler->submitAction(action);
+        action_execution_service->submitAction(action);
 
         // Sleep 5s
         wrench::Simulation::sleep(5.0);
 
         // Invalidly, submit the action to the action executor, for coverage
         try {
-            action_scheduler->submitAction(action);
+            action_execution_service->submitAction(action);
             throw std::runtime_error("Should not be able to submit a non-ready action to the action_execution_service");
         } catch (std::runtime_error &e) {
             // expected
         }
 
         // Terminate the action
-        action_scheduler->terminateAction(action);
+        action_execution_service->terminateAction(action);
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
@@ -318,11 +319,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, OneActionTerminate) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionTerminateTest_test);
+TEST_F(ActionExecutionServiceTest, OneActionTerminate) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionTerminateTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -350,7 +351,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerOneActionTerminateTestWMS(this, "Host1")));
+            new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
@@ -369,10 +370,10 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionTerminateTest_test() {
 /**********************************************************************/
 
 
-class ActionSchedulerOneActionCrashRestartTestWMS : public wrench::WMS {
+class ActionExecutionServiceOneActionCrashRestartTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerOneActionCrashRestartTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceOneActionCrashRestartTestWMS(ActionExecutionServiceTest *test,
                                              std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -380,7 +381,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -390,14 +391,15 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(4, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                             {{wrench::ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
 
+        action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
+        
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -406,7 +408,7 @@ private:
         auto action = job->addComputeAction("my_compute", 100.0, 80.0, 2, 3, wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit the action to the action executor
-        action_scheduler->submitAction(action);
+        action_execution_service->submitAction(action);
 
         // Sleep 1s
         wrench::Simulation::sleep(1.0);
@@ -487,11 +489,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, OneActionCrashRestart) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionCrashRestartTest_test);
+TEST_F(ActionExecutionServiceTest, OneActionCrashRestart) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionCrashRestartTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerOneActionCrashRestartTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -519,7 +521,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashRestartTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerOneActionCrashRestartTestWMS(this, "Host1")));
+            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
@@ -538,10 +540,10 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashRestartTest_test() {
 /**********************************************************************/
 
 
-class ActionSchedulerOneActionCrashNoRestartTestWMS : public wrench::WMS {
+class ActionExecutionServiceOneActionCrashNoRestartTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerOneActionCrashNoRestartTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceOneActionCrashNoRestartTestWMS(ActionExecutionServiceTest *test,
                                                 std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -549,7 +551,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -559,14 +561,15 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                             {{wrench::ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
 
+        action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
+        
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -575,7 +578,7 @@ private:
         auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
 
         // Submit the action to the action executor
-        action_scheduler->submitAction(action);
+        action_execution_service->submitAction(action);
 
         // Sleep 1s
         wrench::Simulation::sleep(1.0);
@@ -616,11 +619,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, OneActionCrashNoRestart) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionCrashNoRestartTest_test);
+TEST_F(ActionExecutionServiceTest, OneActionCrashNoRestart) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionCrashNoRestartTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerOneActionCrashNoRestartTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestartTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -648,7 +651,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashNoRestartTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerOneActionCrashNoRestartTestWMS(this, "Host1")));
+            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
@@ -667,10 +670,10 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionCrashNoRestartTest_test() {
 /**********************************************************************/
 
 
-class ActionSchedulerOneActionFailureTestWMS : public wrench::WMS {
+class ActionExecutionServiceOneActionFailureTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerOneActionFailureTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceOneActionFailureTestWMS(ActionExecutionServiceTest *test,
                                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -678,7 +681,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -688,14 +691,14 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
+        action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -704,7 +707,7 @@ private:
         auto action = job->addFileReadAction("my_file_read", this->test->file, wrench::FileLocation::LOCATION(this->test->ss));
 
         // Submit the action to the action executor
-        action_scheduler->submitAction(action);
+        action_execution_service->submitAction(action);
 
         // Sleep 1s
         wrench::Simulation::sleep(1.0);
@@ -750,11 +753,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, OneActionFailure) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionFailureTest_test);
+TEST_F(ActionExecutionServiceTest, OneActionFailure) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionFailureTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -782,7 +785,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerOneActionFailureTestWMS(this, "Host1")));
+            new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
@@ -801,10 +804,10 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionFailureTest_test() {
 /**********************************************************************/
 
 
-class ActionSchedulerOneActionNotEnoughResourcesTestWMS : public wrench::WMS {
+class ActionExecutionServiceOneActionNotEnoughResourcesTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerOneActionNotEnoughResourcesTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(ActionExecutionServiceTest *test,
                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -812,7 +815,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -822,14 +825,14 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
+        action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -840,7 +843,7 @@ private:
 
         // Submit the actions to the action executor
         try {
-            action_scheduler->submitAction(action1);
+            action_execution_service->submitAction(action1);
             throw std::runtime_error("Should not have been able to submit action 1");
         } catch (wrench::ExecutionException &e) {
             if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
@@ -848,7 +851,7 @@ private:
             }
         }
         try {
-            action_scheduler->submitAction(action2);
+            action_execution_service->submitAction(action2);
             throw std::runtime_error("Should not have been able to submit action 2");
         } catch (wrench::ExecutionException &e) {
             if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
@@ -860,11 +863,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, OneActionNotEnoughResources) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerOneActionNotEnoughResourcesTest_test);
+TEST_F(ActionExecutionServiceTest, OneActionNotEnoughResources) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceOneActionNotEnoughResourcesTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerOneActionNotEnoughResourcesTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughResourcesTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -892,7 +895,7 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionNotEnoughResourcesTest_test
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerOneActionNotEnoughResourcesTestWMS(this, "Host1")));
+            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
@@ -910,10 +913,10 @@ void ActionSchedulerTest::do_ActionSchedulerOneActionNotEnoughResourcesTest_test
 /**********************************************************************/
 
 
-class ActionSchedulerThreeActionsInSequenceTestWMS : public wrench::WMS {
+class ActionExecutionServiceThreeActionsInSequenceTestWMS : public wrench::WMS {
 
 public:
-    ActionSchedulerThreeActionsInSequenceTestWMS(ActionSchedulerTest *test,
+    ActionExecutionServiceThreeActionsInSequenceTestWMS(ActionExecutionServiceTest *test,
                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -921,7 +924,7 @@ public:
 
 private:
 
-    ActionSchedulerTest *test;
+    ActionExecutionServiceTest *test;
 
     int main() {
 
@@ -931,14 +934,14 @@ private:
         // Create an ActionExecutionService
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
-        auto action_scheduler = std::shared_ptr<wrench::ActionExecutionService>(
+        auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            this->getSharedPtr<wrench::Service>(),
                                             {}, {}));
+        action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
-        action_scheduler->simulation = this->simulation;
-        action_scheduler->start(action_scheduler, true, false);
+        action_execution_service->setSimulation(this->simulation);
+        action_execution_service->start(action_execution_service, true, false);
 
         // Create a Compound Job
         auto job = job_manager->createCompoundJob("my_job");
@@ -953,9 +956,9 @@ private:
         auto action3 = job->addComputeAction("compute_action_3", 10.0, 20.0, 2, 2, wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit the actions to the action executor
-        action_scheduler->submitAction(action1);
-        action_scheduler->submitAction(action2);
-        action_scheduler->submitAction(action3);
+        action_execution_service->submitAction(action1);
+        action_execution_service->submitAction(action2);
+        action_execution_service->submitAction(action3);
 
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -1028,11 +1031,11 @@ private:
     }
 };
 
-TEST_F(ActionSchedulerTest, ThreeActionsInSequence) {
-    DO_TEST_WITH_FORK(do_ActionSchedulerThreeActionsInSequenceTest_test);
+TEST_F(ActionExecutionServiceTest, ThreeActionsInSequence) {
+    DO_TEST_WITH_FORK(do_ActionExecutionServiceThreeActionsInSequenceTest_test);
 }
 
-void ActionSchedulerTest::do_ActionSchedulerThreeActionsInSequenceTest_test() {
+void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequenceTest_test() {
 
     // Create and initialize a simulation
     simulation = new wrench::Simulation();
@@ -1060,7 +1063,7 @@ void ActionSchedulerTest::do_ActionSchedulerThreeActionsInSequenceTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionSchedulerThreeActionsInSequenceTestWMS(this, "Host1")));
+            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 

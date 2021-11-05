@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,12 +113,12 @@ int main(int argc, char **argv) {
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "500000000"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation.
-     * A wrench::bare_metal is an abstraction of a compute service that corresponds
+     * A wrench::bare_metal_standard_jobs is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has scratch storage space (mount point argument = "/scratch").
      * This means that the WMS can opt to leave files in scratch. However, files in scratch are removed after
      * a job completes */
-    std::cerr << "Instantiating a bare_metal on ComputeHost..." << std::endl;
+    std::cerr << "Instantiating a bare_metal_standard_jobs on ComputeHost..." << std::endl;
     auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "/scratch/", {}, {}));
 

@@ -35,7 +35,7 @@
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
-WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal");
+WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_standard_jobs");
 
 namespace wrench {
     /**
@@ -130,6 +130,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // TODO: Do these checks in the job manager
+        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
 
         /* make sure that service arguments are provided for actions in the jobs */
         for (auto const &arg : service_specific_args) {
@@ -142,7 +143,7 @@ namespace wrench {
             }
             if (not found) {
                 throw std::invalid_argument(
-                        "bare_metal::submitStandardJob(): Service-specific argument provided for action with name '" +
+                        "bare_metal_standard_jobs::submitStandardJob(): Service-specific argument provided for action with name '" +
                         arg.first + "' but there is no action with such name in the job");
             }
         }
@@ -215,7 +216,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
@@ -274,7 +275,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "bare_metal::submitPilotJob(): Received an unexpected [" + message->getName() +
+                    "bare_metal_standard_jobs::submitPilotJob(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
     }
@@ -299,8 +300,8 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
-                       "bare_metal",
-                       "bare_metal",
+                       "bare_metal_standard_jobs",
+                       "bare_metal_standard_jobs",
                        scratch_space_mount_point) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -323,8 +324,8 @@ namespace wrench {
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
-                       "bare_metal",
-                       "bare_metal",
+                       "bare_metal_standard_jobs",
+                       "bare_metal_standard_jobs",
                        scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (auto h : compute_hosts) {
@@ -360,8 +361,8 @@ namespace wrench {
             std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space
     ) : ComputeService(hostname,
-                       "bare_metal" + suffix,
-                       "bare_metal" + suffix,
+                       "bare_metal_standard_jobs" + suffix,
+                       "bare_metal_standard_jobs" + suffix,
                        scratch_space) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -388,8 +389,8 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list,
             std::shared_ptr<StorageService> scratch_space) :
             ComputeService(hostname,
-                           "bare_metal",
-                           "bare_metal",
+                           "bare_metal_standard_jobs",
+                           "bare_metal_standard_jobs",
                            scratch_space) {
         initiateInstance(hostname,
                          compute_resources,
@@ -418,7 +419,7 @@ namespace wrench {
             std::shared_ptr<PilotJob> pj) {
         if (ttl < 0) {
             throw std::invalid_argument(
-                    "bare_metal::initiateInstance(): invalid TTL value (must be >0)");
+                    "bare_metal_standard_jobs::initiateInstance(): invalid TTL value (must be >0)");
         }
 
         // Set default and specified properties
@@ -435,13 +436,12 @@ namespace wrench {
             this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
                     hostname,
                     std::move(compute_resources),
-                    this->getSharedPtr<Service>(),
                     {{ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
                      {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)}
                     },
                     {}
             ));
-            this->action_execution_service->simulation = this->simulation;
+            this->action_execution_service->setSimulation(this->simulation);
         } catch (std::invalid_argument &e) {
             throw;
         }
@@ -459,11 +459,14 @@ namespace wrench {
     int BareMetalComputeService::main() {
         this->state = Service::UP;
 
+
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         WRENCH_INFO("New BareMetal Compute Service starting");
 
         // Start the ActionExecutionService
+        this->action_execution_service->setParentService(this->getSharedPtr<Service>());
+        this->action_execution_service->setSimulation(this->simulation);
         this->action_execution_service->start(this->action_execution_service, true, false);
 
         // Set an alarm for my timely death, if necessary
@@ -502,6 +505,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->terminate();
 
@@ -583,7 +587,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "bare_metal::terminateStandardJob(): Received an unexpected [" +
+                    "bare_metal_standard_jobs::terminateStandardJob(): Received an unexpected [" +
                     message->getName() + "] message!");
         }
     }
@@ -745,7 +749,7 @@ namespace wrench {
         }
 
         throw std::runtime_error(
-                "bare_metal::processSubmitPilotJob(): We shouldn't be here! (fatal)");
+                "bare_metal_standard_jobs::processSubmitPilotJob(): We shouldn't be here! (fatal)");
     }
 
 /**
@@ -839,7 +843,7 @@ namespace wrench {
  */
     void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
         throw std::runtime_error(
-                "bare_metal::terminatePilotJob(): not implemented because bare_metal never supports pilot jobs");
+                "bare_metal_standard_jobs::terminatePilotJob(): not implemented because bare_metal_standard_jobs never supports pilot jobs");
     }
 
 
@@ -863,7 +867,10 @@ namespace wrench {
  */
     void BareMetalComputeService::processActionDone(std::shared_ptr<Action> action) {
 
-        if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
+//        for (auto const &a : this->dispatched_actions) {
+//            WRENCH_INFO("DISPATCHED LIST: %s", a->getName().c_str());
+//        }
+        if (this->dispatched_actions.find(action) == this->dispatched_actions.end()) {
             WRENCH_INFO("Received a notification about action %s being done, but I don't know anything about this action - ignoring",
                         action->getName().c_str());
             return;
@@ -887,7 +894,7 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(
                         job->popCallbackMailbox(),
                         new ComputeServiceCompoundJobDoneMessage(
-                                job, this->getSharedPtr<BatchComputeService>(),
+                                job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
                                         BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
 

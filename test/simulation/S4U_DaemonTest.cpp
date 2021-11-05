@@ -131,7 +131,7 @@ private:
 
 
         // Start the daemon for real
-        daemon->simulation = this->simulation;
+        daemon->setSimulation(this->simulation);
         daemon->startDaemon(false, false);
 
         daemon->isDaemonized(); // coverage
@@ -225,7 +225,7 @@ private:
                 std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host2"));
 
         daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
-        daemon->simulation = this->simulation;
+        daemon->setSimulation(this->simulation);
         daemon->startDaemon(false, false);
 
         // sleep 10 seconds

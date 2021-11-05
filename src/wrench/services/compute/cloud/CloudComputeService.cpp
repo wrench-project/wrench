@@ -106,12 +106,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a bare_metal VM (balances load on execution hosts)
+     * @brief Create a bare_metal_standard_jobs VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores for the VM
      * @param ram_memory: the VM's RAM memory_manager_service capacity
-     * @param property_list: a property list for the bare_metal that will run on the VM ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list for the bare_metal that will run on the VM ({} means "use all defaults")
+     * @param property_list: a property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
      *
      * @return A VM name
      *
@@ -126,13 +126,13 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a bare_metal VM (balances load on execution hosts)
+     * @brief Create a bare_metal_standard_jobs VM (balances load on execution hosts)
      *
      * @param num_cores: the number of cores for the VM
      * @param ram_memory: the VM's RAM memory_manager_service capacity
      * @param desired_vm_name: the VM's desired name ("" means "pick a name for me")
-     * @param property_list: a property list for the bare_metal that will run on the VM ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list for the bare_metal that will run on the VM ({} means "use all defaults")
+     * @param property_list: a property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
      *
      * @return A VM name
      *
@@ -218,7 +218,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @return A bare_metal that runs on the VM
+     * @return A bare_metal_standard_jobs that runs on the VM
      *
      * @throw ExecutionException
      * @throw std::invalid_argument
@@ -255,7 +255,7 @@ namespace wrench {
      *
      * @param vm_name: the name of the VM
      *
-     * @return A bare_metal that runs on the VM, or nullptr if none
+     * @return A bare_metal_standard_jobs that runs on the VM, or nullptr if none
      *
      * @throw ExecutionException
      * @throw std::invalid_argument
@@ -673,7 +673,7 @@ namespace wrench {
             } else {
                 throw std::runtime_error(
                         "CloudComputeService::processNextMessage(): Received a service termination message for "
-                        "a non-bare_metal!");
+                        "a non-bare_metal_standard_jobs!");
             }
             return true;
 
@@ -697,14 +697,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a bare_metal VM on a physical machine
+     * @brief Create a bare_metal_standard_jobs VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param requested_num_cores: the number of cores the service can use
      * @param requested_ram: the VM's RAM memory_manager_service capacity
      * @param desired_vm_name: the desired VM name ("" means "pick a name for me")
-     * @param property_list: a property list for the bare_metal that will run on the VM ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list for the bare_metal that will run on the VM ({} means "use all defaults")
+     * @param property_list: a property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
@@ -825,7 +825,7 @@ namespace wrench {
             // Stop the Compute Service
             cs->stop();
             // We do not shut down the VM. This will be done when the CloudComputeService is notified
-            // of the bare_metal completion.
+            // of the bare_metal_standard_jobs completion.
             vm->shutdown();
 
             // Update internal data structures
@@ -989,7 +989,7 @@ namespace wrench {
                 // Create the Compute Service if needed
                 if (vm_pair.second == nullptr) {
 
-                    // Create the resource set for the bare_metal
+                    // Create the resource set for the bare_metal_standard_jobs
                     std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                             std::make_pair(vm_name, std::make_tuple(vm->getNumCores(), vm->getMemory()))};
 
@@ -1024,7 +1024,7 @@ namespace wrench {
                 auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
                         new ServiceTerminationDetector(this->hostname, std::get<1>(this->vm_list[vm_name]),
                                                        this->mailbox_name, false, true));
-                termination_detector->simulation = this->simulation;
+                termination_detector->setSimulation(this->simulation);
                 termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
 
                 msg_to_send_back = new CloudComputeServiceStartVMAnswerMessage(
@@ -1327,7 +1327,7 @@ namespace wrench {
 
 
     /**
-     * @brief Process a termination by a previously started bare_metal on a VM
+     * @brief Process a termination by a previously started bare_metal_standard_jobs on a VM
      * @param cs: the service that has terminated
      * @param exit_code: the service's exit code
      */
@@ -1342,7 +1342,7 @@ namespace wrench {
         }
         if (vm_name.empty()) {
             throw std::runtime_error(
-                    "CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown bare_metal");
+                    "CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown bare_metal_standard_jobs");
         }
         unsigned long used_cores = this->vm_list[vm_name].first->getNumCores();
         double used_ram = this->vm_list[vm_name].first->getMemory();
