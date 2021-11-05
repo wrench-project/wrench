@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -363,4 +363,21 @@ namespace wrench {
     void S4U_Daemon::releaseDaemonLock() {
         this->daemon_lock->unlock();
     }
+
+    /**
+     * @brief Get the service's simulation
+     * @return a simulation
+     */
+    Simulation *S4U_Daemon::getSimulation() {
+        return this->simulation;
+    }
+
+    /**
+     * @brief Set the service's simulation
+     * @param simulation: a simulation
+     */
+    void S4U_Daemon::setSimulation(Simulation *simulation) {
+        this->simulation = simulation;
+    }
+
 };

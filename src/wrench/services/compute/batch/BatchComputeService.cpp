@@ -719,7 +719,7 @@ namespace wrench {
 
                         default:
                             throw std::runtime_error(
-                                    "bare_metal::terminateRunningStandardJob(): unexpected task state");
+                                    "bare_metal_standard_jobs::terminateRunningStandardJob(): unexpected task state");
                     }
                 }
                 PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
@@ -1460,7 +1460,7 @@ namespace wrench {
                             {},
                             allocated_time, pjob, "pilot_job", getScratch()
                     ));
-            cs->simulation = this->simulation;
+            cs->setSimulation(this->simulation);
             pjob->setComputeService(cs);
 
             try {
@@ -1588,7 +1588,7 @@ namespace wrench {
                         this->workload_trace)
         );
         try {
-            this->workload_trace_replayer->simulation = this->simulation;
+            this->workload_trace_replayer->setSimulation(this->simulation);
             this->workload_trace_replayer->start(this->workload_trace_replayer, true,
                                                  false); // Daemonized, no auto-restart
         } catch (std::runtime_error &e) {

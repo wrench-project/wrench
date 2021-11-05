@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
  **    - Pick one ready task
- **    - Submit it as part of a single job to the one available bare_metal so that:
+ **    - Submit it as part of a single job to the one available bare_metal_standard_jobs so that:
  **       - The task uses 10 cores
  **    - Wait for the task's completion
  **/

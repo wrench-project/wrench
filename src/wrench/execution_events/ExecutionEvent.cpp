@@ -63,7 +63,15 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto m = dynamic_cast<JobManagerStandardJobDoneMessage*>(message.get())) {
+        if (auto m = dynamic_cast<JobManagerCompoundJobCompletedMessage*>(message.get())) {
+            return std::shared_ptr<CompoundJobCompletedEvent>(
+                    new CompoundJobCompletedEvent(m->job, m->compute_service));
+
+        } else if (auto m = dynamic_cast<JobManagerCompoundJobFailedMessage*>(message.get())) {
+            return std::shared_ptr<CompoundJobFailedEvent>(
+                    new CompoundJobFailedEvent(m->job, m->compute_service));
+       
+        } else if (auto m = dynamic_cast<JobManagerStandardJobCompletedMessage*>(message.get())) {
             // Update task states
             for (auto state_update : m->necessary_state_changes) {
                 WorkflowTask *task = state_update.first;

@@ -110,7 +110,7 @@ private:
                                                              wrench::ResourceRandomRepeatSwitcher::LINK));
 
 
-            switcher->simulation = this->simulation;
+            switcher->setSimulation(this->simulation);
             switcher->start(switcher, true, false); // Daemonized, no auto-restart
 
         }

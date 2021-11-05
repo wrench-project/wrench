@@ -102,7 +102,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
 
-        std::set<std::shared_ptr<PilotJob>> getRunningPilotJobs();
+        unsigned long getNumRunningPilotJobs();
 
         /***********************/
         /** \cond INTERNAL    */
@@ -124,6 +124,8 @@ namespace wrench {
 
         int main() override;
 
+        void dispatchJobs();
+
         bool processNextMessage();
 
         void
@@ -133,6 +135,12 @@ namespace wrench {
         processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
                                   std::shared_ptr<FailureCause> cause);
 
+        void
+        processCompoundJobCompletion(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service);
+
+        void
+        processCompoundJobFailure(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service);
+
         void processPilotJobStart(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
 
         void processPilotJobExpiration(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
@@ -141,17 +149,29 @@ namespace wrench {
         // Relevant WMS
         std::shared_ptr<WMS> wms;
 
-        // Job lists
-        std::set<std::shared_ptr<StandardJob>> new_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> pending_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> running_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> completed_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> failed_standard_jobs;
+        std::vector<std::shared_ptr<Job>> jobs_to_dispatch;
+        std::set<std::shared_ptr<Job>> jobs_dispatched;
 
-        std::set<std::shared_ptr<PilotJob>> new_pilot_jobs;
-        std::set<std::shared_ptr<PilotJob>> pending_pilot_jobs;
-        std::set<std::shared_ptr<PilotJob>> running_pilot_jobs;
-        std::set<std::shared_ptr<PilotJob>> completed_pilot_jobs;
+        unsigned long num_running_pilot_jobs = 0;
+
+        // Job lists
+//        std::set<std::shared_ptr<StandardJob>> ready_standard_jobs;
+//        std::set<std::shared_ptr<StandardJob>> pending_standard_jobs;
+//        std::set<std::shared_ptr<StandardJob>> running_standard_jobs;
+////        std::set<std::shared_ptr<StandardJob>> completed_standard_jobs;
+////        std::set<std::shared_ptr<StandardJob>> failed_standard_jobs;
+//
+//        std::set<std::shared_ptr<PilotJob>> ready_pilot_jobs;
+//        std::set<std::shared_ptr<PilotJob>> pending_pilot_jobs;
+//        std::set<std::shared_ptr<PilotJob>> running_pilot_jobs;
+////        std::set<std::shared_ptr<PilotJob>> completed_pilot_jobs;
+//
+//
+//        std::set<std::shared_ptr<CompoundJob>> not_ready_compound_jobs;
+//        std::set<std::shared_ptr<CompoundJob>> ready_compound_jobs;
+//        std::set<std::shared_ptr<CompoundJob>> pending_compound_jobs;
+//        std::set<std::shared_ptr<CompoundJob>> running_compound_jobs;
+////        std::set<std::shared_ptr<CompoundJob>> completed_compound_jobs;
 
     };
 

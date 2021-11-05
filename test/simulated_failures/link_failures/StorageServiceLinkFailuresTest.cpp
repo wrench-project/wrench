@@ -233,14 +233,14 @@ private:
         auto switcher1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 1045, 1, 5,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher1->simulation = this->simulation;
+        switcher1->setSimulation(this->simulation);
         switcher1->start(switcher1, true, false); // Daemonized, no auto-restart
 
         // Create a link switcher on/off er for link2
         auto switcher2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 234, 1, 15, 1, 5,
                                                          "link2", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher2->simulation = this->simulation;
+        switcher2->setSimulation(this->simulation);
         switcher2->start(switcher2, true, false); // Daemonized, no auto-restart
 
 

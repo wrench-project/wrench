@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -324,7 +324,7 @@ namespace wrench {
                                            answer_mailbox,
                                            "",
                                            buffer_size));
-            ftt->simulation = this->simulation;
+            ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_back(ftt);
@@ -409,7 +409,7 @@ namespace wrench {
                                            "",
                                            "",
                                            buffer_size));
-            ftt->simulation = this->simulation;
+            ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_front(ftt);
@@ -507,7 +507,7 @@ namespace wrench {
                                        "",
                                        answer_mailbox,
                                        this->buffer_size));
-        ftt->simulation = this->simulation;
+        ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
 
         return true;

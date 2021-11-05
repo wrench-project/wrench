@@ -213,14 +213,12 @@ namespace wrench {
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
-     * @param parent_service: the service that started this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            std::shared_ptr<Service> parent_service,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : Service(hostname,
@@ -293,7 +291,6 @@ namespace wrench {
             this->running_thread_counts[host.first] = 0;
         }
 
-        this->parent_service = std::move(parent_service);
     }
 
 
@@ -303,6 +300,11 @@ namespace wrench {
      * @return 0 on termination
      */
     int ActionExecutionService::main() {
+
+        if (this->parent_service == nullptr) {
+            throw std::runtime_error("ActionExecutionService::main(): parent service not set - please call setParentService before starting this service");
+        }
+
         this->state = Service::UP;
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
@@ -331,7 +333,7 @@ namespace wrench {
                     new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, true, true,
                                                 this->getSharedPtr<Service>(), this->mailbox_name,
                                                 {{HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}}));
-            this->host_state_change_monitor->simulation = this->simulation;
+            this->host_state_change_monitor->setSimulation(this->simulation);
             this->host_state_change_monitor->start(this->host_state_change_monitor, true,
                                                    false); // Daemonized, no auto-restart
         }
@@ -493,7 +495,7 @@ namespace wrench {
                                        this->mailbox_name,
                                        action));
 
-            action_executor->simulation = this->simulation;
+            action_executor->setSimulation(this->simulation);
             try {
                 action_executor->start(action_executor, true, false); // Daemonized, no auto-restart
             } catch (std::shared_ptr<HostError> &e) {
@@ -506,7 +508,7 @@ namespace wrench {
             // action executor has died)
             auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(
                     new ServiceTerminationDetector(this->hostname, action_executor, this->mailbox_name, true, false));
-            failure_detector->simulation = this->simulation;
+            failure_detector->setSimulation(this->simulation);
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
             // Keep track of this workunit executor
@@ -555,7 +557,7 @@ namespace wrench {
             return true;
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
@@ -1103,6 +1105,14 @@ namespace wrench {
         }
 
         return all_resources_down and (this->action_executors.empty());
+    }
+
+    /**
+     * @brief Set parent service
+     *
+     */
+    void ActionExecutionService::setParentService(std::shared_ptr<Service> service) {
+        this->parent_service = service;
     }
 
 }

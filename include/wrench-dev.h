@@ -58,8 +58,23 @@
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/WorkflowFile.h"
 
+// Actions
+#include "wrench/action/Action.h"
+#include "wrench/action/ComputeAction.h"
+#include "wrench/action/CustomAction.h"
+#include "wrench/action/FileCopyAction.h"
+#include "wrench/action/FileDeleteAction.h"
+#include "wrench/action/FileReadAction.h"
+#include "wrench/action/FileRegistryAction.h"
+#include "wrench/action/FileRegistryAddEntryAction.h"
+#include "wrench/action/FileRegistryDeleteEntryAction.h"
+#include "wrench/action/FileWriteAction.h"
+#include "wrench/action/SleepAction.h"
+
+
 // Job
 #include "wrench/job/Job.h"
+#include "wrench/job/CompoundJob.h"
 #include "wrench/job/StandardJob.h"
 #include "wrench/job/PilotJob.h"
 

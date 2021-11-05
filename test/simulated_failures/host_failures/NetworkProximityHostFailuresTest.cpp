@@ -102,13 +102,13 @@ private:
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 300, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        resurector->simulation = this->simulation;
+        resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
         std::pair<std::string, std::string> first_pair_to_compute_proximity;

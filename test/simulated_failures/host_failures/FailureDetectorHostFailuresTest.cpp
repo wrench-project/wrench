@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,28 +98,28 @@ private:
 
         // Starting a victim on the FailedHost, which should fail at time 50
         auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim1->simulation = this->simulation;
+        victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
-        failure_detector1->simulation = this->simulation;
+        failure_detector1->setSimulation(this->simulation);
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
         auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim2->simulation = this->simulation;
+        victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
-        failure_detector2->simulation = this->simulation;
+        failure_detector2->setSimulation(this->simulation);
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
 
@@ -223,28 +223,28 @@ private:
 
         // Starting a victim on the FailedHost, which should fail at time 50
         auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim1->simulation = this->simulation;
+        victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
-        failure_detector1->simulation = this->simulation;
+        failure_detector1->setSimulation(this->simulation);
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
         auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim2->simulation = this->simulation;
+        victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
-        failure_detector2->simulation = this->simulation;
+        failure_detector2->setSimulation(this->simulation);
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message

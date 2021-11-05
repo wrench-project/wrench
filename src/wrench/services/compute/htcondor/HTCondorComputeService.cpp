@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -271,7 +271,7 @@ namespace wrench {
                 this->mailbox_name.c_str());
 
         // start the central manager service
-        this->central_manager->simulation = this->simulation;
+        this->central_manager->setSimulation(this->simulation);
         this->central_manager->start(this->central_manager, true, false); // Daemonized, no auto-restart
 
 

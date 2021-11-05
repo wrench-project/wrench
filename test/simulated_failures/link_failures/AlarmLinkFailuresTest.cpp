@@ -85,7 +85,7 @@ private:
         auto switcher = std::shared_ptr<wrench::ResourceSwitcher>(
                 new wrench::ResourceSwitcher("Host1", 20, "link1",
                                              wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::LINK));
-        switcher->simulation = this->simulation;
+        switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
 
         // Wait for the message

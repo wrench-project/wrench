@@ -218,7 +218,7 @@ namespace wrench {
                             new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead,
                                                           this->compute_services,
                                                           this->running_jobs, this->pending_jobs, this->mailbox_name));
-                    negotiator->simulation = this->simulation;
+                    negotiator->setSimulation(this->simulation);
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
                 }
             }
@@ -396,7 +396,6 @@ namespace wrench {
         }
 
         // Send the callback to the originator
-        WRENCH_INFO("SENDING A CALLBACK TO ORIGINATOR: %s", callback_mailbox.c_str());
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceStandardJobDoneMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(

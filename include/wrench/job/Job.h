@@ -68,6 +68,8 @@ namespace wrench {
 
         Job(std::string name, std::shared_ptr<JobManager> job_manager);
 
+        void setServiceSpecificArguments(std::map<std::string, std::string> args);
+
         unsigned long getNewUniqueNumber();
 
         /** @brief Service-specific arguments used during job submission **/
@@ -87,6 +89,9 @@ namespace wrench {
         double end_date;
         /** @brief The compute service to which the job was submitted */
         std::shared_ptr<ComputeService> parent_compute_service;
+
+        /** @brief Whether the job has already been submitted to the job manager */
+        bool already_submitted_to_job_manager = false;
 
 
     private:

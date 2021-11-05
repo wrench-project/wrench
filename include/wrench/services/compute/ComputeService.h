@@ -20,6 +20,7 @@
 #include "wrench/job/Job.h"
 #include "wrench/job/StandardJob.h"
 #include "wrench/job/PilotJob.h"
+#include "wrench/job/CompoundJob.h"
 
 namespace wrench {
 

@@ -81,12 +81,12 @@ private:
 
         // Create a random service on Host 2
         auto service_on_host2 = std::shared_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService("Host2"));
-        service_on_host2->simulation = this->simulation;
+        service_on_host2->setSimulation(this->simulation);
         service_on_host2->start(service_on_host2, true, false);
 
         // Create a compute thread on Host 3 that should report to the service on Host 2
         auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, service_on_host2->mailbox_name));
-        thread->simulation = this->simulation;
+        thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Sleep 10 seconds and turn off link 23
