@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -367,7 +367,7 @@ namespace wrench {
     std::shared_ptr<EnergyMeterService> WMS::createEnergyMeter(const std::map<std::string, double> &measurement_periods) {
         auto energy_meter_raw_ptr = new EnergyMeterService(this->hostname, measurement_periods);
         std::shared_ptr<EnergyMeterService> energy_meter = std::shared_ptr<EnergyMeterService>(energy_meter_raw_ptr);
-        energy_meter->simulation = this->simulation;
+        energy_meter->setSimulation(this->simulation);
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
         return energy_meter;
     }
@@ -382,7 +382,7 @@ namespace wrench {
     WMS::createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period) {
         auto energy_meter_raw_ptr = new EnergyMeterService(this->hostname, hostnames, measurement_period);
         std::shared_ptr<EnergyMeterService> energy_meter = std::shared_ptr<EnergyMeterService>(energy_meter_raw_ptr);
-        energy_meter->simulation = this->simulation;
+        energy_meter->setSimulation(this->simulation);
         energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
         return energy_meter;
     }
@@ -397,7 +397,7 @@ namespace wrench {
     std::shared_ptr<BandwidthMeterService> WMS::createBandwidthMeter(const std::map<std::string, double> &measurement_periods) {
         auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, measurement_periods);
         std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
-        bandwidth_meter->simulation = this->simulation;
+        bandwidth_meter->setSimulation(this->simulation);
         bandwidth_meter->start(bandwidth_meter, true, false); // Always daemonize, no auto-restart
         return bandwidth_meter;
     }
@@ -412,7 +412,7 @@ namespace wrench {
     WMS::createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period) {
         auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, linknames, measurement_period);
         std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
-        bandwidth_meter->simulation = this->simulation;
+        bandwidth_meter->setSimulation(this->simulation);
         bandwidth_meter->start(bandwidth_meter, true, false); // Always daemonize, no auto-restart
         return bandwidth_meter;
     }

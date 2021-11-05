@@ -145,7 +145,7 @@ private:
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_copy_action));
         // Start it
-        file_copy_action_executor->simulation = this->simulation;
+        file_copy_action_executor->setSimulation(this->simulation);
         file_copy_action_executor->start(file_copy_action_executor, true, false);
 
         // Wait for a message from it

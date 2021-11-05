@@ -45,6 +45,8 @@ namespace wrench {
 
         std::map<WorkflowTask *, double> flopsMap;
 
+        int num_running_pilot_jobs = 0;
+
         FRIEND_TEST(CriticalPathSchedulerTest, GetTotalFlops);
 
         FRIEND_TEST(CriticalPathSchedulerTest, GetMaxParallelization);

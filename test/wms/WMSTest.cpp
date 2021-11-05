@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,26 +117,10 @@ private:
         job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         this->waitForAndProcessNextEvent();
 
-        // Get the list of running pilot jobs
-        auto running_pilot_jobs = job_manager->getRunningPilotJobs();
-        if (running_pilot_jobs.size() != 1) {
-            throw std::runtime_error("Should see 1 running pilot job");
-        }
-        if (*running_pilot_jobs.begin() != job2) {
-            throw std::runtime_error("Pilot job should be seen in list of running pilot jobs");
-        }
-
         // Submit another pilot job, which won't be running for a while
         auto job2_1 = job_manager->createPilotJob();
         job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         // Get the list of pending pilot jobs
-        auto pending_pilot_jobs = job_manager->getPendingPilotJobs();
-        if (pending_pilot_jobs.size() != 1) {
-            throw std::runtime_error("Should see 1 pending pilot job");
-        }
-        if (*pending_pilot_jobs.begin() != job2_1) {
-            throw std::runtime_error("Pilot job should be seen in list of pending pilot jobs");
-        }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
         wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);

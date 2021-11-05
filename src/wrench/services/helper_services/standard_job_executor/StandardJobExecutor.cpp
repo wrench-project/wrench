@@ -295,7 +295,7 @@ namespace wrench {
             this->host_state_monitor = std::shared_ptr<HostStateChangeDetector>(
                     new HostStateChangeDetector(this->hostname, hosts_to_monitor, true, false, false,
                                                 this->getSharedPtr<Service>(), this->mailbox_name));
-            this->host_state_monitor->simulation = this->simulation;
+            this->host_state_monitor->setSimulation(this->simulation);
             this->host_state_monitor->start(this->host_state_monitor, true, false); // Daemonized, no auto-restart
         }
 
@@ -538,21 +538,21 @@ namespace wrench {
                                                  StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP)
                     ));
 
-            workunit_executor->simulation = this->simulation;
+            workunit_executor->setSimulation(this->simulation);
             try {
                 workunit_executor->start(workunit_executor, true, false); // Daemonized, no auto-restart
                 // This is an error on the target host!!
             } catch (std::shared_ptr<HostError> &e) {
                 this->releaseDaemonLock();
                 throw std::runtime_error(
-                        "bare_metal::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
+                        "bare_metal_standard_jobs::dispatchReadyWorkunits(): got a host error on the target host - this shouldn't happen");
             }
 
             // Start a failure detector for this workunit executor (which will send me a message in case the
             // work unit executor has died)
             auto failure_detector = std::shared_ptr<ServiceTerminationDetector>(
                     new ServiceTerminationDetector(this->hostname, workunit_executor, this->mailbox_name, true, false));
-            failure_detector->simulation = this->simulation;
+            failure_detector->setSimulation(this->simulation);
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
             // Update core availabilities
@@ -736,7 +736,7 @@ namespace wrench {
                     }
                     if (!found_it) {
                         throw std::runtime_error(
-                                "bare_metal::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
+                                "bare_metal_standard_jobs::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
                     }
 
                 }

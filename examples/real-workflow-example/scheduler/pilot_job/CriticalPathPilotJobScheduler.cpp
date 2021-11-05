@@ -44,7 +44,7 @@ namespace wrench {
                                     max_parallel : max_parallel - compute_services.size());
 
       // If there is always a pilot job in the system, do nothing
-      if ((this->getJobManager()->getRunningPilotJobs().size() > 0)) {
+      if ((this->getJobManager()->getNumRunningPilotJobs() > 0)) {
         WRENCH_INFO("There is already a pilot job in the system...");
         return;
       }

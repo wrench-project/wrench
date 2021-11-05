@@ -74,7 +74,7 @@ private:
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
                                                     this->getSharedPtr<wrench::WMS>(), this->mailbox_name, {}));
-        ssd->simulation = this->simulation;
+        ssd->setSimulation(this->simulation);
         ssd->start(ssd, true, false);
 
         wrench::Simulation::sleep(10);

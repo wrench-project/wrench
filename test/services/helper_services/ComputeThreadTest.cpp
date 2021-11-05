@@ -82,7 +82,7 @@ private:
 
         // Create a compute thread on Host 3 that should report to me
         auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox_name));
-        thread->simulation = this->simulation;
+        thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Get the message
@@ -155,7 +155,7 @@ private:
 
         // Create a compute thread on Host 3 that should report to me
         auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox_name));
-        thread->simulation = this->simulation;
+        thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Get the message

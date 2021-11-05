@@ -237,7 +237,7 @@ private:
                                            action));
 
         // Start it
-        action_executor->simulation = this->simulation;
+        action_executor->setSimulation(this->simulation);
         action_executor->start(action_executor, true, false);
 
 //        WRENCH_INFO("SLEEPING %lf", this->sleep_time);

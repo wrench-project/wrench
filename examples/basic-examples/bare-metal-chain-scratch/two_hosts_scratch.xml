@@ -11,7 +11,7 @@
             </disk>
         </host>
 
-        <!-- The host on which the bare_metal will run -->
+        <!-- The host on which the bare_metal_standard_jobs will run -->
         <host id="ComputeHost" speed="1Gf" core="10">
             <prop id="ram" value="16GB" />
             <disk id="scratch" read_bw="100MBps" write_bw="100MBps">

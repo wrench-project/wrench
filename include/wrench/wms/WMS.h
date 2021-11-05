@@ -18,6 +18,8 @@
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
+#include "wrench/execution_events/CompoundJobFailedEvent.h"
+#include "wrench/execution_events/CompoundJobCompletedEvent.h"
 #include "wrench/execution_events/StandardJobCompletedEvent.h"
 #include "wrench/execution_events/StandardJobFailedEvent.h"
 #include "wrench/execution_events/PilotJobStartedEvent.h"

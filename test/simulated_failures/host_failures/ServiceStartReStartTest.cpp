@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ private:
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        sleeper->simulation = this->simulation;
+        sleeper->setSimulation(this->simulation);
         try {
             sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
         } catch (std::shared_ptr<wrench::HostError> &e) {
@@ -173,19 +173,19 @@ private:
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        sleeper->simulation = this->simulation;
+        sleeper->setSimulation(this->simulation);
         sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
 
         // Starting a host-switcher-offer
         auto death = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 10, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        death->simulation = this->simulation;
+        death->setSimulation(this->simulation);
         death->start(death, true, false); // Daemonized, no auto-restart
 
         // Starting a host-switcher-oner
         auto life = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 30, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        life->simulation = this->simulation;
+        life->setSimulation(this->simulation);
         life->start(life, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
- **    - Submit both of them as part of a single job to the first available bare_metal so tbat:
+ **    - Submit both of them as part of a single job to the first available bare_metal_standard_jobs so tbat:
  **       - The most expensive task uses 6 cores
  **       - The least expensive task uses 4 cores
  **       - Each task reads the input file from the StorageService

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the property list for the bare_metal that is to run on the VM ({} means "use all defaults")
+     * @brief Get the property list for the bare_metal_standard_jobs that is to run on the VM ({} means "use all defaults")
      * @return a property list
      */
     std::map<std::string, std::string> S4U_VirtualMachine::getPropertyList() {
@@ -187,7 +187,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the message payload list for the bare_metal that will run on the VM ({} means "use all defaults")
+     * @brief Get the message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
      * @return a message payload list
      */
     std::map<std::string, double> S4U_VirtualMachine::getMessagePayloadList() {

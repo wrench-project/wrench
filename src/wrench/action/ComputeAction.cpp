@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ namespace wrench {
                 action_executor->acquireDaemonLock();
                 compute_thread = std::shared_ptr<ComputeThread>(
                         new ComputeThread(S4U_Simulation::getHostName(), work, ""));
-                compute_thread->simulation = action_executor->simulation;
+                compute_thread->setSimulation(action_executor->getSimulation());
                 compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 action_executor->releaseDaemonLock();
             } catch (std::exception &e) {
