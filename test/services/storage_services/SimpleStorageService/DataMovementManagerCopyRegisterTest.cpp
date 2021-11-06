@@ -176,7 +176,7 @@ private:
         }
 
         try {
-            async_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
+            async_copy_event = this->waitForNextEvent();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
@@ -216,7 +216,7 @@ private:
             double_copy_failed = true;
         }
 
-        async_dual_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
+        async_dual_copy_event = this->waitForNextEvent();
 
         auto src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
 
@@ -261,7 +261,7 @@ private:
             }
         }
 
-        async_dual_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
+        async_dual_copy_event2 = this->waitForNextEvent();
 
         auto async_dual_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_dual_copy_event2);
 
@@ -301,7 +301,7 @@ private:
 
         file_registry_service->stop();
 
-        async_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
+        async_copy_event2 = this->waitForNextEvent();
 
         auto async_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_copy_event2);
 

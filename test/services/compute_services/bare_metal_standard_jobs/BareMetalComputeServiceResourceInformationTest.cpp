@@ -210,7 +210,7 @@ private:
       this->test->compute_service1->getPerHostAvailableMemoryCapacity(); // coverage
 
       // Wait for the workflow execution event
-      auto event = this->getWorkflow()->waitForNextExecutionEvent();
+      auto event = this->waitForNextEvent();
       if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
         throw std::runtime_error("Unexpected workflow execution event!");
       }

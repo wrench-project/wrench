@@ -158,7 +158,7 @@ private:
 
         double elapsed[NUM_PARALLEL_TRANSFERS];
         for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
-          std::shared_ptr<wrench::ExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+          std::shared_ptr<wrench::ExecutionEvent> event1 = this->waitForNextEvent();
           if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event1)) {
             throw std::runtime_error("Unexpected Workflow Execution Event: " + event1->toString());
           }

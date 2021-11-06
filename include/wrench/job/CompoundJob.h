@@ -131,6 +131,7 @@ namespace wrench {
 
     protected:
 
+        friend class BareMetalComputeService;
         friend class JobManager;
         friend class Action;
 
@@ -144,6 +145,8 @@ namespace wrench {
         unsigned long priority;
 
         void updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state);
+
+        void setAllActionsFailed(std::shared_ptr<FailureCause> cause);
 
     private:
 

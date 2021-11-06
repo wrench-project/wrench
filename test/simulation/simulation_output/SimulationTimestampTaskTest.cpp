@@ -135,7 +135,7 @@ private:
 
         std::shared_ptr<wrench::ExecutionEvent> workflow_execution_event;
         try {
-            workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
+            workflow_execution_event = this->waitForNextEvent();
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error getting the execution event: " + e.getCause()->toString());
         }

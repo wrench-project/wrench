@@ -79,8 +79,11 @@ namespace wrench {
         std::stack<std::string> callback_mailbox_stack;
         /** @brief The Job Manager in charge of this job **/
         std::shared_ptr<JobManager> job_manager;
-        /** @brief The workflow this job belong to */
-        Workflow *workflow;
+        /** @brief The originator's mailbox */
+        std::string originator_mailbox;
+
+//        /** @brief The workflow this job belong to */
+//        Workflow *workflow;
         /** @brief The job's name */
         std::string name;
         /** @brief The date at which the job was last submitted */

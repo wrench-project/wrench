@@ -33,7 +33,7 @@ namespace wrench {
             WRENCH_INFO("Waiting for job completion...");
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
+                event = this->waitForNextEvent();
 
                 if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     job = real_event->standard_job;

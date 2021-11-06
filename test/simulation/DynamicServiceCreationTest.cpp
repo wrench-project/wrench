@@ -228,7 +228,7 @@ private:
         for (auto task : tasks) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
+                event = this->waitForNextEvent();
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
