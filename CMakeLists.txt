@@ -153,6 +153,7 @@ set(HEADER_FILES
         include/wrench/execution_events/TimerEvent.h
         include/wrench/failure_causes/ComputeThreadHasDied.h
         include/wrench/failure_causes/FailureCause.h
+        include/wrench/failure_causes/SomeActionsHaveFailed.h
         include/wrench/failure_causes/FatalFailure.h
         include/wrench/failure_causes/FileAlreadyBeingCopied.h
         include/wrench/failure_causes/FileNotFound.h
@@ -332,6 +333,7 @@ set(SOURCE_FILES
         src/wrench/execution_events/ExecutionEvent.cpp
         src/wrench/failure_causes/ComputeThreadHasDied.cpp
         src/wrench/failure_causes/FailureCause.cpp
+        src/wrench/failure_causes/SomeActionsHaveFailed.cpp
         src/wrench/failure_causes/FatalFailure.cpp
         src/wrench/failure_causes/FileAlreadyBeingCopied.cpp
         src/wrench/failure_causes/FileNotFound.cpp

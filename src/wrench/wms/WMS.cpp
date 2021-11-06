@@ -170,7 +170,7 @@ namespace wrench {
      */
     bool WMS::waitForAndProcessNextEvent(double timeout) {
 
-        std::shared_ptr<ExecutionEvent> event = workflow->waitForNextExecutionEvent(timeout);
+        std::shared_ptr<ExecutionEvent> event = this->waitForNextEvent(timeout);
         if (event == nullptr) {
             return false;
         }
@@ -202,7 +202,7 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> WMS::waitForNextEvent(double timeout) {
-        return workflow->waitForNextExecutionEvent(timeout);
+        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name);
     }
 
     /**
@@ -210,7 +210,7 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> WMS::waitForNextEvent() {
-        return workflow->waitForNextExecutionEvent();
+        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name, -1.0);
     }
 
     /**

@@ -19,7 +19,7 @@ namespace wrench {
     PilotJob::PilotJob(Workflow *workflow) :
             Job("", nullptr), state(PilotJob::State::NOT_SUBMITTED) {
 
-      this->workflow = workflow;
+//      this->workflow = workflow;
       this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
     }
 

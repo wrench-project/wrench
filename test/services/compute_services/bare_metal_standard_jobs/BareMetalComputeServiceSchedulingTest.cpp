@@ -140,7 +140,7 @@ private:
         for (int i=0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
+                event = this->waitForNextEvent();
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
             }
@@ -284,7 +284,7 @@ private:
         for (int i=0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
+                event = this->waitForNextEvent();
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
             }
@@ -419,7 +419,7 @@ private:
         for (int i=0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
+                event = this->waitForNextEvent();
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
             }

@@ -387,4 +387,16 @@ namespace wrench {
         return (not this->state_task_map[Action::State::FAILED].empty());
     }
 
+    /**
+     * @brief Set all actions to FAILED for the same failure cause (e.g., a job-level failure)
+     * @param cause: a failure cause
+     */
+    void CompoundJob::setAllActionsFailed(std::shared_ptr<FailureCause> cause) {
+        for (auto const &action : this->actions) {
+            action->setState(Action::State::FAILED);
+            action->setFailureCause(cause);
+        }
+
+    }
+
 }

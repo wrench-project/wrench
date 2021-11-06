@@ -310,7 +310,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         // Print some logging
-        WRENCH_INFO("New Action Scheduler started by %s on %ld hosts",
+        WRENCH_INFO("New Action Execution Service started by %s on %ld hosts",
                     this->parent_service->getName().c_str(), this->compute_resources.size());
         std::string msg = "\n";
         for (auto cr : this->compute_resources) {
@@ -558,6 +558,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;

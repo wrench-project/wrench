@@ -17,13 +17,11 @@
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/job/StandardJob.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/job/PilotJob.h>
-#include <wrench/wms/WMS.h>
 #include "JobManagerMessage.h"
 
 
@@ -921,7 +919,7 @@ namespace wrench {
     std::shared_ptr<CompoundJob> JobManager::createCompoundJob(std::string name) {
         auto job = std::shared_ptr<CompoundJob>(new CompoundJob(name, this->getSharedPtr<JobManager>()));
         job->shared_this = job;
-        job->workflow = this->wms->getWorkflow();
+//        job->workflow = this->wms->getWorkflow();
         return job;
     }
 
@@ -935,6 +933,8 @@ namespace wrench {
         auto it = this->jobs_to_dispatch.begin();
         while (it != this->jobs_to_dispatch.end()) {
             auto job = *it;
+
+            // So pre-work
             if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 // Always ready
                 pjob->state = PilotJob::PENDING;
@@ -948,37 +948,71 @@ namespace wrench {
                 throw std::runtime_error("DataManager: Unsupported Job type");
             }
 
-            // Submit the job to the service
             try {
-                job->submit_date = Simulation::getCurrentSimulatedDate();
-                job->parent_compute_service->submitJob(job, job->service_specific_args);
+                this->dispatchJob(job);
+                this->jobs_dispatched.insert(job);
+                it = this->jobs_to_dispatch.erase(it);
             } catch (ExecutionException &e) {
-                // "Undo" everything
+                it = this->jobs_to_dispatch.erase(it);
                 job->popCallbackMailbox();
-                throw;
-
-            } catch (std::invalid_argument &e) {
-                // "Undo" everything
-                job->popCallbackMailbox();
-                throw;
+                if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+                    cjob->setAllActionsFailed(e.getCause());
+                    try {
+                        auto message =
+                                new JobManagerCompoundJobFailedMessage(cjob, cjob->parent_compute_service, e.getCause());
+                        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+                    } catch (NetworkError &e) {
+                    }
+                } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                    try {
+                        auto message =
+                                new JobManagerPilotJobFailedMessage(pjob, pjob->parent_compute_service, e.getCause());
+                        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+                    } catch (NetworkError &e) {
+                    }
+                }
             }
 
-            if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                // TODO: Useful???
-                pjob->state = PilotJob::PENDING;
-            }
 
-            dispatched.insert(job);
-            it = this->jobs_to_dispatch.erase(it);
         }
 
     }
 
+
     /**
-     * @brief Method to process a compound job completion
-     * @param job: the job that completed
-     * @param compute_service: the compute service on which the job completed
+     * @brief Helper method to dispatch jobs
      */
+    void JobManager::dispatchJob(std::shared_ptr<Job> job) {
+
+
+
+        // Submit the job to the service
+        try {
+            job->submit_date = Simulation::getCurrentSimulatedDate();
+            job->parent_compute_service->submitJob(job, job->service_specific_args);
+        } catch (ExecutionException &e) {
+            // "Undo" everything
+            job->popCallbackMailbox();
+            throw;
+
+        } catch (std::invalid_argument &e) {
+            // "Undo" everything
+
+            throw;
+        }
+
+        if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+            // TODO: Useful???
+            pjob->state = PilotJob::PENDING;
+        }
+    }
+
+
+        /**
+         * @brief Method to process a compound job completion
+         * @param job: the job that completed
+         * @param compute_service: the compute service on which the job completed
+         */
     void JobManager::processCompoundJobCompletion(std::shared_ptr<CompoundJob> job,
                                                   std::shared_ptr<ComputeService> compute_service) {
         job->state = CompoundJob::State::COMPLETED;
@@ -1008,10 +1042,19 @@ namespace wrench {
         // Forward the notification along the notification chain
         try {
             auto message =
-                    new JobManagerCompoundJobFailedMessage(job, compute_service);
+                    new JobManagerCompoundJobFailedMessage(job, compute_service,
+                                                           std::make_shared<SomeActionsHaveFailed>());
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
         } catch (NetworkError &e) {
         }
+    }
+
+    /**
+     * @brief Get the WMS associated to this DataManager
+     * @return a WMS
+     */
+    std::shared_ptr<WMS> JobManager::getWMS() {
+        return this->wms;
     }
 
 }

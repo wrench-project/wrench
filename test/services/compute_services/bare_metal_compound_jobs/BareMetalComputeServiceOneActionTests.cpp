@@ -29,11 +29,20 @@ public:
     void do_BadSetup_test();
 
     void do_Noop_test();
-    
+
     void do_OneSleepAction_test();
 
-    void do_StandardJobConstructor_test();
+    void do_OneComputeActionNotEnoughResources_test();
 
+    void do_OneSleepActionServiceCrashed_test();
+
+    void do_OneFileReadActionFileNotThere_test();
+
+    void do_ExecutionWithDownService_test();
+
+    void do_ExecutionWithSuspendedService_test();
+
+    /**
     void do_HostMemory_test();
 
     void do_ExecutionWithLocationMap_test();
@@ -57,6 +66,8 @@ public:
     void do_ExecutionWithDownService_test();
 
     void do_ExecutionWithSuspendedService_test();
+
+     */
 
 
 protected:
@@ -415,15 +426,15 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
 
 
 /**********************************************************************/
-/**  ONE SLEEP ACTION TEST                                            **/
+/**  ONE SLEEP ACTION TEST                                           **/
 /**********************************************************************/
 
 class OneSleepActionTestWMS : public wrench::WMS {
 public:
     OneSleepActionTestWMS(BareMetalComputeServiceOneActionTest *test,
-                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                std::string &hostname) :
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                          std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -432,8 +443,6 @@ private:
     BareMetalComputeServiceOneActionTest *test;
 
     int main() {
-
-        wrench::TerminalOutput::disableColor(); // just for increasing stupid coverage
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -447,7 +456,7 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
@@ -561,6 +570,166 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     free(argv);
 }
 
+
+
+/**********************************************************************/
+/**  ONE COMPUTE ACTION NOT ENOUGH RESOURCES TEST                    **/
+/**********************************************************************/
+
+class OneComputeActionNotEnoughResourcesTestWMS : public wrench::WMS {
+public:
+    OneComputeActionNotEnoughResourcesTestWMS(BareMetalComputeServiceOneActionTest *test,
+                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                              std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceOneActionTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a compound job that asks for too many cores
+        auto job1 = job_manager->createCompoundJob("my_job1");
+        // Create a compute action that asks for too many cores
+        auto action1 = job1->addComputeAction("my_computation", 1000.0, 0.0, 100, 100,
+                                            wrench::ParallelModel::AMDAHL(1.0));
+        // Create a compound job that asks for too much RAM
+        auto job2 = job_manager->createCompoundJob("my_job2");
+        // Create a compute action that asks for too many cores
+        auto action2 = job2->addComputeAction("my_computation", 1000.0, 1000.0, 1, 1,
+                                             wrench::ParallelModel::AMDAHL(1.0));
+
+        std::vector<std::shared_ptr<wrench::CompoundJob>> jobs = {job1, job2};
+
+        for (auto const &job : jobs) {
+
+            // Submit the job
+            job_manager->submitJob(job, this->test->compute_service, {});
+
+            // Wait for the workflow execution event
+            std::shared_ptr <wrench::ExecutionEvent> event = this->waitForNextEvent();
+            if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+
+            // Check event content
+            auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
+            if (real_event->job != job) {
+                std::cerr << job->getName() << " " << real_event->job->getName() << "\n";
+                throw std::runtime_error("Event's job isn't the right job!");
+            }
+            if (real_event->compute_service != this->test->compute_service) {
+                throw std::runtime_error("Event's compute service isn't the right compute service!");
+            }
+
+            // Check failure cause
+            if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
+                throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString());
+            }
+
+            // Chek action stuff
+            if ((*(job->getActions().begin()))->getState() != wrench::Action::State::FAILED) {
+                throw std::runtime_error("Unexpected action state " + (*(job->getActions().begin()))->getStateAsString());
+            }
+        }
+
+
+        // Stop the Job Manager manually, just for kicks
+        job_manager->stop();
+
+        // Stop the Data Movement Manager manually, just for kicks
+        data_movement_manager->stop();
+
+        wrench::Simulation::sleep(1);
+
+        // Stop the Compute service manually, for coverage
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionNotEnoughResourcesTest) {
+    DO_TEST_WITH_FORK(do_OneComputeActionNotEnoughResources_test);
+}
+
+void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_test() {
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("TwoCoreHost",
+                                                {std::make_pair("TwoCoreHost",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                100.0))},
+                                                {"/scratch"},
+                                                {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string hostname = "TwoCoreHost";
+    ASSERT_NO_THROW(wms = simulation->add(
+            new OneComputeActionNotEnoughResourcesTestWMS(
+                    this,
+                    {compute_service}, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Without a file registry service this should fail
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(input_file, storage_service1), std::runtime_error);
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
+                 std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
 #if 0
 
 
@@ -696,7 +865,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
@@ -859,7 +1028,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
@@ -1019,7 +1188,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
@@ -1145,7 +1314,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             // do nothing
         } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
@@ -1303,7 +1472,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             // do nothing
         } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
@@ -1434,7 +1603,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             // do nothing
         } else if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
@@ -1551,7 +1720,7 @@ private:
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         if (real_event) {
             auto cause = std::dynamic_pointer_cast<wrench::FileNotFound>(real_event->failure_cause);

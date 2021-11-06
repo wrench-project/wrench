@@ -102,6 +102,8 @@ namespace wrench {
 
         std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
 
+        std::shared_ptr<WMS> getWMS();
+
         unsigned long getNumRunningPilotJobs();
 
         /***********************/
@@ -126,6 +128,8 @@ namespace wrench {
 
         void dispatchJobs();
 
+        void dispatchJob(std::shared_ptr<Job> job);
+
         bool processNextMessage();
 
         void
@@ -144,7 +148,6 @@ namespace wrench {
         void processPilotJobStart(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
 
         void processPilotJobExpiration(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
-
 
         // Relevant WMS
         std::shared_ptr<WMS> wms;
