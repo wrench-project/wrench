@@ -161,10 +161,10 @@ private:
         this->data_movement_manager->initiateAsynchronousFileCopy(
                 file, source, destination, this->test->file_registry_service);
 
-        // Wait for the eventm (with a timeout)
+        // Wait for the event (with a timeout)
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
-            event = this->getWorkflow()->waitForNextExecutionEvent(100);
+            event = this->waitForNextEvent(100);
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }

@@ -17,6 +17,7 @@
 #include "wrench/failure_causes/FailureCause.h"
 #include "wrench/failure_causes/ComputeThreadHasDied.h"
 #include "wrench/failure_causes/FatalFailure.h"
+#include "wrench/failure_causes/SomeActionsHaveFailed.h"
 #include "wrench/failure_causes/FileAlreadyBeingCopied.h"
 #include "wrench/failure_causes/FileNotFound.h"
 #include "wrench/failure_causes/FunctionalityNotAvailable.h"

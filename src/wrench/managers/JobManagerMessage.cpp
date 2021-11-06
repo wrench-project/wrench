@@ -60,6 +60,21 @@ namespace wrench {
         this->cause = std::move(cause);
     }
 
+    /**
+     * @brief Constructor 
+     * @param job: the job that has failed
+     * @param compute_service: the ComputeService on which it ran 
+     * @param cause: the cause of the failure
+     */
+    JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+                                                                           std::shared_ptr<ComputeService> compute_service,
+                                                                           std::shared_ptr<FailureCause> cause) :
+            JobManagerMessage("JobManagerPilotJobFailedMessage") {
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->cause = std::move(cause);
+    }
+
 
     /**
      * @brief Message from by job manager to notify somebody of a standard job successfully completed
@@ -77,12 +92,15 @@ namespace wrench {
      * @brief Message from by job manager to notify somebody of a standard job has failed to complete
      * @param job: the job
      * @param compute_service: the compute service that did the job
+     * @param cause: the failure cause
      */
     JobManagerCompoundJobFailedMessage::JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
-                                                                       std::shared_ptr<ComputeService> compute_service) :
+                                                                       std::shared_ptr<ComputeService> compute_service,
+                                                                       std::shared_ptr<FailureCause> cause) :
                                                                        JobManagerMessage("JobManagerCompoundJobFailedMessage") {
         this->job = std::move(job);
         this->compute_service = std::move(compute_service);
+        this->cause = std::move(cause);
     }
 
     /**

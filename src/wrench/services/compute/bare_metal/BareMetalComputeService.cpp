@@ -607,12 +607,14 @@ namespace wrench {
 
         // Do we support standard jobs?
         if (not this->supportsCompoundJobs()) {
+            auto failure_cause = std::shared_ptr<FailureCause>(
+                    new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>()));
+            job->setAllActionsFailed(failure_cause);
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
                             job, this->getSharedPtr<BareMetalComputeService>(), false,
-                            std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
+                            failure_cause,
                             this->getMessagePayloadValue(
                                     ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;

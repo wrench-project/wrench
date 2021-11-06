@@ -106,8 +106,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent();
-        std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(double timeout);
+
 
         std::string getCallbackMailbox();
 

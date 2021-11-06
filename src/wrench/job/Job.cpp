@@ -9,6 +9,7 @@
 
 
 #include <string>
+#include <utility>
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/job/Job.h>
@@ -38,7 +39,8 @@ namespace wrench {
         } else {
             this->name = name;
         }
-        this->job_manager = job_manager;
+        this->job_manager = std::move(job_manager);
+        this->originator_mailbox = this->job_manager->getWMS()->mailbox_name;
 
         this->parent_compute_service = nullptr;
         this->submit_date = -1.0;
@@ -55,26 +57,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "next" callback mailbox (returns the
-     *         origin (i.e., workflow) mailbox if the mailbox stack is empty)
-     *
-     * @return the next callback mailbox
-     */
-    std::string Job::getCallbackMailbox() {
-        WRENCH_INFO("===> %ld", this->callback_mailbox_stack.size());
-        if (this->callback_mailbox_stack.empty()) {
-            return this->workflow->getCallbackMailbox();
-        }
-        return this->callback_mailbox_stack.top();
-    }
-
-    /**
      * @brief Get the "origin" callback mailbox
      *
      * @return the next callback mailbox
      */
     std::string Job::getOriginCallbackMailbox() {
-        return this->workflow->getCallbackMailbox();
+        return this->originator_mailbox;
     }
 
 
@@ -87,11 +75,22 @@ namespace wrench {
      */
     std::string Job::popCallbackMailbox() {
         if (this->callback_mailbox_stack.empty()) {
-            return this->workflow->getCallbackMailbox();
+            return this->originator_mailbox;
         }
         std::string mailbox = this->callback_mailbox_stack.top();
         this->callback_mailbox_stack.pop();
         return mailbox;
+    }
+
+    /**
+     * @brief Get the job's "next" callback mailbox, without popping it
+     * @return the next callback mailbox
+     */
+    std::string Job::getCallbackMailbox() {
+        if (this->callback_mailbox_stack.empty()) {
+            return this->originator_mailbox;
+        }
+        return this->callback_mailbox_stack.top();
     }
 
     /**

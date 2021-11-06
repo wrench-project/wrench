@@ -485,24 +485,6 @@ namespace wrench {
         return this->dag.getNumberOfParents(task);
     }
 
-    /**
-     * @brief Wait for the next workflow execution event
-     *
-     * @return a workflow execution event
-     */
-    std::shared_ptr<ExecutionEvent> Workflow::waitForNextExecutionEvent() {
-        return ExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox);
-    }
-
-    /**
-    * @brief Wait for the next worklow execution event
-    * @param timeout: a timeout value in seconds
-    *
-    * @return a workflow execution event, or nullptr if a timeout occurred
-    */
-    std::shared_ptr<ExecutionEvent> Workflow::waitForNextExecutionEvent(double timeout) {
-        return ExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox, timeout);
-    }
 
     /**
      * @brief Get the mailbox name associated to this workflow

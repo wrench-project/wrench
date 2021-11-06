@@ -192,6 +192,8 @@ namespace wrench {
         /** @brief The enabled static optimizations */
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
+
+
         /***********************/
         /** \endcond           */
         /***********************/

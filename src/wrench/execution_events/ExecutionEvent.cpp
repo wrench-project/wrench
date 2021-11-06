@@ -69,7 +69,7 @@ namespace wrench {
 
         } else if (auto m = dynamic_cast<JobManagerCompoundJobFailedMessage*>(message.get())) {
             return std::shared_ptr<CompoundJobFailedEvent>(
-                    new CompoundJobFailedEvent(m->job, m->compute_service));
+                    new CompoundJobFailedEvent(m->job, m->compute_service, m->cause));
        
         } else if (auto m = dynamic_cast<JobManagerStandardJobCompletedMessage*>(message.get())) {
             // Update task states

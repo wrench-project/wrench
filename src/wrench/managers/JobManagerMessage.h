@@ -56,13 +56,17 @@ namespace wrench {
      */
     class JobManagerCompoundJobFailedMessage : public JobManagerMessage {
     public:
-        JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service);
+        JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
+                                           std::shared_ptr<ComputeService> compute_service,
+                                           std::shared_ptr<FailureCause> cause);
 
 
         /** @brief The job that has failed */
         std::shared_ptr<CompoundJob> job;
         /** @brief The compute service on which the job has failed */
         std::shared_ptr<ComputeService> compute_service;
+        /** @brief The failure cause */
+        std::shared_ptr<FailureCause> cause;
     };
     
     
@@ -103,6 +107,24 @@ namespace wrench {
         /** @brief The tasks whose failure counts need to be incremented */
         std::set<WorkflowTask *> necessary_failure_count_increments;
         /** @brief The cause of the failure */
+        std::shared_ptr<FailureCause> cause;
+    };
+
+    /**
+    * @brief A message sent by the JobManager to notify some submitter that a PilotJob has failed
+    */
+    class JobManagerPilotJobFailedMessage : public JobManagerMessage {
+    public:
+        JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+                                           std::shared_ptr<ComputeService> compute_service,
+                                           std::shared_ptr<FailureCause> cause);
+
+
+        /** @brief The job that has failed */
+        std::shared_ptr<PilotJob> job;
+        /** @brief The compute service on which the job has failed */
+        std::shared_ptr<ComputeService> compute_service;
+        /** @brief The failure cause */
         std::shared_ptr<FailureCause> cause;
     };
 
