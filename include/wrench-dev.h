@@ -29,6 +29,7 @@
 #include "wrench/failure_causes/NotAllowed.h"
 #include "wrench/failure_causes/NoScratchSpace.h"
 #include "wrench/failure_causes/NotEnoughResources.h"
+#include "wrench/failure_causes/HostError.h"
 #include "wrench/failure_causes/ServiceIsDown.h"
 #include "wrench/failure_causes/ServiceIsSuspended.h"
 #include "wrench/failure_causes/StorageServiceNotEnoughSpace.h"

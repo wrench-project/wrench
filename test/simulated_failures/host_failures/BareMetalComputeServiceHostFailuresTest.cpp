@@ -566,7 +566,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
                     },
                     "/scratch",
                     {
-                            {wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "true"}
+                            {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}
                     }));
 
     // Create a Storage Service

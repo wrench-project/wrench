@@ -28,7 +28,7 @@ namespace wrench {
      * @return the message
      */
     std::string HostError::toString() {
-        return "The host (" + this->hostname + ") is down and no service cannot be started on it";
+        return "The host (" + this->hostname + ") is down / has crashed";
     }
 
 

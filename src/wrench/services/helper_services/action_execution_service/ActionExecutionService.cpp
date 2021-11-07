@@ -511,7 +511,7 @@ namespace wrench {
             failure_detector->setSimulation(this->simulation);
             failure_detector->start(failure_detector, true, false); // Daemonized, no auto-restart
 
-            // Keep track of this workunit executor
+            // Keep track of this action executor
             this->action_executors[action] = action_executor;
 
             // Update core and RAM availability
@@ -558,7 +558,6 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
@@ -575,22 +574,22 @@ namespace wrench {
 
             } else {
                 // If not all resources are down or somebody is still running, nevermind
-                // we may have gotten the "Host down" message before the "This Action Executor has crashed" message.
+                // we may have gotten this "Host down" message before the "This Action Executor has crashed" message.
                 // So we don't want to just quit right now. We'll
                 //  get a Action Executor Crash message, at which point we'll check whether all hosts are down again
                 if (not this->areAllComputeResourcesDownWithNoActionExecutorRunning()) {
                     WRENCH_INFO("Not terminating as there are still non-down resources and/or WUE executors that "
                                 "haven't reported back yet");
                     return true;
+                } else {
+                    this->terminate(true);
+                    this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
+                    return false;
                 }
-
-                this->terminate();
-                this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
-                return false;
             }
 
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            this->terminate();
+            this->terminate(false);
 
             // This is Synchronous
             try {
@@ -640,7 +639,7 @@ namespace wrench {
                     return true;
                 }
 
-                this->terminate();
+                this->terminate(true);
                 this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
                 return false;
             }
@@ -651,60 +650,64 @@ namespace wrench {
     }
 
     /**
-     * @brief fail a running action
+     * @brief kill a running action
      * @param action: the action
      * @param cause: the failure cause
      */
-    void ActionExecutionService::failRunningAction(
+    void ActionExecutionService::killAction(
             std::shared_ptr<Action> action,
             std::shared_ptr<FailureCause> cause) {
-        WRENCH_INFO("Failing running action %s", action->getName().c_str());
+        WRENCH_INFO("Killing action %s", action->getName().c_str());
 
-        if (action)
-        terminateRunningAction(action, false);
+        bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
 
-        // Send back an action failed message
-        WRENCH_INFO("Sending action failure notification to '%s'", this->parent_service->mailbox_name.c_str());
-        // NOTE: This is synchronous so that the process doesn't fall off the end
-        try {
-            S4U_Mailbox::putMessage(
-                    this->parent_service->mailbox_name,
-                    new ActionExecutionServiceActionDoneMessage(action, 0));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
+        // If action is running kill the executor
+        if (this->action_executors.find(action) != this->action_executors.end()) {
+            auto executor = this->action_executors[action];
+            this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
+            this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+            executor->kill(killed_due_to_job_cancelation);
+            this->action_executors.erase(action);
+
+            /** Yield, so that the executor has a chance to do their cleanup, etc. */
+            S4U_Simulation::yield();
         }
-    }
 
-    /**
-    * @brief terminate a running action
-    * @param job: the job
-    */
-    void ActionExecutionService::terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancelation) {
-
-        auto executor = this->action_executors[action];
-        this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
-        this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
-        executor->kill(killed_due_to_job_cancelation);
-        this->action_executors.erase(action);
-
-        /** Yield, so that the executor has a chance to do their cleanup, etc. */
-        S4U_Simulation::yield();
-
-        // Remove the action from our list of actions
+        // Remove the action from the set of known actions
         this->all_actions.erase(action);
+
+        // Set the action's state
+        action->setFailureCause(cause);
+
+        // Send back an action failed message if necessary
+        if (not killed_due_to_job_cancelation) {
+            WRENCH_INFO("Sending action failure notification to '%s'",
+                        this->parent_service->mailbox_name.c_str());
+            // NOTE: This is synchronous so that the process doesn't fall off the end
+            try {
+                S4U_Mailbox::putMessage(
+                        this->parent_service->mailbox_name,
+                        new ActionExecutionServiceActionDoneMessage(action, 0));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return;
+            }
+        }
     }
 
     /**
      * @brief Terminate the daemon, dealing with pending/running actions
      *
      */
-    void ActionExecutionService::terminate() {
+    void ActionExecutionService::terminate(bool crashed) {
         this->setStateToDown();
 
         WRENCH_INFO("Failing currently running actions");
         for (auto const &action : this->running_actions) {
-            this->failRunningAction(action, std::shared_ptr<FailureCause>(
-                    new JobKilled(action->getJob(), this->parent_service)));
+            if (crashed) {
+                this->killAction(action, std::make_shared<ServiceIsDown>(this->parent_service));
+            } else {
+                this->killAction(action, std::make_shared<JobKilled>(action->getJob(), this->parent_service));
+            }
         }
 
     }
@@ -765,6 +768,7 @@ namespace wrench {
 
         // Forget the action executor
         this->action_executors.erase(executor->getAction());
+        this->all_actions.erase(executor->getAction());
 
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(
@@ -809,7 +813,7 @@ namespace wrench {
     void ActionExecutionService::processActionTerminationRequest(std::shared_ptr<Action> action,
                                                           const std::string &answer_mailbox) {
 
-        // If the job doesn't exit, we reply right away
+        // If the action doesn't exit, we reply right away
         if (this->all_actions.find(action) == this->all_actions.end()) {
             WRENCH_INFO(
                     "Trying to terminate an action that's not (no longer?) running!");
@@ -822,7 +826,7 @@ namespace wrench {
             return;
         }
 
-        terminateRunningAction(action, true);
+        killAction(action, std::make_shared<JobKilled>(action->getJob(), this->parent_service));
 
         // reply
         auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
@@ -1070,7 +1074,7 @@ namespace wrench {
         // Forget the executor
         this->action_executors.erase(action);
 
-        if (this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
+        if (not this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
 
             // Reset the action state to READY)
             action->newExecution();
@@ -1113,7 +1117,8 @@ namespace wrench {
      *
      */
     void ActionExecutionService::setParentService(std::shared_ptr<Service> service) {
-        this->parent_service = service;
+        this->parent_service = std::move(service);
     }
+
 
 }
