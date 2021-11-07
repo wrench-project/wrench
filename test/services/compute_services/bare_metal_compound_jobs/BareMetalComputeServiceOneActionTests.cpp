@@ -624,6 +624,9 @@ private:
             if (real_event->compute_service != this->test->compute_service) {
                 throw std::runtime_error("Event's compute service isn't the right compute service!");
             }
+            if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
+                throw std::runtime_error("Unexpected event-level failure cause");
+            }
 
             // Check failure cause
             if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
@@ -652,7 +655,7 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionNotEnoughResourcesTest) {
+TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionNotEnoughResources) {
     DO_TEST_WITH_FORK(do_OneComputeActionNotEnoughResources_test);
 }
 
@@ -776,6 +779,10 @@ private:
         }
         if (real_event->compute_service != this->test->compute_service)  {
             throw std::runtime_error("Event's compute service isn't the right compute service!");
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause)) {
+            throw std::runtime_error("Unexpected event-level failure cause");
         }
 
         // Chek action stuff
