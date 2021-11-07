@@ -91,64 +91,59 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"TwoCoreHost\" speed=\"1f\" core=\"2\"> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
                           "          </disk>"
                           "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk3\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"1f\" core=\"1\"> "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk3\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "       </host> "
-                          "       <host id=\"RAMHost\" speed=\"1f\" core=\"1\" > "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk1\"/>"
+                          "       </host>"
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
-                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk3\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk3\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"100B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
-                          "         <prop id=\"ram\" value=\"1024B\" />"
-                          "       </host> "
+                          "       </host>"
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "         <prop id=\"ram\" value=\"1024B\"/> "
+                          "       </host>  "
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                          "       <route src=\"RAMHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                          "       <link id=\"2\" bandwidth=\"100MBps\" latency=\"0us\"/>"
+                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
                           "   </zone> "
                           "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -374,8 +369,8 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("TwoCoreHost",
-                                                {std::make_pair("TwoCoreHost",
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                 {"/scratch"},
@@ -384,12 +379,12 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
+            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    std::string hostname = "TwoCoreHost";
+    std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new NoopTestWMS(
                     this,
@@ -522,8 +517,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("TwoCoreHost",
-                                                {std::make_pair("TwoCoreHost",
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                 {"/scratch"},
@@ -532,12 +527,12 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
+            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    std::string hostname = "TwoCoreHost";
+    std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new OneSleepActionTestWMS(
                     this,
@@ -683,8 +678,8 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("TwoCoreHost",
-                                                {std::make_pair("TwoCoreHost",
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 100.0))},
                                                 {"/scratch"},
@@ -693,12 +688,12 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("TwoCoreHost", {"/disk1"})));
+            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    std::string hostname = "TwoCoreHost";
+    std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new OneComputeActionNotEnoughResourcesTestWMS(
                     this,
@@ -730,6 +725,167 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
         free(argv[i]);
     free(argv);
 }
+
+
+
+/**********************************************************************/
+/**  ONE COMPUTE ACTION SERVICE CRASHED TEST                         **/
+/**********************************************************************/
+
+class ServiceCrashedTestWMS : public wrench::WMS {
+public:
+    ServiceCrashedTestWMS(BareMetalComputeServiceOneActionTest *test,
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                          std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceOneActionTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a compound job and submit it
+        auto job = job_manager->createCompoundJob("my_job");
+        auto action = job->addSleepAction("my_sleep", 10.0);
+        job_manager->submitJob(job, this->test->compute_service, {});
+
+        // Sleep 1 sec
+        wrench::Simulation::sleep(1.0);
+
+        // Kill the BareMetalComputeService
+        wrench::Simulation::turnOffHost("Host4");
+
+        // Wait for the workflow execution event
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
+        if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        // Check event content
+        auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
+        if (real_event->job != job) {
+            throw std::runtime_error("Event's job isn't the right job!");
+        }
+        if (real_event->compute_service != this->test->compute_service)  {
+            throw std::runtime_error("Event's compute service isn't the right compute service!");
+        }
+
+        // Chek action stuff
+        if (action->getState() != wrench::Action::State::FAILED) {
+            throw std::runtime_error("Unexpected action state " + action->getStateAsString());
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::HostError>(action->getFailureCause())) {
+            throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
+        }
+
+        std::cerr << action->getStartDate() << "\n";
+        std::cerr << action->getEndDate() << "\n";
+
+        if ((action->getStartDate() > 0.0001) or (std::abs<double>(action->getEndDate() - 1.0) > 0)) {
+            throw std::runtime_error("Unexpected action start/end dates");
+        }
+
+
+        // Stop the Job Manager manually, just for kicks
+        job_manager->stop();
+
+        // Stop the Data Movement Manager manually, just for kicks
+        data_movement_manager->stop();
+
+        wrench::Simulation::sleep(1);
+
+        // Stop the Compute service manually, for coverage
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneActionTest, ServiceCrashed) {
+    DO_TEST_WITH_FORK(do_OneSleepActionServiceCrashed_test);
+}
+
+void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+
+    int argc = 3;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+    argv[1] = strdup("--wrench-full-log");
+    argv[2] = strdup("--wrench-host-shutdown-simulation");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ServiceCrashedTestWMS(
+                    this,
+                    {compute_service}, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Without a file registry service this should fail
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->stageFile(input_file, storage_service1), std::runtime_error);
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
+                 std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
 #if 0
 
 

@@ -43,7 +43,7 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values = {
                 {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
-                {ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH,     "false"},
+                {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
@@ -113,7 +113,7 @@ namespace wrench {
 
         // Helper functions to make main() a bit more palatable
 
-        void terminate();
+        void terminate(bool crashed);
 
         void failCurrentActions();
 
@@ -144,7 +144,7 @@ namespace wrench {
 
         void terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancelation);
 
-        void failRunningAction(std::shared_ptr<Action> action, std::shared_ptr<FailureCause> cause);
+        void killAction(std::shared_ptr<Action> action, std::shared_ptr<FailureCause> cause);
 
 
         void processSubmitAction(const std::string &answer_mailbox, std::shared_ptr<Action> action);
@@ -159,7 +159,6 @@ namespace wrench {
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
         bool areAllComputeResourcesDownWithNoActionExecutorRunning();
-
 
 
         int exit_code = 0;
