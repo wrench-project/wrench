@@ -250,8 +250,13 @@ namespace wrench {
         // until the host has a >0 pstate
         S4U_Simulation::computeZeroFlop();
         this->state = State::UP;
-        this->return_value = this->main();
+        std::cerr << "CALLING MAIN for " << this->process_name << "\n";
+        auto stuff = this->main();
+        std::cerr << "CALLED MAIN for " << this->process_name << "\n";
+        this->return_value = stuff;
+        std::cerr << "CALLED MAIN 2" << this << "\n";
         this->has_returned_from_main = true;
+        std::cerr << "CALLED MAIN 3\n";
         this->state = State::DOWN;
     }
 
