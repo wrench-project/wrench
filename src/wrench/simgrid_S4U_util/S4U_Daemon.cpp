@@ -82,7 +82,7 @@ namespace wrench {
 
     S4U_Daemon::~S4U_Daemon() {
 
-//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
+        WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
         /** The code below was to avoid a memory_manager_service leak on the actor! However, weirdly,
          *  it now causes problems due to SimGrid complaining that on_exit() functions
@@ -250,13 +250,9 @@ namespace wrench {
         // until the host has a >0 pstate
         S4U_Simulation::computeZeroFlop();
         this->state = State::UP;
-        std::cerr << "CALLING MAIN for " << this->process_name << "\n";
         auto stuff = this->main();
-        std::cerr << "CALLED MAIN for " << this->process_name << "\n";
         this->return_value = stuff;
-        std::cerr << "CALLED MAIN 2" << this << "\n";
         this->has_returned_from_main = true;
-        std::cerr << "CALLED MAIN 3\n";
         this->state = State::DOWN;
     }
 

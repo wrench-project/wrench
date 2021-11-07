@@ -595,12 +595,12 @@ private:
         auto job1 = job_manager->createCompoundJob("my_job1");
         // Create a compute action that asks for too many cores
         auto action1 = job1->addComputeAction("my_computation", 1000.0, 0.0, 100, 100,
-                                            wrench::ParallelModel::AMDAHL(1.0));
+                                              wrench::ParallelModel::AMDAHL(1.0));
         // Create a compound job that asks for too much RAM
         auto job2 = job_manager->createCompoundJob("my_job2");
         // Create a compute action that asks for too many cores
         auto action2 = job2->addComputeAction("my_computation", 1000.0, 1000.0, 1, 1,
-                                             wrench::ParallelModel::AMDAHL(1.0));
+                                              wrench::ParallelModel::AMDAHL(1.0));
 
         std::vector<std::shared_ptr<wrench::CompoundJob>> jobs = {job1, job2};
 
@@ -893,9 +893,9 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
 class ServiceCrashedRestartedTestWMS : public wrench::WMS {
 public:
     ServiceCrashedRestartedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                   std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -948,17 +948,41 @@ private:
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
         }
 
-        if (not std::dynamic_pointer_cast<wrench::HostError>(action->getFailureCause())) {
-            throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
-        }
-
-        std::cerr << action->getStartDate() << "\n";
-        std::cerr << action->getEndDate() << "\n";
-
-        if ((action->getStartDate() > 0.0001) or (std::abs<double>(action->getEndDate() - 1.0) > 0)) {
+        if ((std::abs<double>(action->getStartDate() - 2.0) > 0.0001) or (std::abs<double>(action->getEndDate() - 12.0) > 0.0001)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
 
+        // Check action history
+        auto history = action->getExecutionHistory();
+        if (history.size() != 2) {
+            throw std::runtime_error("Unexpected execution history size");
+        }
+        auto top = history.top();
+        if ((top.failure_cause != nullptr) or
+            (std::abs<double>(top.start_date - 2.0) > 0.0001) or
+            (std::abs<double>(top.end_date - 12.0) > 0.0001) or
+            (top.execution_host != "Host4") or
+            (top.num_cores_allocated != 0) or
+            (top.state != wrench::Action::State::COMPLETED) or
+            (top.ram_allocated != 0.0) or
+            (top.physical_execution_host != "Host4")) {
+            std::cerr << "---> " << top.failure_cause->toString() << "\n";
+            throw std::runtime_error("Unexpected last history");
+        }
+        history.pop();
+        top = history.top();
+        if ((top.failure_cause == nullptr) or
+                (std::dynamic_pointer_cast<wrench::HostError>(top.failure_cause) == nullptr) or
+            (std::abs<double>(top.start_date - 0.0) > 0.0001) or
+            (std::abs<double>(top.end_date - 1.0) > 0.0001) or
+            (top.execution_host != "Host4") or
+            (top.num_cores_allocated != 0) or
+            (top.state != wrench::Action::State::FAILED) or
+            (top.ram_allocated != 0.0) or
+            (top.physical_execution_host != "Host4")) {
+            std::cerr << "---> " << top.failure_cause->toString() << "\n";
+            throw std::runtime_error("Unexpected last history");
+        }
 
         // Stop the Job Manager manually, just for kicks
         job_manager->stop();
