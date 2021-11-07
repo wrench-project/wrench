@@ -68,7 +68,7 @@ namespace wrench {
      * @param return_value: main's return value
      */
     void ActionExecutor::cleanup(bool has_returned_from_main, int return_value) {
-        WRENCH_INFO(
+        WRENCH_DEBUG(
                 "In on_exit.cleanup(): ActionExecutor: %s has_returned_from_main = %d (return_value = %d, killed_on_pupose = %d)",
                 this->getName().c_str(), has_returned_from_main, return_value,
                 this->killed_on_purpose);
