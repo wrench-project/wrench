@@ -436,9 +436,7 @@ namespace wrench {
             this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
                     hostname,
                     std::move(compute_resources),
-                    {{ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
-                     {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)}
-                    },
+                    {{ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)}},
                     {}
             ));
             this->action_execution_service->setSimulation(this->simulation);
@@ -681,9 +679,9 @@ namespace wrench {
                 S4U_Mailbox::putMessage(
                         job->popCallbackMailbox(),
                         new ComputeServiceCompoundJobFailedMessage(
-                                job, this->getSharedPtr<BatchComputeService>(),
+                                job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
-                                        BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                        BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> &cause) {
                 return; // ignore
             }
@@ -898,16 +896,16 @@ namespace wrench {
                         new ComputeServiceCompoundJobDoneMessage(
                                 job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
-                                        BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
+                                        BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
 
             } else if (job->hasFailed()) {
                 this->current_jobs.erase(job);
                 S4U_Mailbox::putMessage(
                         job->popCallbackMailbox(),
                         new ComputeServiceCompoundJobFailedMessage(
-                                job, this->getSharedPtr<BatchComputeService>(),
+                                job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
-                                        BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                        BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
             }
         } catch (std::shared_ptr<NetworkError> &cause) {
             return; // ignore

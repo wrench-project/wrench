@@ -393,7 +393,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(4, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            {{wrench::ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
+                                            {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
         
@@ -563,7 +563,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            {{wrench::ActionExecutionServiceProperty::RE_READY_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
+                                            {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
         

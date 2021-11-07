@@ -56,7 +56,7 @@ namespace wrench {
                 {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
                 {BareMetalComputeServiceProperty::SUPPORTS_COMPOUND_JOBS,                         "true"},
                 {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
-                {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
+                {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
         };
 
         std::map<std::string, double> default_messagepayload_values = {
