@@ -152,6 +152,8 @@ namespace wrench {
 
         void assertJobNotSubmitted();
 
+        bool pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b);
+
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
 
