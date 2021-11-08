@@ -212,6 +212,11 @@ private:
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::COMPLETED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         // Check makespan
         if (std::abs<double>(wrench::Simulation::getCurrentSimulatedDate() - expected_makespan) > 0.0001) {
             throw std::runtime_error("Unexpected makespan");
@@ -464,6 +469,11 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::COMPLETED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         // Check timing
         if (std::abs<double>(compute1->getEndDate() - compute2->getEndDate()) > 0.0001) {
             throw std::runtime_error("Compute1 and Compute2 actions should have completed at the same time");
@@ -605,6 +615,11 @@ private:
             throw std::runtime_error("Unexpected job-level failure cause");
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         if (sleep1->getState() != wrench::Action::State::COMPLETED) {
             throw std::runtime_error("Unexpected state of the sleep1 action: " + sleep1->getStateAsString());
         }
@@ -736,6 +751,11 @@ private:
         // Terminate the job
         job_manager->terminateJob(job);
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         if (sleep1->getState() != wrench::Action::State::COMPLETED) {
             throw std::runtime_error("Unexpected state of the sleep1 action: " + sleep1->getStateAsString());
         }
@@ -764,10 +784,10 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("multi_action_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -817,3 +837,5 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
         free(argv[i]);
     free(argv);
 }
+
+

@@ -993,21 +993,25 @@ namespace wrench {
         try {
             job->submit_date = Simulation::getCurrentSimulatedDate();
             job->parent_compute_service->submitJob(job, job->service_specific_args);
+            if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                pjob->state = PilotJob::PENDING;
+            }
         } catch (ExecutionException &e) {
+            job->end_date = Simulation::getCurrentSimulatedDate();
             // "Undo" everything
+            if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+                cjob->state = CompoundJob::State::DISCONTINUED;
+            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                pjob->state = PilotJob::State::FAILED;
+            }
             job->popCallbackMailbox();
             throw;
 
         } catch (std::invalid_argument &e) {
-            // "Undo" everything
-
             throw;
         }
 
-        if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-            // TODO: Useful???
-            pjob->state = PilotJob::PENDING;
-        }
+
     }
 
 

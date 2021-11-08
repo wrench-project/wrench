@@ -309,7 +309,8 @@ namespace wrench {
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
-        this->parents.insert(std::move(parent));
+        this->parents.insert(parent);
+        parent->children.insert(this->shared_this);
     }
 
     /**
@@ -321,7 +322,8 @@ namespace wrench {
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
         }
-        this->parents.insert(std::move(child));
+        this->children.insert(child);
+        child->parents.insert(this->shared_this);
     }
 
     /**
