@@ -1,0 +1,251 @@
+/**
+ * Copyright (c) 2017-2021. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+#include <math.h>
+#include <gtest/gtest.h>
+#include <wrench-dev.h>
+
+#include "../../../include/TestWithFork.h"
+#include "../../../include/UniqueTmpPathPrefix.h"
+
+WRENCH_LOG_CATEGORY(bare_metal_compute_service_multi_job_test, "Log category for BareMetalComputeServiceMultiJob test");
+
+class BareMetalComputeServiceMultiJobTest : public ::testing::Test {
+public:
+    wrench::WorkflowFile *input_file;
+    wrench::WorkflowFile *output_file;
+    wrench::WorkflowTask *task;
+    std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
+    std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
+    std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
+
+    void do_DAGOfJobs_test();
+
+protected:
+    BareMetalComputeServiceMultiJobTest() {
+
+        // Create the simplest workflow
+        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = workflow_unique_ptr.get();
+
+        // Create two files
+        input_file = workflow->addFile("input_file", 10000.0);
+        output_file = workflow->addFile("output_file", 20000.0);
+
+        // Create a platform file
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/disk1/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/disk2/\"/>"
+                          "          </disk>"
+
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host2\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host3\" speed=\"1f\" core=\"10\"> "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "       </host>"
+                          "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
+                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
+                          "          </disk>"
+                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                          "             <prop id=\"size\" value=\"100B\"/>"
+                          "             <prop id=\"mount\" value=\"/scratch\"/>"
+                          "          </disk>"
+                          "         <prop id=\"ram\" value=\"1000B\"/> "
+                          "       </host>  "
+                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                          "       <link id=\"2\" bandwidth=\"100MBps\" latency=\"0us\"/>"
+                          "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host2\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                          "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
+                          "   </zone> "
+                          "</platform>";
+        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        fprintf(platform_file, "%s", xml.c_str());
+        fclose(platform_file);
+
+    }
+
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    wrench::Workflow *workflow;
+
+};
+
+
+
+/**********************************************************************/
+/**  DAG OF JOBS TEST                                               **/
+/**********************************************************************/
+
+class DAGOfJobsTestWMS : public wrench::WMS {
+public:
+    DAGOfJobsTestWMS(BareMetalComputeServiceMultiJobTest *test,
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                          std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceMultiJobTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a DAG of jobs
+        auto job1 = job_manager->createCompoundJob("job1");
+        auto job2 = job_manager->createCompoundJob("job2");
+        auto job3 = job_manager->createCompoundJob("job3");
+        auto job4 = job_manager->createCompoundJob("job4");
+
+        auto action1 = job1->addSleepAction("job1_sleep", 10.);
+        auto action2 = job2->addSleepAction("job2_sleep", 10.);
+        auto action3 = job3->addSleepAction("job3_sleep", 10.);
+        auto action4 = job4->addSleepAction("job4_sleep", 10.);
+
+        job1->addChildJob(job2);
+        job1->addChildJob(job3);
+        job3->addChildJob(job4);
+
+        // Submit all the jobs, in whatever order
+        job_manager->submitJob(job4, this->test->compute_service);
+        job_manager->submitJob(job2, this->test->compute_service);
+        job_manager->submitJob(job3, this->test->compute_service);
+        job_manager->submitJob(job1, this->test->compute_service);
+
+        // Wait for events
+        for (int i=0; i < 4; i++) {
+            this->waitForNextEvent();
+        }
+
+        // Check on action sequencing
+        if (action2->getStartDate() < action1->getEndDate()) {
+            throw std::runtime_error("Action 2 shouldn't start before Action 1 ends");
+        }
+        if (action3->getStartDate() < action1->getEndDate()) {
+            throw std::runtime_error("Action 3 shouldn't start before Action 1 ends");
+        }
+        if (action4->getStartDate() < action3->getEndDate()) {
+            throw std::runtime_error("Action 4 shouldn't start before Action 3 ends");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceMultiJobTest, DAGOfJobs) {
+    DO_TEST_WITH_FORK(do_DAGOfJobs_test);
+}
+
+void BareMetalComputeServiceMultiJobTest::do_DAGOfJobs_test() {
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("multi_action_test");
+    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+            new DAGOfJobsTestWMS(
+                    this,
+                    {compute_service}, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    ASSERT_THROW(simulation->stageFile(input_file, (std::shared_ptr<wrench::StorageService>) nullptr),
+                 std::invalid_argument);
+    ASSERT_THROW(simulation->stageFile(nullptr, storage_service1), std::invalid_argument);
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
