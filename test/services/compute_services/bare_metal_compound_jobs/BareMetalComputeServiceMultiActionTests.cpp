@@ -30,6 +30,7 @@ public:
     void do_NonDAG_test();
     void do_RAMConstraintsAndPriorities_test();
     void do_PartialFailure_test();
+    void do_PartialTermination_test();
 
 protected:
     BareMetalComputeServiceMultiActionTest() {
@@ -593,13 +594,32 @@ private:
 
         // Shut down the compute service
         this->test->compute_service->stop();
-//
-//        // Wait for the workflow execution event
-//        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
-//        if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
-//            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
-//        }
 
+        // Wait for the workflow execution event
+        auto event = this->waitForNextEvent();
+        auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
+        if (not real_event) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+        if (not std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause)) {
+            throw std::runtime_error("Unexpected job-level failure cause");
+        }
+
+        if (sleep1->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected state of the sleep1 action: " + sleep1->getStateAsString());
+        }
+        if (file_read->getState() != wrench::Action::State::FAILED) {
+            throw std::runtime_error("Unexpected state of the file_read action: " + file_read->getStateAsString());
+        }
+        if (sleep_after_file_read->getState() != wrench::Action::State::NOT_READY) {
+            throw std::runtime_error("Unexpected state of the sleep_after_file_read action: " + sleep_after_file_read->getStateAsString());
+        }
+        if (compute->getState() != wrench::Action::State::KILLED) {
+            throw std::runtime_error("Unexpected state of the compute action: " + compute->getStateAsString());
+        }
+        if (sleep_after_compute->getState() != wrench::Action::State::NOT_READY) {
+            throw std::runtime_error("Unexpected state of the sleep_after_compute action: " + sleep_after_compute->getStateAsString());
+        }
 
         return 0;
     }
@@ -610,6 +630,137 @@ TEST_F(BareMetalComputeServiceMultiActionTest, PartialFailure) {
 }
 
 void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("multi_action_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {"/scratch"},
+                                                {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+            new PartialFailureTestWMS(
+                    this,
+                    {compute_service}, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  PARTIAL TERMINATION TEST                                        **/
+/**********************************************************************/
+
+class PartialTerminationTestWMS : public wrench::WMS {
+public:
+    PartialTerminationTestWMS(BareMetalComputeServiceMultiActionTest *test,
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                          std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceMultiActionTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("my_job");
+
+        auto sleep1 = job->addSleepAction("sleep1", 10.0);
+        auto file_read = job->addFileReadAction("file_read", this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service1));
+        auto sleep_after_file_read = job->addSleepAction("sleep_after_file_read", 10.0);
+        auto compute = job->addComputeAction("compute", 10000.0, 100.0, 1,1, wrench::ParallelModel::AMDAHL(1.0));
+        auto sleep_after_compute = job->addSleepAction("sleep_after_compute", 10.0);
+
+        job->addActionDependency(sleep1, file_read);
+        job->addActionDependency(sleep1, compute);
+        job->addActionDependency(file_read, sleep_after_file_read);
+        job->addActionDependency(compute, sleep_after_compute);
+
+        // Submit the job
+        job_manager->submitJob(job, this->test->compute_service, {});
+
+        // Sleep 11 seconds
+        wrench::Simulation::sleep(11.0);
+
+        // Terminate the job
+        job_manager->terminateJob(job);
+
+        if (sleep1->getState() != wrench::Action::State::COMPLETED) {
+            throw std::runtime_error("Unexpected state of the sleep1 action: " + sleep1->getStateAsString());
+        }
+        if (file_read->getState() != wrench::Action::State::FAILED) {
+            throw std::runtime_error("Unexpected state of the file_read action: " + file_read->getStateAsString());
+        }
+        if (sleep_after_file_read->getState() != wrench::Action::State::NOT_READY) {
+            throw std::runtime_error("Unexpected state of the sleep_after_file_read action: " + sleep_after_file_read->getStateAsString());
+        }
+        if (compute->getState() != wrench::Action::State::KILLED) {
+            throw std::runtime_error("Unexpected state of the compute action: " + compute->getStateAsString());
+        }
+        if (sleep_after_compute->getState() != wrench::Action::State::NOT_READY) {
+            throw std::runtime_error("Unexpected state of the sleep_after_compute action: " + sleep_after_compute->getStateAsString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceMultiActionTest, PartialTermination) {
+    DO_TEST_WITH_FORK(do_PartialTermination_test);
+}
+
+void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -647,7 +798,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new PartialFailureTestWMS(
+            new PartialTerminationTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
