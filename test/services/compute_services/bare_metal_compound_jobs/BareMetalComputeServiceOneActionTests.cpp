@@ -423,6 +423,11 @@ private:
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::COMPLETED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         // Chek action stuff
         if (action->getState() != wrench::Action::State::COMPLETED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
@@ -587,6 +592,11 @@ private:
                 throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString());
             }
 
+            // Check job state
+            if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+                throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+            }
+
             // Chek action stuff
             if ((*(job->getActions().begin()))->getState() != wrench::Action::State::FAILED) {
                 throw std::runtime_error("Unexpected action state " + (*(job->getActions().begin()))->getStateAsString());
@@ -744,9 +754,6 @@ private:
             throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
 
-        std::cerr << action->getStartDate() << "\n";
-        std::cerr << action->getEndDate() << "\n";
-
         if ((action->getStartDate() > 0.0001) or (std::abs<double>(action->getEndDate() - 1.0) > 0)) {
             throw std::runtime_error("Unexpected action start/end dates");
         }
@@ -866,8 +873,16 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
+        if (job->getState() != wrench::CompoundJob::State::NOT_SUBMITTED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
         auto action = job->addSleepAction("my_sleep", 10.0);
         job_manager->submitJob(job, this->test->compute_service, {});
+
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::SUBMITTED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
 
         // Sleep 1 sec
         wrench::Simulation::sleep(1.0);
@@ -1196,6 +1211,11 @@ private:
             throw std::runtime_error("Unexpected event-level failure cause");
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         // Chek action stuff
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
@@ -1343,6 +1363,11 @@ private:
             throw std::runtime_error("Unexpected event-level failure cause");
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         // Chek action stuff
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
@@ -1471,6 +1496,11 @@ private:
         }
         if (not std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(real_event->failure_cause)) {
             throw std::runtime_error("Unexpected event-level failure cause");
+        }
+
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
 
         // Chek action stuff
