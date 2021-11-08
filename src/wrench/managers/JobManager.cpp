@@ -468,6 +468,7 @@ namespace wrench {
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
             this->jobs_to_dispatch.push_back(job);
         } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+            cjob->state = CompoundJob::State::SUBMITTED;
             this->jobs_to_dispatch.push_back(job);
         }
 
@@ -493,7 +494,7 @@ namespace wrench {
         }
 
         if (job->getParentComputeService() == nullptr) {
-            std::string err_msg = "Job cannot be terminated because it doesn't  have a parent compute service";
+            std::string err_msg = "Job cannot be terminated because it doesn't have a parent compute service";
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
@@ -538,6 +539,8 @@ namespace wrench {
             }
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
             pjob->state = PilotJob::State::TERMINATED;
+        } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+            cjob->state = CompoundJob::State::DISCONTINUED;
         }
     }
 

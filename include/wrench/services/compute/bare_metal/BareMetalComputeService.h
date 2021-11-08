@@ -184,7 +184,7 @@ namespace wrench {
 //        std::map<std::shared_ptr<StandardJob> , std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
 
         // Map of all Workunits
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> all_workunits;
+//        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> all_workunits;
 
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
