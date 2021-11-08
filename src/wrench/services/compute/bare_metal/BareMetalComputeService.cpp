@@ -673,7 +673,8 @@ namespace wrench {
         }
 
         // Deal with all jobs
-        for (auto const &job : this->current_jobs) {
+        while (not this->current_jobs.empty()) {
+            auto job = *(this->current_jobs.begin());
             try {
                 this->current_jobs.erase(job);
                 S4U_Mailbox::putMessage(
