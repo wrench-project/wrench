@@ -37,6 +37,7 @@ namespace wrench {
 
         this->simulate_computation_as_sleep = false;
         this->thread_creation_overhead = 0.0;
+        this->priority = 0.0;
     }
 
     /**
@@ -283,12 +284,36 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Get the action's children
+     * @return a set of children
+     */
     std::set<std::shared_ptr<Action>> &Action::getChildren() {
         return this->children;
     }
 
+    /**
+     * @brief Get the action's parents
+     * @return a set of parents
+     */
     std::set<std::shared_ptr<Action>> &Action::getParents() {
         return this->parents;
+    }
+
+    /**
+     * @brief Set the action's priority
+     * @param priority: a priority
+     */
+    void Action::setPriority(double priority) {
+        this->priority = priority;
+    }
+
+    /**
+   * @brief Get the action's priority
+   * @return a priority
+   */
+    double Action::getPriority() const {
+        return this->priority;
     }
 
 

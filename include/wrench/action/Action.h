@@ -59,6 +59,9 @@ namespace wrench {
         virtual unsigned long getMaxNumCores() const;
         virtual double getMinRAMFootprint() const;
 
+        void setPriority(double priority);
+        double getPriority() const;
+
         void setSimulateComputationAsSleep(bool simulate_computation_as_sleep);
         void setThreadCreationOverhead(double overhead_in_seconds);
 
@@ -122,6 +125,8 @@ namespace wrench {
         void updateState();
 
     private:
+
+        double priority;
 
         std::shared_ptr<Action> shared_ptr_this;
 
