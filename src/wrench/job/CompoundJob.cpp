@@ -271,11 +271,18 @@ namespace wrench {
     void CompoundJob::addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child) {
         assertJobNotSubmitted();
         if ((parent == nullptr) or (child == nullptr)) {
-            throw std::invalid_argument("CompoundJob::addDependency(): arguments cannot be nullptr");
+            throw std::invalid_argument("CompoundJob::addDependency(): Arguments cannot be nullptr");
+        }
+        if (parent == child) {
+            throw std::invalid_argument("CompoundJob::addDependency(): Cannot add a dependency between a task and itself");
         }
         if (parent->getJob() != this->shared_this or child->getJob() != this->shared_this) {
             throw std::invalid_argument("CompoundJob::addDependency(): Both actions must belong to this job");
         }
+        if (pathExists(child, parent)) {
+            throw std::invalid_argument("CompoundJob::addDependency(): Adding this dependency would create a cycle");
+        }
+
         child->parents.insert(parent);
         parent->children.insert(child);
         child->updateState();
@@ -397,6 +404,24 @@ namespace wrench {
             action->setFailureCause(cause);
         }
 
+    }
+
+    /**
+     * Determine whether there is a path between two actions
+     * @param a: an action
+     * @param b: another action
+     * @return
+     */
+    bool CompoundJob::pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b) {
+        auto children = a->getChildren();
+        if (children.find(b) != children.end()) {
+            return true;
+        }
+        bool path_exists = false;
+        for (auto const &c : children) {
+            path_exists = path_exists || this->pathExists(c, b);
+        }
+        return path_exists;
     }
 
 }

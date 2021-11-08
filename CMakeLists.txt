@@ -380,6 +380,7 @@ set(TEST_FILES
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
