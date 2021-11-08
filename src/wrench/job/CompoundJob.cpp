@@ -57,19 +57,12 @@ namespace wrench {
         return this->state;
     }
 
-    /**
-     * @brief Get the job's priority (which may be used by some services)
-     * @return the priority
-     */
-    unsigned long CompoundJob::getPriority() {
-        return this->priority;
-    }
 
     /**
-    * @brief Set the job's priority (which may be used by some services)
-    * @param priority: the job's priority
+    * @brief Set the job's priority (the higher the priority value, the higher the priority)
+    * @param priority: a priority
     */
-    void CompoundJob::setPriority(unsigned long priority) {
+    void CompoundJob::setPriority(double priority) {
         assertJobNotSubmitted();
         this->priority = priority;
     }

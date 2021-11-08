@@ -162,10 +162,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Return default job priority as zero.
-     * @return priority as zero
-     */
-    unsigned long Job::getPriority() {
-        return 0;
+    * @brief Get the job's priority (the higher the priority value, the higher the priority)
+    * @return the job's priority
+    */
+    double Job::getPriority() {
+        return this->priority;
+    }
+
+    /**
+   * @brief Set the job's priority (the higher the priority value, the higher the priority)
+   * @param priority: a priority
+   */
+    void Job::setPriority(double priority) {
+        this->priority = priority;
     }
 }

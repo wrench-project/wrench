@@ -63,8 +63,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<Action>> getActions();
         CompoundJob::State getState();
-        unsigned long getPriority() override;
-        void setPriority(unsigned long priority);
+        void setPriority(double priority) override;
 
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
 

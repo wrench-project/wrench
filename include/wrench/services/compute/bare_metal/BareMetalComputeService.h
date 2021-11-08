@@ -189,7 +189,7 @@ namespace wrench {
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
         std::set<std::shared_ptr<Action>> not_ready_actions;
-        std::deque<std::shared_ptr<Action>> ready_actions;
+        std::vector<std::shared_ptr<Action>> ready_actions;
         std::set<std::shared_ptr<Action>> dispatched_actions;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
@@ -212,7 +212,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void dispatchReadyAction();
+        void dispatchReadyActions();
 
 //        void someHostIsBackOn(simgrid::s4u::Host const &h);
 //        bool host_back_on = false;
