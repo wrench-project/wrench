@@ -57,6 +57,25 @@ namespace wrench {
         return this->state;
     }
 
+    /**
+     * @brief Get the state of the standard job
+     * @return the state
+     */
+    std::string CompoundJob::getStateAsString() {
+        switch(this->state) {
+            case NOT_SUBMITTED:
+                return "NOT SUBMITTED";
+            case SUBMITTED:
+                return "SUBMITTED";
+            case COMPLETED:
+                return "COMPLETED";
+            case DISCONTINUED:
+                return "DISCONTINUED";
+            default:
+                return "???";
+        }
+    }
+
 
     /**
     * @brief Set the job's priority (the higher the priority value, the higher the priority)
@@ -384,7 +403,11 @@ namespace wrench {
      * @return true or false
      */
     bool CompoundJob::hasFailed() {
-        return (not this->state_task_map[Action::State::FAILED].empty());
+        return (this->actions.size() ==
+                this->state_task_map[Action::State::NOT_READY].size() +
+                        this->state_task_map[Action::State::COMPLETED].size() +
+                        this->state_task_map[Action::State::KILLED].size() +
+                        this->state_task_map[Action::State::FAILED].size());
     }
 
     /**

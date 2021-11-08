@@ -658,6 +658,7 @@ namespace wrench {
     void ActionExecutionService::killAction(
             std::shared_ptr<Action> action,
             std::shared_ptr<FailureCause> cause) {
+
         WRENCH_INFO("Killing action %s", action->getName().c_str());
 
         bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
@@ -678,6 +679,7 @@ namespace wrench {
         this->all_actions.erase(action);
 
         // Set the action's state
+        action->setState(Action::State::KILLED);
         action->setFailureCause(cause);
 
         // Send back an action failed message if necessary

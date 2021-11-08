@@ -97,6 +97,8 @@ namespace wrench {
                 this->terminateStandardJob(sjob);
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 this->terminatePilotJob(pjob);
+            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+                this->terminateCompoundJob(cjob);
             }
         } catch (ExecutionException &e) {
             throw;

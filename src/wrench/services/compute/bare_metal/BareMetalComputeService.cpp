@@ -64,7 +64,7 @@ namespace wrench {
         }
 
         this->current_jobs.clear();
-        this->all_workunits.clear();
+//        this->all_workunits.clear();
         this->not_ready_actions.clear();
         this->ready_actions.clear();
         this->dispatched_actions.clear();
@@ -699,6 +699,7 @@ namespace wrench {
  */
     void BareMetalComputeService::processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job,
                                                                        const std::string &answer_mailbox) {
+
         // If the job doesn't exit, we reply right away
         if (this->current_jobs.find(job) == this->current_jobs.end()) {
             WRENCH_INFO(
@@ -852,7 +853,7 @@ namespace wrench {
  */
     void BareMetalComputeService::dispatchReadyActions() {
 
-        // Sort all the tasks in the ready queue by (job.priority, action.priority)
+        // Sort all the actions in the ready queue by (job.priority, action.priority)
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
                         if (a->getJob() != b->getJob()) {

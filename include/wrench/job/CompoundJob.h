@@ -55,14 +55,15 @@ namespace wrench {
             /** @brief Job has finished executing and all actions were successfully completed **/
             COMPLETED,
             /** @brief Job has finished executing but not all actions were successfully completed.
-             * Actions may have failed, they job may have been terminated/killed, or parent
-             * jobs by have been discontinued.
+             * Actions may have failed, the job may have been terminated/killed, or parent
+             * jobs may have been discontinued.
              */
             DISCONTINUED
         };
 
         std::set<std::shared_ptr<Action>> getActions();
         CompoundJob::State getState();
+        std::string getStateAsString();
         void setPriority(double priority) override;
 
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
