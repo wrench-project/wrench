@@ -474,7 +474,7 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
-            dispatchReadyAction();
+            dispatchReadyActions();
         }
 
         WRENCH_INFO("BareMetalService terminating cleanly!");
@@ -847,18 +847,39 @@ namespace wrench {
     }
 
 
-
 /**
- * @brief Helper method to dispatch work units
+ * @brief Helper method to dispatch actions
  */
-    void BareMetalComputeService::dispatchReadyAction() {
+    void BareMetalComputeService::dispatchReadyActions() {
 
-        while (not this->ready_actions.empty()) {
-            auto action = this->ready_actions.front();
+        // Sort all the tasks in the ready queue by (job.priority, action.priority)
+        std::sort(this->ready_actions.begin(), this->ready_actions.end(),
+                  [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
+                        if (a->getJob() != b->getJob()) {
+                            if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
+                                return true;
+                            } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
+                                return false;
+                            } else {
+                                return (unsigned long)(a->getJob().get()) > (unsigned long)(b->getJob().get());
+                            }
+                        } else {
+                            if (a->getPriority() > b->getPriority()) {
+                                return true;
+                            } else if (a->getPriority() < b->getPriority()) {
+                                return false;
+                            } else {
+                                return (unsigned long)(a.get()) > (unsigned long)(b.get());
+                            }
+                        }
+                  });
+
+        for (auto const &action : this->ready_actions) {
             this->action_execution_service->submitAction(action);
-            this->ready_actions.pop_front();
             this->dispatched_actions.insert(action);
         }
+
+        this->ready_actions.clear();
     }
 
 /**

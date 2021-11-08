@@ -58,9 +58,11 @@ namespace wrench {
 
         std::map<std::string, std::string> getServiceSpecificArguments();
 
-        virtual unsigned long getPriority();
-
         virtual ~Job();
+
+        virtual void setPriority(double priority);
+
+        double getPriority() ;
 
     protected:
 
@@ -96,9 +98,12 @@ namespace wrench {
         /** @brief Whether the job has already been submitted to the job manager */
         bool already_submitted_to_job_manager = false;
 
+        /** @brief The job's priority */
+        double priority;
 
     private:
 //        bool forward_notification_to_original_source;
+
 
         /***********************/
         /** \endcond           */
