@@ -16,7 +16,7 @@
 
 WRENCH_LOG_CATEGORY(bare_metal_compute_service_multi_job_test, "Log category for BareMetalComputeServiceMultiJob test");
 
-class BareMetalComputeServiceMultiJobTest : public ::testing::Test {
+class BareMetalComputeServiceActionMultiJobTest : public ::testing::Test {
 public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
@@ -29,7 +29,7 @@ public:
     void do_DAGOfJobs_test();
 
 protected:
-    BareMetalComputeServiceMultiJobTest() {
+    BareMetalComputeServiceActionMultiJobTest() {
 
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
@@ -120,7 +120,7 @@ protected:
 
 class DAGOfJobsTestWMS : public wrench::WMS {
 public:
-    DAGOfJobsTestWMS(BareMetalComputeServiceMultiJobTest *test,
+    DAGOfJobsTestWMS(BareMetalComputeServiceActionMultiJobTest *test,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
@@ -129,7 +129,7 @@ public:
     }
 
 private:
-    BareMetalComputeServiceMultiJobTest *test;
+    BareMetalComputeServiceActionMultiJobTest *test;
 
     int main() {
 
@@ -180,18 +180,18 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceMultiJobTest, DAGOfJobs) {
+TEST_F(BareMetalComputeServiceActionMultiJobTest, DAGOfJobs) {
     DO_TEST_WITH_FORK(do_DAGOfJobs_test);
 }
 
-void BareMetalComputeServiceMultiJobTest::do_DAGOfJobs_test() {
+void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("multi_action_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
