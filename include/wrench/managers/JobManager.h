@@ -157,26 +157,21 @@ namespace wrench {
 
         unsigned long num_running_pilot_jobs = 0;
 
-        // Job lists
-//        std::set<std::shared_ptr<StandardJob>> ready_standard_jobs;
-//        std::set<std::shared_ptr<StandardJob>> pending_standard_jobs;
-//        std::set<std::shared_ptr<StandardJob>> running_standard_jobs;
-////        std::set<std::shared_ptr<StandardJob>> completed_standard_jobs;
-////        std::set<std::shared_ptr<StandardJob>> failed_standard_jobs;
-//
-//        std::set<std::shared_ptr<PilotJob>> ready_pilot_jobs;
-//        std::set<std::shared_ptr<PilotJob>> pending_pilot_jobs;
-//        std::set<std::shared_ptr<PilotJob>> running_pilot_jobs;
-////        std::set<std::shared_ptr<PilotJob>> completed_pilot_jobs;
-//
-//
-//        std::set<std::shared_ptr<CompoundJob>> not_ready_compound_jobs;
-//        std::set<std::shared_ptr<CompoundJob>> ready_compound_jobs;
-//        std::set<std::shared_ptr<CompoundJob>> pending_compound_jobs;
-//        std::set<std::shared_ptr<CompoundJob>> running_compound_jobs;
-////        std::set<std::shared_ptr<CompoundJob>> completed_compound_jobs;
+        void validateJobSubmission(std::shared_ptr<Job> job,
+        std::shared_ptr<ComputeService> compute_service,
+                std::map<std::string, std::string> service_specific_args);
 
-    };
+        void validateCompoundJobSubmission(std::shared_ptr<CompoundJob> job,
+                                   std::shared_ptr<ComputeService> compute_service,
+                                   std::map<std::string, std::string> service_specific_args);
+        void validatePilotJobSubmission(std::shared_ptr<PilotJob> job,
+                                           std::shared_ptr<ComputeService> compute_service,
+                                           std::map<std::string, std::string> service_specific_args);
+
+        static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
+
+
+        };
 
     /***********************/
     /** \endcond            */

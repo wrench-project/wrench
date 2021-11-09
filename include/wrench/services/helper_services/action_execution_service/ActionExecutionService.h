@@ -72,6 +72,8 @@ namespace wrench {
 
         bool IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores, double ram);
 
+        std::map<std::string, std::tuple<unsigned long, double>> &getComputeResources();
+
         std::map<std::string, std::map<std::string, double>> getResourceInformation();
 
         ~ActionExecutionService();
