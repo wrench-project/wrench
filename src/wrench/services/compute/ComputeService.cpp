@@ -558,4 +558,14 @@ namespace wrench {
         return (this->scratch_space_storage_service != nullptr);
     }
 
+    /**
+     * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
+     * @param job: the job that's being submitted
+     * @param service_specific_arg: the service-specific arguments
+     */
+    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<Job> job,
+                                                          const map<std::string, std::string> &service_specific_args) {
+        throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
+    }
+
 };

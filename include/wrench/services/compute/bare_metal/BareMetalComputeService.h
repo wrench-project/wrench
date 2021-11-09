@@ -129,13 +129,19 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
+    protected:
+        friend class JobManager;
+
+        void validateServiceSpecificArguments(std::shared_ptr<Job> job,
+                                                      const std::map<std::string, std::string> &service_specific_args) override;
+
     private:
 
         friend class Simulation;
 
         void validateProperties();
 
-        // Low-level Constructor
+
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 std::map<std::string, std::string> property_list,
@@ -160,14 +166,6 @@ namespace wrench {
                               std::shared_ptr<PilotJob> pj);
 
 
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
-
-        // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
-        std::map<std::string, double> ram_availabilities;
-        std::map<std::string, unsigned long> running_thread_counts;
-
-        unsigned long total_num_cores;
-
         double ttl;
         bool has_ttl;
         double death_date;
@@ -176,15 +174,6 @@ namespace wrench {
         std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
 
         std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
-
-        // Set of running jobs
-//        std::set<std::shared_ptr<StandardJob> > running_jobs;
-
-        // Job task execution specs
-//        std::map<std::shared_ptr<StandardJob> , std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
-
-        // Map of all Workunits
-//        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> all_workunits;
 
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
@@ -204,8 +193,6 @@ namespace wrench {
 
         void terminate();
 
-        void failCurrentStandardJobs();
-
         void processActionDone(std::shared_ptr<Action> action);
 
         void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, const std::string &answer_mailbox);
@@ -214,8 +201,6 @@ namespace wrench {
 
         void dispatchReadyActions();
 
-//        void someHostIsBackOn(simgrid::s4u::Host const &h);
-//        bool host_back_on = false;
 
 
         /** @brief Reasons why a standard job could be terminated */
@@ -228,8 +213,6 @@ namespace wrench {
         };
 
         void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, JobTerminationCause termination_cause);
-
-//        void failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause);
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
@@ -252,6 +235,8 @@ namespace wrench {
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
         bool areAllComputeResourcesDownWithNoWUERunning();
+
+        static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 
 
         int exit_code = 0;

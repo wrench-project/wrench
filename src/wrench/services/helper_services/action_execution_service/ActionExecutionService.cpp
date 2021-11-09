@@ -1117,10 +1117,18 @@ namespace wrench {
 
     /**
      * @brief Set parent service
-     *
+     * @param service: the parent service
      */
     void ActionExecutionService::setParentService(std::shared_ptr<Service> service) {
         this->parent_service = std::move(service);
+    }
+
+    /**
+     * @brief Get a (reference to) the compute resources of this service
+     * @return the compute resources
+     */
+    std::map<std::string, std::tuple<unsigned long, double>> &ActionExecutionService::getComputeResources() {
+        return this->compute_resources;
     }
 
 
