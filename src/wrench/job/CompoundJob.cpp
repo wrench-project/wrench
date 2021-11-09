@@ -309,6 +309,9 @@ namespace wrench {
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
         }
+        if (this->pathExists(this->shared_this, parent)) {
+            throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
+        }
         this->parents.insert(parent);
         parent->children.insert(this->shared_this);
     }
@@ -321,6 +324,9 @@ namespace wrench {
         assertJobNotSubmitted();
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
+        }
+        if (this->pathExists(child, this->shared_this)) {
+            throw std::invalid_argument("CompoundJob::addChildJob(): Adding this dependency would create a cycle");
         }
         this->children.insert(child);
         child->parents.insert(this->shared_this);
@@ -440,6 +446,40 @@ namespace wrench {
             path_exists = path_exists || this->pathExists(c, b);
         }
         return path_exists;
+    }
+
+    /**
+     * Determine whether there is a path between two jobs
+     * @param a: a job
+     * @param b: another job
+     * @return
+     */
+    bool CompoundJob::pathExists(const std::shared_ptr<CompoundJob>& a, const std::shared_ptr<CompoundJob> &b) {
+        auto children = a->getChildren();
+        if (children.find(b) != children.end()) {
+            return true;
+        }
+        bool path_exists = false;
+        for (auto const &c : children) {
+            path_exists = path_exists || this->pathExists(c, b);
+        }
+        return path_exists;
+    }
+
+    /**
+     * @brief Returns the job's child jobs, if any
+     * @return a set of jobs
+     */
+    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getChildren() {
+        return this->children;
+    }
+
+    /**
+     * @brief Returns the job's parent jobs, if any
+     * @return a set of jobs
+     */
+    std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
+        return this->parents;
     }
 
 }
