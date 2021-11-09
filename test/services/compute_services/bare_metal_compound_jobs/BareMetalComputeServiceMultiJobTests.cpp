@@ -154,6 +154,16 @@ private:
         job1->addChildJob(job3);
         job3->addChildJob(job4);
 
+        // Add an invalid dependency for testing
+        try {
+            job1->addParentJob(job4);
+            throw std::runtime_error("Shouldn't be able to add a cycle when adding a bogus parent!");
+        } catch (std::invalid_argument &e) {}
+        try {
+            job4->addChildJob(job1);
+            throw std::runtime_error("Shouldn't be able to add a cycle when adding a bogus child!");
+        } catch (std::invalid_argument &e) {}
+
         // Submit all the jobs, in whatever order
         job_manager->submitJob(job4, this->test->compute_service);
         job_manager->submitJob(job2, this->test->compute_service);
