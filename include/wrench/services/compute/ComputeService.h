@@ -174,6 +174,9 @@ namespace wrench {
 
         void submitJob(std::shared_ptr<Job> job, const std::map<std::string, std::string>& = {});
 
+        virtual void validateServiceSpecificArguments(std::shared_ptr<Job> job,
+                                          const std::map<std::string, std::string> &service_specific_args);
+
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
@@ -197,7 +200,6 @@ namespace wrench {
         /***********************/
 
     private:
-
 
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 

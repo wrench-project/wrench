@@ -9,7 +9,6 @@
 
 #include <typeinfo>
 #include <map>
-#include <wrench/util/PointerUtil.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
@@ -20,19 +19,14 @@
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
-#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
-#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/job/PilotJob.h>
-#include <wrench/job/StandardJob.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h>
 #include <wrench/failure_causes/JobTypeNotSupported.h>
-#include <wrench/failure_causes/HostError.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_standard_jobs");
@@ -55,28 +49,19 @@ namespace wrench {
         // Do the default behavior (which will throw as this is not a fault-tolerant service)
         Service::cleanup(has_returned_from_main, return_value);
 
-        // Clean up state in case of a restart
-        for (auto host : this->compute_resources) {
-            this->total_num_cores += std::get<0>(host.second);
-            this->ram_availabilities.insert(
-                    std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
-            this->running_thread_counts.insert(std::make_pair(host.first, 0));
-        }
-
         this->current_jobs.clear();
-//        this->all_workunits.clear();
         this->not_ready_actions.clear();
         this->ready_actions.clear();
         this->dispatched_actions.clear();
     }
 
     /**
-     * @brief Helper static method to parse resource specifications to the <cores,ram> format
-     * @param spec: specification string
-     * @return a <cores, ram> tuple
-     * @throw std::invalid_argument
-     */
-    static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec) {
+       * @brief Helper static method to parse resource specifications to the <cores,ram> format
+       * @param spec: specification string
+       * @return a <cores, ram> tuple
+       * @throw std::invalid_argument
+       */
+    std::tuple<std::string, unsigned long> BareMetalComputeService::parseResourceSpec(const std::string &spec) {
         std::vector<std::string> tokens;
         boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
         switch (tokens.size()) {
@@ -99,6 +84,82 @@ namespace wrench {
             }
             default: {
                 throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
+            }
+        }
+    }
+
+    /**
+     * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
+     * @param job: the job that's being submitted
+     * @param service_specific_arg: the service-specific arguments
+     */
+    void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<Job> job,
+                                                                const std::map<std::string, std::string> &service_specific_args) {
+
+        auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
+        auto compute_resources = this->action_execution_service->getComputeResources();
+
+        // Check that service-specific args make sense w.r.t to the resources I have
+        for (auto const &action : cjob->getActions()) {
+            if ((service_specific_args.find(action->getName()) != service_specific_args.end()) and
+                (not service_specific_args.at(action->getName()).empty())) {
+                std::tuple<std::string, unsigned long> parsed_spec;
+
+                try {
+                    parsed_spec = BareMetalComputeService::parseResourceSpec(service_specific_args.at(action->getName()));
+                } catch (std::invalid_argument &e) {
+                    throw;
+                }
+
+                std::string target_host = std::get<0>(parsed_spec);
+                unsigned long target_num_cores = std::get<1>(parsed_spec);
+
+                if (not target_host.empty()) {
+
+                    if (compute_resources.find(target_host) == compute_resources.end()) {
+                        throw std::invalid_argument(
+                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                                service_specific_args.at(action->getName()) +
+                                "' for action '" + action->getName() + "': no such host");
+                    }
+
+                    if (target_num_cores > std::get<0>(compute_resources[target_host])) {
+                        throw std::invalid_argument(
+                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                                service_specific_args.at(action->getName()) +
+                                "' for action '" + action->getName() +
+                                "': the specified host does not have that many cores");
+                    }
+                } else {
+                    bool found_enough_cores = false;
+                    for (auto const &cr : compute_resources) {
+                        if (std::get<0>(cr.second) >= target_num_cores) {
+                            found_enough_cores = true;
+                            break;
+                        }
+                    }
+                    if (not found_enough_cores) {
+                        throw std::invalid_argument(
+                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                                service_specific_args.at(action->getName()) +
+                                "' for action '" + action->getName() +
+                                "': no host on this service has this many cores");
+                    }
+                }
+
+                if (target_num_cores < action->getMinNumCores()) {
+                    throw std::invalid_argument(
+                            "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                            service_specific_args.at(action->getName()) +
+                            "' for action '" + action->getName() + "': the action requires more cores");
+                }
+
+                if (target_num_cores > action->getMaxNumCores()) {
+                    throw std::invalid_argument(
+                            "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                            service_specific_args.at(action->getName()) +
+                            "' for action '" + action->getName() + "': the action cannot use this many cores");
+                }
             }
         }
     }
@@ -129,71 +190,7 @@ namespace wrench {
             const std::map<std::string, std::string> &service_specific_args) {
         assertServiceIsUp();
 
-        // TODO: Do these checks in the job manager
         WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
-
-        /* make sure that service arguments are provided for actions in the jobs */
-        for (auto const &arg : service_specific_args) {
-            bool found = false;
-            for (auto const &action : job->getActions()) {
-                if (action->getName() == arg.first) {
-                    found = true;
-                    break;
-                }
-            }
-            if (not found) {
-                throw std::invalid_argument(
-                        "bare_metal_standard_jobs::submitStandardJob(): Service-specific argument provided for action with name '" +
-                        arg.first + "' but there is no action with such name in the job");
-            }
-        }
-
-        // Check that service-specific args that are provided are well-formatted
-        for (auto const &action : job->getActions()) {
-            if ((service_specific_args.find(action->getName()) != service_specific_args.end()) and
-                (not service_specific_args.at(action->getName()).empty())) {
-                std::tuple<std::string, unsigned long> parsed_spec;
-
-                try {
-                    parsed_spec = parseResourceSpec(service_specific_args.at(action->getName()));
-                } catch (std::invalid_argument &e) {
-                    throw;
-                }
-
-                std::string target_host = std::get<0>(parsed_spec);
-                unsigned long target_num_cores = std::get<1>(parsed_spec);
-
-                if (not target_host.empty()) {
-                    if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
-                        throw std::invalid_argument(
-                                "Invalid service-specific argument '" + service_specific_args.at(action->getName()) +
-                                "' for action '" +
-                                action->getName() + "': no such host");
-                    }
-                }
-
-                if (target_num_cores > 0) {
-                    if (target_num_cores < action->getMinNumCores()) {
-                        throw std::invalid_argument(
-                                "Invalid service-specific argument '" + service_specific_args.at(action->getName()) +
-                                "' for action '" +
-                                action->getName() + "': the action requires at least " + std::to_string(action->getMinNumCores()) +
-                                " cores");
-                    }
-                    if (target_num_cores > action->getMaxNumCores()) {
-                        throw std::invalid_argument(
-                                "Invalid service-specific argument '" + service_specific_args.at(action->getName()) +
-                                "' for action '" +
-                                action->getName() + "': the action can use at most " + std::to_string(action->getMaxNumCores()) +
-                                " cores");
-                    }
-                }
-            }
-        }
-
-        // At this point, there may still be insufficient resources to run the action, but that will
-        // be handled later (and a WorkflowExecutionError with a "not enough resources" FailureCause
-        // may be generated).
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
@@ -857,23 +854,23 @@ namespace wrench {
         // Sort all the actions in the ready queue by (job.priority, action.priority)
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
-                        if (a->getJob() != b->getJob()) {
-                            if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
-                                return true;
-                            } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
-                                return false;
-                            } else {
-                                return (unsigned long)(a->getJob().get()) > (unsigned long)(b->getJob().get());
-                            }
-                        } else {
-                            if (a->getPriority() > b->getPriority()) {
-                                return true;
-                            } else if (a->getPriority() < b->getPriority()) {
-                                return false;
-                            } else {
-                                return (unsigned long)(a.get()) > (unsigned long)(b.get());
-                            }
-                        }
+                      if (a->getJob() != b->getJob()) {
+                          if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
+                              return true;
+                          } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
+                              return false;
+                          } else {
+                              return (unsigned long)(a->getJob().get()) > (unsigned long)(b->getJob().get());
+                          }
+                      } else {
+                          if (a->getPriority() > b->getPriority()) {
+                              return true;
+                          } else if (a->getPriority() < b->getPriority()) {
+                              return false;
+                          } else {
+                              return (unsigned long)(a.get()) > (unsigned long)(b.get());
+                          }
+                      }
                   });
 
         for (auto const &action : this->ready_actions) {

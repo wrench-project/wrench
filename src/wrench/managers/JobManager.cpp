@@ -8,8 +8,10 @@
  */
 
 #include <string>
-#include <wrench/wms/WMS.h>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
+#include <wrench/wms/WMS.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/managers/JobManager.h>
@@ -365,6 +367,8 @@ namespace wrench {
         return this->createStandardJob(tasks, std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>{});
     }
 
+
+
     /**
      * @brief Create a pilot job
      *
@@ -378,31 +382,91 @@ namespace wrench {
     }
 
     /**
-     * @brief Submit a job to compute service
-     *
-     * @param job: a workflow job
-     * @param compute_service: a compute service
-     * @param service_specific_args: arguments specific for compute services:
-     *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
-     *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
-     *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
-     *           - If a "hostname" value is provided for a task, then the service will run the task on that
-     *             host, using as many of its cores as possible
-     *           - If a "num_cores" value is provided for a task, then the service will run that task with
-     *             this many cores, but will choose the host on which to run it.
-     *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
-     *             task with the specified number of cores on that host.
-     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-u":"<string>" (username)}]}
-     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
-     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
-     *      - to a HTCondorComputeService:
-     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}, {"-u":"<string>" (username)}]}
-     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
-     *
-     *
-     * @throw std::invalid_argument
-     * @throw ExecutionException
+     * @brief Helper method to validate a job submission
+     * @param job: the job to submit
+     * @param compute_service: the compute service
+     * @param service_specific_args: the service-specific arguments
      */
+    void JobManager::validateJobSubmission(std::shared_ptr<Job> job,
+                               std::shared_ptr<ComputeService> compute_service,
+                               std::map<std::string, std::string> service_specific_args) {
+
+        if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+            validateCompoundJobSubmission(cjob, compute_service, service_specific_args);
+        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+            validatePilotJobSubmission(pjob, compute_service, service_specific_args);
+        }
+    }
+
+    /**
+     * @brief Helper method to validate a compound job submission
+     * @param job: the job to submit
+     * @param compute_service: the compute service
+     * @param service_specific_args: the service-specific arguments
+     */
+    void JobManager::validateCompoundJobSubmission(std::shared_ptr<CompoundJob> job,
+                                           std::shared_ptr<ComputeService> compute_service,
+                                           std::map<std::string, std::string> service_specific_args) {
+
+        /* make sure that service arguments are provided for valid actions in the jobs */
+        for (auto const &arg : service_specific_args) {
+            bool found = false;
+            for (auto const &action : job->getActions()) {
+                if (action->getName() == arg.first) {
+                    found = true;
+                    break;
+                }
+            }
+            if (not found) {
+                throw std::invalid_argument(
+                        "JobManager::validateCompoundJobSubmission(): Service-specific argument provided for action with name '" +
+                        arg.first + "' but there is no action with such name in the job");
+            }
+        }
+
+        // Invoke the validation method on the service
+        compute_service->validateServiceSpecificArguments(job, service_specific_args);
+
+    }
+
+    /**
+    * @brief Helper method to validate a pilot job submission
+    * @param job: the job to submit
+    * @param compute_service: the compute service
+    * @param service_specific_args: the service-specific arguments
+    */
+    void JobManager::validatePilotJobSubmission(std::shared_ptr<PilotJob> job,
+                                                   std::shared_ptr<ComputeService> compute_service,
+                                                   std::map<std::string, std::string> service_specific_args) {
+    throw std::runtime_error("JobManager::validatePilotJobSubmission(): TO IMPLEMENT!");
+    }
+
+        /**
+         * @brief Submit a job to compute service
+         *
+         * @param job: a workflow job
+         * @param compute_service: a compute service
+         * @param service_specific_args: arguments specific for compute services:
+         *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
+         *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+         *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+         *           - If a "hostname" value is provided for a task, then the service will run the task on that
+         *             host, using as many of its cores as possible
+         *           - If a "num_cores" value is provided for a task, then the service will run that task with
+         *             this many cores, but will choose the host on which to run it.
+         *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
+         *             task with the specified number of cores on that host.
+         *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-u":"<string>" (username)}]}
+         *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
+         *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
+         *      - to a HTCondorComputeService:
+         *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}, {"-u":"<string>" (username)}]}
+         *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
+         *
+         *
+         * @throw std::invalid_argument
+         * @throw ExecutionException
+         */
     void JobManager::submitJob(std::shared_ptr<Job> job,
                                std::shared_ptr<ComputeService> compute_service,
                                std::map<std::string, std::string> service_specific_args) {
@@ -413,8 +477,14 @@ namespace wrench {
         if (job->already_submitted_to_job_manager) {
             throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
         }
-        job->already_submitted_to_job_manager = true;
 
+        try {
+            this->validateJobSubmission(job, compute_service, service_specific_args);
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
+        job->already_submitted_to_job_manager = true;
 
         // Push back the mailbox_name of the manager,
         // so that it will getMessage the initial callback
@@ -468,6 +538,7 @@ namespace wrench {
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
             this->jobs_to_dispatch.push_back(job);
         } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+
             cjob->state = CompoundJob::State::SUBMITTED;
             this->jobs_to_dispatch.push_back(job);
         }
@@ -986,7 +1057,6 @@ namespace wrench {
      * @brief Helper method to dispatch jobs
      */
     void JobManager::dispatchJob(std::shared_ptr<Job> job) {
-
 
 
         // Submit the job to the service

@@ -154,7 +154,6 @@ private:
         unsigned long fork_width = 15;
         unsigned long second_chain_length = 6;
 
-
         std::vector<std::shared_ptr<wrench::SleepAction>> first_chain_tasks;
         for (unsigned long i=0; i < first_chain_length; i++) {
             first_chain_tasks.push_back(job->addSleepAction("chain1_sleep_"+std::to_string(i), dist_sleep(rng)));
