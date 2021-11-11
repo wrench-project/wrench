@@ -492,6 +492,7 @@ namespace wrench {
 
 
         job->setServiceSpecificArguments(service_specific_args);
+
         job->setParentComputeService(compute_service);
 
 
@@ -673,6 +674,8 @@ namespace wrench {
 
             cjob->printActionDependencies();
 
+            cjob->setParentComputeService(sjob->getParentComputeService());
+
             // Record all this information in the sjob
             sjob->compound_job = cjob;
             sjob->pre_overhead_action = pre_overhead_action;
@@ -684,8 +687,7 @@ namespace wrench {
             sjob->task_compute_actions = task_compute_actions;
             sjob->task_file_write_actions = task_file_write_actions;
 
-
-            // The coumpound job
+            // The compound job
             this->cjob_to_sjob_map[cjob] = sjob;
             this->jobs_to_dispatch.push_back(cjob);
 
