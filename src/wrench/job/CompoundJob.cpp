@@ -493,6 +493,7 @@ namespace wrench {
         }
         for (auto const &child : action->children) {
             child->parents.erase(action);
+            child->updateState();
         }
         this->actions.erase(action);
     }
@@ -502,7 +503,7 @@ namespace wrench {
      */
     void CompoundJob::printActionDependencies() {
         for (auto const &action : this->actions) {
-            std::cerr << "* " << Action::getActionTypeAsString(action) << "-" << action->getName() << "\n";
+            std::cerr << "* " << Action::getActionTypeAsString(action) << "-" << action->getName() << " ("  << action->getStateAsString() << ")\n";
             if (not action->getChildren().empty()) {
                 std::cerr << "  CHILDREN:\n";
                 for (auto const &child: action->getChildren()) {

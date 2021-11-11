@@ -638,6 +638,7 @@ namespace wrench {
         }
 
         // Add the job to the set of jobs
+        std::cerr << "INSERVING IN LIST OF JOBS\n";
         this->current_jobs.insert(job);
 
         // Add all action to the list of actions to run
@@ -850,6 +851,8 @@ namespace wrench {
  * @brief Helper method to dispatch actions
  */
     void BareMetalComputeService::dispatchReadyActions() {
+
+        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
         // Sort all the actions in the ready queue by (job.priority, action.priority)
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
