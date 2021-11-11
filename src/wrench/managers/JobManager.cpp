@@ -928,99 +928,29 @@ namespace wrench {
      */
     void JobManager::processStandardJobCompletion(std::shared_ptr<StandardJob> job,
                                                   std::shared_ptr<ComputeService> compute_service) {
-//        // update job state
-//        job->state = StandardJob::State::COMPLETED;
-//
-//        // Set the job end date
-//        job->end_date = Simulation::getCurrentSimulatedDate();
-//
-//        // Determine all task state changes
-//        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
-//        for (auto task : job->tasks) {
-//            if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-//                if (task->getUpcomingState() != WorkflowTask::State::COMPLETED) {
-//                    if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
-//                        necessary_state_changes.insert(std::make_pair(task, WorkflowTask::State::COMPLETED));
-//                    } else {
-//                        necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
-//                    }
-//                }
-//            } else {
-//                throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
-//                                         task->getID() + " does not have a TASK_COMPLETED internal state (" +
-//                                         WorkflowTask::stateToString(task->getInternalState()) + ")");
-//            }
-//            auto children = task->getWorkflow()->getTaskChildren(task);
-//            for (auto child : children) {
-//                switch (child->getInternalState()) {
-//                    case WorkflowTask::InternalState::TASK_NOT_READY:
-//                        if (child->getState() != WorkflowTask::State::NOT_READY) {
-//                            throw std::runtime_error(
-//                                    "JobManager::main(): Child's internal state if NOT READY, but child's visible "
-//                                    "state is " + WorkflowTask::stateToString(child->getState()));
-//                        }
-//                    case WorkflowTask::InternalState::TASK_COMPLETED:
-//                        break;
-//                    case WorkflowTask::InternalState::TASK_FAILED:
-//                    case WorkflowTask::InternalState::TASK_RUNNING:
-//                        // no nothing
-//                        throw std::runtime_error("JobManager::main(): should never happen: " +
-//                                                 WorkflowTask::stateToString(child->getInternalState()));
-//                        break;
-//                    case WorkflowTask::InternalState::TASK_READY:
-//                        if (child->getState() == WorkflowTask::State::NOT_READY) {
-//                            bool all_parents_visibly_completed = true;
-//                            for (auto parent : child->getWorkflow()->getTaskParents(child)) {
-//                                if (parent->getState() == WorkflowTask::State::COMPLETED) {
-//                                    continue; // COMPLETED FROM BEFORE
-//                                }
-//                                if (parent->getUpcomingState() == WorkflowTask::State::COMPLETED) {
-//                                    continue; // COMPLETED FROM BEFORE, BUT NOT YET SEEN BY WMS
-//                                }
-//                                if ((necessary_state_changes.find(parent) != necessary_state_changes.end()) &&
-//                                    (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
-//                                    continue; // ABOUT TO BECOME COMPLETED
-//                                }
-//                                all_parents_visibly_completed = false;
-//                                break;
-//                            }
-//                            if (all_parents_visibly_completed) {
-//                                if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
-//                                    necessary_state_changes.insert(
-//                                            std::make_pair(child, WorkflowTask::State::READY));
-//                                } else {
-//                                    necessary_state_changes[child] = WorkflowTask::State::READY;
-//                                }
-//                            }
-//                        }
-//                        break;
-//                }
-//            }
-//        }
-//
-//        // remove the job from the "dispatched" list
-//        this->jobs_dispatched.erase(job);
-//
-//        /*
-//        WRENCH_INFO("HERE ARE NECESSARY STATE CHANGES");
-//        for (auto s : necessary_state_changes) {
-//          WRENCH_INFO("  STATE(%s) = %s", s.first->getID().c_str(),
-//          WorkflowTask::stateToString(s.second).c_str());
-//        }
-//        */
-//
-//        for (auto s : necessary_state_changes) {
-//            s.first->setUpcomingState(s.second);
-//        }
-//
-//        // Forward the notification along the notification chain
-//        std::string callback_mailbox = job->popCallbackMailbox();
-//        if (not callback_mailbox.empty()) {
-//            auto augmented_msg = new JobManagerStandardJobCompletedMessage(
-//                    job, compute_service, necessary_state_changes);
-//            S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
-//        }
-        throw std::runtime_error("PROCESS STANDARD JOB COMPLETION NOT IMPLEMENTED");
+        // update job state
+        job->state = StandardJob::State::COMPLETED;
+
+        // Set the job end date
+        job->end_date = Simulation::getCurrentSimulatedDate();
+
+        // Task state changes are: all completed (and deal with the children)
+        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+        for (auto task : job->tasks) {
+            necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
+        }
+
+        // remove the job from the "dispatched" list
+        this->jobs_dispatched.erase(job);
+
+        // Forward the notification along the notification chain
+        std::string callback_mailbox = job->popCallbackMailbox();
+        if (not callback_mailbox.empty()) {
+            auto augmented_msg = new JobManagerStandardJobCompletedMessage(
+                    job, compute_service, necessary_state_changes);
+            S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
+        }
+//        throw std::runtime_error("PROCESS STANDARD JOB COMPLETION NOT IMPLEMENTED");
     }
 
     /**
