@@ -28,8 +28,8 @@ namespace wrench {
     /***********************/
 
     class WorkflowFile;
-
     class WorkflowTask;
+    class Action;
 
     /**
      * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a ComputeService
@@ -107,9 +107,9 @@ namespace wrench {
 
         friend class StandardJobExecutor;
         friend class BareMetalComputeService;
-        void incrementNumCompletedTasks();
-
         friend class JobManager;
+
+        void incrementNumCompletedTasks();
 
         StandardJob(Workflow *workflow,
                     std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
@@ -120,6 +120,17 @@ namespace wrench {
         State state;
         double pre_overhead = 0.0;
         double post_overhead = 0.0;
+
+        std::shared_ptr<CompoundJob> compound_job;
+        std::shared_ptr<Action> pre_overhead_action;
+        std::shared_ptr<Action> post_overhead_action;
+        std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
+        std::vector<std::shared_ptr<Action>> post_file_copy_actions;
+        std::vector<std::shared_ptr<Action>> cleanup_actions;
+        std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
+        std::map<WorkflowTask*, std::shared_ptr<Action>> task_compute_actions;
+        std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
+
 
     };
 

@@ -22,6 +22,8 @@ namespace wrench {
      *
      * @param workflow: the workflow for which this job is
      *
+     * @param job_manager: the job manager that creates this job
+     *
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies locations where input/output files should be read/written
@@ -34,7 +36,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob::StandardJob(Workflow *workflow, std::vector<WorkflowTask *> tasks,
+    StandardJob::StandardJob(Workflow *workflow,
+                             std::vector<WorkflowTask *> tasks,
                              std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
@@ -70,6 +73,7 @@ namespace wrench {
         }
 //        this->workflow = workflow;
         this->name = "standard_job_" + std::to_string(Job::getNewUniqueNumber());
+
     }
 
     /**

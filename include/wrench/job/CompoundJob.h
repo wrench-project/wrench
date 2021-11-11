@@ -98,13 +98,15 @@ namespace wrench {
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,
                                                         double flops,
                                                         double ram,
-                                                        int min_num_cores,
-                                                        int max_num_cores,
+                                                        unsigned long min_num_cores,
+                                                        unsigned long max_num_cores,
                                                         std::shared_ptr<ParallelModel> parallel_model);
 
         std::shared_ptr<CustomAction> addCustomAction(std::string name,
                                                       const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                                                       const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
+
+        void removeAction(std::shared_ptr<Action> &action);
 
         void addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child);
 
@@ -120,6 +122,8 @@ namespace wrench {
 
         bool hasSuccessfullyCompleted();
         bool hasFailed();
+
+        void printActionDependencies();
 
         /***********************/
         /** \endcond           */

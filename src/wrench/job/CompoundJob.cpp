@@ -113,8 +113,8 @@ namespace wrench {
     std::shared_ptr<ComputeAction> CompoundJob::addComputeAction(std::string name,
                                                                  double flops,
                                                                  double ram,
-                                                                 int min_num_cores,
-                                                                 int max_num_cores,
+                                                                 unsigned long min_num_cores,
+                                                                 unsigned long max_num_cores,
                                                                  std::shared_ptr<ParallelModel> parallel_model) {
         assertJobNotSubmitted();
         auto new_action = std::shared_ptr<ComputeAction>(
@@ -480,6 +480,43 @@ namespace wrench {
      */
     std::set<std::shared_ptr<CompoundJob>> &CompoundJob::getParents() {
         return this->parents;
+    }
+
+    /**
+     * @brief Remove an action from the job
+     * @param action: the action to remove
+     */
+    void CompoundJob::removeAction(shared_ptr<Action> &action) {
+        assertJobNotSubmitted();
+        for (auto const &parent : action->parents) {
+            parent->children.erase(action);
+        }
+        for (auto const &child : action->children) {
+            child->parents.erase(action);
+        }
+        this->actions.erase(action);
+    }
+
+    /**
+     * @brief Print the list of actions with their children and parents
+     */
+    void CompoundJob::printActionDependencies() {
+        for (auto const &action : this->actions) {
+            std::cerr << "* " << Action::getActionTypeAsString(action) << "-" << action->getName() << "\n";
+            if (not action->getChildren().empty()) {
+                std::cerr << "  CHILDREN:\n";
+                for (auto const &child: action->getChildren()) {
+                    std::cerr << "    - " << Action::getActionTypeAsString(child) << "-" << child->getName() << "\n";
+                }
+            }
+            if (not action->getParents().empty()) {
+                std::cerr << "  PARENTS:\n";
+                for (auto const &parent: action->getParents()) {
+                    std::cerr << "    - " << Action::getActionTypeAsString(parent) << "-" << parent->getName() << "\n";
+                }
+            }
+        }
+
     }
 
 }

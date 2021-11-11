@@ -136,8 +136,7 @@ namespace wrench {
         processStandardJobCompletion(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service);
 
         void
-        processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
-                                  std::shared_ptr<FailureCause> cause);
+        processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service);
 
         void
         processCompoundJobCompletion(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service);
@@ -170,6 +169,7 @@ namespace wrench {
 
         static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<StandardJob>> cjob_to_sjob_map;
 
         };
 

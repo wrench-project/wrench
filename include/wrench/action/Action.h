@@ -65,6 +65,8 @@ namespace wrench {
         void setSimulateComputationAsSleep(bool simulate_computation_as_sleep);
         void setThreadCreationOverhead(double overhead_in_seconds);
 
+        static std::string getActionTypeAsString(const std::shared_ptr<Action>& action);
+
         /**
          * @brief A data structure that keeps track of an action's execution(s)
          */
