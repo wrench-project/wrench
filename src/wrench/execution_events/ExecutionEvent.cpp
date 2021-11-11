@@ -77,6 +77,23 @@ namespace wrench {
                 WorkflowTask *task = state_update.first;
                 WorkflowTask::State state = state_update.second;
                 task->setState(state);
+                if (state == WorkflowTask::State::COMPLETED) {
+                    auto children = task->getWorkflow()->getTaskChildren(task);
+                    for (auto const &child : children) {
+                        if (child->getState() == WorkflowTask::State::NOT_READY) {
+                            bool ready = true;
+                            for (auto const &parent : child->getParents()) {
+                                if (parent->getState() != WorkflowTask::State::COMPLETED)  {
+                                    ready = false;
+                                    break;
+                                }
+                            }
+                            if (ready) {
+                                child->setState(WorkflowTask::State::READY);
+                            }
+                        }
+                    }
+                }
             }
             return std::shared_ptr<StandardJobCompletedEvent>(
                     new StandardJobCompletedEvent(m->job, m->compute_service));
