@@ -10,6 +10,15 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/action/Action.h>
+#include <wrench/action/SleepAction.h>
+#include <wrench/action/ComputeAction.h>
+#include <wrench/action/FileReadAction.h>
+#include <wrench/action/FileWriteAction.h>
+#include <wrench/action/FileCopyAction.h>
+#include <wrench/action/FileDeleteAction.h>
+#include <wrench/action/CustomAction.h>
+#include <wrench/action/FileRegistryAddEntryAction.h>
+#include <wrench/action/FileRegistryDeleteEntryAction.h>
 
 #include <utility>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
@@ -316,5 +325,33 @@ namespace wrench {
         return this->priority;
     }
 
+    /**
+    * @brief Returns an action's type as a human-readable string
+    * @param action: the action
+    * @return the type as a string
+    */
+    std::string Action::getActionTypeAsString(const std::shared_ptr<Action>& action) {
+        if (std::dynamic_pointer_cast<SleepAction>(action)) {
+            return "SLEEP-";
+        } else if (std::dynamic_pointer_cast<ComputeAction>(action)) {
+            return "COMPUTE-";
+        } else if (std::dynamic_pointer_cast<FileReadAction>(action)) {
+            return "FILEREAD-";
+        } else if (std::dynamic_pointer_cast<FileWriteAction>(action)) {
+            return "FILEWRITE-";
+        } else if (std::dynamic_pointer_cast<FileCopyAction>(action)) {
+            return "FILECOPY-";
+        } else if (std::dynamic_pointer_cast<FileDeleteAction>(action)) {
+            return "FILEDELETE-";
+        } else if (std::dynamic_pointer_cast<CustomAction>(action)) {
+            return "CUSTOM-";
+        } else if (std::dynamic_pointer_cast<FileRegistryAddEntryAction>(action)) {
+            return "FILEREGISTRY_ADD-";
+        } else if (std::dynamic_pointer_cast<FileRegistryDeleteEntryAction>(action)) {
+            return "FILEREGISTRY_DELETE-";
+        } else {
+            return "????-";
+        }
+    }
 
 }

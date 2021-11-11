@@ -231,7 +231,7 @@ namespace wrench {
         }
 
         auto job = std::shared_ptr<StandardJob>(
-                new StandardJob(this->wms->getWorkflow(), tasks, file_locations, pre_file_copies,
+                new StandardJob(this->wms->getWorkflow(),tasks, file_locations, pre_file_copies,
                                 post_file_copies, cleanup_file_deletions));
 
         return job;
@@ -490,7 +490,6 @@ namespace wrench {
         // so that it will getMessage the initial callback
         job->pushCallbackMailbox(this->mailbox_name);
 
-//        std::map<WorkflowTask *, WorkflowTask::State> original_states;
 
         job->setServiceSpecificArguments(service_specific_args);
         job->setParentComputeService(compute_service);
@@ -498,45 +497,201 @@ namespace wrench {
 
         // Update the job state and insert it into the pending list
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-            throw std::runtime_error("STANDARD JOB NOT IMPLEMENTED YET IN JOB MANAGER");
-//            // Do a sanity check on task states
-//            for (auto t : sjob->tasks) {
-//                if ((t->getState() == WorkflowTask::State::COMPLETED) or
-//                    (t->getState() == WorkflowTask::State::PENDING)) {
-//                    throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
-//                                                " cannot be submitted as part of a standard job because its state is " +
-//                                                WorkflowTask::stateToString(t->getState()));
-//                }
-//            }
-//
-//            // Modify task states
-//            sjob->state = StandardJob::PENDING;
-//            for (auto t : sjob->tasks) {
+
+//            std::map<WorkflowTask *, WorkflowTask::State> original_states;
+
+            // Do a sanity check on task states
+            for (auto t : sjob->tasks) {
+                if ((t->getState() == WorkflowTask::State::COMPLETED) or
+                    (t->getState() == WorkflowTask::State::PENDING)) {
+                    throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
+                                                " cannot be submitted as part of a standard job because its state is " +
+                                                WorkflowTask::stateToString(t->getState()));
+                }
+            }
+
+            // Modify task states
+            sjob->state = StandardJob::PENDING;
+            for (auto t : sjob->tasks) {
 //                original_states.insert(std::make_pair(t, t->getState()));
-//                t->setState(WorkflowTask::State::PENDING);
-//            }
-//
-//            // Do a sanity check on use of scratch space, and replace scratch space by the compute
-//            // Service's scratch space
-//            for (auto fl : sjob->file_locations) {
-//                for (auto const &fl_l : fl.second) {
-//                    if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
-//                        throw std::invalid_argument("JobManager():submitJob(): file location for file " +
-//                                                    fl.first->getID() +
-//                                                    " is scratch  space, but the compute service to which this " +
-//                                                    "job is being submitted to doesn't have any!");
-//                    }
-//                    if (fl_l == FileLocation::SCRATCH) {
-//                        sjob->file_locations[fl.first] = {FileLocation::LOCATION(compute_service->getScratch())};
-//                    }
-//                }
-//            }
-//
-//            this->new_standard_jobs.erase(sjob);
-//            this->pending_standard_jobs.insert(sjob);
+                t->setState(WorkflowTask::State::PENDING);
+            }
+
+            // Do a sanity check on use of scratch space, and replace scratch space by the compute
+            // Service's scratch space
+            for (auto fl : sjob->file_locations) {
+                for (auto const &fl_l : fl.second) {
+                    if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
+                        throw std::invalid_argument("JobManager():submitJob(): file location for file " +
+                                                    fl.first->getID() +
+                                                    " is scratch  space, but the compute service to which this " +
+                                                    "job is being submitted to doesn't have any!");
+                    }
+                    if (fl_l == FileLocation::SCRATCH) {
+                        sjob->file_locations[fl.first] = {FileLocation::LOCATION(compute_service->getScratch())};
+                    }
+                }
+            }
+
+            // Create the corresponding compound job
+            auto cjob = this->createCompoundJob("compound_job_for_" + sjob->getName());
+            std::shared_ptr<Action> pre_overhead_action = nullptr;
+            std::shared_ptr<Action> post_overhead_action = nullptr;
+            std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
+            std::vector<std::shared_ptr<Action>> post_file_copy_actions;
+            std::vector<std::shared_ptr<Action>> cleanup_actions;
+            std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
+            std::map<WorkflowTask*, std::shared_ptr<Action>> task_compute_actions;
+            std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
+
+            // Create pre- and post-overhead work units
+            if (sjob->getPreJobOverheadInSeconds() > 0.0) {
+                pre_overhead_action = cjob->addSleepAction("", sjob->getPreJobOverheadInSeconds());
+            }
+
+            if (sjob->getPostJobOverheadInSeconds() > 0.0) {
+                post_overhead_action = cjob->addSleepAction("", sjob->getPostJobOverheadInSeconds());
+            }
+
+            // Create the pre- file copy actions
+            for (auto const &pfc : sjob->pre_file_copies) {
+                pre_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), std::get<1>(pfc), std::get<2>(pfc)));
+            }
+
+            // Create the post- file copy actions
+            for (auto const &pfc : sjob->post_file_copies) {
+                post_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), std::get<1>(pfc), std::get<2>(pfc)));
+            }
+
+            // Create the file cleanup actions
+            for (auto const &fc: sjob->cleanup_file_deletions) {
+                cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), std::get<1>(fc)));
+            }
+
+            // Create the task actions
+            for (auto const &task : sjob->tasks) {
+                auto compute_action = cjob->addComputeAction("action_" + task->getID(), task->getFlops(), task->getMemoryRequirement(),
+                                                             task->getMinNumCores(), task->getMaxNumCores(), task->getParallelModel());
+                task_compute_actions[task] = compute_action;
+                task_file_read_actions[task] = {};
+                for (auto const &f : task->getInputFiles()) {
+                    auto fread_action = cjob->addFileReadAction("", f, sjob->file_locations[f]);
+                    task_file_read_actions[task].push_back(fread_action);
+                    cjob->addActionDependency(fread_action, compute_action);
+                }
+                task_file_write_actions[task] = {};
+                for (auto const &f : task->getOutputFiles()) {
+                    auto fwrite_action = cjob->addFileWriteAction("", f, sjob->file_locations[f].at(0));
+                    task_file_write_actions[task].push_back(fwrite_action);
+                    cjob->addActionDependency(compute_action, fwrite_action);
+                }
+            }
+
+            // Add all inter-task dependencies
+            for (auto const &parent_task : sjob->getTasks()) {
+                for (auto const &child_task : parent_task->getChildren()) {
+                    if (task_compute_actions.find(child_task) == task_compute_actions.end()) {
+                        continue;
+                    }
+                    std::vector<std::shared_ptr<Action>> parent_actions;
+                    if (not task_file_write_actions[parent_task].empty()) {
+                        parent_actions = task_file_write_actions[parent_task];
+                    } else {
+                        parent_actions = {task_compute_actions[parent_task]};
+                    }
+                    std::vector<std::shared_ptr<Action>> child_actions;
+                    if (not task_file_read_actions[child_task].empty()) {
+                        child_actions = task_file_read_actions[child_task];
+                    } else {
+                        child_actions = {task_compute_actions[child_task]};
+                    }
+                    for (auto const &parent_action : parent_actions) {
+                        for (auto const &child_action: child_actions) {
+                            cjob->addActionDependency(parent_action, child_action);
+                        }
+                    }
+                }
+            }
+
+            // Create  4 dummy tasks
+            std::shared_ptr<Action> pre_overhead_to_pre_file_copies = cjob->addSleepAction("", 0);
+            std::shared_ptr<Action> pre_file_copies_to_tasks = cjob->addSleepAction("", 0);
+            std::shared_ptr<Action> tasks_to_post_file_copies = cjob->addSleepAction("", 0);
+            std::shared_ptr<Action> file_copies_to_post_overhead = cjob->addSleepAction("", 0);
+
+            // Add all dependencies, usingthe dummy tasks to help
+            if (pre_overhead_action != nullptr) {
+                cjob->addActionDependency(pre_overhead_action, pre_overhead_to_pre_file_copies);
+            }
+            if (not pre_file_copy_actions.empty()) {
+                for (auto const &pfca : pre_file_copy_actions) {
+                    cjob->addActionDependency(pre_overhead_to_pre_file_copies, pfca);
+                    cjob->addActionDependency(pfca, pre_file_copies_to_tasks);
+                }
+            }
+            if (not task_compute_actions.empty()) {
+                for (auto const &tca : task_compute_actions) {
+                    WorkflowTask *task = tca.first;
+                    if (not task_file_read_actions[task].empty()) {
+                        for (auto const &tfra : task_file_read_actions[task]) {
+                            cjob->addActionDependency(pre_file_copies_to_tasks, tfra);
+                        }
+                    } else {
+                        cjob->addActionDependency(pre_file_copies_to_tasks, tca.second);
+                    }
+                    if (not task_file_write_actions[task].empty()) {
+                        for (auto const &tfwa : task_file_write_actions[task]) {
+                            cjob->addActionDependency(tfwa, tasks_to_post_file_copies);
+                        }
+                    } else {
+                        cjob->addActionDependency(tca.second, tasks_to_post_file_copies);
+                    }
+                }
+            }
+            if (not post_file_copy_actions.empty()) {
+                for (auto const &pfca : post_file_copy_actions) {
+                    cjob->addActionDependency(tasks_to_post_file_copies, pfca);
+                    cjob->addActionDependency(pfca, file_copies_to_post_overhead);
+                }
+            }
+            if (post_overhead_action != nullptr) {
+                cjob->addActionDependency(file_copies_to_post_overhead, post_overhead_action);
+            }
+
+            // Use the dummy tasks for "easy" dependencies and remove the dummies
+            std::vector<std::shared_ptr<Action>> dummies = {pre_overhead_to_pre_file_copies, pre_file_copies_to_tasks, tasks_to_post_file_copies, file_copies_to_post_overhead};
+            for (auto &dummy : dummies) {
+                // propagate dependencies
+                for (auto const &parent_action : dummy->getParents()) {
+                    for (auto const &child_action : dummy->getChildren()) {
+                        cjob->addActionDependency(parent_action, child_action);
+                    }
+                }
+                // remove the dummy
+                cjob->removeAction(dummy);
+            }
+
+            cjob->printActionDependencies();
+
+            // Record all this information in the sjob
+            sjob->compound_job = cjob;
+            sjob->pre_overhead_action = pre_overhead_action;
+            sjob->post_overhead_action = post_overhead_action;
+            sjob->pre_file_copy_actions = pre_file_copy_actions;
+            sjob->post_file_copy_actions = post_file_copy_actions;
+            sjob->cleanup_actions = cleanup_actions;
+            sjob->task_file_read_actions = task_file_read_actions;
+            sjob->task_compute_actions = task_compute_actions;
+            sjob->task_file_write_actions = task_file_write_actions;
+
+
+            // The coumpound job
+            this->cjob_to_sjob_map[cjob] = sjob;
+            this->jobs_to_dispatch.push_back(cjob);
 
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
             this->jobs_to_dispatch.push_back(job);
+
         } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
 
             cjob->state = CompoundJob::State::SUBMITTED;
@@ -728,17 +883,28 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean up any state
             return false;
-        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
-            processStandardJobCompletion(msg->job, msg->compute_service);
-            return true;
-        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
-            processStandardJobFailure(msg->job, msg->compute_service, msg->cause);
-            return true;
+//        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+//            processStandardJobCompletion(msg->job, msg->compute_service);
+//            return true;
+//        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
+//            processStandardJobFailure(msg->job, msg->compute_service, msg->cause);
+//            return true;
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
-            processCompoundJobCompletion(msg->job, msg->compute_service);
+            // Is this in fact a standard job???
+            if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
+                this->cjob_to_sjob_map.erase(msg->job);
+                processStandardJobCompletion(this->cjob_to_sjob_map[msg->job], msg->compute_service);
+            } else {
+                processCompoundJobCompletion(msg->job, msg->compute_service);
+            }
             return true;
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
-            processCompoundJobFailure(msg->job, msg->compute_service);
+            if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
+                this->cjob_to_sjob_map.erase(msg->job);
+                processStandardJobFailure(this->cjob_to_sjob_map[msg->job], msg->compute_service);
+            } else {
+                processCompoundJobFailure(msg->job, msg->compute_service);
+            }
             return true;
         } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
             processPilotJobStart(msg->job, msg->compute_service);
@@ -850,18 +1016,16 @@ namespace wrench {
 //                    job, compute_service, necessary_state_changes);
 //            S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
 //        }
-        throw std::runtime_error("NOT IMPLEMENTED");
+        throw std::runtime_error("PROCESS STANDARD JOB COMPLETION NOT IMPLEMENTED");
     }
 
     /**
      * @brief Process a standard job failure
      * @param job: the job that failure
      * @param compute_service: the compute service on which the job has failed
-     * @param failure_cause: the cause of the failure
      */
     void JobManager::processStandardJobFailure(std::shared_ptr<StandardJob> job,
-                                               std::shared_ptr<ComputeService> compute_service,
-                                               std::shared_ptr<FailureCause> cause) {
+                                               std::shared_ptr<ComputeService> compute_service) {
 //        // update job state
 //        job->state = StandardJob::State::FAILED;
 //
@@ -944,7 +1108,7 @@ namespace wrench {
 //                                                       necessary_failure_count_increments,
 //                                                       std::move(cause));
 //        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
-        throw std::runtime_error("NOT IMPLEMENTED");
+        throw std::runtime_error("PROCESS STANDARD JOB FAILURE NOT IMPLEMENTED");
     }
 
     /**
@@ -1008,10 +1172,10 @@ namespace wrench {
         while (it != this->jobs_to_dispatch.end()) {
             auto job = *it;
 
-            // So pre-work
+            // Do pre-work
             if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 // Always ready
-                pjob->state = PilotJob::PENDING;
+                pjob->state = PilotJob::State::PENDING;
             } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
                 // Check if ready
                 if (not cjob->isReady()) {
@@ -1019,7 +1183,7 @@ namespace wrench {
                     continue;
                 }
             } else {
-                throw std::runtime_error("DataManager: Unsupported Job type");
+                throw std::runtime_error("UNSUPPORTED JOB");
             }
 
             try {
