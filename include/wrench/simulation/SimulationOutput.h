@@ -87,64 +87,64 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void addTimestampTaskStart(WorkflowTask *task);
+        void addTimestampTaskStart(double date, WorkflowTask *task);
 
-        void addTimestampTaskFailure(WorkflowTask *task);
+        void addTimestampTaskFailure(double date, WorkflowTask *task);
 
-        void addTimestampTaskCompletion(WorkflowTask *task);
+        void addTimestampTaskCompletion(double date, WorkflowTask *task);
 
-        void addTimestampTaskTermination(WorkflowTask *task);
+        void addTimestampTaskTermination(double date, WorkflowTask *task);
 
-        void addTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service,
+        void addTimestampFileReadStart(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
                                        WorkflowTask *task = nullptr);
 
-        void addTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service,
+        void addTimestampFileReadFailure(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
                                          WorkflowTask *task = nullptr);
 
-        void addTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service,
+        void addTimestampFileReadCompletion(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
                                             WorkflowTask *task = nullptr);
 
-        void addTimestampFileWriteStart(WorkflowFile *file, FileLocation *src, StorageService *service,
+        void addTimestampFileWriteStart(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
                                         WorkflowTask *task = nullptr);
 
-        void addTimestampFileWriteFailure(WorkflowFile *file, FileLocation *src, StorageService *service,
+        void addTimestampFileWriteFailure(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
                                           WorkflowTask *task = nullptr);
 
-        void addTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *src, StorageService *service,
+        void addTimestampFileWriteCompletion(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
                                              WorkflowTask *task = nullptr);
 
-        void addTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyStart(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src,
                                        std::shared_ptr<FileLocation> dst);
 
-        void addTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyFailure(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src,
                                          std::shared_ptr<FileLocation> dst);
 
-        void addTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyCompletion(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst);
 
         void
-        addTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        addTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
 
         void
-        addTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        addTimestampDiskReadFailure(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
 
-        void addTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes,
+        void addTimestampDiskReadCompletion(double date, std::string hostname, std::string mount, double bytes,
                                             int unique_sequence_number);
 
         void
-        addTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
 
         void
-        addTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        addTimestampDiskWriteFailure(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
 
-        void addTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes,
+        void addTimestampDiskWriteCompletion(double date, std::string hostname, std::string mount, double bytes,
                                              int unique_sequence_number);
 
-        void addTimestampPstateSet(std::string hostname, int pstate);
+        void addTimestampPstateSet(double date, std::string hostname, int pstate);
 
-        void addTimestampEnergyConsumption(std::string hostname, double joules);
+        void addTimestampEnergyConsumption(double date, std::string hostname, double joules);
 
-        void addTimestampLinkUsage(std::string linkname, double bytes_per_second);
+        void addTimestampLinkUsage(double date, std::string linkname, double bytes_per_second);
 
         /**
         * @brief Append a simulation timestamp to a simulation output trace

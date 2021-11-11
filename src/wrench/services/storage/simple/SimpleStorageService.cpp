@@ -464,7 +464,7 @@ namespace wrench {
         // File is not already here
         if (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint())) {
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
-                this->simulation->getOutput().addTimestampFileCopyFailure(file, src_location, dst_location);
+                this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
 
                 try {
                     S4U_Mailbox::putMessage(
@@ -570,7 +570,7 @@ namespace wrench {
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // May be no corresponding timestamp.
                 try {
-                    this->simulation->getOutput().addTimestampFileCopyCompletion(file, src_location, dst_location);
+                    this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
                 } catch (invalid_argument &e) {
                 }
 

@@ -258,10 +258,10 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     // test constructors
 
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskStart(nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskFailure(nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskStart(0.0, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskFailure(0.0,nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(0.0,nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(0.0,nullptr), std::invalid_argument);
 
     delete simulation;
     for (int i=0; i < argc; i++)
