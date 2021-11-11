@@ -110,14 +110,14 @@ namespace wrench {
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 if (not this->terminated_due_job_being_forcefully_terminated) {
                     task->setFailureDate(S4U_Simulation::getClock());
-                    this->simulation->getOutput().addTimestampTaskFailure(task);
+                    this->simulation->getOutput().addTimestampTaskFailure(Simulation::getCurrentSimulatedDate(), task);
                 } else {
                     task->setTerminationDate(S4U_Simulation::getClock());
-                    this->simulation->getOutput().addTimestampTaskTermination(task);
+                    this->simulation->getOutput().addTimestampTaskTermination(Simulation::getCurrentSimulatedDate(), task);
                 }
             }
         } else if ((this->workunit->task != nullptr) and this->task_completion_timestamp_should_be_generated) {
-            this->simulation->getOutput().addTimestampTaskCompletion(this->workunit->task);
+            this->simulation->getOutput().addTimestampTaskCompletion(Simulation::getCurrentSimulatedDate(), this->workunit->task);
         }
     }
 
@@ -290,7 +290,7 @@ namespace wrench {
                 WorkflowTask *task = this->workunit->task;
                 task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
                 task->setFailureDate(S4U_Simulation::getClock());
-                this->simulation->getOutput().addTimestampTaskFailure(task);
+                this->simulation->getOutput().addTimestampTaskFailure(Simulation::getCurrentSimulatedDate(), task);
                 this->task_failure_time_stamp_has_already_been_generated = true;
             }
         }
@@ -365,7 +365,7 @@ namespace wrench {
             task->setExecutionHost(this->hostname);
             task->setNumCoresAllocated(this->num_cores);
 
-            this->simulation->getOutput().addTimestampTaskStart(task);
+            this->simulation->getOutput().addTimestampTaskStart(Simulation::getCurrentSimulatedDate(), task);
 //            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
 //                    new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
@@ -409,7 +409,7 @@ namespace wrench {
 
                     bool isFileRead = false;
                     try {
-                        this->simulation->getOutput().addTimestampFileReadStart(f, l.get(),
+                        this->simulation->getOutput().addTimestampFileReadStart(Simulation::getCurrentSimulatedDate(), f, l.get(),
                                                                                 l->getStorageService().get(), task);
                         if (Simulation::isPageCachingEnabled() && l->getServerStorageService() != nullptr) {
                             MemoryManager *mm = simulation->getMemoryManagerByHost(S4U_Simulation::getHostName());
@@ -429,11 +429,11 @@ namespace wrench {
 //                        StorageService::readFile(f, l);
 
                     } catch (ExecutionException &e) {
-                        this->simulation->getOutput().addTimestampFileReadFailure(f, l.get(),
+                        this->simulation->getOutput().addTimestampFileReadFailure(Simulation::getCurrentSimulatedDate(), f, l.get(),
                                                                                   l->getStorageService().get(), task);
                         throw;
                     }
-                    this->simulation->getOutput().addTimestampFileReadCompletion(f, l.get(),
+                    this->simulation->getOutput().addTimestampFileReadCompletion(Simulation::getCurrentSimulatedDate(), f, l.get(),
                                                                                  l->getStorageService().get(), task);
                 }
                 task->setReadInputEndDate(S4U_Simulation::getClock());
@@ -495,15 +495,15 @@ namespace wrench {
                     std::shared_ptr <FileLocation> l = p.second;
 
                     try {
-                        this->simulation->getOutput().addTimestampFileWriteStart(f, l.get(),
+                        this->simulation->getOutput().addTimestampFileWriteStart(Simulation::getCurrentSimulatedDate(), f, l.get(),
                                                                                  l->getStorageService().get(), task);
                         StorageService::writeFile(f, l);
                     } catch (ExecutionException &e) {
-                        this->simulation->getOutput().addTimestampFileWriteFailure(f, l.get(),
+                        this->simulation->getOutput().addTimestampFileWriteFailure(Simulation::getCurrentSimulatedDate(), f, l.get(),
                                                                                    l->getStorageService().get(), task);
                         throw;
                     }
-                    this->simulation->getOutput().addTimestampFileWriteCompletion(f, l.get(),
+                    this->simulation->getOutput().addTimestampFileWriteCompletion(Simulation::getCurrentSimulatedDate(), f, l.get(),
                                                                                   l->getStorageService().get(), task);
                 }
                 task->setWriteOutputEndDate(S4U_Simulation::getClock());

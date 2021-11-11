@@ -117,10 +117,10 @@ private:
     int main() {
 
         try {
-            this->simulation->getOutput().addTimestampTaskStart(nullptr);
-            this->simulation->getOutput().addTimestampTaskCompletion(nullptr);
-            this->simulation->getOutput().addTimestampTaskTermination(nullptr);
-            this->simulation->getOutput().addTimestampTaskFailure(nullptr);
+            this->simulation->getOutput().addTimestampTaskStart(0.0, nullptr);
+            this->simulation->getOutput().addTimestampTaskCompletion(0.0, nullptr);
+            this->simulation->getOutput().addTimestampTaskTermination(0.0, nullptr);
+            this->simulation->getOutput().addTimestampTaskFailure(0.0, nullptr);
             throw std::runtime_error("Should have caught exception!");
         } catch (std::exception &ignore) {
 
