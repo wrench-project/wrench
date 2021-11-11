@@ -620,7 +620,7 @@ namespace wrench {
             std::shared_ptr<Action> tasks_to_post_file_copies = cjob->addSleepAction("", 0);
             std::shared_ptr<Action> file_copies_to_post_overhead = cjob->addSleepAction("", 0);
 
-            // Add all dependencies, usingthe dummy tasks to help
+            // Add all dependencies, using the dummy tasks to help
             if (pre_overhead_action != nullptr) {
                 cjob->addActionDependency(pre_overhead_action, pre_overhead_to_pre_file_copies);
             }
@@ -675,6 +675,7 @@ namespace wrench {
             cjob->printActionDependencies();
 
             cjob->setParentComputeService(sjob->getParentComputeService());
+            cjob->pushCallbackMailbox(this->mailbox_name);
 
             // Record all this information in the sjob
             sjob->compound_job = cjob;
@@ -878,6 +879,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Job Manager got a %s message", message->getName().c_str());
+        WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<JobManagerWakeupMessage *>(message.get())) {
             // Just wakeup
@@ -1168,6 +1170,7 @@ namespace wrench {
      */
     void JobManager::dispatchJobs() {
 
+        std::cerr << "IN DISPATCH JOBS\n";
         std::set<std::shared_ptr<Job>> dispatched;
 
         auto it = this->jobs_to_dispatch.begin();
@@ -1189,6 +1192,7 @@ namespace wrench {
             }
 
             try {
+                std::cerr << "CALLING DISPTCH\n";
                 this->dispatchJob(job);
                 this->jobs_dispatched.insert(job);
                 it = this->jobs_to_dispatch.erase(it);
