@@ -350,7 +350,7 @@ namespace wrench {
         double usage = S4U_Simulation::getLinkUsage(link_name);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestampLinkUsage(link_name, usage);
+            this->getOutput().addTimestampLinkUsage(Simulation::getCurrentSimulatedDate(), link_name, usage);
         }
 
         return usage;
@@ -422,7 +422,7 @@ namespace wrench {
         // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
         // still be called.
         for (const auto &hostname: this->getHostnameList()) {
-            this->getOutput().addTimestampPstateSet(hostname, getCurrentPstate(hostname));
+            this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
         }
 
         // Start all services (and the WMS)
@@ -769,15 +769,15 @@ namespace wrench {
     void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes,
+            this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
     }
 
     /**
@@ -797,23 +797,23 @@ namespace wrench {
                                                             std::string write_mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                     temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                      temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
                                                                    read_mount_point, write_mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write,
+            this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                            temp_unique_sequence_number);
-            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read,
+            this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                           temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                           temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                          temp_unique_sequence_number);
     }
 
@@ -829,15 +829,15 @@ namespace wrench {
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes,
+            this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
                                                            temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -853,7 +853,7 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                     temp_unique_sequence_number);
 
         auto mem_mng = getMemoryManagerByHost(hostname);
@@ -880,7 +880,7 @@ namespace wrench {
 //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
 
-        this->getOutput().addTimestampDiskReadCompletion(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                          temp_unique_sequence_number);
     }
 
@@ -900,7 +900,7 @@ namespace wrench {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
 
-        this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
@@ -932,7 +932,7 @@ namespace wrench {
             remaining -= to_cache;
         }
 
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -949,7 +949,7 @@ namespace wrench {
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
@@ -960,7 +960,7 @@ namespace wrench {
         mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
         mem_mng->addToCache(file->getID(), location, n_bytes, false);
 
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -1167,7 +1167,7 @@ namespace wrench {
         double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestampEnergyConsumption(hostname, consumption);
+            this->getOutput().addTimestampEnergyConsumption(Simulation::getCurrentSimulatedDate(), hostname, consumption);
         }
 
         return consumption;
@@ -1211,7 +1211,7 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
-        this->getOutput().addTimestampPstateSet(hostname, pstate);
+        this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(),hostname, pstate);
     }
 
     /**

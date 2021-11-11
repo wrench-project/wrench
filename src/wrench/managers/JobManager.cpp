@@ -676,6 +676,8 @@ namespace wrench {
 
             cjob->setParentComputeService(sjob->getParentComputeService());
             cjob->pushCallbackMailbox(this->mailbox_name);
+            // Undo the push we have done on the StandardJob job
+            sjob->popCallbackMailbox();
 
             // Record all this information in the sjob
             sjob->compound_job = cjob;
@@ -896,16 +898,18 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
             // Is this in fact a standard job???
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
+                auto sjob = this->cjob_to_sjob_map[msg->job];
                 this->cjob_to_sjob_map.erase(msg->job);
-                processStandardJobCompletion(this->cjob_to_sjob_map[msg->job], msg->compute_service);
+                processStandardJobCompletion(sjob, msg->compute_service);
             } else {
                 processCompoundJobCompletion(msg->job, msg->compute_service);
             }
             return true;
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
+                auto sjob = this->cjob_to_sjob_map[msg->job];
                 this->cjob_to_sjob_map.erase(msg->job);
-                processStandardJobFailure(this->cjob_to_sjob_map[msg->job], msg->compute_service);
+                processStandardJobFailure(sjob, msg->compute_service);
             } else {
                 processCompoundJobFailure(msg->job, msg->compute_service);
             }
@@ -928,23 +932,91 @@ namespace wrench {
      */
     void JobManager::processStandardJobCompletion(std::shared_ptr<StandardJob> job,
                                                   std::shared_ptr<ComputeService> compute_service) {
+
         // update job state
         job->state = StandardJob::State::COMPLETED;
 
         // Set the job end date
         job->end_date = Simulation::getCurrentSimulatedDate();
 
+        // Set task information based on actions
+        for (auto task : job->tasks) {
+
+            double input_start_date = -1.0;
+            double input_end_date = -1.0;
+            double compute_start_date = -1.0;
+            double compute_end_date = -1.0;
+            double output_start_date = -1.0;
+            double output_end_date = -1.0;
+
+            // compute input start/end date
+            if (not task->getInputFiles().empty()) {
+                double input_start_date = DBL_MAX;
+                double input_end_date = -1;
+                for (auto const &file_read_action : job->task_file_read_actions[task]) {
+                    input_start_date = (input_start_date > file_read_action->getStartDate()
+                                        ? file_read_action->getStartDate() : input_start_date);
+                    input_end_date = (input_end_date < file_read_action->getEndDate() ? file_read_action->getEndDate()
+                                                                                      : input_end_date);
+                }
+            }
+            
+            compute_start_date = job->task_compute_actions[task]->getStartDate();
+            compute_end_date = job->task_compute_actions[task]->getEndDate();
+
+            if (not task->getOutputFiles().empty()) {
+                // compute output start/end date
+                double output_start_date = DBL_MAX;
+                double output_end_date = -1;
+                for (auto const &file_write_action : job->task_file_write_actions[task]) {
+                    output_start_date = (output_start_date > file_write_action->getStartDate()
+                                         ? file_write_action->getStartDate() : output_start_date);
+                    output_end_date = (output_end_date < file_write_action->getEndDate()
+                                       ? file_write_action->getEndDate() : output_end_date);
+                }
+            }
+
+            if (input_start_date > 0) {
+                task->setStartDate(input_start_date);
+            } else {
+                task->setStartDate(compute_start_date);
+            }
+
+            if (output_end_date > 0) {
+                task->setEndDate(output_end_date);
+            } else {
+                task->setEndDate(compute_end_date);
+            }
+
+            task->setReadInputStartDate(input_start_date);
+            task->setReadInputEndDate(input_end_date);
+            task->setComputationStartDate(compute_start_date);
+            task->setComputationEndDate(compute_end_date);
+            task->setWriteOutputStartDate(output_start_date);
+            task->setWriteOutputEndDate(output_end_date);
+
+            this->simulation->getOutput().addTimestampTaskStart(task->getStartDate(), task);
+            this->simulation->getOutput().addTimestampTaskCompletion(task->getEndDate(), task);
+            // TODO: ADD OTHER STAMPS
+
+            task->setExecutionHost(job->task_compute_actions[task]->getExecutionHistory().top().execution_host);
+            task->setNumCoresAllocated(job->task_compute_actions[task]->getExecutionHistory().top().num_cores_allocated);
+
+        }
+        
         // Task state changes are: all completed (and deal with the children)
         std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
         for (auto task : job->tasks) {
             necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
         }
+        
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
 
         // Forward the notification along the notification chain
         std::string callback_mailbox = job->popCallbackMailbox();
+        std::cerr << "FORWARDING NOTIFICATION OF JOB COMPLETION to " << callback_mailbox << "\n";
         if (not callback_mailbox.empty()) {
             auto augmented_msg = new JobManagerStandardJobCompletedMessage(
                     job, compute_service, necessary_state_changes);

@@ -73,10 +73,12 @@ namespace wrench {
         SimulationTimestampType();
         double getDate();
 
+    protected:
+        double date = -0.1;
+
     private:
         friend  class SimulationOutput;
         void setDate(double date);
-        double date = -0.1;
     };
 
     /**
@@ -88,7 +90,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
         SimulationTimestampPair();
-        SimulationTimestampPair(SimulationTimestampPair *endpoint);
+        SimulationTimestampPair(double date, SimulationTimestampPair *endpoint);
         virtual ~SimulationTimestampPair() = default;
         /***********************/
         /** \endcond           */
@@ -113,7 +115,7 @@ namespace wrench {
     protected:
         static std::map<std::string, SimulationTimestampTask *> pending_task_timestamps;
         void setEndpoints();
-        explicit SimulationTimestampTask(WorkflowTask *);
+        SimulationTimestampTask(double date, WorkflowTask *task);
 
     private:
         friend class SimulationOutput;
@@ -126,7 +128,7 @@ namespace wrench {
     class SimulationTimestampTaskStart : public SimulationTimestampTask {
     private:
         friend class SimulationOutput;
-        explicit SimulationTimestampTaskStart(WorkflowTask *task);
+        SimulationTimestampTaskStart(double date, WorkflowTask *task);
     };
 
     /**
@@ -135,7 +137,7 @@ namespace wrench {
     class SimulationTimestampTaskFailure : public SimulationTimestampTask {
     private:
         friend class SimulationOutput;
-        explicit SimulationTimestampTaskFailure(WorkflowTask *task);
+        SimulationTimestampTaskFailure(double date, WorkflowTask *task);
     };
 
     /**
@@ -144,7 +146,7 @@ namespace wrench {
     class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
     private:
         friend class SimulationOutput;
-        explicit SimulationTimestampTaskCompletion(WorkflowTask *);
+        SimulationTimestampTaskCompletion(double date, WorkflowTask *task);
     };
 
     /**
@@ -153,7 +155,7 @@ namespace wrench {
      class SimulationTimestampTaskTermination : public SimulationTimestampTask {
      private:
          friend class SimulationOutput;
-         explicit SimulationTimestampTaskTermination(WorkflowTask *);
+         SimulationTimestampTaskTermination(double date, WorkflowTask *);
      };
 
     class SimulationTimestampFileReadStart;
@@ -203,7 +205,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampFileRead(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileRead(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     class SimulationTimestampFileReadFailure;
@@ -215,7 +217,7 @@ namespace wrench {
     class SimulationTimestampFileReadStart : public SimulationTimestampFileRead {
     public:
         friend class SimulationOutput;
-        SimulationTimestampFileReadStart(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileReadStart(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
 
         friend class SimulationTimestampFileReadFailure;
         friend class SimulationTimestampFileReadCompletion;
@@ -227,7 +229,7 @@ namespace wrench {
     class SimulationTimestampFileReadFailure : public SimulationTimestampFileRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileReadFailure(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileReadFailure(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     /**
@@ -236,7 +238,7 @@ namespace wrench {
     class SimulationTimestampFileReadCompletion : public SimulationTimestampFileRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileReadCompletion(WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileReadCompletion(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     class SimulationTimestampFileWriteStart;
@@ -287,7 +289,7 @@ namespace wrench {
         void setEndpoints();
 
         friend class SimulationOutput;
-        SimulationTimestampFileWrite(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWrite(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     class SimulationTimestampFileWriteFailure;
@@ -301,7 +303,7 @@ namespace wrench {
         friend class SimulationOutput;
         friend class SimulationTimestampFileWriteFailure;
         friend class SimulationTimestampFileWriteCompletion;
-        SimulationTimestampFileWriteStart(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWriteStart(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     /**
@@ -310,7 +312,7 @@ namespace wrench {
     class SimulationTimestampFileWriteFailure : public SimulationTimestampFileWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileWriteFailure(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWriteFailure(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     /**
@@ -319,7 +321,7 @@ namespace wrench {
     class SimulationTimestampFileWriteCompletion : public SimulationTimestampFileWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileWriteCompletion(WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWriteCompletion(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
     };
 
     class SimulationTimestampFileCopyStart;
@@ -340,7 +342,7 @@ namespace wrench {
         std::shared_ptr<FileLocation> getDestination();
 
     protected:
-        SimulationTimestampFileCopy(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopy(double date, WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
 
         /**
          * @brief The WorkflowFile that was being copied
@@ -376,7 +378,7 @@ namespace wrench {
         friend class SimulationOutput;
         friend class SimulationTimestampFileCopyFailure;
         friend class SimulationTimestampFileCopyCompletion;
-        SimulationTimestampFileCopyStart(WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopyStart(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
     };
 
     /**
@@ -385,7 +387,7 @@ namespace wrench {
     class SimulationTimestampFileCopyFailure : public SimulationTimestampFileCopy {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileCopyFailure(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopyFailure(double date, WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
     };
 
     /**
@@ -394,7 +396,7 @@ namespace wrench {
     class SimulationTimestampFileCopyCompletion : public SimulationTimestampFileCopy {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileCopyCompletion(WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopyCompletion(double date, WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
     };
 
     class SimulationTimestampDiskReadStart;
@@ -444,7 +446,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampDiskRead(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskRead(double date, std::string hostname, std::string mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskReadFailure;
@@ -456,7 +458,7 @@ namespace wrench {
     class SimulationTimestampDiskReadStart : public SimulationTimestampDiskRead {
     public:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadStart(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskReadStart(double date, std::string hostname, std::string mount, double bytes, int counter);
 
         friend class SimulationTimestampDiskReadFailure;
         friend class SimulationTimestampDiskReadCompletion;
@@ -468,7 +470,7 @@ namespace wrench {
     class SimulationTimestampDiskReadFailure : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadFailure(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskReadFailure(double date, std::string hostname, std::string mount, double bytes, int counter);
     };
 
     /**
@@ -477,7 +479,7 @@ namespace wrench {
     class SimulationTimestampDiskReadCompletion : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadCompletion(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskReadCompletion(double date, std::string hostname, std::string mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteStart;
@@ -527,7 +529,7 @@ namespace wrench {
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampDiskWrite(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWrite(double date, std::string hostname, std::string mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteFailure;
@@ -539,7 +541,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteStart : public SimulationTimestampDiskWrite {
     public:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteStart(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes, int counter);
 
         friend class SimulationTimestampDiskWriteFailure;
         friend class SimulationTimestampDiskWriteCompletion;
@@ -551,7 +553,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteFailure : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteFailure(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWriteFailure(double date, std::string hostname, std::string mount, double bytes, int counter);
     };
 
     /**
@@ -560,7 +562,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteCompletion : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteCompletion(std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWriteCompletion(double date, std::string hostname, std::string mount, double bytes, int counter);
     };
 
     /**
@@ -573,7 +575,7 @@ namespace wrench {
 
     private:
         friend class SimulationOutput;
-        SimulationTimestampPstateSet(std::string hostname, int pstate);
+        SimulationTimestampPstateSet(double date, std::string hostname, int pstate);
         std::string hostname;
         int pstate;
     };
@@ -588,7 +590,7 @@ namespace wrench {
 
     private:
         friend class SimulationOutput;
-        SimulationTimestampEnergyConsumption(std::string hostname, double joules);
+        SimulationTimestampEnergyConsumption(double date, std::string hostname, double joules);
         std::string hostname;
         double joules;
     };
@@ -603,7 +605,7 @@ namespace wrench {
 
     private:
         friend class SimulationOutput;
-        SimulationTimestampLinkUsage(std::string linkname, double bytes_per_second);
+        SimulationTimestampLinkUsage(double date, std::string linkname, double bytes_per_second);
         std::string linkname;
         double bytes_per_second;
     };

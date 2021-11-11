@@ -41,8 +41,8 @@ namespace wrench {
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
-            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
-            internal_state(WorkflowTask::InternalState::TASK_READY),
+//            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
+//            internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
@@ -292,42 +292,42 @@ namespace wrench {
 
         // Sanity check
         bool sane = true;
-        switch (state) {
-            case NOT_READY:
-                if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-                    sane = false;
-                }
-                break;
-            case READY:
-                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-                    sane = false;
-                }
-                break;
-            case PENDING:
-                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
-                    sane = false;
-                }
-                break;
-            case COMPLETED:
-                if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
-                    sane = false;
-                }
-                break;
-            case UNKNOWN:
-                sane = false;
-                break;
-        }
-
-        if (not sane) {
-            throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-                                     this->getID() + "'s visible state to " +
-                                     stateToString(state) + " when its internal " +
-                                     "state is " + stateToString(this->internal_state));
-        }
+//        switch (state) {
+//            case NOT_READY:
+//                if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+//                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
+//                    sane = false;
+//                }
+//                break;
+//            case READY:
+//                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
+//                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
+//                    sane = false;
+//                }
+//                break;
+//            case PENDING:
+//                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
+//                    (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+//                    (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
+//                    sane = false;
+//                }
+//                break;
+//            case COMPLETED:
+//                if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
+//                    sane = false;
+//                }
+//                break;
+//            case UNKNOWN:
+//                sane = false;
+//                break;
+//        }
+//
+//        if (not sane) {
+//            throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
+//                                     this->getID() + "'s visible state to " +
+//                                     stateToString(state) + " when its internal " +
+//                                     "state is " + stateToString(this->internal_state));
+//        }
         this->visible_state = state;
     }
 
