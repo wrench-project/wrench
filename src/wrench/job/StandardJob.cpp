@@ -37,13 +37,14 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(Workflow *workflow,
+                             std::shared_ptr<JobManager> job_manager,
                              std::vector<WorkflowTask *> tasks,
                              std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
             :
-            Job("", nullptr),
+            Job("", std::move(job_manager)),
             num_completed_tasks(0),
             file_locations(file_locations),
             pre_file_copies(pre_file_copies),
