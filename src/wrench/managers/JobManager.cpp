@@ -231,7 +231,7 @@ namespace wrench {
         }
 
         auto job = std::shared_ptr<StandardJob>(
-                new StandardJob(this->wms->getWorkflow(),tasks, file_locations, pre_file_copies,
+                new StandardJob(this->wms->getWorkflow(), this->getSharedPtr<JobManager>(), tasks, file_locations, pre_file_copies,
                                 post_file_copies, cleanup_file_deletions));
 
         return job;
