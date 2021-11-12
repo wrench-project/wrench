@@ -558,40 +558,20 @@ private:
         for (auto const &job : jobs) {
 
             // Submit the job
-            job_manager->submitJob(job, this->test->compute_service, {});
-
-            // Wait for the workflow execution event
-            std::shared_ptr <wrench::ExecutionEvent> event = this->waitForNextEvent();
-            if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
-                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
-            }
-
-            // Check event content
-            auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
-            if (real_event->job != job) {
-                std::cerr << job->getName() << " " << real_event->job->getName() << "\n";
-                throw std::runtime_error("Event's job isn't the right job!");
-            }
-            if (real_event->compute_service != this->test->compute_service) {
-                throw std::runtime_error("Event's compute service isn't the right compute service!");
-            }
-            if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
-                throw std::runtime_error("Unexpected event-level failure cause");
-            }
-
-            // Check failure cause
-            if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
-                throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString());
-            }
-
-            // Check job state
-            if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
-                throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
-            }
-
-            // Chek action stuff
-            if ((*(job->getActions().begin()))->getState() != wrench::Action::State::FAILED) {
-                throw std::runtime_error("Unexpected action state " + (*(job->getActions().begin()))->getStateAsString());
+            try {
+                job_manager->submitJob(job, this->test->compute_service, {});
+                throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
+            } catch (wrench::ExecutionException &e) {
+                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+                if (not cause) {
+                    throw std::runtime_error("Unexpected failure cause");
+                }
+                if (cause->getJob() != job) {
+                    throw std::runtime_error("Unexpected job in failure cause");
+                }
+                if (cause->getService() != this->test->compute_service) {
+                    throw std::runtime_error("Unexpected service in failure cause");
+                }
             }
         }
 
@@ -712,7 +692,7 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
         // Create a compute action
         auto action = job->addComputeAction("my_computation", 1000.0, 0.0, 2, 15,
-                                              wrench::ParallelModel::AMDAHL(1.0));
+                                            wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit the job with bogus args
         std::vector<std::map<std::string, std::string>> bogus_args;
@@ -729,8 +709,8 @@ private:
             try {
                 job_manager->submitJob(job, this->test->compute_service, args);
                 throw std::runtime_error("Shouldn't have been able to submit job (" + args.begin()->first + ":" + args.begin()->second + ")");
-            } catch (std::invalid_argument &e) {
-                std::cerr << "Expected exception: " << e.what() << "\n";
+            } catch (std::invalid_argument &ignore) {
+//                std::cerr << "Expected exception: " << e.what() << "\n";
             }
         }
 
@@ -1046,10 +1026,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1386,10 +1366,10 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1474,39 +1454,21 @@ private:
         this->test->compute_service->stop();
 
         // Submit the job
-        job_manager->submitJob(job, this->test->compute_service, {});
-
-        // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
-        if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
-            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
-        }
-
-        // Check event content
-        auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
-        if (real_event->job != job) {
-            throw std::runtime_error("Event's job isn't the right job!");
-        }
-        if (real_event->compute_service != this->test->compute_service)  {
-            throw std::runtime_error("Event's compute service isn't the right compute service!");
-        }
-        if (not std::dynamic_pointer_cast<wrench::ServiceIsDown>(real_event->failure_cause)) {
-            throw std::runtime_error("Unexpected event-level failure cause");
-        }
-
-        // Check job state
-        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
-            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
-        }
-
-        // Chek action stuff
-        if (action->getState() != wrench::Action::State::FAILED) {
-            throw std::runtime_error("Unexpected action state " + action->getStateAsString());
-        }
-
-        auto real_failure = std::dynamic_pointer_cast<wrench::ServiceIsDown>(action->getFailureCause());
-        if (not real_failure) {
-            throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
+        try {
+            job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Shouldn't be able to submit a job to a down service");
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Unexpected failure cause");
+            }
+            if (cause->getService() != this->test->compute_service) {
+                throw std::runtime_error("Unexpected service in failure cause");
+            }
+            // Check job state
+            if (job->getState() != wrench::CompoundJob::State::NOT_SUBMITTED) {
+                throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+            }
         }
 
         return 0;
@@ -1521,10 +1483,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1609,39 +1571,21 @@ private:
         this->test->compute_service->suspend();
 
         // Submit the job
-        job_manager->submitJob(job, this->test->compute_service, {});
-
-        // Wait for the workflow execution event
-        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
-        if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
-            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
-        }
-
-        // Check event content
-        auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
-        if (real_event->job != job) {
-            throw std::runtime_error("Event's job isn't the right job!");
-        }
-        if (real_event->compute_service != this->test->compute_service)  {
-            throw std::runtime_error("Event's compute service isn't the right compute service!");
-        }
-        if (not std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(real_event->failure_cause)) {
-            throw std::runtime_error("Unexpected event-level failure cause");
-        }
-
-        // Check job state
-        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
-            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
-        }
-
-        // Chek action stuff
-        if (action->getState() != wrench::Action::State::FAILED) {
-            throw std::runtime_error("Unexpected action state " + action->getStateAsString());
-        }
-
-        auto real_failure = std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(action->getFailureCause());
-        if (not real_failure) {
-            throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
+        try {
+            job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Shouldn't be able to submit a job to a suspended service");
+        } catch (wrench::ExecutionException &e) {
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsSuspended>(e.getCause());
+            if (not cause) {
+                throw std::runtime_error("Unexpected failure cause");
+            }
+            if (cause->getService() != this->test->compute_service) {
+                throw std::runtime_error("Unexpected service in failure cause");
+            }
+            // Check job state
+            if (job->getState() != wrench::CompoundJob::State::NOT_SUBMITTED) {
+                throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+            }
         }
 
         return 0;
@@ -1656,10 +1600,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
