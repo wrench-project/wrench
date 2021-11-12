@@ -42,7 +42,7 @@ namespace wrench {
         this->job = std::move(job);
 
         this->execution_history.push(Action::ActionExecution());
-        this->execution_history.top().state = Action::State::READY;
+        this->setState(Action::State::READY);
 
         this->simulate_computation_as_sleep = false;
         this->thread_creation_overhead = 0.0;
@@ -121,7 +121,7 @@ namespace wrench {
      */
     void Action::setState(Action::State new_state) {
         auto old_state = this->execution_history.top().state;
-//        std::cerr << "STATE " + Action::stateToString(old_state) + " -> " + Action::stateToString(new_state) << "\n";
+//        std::cerr << "STATE " + this->name + ": " + Action::stateToString(old_state) + " -> " + Action::stateToString(new_state) << "\n";
         this->job->updateStateActionMap(this->shared_ptr_this, old_state, new_state);
         this->execution_history.top().state = new_state;
     }
@@ -246,9 +246,9 @@ namespace wrench {
             }
         }
         if (ready) {
-            this->execution_history.top().state = Action::State::READY;
+            this->setState(Action::State::READY);
         } else {
-            this->execution_history.top().state = Action::State::NOT_READY;
+            this->setState(Action::State::NOT_READY);
         }
     }
 

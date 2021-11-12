@@ -34,7 +34,7 @@ namespace wrench {
                                      WorkflowFile *file,
                                      std::shared_ptr<FileLocation> src_file_location,
                                      std::shared_ptr<FileLocation> dst_file_location) :
-            Action(name, "file_write_", job),
+            Action(name, "file_copy_", job),
             file(std::move(file)),
             src_file_location(std::move(src_file_location)),
             dst_file_location(std::move(dst_file_location)) {

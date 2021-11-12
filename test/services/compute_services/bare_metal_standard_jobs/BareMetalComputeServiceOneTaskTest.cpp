@@ -884,10 +884,10 @@ TEST_F(BareMetalComputeServiceOneTaskTest, ExecutionWithLocationMap) {
 void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -1322,6 +1322,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1672,13 +1673,23 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-//        // Remove the staged file!
-//        wrench::StorageService::deleteFile(test->input_file,
-//                                           wrench::FileLocation::LOCATION(test->storage_service1));
+        // Remove the staged file!
+        wrench::StorageService::deleteFile(test->input_file,
+                                           wrench::FileLocation::LOCATION(test->storage_service1));
 
-        // Create a job (that doesn't say where the file should come from!)
-        auto job = job_manager->createStandardJob(test->task);
+        // Create a bogus job (that doesn't say where the file should come from!)
+        try {
+            auto job = job_manager->createStandardJob(test->task);
+            throw std::runtime_error("Shouldn't be able to create job with missin file locations!");
+        } catch (std::invalid_argument &ignore) {
+            // expected
+        }
+
         // Submit the job
+        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> file_locations;
+        file_locations[test->input_file] = wrench::FileLocation::LOCATION(test->storage_service2);
+        file_locations[test->output_file] = wrench::FileLocation::LOCATION(test->storage_service2);
+        auto job = job_manager->createStandardJob(test->task, file_locations);
         job_manager->submitJob(job, test->compute_service);
 
         // Wait for the workflow execution event
@@ -1715,6 +1726,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1835,6 +1847,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -1950,6 +1963,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
@@ -2069,6 +2083,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_task_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 

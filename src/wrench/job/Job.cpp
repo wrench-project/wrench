@@ -99,7 +99,6 @@ namespace wrench {
      * @param mailbox: the mailbox name
      */
     void Job::pushCallbackMailbox(std::string mailbox) {
-        WRENCH_INFO("PUSHING %s", mailbox.c_str());
         this->callback_mailbox_stack.push(mailbox);
     }
 
@@ -150,7 +149,7 @@ namespace wrench {
      * @brief Return the service-specific arguments that are used during job submission
      * @return a map of argument name/values
      */
-    std::map<std::string, std::string> Job::getServiceSpecificArguments() {
+    std::map<std::string, std::string> &Job::getServiceSpecificArguments() {
         return this->service_specific_args;
     }
 
