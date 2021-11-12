@@ -363,22 +363,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the service-specific args
-     * @param service_specific_args: the args
-     */
-    void CompoundJob::setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args) {
-        this->service_specific_args = std::move(service_specific_args);
-    }
-
-    /**
-     * @brief Get the service-specific args
-     * @return the args
-     */
-    const std::map<std::string, std::string> & CompoundJob::getServiceSpecificArgs() {
-        return this->service_specific_args;
-    }
-
-    /**
      * @brief Update the internal State-Action map
      * @param action: the action
      * @param old_state: the action's old state
@@ -411,6 +395,12 @@ namespace wrench {
      * @return true or false
      */
     bool CompoundJob::hasFailed() {
+//        std::cerr << "IN HAS FAILED: TOTAL " << this->actions.size() << "\n";
+//        std::cerr << "IN HAS FAILED: READY " << this->state_task_map[Action::State::READY].size() << "\n";
+//        std::cerr << "IN HAS FAILED: NOTREADY " << this->state_task_map[Action::State::NOT_READY].size() << "\n";
+//        std::cerr << "IN HAS FAILED: COMPETED " << this->state_task_map[Action::State::COMPLETED].size() << "\n";
+//        std::cerr << "IN HAS FAILED: KILLED " << this->state_task_map[Action::State::KILLED].size() << "\n";
+//        std::cerr << "IN HAS FAILED: FAILED " << this->state_task_map[Action::State::FAILED].size() << "\n";
         return (this->actions.size() ==
                 this->state_task_map[Action::State::NOT_READY].size() +
                         this->state_task_map[Action::State::COMPLETED].size() +
@@ -495,6 +485,7 @@ namespace wrench {
             child->parents.erase(action);
             child->updateState();
         }
+        this->state_task_map[action->getState()].erase(action);
         this->actions.erase(action);
     }
 

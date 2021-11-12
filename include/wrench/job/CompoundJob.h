@@ -116,9 +116,8 @@ namespace wrench {
         std::set<std::shared_ptr<CompoundJob>> getParentJobs();
         std::set<std::shared_ptr<CompoundJob>> getChildrenJobs();
 
-        void setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args);
-
-        const std::map<std::string, std::string> & getServiceSpecificArgs();
+//        void setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args);
+//        const std::map<std::string, std::string> & getServiceSpecificArgs();
 
         bool hasSuccessfullyCompleted();
         bool hasFailed();

@@ -180,6 +180,7 @@ namespace wrench {
         std::set<std::shared_ptr<Action>> not_ready_actions;
         std::vector<std::shared_ptr<Action>> ready_actions;
         std::set<std::shared_ptr<Action>> dispatched_actions;
+        std::map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);

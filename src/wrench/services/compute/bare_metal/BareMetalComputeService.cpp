@@ -98,6 +98,21 @@ namespace wrench {
 
         auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
         auto compute_resources = this->action_execution_service->getComputeResources();
+        // Check that each action can run w.r.t. the resource I have
+        unsigned long max_cores = 0;
+        double max_ram = 0;
+        for (auto const &cr : compute_resources) {
+            max_cores = (std::get<0>(cr.second) > max_cores ? std::get<0>(cr.second) : max_cores);
+            max_ram = (std::get<1>(cr.second) > max_ram ? std::get<1>(cr.second) : max_ram);
+        }
+
+        // Validate that there are enough resources for each task
+        for (auto const &action : cjob->getActions()) {
+            if ((action->getMinRAMFootprint() > max_ram) or
+                    (action->getMinNumCores() > max_cores)) {
+                throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
+            }
+        }
 
         // Check that service-specific args make sense w.r.t to the resources I have
         for (auto const &action : cjob->getActions()) {
@@ -114,6 +129,8 @@ namespace wrench {
                 std::string target_host = std::get<0>(parsed_spec);
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
+//                std::cerr << "TRGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
+
                 if (not target_host.empty()) {
 
                     if (compute_resources.find(target_host) == compute_resources.end()) {
@@ -123,27 +140,9 @@ namespace wrench {
                                 "' for action '" + action->getName() + "': no such host");
                     }
 
+                    std::cerr << "---> " << std::get<0>(compute_resources[target_host]) << "\n";
                     if (target_num_cores > std::get<0>(compute_resources[target_host])) {
-                        throw std::invalid_argument(
-                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                                service_specific_args.at(action->getName()) +
-                                "' for action '" + action->getName() +
-                                "': the specified host does not have that many cores");
-                    }
-                } else {
-                    bool found_enough_cores = false;
-                    for (auto const &cr : compute_resources) {
-                        if (std::get<0>(cr.second) >= target_num_cores) {
-                            found_enough_cores = true;
-                            break;
-                        }
-                    }
-                    if (not found_enough_cores) {
-                        throw std::invalid_argument(
-                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                                service_specific_args.at(action->getName()) +
-                                "' for action '" + action->getName() +
-                                "': no host on this service has this many cores");
+                        throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
                     }
                 }
 
@@ -482,7 +481,7 @@ namespace wrench {
 
     /**
      * @brief Wait for and react to any incoming message
-     *
+     *x
      * @return false if the daemon should terminate, true otherwise
      *
      * @throw std::runtime_error
@@ -500,6 +499,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->terminate();
@@ -638,7 +638,7 @@ namespace wrench {
         }
 
         // Add the job to the set of jobs
-        std::cerr << "INSERVING IN LIST OF JOBS\n";
+        this->num_dispatched_actions_for_cjob[job] = 0;
         this->current_jobs.insert(job);
 
         // Add all action to the list of actions to run
@@ -852,7 +852,7 @@ namespace wrench {
  */
     void BareMetalComputeService::dispatchReadyActions() {
 
-        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
+//        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
         // Sort all the actions in the ready queue by (job.priority, action.priority)
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
@@ -878,6 +878,7 @@ namespace wrench {
 
         for (auto const &action : this->ready_actions) {
             this->action_execution_service->submitAction(action);
+            this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);
         }
 
@@ -899,7 +900,10 @@ namespace wrench {
             return;
         }
 
+//        std::cerr << "AN ACTION IS DONE: " << action->getName() << "\n";
+
         this->dispatched_actions.erase(action);
+        this->num_dispatched_actions_for_cjob[action->getJob()]--;
 
         // Deal with action's ready children, if any
         for (auto const &child : action->getChildren()) {
@@ -912,7 +916,8 @@ namespace wrench {
         // Is the job done?
         auto job = action->getJob();
         try {
-            if (job->hasSuccessfullyCompleted()) {
+            if (job->hasSuccessfullyCompleted() and (this->num_dispatched_actions_for_cjob[job] == 0)) {
+//                std::cerr << "JOB IS DONE!\n";
                 this->current_jobs.erase(job);
                 S4U_Mailbox::dputMessage(
                         job->popCallbackMailbox(),
@@ -921,7 +926,8 @@ namespace wrench {
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
 
-            } else if (job->hasFailed()) {
+            } else if (job->hasFailed() and ((this->num_dispatched_actions_for_cjob[job] == 0))) {
+//                std::cerr << "JOB HAS FAILED\n";
                 this->current_jobs.erase(job);
                 S4U_Mailbox::putMessage(
                         job->popCallbackMailbox(),
@@ -929,6 +935,8 @@ namespace wrench {
                                 job, this->getSharedPtr<BareMetalComputeService>(),
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+            } else {
+//                std::cerr << "JOB IS NOT DONE\n";
             }
         } catch (std::shared_ptr<NetworkError> &cause) {
             return; // ignore

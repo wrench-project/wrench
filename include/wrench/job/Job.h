@@ -56,7 +56,7 @@ namespace wrench {
 
         std::shared_ptr<ComputeService> getParentComputeService();
 
-        std::map<std::string, std::string> getServiceSpecificArguments();
+        std::map<std::string, std::string> &getServiceSpecificArguments();
 
         virtual ~Job();
 
