@@ -70,45 +70,15 @@ namespace wrench {
         } else if (auto m = dynamic_cast<JobManagerCompoundJobFailedMessage*>(message.get())) {
             return std::shared_ptr<CompoundJobFailedEvent>(
                     new CompoundJobFailedEvent(m->job, m->compute_service, m->cause));
-       
+
         } else if (auto m = dynamic_cast<JobManagerStandardJobCompletedMessage*>(message.get())) {
-            // Update task states
-            for (auto state_update : m->necessary_state_changes) {
-                WorkflowTask *task = state_update.first;
-                WorkflowTask::State state = state_update.second;
-                task->setState(state);
-                if (state == WorkflowTask::State::COMPLETED) {
-                    auto children = task->getWorkflow()->getTaskChildren(task);
-                    for (auto const &child : children) {
-                        if (child->getState() == WorkflowTask::State::NOT_READY) {
-                            bool ready = true;
-                            for (auto const &parent : child->getParents()) {
-                                if (parent->getState() != WorkflowTask::State::COMPLETED)  {
-                                    ready = false;
-                                    break;
-                                }
-                            }
-                            if (ready) {
-                                child->setState(WorkflowTask::State::READY);
-                            }
-                        }
-                    }
-                }
-            }
+            std::set<WorkflowTask*> failure_count_increments;
+            m->job->applyTaskUpdates(m->necessary_state_changes, failure_count_increments);
             return std::shared_ptr<StandardJobCompletedEvent>(
                     new StandardJobCompletedEvent(m->job, m->compute_service));
 
         } else if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage*>(message.get())) {
-            // Update task states
-            for (auto state_update : m->necessary_state_changes) {
-                WorkflowTask *task = state_update.first;
-                WorkflowTask::State state = state_update.second;
-                task->setState(state);
-            }
-            // Update task failure counts
-            for (auto task : m->necessary_failure_count_increments) {
-                task->incrementFailureCount();
-            }
+            m->job->applyTaskUpdates(m->necessary_state_changes, m->necessary_failure_count_increments);
             return std::shared_ptr<StandardJobFailedEvent>(
                     new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
 
