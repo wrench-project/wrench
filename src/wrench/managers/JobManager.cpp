@@ -507,7 +507,6 @@ namespace wrench {
             if (not compute_service->supportsStandardJobs()) {
                 throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
             }
-//            std::map<WorkflowTask *, WorkflowTask::State> original_states;
 
             // Do a sanity check on task states
             for (auto t : sjob->tasks) {
@@ -519,11 +518,7 @@ namespace wrench {
                 }
             }
 
-            auto cjob = this->createCompoundJob("compound_job_for_" + sjob->getName());
-
-            // Do a sanity check on use of scratch space, and build the file location map for
-            // the compound job!
-
+            // Do a sanity check on use of scratch space
             for (auto fl : sjob->file_locations) {
                 for (auto const &fl_l : fl.second) {
                     if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
@@ -535,285 +530,19 @@ namespace wrench {
                 }
             }
 
-            // Create the corresponding compound job
-            std::shared_ptr<Action> pre_overhead_action = nullptr;
-            std::shared_ptr<Action> post_overhead_action = nullptr;
-            std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
-            std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
-            std::map<WorkflowTask*, std::shared_ptr<Action>> task_compute_actions;
-            std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
-            std::vector<std::shared_ptr<Action>> post_file_copy_actions;
-            std::vector<std::shared_ptr<Action>> cleanup_actions;
-            std::shared_ptr<Action> scratch_cleanup = nullptr;
-
-            // Create pre- and post-overhead work units
-            if (sjob->getPreJobOverheadInSeconds() > 0.0) {
-                pre_overhead_action = cjob->addSleepAction("", sjob->getPreJobOverheadInSeconds());
-            }
-
-            if (sjob->getPostJobOverheadInSeconds() > 0.0) {
-                post_overhead_action = cjob->addSleepAction("", sjob->getPostJobOverheadInSeconds());
-            }
-
-            // Create the pre- file copy actions
-            for (auto const &pfc : sjob->pre_file_copies) {
-                auto src_location = std::get<1>(pfc);
-                auto dst_location = std::get<2>(pfc);
-                if (src_location == FileLocation::SCRATCH) {
-                    src_location = FileLocation::LOCATION(compute_service->getScratch());
-                }
-                if (dst_location == FileLocation::SCRATCH) {
-                    dst_location = FileLocation::LOCATION(compute_service->getScratch());
-                }
-
-                pre_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), src_location, dst_location));
-            }
-
-            // Create the post- file copy actions
-            for (auto const &pfc : sjob->post_file_copies) {
-                auto src_location = std::get<1>(pfc);
-                auto dst_location = std::get<2>(pfc);
-                if (src_location == FileLocation::SCRATCH) {
-                    src_location = FileLocation::LOCATION(compute_service->getScratch());
-                }
-                if (dst_location == FileLocation::SCRATCH) {
-                    dst_location = FileLocation::LOCATION(compute_service->getScratch());
-                }
-
-                post_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), src_location, dst_location));
-            }
-
-            // Create the file cleanup actions
-            for (auto const &fc: sjob->cleanup_file_deletions) {
-                auto target_location = std::get<1>(fc);
-                if (target_location == FileLocation::SCRATCH) {
-                    target_location = FileLocation::LOCATION(compute_service->getScratch());
-                }
-                cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), target_location));
-            }
-
-            auto file_locations = sjob->getFileLocations();
-
-            // Create the task actions
-            for (auto const &task : sjob->tasks) {
-                auto compute_action = cjob->addComputeAction("task_" + task->getID(), task->getFlops(), task->getMemoryRequirement(),
-                                                             task->getMinNumCores(), task->getMaxNumCores(), task->getParallelModel());
-                task_compute_actions[task] = compute_action;
-                task_file_read_actions[task] = {};
-                for (auto const &f : task->getInputFiles()) {
-                    std::shared_ptr<Action> fread_action;
-                    if (file_locations.find(f) != file_locations.end()) {
-                        std::vector<std::shared_ptr<FileLocation>> fixed_locations;
-                        for (auto const &loc : file_locations[f]) {
-                            if (loc == FileLocation::SCRATCH) {
-                                fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
-                            } else {
-                                fixed_locations.push_back(loc);
-                            }
-                        }
-                        fread_action = cjob->addFileReadAction("", f, fixed_locations);
-                    } else {
-                        fread_action = cjob->addFileReadAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
-                    }
-                    task_file_read_actions[task].push_back(fread_action);
-                    cjob->addActionDependency(fread_action, compute_action);
-                }
-                task_file_write_actions[task] = {};
-                for (auto const &f : task->getOutputFiles()) {
-                    std::shared_ptr<Action> fwrite_action;
-                    if (file_locations.find(f) != file_locations.end()) {
-                        std::vector<std::shared_ptr<FileLocation>> fixed_locations;
-                        for (auto const &loc : file_locations[f]) {
-                            if (loc == FileLocation::SCRATCH) {
-                                fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
-                            } else {
-                                fixed_locations.push_back(loc);
-                            }
-                        }
-                        fwrite_action = cjob->addFileWriteAction("", f, fixed_locations.at(0));  // TODO: The at(0) here is ok? I mean, what does it mean to write to multiple locations....
-                    } else {
-                        fwrite_action = cjob->addFileWriteAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
-                    }
-                    task_file_write_actions[task].push_back(fwrite_action);
-                    cjob->addActionDependency(compute_action, fwrite_action);
-                }
-            }
-
-
-            // TODO replace this horror with some sjob function perhaps?
-            bool need_scratch_clean = false;
-            for (auto const &task : sjob->getTasks()) {
-                for (auto const &f : task->getInputFiles()) {
-                    if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
-                        need_scratch_clean = true;
-                        break;
-                    }
-                }
-                if (need_scratch_clean) {
-                    break;
-                }
-                for (auto const &f : task->getOutputFiles()) {
-                    if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
-                        need_scratch_clean = true;
-                        break;
-                    }
-                }
-                if (need_scratch_clean) {
-                    break;
-                }
-            }
-
-            // Create the scratch clean up actions
-            if (need_scratch_clean) {
-                // Does the lambda capture of cjob_file_locations work?
-                auto lambda_execute = [sjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-                    for (auto const &task : sjob->getTasks()) {
-                        for (auto const &f : task->getInputFiles()) {
-                            if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
-                                try {
-                                    auto scratch = sjob->getParentComputeService()->getScratch();
-                                    scratch->deleteFile(f, FileLocation::LOCATION(scratch));
-                                } catch (ExecutionException &ignore) {
-                                    // ignore
-                                }
-                            }
-                        }
-                        for (auto const &f : task->getOutputFiles()) {
-                            if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
-                                try {
-                                    auto scratch = sjob->getParentComputeService()->getScratch();
-                                    scratch->deleteFile(f, FileLocation::LOCATION(scratch));
-                                } catch (ExecutionException &ignore) {
-                                    // ignore
-                                }
-                            }
-                        }
-                    }
-                };
-                auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
-                scratch_cleanup = cjob->addCustomAction("", lambda_execute, lambda_terminate);
-
-            }
-
-            // Add all inter-task dependencies
-            for (auto const &parent_task : sjob->getTasks()) {
-                for (auto const &child_task : parent_task->getChildren()) {
-                    if (task_compute_actions.find(child_task) == task_compute_actions.end()) {
-                        continue;
-                    }
-                    std::vector<std::shared_ptr<Action>> parent_actions;
-                    if (not task_file_write_actions[parent_task].empty()) {
-                        parent_actions = task_file_write_actions[parent_task];
-                    } else {
-                        parent_actions = {task_compute_actions[parent_task]};
-                    }
-                    std::vector<std::shared_ptr<Action>> child_actions;
-                    if (not task_file_read_actions[child_task].empty()) {
-                        child_actions = task_file_read_actions[child_task];
-                    } else {
-                        child_actions = {task_compute_actions[child_task]};
-                    }
-                    for (auto const &parent_action : parent_actions) {
-                        for (auto const &child_action: child_actions) {
-                            cjob->addActionDependency(parent_action, child_action);
-                        }
-                    }
-                }
-            }
-
-            // Create  4 dummy tasks
-            std::shared_ptr<Action> pre_overhead_to_pre_file_copies = cjob->addSleepAction("", 0);
-            std::shared_ptr<Action> pre_file_copies_to_tasks = cjob->addSleepAction("", 0);
-            std::shared_ptr<Action> tasks_to_post_file_copies = cjob->addSleepAction("", 0);
-            std::shared_ptr<Action> tasks_post_file_copies_to_cleanup = cjob->addSleepAction("", 0);
-            std::shared_ptr<Action> cleanup_to_post_overhead = cjob->addSleepAction("", 0);
-            cjob->addActionDependency(pre_overhead_to_pre_file_copies,pre_file_copies_to_tasks);
-            cjob->addActionDependency(pre_file_copies_to_tasks, tasks_to_post_file_copies);
-            cjob->addActionDependency(tasks_to_post_file_copies, tasks_post_file_copies_to_cleanup);
-            cjob->addActionDependency(tasks_post_file_copies_to_cleanup, cleanup_to_post_overhead);
-
-            // Add all dependencies, using the dummy tasks to help
-            if (pre_overhead_action != nullptr) {
-                cjob->addActionDependency(pre_overhead_action, pre_overhead_to_pre_file_copies);
-            }
-            if (not pre_file_copy_actions.empty()) {
-                for (auto const &pfca : pre_file_copy_actions) {
-                    cjob->addActionDependency(pre_overhead_to_pre_file_copies, pfca);
-                    cjob->addActionDependency(pfca, pre_file_copies_to_tasks);
-                }
-            }
-
-            if (not task_compute_actions.empty()) {
-                for (auto const &tca : task_compute_actions) {
-                    WorkflowTask *task = tca.first;
-                    if (not task_file_read_actions[task].empty()) {
-                        for (auto const &tfra : task_file_read_actions[task]) {
-                            cjob->addActionDependency(pre_file_copies_to_tasks, tfra);
-                        }
-                    } else {
-                        cjob->addActionDependency(pre_file_copies_to_tasks, tca.second);
-                    }
-                    if (not task_file_write_actions[task].empty()) {
-                        for (auto const &tfwa : task_file_write_actions[task]) {
-                            cjob->addActionDependency(tfwa, tasks_to_post_file_copies);
-                        }
-                    } else {
-                        cjob->addActionDependency(tca.second, tasks_to_post_file_copies);
-                    }
-                }
-            }
-            if (not post_file_copy_actions.empty()) {
-                for (auto const &pfca : post_file_copy_actions) {
-                    cjob->addActionDependency(tasks_to_post_file_copies, pfca);
-                    cjob->addActionDependency(pfca, tasks_post_file_copies_to_cleanup);
-                }
-            }
-
-            if (not cleanup_actions.empty()) {
-                for (auto const &ca : cleanup_actions) {
-                    cjob->addActionDependency(tasks_post_file_copies_to_cleanup, ca);
-                    cjob->addActionDependency(ca, cleanup_to_post_overhead);
-                }
-            }
-
-            if (post_overhead_action != nullptr) {
-                cjob->addActionDependency(cleanup_to_post_overhead, post_overhead_action);
-                if (scratch_cleanup != nullptr) {
-                    cjob->addActionDependency(post_overhead_action, scratch_cleanup);
-                }
-            } else {
-                if (scratch_cleanup != nullptr) {
-                    cjob->addActionDependency(cleanup_to_post_overhead, scratch_cleanup);
-                }
-            }
-
-            // Use the dummy tasks for "easy" dependencies and remove the dummies
-            std::vector<std::shared_ptr<Action>> dummies = {pre_overhead_to_pre_file_copies, pre_file_copies_to_tasks, tasks_to_post_file_copies, tasks_post_file_copies_to_cleanup, cleanup_to_post_overhead};
-            for (auto &dummy : dummies) {
-                // propagate dependencies
-                for (auto const &parent_action : dummy->getParents()) {
-                    for (auto const &child_action : dummy->getChildren()) {
-                        cjob->addActionDependency(parent_action, child_action);
-                    }
-                }
-                // remove the dummy
-                cjob->removeAction(dummy);
-            }
-
-//            cjob->printActionDependencies();
-
+            sjob->createUnderlyingCompoundJob(compute_service);
 
             // Tweak the service_specific_arguments
             std::map<std::string, std::string> new_args;
             if (not sjob->getTasks().empty()) {
                 auto workflow = (*(sjob->getTasks().begin()))->getWorkflow();
                 for (auto const &arg : service_specific_args) {
-                    new_args[task_compute_actions[workflow->getTaskByID(arg.first)]->getName()] = arg.second;
+                    new_args[sjob->task_compute_actions[workflow->getTaskByID(arg.first)]->getName()] = arg.second;
                 }
             }
 
             try {
-                this->validateJobSubmission(cjob, compute_service, new_args);
+                this->validateJobSubmission(sjob->compound_job, compute_service, new_args);
             } catch (ExecutionException &e) {
                 if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
                     throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
@@ -824,28 +553,19 @@ namespace wrench {
                 throw;
             }
 
-            cjob->setParentComputeService(sjob->getParentComputeService());
-
-            // Record all this information in the sjob
-            sjob->compound_job = cjob;
-            sjob->pre_overhead_action = pre_overhead_action;
-            sjob->post_overhead_action = post_overhead_action;
-            sjob->pre_file_copy_actions = pre_file_copy_actions;
-            sjob->post_file_copy_actions = post_file_copy_actions;
-            sjob->cleanup_actions = cleanup_actions;
-            sjob->task_file_read_actions = task_file_read_actions;
-            sjob->task_compute_actions = task_compute_actions;
-            sjob->task_file_write_actions = task_file_write_actions;
+            sjob->compound_job->setServiceSpecificArguments(new_args);
+            sjob->compound_job->setParentComputeService(compute_service);
+            sjob->setParentComputeService(compute_service);
 
             // Modify task states
             sjob->state = StandardJob::PENDING;
-            for (auto t : sjob->tasks) {
+            for (auto const &t : sjob->tasks) {
                 t->setState(WorkflowTask::State::PENDING);
             }
 
             // The compound job
-            this->cjob_to_sjob_map[cjob] = sjob;
-            this->jobs_to_dispatch.push_back(cjob);
+            this->cjob_to_sjob_map[sjob->compound_job] = sjob;
+            this->jobs_to_dispatch.push_back(sjob->compound_job);
 
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
 
@@ -876,6 +596,7 @@ namespace wrench {
         }
 
         job->already_submitted_to_job_manager = true;
+        job->submit_date = Simulation::getCurrentSimulatedDate();
         job->setServiceSpecificArguments(service_specific_args);
         job->setParentComputeService(compute_service);
 
@@ -905,48 +626,41 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
-        try {
-            job->getParentComputeService()->terminateJob(job);
-        } catch (std::exception &e) {
-            throw;
-        }
+        if  (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
+            switch (sjob->state) {
+                case StandardJob::State::COMPLETED:
+                case StandardJob::State::FAILED:
+                case StandardJob::State::NOT_SUBMITTED:
+                    throw std::invalid_argument("JobManager::terminateJob(): job cannot be terminated because it's not pending/running");
+            }
 
-        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-            sjob->state = StandardJob::State::TERMINATED;
-            for (auto task : sjob->tasks) {
-                switch (task->getInternalState()) {
-                    case WorkflowTask::TASK_NOT_READY:
-                        task->setState(WorkflowTask::State::NOT_READY);
-                        break;
-                    case WorkflowTask::TASK_READY:
-                        task->setState(WorkflowTask::State::READY);
-                        break;
-                    case WorkflowTask::TASK_COMPLETED:
-                        task->setState(WorkflowTask::State::COMPLETED);
-                        break;
-                    case WorkflowTask::TASK_RUNNING:
-                    case WorkflowTask::TASK_FAILED:
-                        task->setState(WorkflowTask::State::NOT_READY);
-                        break;
-                }
+            try {
+                sjob->getParentComputeService()->terminateJob(sjob->compound_job);
+            } catch (std::exception &e) {
+                throw;
             }
-            // Make second pass to fix NOT_READY states
-            for (auto task : sjob->tasks) {
-                if (task->getState() == WorkflowTask::State::NOT_READY) {
-                    bool ready = true;
-                    for (auto parent : task->getWorkflow()->getTaskParents(task)) {
-                        if (parent->getState() != WorkflowTask::State::COMPLETED) {
-                            ready = false;
-                        }
-                    }
-                    if (ready) {
-                        task->setState(WorkflowTask::State::READY);
-                    }
-                }
-            }
+
+            // Update task states based on compound job
+            std::map<WorkflowTask *, WorkflowTask::State> state_changes;
+            std::set<WorkflowTask *> failure_count_increments;
+            std::shared_ptr<FailureCause> job_failure_cause;
+            sjob->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
+            sjob->applyTaskUpdates(state_changes, failure_count_increments);
+
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+            try {
+                job->getParentComputeService()->terminateJob(pjob);
+            } catch (std::exception &e) {
+                throw;
+            }
             pjob->state = PilotJob::State::TERMINATED;
+
         } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+            try {
+                job->getParentComputeService()->terminateJob(cjob);
+            } catch (std::exception &e) {
+                throw;
+            }
             cjob->state = CompoundJob::State::DISCONTINUED;
         }
     }
@@ -1065,12 +779,6 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean up any state
             return false;
-//        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
-//            processStandardJobCompletion(msg->job, msg->compute_service);
-//            return true;
-//        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
-//            processStandardJobFailure(msg->job, msg->compute_service, msg->cause);
-//            return true;
         } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
             // Is this in fact a standard job???
             if (this->cjob_to_sjob_map.find(msg->job) != this->cjob_to_sjob_map.end()) {
@@ -1115,76 +823,11 @@ namespace wrench {
         // Set the job end date
         job->end_date = Simulation::getCurrentSimulatedDate();
 
-        // Set task information based on actions
-        for (auto task : job->tasks) {
-
-            double input_start_date = -1.0;
-            double input_end_date = -1.0;
-            double compute_start_date = -1.0;
-            double compute_end_date = -1.0;
-            double output_start_date = -1.0;
-            double output_end_date = -1.0;
-
-            // compute input start/end date
-            if (not task->getInputFiles().empty()) {
-                double input_start_date = DBL_MAX;
-                double input_end_date = -1;
-                for (auto const &file_read_action : job->task_file_read_actions[task]) {
-                    input_start_date = (input_start_date > file_read_action->getStartDate()
-                                        ? file_read_action->getStartDate() : input_start_date);
-                    input_end_date = (input_end_date < file_read_action->getEndDate() ? file_read_action->getEndDate()
-                                                                                      : input_end_date);
-                }
-            }
-
-            compute_start_date = job->task_compute_actions[task]->getStartDate();
-            compute_end_date = job->task_compute_actions[task]->getEndDate();
-
-            if (not task->getOutputFiles().empty()) {
-                // compute output start/end date
-                double output_start_date = DBL_MAX;
-                double output_end_date = -1;
-                for (auto const &file_write_action : job->task_file_write_actions[task]) {
-                    output_start_date = (output_start_date > file_write_action->getStartDate()
-                                         ? file_write_action->getStartDate() : output_start_date);
-                    output_end_date = (output_end_date < file_write_action->getEndDate()
-                                       ? file_write_action->getEndDate() : output_end_date);
-                }
-            }
-
-            if (input_start_date > 0) {
-                task->setStartDate(input_start_date);
-            } else {
-                task->setStartDate(compute_start_date);
-            }
-
-            if (output_end_date > 0) {
-                task->setEndDate(output_end_date);
-            } else {
-                task->setEndDate(compute_end_date);
-            }
-
-            task->setReadInputStartDate(input_start_date);
-            task->setReadInputEndDate(input_end_date);
-            task->setComputationStartDate(compute_start_date);
-            task->setComputationEndDate(compute_end_date);
-            task->setWriteOutputStartDate(output_start_date);
-            task->setWriteOutputEndDate(output_end_date);
-
-            this->simulation->getOutput().addTimestampTaskStart(task->getStartDate(), task);
-            this->simulation->getOutput().addTimestampTaskCompletion(task->getEndDate(), task);
-            // TODO: ADD OTHER STAMPS
-
-            task->setExecutionHost(job->task_compute_actions[task]->getExecutionHistory().top().execution_host);
-            task->setNumCoresAllocated(job->task_compute_actions[task]->getExecutionHistory().top().num_cores_allocated);
-
-        }
-
-        // Task state changes are: all completed (and deal with the children)
-        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
-        for (auto task : job->tasks) {
-            necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
-        }
+        // Analyze compound job
+        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
+        std::set<WorkflowTask *> failure_count_increments;
+        std::shared_ptr<FailureCause> job_failure_cause;
+        job->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
@@ -1194,7 +837,7 @@ namespace wrench {
         std::string callback_mailbox = job->popCallbackMailbox();
         if (not callback_mailbox.empty()) {
             auto augmented_msg = new JobManagerStandardJobCompletedMessage(
-                    job, compute_service, necessary_state_changes);
+                    job, compute_service, state_changes);
             S4U_Mailbox::dputMessage(callback_mailbox, augmented_msg);
         }
 //        throw std::runtime_error("PROCESS STANDARD JOB COMPLETION NOT IMPLEMENTED");
@@ -1213,100 +856,12 @@ namespace wrench {
         // Set the job end date
         job->end_date = Simulation::getCurrentSimulatedDate();
 
-        // Determine all task state changes and failure count updates
-        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
-        std::set<WorkflowTask *> necessary_failure_count_increments;
+        // Analyze compound job
+        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
+        std::set<WorkflowTask *> failure_count_increments;
+        std::shared_ptr<FailureCause> job_failure_cause;
+        job->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
 
-        std::shared_ptr<FailureCause> job_failure_cause = nullptr;
-
-        for (auto t: job->getTasks()) {
-            double failure_date = -1.0;
-            double input_start_date = -1.0;
-            double input_end_date = -1.0;
-            double compute_start_date = -1.0;
-            double compute_end_date = -1.0;
-            double output_start_date = -1.0;
-            double output_end_date = -1.0;
-
-            // Look at file-read actions
-            auto file_read_actions = job->task_file_read_actions[t];
-
-            bool all_file_read_actions_completed = true;
-            for (const auto &fra : file_read_actions) {
-                // Set the dates
-                if ((input_start_date == -1.0) or ((fra->getStartDate() < input_start_date) and (fra->getStartDate() != -1.0))) {
-                    input_start_date = fra->getStartDate();
-                }
-                if ((input_end_date == -1.0) or ((fra->getEndDate() > input_end_date) and (fra->getEndDate() != -1.0))) {
-                    input_end_date = fra->getEndDate();
-                }
-                if (fra->getState() != Action::State::COMPLETED) {
-                    if (not job_failure_cause) {
-                        job_failure_cause = fra->getFailureCause();
-                    }
-                    if ((failure_date == -1) or ((failure_date > fra->getEndDate()) and (fra->getEndDate() != -1.0))) {
-                        failure_date = fra->getEndDate();
-                    }
-                    all_file_read_actions_completed = false;
-                }
-            }
-            if (not all_file_read_actions_completed) {
-                t->setStartDate(input_start_date);
-                t->setReadInputStartDate(input_start_date);
-                t->setFailureDate(failure_date);
-                necessary_state_changes[t] = WorkflowTask::State::NOT_READY; // TODO: THIS COULD BE READY
-                necessary_failure_count_increments.insert(t);
-
-            } else {
-                t->setStartDate(input_start_date);
-                t->setReadInputStartDate(input_start_date);
-
-                // Look at the compute action
-                auto compute_action = job->task_compute_actions[t];
-                t->setComputationStartDate(compute_action->getStartDate());  // could be -1.0
-                t->setComputationEndDate(compute_action->getEndDate());      // could be -1.0
-
-                t->setReadInputEndDate(input_end_date);
-
-                if (compute_action->getState() != Action::State::COMPLETED) {
-                    if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
-                    t->setFailureDate(compute_action->getEndDate());
-                    necessary_state_changes[t] = WorkflowTask::State::NOT_READY; // TODO: THIS COULD BE READY
-                } else {
-                    auto file_write_actions = job->task_file_write_actions[t];
-
-                    bool all_file_write_actions_completed = true;
-                    for (const auto &fwa : file_write_actions) {
-                        // Set the dates
-                        if ((output_start_date == -1.0) or
-                            ((fwa->getStartDate() < output_start_date) and (fwa->getStartDate() != -1.0))) {
-                            output_start_date = fwa->getStartDate();
-                        }
-                        if ((output_end_date == -1.0) or
-                            ((fwa->getEndDate() > output_end_date) and (fwa->getEndDate() != -1.0))) {
-                            output_end_date = fwa->getEndDate();
-                        }
-                        if (fwa->getState() != Action::State::COMPLETED) {
-                            if (not job_failure_cause) job_failure_cause = fwa->getFailureCause();
-                            if ((failure_date == -1) or ((failure_date > fwa->getEndDate()) and (fwa->getEndDate() != -1.0))) {
-                                failure_date = fwa->getEndDate();
-                            }
-                            all_file_write_actions_completed = false;
-                        }
-                    }
-                    if (not all_file_write_actions_completed) {
-                        t->setWriteOutputStartDate(output_start_date);
-                        t->setFailureDate(failure_date);
-                        necessary_state_changes[t] = WorkflowTask::State::NOT_READY; // TODO: THIS COULD BE READY
-                        necessary_failure_count_increments.insert(t);
-                    } else {
-                        t->setWriteOutputStartDate(output_start_date);
-                        t->setWriteOutputEndDate(output_end_date);
-                        necessary_state_changes[t] = WorkflowTask::State::COMPLETED;
-                    }
-                }
-            }
-        }
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
@@ -1314,8 +869,8 @@ namespace wrench {
         // Forward the notification along the notification chain
         auto augmented_message =
                 new JobManagerStandardJobFailedMessage(job, compute_service,
-                                                       necessary_state_changes,
-                                                       necessary_failure_count_increments,
+                                                       state_changes,
+                                                       failure_count_increments,
                                                        std::move(job_failure_cause));
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
     }

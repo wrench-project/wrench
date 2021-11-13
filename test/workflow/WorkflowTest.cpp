@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <wrench/workflow/WorkflowFile.h>
+#include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/Workflow.h>
 
 class WorkflowTest : public ::testing::Test {

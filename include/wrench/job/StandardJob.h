@@ -16,6 +16,8 @@
 #include <set>
 #include <vector>
 #include <wrench/workflow/Workflow.h>
+#include <wrench/workflow/WorkflowTask.h>
+#include <wrench/workflow/WorkflowFile.h>
 
 #include "Job.h"
 
@@ -68,8 +70,6 @@ namespace wrench {
 
         std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
 
-        unsigned long getPriority();
-
 
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
@@ -108,6 +108,7 @@ namespace wrench {
         friend class StandardJobExecutor;
         friend class BareMetalComputeService;
         friend class JobManager;
+        friend class ExecutionEvent;
 
         void incrementNumCompletedTasks();
 
@@ -118,21 +119,28 @@ namespace wrench {
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &post_file_copies,
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
+        void createUnderlyingCompoundJob(const std::shared_ptr<ComputeService>& compute_service);
+        void computeTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
+                                std::set<WorkflowTask *> &failure_count_increments,
+                                std::shared_ptr<FailureCause> &job_failure_cause);
+        void applyTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
+                                std::set<WorkflowTask *> &failure_count_increments);
+
+
         State state;
         double pre_overhead = 0.0;
         double post_overhead = 0.0;
 
         std::shared_ptr<CompoundJob> compound_job;
-        std::shared_ptr<Action> pre_overhead_action;
-        std::shared_ptr<Action> post_overhead_action;
+        std::shared_ptr<Action> pre_overhead_action = nullptr;
+        std::shared_ptr<Action> post_overhead_action = nullptr;
         std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
-        std::vector<std::shared_ptr<Action>> post_file_copy_actions;
-        std::vector<std::shared_ptr<Action>> cleanup_actions;
         std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
         std::map<WorkflowTask*, std::shared_ptr<Action>> task_compute_actions;
         std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
-
-
+        std::vector<std::shared_ptr<Action>> post_file_copy_actions;
+        std::vector<std::shared_ptr<Action>> cleanup_actions;
+        std::shared_ptr<Action> scratch_cleanup = nullptr;
     };
 
     /***********************/
