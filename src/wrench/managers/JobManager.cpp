@@ -230,21 +230,21 @@ namespace wrench {
             }
         }
 
-        // Check that every file has a file location
-        for (const auto &t : tasks) {
-            for (const auto & f : t->getInputFiles()) {
-                if (file_locations.find(f) == file_locations.end()) {
-                    throw std::invalid_argument(
-                            "JobManager::createStandardJob(): A location needs to be provided for file " + f->getID());
-                }
-            }
-            for (const auto & f : t->getOutputFiles()) {
-                if (file_locations.find(f) == file_locations.end()) {
-                    throw std::invalid_argument(
-                            "JobManager::createStandardJob(): A location needs to be provided for file " + f->getID());
-                }
-            }
-        }
+        // Check that every file has a file location: NOPE USE SCARTCH B Y DEFAULT
+//        for (const auto &t : tasks) {
+//            for (const auto & f : t->getInputFiles()) {
+//                if (file_locations.find(f) == file_locations.end()) {
+//                    throw std::invalid_argument(
+//                            "JobManager::createStandardJob(): A location needs to be provided for file " + f->getID());
+//                }
+//            }
+//            for (const auto & f : t->getOutputFiles()) {
+//                if (file_locations.find(f) == file_locations.end()) {
+//                    throw std::invalid_argument(
+//                            "JobManager::createStandardJob(): A location needs to be provided for file " + f->getID());
+//                }
+//            }
+//        }
 
         auto job = std::shared_ptr<StandardJob>(
                 new StandardJob(this->wms->getWorkflow(), this->getSharedPtr<JobManager>(), tasks, file_locations, pre_file_copies,
@@ -500,13 +500,13 @@ namespace wrench {
             throw;
         }
 
-        job->already_submitted_to_job_manager = true;
-        job->setServiceSpecificArguments(service_specific_args);
-        job->setParentComputeService(compute_service);
 
         // Update the job state and insert it into the pending list
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
 
+            if (not compute_service->supportsStandardJobs()) {
+                throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+            }
 //            std::map<WorkflowTask *, WorkflowTask::State> original_states;
 
             // Do a sanity check on task states
@@ -519,15 +519,11 @@ namespace wrench {
                 }
             }
 
-            // Modify task states
-            sjob->state = StandardJob::PENDING;
-            for (auto t : sjob->tasks) {
-//                original_states.insert(std::make_pair(t, t->getState()));
-                t->setState(WorkflowTask::State::PENDING);
-            }
+            auto cjob = this->createCompoundJob("compound_job_for_" + sjob->getName());
 
-            // Do a sanity check on use of scratch space, and replace scratch space by the compute
-            // Service's scratch space
+            // Do a sanity check on use of scratch space, and build the file location map for
+            // the compound job!
+
             for (auto fl : sjob->file_locations) {
                 for (auto const &fl_l : fl.second) {
                     if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
@@ -536,14 +532,10 @@ namespace wrench {
                                                     " is scratch  space, but the compute service to which this " +
                                                     "job is being submitted to doesn't have any!");
                     }
-                    if (fl_l == FileLocation::SCRATCH) {
-                        sjob->file_locations[fl.first] = {FileLocation::LOCATION(compute_service->getScratch())};
-                    }
                 }
             }
 
             // Create the corresponding compound job
-            auto cjob = this->createCompoundJob("compound_job_for_" + sjob->getName());
             std::shared_ptr<Action> pre_overhead_action = nullptr;
             std::shared_ptr<Action> post_overhead_action = nullptr;
             std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
@@ -565,18 +557,42 @@ namespace wrench {
 
             // Create the pre- file copy actions
             for (auto const &pfc : sjob->pre_file_copies) {
-                pre_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), std::get<1>(pfc), std::get<2>(pfc)));
+                auto src_location = std::get<1>(pfc);
+                auto dst_location = std::get<2>(pfc);
+                if (src_location == FileLocation::SCRATCH) {
+                    src_location = FileLocation::LOCATION(compute_service->getScratch());
+                }
+                if (dst_location == FileLocation::SCRATCH) {
+                    dst_location = FileLocation::LOCATION(compute_service->getScratch());
+                }
+
+                pre_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), src_location, dst_location));
             }
 
             // Create the post- file copy actions
             for (auto const &pfc : sjob->post_file_copies) {
-                post_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), std::get<1>(pfc), std::get<2>(pfc)));
+                auto src_location = std::get<1>(pfc);
+                auto dst_location = std::get<2>(pfc);
+                if (src_location == FileLocation::SCRATCH) {
+                    src_location = FileLocation::LOCATION(compute_service->getScratch());
+                }
+                if (dst_location == FileLocation::SCRATCH) {
+                    dst_location = FileLocation::LOCATION(compute_service->getScratch());
+                }
+
+                post_file_copy_actions.push_back(cjob->addFileCopyAction("", std::get<0>(pfc), src_location, dst_location));
             }
 
             // Create the file cleanup actions
             for (auto const &fc: sjob->cleanup_file_deletions) {
-                cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), std::get<1>(fc)));
+                auto target_location = std::get<1>(fc);
+                if (target_location == FileLocation::SCRATCH) {
+                    target_location = FileLocation::LOCATION(compute_service->getScratch());
+                }
+                cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), target_location));
             }
+
+            auto file_locations = sjob->getFileLocations();
 
             // Create the task actions
             for (auto const &task : sjob->tasks) {
@@ -585,45 +601,92 @@ namespace wrench {
                 task_compute_actions[task] = compute_action;
                 task_file_read_actions[task] = {};
                 for (auto const &f : task->getInputFiles()) {
-                    auto fread_action = cjob->addFileReadAction("", f, sjob->file_locations[f]);
+                    std::shared_ptr<Action> fread_action;
+                    if (file_locations.find(f) != file_locations.end()) {
+                        std::vector<std::shared_ptr<FileLocation>> fixed_locations;
+                        for (auto const &loc : file_locations[f]) {
+                            if (loc == FileLocation::SCRATCH) {
+                                fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
+                            } else {
+                                fixed_locations.push_back(loc);
+                            }
+                        }
+                        fread_action = cjob->addFileReadAction("", f, fixed_locations);
+                    } else {
+                        fread_action = cjob->addFileReadAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
+                    }
                     task_file_read_actions[task].push_back(fread_action);
                     cjob->addActionDependency(fread_action, compute_action);
                 }
                 task_file_write_actions[task] = {};
                 for (auto const &f : task->getOutputFiles()) {
-                    std::shared_ptr<FileLocation> location;
-                    if (sjob->file_locations.find(f) != sjob->file_locations.end()) {
-                        location = sjob->file_locations[f].at(0);
+                    std::shared_ptr<Action> fwrite_action;
+                    if (file_locations.find(f) != file_locations.end()) {
+                        std::vector<std::shared_ptr<FileLocation>> fixed_locations;
+                        for (auto const &loc : file_locations[f]) {
+                            if (loc == FileLocation::SCRATCH) {
+                                fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
+                            } else {
+                                fixed_locations.push_back(loc);
+                            }
+                        }
+                        fwrite_action = cjob->addFileWriteAction("", f, fixed_locations.at(0));  // TODO: The at(0) here is ok? I mean, what does it mean to write to multiple locations....
+                    } else {
+                        fwrite_action = cjob->addFileWriteAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
                     }
-                    auto fwrite_action = cjob->addFileWriteAction("", f, location);
                     task_file_write_actions[task].push_back(fwrite_action);
                     cjob->addActionDependency(compute_action, fwrite_action);
                 }
             }
 
 
+            // TODO replace this horror with some sjob function perhaps?
             bool need_scratch_clean = false;
-            for (auto const &fl : sjob->file_locations) {
-                auto file = fl.first;
-                auto location = fl.second.at(0);
-                if (location->getStorageService()->isScratch()) {
-                    need_scratch_clean = true;
+            for (auto const &task : sjob->getTasks()) {
+                for (auto const &f : task->getInputFiles()) {
+                    if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
+                        need_scratch_clean = true;
+                        break;
+                    }
+                }
+                if (need_scratch_clean) {
+                    break;
+                }
+                for (auto const &f : task->getOutputFiles()) {
+                    if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
+                        need_scratch_clean = true;
+                        break;
+                    }
+                }
+                if (need_scratch_clean) {
                     break;
                 }
             }
+
             // Create the scratch clean up actions
             if (need_scratch_clean) {
+                // Does the lambda capture of cjob_file_locations work?
                 auto lambda_execute = [sjob](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-//                    std::cerr << "IN CLEANUP SCRATCH\n";
-                    for (auto const &fl : sjob->file_locations) {
-                        auto file = fl.first;
-                        auto location = fl.second.at(0);
-//                        std::cerr << "---> " << location->getStorageService()->getName() << "\n";
-                        if (location->getStorageService()->isScratch()) {
-//                            std::cerr << "REMOVING FROM SCRATCH!!\n";
-                            try {
-                                location->getStorageService()->deleteFile(file, location);
-                            } catch (ExecutionException &ignore) {}
+                    for (auto const &task : sjob->getTasks()) {
+                        for (auto const &f : task->getInputFiles()) {
+                            if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
+                                try {
+                                    auto scratch = sjob->getParentComputeService()->getScratch();
+                                    scratch->deleteFile(f, FileLocation::LOCATION(scratch));
+                                } catch (ExecutionException &ignore) {
+                                    // ignore
+                                }
+                            }
+                        }
+                        for (auto const &f : task->getOutputFiles()) {
+                            if (sjob->getFileLocations().find(f) == sjob->getFileLocations().end()) {
+                                try {
+                                    auto scratch = sjob->getParentComputeService()->getScratch();
+                                    scratch->deleteFile(f, FileLocation::LOCATION(scratch));
+                                } catch (ExecutionException &ignore) {
+                                    // ignore
+                                }
+                            }
                         }
                     }
                 };
@@ -631,7 +694,6 @@ namespace wrench {
                 scratch_cleanup = cjob->addCustomAction("", lambda_execute, lambda_terminate);
 
             }
-
 
             // Add all inter-task dependencies
             for (auto const &parent_task : sjob->getTasks()) {
@@ -741,28 +803,14 @@ namespace wrench {
 //            cjob->printActionDependencies();
 
 
-//            std::cerr << "************* OLD ARGS ****************\n";
-//            for (auto const &a : job->getServiceSpecificArguments()) {
-//                std::cerr << "    -> " << a.first << ": " << a.second << "\n";
-//            }
-//            std::cerr << "************* END OLD ARGS ****************\n";
-
-
             // Tweak the service_specific_arguments
             std::map<std::string, std::string> new_args;
             if (not sjob->getTasks().empty()) {
                 auto workflow = (*(sjob->getTasks().begin()))->getWorkflow();
-                for (auto const &arg : job->getServiceSpecificArguments()) {
+                for (auto const &arg : service_specific_args) {
                     new_args[task_compute_actions[workflow->getTaskByID(arg.first)]->getName()] = arg.second;
                 }
             }
-
-//            std::cerr << "************* NEW ARGS ****************\n";
-//            for (auto const &a : new_args) {
-//                std::cerr << "    -> " << a.first << ": " << a.second << "\n";
-//            }
-//            std::cerr << "************* END NEW ARGS ****************\n";
-
 
             try {
                 this->validateJobSubmission(cjob, compute_service, new_args);
@@ -789,11 +837,22 @@ namespace wrench {
             sjob->task_compute_actions = task_compute_actions;
             sjob->task_file_write_actions = task_file_write_actions;
 
+            // Modify task states
+            sjob->state = StandardJob::PENDING;
+            for (auto t : sjob->tasks) {
+                t->setState(WorkflowTask::State::PENDING);
+            }
+
             // The compound job
             this->cjob_to_sjob_map[cjob] = sjob;
             this->jobs_to_dispatch.push_back(cjob);
 
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+
+            if (not compute_service->supportsPilotJobs()) {
+                throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+            }
+
             this->jobs_to_dispatch.push_back(job);
             try {
                 this->validateJobSubmission(job, compute_service, service_specific_args);
@@ -802,6 +861,11 @@ namespace wrench {
             }
 
         } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+
+            if (not compute_service->supportsCompoundJobs()) {
+                throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+            }
+
             try {
                 this->validateJobSubmission(cjob, compute_service, service_specific_args);
             } catch (std::invalid_argument &e) {
@@ -810,6 +874,10 @@ namespace wrench {
             cjob->state = CompoundJob::State::SUBMITTED;
             this->jobs_to_dispatch.push_back(job);
         }
+
+        job->already_submitted_to_job_manager = true;
+        job->setServiceSpecificArguments(service_specific_args);
+        job->setParentComputeService(compute_service);
 
         // Send a message to wake up the daemon
         try {
