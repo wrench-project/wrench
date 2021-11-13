@@ -835,4 +835,27 @@ namespace wrench {
         return this->parallel_model;
     }
 
+    /**
+     * @brief Update task readiness
+     */
+    void WorkflowTask::updateReadiness() {
+        if (this->getState() == WorkflowTask::State::NOT_READY) {
+            for (auto const &parent : this->getParents()) {
+                if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                    return;
+                }
+            }
+            this->setState(WorkflowTask::State::READY);
+        } else if (this->getState() == WorkflowTask::State::READY) {
+            for (auto const &parent : this->getParents()) {
+                if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                    this->setState(WorkflowTask::State::NOT_READY);
+                    return;
+                }
+            }
+        } else {
+            // do nothing
+        }
+    }
+
 };

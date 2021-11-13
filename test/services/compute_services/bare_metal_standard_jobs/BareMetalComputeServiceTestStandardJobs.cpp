@@ -866,10 +866,8 @@ private:
         // Submit the 2-task job for execution
         // service-specific args format testing: "hostname:num_cores", and "num_cores"
         // both tasks should run in parallel, using 2 of the 4 cores each
-        std::cerr << "SUBMITTING FOR REAL\n";
         job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                {{"task_6_10s_1_to_2_cores","QuadCoreHost:2"},{"task_5_30s_1_to_3_cores","2"}});
-        std::cerr << "SUBMITTED FOR REAL\n";
 
         // Wait for the job completion
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -951,9 +949,9 @@ private:
 
         // the standard job is expected take about 4 seconds, since each task would run for 2 seconds if the
         // compute host wasn't oversubscribed
-        double two_task_job_2_duration = two_task_job_2_completion_date - two_task_job_2->getSubmitDate();
+        double two_task_job_2_duration = two_task_job_2_completion_date  - two_task_job_2->getSubmitDate();
         if (two_task_job_2_duration < (4.0 - EPSILON) || two_task_job_2_duration > (4.0 + EPSILON)) {
-            throw std::runtime_error("two_task_job_2 should have taken about 4 seconds, but did not");
+            throw std::runtime_error("two_task_job_2 should have taken about 4 seconds, but did not (" + std::to_string(two_task_job_2_duration) + ")");
         }
 
 
@@ -1109,7 +1107,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -1310,12 +1308,14 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+        std::cerr << "BEFORE TERMINATE JOB " << this->test->task1->getState() << "\n";
         // Try to terminate it now (which is stupid)
         try {
             job_manager->terminateJob(two_task_job);
             throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
         } catch (std::exception &e) {
         }
+        std::cerr << "AFTER TERMINATE JOB " << this->test->task1->getState() << "\n";
 
         return 0;
     }
@@ -1329,9 +1329,10 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1350,7 +1351,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

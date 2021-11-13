@@ -164,6 +164,8 @@ namespace wrench {
             TASK_FAILED
         };
 
+        void updateReadiness();
+
         static std::string stateToString(WorkflowTask::InternalState state);
 
         unsigned long updateTopLevel();

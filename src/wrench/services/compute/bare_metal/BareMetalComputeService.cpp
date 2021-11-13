@@ -69,7 +69,7 @@ namespace wrench {
             {
                 unsigned long num_threads;
                 if (sscanf(tokens[0].c_str(), "%lu", &num_threads) != 1) {
-                    return std::make_tuple(tokens[0], 0);
+                    return std::make_tuple(tokens[0], -1);
                 } else {
                     return std::make_tuple(std::string(""), num_threads);
                 }
@@ -129,7 +129,7 @@ namespace wrench {
                 std::string target_host = std::get<0>(parsed_spec);
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
-//                std::cerr << "TRGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
+//                std::cerr << "TARGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
 
                 if (not target_host.empty()) {
 
@@ -140,24 +140,25 @@ namespace wrench {
                                 "' for action '" + action->getName() + "': no such host");
                     }
 
-                    std::cerr << "---> " << std::get<0>(compute_resources[target_host]) << "\n";
-                    if (target_num_cores > std::get<0>(compute_resources[target_host])) {
+                    if ((target_num_cores != -1) and (target_num_cores > std::get<0>(compute_resources[target_host]))) {
                         throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
                     }
                 }
 
-                if (target_num_cores < action->getMinNumCores()) {
-                    throw std::invalid_argument(
-                            "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                            service_specific_args.at(action->getName()) +
-                            "' for action '" + action->getName() + "': the action requires more cores");
-                }
+                if (target_num_cores != -1) {
+                    if (target_num_cores < action->getMinNumCores()) {
+                        throw std::invalid_argument(
+                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                                service_specific_args.at(action->getName()) +
+                                "' for action '" + action->getName() + "': the action requires more cores");
+                    }
 
-                if (target_num_cores > action->getMaxNumCores()) {
-                    throw std::invalid_argument(
-                            "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                            service_specific_args.at(action->getName()) +
-                            "' for action '" + action->getName() + "': the action cannot use this many cores");
+                    if (target_num_cores > action->getMaxNumCores()) {
+                        throw std::invalid_argument(
+                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
+                                service_specific_args.at(action->getName()) +
+                                "' for action '" + action->getName() + "': the action cannot use this many cores");
+                    }
                 }
             }
         }
@@ -499,7 +500,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+//        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->terminate();
@@ -582,7 +583,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "bare_metal_standard_jobs::terminateStandardJob(): Received an unexpected [" +
+                    "bare_metal_standard_jobs::terminateCompoundJob(): Received an unexpected [" +
                     message->getName() + "] message!");
         }
     }
