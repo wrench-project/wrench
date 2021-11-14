@@ -334,10 +334,10 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -467,10 +467,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -600,10 +600,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -862,7 +862,6 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-
         // Submit the 2-task job for execution
         // service-specific args format testing: "hostname:num_cores", and "num_cores"
         // both tasks should run in parallel, using 2 of the 4 cores each
@@ -891,7 +890,7 @@ private:
 
         // Check the each task ran using 2 cores
         if (this->test->task5->getNumCoresAllocated() != 2) {
-            throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task info");
+            throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task info (" + std::to_string(this->test->task5->getNumCoresAllocated()) + ")");
         }
         if (this->test->task6->getNumCoresAllocated() != 2) {
             throw std::runtime_error("It looks like task6 didn't run with 2 cores according to in-task info");
@@ -971,6 +970,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1055,6 +1055,7 @@ private:
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
+
         // Immediately terminate it
         try {
             job_manager->terminateJob(two_task_job);
@@ -1090,6 +1091,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1308,14 +1310,12 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        std::cerr << "BEFORE TERMINATE JOB " << this->test->task1->getState() << "\n";
         // Try to terminate it now (which is stupid)
         try {
             job_manager->terminateJob(two_task_job);
             throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
         } catch (std::exception &e) {
         }
-        std::cerr << "AFTER TERMINATE JOB " << this->test->task1->getState() << "\n";
 
         return 0;
     }
@@ -1329,10 +1329,10 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1488,7 +1488,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

@@ -126,6 +126,13 @@ namespace wrench {
         void applyTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
                                 std::set<WorkflowTask *> &failure_count_increments);
 
+        void analyzeActions(std::vector<std::shared_ptr<Action>> actions,
+                                         bool *at_least_one_failed,
+                                         bool *at_least_one_killed,
+                                         std::shared_ptr<FailureCause> *failure_cause,
+                                         double *earliest_start_date,
+                                         double *latest_end_date,
+                                         double *earliest_failure_date);
 
         State state;
         double pre_overhead = 0.0;
