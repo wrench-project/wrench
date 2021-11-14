@@ -120,9 +120,10 @@ namespace wrench {
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
         void createUnderlyingCompoundJob(const std::shared_ptr<ComputeService>& compute_service);
-        void computeTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
-                                std::set<WorkflowTask *> &failure_count_increments,
-                                std::shared_ptr<FailureCause> &job_failure_cause);
+        void processCompoundJobOutcome(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
+                                       std::set<WorkflowTask *> &failure_count_increments,
+                                       std::shared_ptr<FailureCause> &job_failure_cause,
+                                       Simulation *simulation);
         void applyTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
                                 std::set<WorkflowTask *> &failure_count_increments);
 

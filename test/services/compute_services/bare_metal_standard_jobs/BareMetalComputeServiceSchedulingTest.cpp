@@ -214,8 +214,8 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
-                                                (std::vector<std::string>){"Host1", "Host2"}, {},
-                                                {}, {})));
+                                                (std::vector<std::string>){"Host1", "Host2"}, "",
+                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 
