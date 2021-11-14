@@ -142,6 +142,8 @@ namespace wrench {
 
         WorkflowTask::State getState() const;
 
+        std::string getStateAsString() const;
+
         std::string getColor() const;
 
         void setColor(std::string);

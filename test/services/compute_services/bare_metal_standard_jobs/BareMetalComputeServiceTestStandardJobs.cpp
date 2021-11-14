@@ -1132,8 +1132,8 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
     ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-    ASSERT_EQ(this->task1->getFailureCount(), 0);
-    ASSERT_EQ(this->task2->getFailureCount(), 0);
+    ASSERT_EQ(this->task1->getFailureCount(), 1);
+    ASSERT_EQ(this->task2->getFailureCount(), 1);
 
     delete simulation;
     for (int i=0; i < argc; i++)
@@ -1471,6 +1471,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1598,6 +1599,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1615,7 +1617,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "", {})));
+                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

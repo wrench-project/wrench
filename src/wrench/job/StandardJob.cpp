@@ -296,7 +296,6 @@ namespace wrench {
             }
         }
 
-
         // TODO replace this horror with some sjob function perhaps?
         bool need_scratch_clean = false;
         for (auto const &task : this->tasks) {
@@ -499,6 +498,7 @@ namespace wrench {
                     *earliest_failure_date = action->getEndDate();
                 }
             } else if (action->getState() == Action::State::KILLED) {
+                *failure_cause = action->getFailureCause();
                 *at_least_one_killed = true;
             }
         }
@@ -521,8 +521,67 @@ namespace wrench {
                 break;
         }
 
+        // At this point all tasks are pending, so no matter what we need to change all states
+        // So we provisionally make them all NOT_READY right now, which we may overwrite with
+        // COMPLETED, and then and the level above may turn some of the NOT_READY into READY.
+        for (auto const &t : this->tasks) {
+            state_changes[t] = WorkflowTask::State::NOT_READY;
+        }
+
         job_failure_cause = nullptr;
 
+        /*
+         * Look at Overhead action
+         */
+        if (this->pre_overhead_action) {
+            if (this->pre_overhead_action->getState() == Action::State::KILLED) {
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                for (auto const &t : this->tasks) {
+                    failure_count_increments.insert(t);
+                }
+                return;
+            } else if (this->pre_overhead_action->getState() == Action::State::FAILED) {
+                job_failure_cause = this->pre_overhead_action->getFailureCause();
+                for (auto const &t : this->tasks) {
+                    failure_count_increments.insert(t);
+                }
+                return;
+            }
+        }
+
+        /*
+         * Look at Pre-File copy actions
+         */
+        if (not this->pre_file_copy_actions.empty()) {
+            bool at_least_one_failed, at_least_one_killed;
+            std::shared_ptr<FailureCause> failure_cause;
+            double earliest_start_date, latest_end_date, earliest_failure_date;
+            this->analyzeActions(this->pre_file_copy_actions,
+                                 &at_least_one_failed,
+                                 &at_least_one_killed,
+                                 &failure_cause,
+                                 &earliest_start_date,
+                                 &latest_end_date,
+                                 &earliest_failure_date);
+            if (at_least_one_killed) {
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                for (auto const &t : this->tasks) {
+                    failure_count_increments.insert(t);
+                }
+                return;
+            } else if (at_least_one_failed) {
+                job_failure_cause = failure_cause;
+                for (auto const &t : this->tasks) {
+                    failure_count_increments.insert(t);
+                }
+                return;
+            }
+
+        }
+
+        /*
+         * Look at all the tasks
+         */
         for (auto &t: this->tasks) {
             /*
              * Look at file-read actions
@@ -542,7 +601,9 @@ namespace wrench {
                 t->setStartDate(earliest_start_date);
                 t->setReadInputStartDate(earliest_start_date);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
-                if (at_least_one_failed) {
+                if (at_least_one_killed) {
+                    job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                } else if (at_least_one_failed) {
                     t->setFailureDate(earliest_failure_date);
                     failure_count_increments.insert(t);
                     if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
@@ -563,12 +624,14 @@ namespace wrench {
             t->setComputationEndDate(compute_action->getEndDate());      // could be -1.0
             t->setNumCoresAllocated(compute_action->getExecutionHistory().top().num_cores_allocated);
 
-            if (compute_action->getState() != Action::State::COMPLETED) {
-                if (compute_action->getState() == Action::State::KILLED) {
-                    if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
-                    t->setFailureDate(compute_action->getEndDate());
-                    failure_count_increments.insert(t);
-                }
+            if (compute_action->getState() == Action::State::KILLED) {
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later
+                continue;
+            } else if (compute_action->getState() == Action::State::FAILED) {
+                if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
+                t->setFailureDate(compute_action->getEndDate());
+                failure_count_increments.insert(t);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later
                 continue;
             }
@@ -588,7 +651,9 @@ namespace wrench {
             if (at_least_one_failed or at_least_one_killed) {
                 t->setWriteOutputStartDate(earliest_start_date);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
-                if (at_least_one_failed) {
+                if (at_least_one_killed) {
+                    job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                } else if (at_least_one_failed) {
                     t->setFailureDate(earliest_failure_date);
                     failure_count_increments.insert(t);
                     if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
@@ -601,6 +666,54 @@ namespace wrench {
             state_changes[t] = WorkflowTask::State::COMPLETED;
             t->setEndDate(latest_end_date);
         }
+
+        /*
+        * Look at Port-File copy actions
+        */
+        if (not this->post_file_copy_actions.empty()) {
+            bool at_least_one_failed, at_least_one_killed;
+            std::shared_ptr<FailureCause> failure_cause;
+            double earliest_start_date, latest_end_date, earliest_failure_date;
+            this->analyzeActions(this->post_file_copy_actions,
+                                 &at_least_one_failed,
+                                 &at_least_one_killed,
+                                 &failure_cause,
+                                 &earliest_start_date,
+                                 &latest_end_date,
+                                 &earliest_failure_date);
+            if (at_least_one_killed) {
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+            } else if (at_least_one_failed) {
+                job_failure_cause = failure_cause;
+                return;
+            }
+        }
+
+        /*
+        * Look at Cleanup file_deletion actions
+        */
+        if (not this->cleanup_actions.empty()) {
+            bool at_least_one_failed, at_least_one_killed;
+            std::shared_ptr<FailureCause> failure_cause;
+            double earliest_start_date, latest_end_date, earliest_failure_date;
+            this->analyzeActions(this->cleanup_actions,
+                                 &at_least_one_failed,
+                                 &at_least_one_killed,
+                                 &failure_cause,
+                                 &earliest_start_date,
+                                 &latest_end_date,
+                                 &earliest_failure_date);
+            if (at_least_one_killed) {
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);;
+                return;
+            } else if (at_least_one_failed) {
+                job_failure_cause = failure_cause;
+                return;
+            }
+        }
+
+        /** Let's not care about the SCRATCH cleanup action. If it failed, oh well **/
+
         return;
     }
 

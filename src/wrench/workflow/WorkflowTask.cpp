@@ -200,6 +200,26 @@ namespace wrench {
     }
 
     /**
+    * @brief Get the state of the task as a string
+    *
+    * @return a string
+    */
+    std::string WorkflowTask::getStateAsString() const {
+        switch (this->visible_state) {
+            case WorkflowTask::State::NOT_READY:
+                return "NOT_READY";
+            case WorkflowTask::State::READY:
+                return "READY";
+            case WorkflowTask::State::PENDING:
+                return "PENDING";
+            case WorkflowTask::State::COMPLETED:
+                return "COMPLETED";
+            case WorkflowTask::State::UNKNOWN:
+                return "UNKNOWN";
+        }
+    }
+
+    /**
     * @brief Get the state of the task
     *
     * @return a task state
