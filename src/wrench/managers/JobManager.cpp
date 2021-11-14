@@ -602,7 +602,7 @@ namespace wrench {
 
         // Send a message to wake up the daemon
         try {
-            S4U_Mailbox::dputMessage(this->mailbox_name,new JobManagerWakeupMessage());
+            S4U_Mailbox::putMessage(this->mailbox_name,new JobManagerWakeupMessage());
         } catch (std::exception &e) {
             throw std::runtime_error("Cannot connect to job manager");
         }
@@ -639,6 +639,9 @@ namespace wrench {
             } catch (std::exception &e) {
                 throw;
             }
+
+            sjob->compound_job->state = CompoundJob::State::DISCONTINUED;
+            sjob->state = StandardJob::State::TERMINATED;
 
             // Update task states based on compound job
             std::map<WorkflowTask *, WorkflowTask::State> state_changes;
