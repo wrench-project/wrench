@@ -138,6 +138,8 @@ namespace wrench {
         double pre_overhead = 0.0;
         double post_overhead = 0.0;
 
+        std::shared_ptr<StandardJob> shared_this;
+
         std::shared_ptr<CompoundJob> compound_job;
         std::shared_ptr<Action> pre_overhead_action = nullptr;
         std::shared_ptr<Action> post_overhead_action = nullptr;
