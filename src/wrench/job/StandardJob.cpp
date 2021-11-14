@@ -192,6 +192,17 @@ namespace wrench {
      */
     void StandardJob::createUnderlyingCompoundJob(const std::shared_ptr<ComputeService>& compute_service) {
 
+        this->compound_job = nullptr;
+        this->pre_overhead_action = nullptr;
+        this->post_overhead_action = nullptr;
+        this->pre_file_copy_actions.clear();
+        this->task_file_read_actions.clear();
+        this->task_compute_actions.clear();
+        this->task_file_write_actions.clear();
+        this->post_file_copy_actions.clear();
+        this->cleanup_actions.clear();
+        this->scratch_cleanup = nullptr;
+
         auto cjob = this->job_manager->createCompoundJob("cjob_for_" + this->getName());
 
         // Create pre- and post-overhead work units
@@ -309,6 +320,7 @@ namespace wrench {
             }
         }
 
+
         // Create the scratch clean up actions
         if (need_scratch_clean) {
             // Does the lambda capture of cjob_file_locations work?
@@ -340,6 +352,7 @@ namespace wrench {
             scratch_cleanup = cjob->addCustomAction("", lambda_execute, lambda_terminate);
 
         }
+
 
         // Add all inter-task dependencies
         for (auto const &parent_task : this->tasks) {
@@ -408,6 +421,7 @@ namespace wrench {
                 }
             }
         }
+
         if (not post_file_copy_actions.empty()) {
             for (auto const &pfca : post_file_copy_actions) {
                 cjob->addActionDependency(tasks_to_post_file_copies, pfca);
@@ -447,10 +461,51 @@ namespace wrench {
         }
 
 //            cjob->printActionDependencies();
+        this->compound_job = cjob;
+    }
+
+    void StandardJob::analyzeActions(std::vector<std::shared_ptr<Action>> actions,
+                                     bool *at_least_one_failed,
+                                     bool *at_least_one_killed,
+                                     std::shared_ptr<FailureCause> *failure_cause,
+                                     double *earliest_start_date,
+                                     double *latest_end_date,
+                                     double *earliest_failure_date) {
+
+        *at_least_one_failed = false;
+        *at_least_one_killed = false;
+        *failure_cause = nullptr;
+        *earliest_start_date = -1.0;
+        *latest_end_date = -1.0;
+        *earliest_failure_date = -1.0;
+
+        for (const auto &action : actions) {
+
+            // Set the dates
+            if ((*earliest_start_date == -1.0) or ((action->getStartDate() < *earliest_start_date) and (action->getStartDate() != -1.0))) {
+                *earliest_start_date = action->getStartDate();
+            }
+            if ((*latest_end_date == -1.0) or ((action->getEndDate() > *latest_end_date) and (action->getEndDate() != -1.0))) {
+                *latest_end_date = action->getEndDate();
+            }
+
+            if (action->getState() == Action::State::FAILED) {
+                *at_least_one_failed = true;
+                if (not *failure_cause) {
+                    *failure_cause = action->getFailureCause();
+                }
+                if ((*earliest_failure_date == -1.0) or
+                    ((*earliest_failure_date > action->getEndDate()) and (action->getEndDate() != -1.0))) {
+                    *earliest_failure_date = action->getEndDate();
+                }
+            } else if (action->getState() == Action::State::KILLED) {
+                *at_least_one_killed = true;
+            }
+        }
     }
 
     /**
-     * @brief Compute all task updates based on the state of the underlying compound job
+     * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
      * @param necessary_state_changes: the set of task state changes to apply
      * @param necessary_failure_count_increments: the set ot task failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
@@ -469,92 +524,82 @@ namespace wrench {
         job_failure_cause = nullptr;
 
         for (auto &t: this->tasks) {
-            double failure_date = -1.0;
-            double input_start_date = -1.0;
-            double input_end_date = -1.0;
-            double compute_start_date = -1.0;
-            double compute_end_date = -1.0;
-            double output_start_date = -1.0;
-            double output_end_date = -1.0;
+            /*
+             * Look at file-read actions
+             */
+            bool at_least_one_failed, at_least_one_killed;
+            std::shared_ptr<FailureCause> failure_cause;
+            double earliest_start_date, latest_end_date, earliest_failure_date;
+            this->analyzeActions(this->task_file_read_actions[t],
+                                 &at_least_one_failed,
+                                 &at_least_one_killed,
+                                 &failure_cause,
+                                 &earliest_start_date,
+                                 &latest_end_date,
+                                 &earliest_failure_date);
 
-            // Look at file-read actions
-            auto file_read_actions = this->task_file_read_actions[t];
-
-            bool all_file_read_actions_completed = true;
-            for (const auto &fra : file_read_actions) {
-                // Set the dates
-                if ((input_start_date == -1.0) or ((fra->getStartDate() < input_start_date) and (fra->getStartDate() != -1.0))) {
-                    input_start_date = fra->getStartDate();
+            if (at_least_one_failed or at_least_one_killed) {
+                t->setStartDate(earliest_start_date);
+                t->setReadInputStartDate(earliest_start_date);
+                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
+                if (at_least_one_failed) {
+                    t->setFailureDate(earliest_failure_date);
+                    failure_count_increments.insert(t);
+                    if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
                 }
-                if ((input_end_date == -1.0) or ((fra->getEndDate() > input_end_date) and (fra->getEndDate() != -1.0))) {
-                    input_end_date = fra->getEndDate();
-                }
-                if (fra->getState() != Action::State::COMPLETED) {
-                    if (not job_failure_cause) {
-                        job_failure_cause = fra->getFailureCause();
-                    }
-                    if ((failure_date == -1) or ((failure_date > fra->getEndDate()) and (fra->getEndDate() != -1.0))) {
-                        failure_date = fra->getEndDate();
-                    }
-                    all_file_read_actions_completed = false;
-                }
+                continue;
             }
-            if (not all_file_read_actions_completed) {
-                t->setStartDate(input_start_date);
-                t->setReadInputStartDate(input_start_date);
-                t->setFailureDate(failure_date);
-                state_changes[t] = WorkflowTask::State::NOT_READY; // This may be changed later
-                failure_count_increments.insert(t);
 
-            } else {
-                t->setStartDate(input_start_date);
-                t->setReadInputStartDate(input_start_date);
+            t->setStartDate(earliest_start_date);
+            t->setReadInputStartDate(earliest_start_date);
+            t->setReadInputEndDate(latest_end_date);
 
-                // Look at the compute action
-                auto compute_action = this->task_compute_actions[t];
-                t->setComputationStartDate(compute_action->getStartDate());  // could be -1.0
-                t->setComputationEndDate(compute_action->getEndDate());      // could be -1.0
+            /*
+             * Look at the compute action
+             */
+            // Look at the compute action
+            auto compute_action = this->task_compute_actions[t];
+            t->setComputationStartDate(compute_action->getStartDate());  // could be -1.0
+            t->setComputationEndDate(compute_action->getEndDate());      // could be -1.0
+            t->setNumCoresAllocated(compute_action->getExecutionHistory().top().num_cores_allocated);
 
-                t->setReadInputEndDate(input_end_date);
-
-                if (compute_action->getState() != Action::State::COMPLETED) {
+            if (compute_action->getState() != Action::State::COMPLETED) {
+                if (compute_action->getState() == Action::State::KILLED) {
                     if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
                     t->setFailureDate(compute_action->getEndDate());
-                    state_changes[t] = WorkflowTask::State::NOT_READY; // This may be changed later
-                } else {
-                    auto file_write_actions = this->task_file_write_actions[t];
-
-                    bool all_file_write_actions_completed = true;
-                    for (const auto &fwa : file_write_actions) {
-                        // Set the dates
-                        if ((output_start_date == -1.0) or
-                            ((fwa->getStartDate() < output_start_date) and (fwa->getStartDate() != -1.0))) {
-                            output_start_date = fwa->getStartDate();
-                        }
-                        if ((output_end_date == -1.0) or
-                            ((fwa->getEndDate() > output_end_date) and (fwa->getEndDate() != -1.0))) {
-                            output_end_date = fwa->getEndDate();
-                        }
-                        if (fwa->getState() != Action::State::COMPLETED) {
-                            if (not job_failure_cause) job_failure_cause = fwa->getFailureCause();
-                            if ((failure_date == -1) or ((failure_date > fwa->getEndDate()) and (fwa->getEndDate() != -1.0))) {
-                                failure_date = fwa->getEndDate();
-                            }
-                            all_file_write_actions_completed = false;
-                        }
-                    }
-                    if (not all_file_write_actions_completed) {
-                        t->setWriteOutputStartDate(output_start_date);
-                        t->setFailureDate(failure_date);
-                        state_changes[t] = WorkflowTask::State::NOT_READY; // This may be changed laster
-                        failure_count_increments.insert(t);
-                    } else {
-                        t->setWriteOutputStartDate(output_start_date);
-                        t->setWriteOutputEndDate(output_end_date);
-                        state_changes[t] = WorkflowTask::State::COMPLETED;
-                    }
+                    failure_count_increments.insert(t);
                 }
+                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later
+                continue;
             }
+
+            /*
+             * Look at the file write actions
+             */
+
+            this->analyzeActions(this->task_file_write_actions[t],
+                                 &at_least_one_failed,
+                                 &at_least_one_killed,
+                                 &failure_cause,
+                                 &earliest_start_date,
+                                 &latest_end_date,
+                                 &earliest_failure_date);
+
+            if (at_least_one_failed or at_least_one_killed) {
+                t->setWriteOutputStartDate(earliest_start_date);
+                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
+                if (at_least_one_failed) {
+                    t->setFailureDate(earliest_failure_date);
+                    failure_count_increments.insert(t);
+                    if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
+                }
+                continue;
+            }
+
+            t->setWriteOutputStartDate(earliest_start_date);
+            t->setWriteOutputEndDate(latest_end_date);
+            state_changes[t] = WorkflowTask::State::COMPLETED;
+            t->setEndDate(latest_end_date);
         }
         return;
     }
@@ -568,16 +613,22 @@ namespace wrench {
                                        set<WorkflowTask *> &failure_count_increments) {
 
         // Update task states
-        for (auto state_update : state_changes) {
+        for (auto &state_update : state_changes) {
             WorkflowTask *task = state_update.first;
-            WorkflowTask::State state = state_update.second;
-            task->setState(state);
-            if (state == WorkflowTask::State::COMPLETED) {
+            task->setState(state_update.second);
+        }
+
+        // Update task readiness-es
+        for (auto &state_update : state_changes) {
+            WorkflowTask *task = state_update.first;
+            task->updateReadiness();
+            if (task->getState() == WorkflowTask::State::COMPLETED) {
                 for (auto const &child : task->getChildren()) {
                     child->updateReadiness();
                 }
             }
         }
+
         // Update task failure counts if any
         for (auto task : failure_count_increments) {
             task->incrementFailureCount();
