@@ -159,6 +159,9 @@ namespace wrench {
                                 service_specific_args.at(action->getName()) +
                                 "' for action '" + action->getName() + "': the action cannot use this many cores");
                     }
+                    if (target_num_cores > max_cores) {
+                        throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
+                    }
                 }
             }
         }

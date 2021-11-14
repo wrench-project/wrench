@@ -486,7 +486,7 @@ namespace wrench {
         }
 
 
-        // Update the job state and insert it into the pending list
+        // Standard Job
         if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
 
             if (not compute_service->supportsStandardJobs()) {
@@ -547,8 +547,9 @@ namespace wrench {
             try {
                 this->validateJobSubmission(sjob->compound_job, compute_service, new_args);
             } catch (ExecutionException &e) {
+                sjob->compound_job = nullptr;
                 if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                    throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+                    throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(sjob, compute_service)));
                 } else {
                     throw;
                 }
@@ -652,7 +653,7 @@ namespace wrench {
             std::map<WorkflowTask *, WorkflowTask::State> state_changes;
             std::set<WorkflowTask *> failure_count_increments;
             std::shared_ptr<FailureCause> job_failure_cause;
-            sjob->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
+            sjob->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
             sjob->applyTaskUpdates(state_changes, failure_count_increments);
 
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
@@ -835,7 +836,7 @@ namespace wrench {
         std::map<WorkflowTask *, WorkflowTask::State> state_changes;
         std::set<WorkflowTask *> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
@@ -869,7 +870,7 @@ namespace wrench {
         std::map<WorkflowTask *, WorkflowTask::State> state_changes;
         std::set<WorkflowTask *> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
-        job->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
