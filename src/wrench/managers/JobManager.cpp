@@ -230,25 +230,10 @@ namespace wrench {
             }
         }
 
-        // Check that every file has a file location: NOPE USE SCARTCH B Y DEFAULT
-//        for (const auto &t : tasks) {
-//            for (const auto & f : t->getInputFiles()) {
-//                if (file_locations.find(f) == file_locations.end()) {
-//                    throw std::invalid_argument(
-//                            "JobManager::createStandardJob(): A location needs to be provided for file " + f->getID());
-//                }
-//            }
-//            for (const auto & f : t->getOutputFiles()) {
-//                if (file_locations.find(f) == file_locations.end()) {
-//                    throw std::invalid_argument(
-//                            "JobManager::createStandardJob(): A location needs to be provided for file " + f->getID());
-//                }
-//            }
-//        }
-
         auto job = std::shared_ptr<StandardJob>(
                 new StandardJob(this->wms->getWorkflow(), this->getSharedPtr<JobManager>(), tasks, file_locations, pre_file_copies,
                                 post_file_copies, cleanup_file_deletions));
+        job->shared_this = job;
 
         return job;
     }
@@ -509,7 +494,7 @@ namespace wrench {
             }
 
             // Do a sanity check on task states
-            for (auto t : sjob->tasks) {
+            for (const auto &t : sjob->tasks) {
                 if ((t->getState() == WorkflowTask::State::COMPLETED) or
                     (t->getState() == WorkflowTask::State::PENDING)) {
                     throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
@@ -518,14 +503,32 @@ namespace wrench {
                 }
             }
 
-            // Do a sanity check on use of scratch space
-            for (auto fl : sjob->file_locations) {
+            // Do a sanity check on use of scratch space for files specified in file locations
+            for (const auto &fl : sjob->file_locations) {
                 for (auto const &fl_l : fl.second) {
                     if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
                         throw std::invalid_argument("JobManager():submitJob(): file location for file " +
                                                     fl.first->getID() +
                                                     " is scratch  space, but the compute service to which this " +
                                                     "job is being submitted to doesn't have any!");
+                    }
+                }
+            }
+
+            // Do a sanity check on implicit use of scratch space for task input files
+            for (auto const &task : sjob->tasks) {
+                for (auto const &f : task->getInputFiles()) {
+                    if (sjob->file_locations.find(f) == sjob->file_locations.end()) {
+                        if (not compute_service->hasScratch()) {
+                            throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
+                        }
+                    }
+                }
+                for (auto const &f : task->getOutputFiles()) {
+                    if (sjob->file_locations.find(f) == sjob->file_locations.end()) {
+                        if (not compute_service->hasScratch()) {
+                            throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
+                        }
                     }
                 }
             }
@@ -632,6 +635,8 @@ namespace wrench {
                 case StandardJob::State::FAILED:
                 case StandardJob::State::NOT_SUBMITTED:
                     throw std::invalid_argument("JobManager::terminateJob(): job cannot be terminated because it's not pending/running");
+                default:
+                    break;
             }
 
             try {
@@ -853,6 +858,7 @@ namespace wrench {
      */
     void JobManager::processStandardJobFailure(std::shared_ptr<StandardJob> job,
                                                std::shared_ptr<ComputeService> compute_service) {
+
         // update job state
         job->state = StandardJob::State::FAILED;
 
@@ -864,7 +870,6 @@ namespace wrench {
         std::set<WorkflowTask *> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
         job->computeTaskUpdates(state_changes, failure_count_increments, job_failure_cause);
-
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
