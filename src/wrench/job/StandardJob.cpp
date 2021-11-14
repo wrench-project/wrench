@@ -509,14 +509,16 @@ namespace wrench {
      * @param necessary_state_changes: the set of task state changes to apply
      * @param necessary_failure_count_increments: the set ot task failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
+     * @param simulation: the simulation (to add timestamps!)
      */
-    void StandardJob::computeTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
-                                         std::set<WorkflowTask *> &failure_count_increments,
-                                         std::shared_ptr<FailureCause> &job_failure_cause) {
+    void StandardJob::processCompoundJobOutcome(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
+                                                std::set<WorkflowTask *> &failure_count_increments,
+                                                std::shared_ptr<FailureCause> &job_failure_cause,
+                                                Simulation *simulation) {
         switch(this->state) {
             case StandardJob::State::PENDING:
             case StandardJob::State::RUNNING:
-                throw std::runtime_error("StandardJob::computeTaskUpdates(): Cannot be called on a RUNNING/PENDING job");
+                throw std::runtime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
             default:
                 break;
         }
@@ -612,6 +614,7 @@ namespace wrench {
             }
 
             t->setStartDate(earliest_start_date);
+            simulation->getOutput().addTimestampTaskStart(latest_end_date, t);
             t->setReadInputStartDate(earliest_start_date);
             t->setReadInputEndDate(latest_end_date);
 
@@ -665,6 +668,7 @@ namespace wrench {
             t->setWriteOutputEndDate(latest_end_date);
             state_changes[t] = WorkflowTask::State::COMPLETED;
             t->setEndDate(latest_end_date);
+            simulation->getOutput().addTimestampTaskCompletion(latest_end_date, t);
         }
 
         /*

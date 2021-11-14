@@ -711,6 +711,8 @@ private:
                 throw std::runtime_error("Shouldn't have been able to submit job (" + args.begin()->first + ":" + args.begin()->second + ")");
             } catch (std::invalid_argument &ignore) {
 //                std::cerr << "Expected exception: " << e.what() << "\n";
+            } catch (wrench::ExecutionException &ignore) {
+
             }
         }
 
