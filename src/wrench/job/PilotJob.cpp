@@ -16,10 +16,9 @@ namespace wrench {
      *
      * @param workflow: a workflow
      */
-    PilotJob::PilotJob(Workflow *workflow) :
+    PilotJob::PilotJob() :
             Job("", nullptr), state(PilotJob::State::NOT_SUBMITTED) {
 
-//      this->workflow = workflow;
       this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
     }
 
@@ -29,15 +28,6 @@ namespace wrench {
      */
     PilotJob::State PilotJob::getState() {
       return this->state;
-    }
-
-    /**
-     * @brief Get the pilot job priority value
-     * @return the pilot job priority value
-     */
-    unsigned long PilotJob::getPriority() {
-      // TODO: implement the function
-      return 0;
     }
 
     /**
