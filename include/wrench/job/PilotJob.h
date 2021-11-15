@@ -47,8 +47,6 @@ namespace wrench {
 
         PilotJob::State getState();
 
-        unsigned long getPriority();
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -64,7 +62,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob(Workflow *workflow);
+        PilotJob();
 
         State state;
         std::shared_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job

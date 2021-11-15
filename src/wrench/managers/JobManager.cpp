@@ -378,7 +378,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<PilotJob> JobManager::createPilotJob() {
-        auto job = std::shared_ptr<PilotJob>(new PilotJob(this->wms->workflow));
+        auto job = std::shared_ptr<PilotJob>(new PilotJob());
         return job;
     }
 
