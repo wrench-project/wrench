@@ -1108,12 +1108,12 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Get the WMS associated to this DataManager
-     * @return a WMS
-     */
-    std::shared_ptr<WMS> JobManager::getWMS() {
-        return this->wms;
-    }
+//    /**
+//     * @brief Get the WMS associated to this DataManager
+//     * @return a WMS
+//     */
+//    std::shared_ptr<WMS> JobManager::getWMS() {
+//        return this->wms;
+//    }
 
 }
