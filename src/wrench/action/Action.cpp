@@ -288,7 +288,7 @@ namespace wrench {
      * @brief Retrieve the execution history
      * @return the execution history
      */
-    std::stack<Action::ActionExecution> Action::getExecutionHistory() {
+    std::stack<Action::ActionExecution> &Action::getExecutionHistory() {
         return this->execution_history;
     }
 

@@ -89,7 +89,7 @@ namespace wrench {
             std::shared_ptr<FailureCause> failure_cause;
         };
 
-        std::stack<Action::ActionExecution> getExecutionHistory();
+        std::stack<Action::ActionExecution> &getExecutionHistory();
 
 
     protected:

@@ -1055,7 +1055,6 @@ private:
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
-
         // Immediately terminate it
         try {
             job_manager->terminateJob(two_task_job);
