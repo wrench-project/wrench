@@ -40,7 +40,7 @@ namespace wrench {
             this->name = name;
         }
         this->job_manager = std::move(job_manager);
-        this->originator_mailbox = this->job_manager->getWMS()->mailbox_name;
+        this->originator_mailbox = this->job_manager->mailbox_name;
 
         this->parent_compute_service = nullptr;
         this->submit_date = -1.0;
@@ -165,7 +165,7 @@ namespace wrench {
     * @brief Get the job's priority (the higher the priority value, the higher the priority)
     * @return the job's priority
     */
-    double Job::getPriority() {
+    double Job::getPriority() const {
         return this->priority;
     }
 

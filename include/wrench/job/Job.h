@@ -62,7 +62,7 @@ namespace wrench {
 
         virtual void setPriority(double priority);
 
-        double getPriority() ;
+        double getPriority() const;
 
     protected:
 
