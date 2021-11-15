@@ -35,17 +35,6 @@ public:
 
     void do_UnsupportedPilotJobs_test();
 
-    void do_OnePilotJobNoTimeoutWaitForExpiration_test();
-
-    void do_OnePilotJobNoTimeoutShutdownService_test();
-
-    void do_NonSubmittedPilotJobTermination_test();
-
-    void do_IdlePilotJobTermination_test();
-
-    void do_NonIdlePilotJobTermination_test();
-
-
 protected:
     BareMetalComputeServiceTestPilotJobs() {
 
