@@ -445,7 +445,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
                         "/scratch",
-                        {}, {})));
+                        {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}, {})));
     }
 
     // Create Cloud Service
