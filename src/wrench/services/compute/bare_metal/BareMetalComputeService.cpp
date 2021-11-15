@@ -781,6 +781,9 @@ namespace wrench {
     void BareMetalComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
         auto dict = this->action_execution_service->getResourceInformation();
 
+        // Add the ttl
+        dict["ttl"] = {{"ttl", this->ttl}};
+
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
                 dict,
