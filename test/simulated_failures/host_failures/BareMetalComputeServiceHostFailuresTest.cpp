@@ -458,7 +458,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
                                                 "/scratch",
-                                                {}));
+                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));

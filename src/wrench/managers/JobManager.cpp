@@ -569,7 +569,10 @@ namespace wrench {
 
             // The compound job
             this->cjob_to_sjob_map[sjob->compound_job] = sjob;
+            sjob->compound_job->state = CompoundJob::State::SUBMITTED;
+            this->acquireDaemonLock();
             this->jobs_to_dispatch.push_back(sjob->compound_job);
+            this->releaseDaemonLock();
 
         } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
 
@@ -577,7 +580,10 @@ namespace wrench {
                 throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
             }
 
+            this->acquireDaemonLock();
             this->jobs_to_dispatch.push_back(job);
+            this->releaseDaemonLock();
+
             try {
                 this->validateJobSubmission(job, compute_service, service_specific_args);
             } catch (std::invalid_argument &e) {
@@ -596,7 +602,9 @@ namespace wrench {
                 throw;
             }
             cjob->state = CompoundJob::State::SUBMITTED;
+            this->acquireDaemonLock();
             this->jobs_to_dispatch.push_back(job);
+            this->releaseDaemonLock();
         }
 
         job->already_submitted_to_job_manager = true;
@@ -639,6 +647,16 @@ namespace wrench {
                 default:
                     break;
             }
+
+            // If the job has not been dispatch, just remove it from the to-dispatch list
+            this->acquireDaemonLock();
+            auto it = std::find(this->jobs_to_dispatch.begin(), this->jobs_to_dispatch.end(), sjob->compound_job);
+            if (it != this->jobs_to_dispatch.end()) {
+                this->jobs_to_dispatch.erase(it);
+                this->releaseDaemonLock();
+                return;
+            }
+            this->releaseDaemonLock();
 
             try {
                 sjob->getParentComputeService()->terminateJob(sjob->compound_job);
@@ -941,6 +959,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<Job>> dispatched;
 
+        this->acquireDaemonLock();
         auto it = this->jobs_to_dispatch.begin();
         while (it != this->jobs_to_dispatch.end()) {
             auto job = *it;
@@ -964,6 +983,7 @@ namespace wrench {
                 this->jobs_dispatched.insert(job);
                 it = this->jobs_to_dispatch.erase(it);
             } catch (ExecutionException &e) {
+                std::cerr << "IN CATCH!\n";
                 it = this->jobs_to_dispatch.erase(it);
                 job->popCallbackMailbox();
                 if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
@@ -985,8 +1005,9 @@ namespace wrench {
                 }
             }
 
-
         }
+        this->releaseDaemonLock();
+
 
     }
 
@@ -994,7 +1015,7 @@ namespace wrench {
     /**
      * @brief Helper method to dispatch jobs
      */
-    void JobManager::dispatchJob(std::shared_ptr<Job> job) {
+    void JobManager::dispatchJob(const std::shared_ptr<Job> job) {
 
 
         // Submit the job to the service
@@ -1004,6 +1025,8 @@ namespace wrench {
             job->parent_compute_service->submitJob(job, job->service_specific_args);
             if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                 pjob->state = PilotJob::PENDING;
+            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+                cjob->state = CompoundJob::State::SUBMITTED;
             }
         } catch (ExecutionException &e) {
             job->end_date = Simulation::getCurrentSimulatedDate();
@@ -1019,8 +1042,6 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
-
-
     }
 
 

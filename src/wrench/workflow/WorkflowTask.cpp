@@ -459,12 +459,26 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task's start date.
+     * @brief Set the task's start date (which pushing a new execution history!)
      *
      * @param date: the start date
      */
     void WorkflowTask::setStartDate(double date) {
         this->execution_history.push(WorkflowTask::WorkflowTaskExecution(date));
+    }
+
+    /**
+     * @brief Update the task's start date.
+     *
+     * @param date: the start date
+     */
+    void WorkflowTask::updateStartDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_end = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::updateStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+        this->execution_history.top().task_start = date;
     }
 
     /**
