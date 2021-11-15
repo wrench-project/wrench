@@ -479,6 +479,7 @@ namespace wrench {
         *earliest_failure_date = -1.0;
 
         for (const auto &action : actions) {
+//            std::cerr << "   ANALYSING ACTION " << action->getName() << "    END DATE " << action->getEndDate() << "\n";
 
             // Set the dates
             if ((*earliest_start_date == -1.0) or ((action->getStartDate() < *earliest_start_date) and (action->getStartDate() != -1.0))) {
@@ -522,6 +523,7 @@ namespace wrench {
             default:
                 break;
         }
+
 
         // At this point all tasks are pending, so no matter what we need to change all states
         // So we provisionally make them all NOT_READY right now, which we may overwrite with
@@ -585,9 +587,15 @@ namespace wrench {
          * Look at all the tasks
          */
         for (auto &t: this->tasks) {
+            // Set a provisional start date
+            t->setStartDate(-1.0);
+            // Set the execution host
+            t->setExecutionHost(this->task_compute_actions[t]->getExecutionHistory().top().execution_host);
+
             /*
              * Look at file-read actions
              */
+
             bool at_least_one_failed, at_least_one_killed;
             std::shared_ptr<FailureCause> failure_cause;
             double earliest_start_date, latest_end_date, earliest_failure_date;
@@ -600,7 +608,7 @@ namespace wrench {
                                  &earliest_failure_date);
 
             if (at_least_one_failed or at_least_one_killed) {
-                t->setStartDate(earliest_start_date);
+                t->updateStartDate(earliest_start_date);
                 t->setReadInputStartDate(earliest_start_date);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
                 if (at_least_one_killed) {
@@ -613,7 +621,7 @@ namespace wrench {
                 continue;
             }
 
-            t->setStartDate(earliest_start_date);
+            t->updateStartDate(earliest_start_date); // could be -1.0 if there were no input, but will be updated below
             simulation->getOutput().addTimestampTaskStart(latest_end_date, t);
             t->setReadInputStartDate(earliest_start_date);
             t->setReadInputEndDate(latest_end_date);
@@ -626,6 +634,9 @@ namespace wrench {
             t->setComputationStartDate(compute_action->getStartDate());  // could be -1.0
             t->setComputationEndDate(compute_action->getEndDate());      // could be -1.0
             t->setNumCoresAllocated(compute_action->getExecutionHistory().top().num_cores_allocated);
+            if (t->getStartDate() == -1.0) {
+                t->updateStartDate(t->getComputationStartDate());
+            }
 
             if (compute_action->getState() == Action::State::KILLED) {
                 job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
@@ -663,7 +674,8 @@ namespace wrench {
                 }
                 continue;
             }
-
+            if (earliest_start_date == -1) earliest_start_date = compute_action->getEndDate();
+            if (latest_end_date == -1) latest_end_date = compute_action->getEndDate();
             t->setWriteOutputStartDate(earliest_start_date);
             t->setWriteOutputEndDate(latest_end_date);
             state_changes[t] = WorkflowTask::State::COMPLETED;
@@ -672,7 +684,7 @@ namespace wrench {
         }
 
         /*
-        * Look at Port-File copy actions
+        * Look at Post-File copy actions
         */
         if (not this->post_file_copy_actions.empty()) {
             bool at_least_one_failed, at_least_one_killed;

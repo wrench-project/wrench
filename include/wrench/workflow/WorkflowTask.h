@@ -186,6 +186,8 @@ namespace wrench {
 
         void setStartDate(double date);
 
+        void updateStartDate(double date);
+
         void setEndDate(double date);
 
         void setReadInputStartDate(double date);
