@@ -62,7 +62,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob();
+        PilotJob(std::shared_ptr<JobManager> job_manager);
 
         State state;
         std::shared_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job
