@@ -9,6 +9,8 @@
 
 #include <wrench/job/PilotJob.h>
 
+#include <utility>
+
 namespace wrench {
 
     /**
@@ -43,7 +45,7 @@ namespace wrench {
      * @param cs: a compute service
      */
     void PilotJob::setComputeService(std::shared_ptr<ComputeService> cs) {
-      this->compute_service = cs;
+      this->compute_service = std::move(cs);
     }
 
 
