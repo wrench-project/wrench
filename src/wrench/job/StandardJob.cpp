@@ -489,7 +489,7 @@ namespace wrench {
                 *latest_end_date = action->getEndDate();
             }
 
-            if (action->getState() == Action::State::FAILED) {
+            if (action->getState() == Action::State::FAILED || action->getState() == Action::State::KILLED) {
                 *at_least_one_failed = true;
                 if (not *failure_cause) {
                     *failure_cause = action->getFailureCause();
@@ -498,9 +498,6 @@ namespace wrench {
                     ((*earliest_failure_date > action->getEndDate()) and (action->getEndDate() != -1.0))) {
                     *earliest_failure_date = action->getEndDate();
                 }
-            } else if (action->getState() == Action::State::KILLED) {
-                *failure_cause = action->getFailureCause();
-                *at_least_one_killed = true;
             }
         }
     }
@@ -613,6 +610,8 @@ namespace wrench {
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                    failure_count_increments.insert(t);
+                    t->setFailureDate(earliest_failure_date);
                 } else if (at_least_one_failed) {
                     t->setFailureDate(earliest_failure_date);
                     failure_count_increments.insert(t);
@@ -640,6 +639,8 @@ namespace wrench {
 
             if (compute_action->getState() == Action::State::KILLED) {
                 job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                failure_count_increments.insert(t);
+                t->setFailureDate(compute_action->getEndDate());
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later
                 continue;
             } else if (compute_action->getState() == Action::State::FAILED) {
@@ -667,6 +668,8 @@ namespace wrench {
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                    failure_count_increments.insert(t);
+                    t->setFailureDate(earliest_failure_date);
                 } else if (at_least_one_failed) {
                     t->setFailureDate(earliest_failure_date);
                     failure_count_increments.insert(t);

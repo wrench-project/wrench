@@ -54,6 +54,8 @@ public:
 
     void do_TwoDualCoreTasksCase3_test();
 
+    void do_JobImmediateTermination_test();
+    
     void do_JobTermination_test();
 
     void do_NonSubmittedJobTermination_test();
@@ -790,8 +792,6 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 }
 
 
-
-
 /**********************************************************************/
 /**  TWO DUAL-CORE TASKS TEST #3                                     **/
 /**********************************************************************/
@@ -1016,6 +1016,131 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
 
 /**********************************************************************/
+/**  IMMEDIATE JOB TERMINATION TEST                                  **/
+/**********************************************************************/
+
+class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::WMS {
+
+public:
+    BareMetalComputeServiceJobImmediateTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                 std::string hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+
+    BareMetalComputeServiceTestStandardJobs *test;
+
+    int main() {
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a job  manager
+        auto job_manager = this->createJobManager();
+
+        auto file_registry_service = this->getAvailableFileRegistryService();
+
+        // Create a 2-task job
+        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
+                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                           {std::make_tuple(this->test->input_file,
+                                                                            wrench::FileLocation::LOCATION(this->test->storage_service),
+                                                                            wrench::FileLocation::SCRATCH)},
+                                                           {}, {});
+
+        // Submit the 2-task job for execution
+        job_manager->submitJob(two_task_job, this->test->compute_service);
+
+        // Immediately terminate it
+        try {
+            job_manager->terminateJob(two_task_job);
+        } catch (std::exception &e) {
+            throw std::runtime_error("Unexpected exception while terminating job: " + std::string(e.what()));
+        }
+
+        // Check that the job's state has been updated
+        if (two_task_job->getState() != wrench::StandardJob::TERMINATED) {
+            throw std::runtime_error("Terminated Standard Job is not in TERMINATED state");
+        }
+
+        // Check that task states make sense
+        if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
+            (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
+            throw std::runtime_error("Tasks in a TERMINATED job should be in the READY state but instead (" +
+                                     wrench::WorkflowTask::stateToString(this->test->task1->getState()) + ", " +
+                                     wrench::WorkflowTask::stateToString(this->test->task2->getState()) + ")");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceTestStandardJobs, JobImmediateTermination) {
+    DO_TEST_WITH_FORK(do_JobImmediateTermination_test);
+}
+
+void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() {
+
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+    int argc = 1;
+    auto **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create A Storage Services
+    ASSERT_NO_THROW(storage_service = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/"})));
+
+    // Create a Compute Service
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService(hostname,
+                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new BareMetalComputeServiceJobImmediateTerminationTestWMS(
+                    this, {compute_service}, {storage_service}, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Create a file registry
+    simulation->add(new wrench::FileRegistryService(hostname));
+
+
+    // Staging the input file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+    // Running a "run a single task" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
+    ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
+
+    ASSERT_EQ(this->task1->getFailureCount(), 1);
+    ASSERT_EQ(this->task2->getFailureCount(), 1);
+
+    delete simulation;
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
 /**  JOB TERMINATION TEST                                            **/
 /**********************************************************************/
 
@@ -1055,7 +1180,10 @@ private:
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
-        // Immediately terminate it
+        // sleep 0.1 sec
+        wrench::Simulation::sleep(0.1);
+
+        // Terminate it
         try {
             job_manager->terminateJob(two_task_job);
         } catch (std::exception &e) {
@@ -1424,6 +1552,9 @@ private:
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
+
+        // Sleep for a little bit
+        wrench::Simulation::sleep(0.1);
 
         // Shutdown the compute service
         this->test->compute_service->stop();

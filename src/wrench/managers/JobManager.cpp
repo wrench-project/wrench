@@ -985,14 +985,36 @@ namespace wrench {
             } catch (ExecutionException &e) {
                 std::cerr << "IN CATCH!\n";
                 it = this->jobs_to_dispatch.erase(it);
-                job->popCallbackMailbox();
+//                job->popCallbackMailbox();
                 if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                    cjob->setAllActionsFailed(e.getCause());
-                    try {
-                        auto message =
-                                new JobManagerCompoundJobFailedMessage(cjob, cjob->parent_compute_service, e.getCause());
-                        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
-                    } catch (NetworkError &e) {
+
+                    if (this->cjob_to_sjob_map.find(cjob) == this->cjob_to_sjob_map.end()) {
+                        cjob->setAllActionsFailed(e.getCause());
+                        try {
+                            auto message =
+                                    new JobManagerCompoundJobFailedMessage(cjob, cjob->parent_compute_service,
+                                                                           e.getCause());
+                            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+                        } catch (NetworkError &e) {
+                        }
+                    } else {
+                        auto sjob = this->cjob_to_sjob_map[cjob];
+                        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
+                        std::set<WorkflowTask *> failure_count_increments;
+                        // Set all tasks to not-ready (will be fixed later)
+                        for (auto const &t : sjob->getTasks()) {
+                            state_changes[t] = WorkflowTask::State::NOT_READY;
+                        }
+
+                        this->cjob_to_sjob_map.erase(cjob);
+                        try {
+                            auto message =
+                                    new JobManagerStandardJobFailedMessage(sjob, sjob->parent_compute_service,
+                                                                           state_changes, failure_count_increments,
+                                                                           e.getCause());
+                            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
+                        } catch (NetworkError &e) {
+                        }
                     }
                 } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
                     try {
