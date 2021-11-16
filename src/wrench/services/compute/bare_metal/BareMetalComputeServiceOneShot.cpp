@@ -15,7 +15,7 @@
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 #include <wrench/job/CompoundJob.h>
-#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
@@ -32,311 +32,8 @@
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_standard_jobs");
 
 namespace wrench {
-    /**
-     * @brief Destructor
-     */
-    BareMetalComputeService::~BareMetalComputeService() {
-        this->default_property_values.clear();
-    }
-
-    /**
-     * @brief Cleanup method
-     *
-     * @param has_returned_from_main: whether main() returned
-     * @param return_value: the return value (if main() returned)
-     */
-    void BareMetalComputeService::cleanup(bool has_returned_from_main, int return_value) {
-        // Do the default behavior (which will throw as this is not a fault-tolerant service)
-        Service::cleanup(has_returned_from_main, return_value);
-
-        this->current_jobs.clear();
-        this->not_ready_actions.clear();
-        this->ready_actions.clear();
-        this->dispatched_actions.clear();
-    }
-
-    /**
-       * @brief Helper static method to parse resource specifications to the <cores,ram> format
-       * @param spec: specification string
-       * @return a <cores, ram> tuple
-       * @throw std::invalid_argument
-       */
-    std::tuple<std::string, unsigned long> BareMetalComputeService::parseResourceSpec(const std::string &spec) {
-        std::vector<std::string> tokens;
-        boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
-        switch (tokens.size()) {
-            case 1: // "num_cores" or "hostname"
-            {
-                unsigned long num_threads;
-                if (sscanf(tokens[0].c_str(), "%lu", &num_threads) != 1) {
-                    return std::make_tuple(tokens[0], ULONG_MAX);
-                } else {
-                    return std::make_tuple(std::string(""), num_threads);
-                }
-            }
-            case 2: // "hostname:num_cores"
-            {
-                unsigned long num_threads;
-                if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
-                    throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
-                }
-                return std::make_tuple(tokens[0], num_threads);
-            }
-            default: {
-                throw std::invalid_argument("Invalid service-specific argument '" + spec + "'");
-            }
-        }
-    }
-
-    /**
-     * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
-     * @param job: the job that's being submitted
-     * @param service_specific_arg: the service-specific arguments
-     */
-    void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<Job> job,
-                                                                const std::map<std::string, std::string> &service_specific_args) {
-
-        auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
-        auto compute_resources = this->action_execution_service->getComputeResources();
-        // Check that each action can run w.r.t. the resource I have
-        unsigned long max_cores = 0;
-        double max_ram = 0;
-        for (auto const &cr : compute_resources) {
-            max_cores = (std::get<0>(cr.second) > max_cores ? std::get<0>(cr.second) : max_cores);
-            max_ram = (std::get<1>(cr.second) > max_ram ? std::get<1>(cr.second) : max_ram);
-        }
-
-        // Validate that there are enough resources for each task
-        for (auto const &action : cjob->getActions()) {
-            if ((action->getMinRAMFootprint() > max_ram) or
-                    (action->getMinNumCores() > max_cores)) {
-                throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
-            }
-        }
-
-        // Check that service-specific args make sense w.r.t to the resources I have
-        for (auto const &action : cjob->getActions()) {
-            if ((service_specific_args.find(action->getName()) != service_specific_args.end()) and
-                (not service_specific_args.at(action->getName()).empty())) {
-                std::tuple<std::string, unsigned long> parsed_spec;
-
-                try {
-                    parsed_spec = BareMetalComputeService::parseResourceSpec(service_specific_args.at(action->getName()));
-                } catch (std::invalid_argument &e) {
-                    throw;
-                }
-
-                std::string target_host = std::get<0>(parsed_spec);
-                unsigned long target_num_cores = std::get<1>(parsed_spec);
-
-//                std::cerr << "TARGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
-
-                if (not target_host.empty()) {
-
-                    if (compute_resources.find(target_host) == compute_resources.end()) {
-                        throw std::invalid_argument(
-                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                                service_specific_args.at(action->getName()) +
-                                "' for action '" + action->getName() + "': no such host");
-                    }
-
-                    if ((target_num_cores != ULONG_MAX) and (target_num_cores > std::get<0>(compute_resources[target_host]))) {
-                        throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
-                    }
-                }
-
-                if (target_num_cores != ULONG_MAX) {
-                    if (target_num_cores < action->getMinNumCores()) {
-                        throw std::invalid_argument(
-                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                                service_specific_args.at(action->getName()) +
-                                "' for action '" + action->getName() + "': the action requires more cores");
-                    }
-
-                    if (target_num_cores > action->getMaxNumCores()) {
-                        throw std::invalid_argument(
-                                "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
-                                service_specific_args.at(action->getName()) +
-                                "' for action '" + action->getName() + "': the action cannot use this many cores");
-                    }
-                    if (target_num_cores > max_cores) {
-                        throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @brief Submit a compound job to the compute service
-     * @param job: a compound job
-     * @param service_specific_args: optional service specific arguments
-     *
-     *    These arguments are provided as a map of strings, indexed by action names. These
-     *    strings are formatted as "[hostname:][num_cores]" (e.g., "somehost:12", "somehost","6", "").
-     *
-     *      - If a value is not provided for an action, then the service will choose a host and use as many cores as possible on that host.
-     *      - If a "" value is provided for an action, then the service will choose a host and use as many cores as possible on that host.
-     *      - If a "hostname" value is provided for an action, then the service will run the action on that
-     *        host, using as many of its cores as possible
-     *      - If a "num_cores" value is provided for an action, then the service will run that action with
-     *        this many cores, but will choose the host on which to run it.
-     *      - If a "hostname:num_cores" value is provided for an action, then the service will run that
-     *        action with this many cores on that host.
-     *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void BareMetalComputeService::submitCompoundJob(
-            std::shared_ptr<CompoundJob> job,
-            const std::map<std::string, std::string> &service_specific_args) {
-        assertServiceIsUp();
-
-        WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
-
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
-
-        //  send a "run a standard job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new ComputeServiceSubmitCompoundJobRequestMessage(
-                                            answer_mailbox, job, service_specific_args,
-                                            this->getMessagePayloadValue(
-                                                    ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ComputeService::submitCompoundJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
-        }
-    }
-
-    /**
-     * @brief Asynchronously submit a pilot job to the compute service. This will raise
-     *        a ExecutionException as this service does not support pilot jobs.
-     *
-     * @param job: a pilot job
-     * @param service_specific_args: service specific arguments (only {} is supported)
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
-     */
-    void BareMetalComputeService::submitPilotJob(
-            std::shared_ptr<PilotJob> job,
-            const std::map<std::string, std::string> &service_specific_args) {
-        assertServiceIsUp();
-
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
-
-        // Send a "run a pilot job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox_name,
-                    new ComputeServiceSubmitPilotJobRequestMessage(
-                            answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
-                                    BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        // Wait for a reply
-        std::unique_ptr<SimulationMessage> message = nullptr;
-
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            } else {
-                return;
-            }
-
-        } else {
-            throw std::runtime_error(
-                    "bare_metal_standard_jobs::submitPilotJob(): Received an unexpected [" + message->getName() +
-                    "] message!");
-        }
-    }
 
 
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a map of <num_cores, memory_manager_service> tuples, indexed by hostname, which represents
-     *        the compute resources available to this service.
-     *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
-     *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
-     * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     */
-    BareMetalComputeService::BareMetalComputeService(
-            const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            std::string scratch_space_mount_point,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list
-    ) : ComputeService(hostname,
-                       "bare_metal_standard_jobs",
-                       "bare_metal_standard_jobs",
-                       scratch_space_mount_point) {
-        initiateInstance(hostname,
-                         std::move(compute_resources),
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
-    }
-
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host on which the service should be started
-     * @param compute_hosts:: the names of the hosts available as compute resources (the service
-     *        will use all the cores and all the RAM of each host)
-     * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     */
-    BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                     const std::vector<std::string> compute_hosts,
-                                                     std::string scratch_space_mount_point,
-                                                     std::map<std::string, std::string> property_list,
-                                                     std::map<std::string, double> messagepayload_list
-    ) : ComputeService(hostname,
-                       "bare_metal_standard_jobs",
-                       "bare_metal_standard_jobs",
-                       scratch_space_mount_point) {
-        std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
-        for (auto h : compute_hosts) {
-            specified_compute_resources.insert(
-                    std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
-        }
-
-        initiateInstance(hostname,
-                         specified_compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
-    }
 
     /**
      * @brief Internal constructor
@@ -352,7 +49,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BareMetalComputeService::BareMetalComputeService(
+    BareMetalComputeServiceOneShot::BareMetalComputeServiceOneShot(
+            std::shared_ptr<CompoundJob> job,
             const std::string &hostname,
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::map<std::string, std::string> property_list,
@@ -360,93 +58,8 @@ namespace wrench {
             double ttl,
             std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space
-    ) : ComputeService(hostname,
-                       "bare_metal_standard_jobs" + suffix,
-                       "bare_metal_standard_jobs" + suffix,
-                       scratch_space) {
-        initiateInstance(hostname,
-                         std::move(compute_resources),
-                         std::move(property_list),
-                         std::move(messagepayload_list),
-                         ttl,
-                         std::move(pj));
-    }
+    ) : BareMetalComputeService(hostname, compute_resources, property_list, messagepayload_list, ttl, pj, suffix, scratch_space), job(job) {
 
-    /**
-     * @brief Internal constructor
-     *
-     * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_hosts:: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
-     *        the compute resources available to this service
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param scratch_space: the scratch space for this compute service
-     */
-    BareMetalComputeService::BareMetalComputeService(
-            const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
-            std::shared_ptr<StorageService> scratch_space) :
-            ComputeService(hostname,
-                           "bare_metal_standard_jobs",
-                           "bare_metal_standard_jobs",
-                           scratch_space) {
-        initiateInstance(hostname,
-                         compute_resources,
-                         std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
-    }
-
-    /**
-     * @brief Helper method called by all constructors to initiate object instance
-     *
-     * @param hostname: the name of the host
-     * @param compute_resources: compute_resources: a map of <num_cores, memory_manager_service> pairs, indexed by hostname, which represent
-     *        the compute resources available to this service
-     * @param property_list: a property list ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list ({} means "use all defaults")
-     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
-     * @param pj: a containing PilotJob  (nullptr if none)
-     *
-     * @throw std::invalid_argument
-     */
-    void BareMetalComputeService::initiateInstance(
-            const std::string &hostname,
-            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
-            double ttl,
-            std::shared_ptr<PilotJob> pj) {
-        if (ttl < 0) {
-            throw std::invalid_argument(
-                    "bare_metal_standard_jobs::initiateInstance(): invalid TTL value (must be >0)");
-        }
-
-        // Set default and specified properties
-        this->setProperties(this->default_property_values, std::move(property_list));
-
-        // Validate that properties are correct
-        this->validateProperties();
-
-        // Set default and specified message payloads
-        this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
-
-        // Create an ActionExecutionService
-        try {
-            this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
-                    hostname,
-                    std::move(compute_resources),
-                    {{ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)}},
-                    {}
-            ));
-            this->action_execution_service->setSimulation(this->simulation);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
-
-        this->ttl = ttl;
-        this->has_ttl = (this->ttl != DBL_MAX);
-        this->containing_pilot_job = std::move(pj);
     }
 
     /**
@@ -460,7 +73,7 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-        WRENCH_INFO("New BareMetal Compute Service starting");
+        WRENCH_INFO("New OneShot BareMetal Compute Service starting");
 
         // Start the ActionExecutionService
         this->action_execution_service->setParentService(this->getSharedPtr<Service>());
@@ -472,12 +85,29 @@ namespace wrench {
             this->death_date = S4U_Simulation::getClock() + this->ttl;
         }
 
+
+        /** Note that the code below doesn't do any checks at all, the job had better be well-formed **/
+
+        // Add the job to the set of jobs
+        this->num_dispatched_actions_for_cjob[this->job] = 0;
+        this->current_jobs.insert(this->job);
+
+        // Add all action to the list of actions to run
+        for (auto const &action : this->job->getActions()) {
+            if (action->getState() == Action::State::READY) {
+                this->ready_actions.push_back(action);
+            } else {
+                this->not_ready_actions.insert(action);
+            }
+        }
+
         /** Main loop **/
+        dispatchReadyActions();
         while (this->processNextMessage()) {
             dispatchReadyActions();
         }
 
-        WRENCH_INFO("BareMetalService terminating cleanly!");
+        WRENCH_INFO("One-Shot BareMetalService terminating cleanly!");
         return this->exit_code;
     }
 
@@ -604,6 +234,7 @@ namespace wrench {
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a compound job with %ld actions", job->getActions().size());
 
+        job->hasFailed();
         // Do we support standard jobs?
         if (not this->supportsCompoundJobs()) {
             auto failure_cause = std::shared_ptr<FailureCause>(
@@ -884,6 +515,7 @@ namespace wrench {
                   });
 
         for (auto const &action : this->ready_actions) {
+            action->getJob()->hasFailed();
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);

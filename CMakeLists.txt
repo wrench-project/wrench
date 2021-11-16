@@ -64,6 +64,7 @@ set(HEADER_FILES
         include/wrench/services/compute/ComputeServiceMessagePayload.h
         include/wrench/services/compute/ComputeServiceProperty.h
         include/wrench/services/compute/bare_metal/BareMetalComputeService.h
+        include/wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h
         include/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h
         include/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h
         include/wrench/services/compute/batch/BatchComputeService.h
@@ -234,6 +235,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/ComputeServiceMessagePayload.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeService.cpp
+        src/wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.cpp
         src/wrench/services/compute/batch/BatchComputeService.cpp

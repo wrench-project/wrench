@@ -1120,12 +1120,4 @@ namespace wrench {
         return this->creator_mailbox;
     }
 
-//    /**
-//     * @brief Get the WMS associated to this DataManager
-//     * @return a WMS
-//     */
-//    std::shared_ptr<WMS> JobManager::getWMS() {
-//        return this->wms;
-//    }
-
 }
