@@ -112,8 +112,7 @@ namespace wrench {
 
         void incrementNumCompletedTasks();
 
-        StandardJob(Workflow *workflow,
-                    std::shared_ptr<JobManager> job_manager,
+        StandardJob(std::shared_ptr<JobManager> job_manager,
                     std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &pre_file_copies,
                     std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &post_file_copies,

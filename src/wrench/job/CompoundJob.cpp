@@ -96,6 +96,7 @@ namespace wrench {
         assertJobNotSubmitted();
         auto new_action = std::shared_ptr<SleepAction>(new SleepAction(name, this->shared_this, sleep_time));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -120,6 +121,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<ComputeAction>(
                 new ComputeAction(name, this->shared_this, flops, ram, min_num_cores, max_num_cores, parallel_model));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
 
@@ -140,6 +142,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, file, {std::move(file_location)}));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -158,6 +161,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->shared_this, file, std::move(file_locations)));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -176,6 +180,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileWriteAction>(
                 new FileWriteAction(name, this->shared_this, file, {std::move(file_location)}));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -196,6 +201,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileCopyAction>(
                 new FileCopyAction(name, this->shared_this, file, std::move(src_file_location), std::move(dst_file_location)));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -214,6 +220,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, this->shared_this, file, std::move(file_location)));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -233,6 +240,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
                 new FileRegistryAddEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -252,6 +260,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
                 new FileRegistryDeleteEntryAction(name, this->shared_this, std::move(file_registry), file, std::move(file_location)));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -270,6 +279,7 @@ namespace wrench {
         auto new_action = std::shared_ptr<CustomAction>(
                 new CustomAction(name, this->shared_this, lambda_execute, lambda_terminate));
         new_action->setSharedPtrThis(new_action);
+        new_action->setState(Action::State::READY);
         this->actions.insert(new_action);
         return new_action;
     }
@@ -369,8 +379,10 @@ namespace wrench {
      * @param new_state: the action's new state
      */
     void CompoundJob::updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state) {
-        this->state_task_map[old_state].erase(action);
-        this->state_task_map[new_state].insert(action);
+        if (old_state != new_state) {
+            this->state_task_map[old_state].erase(action);
+            this->state_task_map[new_state].insert(action);
+        }
     }
 
     /**
@@ -391,16 +403,32 @@ namespace wrench {
     }
 
     /**
+     * @brief Print the task map
+     */
+    void CompoundJob::printTaskMap() {
+        std::cerr << "JOB TASK MAP:\n";
+        std::cerr << "   TOTAL (" + std::to_string(this->actions.size()) + "): ";
+        for (auto const &a : this->actions) {
+            std::cerr << a->getName() << " ";
+        }
+        std::cerr << "\n";
+        std::vector<Action::State> states = {Action::State::NOT_READY, Action::State::READY, Action::State::COMPLETED,
+                                             Action::State::FAILED, Action::State::KILLED, Action::State::STARTED};
+        for (auto const &s : states) {
+            std::cerr << "   " << Action::stateToString(s) << " (" + std::to_string(this->state_task_map[s].size()) + ") ";
+            for (auto const &a : this->state_task_map[s]) {
+                std::cerr << a->getName();
+                // std::cerr << "(" << a << ") ";
+            }
+            std::cerr << "\n";
+        }
+    }
+
+    /**
      * @brief Return whether the job has terminated and has done so with some tasks having failed
      * @return true or false
      */
     bool CompoundJob::hasFailed() {
-//        std::cerr << "IN HAS FAILED: TOTAL " << this->actions.size() << "\n";
-//        std::cerr << "IN HAS FAILED: READY " << this->state_task_map[Action::State::READY].size() << "\n";
-//        std::cerr << "IN HAS FAILED: NOTREADY " << this->state_task_map[Action::State::NOT_READY].size() << "\n";
-//        std::cerr << "IN HAS FAILED: COMPETED " << this->state_task_map[Action::State::COMPLETED].size() << "\n";
-//        std::cerr << "IN HAS FAILED: KILLED " << this->state_task_map[Action::State::KILLED].size() << "\n";
-//        std::cerr << "IN HAS FAILED: FAILED " << this->state_task_map[Action::State::FAILED].size() << "\n";
         return (this->actions.size() ==
                 this->state_task_map[Action::State::NOT_READY].size() +
                         this->state_task_map[Action::State::COMPLETED].size() +
@@ -478,6 +506,7 @@ namespace wrench {
      */
     void CompoundJob::removeAction(shared_ptr<Action> &action) {
         assertJobNotSubmitted();
+        this->state_task_map[action->getState()].erase(action);
         for (auto const &parent : action->parents) {
             parent->children.erase(action);
         }
@@ -485,7 +514,6 @@ namespace wrench {
             child->parents.erase(action);
             child->updateState();
         }
-        this->state_task_map[action->getState()].erase(action);
         this->actions.erase(action);
     }
 

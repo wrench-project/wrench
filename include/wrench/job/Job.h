@@ -46,6 +46,8 @@ namespace wrench {
 
         std::string popCallbackMailbox();
 
+        void printCallbackMailboxStack();
+
         void pushCallbackMailbox(std::string);
 
         std::string getCallbackMailbox();

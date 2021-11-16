@@ -503,7 +503,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+//        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->terminate();
@@ -604,6 +604,7 @@ namespace wrench {
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a compound job with %ld actions", job->getActions().size());
 
+        job->hasFailed();
         // Do we support standard jobs?
         if (not this->supportsCompoundJobs()) {
             auto failure_cause = std::shared_ptr<FailureCause>(
@@ -884,6 +885,7 @@ namespace wrench {
                   });
 
         for (auto const &action : this->ready_actions) {
+            action->getJob()->hasFailed();
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);
@@ -907,8 +909,6 @@ namespace wrench {
             return;
         }
 
-//        std::cerr << "AN ACTION IS DONE: " << action->getName() << "\n";
-
         this->dispatched_actions.erase(action);
         this->num_dispatched_actions_for_cjob[action->getJob()]--;
 
@@ -922,9 +922,9 @@ namespace wrench {
 
         // Is the job done?
         auto job = action->getJob();
+
         try {
             if (job->hasSuccessfullyCompleted() and (this->num_dispatched_actions_for_cjob[job] == 0)) {
-//                std::cerr << "JOB IS DONE!\n";
                 this->current_jobs.erase(job);
                 S4U_Mailbox::dputMessage(
                         job->popCallbackMailbox(),
@@ -934,7 +934,6 @@ namespace wrench {
                                         BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
 
             } else if (job->hasFailed() and ((this->num_dispatched_actions_for_cjob[job] == 0))) {
-//                std::cerr << "JOB HAS FAILED\n";
                 this->current_jobs.erase(job);
                 S4U_Mailbox::putMessage(
                         job->popCallbackMailbox(),
@@ -943,7 +942,7 @@ namespace wrench {
                                 this->getMessagePayloadValue(
                                         BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
             } else {
-//                std::cerr << "JOB IS NOT DONE\n";
+                // job is not one
             }
         } catch (std::shared_ptr<NetworkError> &cause) {
             return; // ignore
