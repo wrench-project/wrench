@@ -98,7 +98,7 @@ namespace wrench {
         friend class ActionExecutor;
         friend class ActionExecutionService;
 
-        void newExecution();
+        void newExecution(Action::State state);
 
         void setStartDate(double date);
         void setEndDate(double date);

@@ -100,9 +100,11 @@ namespace wrench {
 
 //        void forgetJob(Job *job);
 
-        std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
+//        std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
 
-        std::shared_ptr<WMS> getWMS();
+//        std::shared_ptr<WMS> getWMS();
+
+        std::string &getCreatorMailbox();
 
         unsigned long getNumRunningPilotJobs();
 
@@ -116,7 +118,8 @@ namespace wrench {
 
         friend class WMS;
 
-        explicit JobManager(std::shared_ptr<WMS> wms);
+//        explicit JobManager(std::shared_ptr<WMS> wms);
+        explicit JobManager(std::string hostname, std::string &creator_mailbox);
 
         /***********************/
         /** \endcond           */
@@ -148,8 +151,9 @@ namespace wrench {
 
         void processPilotJobExpiration(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
 
-        // Relevant WMS
-        std::shared_ptr<WMS> wms;
+        // Mailbox of the creator of this job manager
+        std::string creator_mailbox;
+//        std::shared_ptr<WMS> wms;
 
         std::vector<std::shared_ptr<Job>> jobs_to_dispatch;
         std::set<std::shared_ptr<Job>> jobs_dispatched;

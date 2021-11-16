@@ -35,9 +35,10 @@ namespace wrench {
      *
      * @param wms: the wms for which this manager is working
      */
-    JobManager::JobManager(std::shared_ptr<WMS> wms) :
-            Service(wms->hostname, "job_manager", "job_manager") {
-        this->wms = wms;
+    JobManager::JobManager(std::string hostname, std::string &creator_mailbox) :
+            Service(hostname, "job_manager", "job_manager") {
+//        this->wms = wms;
+        this->creator_mailbox = creator_mailbox;
     }
 
     /**
@@ -231,7 +232,7 @@ namespace wrench {
         }
 
         auto job = std::shared_ptr<StandardJob>(
-                new StandardJob(this->wms->getWorkflow(), this->getSharedPtr<JobManager>(), tasks, file_locations, pre_file_copies,
+                new StandardJob(this->getSharedPtr<JobManager>(), tasks, file_locations, pre_file_copies,
                                 post_file_copies, cleanup_file_deletions));
         job->shared_this = job;
 
@@ -534,6 +535,7 @@ namespace wrench {
             }
 
             sjob->createUnderlyingCompoundJob(compute_service);
+            sjob->compound_job->hasFailed();
 
             // Tweak the service_specific_arguments
             std::map<std::string, std::string> new_args;
@@ -566,6 +568,7 @@ namespace wrench {
             for (auto const &t : sjob->tasks) {
                 t->setState(WorkflowTask::State::PENDING);
             }
+
 
             // The compound job
             this->cjob_to_sjob_map[sjob->compound_job] = sjob;
@@ -1106,6 +1109,15 @@ namespace wrench {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
         } catch (NetworkError &e) {
         }
+    }
+
+    /**
+     * @brief Return the mailbox of the job manager's creator
+     *
+     * @return a mailbox
+     */
+    std::string &JobManager::getCreatorMailbox() {
+        return this->creator_mailbox;
     }
 
 //    /**

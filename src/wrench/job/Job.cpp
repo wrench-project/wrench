@@ -40,7 +40,7 @@ namespace wrench {
             this->name = name;
         }
         this->job_manager = std::move(job_manager);
-        this->originator_mailbox = this->job_manager->mailbox_name;
+        this->originator_mailbox = this->job_manager->getCreatorMailbox();
 
         this->parent_compute_service = nullptr;
         this->submit_date = -1.0;
@@ -65,6 +65,18 @@ namespace wrench {
         return this->originator_mailbox;
     }
 
+
+    /**
+     * @brief Method to print the call back stack
+     */
+    void Job::printCallbackMailboxStack() {
+        auto mystack = this->callback_mailbox_stack;
+        while (not mystack.empty()) {
+            WRENCH_INFO("   STACK : %s", mystack.top().c_str());
+            mystack.pop();
+        }
+        WRENCH_INFO("   ORIGINAL : %s", this->originator_mailbox.c_str());
+    }
 
     /**
      * @brief Get the "next" callback mailbox (returns the
