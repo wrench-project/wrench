@@ -90,7 +90,7 @@ namespace wrench {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
 
-        int index = 0;
+        ssize_t index = 0;
         bool one_comm_failed = false;
         try {
             index =  simgrid::s4u::Comm::wait_any_for(pending_s4u_comms, timeout);
@@ -104,13 +104,12 @@ namespace wrench {
             one_comm_failed = true;
         }
 
-
         if (index == -1) {
             return ULONG_MAX;
         }
 
         if (one_comm_failed) {
-            for (index = 0; index < (int) pending_s4u_comms.size(); index++) {
+            for (index = 0; index < pending_s4u_comms.size(); index++) {
                 if (pending_s4u_comms[index]->get_state() == simgrid::s4u::Activity::State::FAILED) {
                     break;
                 }
