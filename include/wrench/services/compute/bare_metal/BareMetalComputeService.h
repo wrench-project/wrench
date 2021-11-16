@@ -52,7 +52,7 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "false"},
+                {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
                 {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
                 {BareMetalComputeServiceProperty::SUPPORTS_COMPOUND_JOBS,                         "true"},
                 {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
@@ -135,12 +135,6 @@ namespace wrench {
         void validateServiceSpecificArguments(std::shared_ptr<Job> job,
                                                       const std::map<std::string, std::string> &service_specific_args) override;
 
-    private:
-
-        friend class Simulation;
-
-        void validateProperties();
-
 
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
@@ -150,12 +144,17 @@ namespace wrench {
                                 std::shared_ptr<PilotJob> pj, std::string suffix,
                                 std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
-        // Private Constructor
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 std::map<std::string, std::string> property_list,
                                 std::map<std::string, double> messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
+    private:
+
+        friend class Simulation;
+
+        void validateProperties();
+
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,

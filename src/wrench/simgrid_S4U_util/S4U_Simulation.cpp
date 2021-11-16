@@ -654,7 +654,7 @@ namespace wrench {
  * @throw std::invalid_argument
  * @throw std::runtime_error
  */
-    void S4U_Simulation::setPstate(const std::string &hostname, int pstate) {
+    void S4U_Simulation::setPstate(const std::string &hostname, unsigned long pstate) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
@@ -664,7 +664,7 @@ namespace wrench {
                                         std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
-            host->set_pstate((unsigned long)pstate);
+            host->set_pstate(pstate);
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
@@ -702,7 +702,7 @@ namespace wrench {
  * @return The index of the current pstate of the host (as specified in the platform xml description file)
  * @throw std::runtime_error
  */
-    int S4U_Simulation::getCurrentPstate(const std::string &hostname) {
+    unsigned long S4U_Simulation::getCurrentPstate(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
