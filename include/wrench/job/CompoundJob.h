@@ -124,6 +124,8 @@ namespace wrench {
 
         void printActionDependencies();
 
+        void printTaskMap();
+
         /***********************/
         /** \endcond           */
         /***********************/

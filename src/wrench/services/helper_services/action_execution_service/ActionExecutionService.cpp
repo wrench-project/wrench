@@ -558,7 +558,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-//        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
         if (auto msg = dynamic_cast<HostHasTurnedOnMessage *>(message.get())) {
             // Do nothing, just wake up
             return true;
@@ -1080,8 +1080,8 @@ namespace wrench {
         if (not this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
 
             // Reset the action state to READY)
-            action->newExecution();
-            action->setState(Action::State::READY);
+            action->newExecution(Action::State::READY);
+//            action->setState(Action::State::READY);
             // Put the action back in the ready list (at the end)
             WRENCH_INFO("Putting action back in the ready queue");
             this->ready_actions.push_back(action);

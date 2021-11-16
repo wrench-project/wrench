@@ -246,10 +246,10 @@ private:
                 }
             }
 
-            while (scheduleAReadyTask()) {}
+            while (scheduleAReadyTask()) {
+            }
 
             if (not this->waitForAndProcessNextEvent(50.00)) {
-//                WRENCH_INFO("TIMEOUT");
             }
         }
 
@@ -266,7 +266,9 @@ private:
                 break;
             }
         }
-        if (not task) return false; // no ready task right now
+        if (not task) {
+            return false; // no ready task right now
+        }
 
         // Pick a storage service
         std::shared_ptr<wrench::StorageService> target_storage_service;
@@ -413,6 +415,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-log");
 
 //    argv[1] = strdup("--wrench-full-log");
 
@@ -445,7 +448,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
                         "/scratch",
-                        {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}, {})));
+                        {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                         {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
     }
 
     // Create Cloud Service

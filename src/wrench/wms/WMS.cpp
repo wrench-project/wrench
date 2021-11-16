@@ -202,7 +202,7 @@ namespace wrench {
      * @return the event
      */
     std::shared_ptr<ExecutionEvent> WMS::waitForNextEvent(double timeout) {
-        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name);
+        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name, timeout);
     }
 
     /**
@@ -319,7 +319,7 @@ namespace wrench {
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
         std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(
-                new JobManager(this->getSharedPtr<WMS>()));
+                new JobManager(this->hostname, this->mailbox_name));
         job_manager->simulation = this->simulation;
         job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
 

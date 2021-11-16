@@ -36,8 +36,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob::StandardJob(Workflow *workflow,
-                             std::shared_ptr<JobManager> job_manager,
+    StandardJob::StandardJob(std::shared_ptr<JobManager> job_manager,
                              std::vector<WorkflowTask *> tasks,
                              std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
@@ -319,7 +318,6 @@ namespace wrench {
             }
         }
 
-
         // Create the scratch clean up actions
         if (need_scratch_clean) {
             // Does the lambda capture of cjob_file_locations work?
@@ -351,7 +349,6 @@ namespace wrench {
             scratch_cleanup = cjob->addCustomAction("", lambda_execute, lambda_terminate);
 
         }
-
 
         // Add all inter-task dependencies
         for (auto const &parent_task : this->tasks) {
