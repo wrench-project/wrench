@@ -30,7 +30,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
-        void stop() override;
+        void stop(bool send_failure_notifications) override;
         void kill();
         /***********************/
         /** \endcond           */

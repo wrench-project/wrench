@@ -15,7 +15,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param job: the workflow job corresponding to the batch job
+     * @param job: the compound job corresponding to the batch job
      * @param job_id: the batch job id
      * @param time_in_minutes: the requested execution time in minutes
      * @param num_nodes: the requested number of compute nodes (hosts)
@@ -24,14 +24,14 @@ namespace wrench {
      * @param ending_time_stamp: the job's end date
      * @param arrival_time_stamp: the job's arrival date
      */
-    BatchJob::BatchJob(std::shared_ptr<Job> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
+    BatchJob::BatchJob(std::shared_ptr<CompoundJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
                        unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): StandardJob cannot be null"
             );
         }
-        this->job = job;
+        this->compound_job = job;
         if (job_id <= 0 || num_nodes == 0 || cores_per_node == 0) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): either jobid (" + std::to_string(job_id) +
@@ -88,16 +88,13 @@ namespace wrench {
      * @return a size in bytes
      */
     double BatchJob::getMemoryRequirement() {
-        std::shared_ptr<Job> workflow_job = this->job;
+        auto job = this->compound_job;
         double memory_requirement = 0.0;
-        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
-            for (auto const &t : sjob->getTasks()) {
-                double ram = t->getMemoryRequirement();
+            for (auto const &action : job->getActions()) {
+                double ram = action->getMinRAMFootprint();
                 memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
             }
-        }
         return memory_requirement;
-
     }
 
     /**
@@ -109,11 +106,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the workflow job corresponding to this batch job
-     * @return a workflow job
+     * @brief Get the compound job corresponding to this batch job
+     * @return a compound job
      */
-    std::shared_ptr<Job> BatchJob::getWorkflowJob() {
-        return this->job;
+    std::shared_ptr<CompoundJob> BatchJob::getCompoundJob() {
+        return this->compound_job;
     }
 
     /**

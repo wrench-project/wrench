@@ -901,7 +901,7 @@ private:
         wrench::Simulation::sleep(10);
 
         // stop all VMs
-        this->test->compute_service->stop();
+        this->test->compute_service->stop(false);
 
         return 0;
     }
@@ -1268,7 +1268,7 @@ private:
         }
 
         // stop service
-        cs->stop();
+        cs->stop(false);
 
         // Sleep a bit
         wrench::Simulation::sleep(10.0);
@@ -1763,7 +1763,7 @@ private:
         wrench::Simulation::sleep(10);
 
         // Stop the VM Compute Service
-        vm_cs->stop();
+        vm_cs->stop(true);
 
         // Wait for a workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event;

@@ -345,7 +345,7 @@ private:
         wrench::Simulation::sleep(20);
 
         // Shutdown the batch service
-        (*(this->getAvailableComputeServices<wrench::ComputeService>().begin()))->stop();
+        (*(this->getAvailableComputeServices<wrench::ComputeService>().begin()))->stop(false);
 
         // At this point there should be some warning messages from the
         // Workload Trace file replayer (job failures, impossible to submit the last job)

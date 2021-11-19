@@ -823,7 +823,7 @@ namespace wrench {
         } else {
             std::string pm = vm->getPhysicalHostname();
             // Stop the Compute Service
-            cs->stop();
+            cs->stop(false);
             // We do not shut down the VM. This will be done when the CloudComputeService is notified
             // of the bare_metal_standard_jobs completion.
             vm->shutdown();
@@ -1302,7 +1302,7 @@ namespace wrench {
                     // Shut it down
                     std::string pm = actual_vm->getPhysicalHostname();
                     // Stop the Compute Service
-                    cs->stop();
+                    cs->stop(false);
                     // Shutdown the VM
                     actual_vm->shutdown();
                     // Update internal data structures

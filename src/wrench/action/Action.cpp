@@ -60,7 +60,7 @@ namespace wrench {
      * @brief Returns the action's name
      * @return the name
      */
-    std::string Action::getName() const {
+    const std::string &Action::getName() const {
         return this->name;
     }
 

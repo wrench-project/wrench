@@ -30,8 +30,8 @@ namespace wrench {
      * @brief Stop the compute service - must be called by the stop()
      *        method of derived classes
      */
-    void ComputeService::stop() {
-        Service::stop();
+    void ComputeService::stop(bool send_failure_notifications) {
+        Service::stop(send_failure_notifications);
     }
 
     /**
@@ -39,11 +39,11 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
      *      - to a bare_metal_standard_jobs: {}
-     *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
-     *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
-     *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
+     *          - If no entry is provided for an actionID, the service will pick on which host and with how many cores to run the task
+     *          - If a number of cores is provided (e.g., {"action1", "12"}), the service will pick the host on which to run the task
+     *          - If a hostname and a number of cores is provided (e.g., {"action1", "host1:12"}, the service will run the action on that host
      *            with the specified number of cores
-     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}]} (SLURM-like)
+     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}], [{actionID:[host[:num_cores]]}
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
      *         - "-c": number of requested cores per compute host
@@ -54,7 +54,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(std::shared_ptr<Job> job, const std::map<std::string, std::string> &service_specific_args) {
+    void ComputeService::submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
@@ -64,9 +64,9 @@ namespace wrench {
 
         try {
             if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                this->submitStandardJob(sjob, service_specific_args);
+                throw std::runtime_error("CANT SUBMIT A STANDARD JOB!\n");
             } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                this->submitPilotJob(pjob, service_specific_args);
+                throw std::runtime_error("CANT SUBMIT A PILOT JOB!\n");
             } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
                 this->submitCompoundJob(cjob, service_specific_args);
             }
@@ -563,7 +563,7 @@ namespace wrench {
      * @param job: the job that's being submitted
      * @param service_specific_arg: the service-specific arguments
      */
-    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<Job> job,
+    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
                                                           const map<std::string, std::string> &service_specific_args) {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }

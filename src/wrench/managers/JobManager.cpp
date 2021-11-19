@@ -82,9 +82,9 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void JobManager::stop() {
+    void JobManager::stop(bool send_failure_notifications) {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", send_failure_notifications, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -383,73 +383,237 @@ namespace wrench {
         return job;
     }
 
-    /**
-     * @brief Helper method to validate a job submission
-     * @param job: the job to submit
-     * @param compute_service: the compute service
-     * @param service_specific_args: the service-specific arguments
-     */
-    void JobManager::validateJobSubmission(std::shared_ptr<Job> job,
-                                           std::shared_ptr<ComputeService> compute_service,
-                                           std::map<std::string, std::string> service_specific_args) {
+//    /**
+//     * @brief Helper method to validate a job submission
+//     * @param job: the job to submit
+//     * @param compute_service: the compute service
+//     * @param service_specific_args: the service-specific arguments
+//     */
+//    void JobManager::validateJobSubmission(std::shared_ptr<Job> job,
+//                                           std::shared_ptr<ComputeService> compute_service,
+//                                           std::map<std::string, std::string> service_specific_args) {
+//
+//        if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+//            validateCompoundJobSubmission(cjob, compute_service, service_specific_args);
+//        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+//            validatePilotJobSubmission(pjob, compute_service, service_specific_args);
+//        }
+//    }
 
-        if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-            validateCompoundJobSubmission(cjob, compute_service, service_specific_args);
-        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-            validatePilotJobSubmission(pjob, compute_service, service_specific_args);
+//    /**
+//     * @brief Helper method to validate a compound job submission
+//     * @param job: the compound job to submit
+//     * @param compute_service: the compute service
+//     * @param service_specific_args: the service-specific arguments
+//     */
+//    void JobManager::validateJobSubmission(std::shared_ptr<CompoundJob> job,
+//                                                   std::shared_ptr<ComputeService> compute_service,
+//                                                   std::map<std::string, std::string> service_specific_args) {
+//
+//        /* make sure that service arguments are provided for valid actions in the jobs */
+//        for (auto const &arg : service_specific_args) {
+//            bool found = false;
+//            for (auto const &action : job->getActions()) {
+//                if (action->getName() == arg.first) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (not found) {
+//                throw std::invalid_argument(
+//                        "JobManager::validateCompoundJobSubmission(): Service-specific argument provided for action with name '" +
+//                        arg.first + "' but there is no action with such name in the job");
+//            }
+//        }
+//
+//        // Invoke the validation method on the service
+//        compute_service->validateServiceSpecificArguments(job, service_specific_args);
+//
+//    }
+
+//    /**
+//    * @brief Helper method to validate a pilot job submission
+//    * @param job: the job to submit
+//    * @param compute_service: the compute service
+//    * @param service_specific_args: the service-specific arguments
+//    */
+//    void JobManager::validatePilotJobSubmission(std::shared_ptr<PilotJob> job,
+//                                                std::shared_ptr<ComputeService> compute_service,
+//                                                std::map<std::string, std::string> service_specific_args) {
+//        throw std::runtime_error("JobManager::validatePilotJobSubmission(): TO IMPLEMENT!");
+//    }
+
+
+    /**
+    * @brief Submit a standard job to a compute service
+    *
+    * @param job: a standard job
+    * @param compute_service: a compute service
+    * @param service_specific_args: arguments specific for compute services:
+    *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
+    *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+    *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
+    *           - If a "hostname" value is provided for a task, then the service will run the task on that
+    *             host, using as many of its cores as possible
+    *           - If a "num_cores" value is provided for a task, then the service will run that task with
+    *             this many cores, but will choose the host on which to run it.
+    *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
+    *             task with the specified number of cores on that host.
+    *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"taskID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
+    *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
+    *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
+    *      - to a HTCondorComputeService:
+    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+    *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
+    *
+    *
+    * @throw std::invalid_argument
+    * @throw ExecutionException
+    */
+    void JobManager::submitJob(std::shared_ptr<StandardJob> job,
+                               std::shared_ptr<ComputeService> compute_service,
+                               std::map<std::string, std::string> service_specific_args) {
+
+        if ((job == nullptr) || (compute_service == nullptr)) {
+            throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
         }
-    }
 
-    /**
-     * @brief Helper method to validate a compound job submission
-     * @param job: the job to submit
-     * @param compute_service: the compute service
-     * @param service_specific_args: the service-specific arguments
-     */
-    void JobManager::validateCompoundJobSubmission(std::shared_ptr<CompoundJob> job,
-                                                   std::shared_ptr<ComputeService> compute_service,
-                                                   std::map<std::string, std::string> service_specific_args) {
+        if (job->already_submitted_to_job_manager) {
+            throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
+        }
 
-        /* make sure that service arguments are provided for valid actions in the jobs */
-        for (auto const &arg : service_specific_args) {
-            bool found = false;
-            for (auto const &action : job->getActions()) {
-                if (action->getName() == arg.first) {
-                    found = true;
-                    break;
+        try {
+            compute_service->assertServiceIsUp();
+        } catch (ExecutionException &e) {
+            throw;
+        }
+
+
+        if (not compute_service->supportsStandardJobs()) {
+            throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+        }
+
+        // Do a sanity check on task states
+        for (const auto &t : job->tasks) {
+            if ((t->getState() == WorkflowTask::State::COMPLETED) or
+                (t->getState() == WorkflowTask::State::PENDING)) {
+                throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
+                                            " cannot be submitted as part of a standard job because its state is " +
+                                            WorkflowTask::stateToString(t->getState()));
+            }
+        }
+
+        // Do a sanity check on use of scratch space for files specified in file locations
+        for (const auto &fl : job->file_locations) {
+            for (auto const &fl_l : fl.second) {
+                if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
+                    throw std::invalid_argument("JobManager():submitJob(): file location for file " +
+                                                fl.first->getID() +
+                                                " is scratch  space, but the compute service to which this " +
+                                                "job is being submitted to doesn't have any!");
                 }
             }
-            if (not found) {
-                throw std::invalid_argument(
-                        "JobManager::validateCompoundJobSubmission(): Service-specific argument provided for action with name '" +
-                        arg.first + "' but there is no action with such name in the job");
+        }
+
+        // Do a sanity check on implicit use of scratch space for task input files
+        for (auto const &task : job->tasks) {
+            for (auto const &f : task->getInputFiles()) {
+                if (job->file_locations.find(f) == job->file_locations.end()) {
+                    if (not compute_service->hasScratch()) {
+                        throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
+                    }
+                }
+            }
+            for (auto const &f : task->getOutputFiles()) {
+                if (job->file_locations.find(f) == job->file_locations.end()) {
+                    if (not compute_service->hasScratch()) {
+                        throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
+                    }
+                }
             }
         }
 
-        // Invoke the validation method on the service
-        compute_service->validateServiceSpecificArguments(job, service_specific_args);
+        job->createUnderlyingCompoundJob(compute_service);
 
+        // Tweak the service_specific_arguments
+        std::map<std::string, std::string> new_args;
+
+        Workflow* workflow = nullptr;
+        if (not job->getTasks().empty()) {
+            workflow = (*(job->getTasks().begin()))->getWorkflow();
+        }
+
+        for (const auto &arg : service_specific_args) {
+            // Any key that doesn't start with a "-" is a task ID
+            if (arg.first.rfind("-", 0) == 0) {
+                new_args[arg.first] = arg.second;
+            } else {
+                WorkflowTask *task;
+                if (workflow == nullptr) {
+                   throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first +")");
+                }
+                try {
+                    task = workflow->getTaskByID(arg.first);
+                } catch (std::invalid_argument &e) {
+                    throw;
+                }
+                std::cerr << "OLD ARGS[" << arg.first << "] = " << arg.second << "\n";
+                std::cerr << "SETTING ARGS[" << job->task_compute_actions[task]->getName() << "] = " << arg.second << "\n";
+                new_args[job->task_compute_actions[task]->getName()] = arg.second;
+            }
+        }
+
+        try {
+            compute_service->validateServiceSpecificArguments(job->compound_job, new_args);
+        } catch (ExecutionException &e) {
+            job->compound_job = nullptr;
+            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
+                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+            } else {
+                throw;
+            }
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
+
+        // Modify task states
+        job->state = StandardJob::PENDING;
+        for (auto const &t : job->tasks) {
+            t->setState(WorkflowTask::State::PENDING);
+        }
+
+
+        // The compound job
+        this->cjob_to_sjob_map[job->compound_job] = job;
+        job->compound_job->state = CompoundJob::State::SUBMITTED;
+        this->acquireDaemonLock();
+        this->jobs_to_dispatch.push_back(job->compound_job);
+        this->releaseDaemonLock();
+
+
+        job->already_submitted_to_job_manager = true;
+        job->submit_date = Simulation::getCurrentSimulatedDate();
+        job->compound_job->setServiceSpecificArguments(new_args);
+        job->setParentComputeService(compute_service);
+        job->compound_job->setParentComputeService(compute_service);
+
+        // Send a message to wake up the daemon
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,new JobManagerWakeupMessage());
+        } catch (std::exception &e) {
+            throw std::runtime_error("Cannot connect to job manager");
+        }
     }
 
-    /**
-    * @brief Helper method to validate a pilot job submission
-    * @param job: the job to submit
-    * @param compute_service: the compute service
-    * @param service_specific_args: the service-specific arguments
-    */
-    void JobManager::validatePilotJobSubmission(std::shared_ptr<PilotJob> job,
-                                                std::shared_ptr<ComputeService> compute_service,
-                                                std::map<std::string, std::string> service_specific_args) {
-        throw std::runtime_error("JobManager::validatePilotJobSubmission(): TO IMPLEMENT!");
-    }
 
     /**
-     * @brief Submit a job to compute service
+     * @brief Submit a compound job to a compute service
      *
-     * @param job: a workflow job
+     * @param job: a compound job
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
+     *      - to a BareMetalComputeService: {{"actionID", "[hostname:][num_cores]}, ...}
      *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
      *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
      *           - If a "hostname" value is provided for a task, then the service will run the task on that
@@ -458,18 +622,18 @@ namespace wrench {
      *             this many cores, but will choose the host on which to run it.
      *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
      *             task with the specified number of cores on that host.
-     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-u":"<string>" (username)}]}
+     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"actionID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a HTCondorComputeService:
-     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}, {"-u":"<string>" (username)}]}
+     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
      *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
      *
      *
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void JobManager::submitJob(std::shared_ptr<Job> job,
+    void JobManager::submitJob(std::shared_ptr<CompoundJob> job,
                                std::shared_ptr<ComputeService> compute_service,
                                std::map<std::string, std::string> service_specific_args) {
         if ((job == nullptr) || (compute_service == nullptr)) {
@@ -486,129 +650,26 @@ namespace wrench {
             throw;
         }
 
-
-        // Standard Job
-        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-
-            if (not compute_service->supportsStandardJobs()) {
-                throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
-            }
-
-            // Do a sanity check on task states
-            for (const auto &t : sjob->tasks) {
-                if ((t->getState() == WorkflowTask::State::COMPLETED) or
-                    (t->getState() == WorkflowTask::State::PENDING)) {
-                    throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
-                                                " cannot be submitted as part of a standard job because its state is " +
-                                                WorkflowTask::stateToString(t->getState()));
-                }
-            }
-
-            // Do a sanity check on use of scratch space for files specified in file locations
-            for (const auto &fl : sjob->file_locations) {
-                for (auto const &fl_l : fl.second) {
-                    if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
-                        throw std::invalid_argument("JobManager():submitJob(): file location for file " +
-                                                    fl.first->getID() +
-                                                    " is scratch  space, but the compute service to which this " +
-                                                    "job is being submitted to doesn't have any!");
-                    }
-                }
-            }
-
-            // Do a sanity check on implicit use of scratch space for task input files
-            for (auto const &task : sjob->tasks) {
-                for (auto const &f : task->getInputFiles()) {
-                    if (sjob->file_locations.find(f) == sjob->file_locations.end()) {
-                        if (not compute_service->hasScratch()) {
-                            throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
-                        }
-                    }
-                }
-                for (auto const &f : task->getOutputFiles()) {
-                    if (sjob->file_locations.find(f) == sjob->file_locations.end()) {
-                        if (not compute_service->hasScratch()) {
-                            throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
-                        }
-                    }
-                }
-            }
-
-            sjob->createUnderlyingCompoundJob(compute_service);
-            sjob->compound_job->hasFailed();
-
-            // Tweak the service_specific_arguments
-            std::map<std::string, std::string> new_args;
-            if (not sjob->getTasks().empty()) {
-                auto workflow = (*(sjob->getTasks().begin()))->getWorkflow();
-                for (auto const &arg : service_specific_args) {
-                    new_args[sjob->task_compute_actions[workflow->getTaskByID(arg.first)]->getName()] = arg.second;
-                }
-            }
-
-            try {
-                this->validateJobSubmission(sjob->compound_job, compute_service, new_args);
-            } catch (ExecutionException &e) {
-                sjob->compound_job = nullptr;
-                if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                    throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(sjob, compute_service)));
-                } else {
-                    throw;
-                }
-            } catch (std::invalid_argument &e) {
-                throw;
-            }
-
-            sjob->compound_job->setServiceSpecificArguments(new_args);
-            sjob->compound_job->setParentComputeService(compute_service);
-            sjob->setParentComputeService(compute_service);
-
-            // Modify task states
-            sjob->state = StandardJob::PENDING;
-            for (auto const &t : sjob->tasks) {
-                t->setState(WorkflowTask::State::PENDING);
-            }
-
-
-            // The compound job
-            this->cjob_to_sjob_map[sjob->compound_job] = sjob;
-            sjob->compound_job->state = CompoundJob::State::SUBMITTED;
-            this->acquireDaemonLock();
-            this->jobs_to_dispatch.push_back(sjob->compound_job);
-            this->releaseDaemonLock();
-
-        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-
-            if (not compute_service->supportsPilotJobs()) {
-                throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
-            }
-
-            this->acquireDaemonLock();
-            this->jobs_to_dispatch.push_back(job);
-            this->releaseDaemonLock();
-
-            try {
-                this->validateJobSubmission(job, compute_service, service_specific_args);
-            } catch (std::invalid_argument &e) {
-                throw;
-            }
-
-        } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-
-            if (not compute_service->supportsCompoundJobs()) {
-                throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
-            }
-
-            try {
-                this->validateJobSubmission(cjob, compute_service, service_specific_args);
-            } catch (std::invalid_argument &e) {
-                throw;
-            }
-            cjob->state = CompoundJob::State::SUBMITTED;
-            this->acquireDaemonLock();
-            this->jobs_to_dispatch.push_back(job);
-            this->releaseDaemonLock();
+        if (not compute_service->supportsCompoundJobs()) {
+            throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
         }
+
+        try {
+            compute_service->validateServiceSpecificArguments(job, service_specific_args);
+        } catch (ExecutionException &e) {
+            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
+                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+            } else {
+                throw;
+            }
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
+        job->state = CompoundJob::State::SUBMITTED;
+        this->acquireDaemonLock();
+        this->jobs_to_dispatch.push_back(job);
+        this->releaseDaemonLock();
 
         job->already_submitted_to_job_manager = true;
         job->submit_date = Simulation::getCurrentSimulatedDate();
@@ -623,15 +684,89 @@ namespace wrench {
         }
     }
 
+
+
     /**
-     * @brief Terminate a job (standard or pilot) that hasn't completed/expired/failed yet
+     * @brief Submit a pilot job to a compute service
+     *
+     * @param job: a pilot job
+     * @param compute_service: a compute service
+     * @param service_specific_args: arguments specific for compute services:
+     *      - to a BatchComputeService: {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}
+     *      - to a BareMetalComputeService: {} (pilot jobs should not be submitted directly to the service)}
+     *      - to a VirtualizedClusterComputeService: {} (pilot jobs should not be submitted directly to the service)}
+     *      - to a CloudComputeService: {} (pilot jobs should not be submitted directly to the service)}
+     *      - to a HTCondorComputeService: {} (pilot jobs should be be submitted directly to the service)
+     *
+     * @throw std::invalid_argument
+     * @throw ExecutionException
+     */
+    void JobManager::submitJob(std::shared_ptr<PilotJob> job,
+                               std::shared_ptr<ComputeService> compute_service,
+                               std::map<std::string, std::string> service_specific_args) {
+        if ((job == nullptr) || (compute_service == nullptr)) {
+            throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
+        }
+
+        if (job->already_submitted_to_job_manager) {
+            throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
+        }
+
+        try {
+            compute_service->assertServiceIsUp();
+        } catch (ExecutionException &e) {
+            throw;
+        }
+
+        if (not compute_service->supportsPilotJobs()) {
+            throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+        }
+
+        // TODO: CREATE COMPOUND JOB
+        std::shared_ptr<CompoundJob> cjob = nullptr;
+
+        job->compound_job = cjob;
+
+        this->acquireDaemonLock();
+        this->jobs_to_dispatch.push_back(job->compound_job);
+        this->releaseDaemonLock();
+
+
+        try {
+            compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
+        } catch (ExecutionException &e) {
+            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
+                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+            } else {
+                throw;
+            }
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
+        job->already_submitted_to_job_manager = true;
+        job->submit_date = Simulation::getCurrentSimulatedDate();
+        job->compound_job->setServiceSpecificArguments(service_specific_args);
+        job->compound_job->setParentComputeService(compute_service);
+        job->setParentComputeService(compute_service);
+
+        // Send a message to wake up the daemon
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,new JobManagerWakeupMessage());
+        } catch (std::exception &e) {
+            throw std::runtime_error("Cannot connect to job manager");
+        }
+    }
+
+    /**
+     * @brief Terminate a standard job  that hasn't completed/expired/failed yet
      * @param job: the job to be terminated
      *
      * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void JobManager::terminateJob(std::shared_ptr<Job> job) {
+    void JobManager::terminateJob(std::shared_ptr<StandardJob> job) {
         if (job == nullptr) {
             throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
         }
@@ -641,58 +776,99 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
         }
 
-        if  (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-            switch (sjob->state) {
-                case StandardJob::State::COMPLETED:
-                case StandardJob::State::FAILED:
-                case StandardJob::State::NOT_SUBMITTED:
-                    throw std::invalid_argument("JobManager::terminateJob(): job cannot be terminated because it's not pending/running");
-                default:
-                    break;
+        switch (job->state) {
+            case StandardJob::State::COMPLETED:
+            case StandardJob::State::FAILED:
+            case StandardJob::State::NOT_SUBMITTED: {
+                std::string err_msg = "job cannot be terminated because it's not pending/running";
+                throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
             }
-
-            // If the job has not been dispatch, just remove it from the to-dispatch list
-            this->acquireDaemonLock();
-            auto it = std::find(this->jobs_to_dispatch.begin(), this->jobs_to_dispatch.end(), sjob->compound_job);
-            if (it != this->jobs_to_dispatch.end()) {
-                this->jobs_to_dispatch.erase(it);
-                this->releaseDaemonLock();
-                return;
-            }
-            this->releaseDaemonLock();
-
-            try {
-                sjob->getParentComputeService()->terminateJob(sjob->compound_job);
-            } catch (std::exception &e) {
-                throw;
-            }
-
-            sjob->compound_job->state = CompoundJob::State::DISCONTINUED;
-            sjob->state = StandardJob::State::TERMINATED;
-
-            // Update task states based on compound job
-            std::map<WorkflowTask *, WorkflowTask::State> state_changes;
-            std::set<WorkflowTask *> failure_count_increments;
-            std::shared_ptr<FailureCause> job_failure_cause;
-            sjob->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
-            sjob->applyTaskUpdates(state_changes, failure_count_increments);
-
-        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-            try {
-                job->getParentComputeService()->terminateJob(pjob);
-            } catch (std::exception &e) {
-                throw;
-            }
-            pjob->state = PilotJob::State::TERMINATED;
-
-        } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-            try {
-                job->getParentComputeService()->terminateJob(cjob);
-            } catch (std::exception &e) {
-                throw;
-            }
-            cjob->state = CompoundJob::State::DISCONTINUED;
+            default:
+                break;
         }
+
+        // If the job has not been dispatch, just remove it from the to-dispatch list
+        this->acquireDaemonLock();
+        auto it = std::find(this->jobs_to_dispatch.begin(), this->jobs_to_dispatch.end(), job->compound_job);
+        if (it != this->jobs_to_dispatch.end()) {
+            this->jobs_to_dispatch.erase(it);
+            this->releaseDaemonLock();
+            return;
+        }
+        this->releaseDaemonLock();
+
+        try {
+            job->getParentComputeService()->terminateJob(job->compound_job);
+        } catch (std::exception &e) {
+            throw;
+        }
+
+        job->compound_job->state = CompoundJob::State::DISCONTINUED;
+        job->state = StandardJob::State::TERMINATED;
+
+        // Update task states based on compound job
+        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
+        std::set<WorkflowTask *> failure_count_increments;
+        std::shared_ptr<FailureCause> job_failure_cause;
+        job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+        job->applyTaskUpdates(state_changes, failure_count_increments);
+
+
+    }
+
+
+    /**
+    * @brief Terminate a compound job  that hasn't completed/expired/failed yet
+    * @param job: the job to be terminated
+    *
+    * @throw ExecutionException
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
+    void JobManager::terminateJob(std::shared_ptr<CompoundJob> job) {
+        if (job == nullptr) {
+            throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
+        }
+
+        if (job->getParentComputeService() == nullptr) {
+            std::string err_msg = "Job cannot be terminated because it doesn't have a parent compute service";
+            throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+        }
+
+        try {
+            job->getParentComputeService()->terminateJob(job);
+        } catch (std::exception &e) {
+            throw;
+        }
+        job->state = CompoundJob::State::DISCONTINUED;
+    }
+
+
+    /**
+    * @brief Terminate a pilot jobthat hasn't completed/expired/failed yet
+    * @param job: the job to be terminated
+    *
+    * @throw ExecutionException
+    * @throw std::invalid_argument
+    * @throw std::runtime_error
+    */
+    void JobManager::terminateJob(std::shared_ptr<PilotJob> job) {
+        if (job == nullptr) {
+            throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
+        }
+
+        if (job->getParentComputeService() == nullptr) {
+            std::string err_msg = "Job cannot be terminated because it doesn't have a parent compute service";
+            throw ExecutionException(std::shared_ptr<FailureCause>(new NotAllowed(nullptr, err_msg)));
+        }
+
+        try {
+            job->getParentComputeService()->terminateJob(job);
+        } catch (std::exception &e) {
+            throw;
+        }
+        job->state = PilotJob::State::TERMINATED;
+
     }
 
     /**
@@ -860,7 +1036,7 @@ namespace wrench {
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
         // remove the job from the "dispatched" list
-        this->jobs_dispatched.erase(job);
+        this->jobs_dispatched.erase(job->compound_job);
 
         // Forward the notification along the notification chain
 
@@ -894,7 +1070,7 @@ namespace wrench {
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
         // remove the job from the "dispatched" list
-        this->jobs_dispatched.erase(job);
+        this->jobs_dispatched.erase(job->compound_job);
 
         // Forward the notification along the notification chain
         auto augmented_message =
@@ -935,7 +1111,7 @@ namespace wrench {
         this->num_running_pilot_jobs--;
 
         // Remove the job from the "dispatched" list and put it in the completed list
-        this->jobs_dispatched.erase(job);
+        this->jobs_dispatched.erase(job->compound_job);
 
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
@@ -982,7 +1158,9 @@ namespace wrench {
             }
 
             try {
+                std::cerr << "CALLING DISPATCH JOB ON JOB " << job->getName() << "\n";
                 this->dispatchJob(job);
+                std::cerr << "JOB DISPATCHED!\n";
                 this->jobs_dispatched.insert(job);
                 it = this->jobs_to_dispatch.erase(it);
             } catch (ExecutionException &e) {
@@ -1040,26 +1218,32 @@ namespace wrench {
     /**
      * @brief Helper method to dispatch jobs
      */
-    void JobManager::dispatchJob(const std::shared_ptr<Job> job) {
+    void JobManager::dispatchJob(const std::shared_ptr<CompoundJob> job) {
 
 
         // Submit the job to the service
         try {
             job->submit_date = Simulation::getCurrentSimulatedDate();
             job->pushCallbackMailbox(this->mailbox_name);
-            job->parent_compute_service->submitJob(job, job->service_specific_args);
-            if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                pjob->state = PilotJob::PENDING;
-            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                cjob->state = CompoundJob::State::SUBMITTED;
+            std::cerr << "CALLING SUBMIG jOB To the coMOPTE SERUCE\n";
+            job->parent_compute_service->submitJob(job, job->getServiceSpecificArguments());
+            std::cerr << "CALLED SUBMIG jOB To the coMOPTE SERUCE\n";
+            if (this->cjob_to_pjob_map.find(job) != this->cjob_to_pjob_map.end()) {
+                this->cjob_to_pjob_map[job]->state = PilotJob::State::PENDING;
+            } else if (this->cjob_to_sjob_map.find(job) != this->cjob_to_sjob_map.end()) {
+                this->cjob_to_sjob_map[job]->state = StandardJob::State::PENDING;
+            } else {
+                job->state = CompoundJob::State::SUBMITTED; // useless likely
             }
         } catch (ExecutionException &e) {
             job->end_date = Simulation::getCurrentSimulatedDate();
             // "Undo" everything
-            if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                cjob->state = CompoundJob::State::DISCONTINUED;
-            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                pjob->state = PilotJob::State::FAILED;
+            if (this->cjob_to_pjob_map.find(job) != this->cjob_to_pjob_map.end()) {
+                this->cjob_to_pjob_map[job]->state = PilotJob::State::FAILED;
+            } else if (this->cjob_to_sjob_map.find(job) != this->cjob_to_sjob_map.end()) {
+                this->cjob_to_sjob_map[job]->state = StandardJob::State::FAILED;
+            } else {
+                job->state = CompoundJob::State::DISCONTINUED;
             }
             job->popCallbackMailbox();
             throw;

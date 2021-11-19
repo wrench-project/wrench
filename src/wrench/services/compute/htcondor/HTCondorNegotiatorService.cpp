@@ -100,10 +100,14 @@ namespace wrench {
             if (target_compute_service) {
                 job->pushCallbackMailbox(this->reply_mailbox);
                 if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                    target_compute_service->submitStandardJob(sjob, service_specific_arguments);
-                } else {
-                    auto pjob = std::dynamic_pointer_cast<PilotJob>(job);
-                    target_compute_service->submitPilotJob(pjob, service_specific_arguments);
+//                    target_compute_service->submitStandardJob(sjob, service_specific_arguments);
+                    throw std::runtime_error("CANNOT SUBMIT STANDARD JOB");
+                } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
+                    target_compute_service->submitCompoundJob(cjob, service_specific_arguments);
+                } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
+                    throw std::runtime_error("CANNOT SUBMIT PILOT JOB");
+//                    auto pjob = std::dynamic_pointer_cast<PilotJob>(job);
+//                    target_compute_service->submitPilotJob(pjob, service_specific_arguments);
                 }
                 this->running_jobs.insert(std::make_pair(job, target_compute_service));
                 scheduled_jobs.push_back(job);
@@ -126,12 +130,12 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Helper method to pick a target compute service for a job
-     * @param job
-     * @param service_specific_arguments
-     * @return
-     */
+/**
+ * @brief Helper method to pick a target compute service for a job
+ * @param job
+ * @param service_specific_arguments
+ * @return
+ */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
             std::shared_ptr<Job> job, std::map<std::string,
             std::string> service_specific_arguments) {
@@ -146,12 +150,12 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Helper method to pick a target compute service for a job for a Grid universe job
-     * @param job: job to run
-     * @param service_specific_arguments: service-specific arguments
-     * @return
-     */
+/**
+ * @brief Helper method to pick a target compute service for a job for a Grid universe job
+ * @param job: job to run
+ * @param service_specific_arguments: service-specific arguments
+ * @return
+ */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(
             std::shared_ptr<Job> job, std::map<std::string,
             std::string> service_specific_arguments) {
@@ -209,12 +213,12 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Helper method to pick a target compute service for a job for a Non-Grid universe job
-     * @param job: job to run
-     * @param service_specific_arguments: service-specific arguments
-     * @return
-     */
+/**
+ * @brief Helper method to pick a target compute service for a job for a Non-Grid universe job
+ * @param job: job to run
+ * @param service_specific_arguments: service-specific arguments
+ * @return
+ */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
             std::shared_ptr<Job> job, std::map<std::string,
             std::string> service_specific_arguments) {

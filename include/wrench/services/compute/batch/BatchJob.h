@@ -1,7 +1,7 @@
 #ifndef WRENCH_BATCHJOB_H
 #define WRENCH_BATCHJOB_H
 
-#include "wrench/job/StandardJob.h"
+#include "wrench/job/CompoundJob.h"
 
 namespace wrench {
 
@@ -16,7 +16,7 @@ namespace wrench {
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
-        BatchJob(std::shared_ptr<Job> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
+        BatchJob(std::shared_ptr<CompoundJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
                  unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp);
 
 
@@ -31,7 +31,7 @@ namespace wrench {
         double getEndingTimestamp();
         double getArrivalTimestamp();
         unsigned long getRequestedNumNodes();
-        std::shared_ptr<Job> getWorkflowJob();
+        std::shared_ptr<CompoundJob> getCompoundJob();
         void setEndingTimestamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
@@ -63,7 +63,7 @@ namespace wrench {
         unsigned long job_id;
         unsigned long requested_num_nodes;
         unsigned long  requested_time;
-        std::shared_ptr<Job> job;
+        std::shared_ptr<CompoundJob> compound_job;
         unsigned long requested_cores_per_node;
         std::string username;
         double begin_time_stamp;

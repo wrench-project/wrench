@@ -111,7 +111,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override {} ;
+//        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override {} ;
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
@@ -132,7 +132,7 @@ namespace wrench {
     protected:
         friend class JobManager;
 
-        void validateServiceSpecificArguments(std::shared_ptr<Job> job,
+        void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                       const std::map<std::string, std::string> &service_specific_args) override;
 
 
@@ -149,9 +149,6 @@ namespace wrench {
                                 std::map<std::string, std::string> property_list,
                                 std::map<std::string, double> messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
-    private:
-
-        friend class Simulation;
 
         void validateProperties();
 
@@ -191,7 +188,7 @@ namespace wrench {
 
         // Helper functions to make main() a bit more palatable
 
-        void terminate();
+        void terminate(bool send_failure_notifications);
 
         void processActionDone(std::shared_ptr<Action> action);
 

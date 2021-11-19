@@ -134,6 +134,7 @@ namespace wrench {
                                          double *latest_end_date,
                                          double *earliest_failure_date);
 
+
         State state;
         double pre_overhead = 0.0;
         double post_overhead = 0.0;

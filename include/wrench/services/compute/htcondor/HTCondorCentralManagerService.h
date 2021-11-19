@@ -53,7 +53,7 @@ namespace wrench {
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
         void submitStandardJob(std::shared_ptr<StandardJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments) override;
+                               const std::map<std::string, std::string> &service_specific_arguments);
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override {} ;
@@ -72,7 +72,6 @@ namespace wrench {
         bool jobKindIsSupported(const std::shared_ptr<Job>& job, std::map<std::string, std::string> service_specific_arguments);
 
         bool jobCanRunSomewhere(std::shared_ptr<Job> job, std::map<std::string, std::string> service_specific_arguments);
-
 
     private:
         int main() override;

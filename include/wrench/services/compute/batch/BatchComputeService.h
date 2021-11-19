@@ -12,13 +12,12 @@
 #define WRENCH_BATCH_SERVICE_H
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
 #include "wrench/services/compute/batch/BatchComputeServiceMessagePayload.h"
 #include "wrench/services/helper_services/alarm/Alarm.h"
-#include "wrench/job/StandardJob.h"
+#include "wrench/job/CompoundJob.h"
 #include "wrench/job/Job.h"
 #include "wrench/services/compute/batch/batch_schedulers/BatchScheduler.h"
 
@@ -29,7 +28,8 @@
 
 namespace wrench {
 
-    class WorkloadTraceFileReplayer; // forward
+    class WorkloadTraceFileReplayer;
+    class BareMetalComputeServiceOneShot;
 
     /**
      * @brief A batch-scheduled compute service that manages a set of compute hosts and
@@ -96,6 +96,12 @@ namespace wrench {
                 {BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           1024},
                 {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
                 {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD,              1024},
+                {BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
                 {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
@@ -125,10 +131,17 @@ namespace wrench {
         ~BatchComputeService() override;
         // helper function
         static unsigned long parseUnsignedLongServiceSpecificArgument(std::string key, const std::map<std::string, std::string> &args);
-        /***********************/
-        /** \endcond          **/
+
+        void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+                                                                   const std::map<std::string, std::string> &service_specific_args) override;
 
         /***********************/
+        /** \endcond          **/
+        /***********************/
+
+        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override {};
+
+        void terminatePilotJob(std::shared_ptr<PilotJob> job) override {};
 
     private:
         friend class WorkloadTraceFileReplayer;
@@ -149,39 +162,27 @@ namespace wrench {
         );
 
         // helper function
-        void submitWorkflowJob(std::shared_ptr<Job> job, const std::map<std::string, std::string> &batch_job_args);
 
         //submits a standard job
-        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &batch_job_args) override;
+        void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
-        //submits a compound job
-        void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &batch_job_args) override {};
-
-        //submits a standard job
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &batch_job_args) override;
 
         // helper function
         void terminateWorkflowJob(std::shared_ptr<Job> job);
 
         // terminate a standard job
-        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
-
-        // terminate a compound job
-        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override {} ;
-
-        // terminate a pilot job
-        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> workload_trace;
         std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
 
         bool clean_exit = false;
 
-        //create alarms for standard jobs
-        std::map<std::string,std::shared_ptr<Alarm>> standard_job_alarms;
+        //create alarms for compound jobs
+        std::map<std::shared_ptr<CompoundJob>,std::shared_ptr<Alarm>> compound_job_alarms;
 
-        //alarms for pilot jobs (only one pilot job alarm)
-        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
+//        //alarms for pilot jobs (only one pilot job alarm)
+//        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
         /* Resources information in batch */
         unsigned long total_num_of_nodes;
@@ -193,11 +194,12 @@ namespace wrench {
         std::vector<std::string> compute_hosts;
         /* End Resources information in batch */
 
-        // Vector of standard job executors
-        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
+        // Vector of one-shot bare-metal compute services
+//        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
+        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>> running_bare_metal_one_shot_compute_services;
 
-        // Vector of standard job executors (which is cleared periodically)
-        std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
+        // Vector of one-shot bare-metal compute services (which is cleared periodically)
+        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>> finished_bare_metal_one_shot_compute_services;
 
         // Master List of batch jobs
         std::set<std::shared_ptr<BatchJob>>  all_jobs;
@@ -258,13 +260,13 @@ namespace wrench {
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
-        void processStandardJobCompletion(std::shared_ptr<StandardJobExecutor> executor, std::shared_ptr<StandardJob> job);
+        void processCompoundJobCompletion(std::shared_ptr<BareMetalComputeServiceOneShot> executor, std::shared_ptr<CompoundJob> job);
 
-        void processStandardJobFailure(std::shared_ptr<StandardJobExecutor> executor,
-                                       std::shared_ptr<StandardJob> job,
+        void processCompoundJobFailure(std::shared_ptr<BareMetalComputeServiceOneShot> executor,
+                                       std::shared_ptr<CompoundJob> job,
                                        std::shared_ptr<FailureCause> cause);
 
-        void terminateRunningStandardJob(std::shared_ptr<StandardJob> job);
+        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job);
 
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
@@ -274,22 +276,22 @@ namespace wrench {
         void terminateRunningPilotJobs();
 
         //Fail the standard jobs
-        void failCurrentStandardJobs();
+        void failCurrentCompoundJobs();
 
         //Process the pilot job completion
-        void processPilotJobCompletion(std::shared_ptr<PilotJob> job);
+        void processPilotJobCompletion(std::shared_ptr<PilotJob> job) {}; // TODO: TO REMOVE
 
         //Process standard job timeout
-        void processStandardJobTimeout(std::shared_ptr<StandardJob> job);
+        void processCompoundJobTimeout(std::shared_ptr<CompoundJob> job);
 
         //process standard job termination request
-        void processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job, std::string answer_mailbox);
+        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, std::string answer_mailbox);
 
         //process pilot job termination request
-        void processPilotJobTerminationRequest(std::shared_ptr<PilotJob> job, std::string answer_mailbox);
+        void processPilotJobTerminationRequest(std::shared_ptr<PilotJob> job, std::string answer_mailbox) {}; // TODO: TO REMOVE
 
-        // process a batch job tiemout event
-        void processAlarmJobTimeout(std::shared_ptr<BatchJob>job);
+        // process a batch bach_job tiemout event
+        void processAlarmJobTimeout(std::shared_ptr<BatchJob>bach_job);
 
         //Process pilot job timeout
         void processPilotJobTimeout(std::shared_ptr<PilotJob> job);
@@ -301,13 +303,13 @@ namespace wrench {
         void sendPilotJobExpirationNotification(std::shared_ptr<PilotJob> job);
 
         //send call back to the standard job submitters
-        void sendStandardJobFailureNotification(std::shared_ptr<StandardJob> job, std::string job_id, std::shared_ptr<FailureCause> cause);
+        void sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // process a job submission
         void processJobSubmission(std::shared_ptr<BatchJob>job, std::string answer_mailbox);
 
         //start a job
-        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<Job> ,
+        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<CompoundJob> ,
                       std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
 
 

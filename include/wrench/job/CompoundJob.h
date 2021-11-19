@@ -146,6 +146,8 @@ namespace wrench {
 
         std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
         std::set<std::shared_ptr<Action>> actions;
+        std::map<std::string, std::shared_ptr<Action>> name_map;
+
         State state;
         unsigned long priority;
 
@@ -153,12 +155,17 @@ namespace wrench {
 
         void setAllActionsFailed(std::shared_ptr<FailureCause> cause);
 
+        bool hasAction(const std::string &name);
+
         std::set<std::shared_ptr<CompoundJob>> &getChildren();
         std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
 
         void assertJobNotSubmitted();
+        void assertActionNameDoesNotAlreadyExist(const std::string &name);
+
+        void addAction(std::shared_ptr<Action> action);
 
         bool pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b);
         bool pathExists(const std::shared_ptr<CompoundJob>& a, const std::shared_ptr<CompoundJob> &b);
