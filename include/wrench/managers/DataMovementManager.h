@@ -32,7 +32,7 @@ namespace wrench {
 
     public:
 
-        void stop();
+        void stop(bool send_failure_notifications);
 
         void kill();
 

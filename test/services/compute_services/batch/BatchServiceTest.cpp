@@ -768,7 +768,8 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
 /**  ONE STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST    **/
 /**********************************************************************/
 
-class OneStandardJobSubmissionTestWMS : public wrench::WMS {
+class
+OneStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     OneStandardJobSubmissionTestWMS(BatchServiceTest *test,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
@@ -837,6 +838,7 @@ private:
             }
 
             // Try to terminate the already terminated job
+            std::cerr << "TRYINT TO TERMINATE THE JOB, WHICH IS BOGUS\n";
             try {
                 job_manager->terminateJob(job);
             } catch (wrench::ExecutionException &e) {
@@ -848,10 +850,10 @@ private:
             this->getWorkflow()->removeTask(task);
 
             // Shutdown the compute service, for testing purposes
-            this->test->compute_service->stop();
+            this->test->compute_service->stop(false);
 
             // Shutdown the compute service, for testing purposes, which should do nothing
-            this->test->compute_service->stop();
+            this->test->compute_service->stop(false);
         }
 
         return 0;
@@ -865,9 +867,10 @@ TEST_F(BatchServiceTest, OneStandardJobSubmissionTest) {
 void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1918,16 +1921,17 @@ private:
     }
 };
 
-TEST_F(BatchServiceTest, StandardJobTimeOutTaskTest) {
+TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
     DO_TEST_WITH_FORK(do_StandardJobTimeOutTaskTest_test);
 }
 
 void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -3571,7 +3575,7 @@ private:
         wrench::Simulation::sleep(5);
 
         // Terminate the service
-        this->test->compute_service->stop();
+        this->test->compute_service->stop(false);
 
         // Sleep 5 seconds
         wrench::Simulation::sleep(5);

@@ -311,7 +311,7 @@ private:
         // The WMS is dying to, i.e., right when the simulation is terminating.
         wrench::Simulation::sleep(1.0);
 
-        em->stop();
+        em->stop(false);
 
         return 0;
     }

@@ -703,7 +703,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        this->test->compute_service->stop();
+        this->test->compute_service->stop(false);
 
         return 0;
     }
@@ -819,7 +819,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        this->test->compute_service->stop();
+        this->test->compute_service->stop(false);
 
         return 0;
     }

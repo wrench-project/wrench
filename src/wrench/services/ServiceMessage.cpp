@@ -22,12 +22,13 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param ack_mailbox: mailbox to which the DaemonStoppedMessage ack will be sent. No ack will be sent if ack_mailbox=""
+     * @param send_failure_notifications: whether the service should send failure notifications before terminating
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments
      */
-    ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox, double payload)
-            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(std::move(ack_mailbox)) {}
+    ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox, bool send_failure_notifications, double payload)
+            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(std::move(ack_mailbox)), send_failure_notifications(send_failure_notifications) {}
 
     /**
      * @brief Constructor

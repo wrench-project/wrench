@@ -492,7 +492,7 @@ namespace wrench {
      */
     void HTCondorComputeService::terminate() {
         this->setStateToDown();
-        this->central_manager->stop();
+        this->central_manager->stop(false);
         this->default_property_values.clear();
         this->default_messagepayload_values.clear();
     }

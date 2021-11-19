@@ -43,6 +43,7 @@ namespace wrench {
     private:
 
         friend class Simulation;
+    friend class BatchComputeService;
 
         BareMetalComputeServiceOneShot(std::shared_ptr<CompoundJob> job,
                                 const std::string &hostname,
@@ -50,7 +51,8 @@ namespace wrench {
                                 std::map<std::string, std::string> property_list,
                                 std::map<std::string, double> messagepayload_list,
                                 double ttl,
-                                std::shared_ptr<PilotJob> pj, std::string suffix,
+                                std::shared_ptr<PilotJob> pj,
+                                std::string suffix,
                                 std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
         int main() override;

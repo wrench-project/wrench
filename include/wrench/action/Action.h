@@ -41,7 +41,7 @@ namespace wrench {
             FAILED
         };
 
-        std::string getName() const;
+        const std::string &getName() const;
         std::shared_ptr<CompoundJob> getJob() const;
         Action::State getState() const;
         std::string getStateAsString() const;

@@ -387,19 +387,19 @@ private:
         auto job_manager = this->createJobManager();
 
         try {
-            job_manager->submitJob(nullptr, std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *) (1234), [](void *ptr){}), {});
+            job_manager->submitJob((std::shared_ptr<wrench::CompoundJob>)nullptr, std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *) (1234), [](void *ptr){}), {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr job");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            job_manager->submitJob(std::shared_ptr<wrench::Job>((wrench::Job *) (1234), [](void *ptr){}), nullptr, {});
+            job_manager->submitJob(std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *) (1234), [](void *ptr){}), nullptr, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            job_manager->terminateJob(nullptr);
+            job_manager->terminateJob((std::shared_ptr<wrench::CompoundJob>)nullptr);
             throw std::runtime_error("Should not be able to terminate a nullptr job");
         } catch (std::invalid_argument &e) {
         }

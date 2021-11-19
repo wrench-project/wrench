@@ -60,12 +60,12 @@ namespace wrench {
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
         void submitStandardJob(std::shared_ptr<StandardJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments) override;
+                               const std::map<std::string, std::string> &service_specific_arguments);
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                const std::map<std::string, std::string> &service_specific_arguments) override {};
 
-        
+
         void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
         std::shared_ptr<StorageService> getLocalStorageService() const;
@@ -95,6 +95,8 @@ namespace wrench {
 
     private:
         int main() override;
+
+
 
         bool processNextMessage();
 

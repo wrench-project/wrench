@@ -172,7 +172,7 @@ private:
         }
 
         // Shutdown the proximity service
-        (*network_proximity_service)->stop();
+        (*network_proximity_service)->stop(false);
 
         try {
             (*network_proximity_service)->getHostPairDistance(hosts_to_compute_proximity);
@@ -551,7 +551,7 @@ private:
         }
 
         // stop the service
-        vivaldi_service->stop();
+        vivaldi_service->stop(false);
         try {
             coordinates = vivaldi_service->getHostCoordinate(target_host).first;
             throw std::runtime_error("Should not be able to get coordinates from a service that is down");

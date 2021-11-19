@@ -39,9 +39,9 @@ protected:
         compute_service = std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *)(1234), [](void *ptr){});
         network_proximity_service = std::shared_ptr<wrench::NetworkProximityService>((wrench::NetworkProximityService *)(1234), [](void *ptr){});
         network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>((wrench::NetworkProximityDaemon *)(1234), [](void *ptr){});
-        standard_job =  std::shared_ptr<wrench::StandardJob>((wrench::StandardJob *)(1234), [](void *ptr){});
+        compound_job =  std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
         pilot_job =  std::shared_ptr<wrench::PilotJob>((wrench::PilotJob *)(1234), [](void *ptr){});
-        batch_job = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(standard_job,1,1,1,1,"user",1,1));
+        batch_job = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(compound_job,1,1,1,1,"user",1,1));
         failure_cause = std::shared_ptr<wrench::FileNotFound>(new wrench::FileNotFound(file, location), [](void *ptr){});
     }
 
@@ -55,6 +55,7 @@ protected:
     std::shared_ptr<wrench::ComputeService> compute_service;
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
     std::shared_ptr<wrench::NetworkProximityDaemon> network_proximity_daemon;
+    std::shared_ptr<wrench::CompoundJob> compound_job;
     std::shared_ptr<wrench::StandardJob> standard_job;
     std::shared_ptr<wrench::PilotJob> pilot_job;
     std::shared_ptr<wrench::BatchJob> batch_job;
