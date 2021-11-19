@@ -29,7 +29,7 @@
 #include <wrench/failure_causes/JobTypeNotSupported.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
-WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_standard_jobs");
+WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_compute_service");
 
 namespace wrench {
     /**
@@ -93,9 +93,10 @@ namespace wrench {
      * @param job: the job that's being submitted
      * @param service_specific_arg: the service-specific arguments
      */
-    void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<Job> job,
-                                                                const std::map<std::string, std::string> &service_specific_args) {
+    void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+                                                                   const std::map<std::string, std::string> &service_specific_args) {
 
+        std::cerr << "IN VALIDATE SERVICE SPECIFIC ARGS\n";
         auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
         auto compute_resources = this->action_execution_service->getComputeResources();
         // Check that each action can run w.r.t. the resource I have
@@ -106,10 +107,18 @@ namespace wrench {
             max_ram = (std::get<1>(cr.second) > max_ram ? std::get<1>(cr.second) : max_ram);
         }
 
+        // Check that args are specified for existing tasks
+        for (auto const &arg : service_specific_args) {
+            if (not job->hasAction(arg.first)) {
+                throw std::invalid_argument("BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '{" +
+                                            arg.first + "," + arg.second + "}: no action named " + arg.first);
+            }
+        }
+
         // Validate that there are enough resources for each task
         for (auto const &action : cjob->getActions()) {
             if ((action->getMinRAMFootprint() > max_ram) or
-                    (action->getMinNumCores() > max_cores)) {
+                (action->getMinNumCores() > max_cores)) {
                 throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
             }
         }
@@ -129,7 +138,7 @@ namespace wrench {
                 std::string target_host = std::get<0>(parsed_spec);
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
-//                std::cerr << "TARGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
+                std::cerr << action->getName() + " TARGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
 
                 if (not target_host.empty()) {
 
@@ -506,7 +515,7 @@ namespace wrench {
 //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            this->terminate();
+            this->terminate(msg->send_failure_notifications);
 
             // This is Synchronous
             try {
@@ -666,7 +675,7 @@ namespace wrench {
     /**
      * @brief Terminate the daemon, dealing with pending/running job
      */
-    void BareMetalComputeService::terminate() {
+    void BareMetalComputeService::terminate(bool send_failure_notifications) {
         this->setStateToDown();
 
         // Terminate all actions
@@ -674,21 +683,24 @@ namespace wrench {
             this->action_execution_service->terminateAction(action);
         }
 
-        // Deal with all jobs
-        while (not this->current_jobs.empty()) {
-            auto job = *(this->current_jobs.begin());
-            try {
-                this->current_jobs.erase(job);
-                S4U_Mailbox::putMessage(
-                        job->popCallbackMailbox(),
-                        new ComputeServiceCompoundJobFailedMessage(
-                                job, this->getSharedPtr<BareMetalComputeService>(),
-                                this->getMessagePayloadValue(
-                                        BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                return; // ignore
+        if (send_failure_notifications) {
+            // Deal with all jobs
+            while (not this->current_jobs.empty()) {
+                auto job = *(this->current_jobs.begin());
+                try {
+                    this->current_jobs.erase(job);
+                    S4U_Mailbox::putMessage(
+                            job->popCallbackMailbox(),
+                            new ComputeServiceCompoundJobFailedMessage(
+                                    job, this->getSharedPtr<BareMetalComputeService>(),
+                                    this->getMessagePayloadValue(
+                                            BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    return; // ignore
+                }
             }
         }
+        this->current_jobs.clear();
 
         cleanUpScratch();
     }

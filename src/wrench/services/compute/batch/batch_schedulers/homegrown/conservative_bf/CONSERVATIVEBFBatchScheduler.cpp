@@ -81,7 +81,7 @@ namespace wrench {
             }
 
             // Get the workflow job associated to the picked batch job
-            std::shared_ptr<Job> workflow_job = batch_job->getWorkflowJob();
+            std::shared_ptr<CompoundJob> compound_job = batch_job->getCompoundJob();
 
             // Find on which resources to actually run the job
             unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
@@ -104,7 +104,7 @@ namespace wrench {
             this->cs->running_jobs.insert(batch_job);
 
             // Start it!
-            this->cs->startJob(resources, workflow_job, batch_job, num_nodes_asked_for, requested_time,
+            this->cs->startJob(resources, compound_job, batch_job, num_nodes_asked_for, requested_time,
                                cores_per_node_asked_for);
         }
     }

@@ -63,9 +63,7 @@ namespace wrench {
 
         virtual ~ComputeService() {}
 
-        void stop() override;
-
-//        void submitJob(Job *job, const std::map<std::string, std::string>& = {});
+        void stop(bool send_failure_nofitications) override;
 
         void terminateJob(std::shared_ptr<Job> job);
 
@@ -112,14 +110,15 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        /**
-         * @brief Method to submit a standard job to the service
-         *
-         * @param job: The job being submitted
-         * @param service_specific_arguments: the set of service-specific arguments
-         */
-        virtual void
-        submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+
+//        /**
+//         * @brief Method to submit a standard job to the service
+//         *
+//         * @param job: The job being submitted
+//         * @param service_specific_arguments: the set of service-specific arguments
+//         */
+//        virtual void
+//        submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /**
          * @brief Method to submit a compound job to the service
@@ -136,13 +135,13 @@ namespace wrench {
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
-        virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+        virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) {}; // TODO: REMOVE
 
         /**
          * @brief Method to terminate a  standard job
          * @param job: the standard job
          */
-        virtual void terminateStandardJob(std::shared_ptr<StandardJob> job) = 0;
+        virtual void terminateStandardJob(std::shared_ptr<StandardJob> job) {}; // TODO: REMOVE
 
         /**
          * @brief Method to terminate a compound job
@@ -154,7 +153,7 @@ namespace wrench {
          * @brief Method to terminate a running pilot job
          * @param job: the pilot job
          */
-        virtual void terminatePilotJob(std::shared_ptr<PilotJob> job) = 0;
+        virtual void terminatePilotJob(std::shared_ptr<PilotJob> job) {} ; // TODO: REMOVE
 
         /**
          * @brief Method that returns the computer service's scratch space's storage service
@@ -172,9 +171,9 @@ namespace wrench {
 
         friend class JobManager;
 
-        void submitJob(std::shared_ptr<Job> job, const std::map<std::string, std::string>& = {});
+        void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string>& = {});
 
-        virtual void validateServiceSpecificArguments(std::shared_ptr<Job> job,
+        virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
                                           const std::map<std::string, std::string> &service_specific_args);
 
         ComputeService(const std::string &hostname,

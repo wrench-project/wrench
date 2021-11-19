@@ -967,10 +967,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1557,7 +1557,7 @@ private:
         wrench::Simulation::sleep(0.1);
 
         // Shutdown the compute service
-        this->test->compute_service->stop();
+        this->test->compute_service->stop(true);
 
         // Wait for the job failure notification
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -1687,7 +1687,7 @@ private:
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
 
         // Shutdown the storage service
-        this->test->storage_service->stop();
+        this->test->storage_service->stop(false);
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);

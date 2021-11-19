@@ -34,7 +34,7 @@ namespace wrench {
         /***********************/
 
         void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
-        virtual void stop();
+        virtual void stop(bool send_failure_notifications);
         void suspend();
         void resume();
 

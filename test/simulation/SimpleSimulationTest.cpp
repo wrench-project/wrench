@@ -314,7 +314,7 @@ private:
         cs->suspend();
         cs->suspend();
         cs->resume();
-        cs->stop();
+        cs->stop(false);
         cs->suspend();
 
         try {

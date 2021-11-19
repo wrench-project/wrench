@@ -52,19 +52,19 @@ void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test(
 
     auto tl = new wrench::NodeAvailabilityTimeLine(10);
 
-    auto wj1 = std::shared_ptr<wrench::Job>((wrench::Job *)(1234), [](void *ptr){});
+    auto wj1 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
 
     auto bj1 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj1, 1, 10, 5, 1, "who", 0, 0));
 
     tl->add(0, 10.0, bj1);
 
     // Note that there is check on the validity of the interval in terms of the number of nodes
-    auto wj2 = std::shared_ptr<wrench::Job>((wrench::Job *)(1234), [](void *ptr){});
+    auto wj2 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
     auto bj2 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 2, 20, 20, 1, "who", 0, 0));
     tl->add(10.0, 30.0, bj2);
 
     // Can even have weird nonsensical start and end...
-    auto wj3 = std::shared_ptr<wrench::Job>((wrench::Job *)(1234), [](void *ptr){});
+    auto wj3 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
     auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
     tl->add(500.0, 30.0, bj3);
 
@@ -97,19 +97,19 @@ void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test(
 
     auto tl = new wrench::CoreAvailabilityTimeLine(10, 6);
 
-    auto wj1 = std::shared_ptr<wrench::Job>((wrench::Job *)(1234), [](void *ptr){});
+    auto wj1 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
 
     auto bj1 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj1, 1, 10, 5, 1, "who", 0, 0));
 
     tl->add(0, 10.0, bj1);
 
     // Note that there is check on the validity of the interval in terms of the number of nodes
-    auto wj2 = std::shared_ptr<wrench::Job>((wrench::Job *)(1234), [](void *ptr){});
+    auto wj2 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
     auto bj2 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 2, 20, 20, 1, "who", 0, 0));
     tl->add(10.0, 30.0, bj2);
 
     // Can even have weird nonsensical start and end...
-    auto wj3 = std::shared_ptr<wrench::Job>((wrench::Job *)(1234), [](void *ptr){});
+    auto wj3 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
     auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
     tl->add(500.0, 30.0, bj3);
 

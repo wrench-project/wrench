@@ -143,6 +143,8 @@ namespace wrench {
             std::string target_host = std::get<0>(parsed_spec);
             unsigned long target_num_cores = std::get<1>(parsed_spec);
 
+            std::cerr << " IN ACTION EXECUTOR SERVICE " << action_name << " " << target_host << "   " << target_num_cores << "\n";
+
             if (not target_host.empty()) {
                 if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
                     throw std::invalid_argument(

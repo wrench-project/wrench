@@ -56,7 +56,7 @@ namespace wrench {
     public:
 
 
-        void stop() override;
+        void stop(bool send_failure_notifications) override;
 
         void kill();
 
@@ -93,10 +93,21 @@ namespace wrench {
 
         std::shared_ptr<PilotJob> createPilotJob();
 
-        void submitJob(std::shared_ptr<Job> job, std::shared_ptr<ComputeService> compute_service,
+        void submitJob(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
                        std::map<std::string, std::string> service_specific_args = {});
 
-        void terminateJob(std::shared_ptr<Job> job);
+        void submitJob(std::shared_ptr<CompoundJob> job, std::shared_ptr<ComputeService> compute_service,
+                       std::map<std::string, std::string> service_specific_args = {});
+
+        void submitJob(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service,
+                       std::map<std::string, std::string> service_specific_args = {});
+
+        void terminateJob(std::shared_ptr<StandardJob> job);
+
+        void terminateJob(std::shared_ptr<CompoundJob> job);
+
+        void terminateJob(std::shared_ptr<PilotJob> job);
+
 
 //        void forgetJob(Job *job);
 
@@ -131,7 +142,7 @@ namespace wrench {
 
         void dispatchJobs();
 
-        void dispatchJob(std::shared_ptr<Job> job);
+        void dispatchJob(std::shared_ptr<CompoundJob> job);
 
         bool processNextMessage();
 
@@ -153,27 +164,16 @@ namespace wrench {
 
         // Mailbox of the creator of this job manager
         std::string creator_mailbox;
-//        std::shared_ptr<WMS> wms;
 
-        std::vector<std::shared_ptr<Job>> jobs_to_dispatch;
-        std::set<std::shared_ptr<Job>> jobs_dispatched;
+        std::vector<std::shared_ptr<CompoundJob>> jobs_to_dispatch;
+        std::set<std::shared_ptr<CompoundJob>> jobs_dispatched;
 
         unsigned long num_running_pilot_jobs = 0;
 
-        void validateJobSubmission(std::shared_ptr<Job> job,
-        std::shared_ptr<ComputeService> compute_service,
-                std::map<std::string, std::string> service_specific_args);
-
-        void validateCompoundJobSubmission(std::shared_ptr<CompoundJob> job,
-                                   std::shared_ptr<ComputeService> compute_service,
-                                   std::map<std::string, std::string> service_specific_args);
-        void validatePilotJobSubmission(std::shared_ptr<PilotJob> job,
-                                           std::shared_ptr<ComputeService> compute_service,
-                                           std::map<std::string, std::string> service_specific_args);
-
-        static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
+        std::map<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> cjob_args;
 
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<StandardJob>> cjob_to_sjob_map;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<PilotJob>> cjob_to_pjob_map;
 
         };
 

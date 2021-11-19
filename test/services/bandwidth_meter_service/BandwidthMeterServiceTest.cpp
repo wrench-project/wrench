@@ -148,7 +148,7 @@ private:
                                             wrench::FileLocation::LOCATION(server_storage_service));
 
         // Terminating the Bandwidth Meter Services
-        bm1->stop();
+        bm1->stop(false);
         wrench::Simulation::sleep(1.0);
         bm2->kill();
         return 0;

@@ -58,13 +58,14 @@ namespace wrench {
 
         std::shared_ptr<ComputeService> getParentComputeService();
 
-        std::map<std::string, std::string> &getServiceSpecificArguments();
 
         virtual ~Job();
 
         virtual void setPriority(double priority);
 
         double getPriority() const;
+
+        std::map<std::string, std::string> &getServiceSpecificArguments();
 
     protected:
 

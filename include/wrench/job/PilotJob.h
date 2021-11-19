@@ -60,6 +60,8 @@ namespace wrench {
 
     private:
 
+        std::shared_ptr<CompoundJob> compound_job;
+
         friend class JobManager;
 
         PilotJob(std::shared_ptr<JobManager> job_manager);
