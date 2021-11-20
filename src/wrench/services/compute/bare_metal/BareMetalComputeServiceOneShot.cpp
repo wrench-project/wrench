@@ -26,7 +26,6 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/job/PilotJob.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include <wrench/failure_causes/JobTypeNotSupported.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service_one_shot, "Log category for bare_metal_compute_service_on_shot");
@@ -110,6 +109,5 @@ namespace wrench {
         WRENCH_INFO("One-Shot BareMetalService terminating cleanly!");
         return this->exit_code;
     }
-
 
 }

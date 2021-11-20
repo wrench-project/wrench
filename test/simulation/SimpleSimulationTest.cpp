@@ -314,7 +314,7 @@ private:
         cs->suspend();
         cs->suspend();
         cs->resume();
-        cs->stop(false);
+        cs->stop();
         cs->suspend();
 
         try {
@@ -385,13 +385,11 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                            { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
+                                            {
                                               {wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}
                                               })));
 
     // Try to get the property in bogus ways, for coverage
-    ASSERT_THROW(compute_service->getPropertyValueAsDouble(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
-    ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
     ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks

@@ -322,15 +322,15 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -634,7 +634,7 @@ private:
         }
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         return 0;
     }
@@ -903,7 +903,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                "", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "", {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1067,7 +1067,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                "", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "", {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -1351,7 +1351,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                "", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1502,7 +1502,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1626,7 +1626,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1750,7 +1750,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1872,7 +1872,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1989,7 +1989,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2040,7 +2040,7 @@ private:
         std::shared_ptr<wrench::StandardJob> job = nullptr;
 
         // Shutdown the service
-        test->compute_service->stop(false);
+        test->compute_service->stop();
 
         // Create a job
         job = job_manager->createStandardJob(test->task,
@@ -2097,7 +2097,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
@@ -2225,7 +2225,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
                                                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(

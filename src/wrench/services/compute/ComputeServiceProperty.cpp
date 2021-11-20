@@ -11,8 +11,5 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_STANDARD_JOBS);
-    SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_PILOT_JOBS);
-    SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_COMPOUND_JOBS);
 
 };

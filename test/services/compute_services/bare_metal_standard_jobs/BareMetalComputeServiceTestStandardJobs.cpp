@@ -193,21 +193,7 @@ private:
             job_manager->submitJob(two_task_job, this->test->compute_service);
             throw std::runtime_error(
                     "Should not be able to submit a standard job to a compute service that does not support them");
-        } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (not cause) {
-                throw std::runtime_error("Got expected exception, but unexpected failure cause: " +
-                                         e.getCause()->toString() + " (expected: 'JobTypeNotSupported");
-            }
-            if (cause->getJob() != two_task_job) {
-                throw std::runtime_error(
-                        "Got the expected exception and failure cause, but the failure cause does not point to the right job");
-            }
-            if (cause->getComputeService() != this->test->compute_service) {
-                throw std::runtime_error(
-                        "Got the expected exception and failure cause, but the failure cause does not point to the right compute service");
-            }
-            std::string error_msg = cause->toString();
+        } catch (std::invalid_argument &ignore) {
         }
 
         return 0;
@@ -243,7 +229,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, "",
-                                                {{{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -357,7 +343,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"}, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}))); //scratch space of size 101
+                                                {"/scratch"}, {}))); //scratch space of size 101
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -492,7 +478,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
                     hostname,
                     {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                     {"/scratch"},
-                    {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}))); //scratch space of size 101
+                    {}))); //scratch space of size 101
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -623,7 +609,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("DualCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"}, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {"/scratch"}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms;
@@ -765,7 +751,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("QuadCoreHost",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"}, {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {"/scratch"}, {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -988,7 +974,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair("QuadCoreHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -1108,7 +1094,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -1236,7 +1222,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
@@ -1478,7 +1464,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1557,7 +1543,8 @@ private:
         wrench::Simulation::sleep(0.1);
 
         // Shutdown the compute service
-        this->test->compute_service->stop(true);
+        this->test->compute_service->stop(true,
+                                          wrench::ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
 
         // Wait for the job failure notification
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -1572,10 +1559,6 @@ private:
             if (not cause) {
                 throw std::runtime_error("Got a job failure event, but an unexpected failure cause: " +
                                          real_event->failure_cause->toString() + " (expected: JobKilled)");
-            }
-            if (cause->getService() != this->test->compute_service) {
-                std::runtime_error(
-                        "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
             }
             if (cause->getJob() != two_task_job) {
                 std::runtime_error(
@@ -1619,7 +1602,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -1687,7 +1670,7 @@ private:
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
 
         // Shutdown the storage service
-        this->test->storage_service->stop(false);
+        this->test->storage_service->stop();
 
         // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1747,7 +1730,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                "/scratch", {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

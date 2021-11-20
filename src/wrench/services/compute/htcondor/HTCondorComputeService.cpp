@@ -18,8 +18,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/ComputeService.h>
-#include <wrench/failure_causes/JobTypeNotSupported.h>
 #include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/JobKilled.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_HTCondor, "Log category for HTCondorComputeService Scheduler");
 
@@ -44,16 +44,6 @@ namespace wrench {
                                                    std::map<std::string, std::string> property_list,
                                                    std::map<std::string, double> messagepayload_list) :
             ComputeService(hostname, "htcondor_service", "htcondor_service", "") {
-
-        // Check the property list for things that the user should not specify
-        if (property_list.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != property_list.end()) {
-            std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): ComputeServiceProperty::SUPPORTS_STANDARD_JOBS cannot be set for "
-                                  "an HTCondorComputeService, as it is based on the capabilities of the child compute services");
-        }
-        if (property_list.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != property_list.end()) {
-            std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): ComputeServiceProperty::SUPPORTS_PILOT_JOBS cannot be set for "
-                                  "an HTCondorComputeService, as it is based on the capabilities of the child compute services");
-        }
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -346,17 +336,6 @@ namespace wrench {
                                                           const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
-        // Check that the job kind is supported
-        if (not this->central_manager->jobKindIsSupported(job, service_specific_args)) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
-                            this->getMessagePayloadValue(
-                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            return;
-        }
 
         // Check that the job can run on some child service
         if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
@@ -439,17 +418,6 @@ namespace wrench {
                                                        const std::map<std::string, std::string> &service_specific_args) {
 
         WRENCH_INFO("Asked to run a pilot job");
-        // Check that the job kind is supported
-        if (not this->central_manager->jobKindIsSupported(job, service_specific_args)) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new ComputeServiceSubmitPilotJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<HTCondorComputeService>())),
-                            this->getMessagePayloadValue(
-                                    HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            return;
-        }
 
         // Check that the job can run on some child service
         if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
@@ -492,7 +460,7 @@ namespace wrench {
      */
     void HTCondorComputeService::terminate() {
         this->setStateToDown();
-        this->central_manager->stop(false);
+        this->central_manager->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
         this->default_property_values.clear();
         this->default_messagepayload_values.clear();
     }

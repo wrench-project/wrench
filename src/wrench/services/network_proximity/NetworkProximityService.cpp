@@ -266,7 +266,7 @@ namespace wrench {
                 std::vector<std::shared_ptr<NetworkProximityDaemon>>::iterator it;
                 for (it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
                     if ((*it)->isUp()) {
-                        (*it)->stop(false);
+                        (*it)->stop();
                     }
                 }
                 this->network_daemons.clear();

@@ -66,7 +66,7 @@ namespace wrench {
 
         void submitAction(const std::shared_ptr<Action> &action);
 
-        void terminateAction(std::shared_ptr<Action> action);
+        void terminateAction(std::shared_ptr<Action> action, ComputeService::TerminationCause termination_cause);
 
         void setParentService(std::shared_ptr<Service> service);
 
@@ -115,7 +115,7 @@ namespace wrench {
 
         // Helper functions to make main() a bit more palatable
 
-        void terminate(bool crashed);
+        void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         void failCurrentActions();
 
@@ -125,7 +125,7 @@ namespace wrench {
 
         void processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor);
 
-        void processActionTerminationRequest(std::shared_ptr<Action> action, const std::string &answer_mailbox);
+        void processActionTerminationRequest(std::shared_ptr<Action> action, const std::string &answer_mailbox, ComputeService::TerminationCause termination_cause);
 
         bool processNextMessage();
 

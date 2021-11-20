@@ -27,11 +27,62 @@ namespace wrench {
     constexpr double ComputeService::ALL_RAM;
 
     /**
-     * @brief Stop the compute service - must be called by the stop()
-     *        method of derived classes
+     * @brief Stop the compute service
      */
-    void ComputeService::stop(bool send_failure_notifications) {
-        Service::stop(send_failure_notifications);
+     void ComputeService::stop() {
+        this->stop(false, (ComputeService::TerminationCause) 0);
+     }
+
+    /**
+     * @brief Stop the compute service
+     * @param send_failure_notifications: whether to send job failure notifications or not
+     * @param termination_cause: the cause (reason) of the service's termination
+     */
+    void ComputeService::stop(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
+        /** THIS IS CODE DUPLICATION FROM Service::stop(), which is not great **/
+
+        // Do nothing if the service is already down
+        if ((this->state == Service::DOWN) or (this->shutting_down)) {
+            return;
+        }
+        this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
+
+        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+
+        // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
+        std::string ack_mailbox = S4U_Mailbox::generateUniqueMailboxName("stop");
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new ServiceStopDaemonMessage(
+                                            ack_mailbox,
+                                            send_failure_notifications,
+                                            termination_cause,
+                                            this->getMessagePayloadValue(
+                                                    ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            this->shutting_down = false;
+            throw ExecutionException(cause);
+        }
+
+        // Wait for the ack
+        std::unique_ptr<SimulationMessage> message = nullptr;
+
+        try {
+            message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            this->shutting_down = false;
+            throw ExecutionException(cause);
+        }
+
+        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
+            this->state = Service::DOWN;
+        } else {
+            throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
+        }
+
+        // Set the service state to down
+        this->shutting_down = false;
+        this->state = Service::DOWN;
     }
 
     /**
@@ -153,30 +204,6 @@ namespace wrench {
 
         this->state = ComputeService::UP;
         this->scratch_space_storage_service = scratch_space;
-    }
-
-    /**
-     * @brief Get whether the compute service supports standard jobs or not
-     * @return true or false
-     */
-    bool ComputeService::supportsStandardJobs() {
-        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS);
-    }
-
-    /**
-     * @brief Get whether the compute service supports pilot jobs or not
-     * @return true or false
-     */
-    bool ComputeService::supportsPilotJobs() {
-        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_PILOT_JOBS);
-    }
-
-    /**
-     * @brief Get whether the compute service supports compound jobs or not
-     * @return true or false
-     */
-    bool ComputeService::supportsCompoundJobs() {
-        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_COMPOUND_JOBS);
     }
 
     /**

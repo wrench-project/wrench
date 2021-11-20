@@ -191,7 +191,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
                   hostname, execution_hosts, "/scratch",
-                  {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                  {})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
@@ -329,7 +329,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BareMetalComputeService(
                   hostname, execution_hosts, "/scratch",
-                  {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                  {})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();

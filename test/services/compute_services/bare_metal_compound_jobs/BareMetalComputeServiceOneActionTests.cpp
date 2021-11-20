@@ -295,15 +295,15 @@ private:
         auto data_movement_manager = this->createDataMovementManager();
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -433,15 +433,15 @@ private:
 //        std::cerr << action->getEndDate() << "\n";
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -577,15 +577,15 @@ private:
 
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -717,15 +717,15 @@ private:
         }
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -873,15 +873,15 @@ private:
 
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -1191,15 +1191,15 @@ private:
         }
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -1346,15 +1346,15 @@ private:
         }
 
         // Stop the Job Manager manually, just for kicks
-        job_manager->stop(false);
+        job_manager->stop();
 
         // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop(false);
+        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
@@ -1453,7 +1453,7 @@ private:
         auto action = job->addSleepAction("my_sleep", 10.0);
 
         // Take down the compute service
-        this->test->compute_service->stop(false);
+        this->test->compute_service->stop();
 
         // Submit the job
         try {

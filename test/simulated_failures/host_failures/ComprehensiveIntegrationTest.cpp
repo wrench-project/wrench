@@ -448,7 +448,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
                         "/scratch",
-                        {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                        {
                          {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
     }
 

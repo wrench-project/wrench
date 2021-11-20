@@ -470,7 +470,7 @@ private:
         }
 
         // Shutdown the service
-        this->test->storage_service_100->stop(false);
+        this->test->storage_service_100->stop();
 
         // Try to do stuff with a shutdown service
         try {
@@ -1049,7 +1049,7 @@ private:
         }
 
         // Do the file copy from a src storage service that's down
-        this->test->storage_service_1000->stop(false);
+        this->test->storage_service_1000->stop();
 
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->file_500,
@@ -1073,7 +1073,7 @@ private:
 
 
         // Do the file copy to a dst storage service that's down
-        this->test->storage_service_510->stop(false);
+        this->test->storage_service_510->stop();
 
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->file_1,
@@ -1265,7 +1265,7 @@ private:
         }
 
         // Do the file copy for a src storage service that's down
-        this->test->storage_service_1000->stop(false);
+        this->test->storage_service_1000->stop();
 
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100,

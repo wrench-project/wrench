@@ -26,7 +26,6 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/job/PilotJob.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include <wrench/failure_causes/JobTypeNotSupported.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service, "Log category for bare_metal_compute_service");
@@ -515,7 +514,7 @@ namespace wrench {
 //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            this->terminate(msg->send_failure_notifications);
+            this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
             try {
@@ -531,9 +530,9 @@ namespace wrench {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            return true;
+//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+//            return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
             processGetResourceInformation(msg->answer_mailbox);
@@ -613,22 +612,6 @@ namespace wrench {
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a compound job with %ld actions", job->getActions().size());
 
-        // Do we support standard jobs?
-        if (not this->supportsCompoundJobs()) {
-            auto failure_cause = std::shared_ptr<FailureCause>(
-                    new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>()));
-            job->setAllActionsFailed(failure_cause);
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox,
-                    new ComputeServiceSubmitCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<BareMetalComputeService>(), false,
-                            failure_cause,
-                            this->getMessagePayloadValue(
-                                    ComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            return;
-        }
-
-
         // Can we run this job at all in terms of available resources?
         bool can_run = true;
         for (auto const &action : job->getActions()) {
@@ -675,12 +658,12 @@ namespace wrench {
     /**
      * @brief Terminate the daemon, dealing with pending/running job
      */
-    void BareMetalComputeService::terminate(bool send_failure_notifications) {
+    void BareMetalComputeService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         this->setStateToDown();
 
         // Terminate all actions
         for (auto const &action : this->dispatched_actions) {
-            this->action_execution_service->terminateAction(action);
+            this->action_execution_service->terminateAction(action, termination_cause);
         }
 
         if (send_failure_notifications) {
@@ -729,7 +712,7 @@ namespace wrench {
             return;
         }
 
-        terminateRunningCompoundJob(job, BareMetalComputeService::JobTerminationCause::TERMINATED);
+        terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
 
         // reply
         auto answer_message = new ComputeServiceTerminateCompoundJobAnswerMessage(
@@ -740,33 +723,33 @@ namespace wrench {
     }
 
 
-/**
- * @brief Process a submit pilot job request
- *
- * @param answer_mailbox: the mailbox to which the answer message should be sent
- * @param job: the job
- *
- * @throw std::runtime_error
- */
-    void BareMetalComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                        std::shared_ptr<PilotJob> job,
-                                                        std::map<std::string, std::string> service_specific_args) {
-        WRENCH_INFO("Asked to run a pilot job");
-
-        if (not this->supportsPilotJobs()) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                            job, this->getSharedPtr<BareMetalComputeService>(), false,
-                            std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
-                            this->getMessagePayloadValue(
-                                    BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            return;
-        }
-
-        throw std::runtime_error(
-                "bare_metal_standard_jobs::processSubmitPilotJob(): We shouldn't be here! (fatal)");
-    }
+///**
+// * @brief Process a submit pilot job request
+// *
+// * @param answer_mailbox: the mailbox to which the answer message should be sent
+// * @param job: the job
+// *
+// * @throw std::runtime_error
+// */
+//    void BareMetalComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
+//                                                        std::shared_ptr<PilotJob> job,
+//                                                        std::map<std::string, std::string> service_specific_args) {
+//        WRENCH_INFO("Asked to run a pilot job");
+//
+//        if (not this->supportsPilotJobs()) {
+//            S4U_Mailbox::dputMessage(
+//                    answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
+//                            job, this->getSharedPtr<BareMetalComputeService>(), false,
+//                            std::shared_ptr<FailureCause>(
+//                                    new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
+//                            this->getMessagePayloadValue(
+//                                    BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+//            return;
+//        }
+//
+//        throw std::runtime_error(
+//                "bare_metal_standard_jobs::processSubmitPilotJob(): We shouldn't be here! (fatal)");
+//    }
 
 /**
  * @brief Process a host available resource request
@@ -846,12 +829,6 @@ namespace wrench {
                                                 BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD));
         }
 
-        // Supporting Pilot jobs
-        if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
-            throw std::invalid_argument(
-                    "Invalid SUPPORTS_PILOT_JOBS property specification: a BareMetal Compute Service "
-                    "cannot support pilot jobs");
-        }
     }
 
 /**
@@ -961,10 +938,10 @@ namespace wrench {
     }
 
     void BareMetalComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job,
-                                                              BareMetalComputeService::JobTerminationCause termination_cause) {
+                                                              ComputeService::TerminationCause termination_cause) {
         for (auto const &action : job->getActions()) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
-                this->action_execution_service->terminateAction(action);
+                this->action_execution_service->terminateAction(action, termination_cause);
             }
         }
         this->current_jobs.erase(job);

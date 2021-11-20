@@ -36,8 +36,6 @@ namespace wrench {
     class CloudComputeService : public ComputeService {
     private:
         std::map<std::string, std::string> default_property_values = {
-                {CloudComputeServiceProperty::SUPPORTS_PILOT_JOBS,              "false"},
-                {CloudComputeServiceProperty::SUPPORTS_STANDARD_JOBS,           "false"},
                 {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS,      "0.0"},
                 {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
         };
@@ -75,6 +73,10 @@ namespace wrench {
                             std::string scratch_space_mount_point,
                             std::map<std::string, std::string> property_list = {},
                             std::map<std::string, double> messagepayload_list = {});
+
+        virtual bool supportsStandardJobs() override { return false; };
+        virtual bool supportsCompoundJobs() override {return false; };
+        virtual bool supportsPilotJobs() override {return false; };
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -180,11 +182,11 @@ namespace wrench {
 
         virtual void processDestroyVM(const std::string &answer_mailbox, const std::string &vm_name);
 
-        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
-                                              std::map<std::string, std::string> &service_specific_args);
-
-        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
-                                           std::map<std::string, std::string> &service_specific_args);
+//        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+//                                              std::map<std::string, std::string> &service_specific_args);
+//
+//        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
+//                                           std::map<std::string, std::string> &service_specific_args);
 
         virtual void
         processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
@@ -193,7 +195,7 @@ namespace wrench {
                 const std::string &answer_mailbox, unsigned long num_cores, double ram);
 
 
-        void stopAllVMs();
+        void stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         /** \cond */
         static unsigned long VM_ID;

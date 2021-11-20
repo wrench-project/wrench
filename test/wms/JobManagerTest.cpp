@@ -490,20 +490,7 @@ private:
         try {
             job_manager->submitJob(job, cs_does_not_support_standard_jobs);
             throw std::runtime_error("Should not be able to submit a standard job to a service that does not support them");
-        } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (not cause) {
-                throw std::runtime_error("Got expected exception but unexpected failure cause: " +
-                                         e.getCause()->toString() + " (expected: JobTypeNotSupported)");
-            }
-            if (cause->getJob() != job) {
-                throw std::runtime_error(
-                        "Got expected exxeption and failure cause, but the failure cause does not point to the correct job");
-            }
-            if (cause->getComputeService() != cs_does_not_support_standard_jobs) {
-                throw std::runtime_error(
-                        "Got expected exxeption and failure cause, but the failure cause does not point to the correct compute service");
-            }
+        } catch (std::invalid_argument &ignore) {
         }
 
         // Check task states
@@ -566,14 +553,14 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
             new wrench::BareMetalComputeService("Host2",
                                                 {std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                {})));
 
     // Create a ComputeService that does support standard jobs
     ASSERT_NO_THROW(cs2 = simulation->add(
             new wrench::BareMetalComputeService("Host3",
                                                 {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -718,7 +705,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
             new wrench::BareMetalComputeService("Host3",
                                                 {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

@@ -585,14 +585,14 @@ namespace wrench {
                                 "haven't reported back yet");
                     return true;
                 } else {
-                    this->terminate(true);
+                    this->terminate(true, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
                     this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
                     return false;
                 }
             }
 
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            this->terminate(false);
+            this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
             try {
@@ -608,7 +608,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<ActionExecutionServiceTerminateActionRequestMessage *>(message.get())) {
-            processActionTerminationRequest(msg->action, msg->reply_mailbox);
+            processActionTerminationRequest(msg->action, msg->reply_mailbox, msg->termination_cause);
             return true;
 
         } else if (auto msg = dynamic_cast<ActionExecutorDoneMessage *>(message.get())) {
@@ -642,7 +642,7 @@ namespace wrench {
                     return true;
                 }
 
-                this->terminate(true);
+                this->terminate(true, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
                 this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
                 return false;
             }
@@ -671,6 +671,8 @@ namespace wrench {
             this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
             this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
             executor->kill(killed_due_to_job_cancelation);
+            std::cerr << "ACTION EXECUTION SERVICE: SETTING FAILURE CAUSE OF ACTION TO " << cause->toString() << "\n";
+            executor->getAction()->setFailureCause(cause);
             this->action_executors.erase(action);
 
             /** Yield, so that the executor has a chance to do their cleanup, etc. */
@@ -703,16 +705,31 @@ namespace wrench {
      * @brief Terminate the daemon, dealing with pending/running actions
      *
      */
-    void ActionExecutionService::terminate(bool crashed) {
+    void ActionExecutionService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         this->setStateToDown();
 
         WRENCH_INFO("Failing currently running actions");
         for (auto const &action : this->running_actions) {
-            if (crashed) {
-                this->killAction(action, std::make_shared<ServiceIsDown>(this->parent_service));
-            } else {
-                this->killAction(action, std::make_shared<JobKilled>(action->getJob(), this->parent_service));
+            std::shared_ptr<FailureCause> failure_cause;
+            switch (termination_cause) {
+                case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
+                    failure_cause = std::make_shared<JobKilled>(action->getJob());
+                    break;
+                case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
+                    failure_cause = std::make_shared<ServiceIsDown>(this->parent_service);
+                    break;
+                case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
+                    failure_cause = std::make_shared<JobTimeout>(action->getJob());
+                    break;
+                default:
+                    failure_cause = std::make_shared<JobKilled>(action->getJob());
+                    break;
             }
+            this->killAction(action, failure_cause);
+        }
+
+        if (send_failure_notifications) {
+            throw std::runtime_error("ActionExecutionService::terminate(): NEED TO IMPLEMENT FAILURE NOTIFICATIONS???");
         }
 
     }
@@ -721,11 +738,13 @@ namespace wrench {
      * @brief Synchronously terminate a standard job previously submitted to the compute service
      *
      * @param job: a standard job
+     * @param termination_cause: termination cause
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void ActionExecutionService::terminateAction(std::shared_ptr<Action> action) {
+    void ActionExecutionService::terminateAction(std::shared_ptr<Action> action,
+                                                 ComputeService::TerminationCause termination_cause) {
         assertServiceIsUp();
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_action");
@@ -734,7 +753,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
                                     new ActionExecutionServiceTerminateActionRequestMessage(
-                                            answer_mailbox, action, 0.0));
+                                            answer_mailbox, action, termination_cause, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -814,9 +833,11 @@ namespace wrench {
      *
      * @param action: the action to terminate
      * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param termination_cause: the termination cause
      */
     void ActionExecutionService::processActionTerminationRequest(std::shared_ptr<Action> action,
-                                                          const std::string &answer_mailbox) {
+                                                                 const std::string &answer_mailbox,
+                                                                 ComputeService::TerminationCause termination_cause) {
 
         // If the action doesn't exit, we reply right away
         if (this->all_actions.find(action) == this->all_actions.end()) {
@@ -831,7 +852,22 @@ namespace wrench {
             return;
         }
 
-        killAction(action, std::make_shared<JobKilled>(action->getJob(), this->parent_service));
+        std::shared_ptr<FailureCause> failure_cause;
+        switch (termination_cause) {
+            case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
+                failure_cause = std::make_shared<JobKilled>(action->getJob());
+                break;
+            case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
+                failure_cause = std::make_shared<ServiceIsDown>(this->parent_service);
+                break;
+            case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
+                failure_cause = std::make_shared<JobTimeout>(action->getJob());
+                break;
+            default:
+                failure_cause = std::make_shared<JobKilled>(action->getJob());
+                break;
+        }
+        this->killAction(action, failure_cause);
 
         // reply
         auto answer_message = new ActionExecutionServiceTerminateActionAnswerMessage(
@@ -964,7 +1000,7 @@ namespace wrench {
  * @param ram: the desired RAM
  */
     bool ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
-                                                                      double ram) {
+                                                                             double ram) {
         bool enough_ram = false;
         bool enough_cores = false;
 

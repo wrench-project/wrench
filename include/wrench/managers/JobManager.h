@@ -56,7 +56,7 @@ namespace wrench {
     public:
 
 
-        void stop(bool send_failure_notifications) override;
+        void stop() override;
 
         void kill();
 

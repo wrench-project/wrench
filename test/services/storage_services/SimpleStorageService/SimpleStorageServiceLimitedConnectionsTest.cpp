@@ -234,7 +234,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
                                               {std::make_pair("WMSHost",
                                                               std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                               "",
-                                              {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                              {})));
 
   // Create a Local storage service with unlimited connections
   ASSERT_NO_THROW(storage_service_wms_unlimited = simulation->add(
