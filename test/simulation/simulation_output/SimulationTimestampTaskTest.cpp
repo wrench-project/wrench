@@ -523,7 +523,7 @@ private:
         auto job_that_will_fail = job_manager->createStandardJob(this->test->task2);
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        this->test->compute_service->stop(false);
+        this->test->compute_service->stop();
 
         return 0;
     }

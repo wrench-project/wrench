@@ -53,6 +53,10 @@ namespace wrench {
                                std::map<std::string, std::string> property_list = {},
                                std::map<std::string, double> messagepayload_list = {});
 
+        virtual bool supportsStandardJobs() override { return true; };
+        virtual bool supportsCompoundJobs() override {return true; };
+        virtual bool supportsPilotJobs() override {return false; };
+
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/

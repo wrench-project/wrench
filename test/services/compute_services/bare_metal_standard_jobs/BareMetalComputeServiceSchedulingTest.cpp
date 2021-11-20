@@ -216,7 +216,7 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
                                                 (std::vector<std::string>){"Host1", "Host2"}, "",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}, {})));
+                                                {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 
@@ -351,7 +351,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
                                                 (std::vector<std::string>){"Host1", "Host2"}, "",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}, {})));
+                                                {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 
@@ -486,7 +486,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host1",
                                                 (std::vector<std::string>){"Host1", "Host3"}, "",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}, {})));
+                                                {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 

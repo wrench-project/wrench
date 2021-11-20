@@ -21,12 +21,10 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param job: the job that could not be executed
-    * @param service: the compute service that didn't have enough cores
+    * @param job: the job that was killed
     */
-    JobKilled::JobKilled(std::shared_ptr<Job> job, std::shared_ptr<Service> service) {
+    JobKilled::JobKilled(std::shared_ptr<Job> job) {
         this->job = job;
-        this->service = service;
     }
 
     /**
@@ -38,20 +36,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Getter
-     * @return the compute service
-     */
-    std::shared_ptr<Service> JobKilled::getService() {
-        return this->service;
-    }
-
-    /**
      * @brief Get the human-readable failure message
      * @return the message
      */
     std::string JobKilled::toString() {
         return "Job " + this->job->getName() + " on service " +
-               this->service->getName() + " was killed (likely the service was stopped/terminated)";
+               this->job->getParentComputeService()->getName() + " was killed";
     }
 
 

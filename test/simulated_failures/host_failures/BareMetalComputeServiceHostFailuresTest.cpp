@@ -202,7 +202,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))
                                                 },
                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                                {
                                                  {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
@@ -323,7 +323,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                 },
                                                 "/scratch",
                                                 {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"},
-                                                 {wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}));
+                                                 }));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
@@ -460,7 +460,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                                {
                                                  {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
@@ -568,7 +568,6 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
                     },
                     "/scratch",
                     {
-                            {wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
                             {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}
                     }));
 

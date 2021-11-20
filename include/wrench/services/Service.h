@@ -19,6 +19,8 @@
 
 namespace wrench {
 
+    class FailureCause;
+
     /**
      * @brief A service that can be added to the simulation and that can be used by a WMS
      *        when executing a workflow
@@ -34,7 +36,7 @@ namespace wrench {
         /***********************/
 
         void start(std::shared_ptr<Service> this_service, bool daemonize, bool auto_restart);
-        virtual void stop(bool send_failure_notifications);
+        virtual void stop();
         void suspend();
         void resume();
 
@@ -153,12 +155,12 @@ namespace wrench {
             return nullptr;
         }
 
+        bool shutting_down = false;
 
     private:
 
         static std::unordered_map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
 
-        bool shutting_down = false;
 
         static unsigned long num_terminated_services;
 

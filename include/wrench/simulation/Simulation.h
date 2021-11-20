@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
+
 #include "Version.h"
 #include "wrench/simulation/SimulationOutput.h"
 
@@ -214,6 +216,8 @@ namespace wrench {
         static bool host_shutdown_enabled;
         static bool pagecache_enabled;
     };
+
+
 
 };
 

@@ -246,7 +246,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
                                               {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                         wrench::ComputeService::ALL_RAM))},
                                               "/scratch3000",
-                                              {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                              {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 

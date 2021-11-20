@@ -303,15 +303,7 @@ private:
             try {
                 job_manager->submitJob(job, bs_does_not_support_standard, batch_job_args);
                 throw std::runtime_error("Should have gotten an exception as Standard Jobs are not supported");
-            } catch (wrench::ExecutionException &e) {
-                auto cause = e.getCause();
-                auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
-                real_cause->toString();
-                if (not real_cause) {
-                    throw std::runtime_error(
-                            "Should have gotten a JobTypeNotSupported error cause as Standard Jobs are not supported "
-                            "(instead got a " + cause->toString() + " error cause");
-                }
+            } catch (std::invalid_argument &ignore) {
             }
         }
 
@@ -327,15 +319,7 @@ private:
             try {
                 job_manager->submitJob(job, bs_does_not_support_pilot, batch_job_args);
                 throw std::runtime_error("Should have gotten an exception as Pilot Jobs are not supported");
-            } catch (wrench::ExecutionException &e) {
-                auto cause = e.getCause();
-                auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(cause);
-                real_cause->toString();
-                if (not real_cause) {
-                    throw std::runtime_error(
-                            "Should have gotten a JobTypeNotSupported error cause as Pilot Jobs are not supported "
-                            "(instead got a " + cause->toString() + " error cause");
-                }
+            } catch (std::invalid_argument &ignore) {
             }
         }
 
@@ -367,17 +351,13 @@ void BatchServiceTest::do_JobTypeNotSupportedTest_test() {
     // Create a Batch Service that does not support Standard Jobs
     ASSERT_NO_THROW(cs1 = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-                                             {wrench::BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"},
-                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "true"}}
+                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}
             )));
 
     // Create a Batch Service that does not support Pilot Jobs
     ASSERT_NO_THROW(cs2 = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"}, "",
-                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
-                                             {wrench::BatchComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-                                             {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "false"}}
+                                            {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}
             )));
 
     // Create a WMS
@@ -850,10 +830,10 @@ private:
             this->getWorkflow()->removeTask(task);
 
             // Shutdown the compute service, for testing purposes
-            this->test->compute_service->stop(false);
+            this->test->compute_service->stop();
 
             // Shutdown the compute service, for testing purposes, which should do nothing
-            this->test->compute_service->stop(false);
+            this->test->compute_service->stop();
         }
 
         return 0;
@@ -2851,10 +2831,6 @@ private:
                                              real_event->failure_cause->toString() + " (expected: JobKilled)");
                 }
                 std::string error_msg = cause->toString();
-                if (cause->getService() != this->test->compute_service) {
-                    std::runtime_error(
-                            "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
-                }
                 if (cause->getJob() != job) {
                     std::runtime_error(
                             "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
@@ -3575,7 +3551,7 @@ private:
         wrench::Simulation::sleep(5);
 
         // Terminate the service
-        this->test->compute_service->stop(false);
+        this->test->compute_service->stop();
 
         // Sleep 5 seconds
         wrench::Simulation::sleep(5);

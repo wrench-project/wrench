@@ -58,14 +58,18 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param action: the action to terminate
+     * @param termination_cause: the termination cause
      * @param payload: the message size in bytes
      */
     ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(
             const std::string &reply_mailbox,
-            std::shared_ptr<Action> action, double payload) :
+            std::shared_ptr<Action> action,
+            ComputeService::TerminationCause termination_cause,
+            double payload) :
             ActionExecutionServiceMessage("ACTION_EXECUTION_SERVICE_TERMINATE_ACTION_REQUEST", payload) {
         this->reply_mailbox = reply_mailbox;
         this->action = std::move(action);
+        this->termination_cause = termination_cause;
     }
 
     /**

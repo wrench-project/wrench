@@ -32,7 +32,7 @@ namespace wrench {
 
     public:
 
-        void stop(bool send_failure_notifications);
+        void stop() override;
 
         void kill();
 
@@ -63,7 +63,7 @@ namespace wrench {
 
     private:
 
-        int main();
+        int main() override;
 
         std::shared_ptr<WMS> wms = nullptr;
 

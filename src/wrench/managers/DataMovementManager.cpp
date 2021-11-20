@@ -52,9 +52,9 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void DataMovementManager::stop(bool send_failure_notifications) {
+    void DataMovementManager::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", send_failure_notifications, 0.0));
+            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", false, 0, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }

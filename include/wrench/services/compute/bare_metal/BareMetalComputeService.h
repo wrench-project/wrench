@@ -52,9 +52,6 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
-                {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
-                {BareMetalComputeServiceProperty::SUPPORTS_COMPOUND_JOBS,                         "true"},
                 {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
                 {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
         };
@@ -106,6 +103,10 @@ namespace wrench {
                                 std::map<std::string, std::string> property_list = {},
                                 std::map<std::string, double> messagepayload_list = {}
         );
+
+        virtual bool supportsStandardJobs() override { return true; };
+        virtual bool supportsCompoundJobs() override {return true; };
+        virtual bool supportsPilotJobs() override {return false; };
 
         /***********************/
         /** \cond INTERNAL     */
@@ -188,7 +189,7 @@ namespace wrench {
 
         // Helper functions to make main() a bit more palatable
 
-        void terminate(bool send_failure_notifications);
+        void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         void processActionDone(std::shared_ptr<Action> action);
 
@@ -199,17 +200,7 @@ namespace wrench {
         void dispatchReadyActions();
 
 
-
-        /** @brief Reasons why a standard job could be terminated */
-        enum JobTerminationCause {
-            /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
-            TERMINATED,
-
-            /** @brief The compute service was directed to stop, and any running StandardJob will fail */
-            COMPUTE_SERVICE_KILLED
-        };
-
-        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, JobTerminationCause termination_cause);
+        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 

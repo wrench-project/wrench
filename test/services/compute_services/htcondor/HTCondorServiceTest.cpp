@@ -340,8 +340,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
             new wrench::HTCondorComputeService(
                     hostname, std::move(compute_services),
                     {
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+
                     })));
 
     // Create a WMS
@@ -476,8 +475,6 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
             new wrench::HTCondorComputeService(
                     hostname, {},
                     {
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
-                            {wrench::HTCondorComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
                     })));
 
     // Create a WMS
@@ -626,7 +623,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(hostname, compute_services,
-                                               {{wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "true"}})));
+                                               {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -703,7 +700,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        this->test->compute_service->stop(false);
+        this->test->compute_service->stop();
 
         return 0;
     }
@@ -746,7 +743,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
 
         ASSERT_THROW(compute_service = simulation->add(
                 new wrench::HTCondorComputeService(hostname, std::move(invalid_compute_services),
-                                                   {{wrench::HTCondorComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})),
+                                                   {})),
                      std::invalid_argument);
     }
 
@@ -819,7 +816,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        this->test->compute_service->stop(false);
+        this->test->compute_service->stop();
 
         return 0;
     }
@@ -945,15 +942,11 @@ private:
         // Submit the  job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
-        } catch (wrench::ExecutionException &e) {
-            auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (real_cause == nullptr) {
-                throw std::runtime_error("Was expecting a JobTypeNotSupported failure cause");
-            }
+            throw std::runtime_error("Shouldn't have been able to submit a grid job");
+        } catch (std::invalid_argument &ignore) {
             return 0;
         }
 
-        throw std::runtime_error("Shouldn't have been able to submit a grid job");
 
         return 1;
     }
@@ -1076,17 +1069,11 @@ private:
         // Submit the  job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
-        } catch (wrench::ExecutionException &e) {
-            auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (real_cause == nullptr) {
-                throw std::runtime_error("Was expecting a JobTypeNotSupported failure cause");
-            }
+             throw std::runtime_error("Shouldn't have been able to submit a grid job");
+             return 1;
+        } catch (std::invalid_argument &ignore) {
             return 0;
         }
-
-        throw std::runtime_error("Shouldn't have been able to submit a grid job");
-
-        return 1;
     }
 };
 
@@ -1124,7 +1111,6 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
                     {"BatchHost1", "BatchHost2"},
                     "/scratch",
                     {
-                            {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
                     }));
     compute_services.insert(batch_service);
 
@@ -1203,15 +1189,11 @@ private:
         // Submit the job for execution
         try {
             job_manager->submitJob(grid_job, this->test->compute_service, test_service_specs);
-        } catch (wrench::ExecutionException &e) {
-            auto real_cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (not real_cause) {
-                throw std::runtime_error("Should have gotten a JobTypeNotSupported failure cause");
-            }
+        throw std::runtime_error("Should not have been able to submit job successfully");
+        } catch (std::invalid_argument &ignore) {
             return 0;
         }
 
-        throw std::runtime_error("Should not have been able to submit job successfully");
     }
 };
 
@@ -1257,7 +1239,6 @@ void HTCondorServiceTest::do_NoPilotJobSupportTest_test() {
                                                                          {"BatchHost1", "BatchHost2"},
                                                                          "/scratch",
                                                                          {
-                                                                                 {wrench::BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
                                                                          }));
     compute_services.insert(batch_service);
 

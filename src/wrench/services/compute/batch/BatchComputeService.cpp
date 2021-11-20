@@ -30,7 +30,6 @@
 #include "batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
 #include "batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h"
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
-#include <wrench/failure_causes/JobTypeNotSupported.h>
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
 #include <wrench/failure_causes/JobKilled.h>
 #include <wrench/failure_causes/NetworkError.h>
@@ -524,9 +523,7 @@ namespace wrench {
         this->scheduler->processJobFailure(batch_job);
 
         std::cerr << "SENDING BACK A JOB FAILED MESSAGE TO NEXT LEVEL UP\n";
-        // This is ugly: I am popping once because, had the job been, successful I would have gotten a message
-        // TODO: IN FACT, have the kob report to be a "Job timeout/killed" or whatever!
-        job->popCallbackMailbox();
+        job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
                     job->popCallbackMailbox(),
@@ -581,36 +578,36 @@ namespace wrench {
         }
     }
 
-    /**
-     *
-     * @param job
-     */
-    void BatchComputeService::processPilotJobTimeout(std::shared_ptr<PilotJob> job) {
-        auto cs = job->getComputeService();
-        if (cs == nullptr) {
-            throw std::runtime_error(
-                    "BatchComputeService::terminate(): can't find compute service associated to pilot job");
-        }
-        try {
-            cs->stop(false);
-        } catch (wrench::ExecutionException &e) {}
-    }
+//    /**
+//     *
+//     * @param job
+//     */
+//    void BatchComputeService::processPilotJobTimeout(std::shared_ptr<PilotJob> job) {
+//        auto cs = job->getComputeService();
+//        if (cs == nullptr) {
+//            throw std::runtime_error(
+//                    "BatchComputeService::terminate(): can't find compute service associated to pilot job");
+//        }
+//        try {
+//            cs->stop(false);
+//        } catch (wrench::ExecutionException &e) {}
+//    }
 
     /**
      *
      * @param job
      */
     void BatchComputeService::processCompoundJobTimeout(std::shared_ptr<CompoundJob> job) {
+        // TODO: Do a map?
         for (auto it = this->running_bare_metal_one_shot_compute_services.begin();
              it != this->running_bare_metal_one_shot_compute_services.end(); it++) {
             if ((*it)->job == job) {
-                (*it)->stop(true);
-                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_bare_metal_one_shot_compute_services),
-                                                       &(this->running_bare_metal_one_shot_compute_services));
+                // I'll get a bunch fo failure notifications, which is fine
+                (*it)->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
+//                this->running_bare_metal_one_shot_compute_services.erase(it);
                 break;
             }
         }
-        this->running_bare_metal_one_shot_compute_services.clear();
     }
 
     /**
@@ -633,8 +630,7 @@ namespace wrench {
 
         // Terminate the executor
         WRENCH_INFO("Terminating a one-shot bare-metal service");
-        executor->stop(true);
-        // Do not update the resource availability, because this is done at a higher level
+        executor->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
     }
 
     /**
@@ -655,8 +651,7 @@ namespace wrench {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(j->getJobID()),
                         std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job,
-                                              this->getSharedPtr<BatchComputeService>())));
+                                new JobKilled(compound_job)));
                 to_erase.push_back(j);
             }
 
@@ -676,8 +671,7 @@ namespace wrench {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string((*it1)->getJobID()),
                         std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job,
-                                              this->getSharedPtr<BatchComputeService>())));
+                                new JobKilled(compound_job)));
             }
 
             for (auto const &j : to_erase) {
@@ -696,8 +690,7 @@ namespace wrench {
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(wj->getJobID()),
                         std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job,
-                                              this->getSharedPtr<BatchComputeService>())));
+                                new JobKilled(compound_job)));
             }
 
             for (auto const &j : to_erase) {
@@ -724,44 +717,45 @@ namespace wrench {
         Service::cleanup(has_returned_from_main, return_value);
     }
 
-    /**
-     * @brief Terminate all running pilot jobs
-     */
-    void BatchComputeService::terminateRunningPilotJobs() {
-        if (getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)) { WRENCH_INFO(
-                    "Failing running pilot jobs");
-            std::vector<std::shared_ptr<BatchJob>> to_erase;
-
-            // LOCK
-            this->acquireDaemonLock();
-
-            // Stopping services
-            for (auto &job : this->running_jobs) {
-                if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job->getCompoundJob())) {
-                    auto cs = pjob->getComputeService();
-                    if (cs == nullptr) {
-                        throw std::runtime_error(
-                                "BatchComputeService::terminate(): can't find compute service associated to pilot job");
-                    }
-                    try {
-                        cs->stop(false);
-                    } catch (wrench::ExecutionException &e) {
-                        // ignore
-                    }
-                    to_erase.push_back(job);
-                }
-            }
-
-            // Cleaning up data structures
-            for (auto &job : to_erase) {
-                this->running_jobs.erase(job);
-                this->removeBatchJobFromJobsList(job);
-            }
-
-            // UNLOCK
-            this->releaseDaemonLock();
-        }
-    }
+//    /**
+//     * @brief Terminate all running pilot jobs
+//     */
+//    void BatchComputeService::terminateRunningPilotJobs() {
+//        if (getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
+//            WRENCH_INFO(
+//                    "Failing running pilot jobs");
+//            std::vector<std::shared_ptr<BatchJob>> to_erase;
+//
+//            // LOCK
+//            this->acquireDaemonLock();
+//
+//            // Stopping services
+//            for (auto &job : this->running_jobs) {
+//                if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job->getCompoundJob())) {
+//                    auto cs = pjob->getComputeService();
+//                    if (cs == nullptr) {
+//                        throw std::runtime_error(
+//                                "BatchComputeService::terminate(): can't find compute service associated to pilot job");
+//                    }
+//                    try {
+//                        cs->stop(false);
+//                    } catch (wrench::ExecutionException &e) {
+//                        // ignore
+//                    }
+//                    to_erase.push_back(job);
+//                }
+//            }
+//
+//            // Cleaning up data structures
+//            for (auto &job : to_erase) {
+//                this->running_jobs.erase(job);
+//                this->removeBatchJobFromJobsList(job);
+//            }
+//
+//            // UNLOCK
+//            this->releaseDaemonLock();
+//        }
+//    }
 
     /**
      * @brief Wait for and procress the next message
@@ -788,7 +782,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->setStateToDown();
             this->failCurrentCompoundJobs();
-            this->terminateRunningPilotJobs();
+//            this->terminateRunningPilotJobs();
 
             // Send back a synchronous reply!
             try {
@@ -1530,12 +1524,14 @@ namespace wrench {
         auto compound_job = bach_job->getCompoundJob();
 
         this->processCompoundJobTimeout(compound_job);
-        this->removeJobFromRunningList(bach_job);
-        this->freeUpResources(bach_job->getResourcesAllocated());
-        this->sendCompoundJobFailureNotification(compound_job,
-                                                 std::to_string(bach_job->getJobID()),
-                                                 std::shared_ptr<FailureCause>(
-                                                         new JobTimeout(bach_job->getCompoundJob())));
+
+        // We will get job failed messages stuff and process then
+//        this->removeJobFromRunningList(bach_job);
+//        this->freeUpResources(bach_job->getResourcesAllocated());
+//        this->sendCompoundJobFailureNotification(compound_job,
+//                                                 std::to_string(bach_job->getJobID()),
+//                                                 std::shared_ptr<FailureCause>(
+//                                                         new JobTimeout(bach_job->getCompoundJob())));
         return;
 
 

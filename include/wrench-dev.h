@@ -23,7 +23,6 @@
 #include "wrench/failure_causes/FunctionalityNotAvailable.h"
 #include "wrench/failure_causes/InvalidDirectoryPath.h"
 #include "wrench/failure_causes/JobTimeout.h"
-#include "wrench/failure_causes/JobTypeNotSupported.h"
 #include "wrench/failure_causes/JobKilled.h"
 #include "wrench/failure_causes/NetworkError.h"
 #include "wrench/failure_causes/NotAllowed.h"

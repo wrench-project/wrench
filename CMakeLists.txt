@@ -163,7 +163,6 @@ set(HEADER_FILES
         include/wrench/failure_causes/InvalidDirectoryPath.h
         include/wrench/failure_causes/JobKilled.h
         include/wrench/failure_causes/JobTimeout.h
-        include/wrench/failure_causes/JobTypeNotSupported.h
         include/wrench/failure_causes/NetworkError.h
         include/wrench/failure_causes/NoScratchSpace.h
         include/wrench/failure_causes/NotAllowed.h
@@ -344,7 +343,6 @@ set(SOURCE_FILES
         src/wrench/failure_causes/InvalidDirectoryPath.cpp
         src/wrench/failure_causes/JobKilled.cpp
         src/wrench/failure_causes/JobTimeout.cpp
-        src/wrench/failure_causes/JobTypeNotSupported.cpp
         src/wrench/failure_causes/NetworkError.cpp
         src/wrench/failure_causes/NoScratchSpace.cpp
         src/wrench/failure_causes/NotAllowed.cpp

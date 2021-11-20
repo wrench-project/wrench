@@ -82,9 +82,9 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void JobManager::stop(bool send_failure_notifications) {
+    void JobManager::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", send_failure_notifications, 0.0));
+            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", false, 0, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -488,9 +488,8 @@ namespace wrench {
             throw;
         }
 
-
         if (not compute_service->supportsStandardJobs()) {
-            throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+            throw std::invalid_argument("JobManager::submitJob(): service does not support standard jobs");
         }
 
         // Do a sanity check on task states
@@ -651,7 +650,7 @@ namespace wrench {
         }
 
         if (not compute_service->supportsCompoundJobs()) {
-            throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+            throw std::invalid_argument("JobManager::submitJob(): service does not support compound jobs");
         }
 
         try {
@@ -719,8 +718,9 @@ namespace wrench {
         }
 
         if (not compute_service->supportsPilotJobs()) {
-            throw ExecutionException(std::make_shared<JobTypeNotSupported>(job, compute_service));
+            throw std::invalid_argument("JobManager::submitJob(): service does not support pilot jobs");
         }
+
 
         // TODO: CREATE COMPOUND JOB
         std::shared_ptr<CompoundJob> cjob = nullptr;
@@ -1057,6 +1057,7 @@ namespace wrench {
     void JobManager::processStandardJobFailure(std::shared_ptr<StandardJob> job,
                                                std::shared_ptr<ComputeService> compute_service) {
 
+        std::cerr << "JOB MANAGER: IN PROCESS STANDARD JOB FAILURE\n";
         // update job state
         job->state = StandardJob::State::FAILED;
 
@@ -1068,6 +1069,16 @@ namespace wrench {
         std::set<WorkflowTask *> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
+
+        // Fix the failure cause in case it's a failure cause that refers to a job (in which case it is
+        // right now referring to the compound job instead of the standard job
+        if (auto actual_cause = std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {
+            job_failure_cause = std::make_shared<JobKilled>(job);
+        } else if (auto actual_cause = std::dynamic_pointer_cast<JobTimeout>(job_failure_cause)) {
+            job_failure_cause = std::make_shared<JobTimeout>(job);
+        } else if (auto actual_cause = std::dynamic_pointer_cast<NotEnoughResources>(job_failure_cause)) {
+            job_failure_cause = std::make_shared<NotEnoughResources>(job, actual_cause->getService());
+        }
 
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job->compound_job);
