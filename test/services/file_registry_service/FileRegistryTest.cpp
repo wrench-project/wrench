@@ -238,7 +238,7 @@ private:
       frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
 
       // Shutting down the service
-      frs->stop(false);
+      frs->stop();
 
       // Trying a removeEntry
       try {
@@ -400,7 +400,7 @@ private:
       }
 
       // shutdown service
-      frs->stop(false);
+      frs->stop();
 
       try {
         frs->lookupEntry(file1);

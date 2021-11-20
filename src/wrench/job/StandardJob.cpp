@@ -528,12 +528,19 @@ namespace wrench {
 
         job_failure_cause = nullptr;
 
+        std::cerr << "IN PROCESS OUTCOME \n";
+        for (auto const &a: this->compound_job->getActions()) {
+            if (a->getFailureCause()) {
+                std::cerr << "ACTION " << a->getName() << ": " << a->getFailureCause()->toString() << "\n";
+            }
+        }
+
         /*
          * Look at Overhead action
          */
         if (this->pre_overhead_action) {
             if (this->pre_overhead_action->getState() == Action::State::KILLED) {
-                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                 for (auto const &t : this->tasks) {
                     failure_count_increments.insert(t);
                 }
@@ -562,7 +569,7 @@ namespace wrench {
                                  &latest_end_date,
                                  &earliest_failure_date);
             if (at_least_one_killed) {
-                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                 for (auto const &t : this->tasks) {
                     failure_count_increments.insert(t);
                 }
@@ -606,7 +613,7 @@ namespace wrench {
                 t->setReadInputStartDate(earliest_start_date);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
                 if (at_least_one_killed) {
-                    job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                    job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                     failure_count_increments.insert(t);
                     t->setFailureDate(earliest_failure_date);
                 } else if (at_least_one_failed) {
@@ -634,13 +641,7 @@ namespace wrench {
                 t->updateStartDate(t->getComputationStartDate());
             }
 
-            if (compute_action->getState() == Action::State::KILLED) {
-                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
-                failure_count_increments.insert(t);
-                t->setFailureDate(compute_action->getEndDate());
-                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later
-                continue;
-            } else if (compute_action->getState() == Action::State::FAILED) {
+            if (compute_action->getState() != Action::State::COMPLETED) {
                 if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
                 t->setFailureDate(compute_action->getEndDate());
                 failure_count_increments.insert(t);
@@ -664,7 +665,7 @@ namespace wrench {
                 t->setWriteOutputStartDate(earliest_start_date);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
                 if (at_least_one_killed) {
-                    job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                    job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                     failure_count_increments.insert(t);
                     t->setFailureDate(earliest_failure_date);
                 } else if (at_least_one_failed) {
@@ -698,7 +699,7 @@ namespace wrench {
                                  &latest_end_date,
                                  &earliest_failure_date);
             if (at_least_one_killed) {
-                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
             } else if (at_least_one_failed) {
                 job_failure_cause = failure_cause;
                 return;
@@ -720,7 +721,7 @@ namespace wrench {
                                  &latest_end_date,
                                  &earliest_failure_date);
             if (at_least_one_killed) {
-                job_failure_cause = std::make_shared<JobKilled>(this->shared_this, this->parent_compute_service);;
+                job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                 return;
             } else if (at_least_one_failed) {
                 job_failure_cause = failure_cause;

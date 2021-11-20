@@ -145,7 +145,7 @@ private:
         wrench::StorageService::deleteFile(this->test->src_file_1,
                                            wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                            file_registry_service);
-        file_registry_service->stop(false);
+        file_registry_service->stop();
         try {
             data_movement_manager->doSynchronousFileCopy(this->test->src_file_1,
                                                          wrench::FileLocation::LOCATION(this->test->src_storage_service),
@@ -299,7 +299,7 @@ private:
                                                             wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                             file_registry_service);
 
-        file_registry_service->stop(false);
+        file_registry_service->stop();
 
         async_copy_event2 = this->waitForNextEvent();
 
@@ -319,7 +319,7 @@ private:
         }
 
         // Stop the data movement manager
-        data_movement_manager->stop(false);
+        data_movement_manager->stop();
 
         return 0;
     }

@@ -32,18 +32,16 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        JobKilled(std::shared_ptr<Job> job, std::shared_ptr<Service> service);
+        JobKilled(std::shared_ptr<Job> job);
         /***********************/
         /** \endcond           */
         /***********************/
 
         std::shared_ptr<Job> getJob();
-        std::shared_ptr<Service> getService();
         std::string toString();
 
     private:
         std::shared_ptr<Job> job;
-        std::shared_ptr<Service> service;
     };
 
 

@@ -10,7 +10,6 @@
 
 #include <cfloat>
 #include <numeric>
-#include <wrench/failure_causes/JobTypeNotSupported.h>
 
 #include "CloudComputeServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
@@ -609,7 +608,7 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            this->stopAllVMs();
+            this->stopAllVMs(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
             this->vm_list.clear();
             // This is Synchronous
             try {
@@ -655,13 +654,13 @@ namespace wrench {
             processDestroyVM(msg->answer_mailbox, msg->vm_name);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            return true;
+//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+//            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+//            return true;
+//
+//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+//            return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
@@ -823,7 +822,7 @@ namespace wrench {
         } else {
             std::string pm = vm->getPhysicalHostname();
             // Stop the Compute Service
-            cs->stop(false);
+            cs->stop();
             // We do not shut down the VM. This will be done when the CloudComputeService is notified
             // of the bare_metal_standard_jobs completion.
             vm->shutdown();
@@ -1158,58 +1157,58 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Process a submit standard job request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param job: the job
-     * @param service_specific_args: service specific arguments
-     *
-     * @throw std::runtime_error
-     */
-    void
-    CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox,
-                                                  std::shared_ptr<StandardJob> job,
-                                                  std::map<std::string, std::string> &service_specific_args) {
-        if (not this->supportsStandardJobs()) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
-                            this->getMessagePayloadValue(
-                                    CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+//    /**
+//     * @brief Process a submit standard job request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     * @param job: the job
+//     * @param service_specific_args: service specific arguments
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void
+//    CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox,
+//                                                  std::shared_ptr<StandardJob> job,
+//                                                  std::map<std::string, std::string> &service_specific_args) {
+//        if (not this->supportsStandardJobs()) {
+//            S4U_Mailbox::dputMessage(
+//                    answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
+//                            job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
+//                                    new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
+//                            this->getMessagePayloadValue(
+//                                    CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+//
+//        } else {
+//            throw std::runtime_error(
+//                    "CloudComputeService::processSubmitPilotJob(): A Cloud service should never support standard jobs");
+//        }
+//    }
 
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::processSubmitPilotJob(): A Cloud service should never support standard jobs");
-        }
-    }
-
-    /**
-     * @brief Process a submit pilot job request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param job: the job
-     * @param service_specific_args: service specific arguments
-     *
-     * @throw std::runtime_error
-     */
-    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                    std::shared_ptr<PilotJob> job,
-                                                    std::map<std::string, std::string> &service_specific_args) {
-        if (not this->supportsPilotJobs()) {
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                            job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
-                            this->getMessagePayloadValue(
-                                    CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
-        }
-    }
+//    /**
+//     * @brief Process a submit pilot job request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     * @param job: the job
+//     * @param service_specific_args: service specific arguments
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
+//                                                    std::shared_ptr<PilotJob> job,
+//                                                    std::map<std::string, std::string> &service_specific_args) {
+//        if (not this->supportsPilotJobs()) {
+//            S4U_Mailbox::dputMessage(
+//                    answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
+//                            job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
+//                                    new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
+//                            this->getMessagePayloadValue(
+//                                    CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+//
+//        } else {
+//            throw std::runtime_error(
+//                    "CloudComputeService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
+//        }
+//    }
 
     /**
      * @brief Process a "get resource information message"
@@ -1284,7 +1283,7 @@ namespace wrench {
     /**
     * @brief Terminate all VMs.
     */
-    void CloudComputeService::stopAllVMs() {
+    void CloudComputeService::stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         WRENCH_INFO("Stopping Cloud Service");
         for (auto &vm : this->vm_list) {
             auto actual_vm = vm.second.first;
@@ -1302,7 +1301,7 @@ namespace wrench {
                     // Shut it down
                     std::string pm = actual_vm->getPhysicalHostname();
                     // Stop the Compute Service
-                    cs->stop(false);
+                    cs->stop(send_failure_notifications, termination_cause);
                     // Shutdown the VM
                     actual_vm->shutdown();
                     // Update internal data structures
@@ -1363,17 +1362,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void CloudComputeService::validateProperties() {
-        // Supporting pilot jobs
-        if (this->getPropertyValueAsBoolean(CloudComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
-            throw std::invalid_argument(
-                    "Invalid SUPPORTS_PILOT_JOBS property specification: a CloudComputeService cannot support pilot jobs");
-        }
-
-        // Supporting standard jobs
-        if (this->getPropertyValueAsBoolean(CloudComputeServiceProperty::SUPPORTS_STANDARD_JOBS)) {
-            throw std::invalid_argument(
-                    "Invalid SUPPORTS_STANDARD_JOBS property specification: a CloudComputeService cannot support standard jobs (instead, it allows for creating VM instances to which standard jobs can be submitted)");
-        }
 
         // VM Boot overhead
         bool success = true;

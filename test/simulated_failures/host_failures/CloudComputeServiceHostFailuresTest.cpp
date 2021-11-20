@@ -167,9 +167,6 @@ private:
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
         }
-        if (cause->getService() != vm_cs) {
-            throw std::runtime_error("Failure cause does not point to the correct compute service");
-        }
 
         // Check that the VM is down
         if (not cloud_service->isVMDown(vm_name)) {
@@ -309,9 +306,6 @@ private:
         }
         if (cause->getJob() != job) {
             throw std::runtime_error("Failure cause does not point to the correct job");
-        }
-        if (cause->getService() != vm_cs) {
-            throw std::runtime_error("Failure cause does not point to the correct compute service");
         }
 
         // Check that the VM is down

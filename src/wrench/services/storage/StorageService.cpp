@@ -121,9 +121,9 @@ namespace wrench {
     /**
      * @brief Stop the service
      */
-    void StorageService::stop(bool send_failure_notifications) {
+    void StorageService::stop() {
         // Just call the super class's method
-        Service::stop(send_failure_notifications);
+        Service::stop();
     }
 
     /***************************************************************/

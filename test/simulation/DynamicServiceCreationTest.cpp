@@ -191,7 +191,7 @@ private:
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
                 new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                                { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                                { })));
         std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
 
         // Create a VM

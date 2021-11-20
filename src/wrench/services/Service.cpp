@@ -282,7 +282,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void Service::stop(bool send_failure_notifications) {
+    void Service::stop() {
 
 
         // Do nothing if the service is already down
@@ -299,7 +299,8 @@ namespace wrench {
             S4U_Mailbox::putMessage(this->mailbox_name,
                                     new ServiceStopDaemonMessage(
                                             ack_mailbox,
-                                            send_failure_notifications,
+                                            false,
+                                            0,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {

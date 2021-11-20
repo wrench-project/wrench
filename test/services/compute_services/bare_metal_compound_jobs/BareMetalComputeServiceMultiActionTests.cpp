@@ -602,7 +602,8 @@ private:
         wrench::Simulation::sleep(11.0);
 
         // Shut down the compute service
-        this->test->compute_service->stop(true);
+        this->test->compute_service->stop(true,
+                                          wrench::ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
 
         // Wait for the workflow execution event
         auto event = this->waitForNextEvent();

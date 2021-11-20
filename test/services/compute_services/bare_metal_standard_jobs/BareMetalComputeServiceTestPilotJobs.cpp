@@ -115,12 +115,7 @@ private:
             job_manager->submitJob(pilot_job, this->test->compute_service);
             throw std::runtime_error(
                     "Should not be able to submit a pilot job to a compute service that does not support them");
-        } catch (wrench::ExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (not cause) {
-                throw std::runtime_error("Did get the expected exception but unexpected failure cause: " +
-                                         e.getCause()->toString() + " (expected: JobTypeNotSupported)");
-            }
+        } catch (std::invalid_argument &ignore) {
         }
 
         return 0;
@@ -156,7 +151,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
             new wrench::BareMetalComputeService(hostname,
                                                 {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms;

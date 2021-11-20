@@ -248,7 +248,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
                                                                  std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
                                                  {std::make_pair("Host2",
                                                                  std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, "",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}
+                                                {}
             )));
 
     // Create 1 Compute Service that manages Host3 and Host4
@@ -258,7 +258,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
                                                                  std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
                                                  {std::make_pair("Host4",
                                                                  std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, "",
-                                                {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}}
+                                                {}
             )));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(compute_service1);

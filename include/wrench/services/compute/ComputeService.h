@@ -61,17 +61,27 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
+
+        enum TerminationCause {
+            TERMINATION_COMPUTE_SERVICE_TERMINATED,
+            TERMINATION_JOB_KILLED,
+            TERMINATION_JOB_TIMEOUT
+        };
+
+
         virtual ~ComputeService() {}
 
-        void stop(bool send_failure_nofitications) override;
+        void stop() override;
+
+        virtual void stop(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         void terminateJob(std::shared_ptr<Job> job);
 
-        bool supportsStandardJobs();
+        virtual bool supportsStandardJobs() = 0;
 
-        bool supportsCompoundJobs();
+        virtual bool supportsCompoundJobs() = 0;
 
-        bool supportsPilotJobs();
+        virtual bool supportsPilotJobs() = 0;
 
         bool hasScratch();
 
@@ -169,6 +179,7 @@ namespace wrench {
 
     protected:
 
+
         friend class JobManager;
 
         void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string>& = {});
@@ -183,6 +194,7 @@ namespace wrench {
 
         /** @brief A scratch storage service associated to the compute service */
         std::shared_ptr<StorageService> scratch_space_storage_service;
+
 
         /***********************/
         /** \endcond          **/

@@ -74,12 +74,15 @@ namespace wrench {
         ActionExecutionServiceTerminateActionRequestMessage(
                 const std::string &reply_mailbox,
                 std::shared_ptr<Action> action,
+                ComputeService::TerminationCause termination_cause,
                 double payload);
 
         /** @brief The reply mailbox */
         std::string reply_mailbox;
         /** @brief The action to terminate  */
         std::shared_ptr<Action> action;
+        /** @brief The termination cause */
+        ComputeService::TerminationCause termination_cause;
     };
 
     /**

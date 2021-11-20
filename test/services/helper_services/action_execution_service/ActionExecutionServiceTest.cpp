@@ -298,7 +298,7 @@ private:
         }
 
         // Terminate the action
-        action_execution_service->terminateAction(action);
+        action_execution_service->terminateAction(action, wrench::ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
 
         // Is the start-date sensible?
         if (action->getStartDate() < 0.0 or action->getStartDate() > EPSILON) {
