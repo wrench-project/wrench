@@ -141,9 +141,9 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
 
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override {};
+//        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override {};
 
-        void terminatePilotJob(std::shared_ptr<PilotJob> job) override {};
+//        void terminatePilotJob(std::shared_ptr<PilotJob> job) override {};
 
     private:
         friend class WorkloadTraceFileReplayer;

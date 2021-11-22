@@ -457,24 +457,24 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Terminate a standard job to the compute service (virtual)
-     * @param job: the standard job
-     *
-     * @throw std::runtime_error
-     */
-    void CloudComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
-        throw std::runtime_error("CloudComputeService::terminateStandardJob(): Not implemented!");
-    }
-
-    /**
-     * @brief non-implemented
-     * @param job: a pilot job to (supposedly) terminate
-     */
-    void CloudComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
-        throw std::runtime_error(
-                "CloudComputeService::terminatePilotJob(): not implemented because CloudComputeService never supports pilot jobs");
-    }
+//    /**
+//     * @brief Terminate a standard job to the compute service (virtual)
+//     * @param job: the standard job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void CloudComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
+//        throw std::runtime_error("CloudComputeService::terminateStandardJob(): Not implemented!");
+//    }
+//
+//    /**
+//     * @brief non-implemented
+//     * @param job: a pilot job to (supposedly) terminate
+//     */
+//    void CloudComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
+//        throw std::runtime_error(
+//                "CloudComputeService::terminatePilotJob(): not implemented because CloudComputeService never supports pilot jobs");
+//    }
 
     /**
      * @brief Method to check whether a VM is currently running

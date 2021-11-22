@@ -118,11 +118,7 @@ namespace wrench {
 
         void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void terminateStandardJob(std::shared_ptr<StandardJob> job) override {};
-
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
-
-        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         ~BareMetalComputeService();
 

@@ -213,25 +213,25 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Terminate a standard job to the compute service (virtual)
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
-    void HTCondorComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
-        throw std::runtime_error("HTCondorComputeService::terminateStandardJob(): Not implemented yet!");
-    }
-
-    /**
-     * @brief Terminate a pilot job to the compute service
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
-    void HTCondorComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
-        throw std::runtime_error("HTCondorComputeService::terminatePilotJob(): Not implemented yet!");
-    }
+//    /**
+//     * @brief Terminate a standard job to the compute service (virtual)
+//     * @param job: the job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
+//        throw std::runtime_error("HTCondorComputeService::terminateStandardJob(): Not implemented yet!");
+//    }
+//
+//    /**
+//     * @brief Terminate a pilot job to the compute service
+//     * @param job: the job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
+//        throw std::runtime_error("HTCondorComputeService::terminatePilotJob(): Not implemented yet!");
+//    }
 
     /**
      * @brief Get the service's local storage service
