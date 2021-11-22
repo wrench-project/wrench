@@ -135,7 +135,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void ComputeService::terminateJob(std::shared_ptr<Job> job) {
+    void ComputeService::terminateJob(std::shared_ptr<CompoundJob> job) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
@@ -144,13 +144,7 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                this->terminateStandardJob(sjob);
-            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                this->terminatePilotJob(pjob);
-            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                this->terminateCompoundJob(cjob);
-            }
+                this->terminateCompoundJob(job);
         } catch (ExecutionException &e) {
             throw;
         }

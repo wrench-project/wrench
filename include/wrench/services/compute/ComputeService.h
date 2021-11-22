@@ -75,7 +75,7 @@ namespace wrench {
 
         virtual void stop(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        void terminateJob(std::shared_ptr<Job> job);
+        void terminateJob(std::shared_ptr<CompoundJob> job);
 
         virtual bool supportsStandardJobs() = 0;
 
@@ -148,22 +148,10 @@ namespace wrench {
         virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) {}; // TODO: REMOVE
 
         /**
-         * @brief Method to terminate a  standard job
-         * @param job: the standard job
-         */
-        virtual void terminateStandardJob(std::shared_ptr<StandardJob> job) {}; // TODO: REMOVE
-
-        /**
          * @brief Method to terminate a compound job
          * @param job: the standard job
          */
         virtual void terminateCompoundJob(std::shared_ptr<CompoundJob> job) = 0;
-
-        /**
-         * @brief Method to terminate a running pilot job
-         * @param job: the pilot job
-         */
-        virtual void terminatePilotJob(std::shared_ptr<PilotJob> job) {} ; // TODO: REMOVE
 
         /**
          * @brief Method that returns the computer service's scratch space's storage service

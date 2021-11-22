@@ -798,7 +798,9 @@ namespace wrench {
         this->releaseDaemonLock();
 
         try {
+            std::cerr << "JOB MANAGER CALLING CS->TERMINATEJOB()\n";
             job->getParentComputeService()->terminateJob(job->compound_job);
+            std::cerr << "JOB MANAGER CALLED CS->TERMINATEJOB()\n";
         } catch (std::exception &e) {
             throw;
         }
@@ -863,7 +865,7 @@ namespace wrench {
         }
 
         try {
-            job->getParentComputeService()->terminateJob(job);
+            job->getParentComputeService()->terminateJob(job->compound_job);
         } catch (std::exception &e) {
             throw;
         }

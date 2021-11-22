@@ -87,11 +87,11 @@ namespace wrench {
 
         ~HTCondorComputeService() override;
 
-        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
+//        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override {};
 
-        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+//        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
 
         /***********************/
         /** \endcond          **/
