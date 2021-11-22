@@ -831,16 +831,16 @@ namespace wrench {
 
     }
 
-/**
- * @brief Not implement implemented. Will throw.
- * @param job: a pilot job to (supposedly) terminate
- *
- * @throw std::runtime_error
- */
-    void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
-        throw std::runtime_error(
-                "bare_metal_standard_jobs::terminatePilotJob(): not implemented because bare_metal_standard_jobs never supports pilot jobs");
-    }
+///**
+// * @brief Not implement implemented. Will throw.
+// * @param job: a pilot job to (supposedly) terminate
+// *
+// * @throw std::runtime_error
+// */
+//    void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
+//        throw std::runtime_error(
+//                "bare_metal_standard_jobs::terminatePilotJob(): not implemented because bare_metal_standard_jobs never supports pilot jobs");
+//    }
 
 
 /**
