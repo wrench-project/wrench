@@ -663,6 +663,9 @@ namespace wrench {
 
         WRENCH_INFO("Killing action %s", action->getName().c_str());
 
+        std::cerr << "**** " << cause << "\n";
+        std::cerr << "**** " << cause->toString() << "\n";
+
         bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
 
         // If action is running kill the executor
@@ -670,6 +673,7 @@ namespace wrench {
             auto executor = this->action_executors[action];
             this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
             this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
+            std::cerr << "KILLED DUE TO JOB CANCELATION: " << killed_due_to_job_cancelation << "\n";
             executor->kill(killed_due_to_job_cancelation);
             std::cerr << "ACTION EXECUTION SERVICE: SETTING FAILURE CAUSE OF ACTION TO " << cause->toString() << "\n";
             executor->getAction()->setFailureCause(cause);
