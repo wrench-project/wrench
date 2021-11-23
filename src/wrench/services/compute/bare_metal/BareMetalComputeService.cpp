@@ -664,9 +664,10 @@ namespace wrench {
 
         std::cerr << "BM CS: IN TERMINATE: send_failure_notifications=" << send_failure_notifications << "\n";
         // Terminate all jobs
+        std:cerr << "THIS = " << this << "\n";
         std::cerr << "THERE ARE " << this->current_jobs.size() << " CURRENT JOBS\n";
         for (auto const &job : this->current_jobs) {
-            this->terminateRunningCompoundJob(job, termination_cause);
+            this->terminateCurrentCompoundJob(job, termination_cause);
         }
 
 //        for (auto const &action : this->dispatched_actions) {
@@ -720,7 +721,7 @@ namespace wrench {
             return;
         }
 
-        terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+        terminateCurrentCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
 
         // reply
         auto answer_message = new ComputeServiceTerminateCompoundJobAnswerMessage(
@@ -945,10 +946,10 @@ namespace wrench {
 
     }
 
-    void BareMetalComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job,
+    void BareMetalComputeService::terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job,
                                                               ComputeService::TerminationCause termination_cause) {
 
-        std::cerr << "IN BM CS: TERMINATE RUNNING COMPOUND JOB " << job->getName() << "\n";
+        std::cerr << "IN BM CS: TERMINATE CURRENT COMPOUND JOB " << job->getName() << "\n";
 
         for (auto const &action : job->getActions()) {
             std::cerr << "TERMINATING ACTION " << action->getName() << "\n";
