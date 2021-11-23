@@ -372,7 +372,7 @@ namespace wrench {
         }
 
         // Send a "run a batch job" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
+        auto answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
         try {
             S4U_Mailbox::dputMessage(
                     this->mailbox_name,
@@ -413,7 +413,7 @@ namespace wrench {
     void BatchComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_compound_job");
+        auto answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_compound_job");
 
         // Send a "terminate a  job" message to the daemon's mailbox_name
         try {
@@ -437,27 +437,17 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (std::dynamic_pointer_cast<StandardJob>(job)) {
-            if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
-// If no success, throw an exception
-                if (not msg->success) {
-                    throw ExecutionException(msg->failure_cause);
-                }
-                return;
-            }
-        } else if (std::dynamic_pointer_cast<PilotJob>(job)) {
-            if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
-// If no success, throw an exception
-                if (not msg->success) {
-                    throw ExecutionException(msg->failure_cause);
-                }
-                return;
-            }
+        auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get());
+
+        if (not msg) {
+            throw std::runtime_error("BatchComputeService::terminateCompoundJob(): Received an unexpected [" +
+                                     message->getName() +
+                                     "] message!");
         }
 
-        throw std::runtime_error("BatchComputeService::terminateWorkflowJob(): Received an unexpected [" +
-                                 message->getName() +
-                                 "] message!");
+        if (not msg->success) {
+            throw ExecutionException(msg->failure_cause);
+        }
     }
 
 
@@ -630,7 +620,7 @@ namespace wrench {
 
         // Terminate the executor
         WRENCH_INFO("Terminating a one-shot bare-metal service");
-        executor->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+        executor->stop(false, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
     }
 
     /**
@@ -1110,9 +1100,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a work failure
-     * @param worker_thread: the worker thread that did the work
-     * @param work: the work
+     * @brief Process a compound job failure
+     * @param executor: the executor (one-shot bare-metal)
+     * @param job: the compound job
      * @param cause: the cause of the failure
      */
     void BatchComputeService::processCompoundJobFailure(std::shared_ptr<BareMetalComputeServiceOneShot> executor,
@@ -1135,12 +1125,13 @@ namespace wrench {
 
         if (not executor_on_the_list) {
             throw std::runtime_error(
-                    "BatchComputeService::processStandardJobCompletion(): Received a standard job completion, "
+                    "BatchComputeService::processCompoundJobFailure(): Received a compound job failure, "
                     "but the executor is not in the executor list");
         }
 
         // Free up resources (by finding the corresponding BatchJob)
         std::shared_ptr<BatchJob> batch_job = nullptr;
+        // TODO: to a map
         for (auto const &rj : this->running_jobs) {
             if (rj->getCompoundJob() == job) {
                 batch_job = rj;
@@ -1149,7 +1140,7 @@ namespace wrench {
 
         if (batch_job == nullptr) {
             throw std::runtime_error(
-                    "BatchComputeService::processStandardJobFailure(): Received a standard job completion, "
+                    "BatchComputeService::processCompoundJobFailure(): Received a compound job failure, "
                     "but the job is not in the running job list");
         }
 
@@ -1426,7 +1417,7 @@ namespace wrench {
         std::shared_ptr<BatchJob> batch_job = nullptr;
         // Is it running?
         bool is_running = false;
-        // TODO make it a map?
+        // TODO: ALL BELOW in maps!
         for (auto const &j : this->running_jobs) {
             auto cj = j->getCompoundJob();
             if (cj == job) {
@@ -1482,6 +1473,7 @@ namespace wrench {
 
         // Is it running?
         if (is_running) {
+            std::cerr << "TERMINATING A RUNNING COMPOUND JOB\n";
             this->scheduler->processJobTermination(batch_job);
             terminateRunningCompoundJob(job);
             this->freeUpResources(batch_job->getResourcesAllocated());
@@ -1489,12 +1481,14 @@ namespace wrench {
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
+            std::cerr << "TERMINATING A PENDING COMPOUND JOB\n";
             this->scheduler->processJobTermination(*batch_pending_it);
             auto to_free = *batch_pending_it;
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
         if (is_waiting) {
+            std::cerr << "TERMINATING A WAITING COMPOUND JOB\n";
             this->scheduler->processJobTermination(batch_job);
             this->waiting_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);

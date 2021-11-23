@@ -272,7 +272,7 @@ namespace wrench {
             std::string answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             double payload) :
-            ComputeServiceMessage("TERMINATE_STANDARD_JOB_REQUEST", payload) {
+            ComputeServiceMessage("TERMINATE_COMPOUND_JOB_REQUEST", payload) {
         if ((answer_mailbox == "") || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(): Invalid arguments");
@@ -296,7 +296,7 @@ namespace wrench {
                                                                                                      bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
-            ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
+            ComputeServiceMessage("TERMINATE_COMPOUND_JOB_ANSWER", payload) {
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
