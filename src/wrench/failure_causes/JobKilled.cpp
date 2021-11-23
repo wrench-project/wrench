@@ -40,8 +40,12 @@ namespace wrench {
      * @return the message
      */
     std::string JobKilled::toString() {
-        return "Job " + this->job->getName() + " on service " +
-               this->job->getParentComputeService()->getName() + " was killed";
+        std::string message = "Job " + this->job->getName() + " ";
+        if (this->job->getParentComputeService()) {
+            message += "on service " + this->job->getParentComputeService()->getName() +" ";
+        }
+        message += "was killed";
+        return message;
     }
 
 

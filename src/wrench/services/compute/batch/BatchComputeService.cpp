@@ -1634,27 +1634,29 @@ namespace wrench {
                 found_dash_N = true;
                 auto num_nodes = strtoul(value.c_str(), nullptr, 10);
                 if (errno == ERANGE) {
-                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}");
+                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
-                    throw std::invalid_argument("Invalid service-specific argument {\" + key + \",\" + value +\"}: Compute service does not have this many compute nodes");
+                    throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
                 }
             } else if (key == "-t") {
                 found_dash_t = true;
                 auto requested_time = strtoul(value.c_str(), nullptr, 10);
                 if (errno == ERANGE) {
-                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}");
+                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
             } else if (key == "-c") {
                 found_dash_c = true;
                 auto num_cores = strtoul(value.c_str(), nullptr, 10);
                 if (errno == ERANGE) {
-                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}");
+                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
                 if (this->num_cores_per_node < num_cores) {
-                    throw std::invalid_argument("Invalid service-specific argument {\" + key + \",\" + value +\"}: Compute service does not have this many cores on compute nodes");
+                    throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
                 }
-            } else if (key == "-user") {
+            } else if (key == "-u") {
+                // nothing
+            } else if (key == "-color") {
                 // nothing
             } else {
                 // It has to be an action
@@ -1667,18 +1669,18 @@ namespace wrench {
                     }
                 }
                 if (not found_task) {
-                    throw std::invalid_argument("Invalid service-specific argument {\" + key + \",\" + value +\"}: Job does not have any task with name " + key);
+                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}: Job does not have any task with name " + key);
                 }
             }
         }
         if (not found_dash_t) {
-            throw std::runtime_error("Compute service requires a '-t' service-specific argument");
+            throw std::invalid_argument("Compute service requires a '-t' service-specific argument");
         }
         if (not found_dash_N) {
-            throw std::runtime_error("Compute service requires a '-N' service-specific argument");
+            throw std::invalid_argument("Compute service requires a '-N' service-specific argument");
         }
         if (not found_dash_c) {
-            throw std::runtime_error("Compute service requires a '-c' service-specific argument");
+            throw std::invalid_argument("Compute service requires a '-c' service-specific argument");
         }
 
     }

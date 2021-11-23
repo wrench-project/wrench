@@ -1472,12 +1472,12 @@ private:
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
                 throw std::runtime_error("Job Submission should have generated an exception");
-            } catch (wrench::ExecutionException &e) {
-                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
-                if (not cause) {
-                    throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
-                                             e.getCause()->toString() + " (expected: NotEnoughResources)");
-                }
+            } catch (std::invalid_argument &e) {
+//                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+//                if (not cause) {
+//                    throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
+//                                             e.getCause()->toString() + " (expected: NotEnoughResources)");
+//                }
             }
 
             this->getWorkflow()->removeTask(task);
@@ -1497,12 +1497,12 @@ private:
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
                 throw std::runtime_error("Job Submission should have generated an exception");
-            } catch (wrench::ExecutionException &e) {
-                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
-                if (not cause) {
-                    throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
-                                             e.getCause()->toString() + " (expected: NotEnoughResources)");
-                }
+            } catch (std::invalid_argument &ignore) {
+//                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+//                if (not cause) {
+//                    throw std::runtime_error("Got an expected exception but unexpected failure cause: " +
+//                                             e.getCause()->toString() + " (expected: NotEnoughResources)");
+//                }
             }
         }
 
