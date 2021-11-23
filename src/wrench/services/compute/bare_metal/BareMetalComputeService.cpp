@@ -514,6 +514,7 @@ namespace wrench {
 //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+            std::cerr << "BM: CALLING TERMINATE()\n";
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -661,12 +662,17 @@ namespace wrench {
     void BareMetalComputeService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         this->setStateToDown();
 
-        // Terminate all actions
-        for (auto const &action : this->dispatched_actions) {
-            this->action_execution_service->terminateAction(action, termination_cause);
+        std::cerr << "BM CS: IN TERMINATE: send_failure_notifications=" << send_failure_notifications << "\n";
+        // Terminate all jobs
+        std::cerr << "THERE ARE " << this->current_jobs.size() << " CURRENT JOBS\n";
+        for (auto const &job : this->current_jobs) {
+            this->terminateRunningCompoundJob(job, termination_cause);
         }
 
-        std::cerr << " BM CS: IN TERMINATE: send_failure_notifications=" << send_failure_notifications << "\n";
+//        for (auto const &action : this->dispatched_actions) {
+//            this->action_execution_service->terminateAction(action, termination_cause);
+//        }
+
 
         if (send_failure_notifications) {
             // Deal with all jobs
@@ -941,9 +947,54 @@ namespace wrench {
 
     void BareMetalComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job,
                                                               ComputeService::TerminationCause termination_cause) {
+
+        std::cerr << "IN BM CS: TERMINATE RUNNING COMPOUND JOB " << job->getName() << "\n";
+
         for (auto const &action : job->getActions()) {
+            std::cerr << "TERMINATING ACTION " << action->getName() << "\n";
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
+                std::cerr << "ITS RUNNING\n";
                 this->action_execution_service->terminateAction(action, termination_cause);
+            } else if (this->not_ready_actions.find(action) != this->not_ready_actions.end()) {
+                std::cerr << "ITS NOT READY\n";
+                std::shared_ptr<FailureCause> failure_cause;
+                switch (termination_cause) {
+                    case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
+                        failure_cause = std::make_shared<JobKilled>(action->getJob());
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
+                        failure_cause = std::make_shared<ServiceIsDown>(job->getParentComputeService());
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
+                        failure_cause = std::make_shared<JobTimeout>(action->getJob());
+                        break;
+                    default:
+                        failure_cause = std::make_shared<JobKilled>(action->getJob());
+                        break;
+                }
+                action->setFailureCause(failure_cause);
+                this->not_ready_actions.erase(action);
+            } else if (std::find(this->ready_actions.begin(), this->ready_actions.end(), action) != this->ready_actions.end()) {
+                std::cerr << "ITS READY\n";
+                std::shared_ptr<FailureCause> failure_cause;
+                switch (termination_cause) {
+                    case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
+                        failure_cause = std::make_shared<JobKilled>(action->getJob());
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
+                        failure_cause = std::make_shared<ServiceIsDown>(job->getParentComputeService());
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
+                        failure_cause = std::make_shared<JobTimeout>(action->getJob());
+                        break;
+                    default:
+                        failure_cause = std::make_shared<JobKilled>(action->getJob());
+                        break;
+                }
+                action->setFailureCause(failure_cause);
+                this->ready_actions.erase(std::find(this->ready_actions.begin(), this->ready_actions.end(), action));
+            } else {
+                throw std::runtime_error("Action should be either not-ready, or ready, or dispatched!");
             }
         }
         this->current_jobs.erase(job);
