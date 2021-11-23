@@ -856,6 +856,7 @@ namespace wrench {
             return;
         }
 
+        std::cerr << "ACTION EXECUTION SERVICE: FAILING ACTION : " << action->getName() << "\n";
         std::shared_ptr<FailureCause> failure_cause;
         switch (termination_cause) {
             case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
