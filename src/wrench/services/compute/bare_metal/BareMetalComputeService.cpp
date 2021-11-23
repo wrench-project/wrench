@@ -666,6 +666,8 @@ namespace wrench {
             this->action_execution_service->terminateAction(action, termination_cause);
         }
 
+        std::cerr << " BM CS: IN TERMINATE: send_failure_notifications=" << send_failure_notifications << "\n";
+
         if (send_failure_notifications) {
             // Deal with all jobs
             while (not this->current_jobs.empty()) {

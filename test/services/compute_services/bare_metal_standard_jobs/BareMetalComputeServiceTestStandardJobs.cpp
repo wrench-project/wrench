@@ -181,18 +181,14 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
-        file_locations[test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
-        file_locations[test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
-        file_locations[test->output_file2] = wrench::FileLocation::LOCATION(this->test->storage_service);
-        auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, file_locations);
+        // Create a pilot job
+        auto pilot = job_manager->createPilotJob();
 
         // Submit the 2-task job for execution
         try {
-            job_manager->submitJob(two_task_job, this->test->compute_service);
+            job_manager->submitJob(pilot, this->test->compute_service);
             throw std::runtime_error(
-                    "Should not be able to submit a standard job to a compute service that does not support them");
+                    "Should not be able to submit a pilot job to a compute service that does not support them");
         } catch (std::invalid_argument &ignore) {
         }
 
@@ -1555,14 +1551,14 @@ private:
         }
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
         if (real_event) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+            auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Got a job failure event, but an unexpected failure cause: " +
-                                         real_event->failure_cause->toString() + " (expected: JobKilled)");
+                                         real_event->failure_cause->toString() + " (expected: ServiceIsDown)");
             }
-            if (cause->getJob() != two_task_job) {
+            if (cause->getService() != this->test->compute_service) {
                 std::runtime_error(
-                        "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
+                        "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
             }
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());

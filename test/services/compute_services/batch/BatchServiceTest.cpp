@@ -30,8 +30,6 @@ public:
 
     void do_BogusSetupTest_test();
 
-    void do_JobTypeNotSupportedTest_test();
-
     void do_OneStandardJobTaskTest_test();
 
     void do_StandardJobFailureTest_test();
@@ -398,9 +396,11 @@ private:
         wrench::Simulation::sleep(1);
 
         // Terminate job2 (which is pending)
+        std::cerr << "TERMINATING JOB 2 - WHICH IS PENDING\n";
         job_manager->terminateJob(job2);
 
         // Terminate job1 (which is running)
+        std::cerr << "TERMINATING JOB 1 - WHICH IS RUNNING\n";
         job_manager->terminateJob(job1);
 
         // Check that job 3 completes
