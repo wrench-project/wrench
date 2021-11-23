@@ -615,7 +615,7 @@ namespace wrench {
         }
         if (executor == nullptr) {
             throw std::runtime_error(
-                    "BatchComputeService::terminateRunningCompoundJob(): Cannot find one-shot bare-metal compute service corresponding to job being terminated");
+                    "BatchComputeService::terminateCurrentCompoundJob(): Cannot find one-shot bare-metal compute service corresponding to job being terminated");
         }
 
         // Terminate the executor
