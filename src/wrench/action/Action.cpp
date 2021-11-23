@@ -120,6 +120,7 @@ namespace wrench {
     void Action::setState(Action::State new_state) {
         auto old_state = this->execution_history.top().state;
         this->job->updateStateActionMap(this->shared_ptr_this, old_state, new_state);
+        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
         this->execution_history.top().state = new_state;
     }
 
@@ -358,5 +359,6 @@ namespace wrench {
             return "????-";
         }
     }
+
 
 }

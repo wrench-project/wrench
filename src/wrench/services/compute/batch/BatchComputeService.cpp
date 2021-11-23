@@ -631,7 +631,7 @@ namespace wrench {
         // LOCK
         this->acquireDaemonLock();
 
-        WRENCH_INFO("Failing current standard jobs");
+        WRENCH_INFO("Failing current compound jobs");
 
         {
             std::vector<std::shared_ptr<BatchJob>> to_erase;

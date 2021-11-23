@@ -3433,11 +3433,13 @@ private:
         wrench::Simulation::sleep(5);
 
         // Terminate the service
+        std::cerr << "************* STOPPING THE CS **********\n";
         this->test->compute_service->stop();
 
         // Sleep 5 seconds
         wrench::Simulation::sleep(5);
 
+        std::cerr << "************* GETTING EXEC EVENTS **********\n";
         // Wait for workflow execution events
         for (int i = 0; i < 3; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
@@ -3452,6 +3454,8 @@ private:
             }
 
             auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
+            std::cerr << "REAL EVENT " << real_event << "\n";
+            std::cerr << "REAL EVENT->failure_cause " << real_event->failure_cause << "\n";
             auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Expected event, but unexpected failure cause: " +
@@ -3476,9 +3480,10 @@ TEST_F(BatchServiceTest, ShutdownWithPendingRunningJobsTest) {
 void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 

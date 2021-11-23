@@ -97,6 +97,7 @@ namespace wrench {
         friend class CompoundJob;
         friend class ActionExecutor;
         friend class ActionExecutionService;
+        friend class BareMetalComputeService; // this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
 
         void newExecution(Action::State state);
 

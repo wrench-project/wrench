@@ -528,10 +528,13 @@ namespace wrench {
 
         job_failure_cause = nullptr;
 
-        std::cerr << "IN PROCESS OUTCOME \n";
+        std::cerr << "IN PROCESS OUTCOME : " << this->compound_job->getActions().size() << "\n";
         for (auto const &a: this->compound_job->getActions()) {
+            std::cerr << "ACTION " << a->getName() << ": STATE=" << Action::stateToString(a->getState()) << "\n";
             if (a->getFailureCause()) {
                 std::cerr << "ACTION " << a->getName() << ": " << a->getFailureCause()->toString() << "\n";
+            } else {
+                std::cerr << "ACTION " << a->getName() << ": NO FAILURE CAUSE\n";
             }
         }
 
