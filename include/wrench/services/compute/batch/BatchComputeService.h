@@ -268,17 +268,17 @@ namespace wrench {
                                        std::shared_ptr<CompoundJob> job,
                                        std::shared_ptr<FailureCause> cause);
 
-        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job);
+        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
 
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
 
-        // Terminate currently running pilot jobs
-        void terminateRunningPilotJobs();
+//        // Terminate currently running pilot jobs
+//        void terminateRunningPilotJobs();
 
-        //Fail the standard jobs
-        void failCurrentCompoundJobs();
+        // Terminate
+        void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         //Process the pilot job completion
         void processPilotJobCompletion(std::shared_ptr<PilotJob> job) {}; // TODO: TO REMOVE
