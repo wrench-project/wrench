@@ -664,7 +664,7 @@ namespace wrench {
 
         std::cerr << "BM CS: IN TERMINATE: send_failure_notifications=" << send_failure_notifications << "\n";
         // Terminate all jobs
-        std:cerr << "THIS = " << this << "\n";
+        std::cerr << "THIS = " << this << "\n";
         std::cerr << "THERE ARE " << this->current_jobs.size() << " CURRENT JOBS\n";
         for (auto const &job : this->current_jobs) {
             this->terminateCurrentCompoundJob(job, termination_cause);
@@ -949,13 +949,14 @@ namespace wrench {
     void BareMetalComputeService::terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job,
                                                               ComputeService::TerminationCause termination_cause) {
 
-        std::cerr << "IN BM CS: TERMINATE CURRENT COMPOUND JOB " << job->getName() << "\n";
+        std::cerr << "IN BM CS: TERMINATE CURRENT COMPOUND JOB " << job->getName() << " with " << job->getActions().size() << " TASKS \n";
 
         for (auto const &action : job->getActions()) {
             std::cerr << "TERMINATING ACTION " << action->getName() << "\n";
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 std::cerr << "ITS RUNNING\n";
                 this->action_execution_service->terminateAction(action, termination_cause);
+                std::cerr << "AFTER CALLING TERMINATE ACITON:  FAILURE ACAUSE = " << action->getName() << "  " << action->getFailureCause() << "\n";
             } else if (this->not_ready_actions.find(action) != this->not_ready_actions.end()) {
                 std::cerr << "ITS NOT READY\n";
                 std::shared_ptr<FailureCause> failure_cause;
@@ -995,10 +996,10 @@ namespace wrench {
                 action->setFailureCause(failure_cause);
                 this->ready_actions.erase(std::find(this->ready_actions.begin(), this->ready_actions.end(), action));
             } else {
-                throw std::runtime_error("Action should be either not-ready, or ready, or dispatched!");
+                // The action is already finished
             }
         }
-        this->current_jobs.erase(job);
+//        this->current_jobs.erase(job);
     }
 
 }

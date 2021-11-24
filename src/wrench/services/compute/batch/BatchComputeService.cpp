@@ -32,6 +32,7 @@
 #include "batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
 #include <wrench/failure_causes/JobKilled.h>
+#include <wrench/failure_causes/ServiceIsDown.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotEnoughResources.h>
 #include <wrench/failure_causes/JobTimeout.h>
@@ -604,7 +605,7 @@ namespace wrench {
     * @brief terminate a running standard job
     * @param job: the job
     */
-    void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job) {
+    void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause) {
         BareMetalComputeServiceOneShot *executor = nullptr;
         std::set<std::shared_ptr<BareMetalComputeServiceOneShot>>::iterator it;
         for (it = this->running_bare_metal_one_shot_compute_services.begin();
@@ -620,28 +621,39 @@ namespace wrench {
 
         // Terminate the executor
         WRENCH_INFO("Terminating a one-shot bare-metal service");
-        executor->stop(false, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+        executor->stop(false, termination_cause); // failure notifications sent by me later, if needed
     }
 
     /**
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
     * or has timed out (because it's in fact a pilot job))
     */
-    void BatchComputeService::failCurrentCompoundJobs() {
+    void BatchComputeService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
+
         // LOCK
         this->acquireDaemonLock();
 
-        WRENCH_INFO("Failing current compound jobs");
+        WRENCH_INFO("Terminating all current compound jobs");
 
         {
             std::vector<std::shared_ptr<BatchJob>> to_erase;
+            WRENCH_INFO("TERMINATING RUNNING COPOUND JOBS!");
             for (auto const &j : this->running_jobs) {
                 auto compound_job = j->getCompoundJob();
-                terminateRunningCompoundJob(compound_job);
-                this->sendCompoundJobFailureNotification(
-                        compound_job, std::to_string(j->getJobID()),
-                        std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job)));
+                WRENCH_INFO("TERMINATING COMOYND JOB %s", compound_job->getName().c_str());
+                terminateRunningCompoundJob(compound_job, termination_cause);
+                // Popping, because I am terminating it, so the executor won't pop, and right now
+                // if I am at the top of the stack!
+                if (compound_job->getCallbackMailbox() == this->mailbox_name) {
+                    compound_job->popCallbackMailbox();
+                }
+                if (send_failure_notifications) {
+                    WRENCH_INFO("SENDING FAILURE NOTIFICATION");
+                    this->sendCompoundJobFailureNotification(
+                            compound_job, std::to_string(j->getJobID()),
+                            std::shared_ptr<FailureCause>(
+                                    new JobKilled(compound_job)));
+                }
                 to_erase.push_back(j);
             }
 
@@ -655,13 +667,36 @@ namespace wrench {
         {
             std::vector<std::deque<std::shared_ptr<BatchJob>>::iterator> to_erase;
 
+            // TODO: Do in a simple while loop that removes as it goes
             for (auto it1 = this->batch_queue.begin(); it1 != this->batch_queue.end(); it1++) {
                 auto compound_job = (*it1)->getCompoundJob();
+                WRENCH_INFO("SIMPLY REMOVING COMPOUNG JOB %s FROM PENDING LIST", compound_job->getName().c_str());
+                std::shared_ptr<FailureCause> failure_cause;
+                switch (termination_cause) {
+                    case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
+                        failure_cause = std::make_shared<JobKilled>(compound_job);
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
+                        failure_cause = std::make_shared<ServiceIsDown>(this->getSharedPtr<ComputeService>());
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
+                        failure_cause = std::make_shared<JobTimeout>(compound_job);
+                        break;
+                    default:
+                        failure_cause = std::make_shared<JobKilled>(compound_job);
+                        break;
+                }
+                for (auto const &action : compound_job->getActions()) {
+                    action->setFailureCause(failure_cause);
+                }
                 to_erase.push_back(it1);
-                this->sendCompoundJobFailureNotification(
-                        compound_job, std::to_string((*it1)->getJobID()),
-                        std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job)));
+                if (send_failure_notifications) {
+                    WRENCH_INFO("SENDING FAILURE NOTIFICATION");
+                    this->sendCompoundJobFailureNotification(
+                            compound_job, std::to_string((*it1)->getJobID()),
+                            std::shared_ptr<FailureCause>(
+                                    new JobKilled(compound_job)));
+                }
             }
 
             for (auto const &j : to_erase) {
@@ -677,10 +712,33 @@ namespace wrench {
             for (auto const &wj : this->waiting_jobs) {
                 auto compound_job = wj->getCompoundJob();
                 to_erase.push_back(wj);
-                this->sendCompoundJobFailureNotification(
-                        compound_job, std::to_string(wj->getJobID()),
-                        std::shared_ptr<FailureCause>(
-                                new JobKilled(compound_job)));
+                WRENCH_INFO("SIMPLY REMOVING COMPOUNG JOB %s FROM WAITING LIST", compound_job->getName().c_str());
+
+                std::shared_ptr<FailureCause> failure_cause;
+                switch (termination_cause) {
+                    case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
+                        failure_cause = std::make_shared<JobKilled>(compound_job);
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED:
+                        failure_cause = std::make_shared<ServiceIsDown>(this->getSharedPtr<ComputeService>());
+                        break;
+                    case ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT:
+                        failure_cause = std::make_shared<JobTimeout>(compound_job);
+                        break;
+                    default:
+                        failure_cause = std::make_shared<JobKilled>(compound_job);
+                        break;
+                }
+                for (auto const &action : compound_job->getActions()) {
+                    action->setFailureCause(failure_cause);
+                }
+
+                if (send_failure_notifications) {
+                    this->sendCompoundJobFailureNotification(
+                            compound_job, std::to_string(wj->getJobID()),
+                            std::shared_ptr<FailureCause>(
+                                    new JobKilled(compound_job)));
+                }
             }
 
             for (auto const &j : to_erase) {
@@ -771,7 +829,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->setStateToDown();
-            this->failCurrentCompoundJobs();
+            this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause)); // TODO: this cast is ugly
 //            this->terminateRunningPilotJobs();
 
             // Send back a synchronous reply!
@@ -1475,7 +1533,7 @@ namespace wrench {
         if (is_running) {
             std::cerr << "TERMINATING A RUNNING COMPOUND JOB\n";
             this->scheduler->processJobTermination(batch_job);
-            terminateRunningCompoundJob(job);
+            terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
             this->freeUpResources(batch_job->getResourcesAllocated());
             this->running_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
