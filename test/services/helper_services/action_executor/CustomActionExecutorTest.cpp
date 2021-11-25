@@ -160,7 +160,7 @@ private:
                                            num_cores,
                                            ram,
                                            this->mailbox_name,
-                                           action));
+                                           action, nullptr));
 
         // Start it
         action_executor->setSimulation(this->simulation);

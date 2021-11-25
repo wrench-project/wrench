@@ -19,6 +19,8 @@ namespace wrench {
     /** \cond DEVELOPER    */
     /***********************/
 
+    class BareMetalComputeService;
+
     /**
      * @brief A pilot (i.e., non-standard) workflow job that can be submitted to a ComputeService
      * by a WMS (via a JobManager)
@@ -43,7 +45,7 @@ namespace wrench {
             TERMINATED
         };
 
-        std::shared_ptr<ComputeService> getComputeService();
+        std::shared_ptr<BareMetalComputeService> getComputeService();
 
         PilotJob::State getState();
 
@@ -52,7 +54,7 @@ namespace wrench {
         /***********************/
 
 
-        void setComputeService(std::shared_ptr<ComputeService> cs);
+        void setComputeService(std::shared_ptr<BareMetalComputeService> cs);
 
         /***********************/
         /** \endcond           */
@@ -67,7 +69,7 @@ namespace wrench {
         PilotJob(std::shared_ptr<JobManager> job_manager);
 
         State state;
-        std::shared_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job
+        std::shared_ptr<BareMetalComputeService> compute_service; // Associated compute service, i.e., the running pilot job
     };
 
     /***********************/

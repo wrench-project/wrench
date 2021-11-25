@@ -39,7 +39,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to terminate the action
+     * @brief Method to terminate the action (called if the action executor is killed)
      * @param action_executor: the executor that executes this action
      */
     void CustomAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {

@@ -55,7 +55,7 @@ namespace wrench {
 
         virtual bool supportsStandardJobs() override { return true; };
         virtual bool supportsCompoundJobs() override {return true; };
-        virtual bool supportsPilotJobs() override {return false; };
+        virtual bool supportsPilotJobs() override {return true; };
 
         /***********************/
         /** \cond DEVELOPER   **/

@@ -134,7 +134,7 @@ private:
         auto sleep_action = job->addSleepAction("", 10.0);
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, sleep_action));
+                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, sleep_action, nullptr));
         // Start it
         sleep_action_executor->setSimulation(this->simulation);
         sleep_action_executor->start(sleep_action_executor, true, false);
