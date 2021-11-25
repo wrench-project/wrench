@@ -54,10 +54,18 @@ namespace wrench {
         Service::cleanup(has_returned_from_main, return_value);
 
         // Clean up state in case of a restart
-        for (auto host : this->compute_resources) {
-            this->ram_availabilities.insert(
-                    std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
-            this->running_thread_counts.insert(std::make_pair(host.first, 0));
+        if (this->isSetToAutoRestart()) {
+            for (auto host : this->compute_resources) {
+                std::cerr << "HOST = " << host.first << "\n";
+                std::cerr << "---> " << (S4U_VirtualMachine::vm_to_pm_map.find(host.first) !=
+                                         S4U_VirtualMachine::vm_to_pm_map.end()) << "\n";
+                std::cerr << "S4U_VirtualMachine::vm_to_pm_map[XXX] = " << S4U_VirtualMachine::vm_to_pm_map[host.first]
+                          << "\n";
+                std::cerr << "----\n";
+                this->ram_availabilities.insert(
+                        std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
+                this->running_thread_counts.insert(std::make_pair(host.first, 0));
+            }
         }
 
         this->all_actions.clear();

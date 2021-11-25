@@ -195,7 +195,7 @@ private:
         if (this->test->faulty_map.find("cloud") != this->test->faulty_map.end()) {
             // Create my sef of VMs
             try {
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 2; i++) {  // TODO: 2->6
                     auto vm_name = this->test->cloud_service->createVM(2, 45);
                     auto vm_cs = this->test->cloud_service->startVM(vm_name);
                     this->vms[vm_name] = vm_cs;
@@ -213,8 +213,8 @@ private:
             }
             if (faulty.first == "cloud") {
                 createMonkey("CloudHost1");
-                createMonkey("CloudHost2");
-                createMonkey("CloudHost3");
+//                createMonkey("CloudHost2");  // TODO UNCOMMENT
+//                createMonkey("CloudHost3");
 
             } else if (faulty.first == "baremetal") {
                 createMonkey("BareMetalHost1");
@@ -229,12 +229,16 @@ private:
 
         while (not this->getWorkflow()->isDone()) {
 
+            if (wrench::Simulation::getCurrentSimulatedDate() > 5000) exit(1);
             // Try to restart down VMs
             for (auto const &vm : this->vms) {
+                std::cerr << "TRYING TO RESTART VM " << vm.first << "\n";
                 if (this->test->cloud_service->isVMDown(vm.first)) {
+                std::cerr << "YES I SHOULD BECAUSEIT'S DOWN!\n";
                     try {
                         this->test->cloud_service->startVM(vm.first);
                     } catch (wrench::ExecutionException &e) {
+                        std::cerr << "NO DICE " << e.getCause()->toString() << "\n";
                         auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                         if (cause) {
                             // oh well
@@ -243,6 +247,8 @@ private:
                             throw;
                         }
                     }
+                } else {
+                    std::cerr << "NOPE, " << vm.first << " IS NOT DOWN\n";
                 }
             }
 
@@ -411,11 +417,11 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 3;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    argv[2] = strdup("--wrench-full-log");
 
 //    argv[1] = strdup("--wrench-full-log");
 
@@ -457,8 +463,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         std::string cloudhead = "CloudHead";
         std::vector<std::string> cloudhosts;
         cloudhosts.push_back("CloudHost1");
-        cloudhosts.push_back("CloudHost2");
-        cloudhosts.push_back("CloudHost3");
+//        cloudhosts.push_back("CloudHost2");
+//        cloudhosts.push_back("CloudHost3");
         this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(
                 simulation->add(new wrench::CloudComputeService(
                         cloudhead,

@@ -509,6 +509,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
+        std::cerr << "IN CC:ISVMDOWN(): STATE= " << vm_pair_it->second.first->getStateAsString() << "\n";
         return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::DOWN);
     }
 
