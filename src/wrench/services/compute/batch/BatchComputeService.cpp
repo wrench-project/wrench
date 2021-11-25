@@ -1685,10 +1685,8 @@ namespace wrench {
             if (key == "-N") {
                 found_dash_N = true;
                 std::cerr <<"IN VALIDATE: -N " << value << "\n";
-                auto num_nodes = strtoul(value.c_str(), nullptr, 10);
-                std::cerr << "num_nodes = " << num_nodes << "\n";
-                std::cerr << "errno = " << errno << "\n";
-                if (errno == ERANGE or errno == EINVAL) {
+                unsigned long num_nodes;
+                if (sscanf(value.c_str(),"%lu", &num_nodes) != 1) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
@@ -1696,14 +1694,14 @@ namespace wrench {
                 }
             } else if (key == "-t") {
                 found_dash_t = true;
-                auto requested_time = strtoul(value.c_str(), nullptr, 10);
-                if (errno == ERANGE or errno == EINVAL) {
+                unsigned long requested_time;
+                if (sscanf(value.c_str(),"%lu", &requested_time) != 1) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
             } else if (key == "-c") {
                 found_dash_c = true;
-                auto num_cores = strtoul(value.c_str(), nullptr, 10);
-                if (errno == ERANGE or errno == EINVAL) {
+                unsigned long num_cores;
+                if (sscanf(value.c_str(),"%lu", &num_cores) != 1) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
                 if (this->num_cores_per_node < num_cores) {

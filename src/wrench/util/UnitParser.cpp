@@ -72,9 +72,11 @@ namespace wrench {
         char *ptr;
         const char *c_string = string.c_str();
         errno = 0;
-        double res = strtod(c_string, &ptr);
-        if (errno == ERANGE)
+        double res;
+
+        if (sscanf(c_string, "%lf", &res) != 1) {
             throw std::runtime_error("Value out of range when parsing value " + string);
+        }
         if (ptr == string)
             throw std::runtime_error("Cannot parse value " + string);
         if (ptr[0] == '\0') {
