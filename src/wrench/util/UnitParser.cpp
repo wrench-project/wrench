@@ -72,7 +72,7 @@ namespace wrench {
         char *ptr;
         const char *c_string = string.c_str();
         errno = 0;
-        
+
         double res = strtod(c_string, &ptr);
         if (errno == ERANGE)
             throw std::runtime_error("Value out of range when parsing value " + string);

@@ -294,6 +294,7 @@ private:
         } catch (std::invalid_argument &ignore) {
         }
 
+        std::cerr << "DICHO\n";
         // Just for kicks (coverage), do the same with a pilot job
         auto pilot_job = job_manager->createPilotJob();
         try {
@@ -350,6 +351,8 @@ private:
             throw std::runtime_error("It should be possible to get the computer service of a started VM");
         }
 
+        std::cerr << "DICHO1.5\n";
+
         // Check the state
         if (not cs->isVMRunning(vm_name)) {
             throw std::runtime_error("A just started VM should be running");
@@ -362,6 +365,8 @@ private:
             throw std::runtime_error(e.what());
         }
 
+        std::cerr << "DICHO2\n";
+
         // Wait for a workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
@@ -373,6 +378,8 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
+        std::cerr << "DICHO3\n";
+
         // Shutdown the VM, because why not
         cs->shutdownVM(vm_name);
 
@@ -382,20 +389,23 @@ private:
             throw std::runtime_error("Should not be able to shutdown a non-existing VM");
         } catch (std::invalid_argument &e) {}
 
+        std::cerr << "DICHO4\n";
+
         return 0;
     }
 };
 
-TEST_F(VirtualizedClusterServiceTest, CloudStandardJobTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, CloudStandardJobTest) {
     DO_TEST_WITH_FORK(do_StandardJobTaskTest_test);
 }
 
 void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -431,6 +441,8 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
+
+    std::cerr << "RETURNED FROM LAUNCH\n";
 
     delete simulation;
     for (int i = 0; i < argc; i++)

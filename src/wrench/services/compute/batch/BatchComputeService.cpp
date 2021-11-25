@@ -1684,7 +1684,6 @@ namespace wrench {
 
             if (key == "-N") {
                 found_dash_N = true;
-                std::cerr <<"IN VALIDATE: -N " << value << "\n";
                 unsigned long num_nodes;
                 if (sscanf(value.c_str(),"%lu", &num_nodes) != 1) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");

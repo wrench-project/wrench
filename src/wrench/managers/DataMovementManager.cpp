@@ -31,10 +31,10 @@ namespace wrench {
      *
      * @param wms: the WMS that uses this data movement manager
      */
-    DataMovementManager::DataMovementManager(std::shared_ptr<WMS> wms) :
-            Service(wms->hostname, "data_movement_manager", "data_movement_manager") {
+    DataMovementManager::DataMovementManager(std::string hostname, std::string &creator_mailbox) :
+            Service(hostname, "data_movement_manager", "data_movement_manager") {
 
-        this->wms = wms;
+        this->creator_mailbox = creator_mailbox;
 
 
     }
@@ -216,7 +216,7 @@ namespace wrench {
 
             WRENCH_INFO("Forwarding status message");
             // Forward it back
-            S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
+            S4U_Mailbox::dputMessage(this->creator_mailbox,
                                      new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                              msg->src,
                                                                              msg->dst,
@@ -233,6 +233,14 @@ namespace wrench {
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
 
+    }
+
+    /** @brief Get the mailbox of the service that created this data movement manager
+     *
+     * @return a mailbox
+     */
+    std::string &DataMovementManager::getCreatorMailbox() {
+        return this->creator_mailbox;
     }
 
 

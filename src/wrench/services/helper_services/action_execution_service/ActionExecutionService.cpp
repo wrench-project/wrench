@@ -143,8 +143,6 @@ namespace wrench {
             std::string target_host = std::get<0>(parsed_spec);
             unsigned long target_num_cores = std::get<1>(parsed_spec);
 
-            std::cerr << " IN ACTION EXECUTOR SERVICE " << action_name << " " << target_host << "   " << target_num_cores << "\n";
-
             if (not target_host.empty()) {
                 if (this->compute_resources.find(target_host) == this->compute_resources.end()) {
                     throw std::invalid_argument(
@@ -346,10 +344,12 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
+            std::cerr << "ACTION SERVICE EXECUTOR IN MAIN\n";
             /** Dispatch ready actions **/
             this->dispatchReadyActions();
         }
 
+        std::cerr << "DONE WITH MAIN\n";
         // Kill the host state monitor if necessary
         if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
             this->host_state_change_monitor->kill();
@@ -678,9 +678,7 @@ namespace wrench {
             auto executor = this->action_executors[action];
             this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
             this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
-            std::cerr << "KILLED DUE TO JOB CANCELATION: " << killed_due_to_job_cancelation << "\n";
             executor->kill(killed_due_to_job_cancelation);
-            std::cerr << "ACTION EXECUTION SERVICE: SETTING FAILURE CAUSE OF ACTION TO " << cause->toString() << "\n";
             executor->getAction()->setFailureCause(cause);
             this->action_executors.erase(action);
 
@@ -861,7 +859,6 @@ namespace wrench {
             return;
         }
 
-        std::cerr << "ACTION EXECUTION SERVICE: FAILING ACTION : " << action->getName() << "\n";
         std::shared_ptr<FailureCause> failure_cause;
         switch (termination_cause) {
             case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:

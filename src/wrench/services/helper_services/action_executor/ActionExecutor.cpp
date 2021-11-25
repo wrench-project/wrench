@@ -112,7 +112,6 @@ namespace wrench {
             this->action->execute(this->getSharedPtr<ActionExecutor>());
             this->action->setState(Action::State::COMPLETED);
         } catch (ExecutionException &e) {
-            std::cerr << "ACTION EXECUTION IN CATCH : " << e.getCause()->toString() << "\n";
             this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
         }
