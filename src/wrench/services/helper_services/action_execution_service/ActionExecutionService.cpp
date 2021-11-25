@@ -215,12 +215,14 @@ namespace wrench {
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory_manager_service = ComputeService::ALL_RAM to use all RAM available on the host
+     * @param parent_service: the parent compute service (nullptr if not known at this time)
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            std::shared_ptr<Service> parent_service,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : Service(hostname,
@@ -292,6 +294,8 @@ namespace wrench {
             this->ram_availabilities[host.first] = std::get<1>(this->compute_resources[host.first]);
             this->running_thread_counts[host.first] = 0;
         }
+
+        this->parent_service = parent_service;
 
     }
 
@@ -495,7 +499,8 @@ namespace wrench {
                                        target_num_cores,
                                        required_ram,
                                        this->mailbox_name,
-                                       action));
+                                       action,
+                                       this->getSharedPtr<ActionExecutionService>()));
 
             action_executor->setSimulation(this->simulation);
             try {
@@ -1162,8 +1167,8 @@ namespace wrench {
      * @brief Set parent service
      * @param service: the parent service
      */
-    void ActionExecutionService::setParentService(std::shared_ptr<Service> service) {
-        this->parent_service = std::move(service);
+    void ActionExecutionService::setParentService(std::shared_ptr<Service> parent) {
+        this->parent_service = std::move(parent);
     }
 
     /**
@@ -1172,6 +1177,14 @@ namespace wrench {
      */
     std::map<std::string, std::tuple<unsigned long, double>> &ActionExecutionService::getComputeResources() {
         return this->compute_resources;
+    }
+
+    /**
+     * @brief Get the parent compute service (could be nullptr if stand-alone)
+     * @return a compute service
+     */
+    std::shared_ptr<Service> ActionExecutionService::getParentService() const {
+        return this->parent_service;
     }
 
 

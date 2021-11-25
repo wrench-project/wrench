@@ -36,7 +36,8 @@ namespace wrench {
             unsigned long num_cores,
             double ram_footprint,
             std::string callback_mailbox,
-            std::shared_ptr <Action> action) :
+            std::shared_ptr <Action> action,
+            std::shared_ptr<ActionExecutionService> action_execution_service) :
             Service(hostname, "action_executor", "action_executor") {
 
         if (action == nullptr) {
@@ -45,6 +46,7 @@ namespace wrench {
 
         this->callback_mailbox = std::move(callback_mailbox);
         this->action = action;
+        this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;
         this->ram_footprint = ram_footprint;
         this->killed_on_purpose = false;
@@ -162,5 +164,13 @@ namespace wrench {
      */
     unsigned long ActionExecutor::getNumCoresAllocated() const {
         return this->num_cores;
+    }
+
+    /**
+     * @brief Get the action execution service that started this action executor (or nullptr if stand-alone action executor)
+     * @return an action execution service
+     */
+    std::shared_ptr<ActionExecutionService> ActionExecutor::getActionExecutionService() const {
+        return this->action_execution_service;
     }
 }

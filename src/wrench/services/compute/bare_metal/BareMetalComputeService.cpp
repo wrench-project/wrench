@@ -444,6 +444,7 @@ namespace wrench {
             this->action_execution_service = std::shared_ptr<ActionExecutionService>(new ActionExecutionService(
                     hostname,
                     std::move(compute_resources),
+                    nullptr,
                     {{ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)}},
                     {}
             ));
@@ -694,6 +695,7 @@ namespace wrench {
         }
         this->current_jobs.clear();
 
+        std::cerr << this->name << ": #### CLEANING UP SCRATCH SPACE!!\n";
         cleanUpScratch();
     }
 

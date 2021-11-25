@@ -617,12 +617,7 @@ private:
                   "Error while getting and execution event: " + e.getCause()->toString());
         }
         if (std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
-          // success, check if the scratch space size is not full again or not, it should not be
-          double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
-          if (free_space_size == 3000.0) {
-            throw std::runtime_error(
-                    "Pilot Job is expected to clear its scratch space only after all the standard job finishes");
-          }
+
         } else {
           throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
@@ -630,12 +625,15 @@ private:
       }
 
       // Wait for the pilot job expiration
+      std::cerr << "TEST TEST: WAITING FOR PJOB EXPIRATION\n";
       try {
         event = this->waitForNextEvent();
       } catch (wrench::ExecutionException &e) {
         throw std::runtime_error(
                 "Error while getting and execution event: " + e.getCause()->toString());
       }
+      std::cerr << "TEST TEST: WAITED FOR PJOB EXPIRATION\n";
+
       if (std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
         // success, check if the scratch space size is full again or not, it should be full
         wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
@@ -662,9 +660,10 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
-  int argc = 1;
+  int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
+  argv[1] = strdup("--wrench-full-log");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 

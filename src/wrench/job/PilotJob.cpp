@@ -36,15 +36,15 @@ namespace wrench {
      * @brief Get the compute service provided by the (running) pilot job
      * @return a compute service
      */
-    std::shared_ptr<ComputeService> PilotJob::getComputeService() {
+    std::shared_ptr<BareMetalComputeService> PilotJob::getComputeService() {
       return this->compute_service;
     }
 
     /**
-     * @brief Set the compute service on which the pilot job is running
+     * @brief Set the compute service that runs on the pilot job
      * @param cs: a compute service
      */
-    void PilotJob::setComputeService(std::shared_ptr<ComputeService> cs) {
+    void PilotJob::setComputeService(std::shared_ptr<BareMetalComputeService> cs) {
       this->compute_service = std::move(cs);
     }
 

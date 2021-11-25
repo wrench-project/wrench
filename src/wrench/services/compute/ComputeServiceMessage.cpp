@@ -207,7 +207,7 @@ namespace wrench {
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
-            ComputeServiceMessage("SUBMIT_STANDARD_JOB_ANSWER", payload) {
+            ComputeServiceMessage("SUBMIT_COMPOUND_JOB_ANSWER", payload) {
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
@@ -413,6 +413,7 @@ namespace wrench {
      */
     ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob> job,
                                                                              std::shared_ptr<ComputeService> cs,
+                                                                             std::shared_ptr<FailureCause> cause,
                                                                              double payload) : ComputeServiceMessage(
             "PILOT_JOB_FAILED", payload) {
         if ((job == nullptr) || (cs == nullptr)) {
@@ -421,6 +422,7 @@ namespace wrench {
         }
         this->job = job;
         this->compute_service = cs;
+        this->cause = cause;
     }
 
     /**
