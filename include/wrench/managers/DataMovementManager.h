@@ -46,16 +46,16 @@ namespace wrench {
                                    std::shared_ptr<FileLocation> dst,
                                    std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
 
+
     protected:
 
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
 
-
         friend class WMS;
 
-        explicit DataMovementManager(std::shared_ptr<WMS> wms);
+        explicit DataMovementManager(std::string hostname, std::string &creator_mailbox);
 
         /***********************/
         /** \endcond           */
@@ -65,7 +65,11 @@ namespace wrench {
 
         int main() override;
 
-        std::shared_ptr<WMS> wms = nullptr;
+//        std::shared_ptr<WMS> wms = nullptr;
+        std::string &getCreatorMailbox();
+
+
+        std::string creator_mailbox;
 
         bool processNextMessage();
 

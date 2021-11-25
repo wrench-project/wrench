@@ -558,8 +558,6 @@ namespace wrench {
                 } catch (std::invalid_argument &e) {
                     throw;
                 }
-                std::cerr << "OLD ARGS[" << arg.first << "] = " << arg.second << "\n";
-                std::cerr << "SETTING ARGS[" << job->task_compute_actions[task]->getName() << "] = " << arg.second << "\n";
                 new_args[job->task_compute_actions[task]->getName()] = arg.second;
             }
         }
@@ -724,7 +722,6 @@ namespace wrench {
         }
 
         try {
-            std::cerr << "CALLING VALIDATE ARGUMENTS\n";
             compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
         } catch (ExecutionException &e) {
             job->compound_job = nullptr;
@@ -768,10 +765,7 @@ namespace wrench {
                                   bm_cs->start(bm_cs, true, false); // Daemonized, no auto-restart
                                   job->compute_service = bm_cs;
 
-                                  std::cerr << "******************* " << job->compute_service->getScratch() << "\n";
-
                                   // Send a call back
-                                  std::cerr << "PILOT JOB ACTION SENDING BACK A MESSAGE STATING THAT PILOT JOB HAS STARTED\n";
                                   S4U_Mailbox::dputMessage(
                                           callback_mailbox,
                                           new ComputeServicePilotJobStartedMessage(
@@ -780,12 +774,10 @@ namespace wrench {
                                                           BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
 
                                   // Sleep FOREVER (will be killed by service above)
-                                  std::cerr << "PILOT JOB ACTION SLEEPING FOREVER\n";
                                   Simulation::sleep(DBL_MAX);
 
                               },
                               [job](std::shared_ptr<ActionExecutor> executor) {
-                                  std::cerr << "PILOT JOB  ACTION TERMINATION METHOD! TERMINATING THE BMCS\n";
                                   job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
                               });
 
@@ -864,9 +856,7 @@ namespace wrench {
         this->releaseDaemonLock();
 
         try {
-            std::cerr << "JOB MANAGER CALLING CS->TERMINATEJOB()\n";
             job->getParentComputeService()->terminateJob(job->compound_job);
-            std::cerr << "JOB MANAGER CALLED CS->TERMINATEJOB()\n";
         } catch (std::exception &e) {
             throw;
         }
@@ -1073,9 +1063,9 @@ namespace wrench {
                 auto pjob_action = *(msg->job->getActions().begin());
                 if (std::dynamic_pointer_cast<JobTimeout>(pjob_action->getFailureCause())) {
                     std::cerr << "IT'S A TIMEOUT!\n";
-                processPilotJobExpiration(pjob, msg->compute_service);
+                    processPilotJobExpiration(pjob, msg->compute_service);
                 } else {
-                processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
+                    processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
                     std::cerr << "IT'S SOME FAILURE\n";
                 }
             } else {
@@ -1135,7 +1125,6 @@ namespace wrench {
     void JobManager::processStandardJobFailure(std::shared_ptr<StandardJob> job,
                                                std::shared_ptr<ComputeService> compute_service) {
 
-        std::cerr << "JOB MANAGER: IN PROCESS STANDARD JOB FAILURE\n";
         // update job state
         job->state = StandardJob::State::FAILED;
 
@@ -1214,7 +1203,7 @@ namespace wrench {
   * @param compute_service: the compute service on which it was running
   */
     void JobManager::processPilotJobFailure(std::shared_ptr<PilotJob> job,
-                                               std::shared_ptr<ComputeService> compute_service,
+                                            std::shared_ptr<ComputeService> compute_service,
                                             std::shared_ptr<FailureCause> cause) {
         // update job state
         job->state = PilotJob::State::FAILED;
@@ -1253,28 +1242,16 @@ namespace wrench {
         while (it != this->jobs_to_dispatch.end()) {
             auto job = *it;
 
-            // Do pre-work
-            if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                // Always ready
-                pjob->state = PilotJob::State::PENDING;
-            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                // Check if ready
-                if (not cjob->isReady()) {
-                    it++;
-                    continue;
-                }
-            } else {
-                throw std::runtime_error("UNSUPPORTED JOB");
+            if (not job->isReady()) {
+                it++;
+                continue;
             }
 
             try {
-                std::cerr << "CALLING DISPATCH JOB ON JOB " << job->getName() << "\n";
                 this->dispatchJob(job);
-                std::cerr << "JOB DISPATCHED!\n";
                 this->jobs_dispatched.insert(job);
                 it = this->jobs_to_dispatch.erase(it);
             } catch (ExecutionException &e) {
-                std::cerr << "IN CATCH!\n";
                 it = this->jobs_to_dispatch.erase(it);
 //                job->popCallbackMailbox();
                 if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
@@ -1335,9 +1312,7 @@ namespace wrench {
         try {
             job->submit_date = Simulation::getCurrentSimulatedDate();
             job->pushCallbackMailbox(this->mailbox_name);
-            std::cerr << "CALLING SUBMIG jOB To the coMOPTE SERUCE\n";
             job->parent_compute_service->submitJob(job, job->getServiceSpecificArguments());
-            std::cerr << "CALLED SUBMIG jOB To the coMOPTE SERUCE\n";
             if (this->cjob_to_pjob_map.find(job) != this->cjob_to_pjob_map.end()) {
                 this->cjob_to_pjob_map[job]->state = PilotJob::State::PENDING;
             } else if (this->cjob_to_sjob_map.find(job) != this->cjob_to_sjob_map.end()) {

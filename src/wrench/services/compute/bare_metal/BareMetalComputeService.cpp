@@ -95,7 +95,6 @@ namespace wrench {
     void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                                    const std::map<std::string, std::string> &service_specific_args) {
 
-        std::cerr << "IN VALIDATE SERVICE SPECIFIC ARGS\n";
         auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
         auto compute_resources = this->action_execution_service->getComputeResources();
         // Check that each action can run w.r.t. the resource I have
@@ -136,8 +135,6 @@ namespace wrench {
 
                 std::string target_host = std::get<0>(parsed_spec);
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
-
-                std::cerr << action->getName() + " TARGET HOST " << target_host << "   TARGET CORES " << target_num_cores << "\n";
 
                 if (not target_host.empty()) {
 
@@ -515,7 +512,6 @@ namespace wrench {
 //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            std::cerr << "BM: CALLING TERMINATE()\n";
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -663,10 +659,7 @@ namespace wrench {
     void BareMetalComputeService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         this->setStateToDown();
 
-        std::cerr << "BM CS: IN TERMINATE: send_failure_notifications=" << send_failure_notifications << "\n";
         // Terminate all jobs
-        std::cerr << "THIS = " << this << "\n";
-        std::cerr << "THERE ARE " << this->current_jobs.size() << " CURRENT JOBS\n";
         for (auto const &job : this->current_jobs) {
             this->terminateCurrentCompoundJob(job, termination_cause);
         }
@@ -954,13 +947,9 @@ namespace wrench {
         std::cerr << "IN BM CS: TERMINATE CURRENT COMPOUND JOB " << job->getName() << " with " << job->getActions().size() << " TASKS \n";
 
         for (auto const &action : job->getActions()) {
-            std::cerr << "TERMINATING ACTION " << action->getName() << "\n";
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
-                std::cerr << "ITS RUNNING\n";
                 this->action_execution_service->terminateAction(action, termination_cause);
-                std::cerr << "AFTER CALLING TERMINATE ACITON:  FAILURE ACAUSE = " << action->getName() << "  " << action->getFailureCause() << "\n";
             } else if (this->not_ready_actions.find(action) != this->not_ready_actions.end()) {
-                std::cerr << "ITS NOT READY\n";
                 std::shared_ptr<FailureCause> failure_cause;
                 switch (termination_cause) {
                     case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
@@ -979,7 +968,6 @@ namespace wrench {
                 action->setFailureCause(failure_cause);
                 this->not_ready_actions.erase(action);
             } else if (std::find(this->ready_actions.begin(), this->ready_actions.end(), action) != this->ready_actions.end()) {
-                std::cerr << "ITS READY\n";
                 std::shared_ptr<FailureCause> failure_cause;
                 switch (termination_cause) {
                     case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:

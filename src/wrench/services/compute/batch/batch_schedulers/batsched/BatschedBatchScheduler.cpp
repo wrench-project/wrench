@@ -373,9 +373,7 @@ namespace wrench {
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
-        WRENCH_INFO("CALLING NOTIFYJOBEVENTSTOBATSCHED");
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
-        WRENCH_INFO("CALLED NOTIFYJOBEVENTSTOBATSCHED");
 
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "FAILED");
 #else
