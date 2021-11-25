@@ -162,6 +162,8 @@ namespace wrench {
 
         void processPilotJobExpiration(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
 
+        void processPilotJobFailure(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
+
         // Mailbox of the creator of this job manager
         std::string creator_mailbox;
 

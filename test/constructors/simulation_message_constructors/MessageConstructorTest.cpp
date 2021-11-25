@@ -172,9 +172,9 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
     ASSERT_THROW(new wrench::ComputeServicePilotJobExpiredMessage(nullptr, compute_service, 666), std::invalid_argument);
     ASSERT_THROW(new wrench::ComputeServicePilotJobExpiredMessage(pilot_job, nullptr, 666), std::invalid_argument);
 
-    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, compute_service, 666));
-    ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(nullptr, compute_service, 666), std::invalid_argument);
-    ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, nullptr, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, compute_service, failure_cause, 666));
+    ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(nullptr, compute_service, failure_cause, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, nullptr, failure_cause, 666), std::invalid_argument);
 
     ASSERT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox", pilot_job, 666));
     ASSERT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("", pilot_job, 666), std::invalid_argument);

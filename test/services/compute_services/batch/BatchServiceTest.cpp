@@ -1168,6 +1168,7 @@ private:
             }
 
             // Wait for a workflow execution event (pilot job started)
+            std::cerr << "WAITING FOR PILOT STARTED EVENT!\n";
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -1177,8 +1178,11 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
+            std::cerr << "GOT PILOT STARTED EVENT!\n";
 
             // Wait for another workflow execution event (pilot job terminated)
+            std::cerr << "WAITING FOR PILOT TERMINATED EVENT!\n";
+
             try {
                 event = this->waitForNextEvent();
             } catch (wrench::ExecutionException &e) {
@@ -1187,6 +1191,7 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
+            std::cerr << "GOT PILOT TERMINATED EVENT!\n";
         }
         return 0;
     }
@@ -1199,9 +1204,10 @@ TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2683,6 +2689,8 @@ private:
             auto job = job_manager->createStandardJob(
                     {task}, {{file1, wrench::FileLocation::LOCATION(this->test->storage_service1)}}, {}, {}, {});
 
+            std::cerr << "SUBMITTING THE JON TO THE PJ'S CS\n";
+            std::cerr << "CS SCRATCJ: " << pilot_job->getComputeService()->getScratch() << "\n";
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {});
             } catch (wrench::ExecutionException &e) {
@@ -2707,14 +2715,14 @@ private:
             }
             auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
             if (real_event) {
-                auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+                auto cause = std::dynamic_pointer_cast<wrench::JobTimeout>(real_event->failure_cause);
                 if (not cause) {
                     throw std::runtime_error("Got a job failure event but unexpected failure cause: " +
-                                             real_event->failure_cause->toString() + " (expected: JobKilled)");
+                                             real_event->failure_cause->toString() + " (expected: JobTimeout)");
                 }
                 std::string error_msg = cause->toString();
                 if (cause->getJob() != job) {
-                    std::runtime_error(
+                    throw std::runtime_error(
                             "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
                 }
             } else {
@@ -2735,9 +2743,10 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobTimeOutTaskTest) {
 void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2758,7 +2767,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, {})));
+                                            {"Host1", "Host2", "Host3", "Host4"}, "/scratch")));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

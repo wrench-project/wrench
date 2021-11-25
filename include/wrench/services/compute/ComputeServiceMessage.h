@@ -292,12 +292,17 @@ namespace wrench {
      */
     class ComputeServicePilotJobFailedMessage : public ComputeServiceMessage {
     public:
-        ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob> , std::shared_ptr<ComputeService>, double payload);
+        ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob> ,
+                std::shared_ptr<ComputeService>,
+                        std::shared_ptr<FailureCause> cause,
+                        double payload);
 
         /** @brief The pilot job that has failed */
         std::shared_ptr<PilotJob> job;
         /** @brief The compute service on which the pilot job failed */
         std::shared_ptr<ComputeService> compute_service;
+        /** @brief The failure cause */
+        std::shared_ptr<FailureCause> cause;
     };
 
     /**

@@ -19,6 +19,7 @@ namespace wrench {
 
     class Simulation;
     class Action;
+    class ActionExecutionService;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -36,7 +37,8 @@ namespace wrench {
                 unsigned long num_cores,
                 double ram_footprint,
                 std::string callback_mailbox,
-                std::shared_ptr<Action> action);
+                std::shared_ptr<Action> action,
+                std::shared_ptr<ActionExecutionService> action_execution_service);
 
         int main() override;
         void kill(bool job_termination);
@@ -46,9 +48,12 @@ namespace wrench {
         unsigned long getNumCoresAllocated() const;
         double getMemoryAllocated() const;
 
+        std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
+
     protected:
 
         std::shared_ptr<Action> action;
+        std::shared_ptr<ActionExecutionService> action_execution_service;
         std::string callback_mailbox;
         bool killed_on_purpose;
 

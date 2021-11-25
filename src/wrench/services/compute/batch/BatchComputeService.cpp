@@ -1258,22 +1258,15 @@ namespace wrench {
 //        std::shared_ptr<PilotJob> pj, std::string suffix,
 //                std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
-        //TODO: PLACE THE RIGHT CALL!
         compound_job->pushCallbackMailbox(this->mailbox_name);
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(new
                                                                                 BareMetalComputeServiceOneShot(
                 compound_job,
                 this->hostname,
                 resources,
-                {{StandardJobExecutorProperty::TASK_STARTUP_OVERHEAD,
+                {{BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
                          this->getPropertyValueAsString(
-                                 BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
-                 {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
-                         this->getPropertyValueAsString(
-                                 BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},
-                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,
-                         this->getPropertyValueAsString(
-                                 BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM)}
+                                 BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}
                 },
                 {},
                 DBL_MAX,
@@ -1282,6 +1275,7 @@ namespace wrench {
                 this->getScratch()
         ));
 
+        std::cerr << "CREATED A ONE SHOT EXECUTOR WITH SCRACTH " << executor->getScratch() << "\n";
         executor->simulation = this->simulation;
         executor->start(executor, true, false); // Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
@@ -1690,8 +1684,11 @@ namespace wrench {
 
             if (key == "-N") {
                 found_dash_N = true;
+                std::cerr <<"IN VALIDATE: -N " << value << "\n";
                 auto num_nodes = strtoul(value.c_str(), nullptr, 10);
-                if (errno == ERANGE) {
+                std::cerr << "num_nodes = " << num_nodes << "\n";
+                std::cerr << "errno = " << errno << "\n";
+                if (errno == ERANGE or errno == EINVAL) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
@@ -1700,13 +1697,13 @@ namespace wrench {
             } else if (key == "-t") {
                 found_dash_t = true;
                 auto requested_time = strtoul(value.c_str(), nullptr, 10);
-                if (errno == ERANGE) {
+                if (errno == ERANGE or errno == EINVAL) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
             } else if (key == "-c") {
                 found_dash_c = true;
                 auto num_cores = strtoul(value.c_str(), nullptr, 10);
-                if (errno == ERANGE) {
+                if (errno == ERANGE or errno == EINVAL) {
                     throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
                 }
                 if (this->num_cores_per_node < num_cores) {
@@ -1719,11 +1716,13 @@ namespace wrench {
             } else {
                 // It has to be an action
                 bool found_task = false;
-                // TODO: Should we have an ID/Action map in the job instead of just a set of actions?
-                for (auto const &action : job->getActions()) {
-                    if (action->getName() == key) {
-                        found_task = true;
-                        break;
+                if (job != nullptr) {
+                    // TODO: Should we have an ID/Action map in the job instead of just a set of actions?
+                    for (auto const &action : job->getActions()) {
+                        if (action->getName() == key) {
+                            found_task = true;
+                            break;
+                        }
                     }
                 }
                 if (not found_task) {

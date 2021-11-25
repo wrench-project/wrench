@@ -24,6 +24,8 @@
 #include <wrench/job/StandardJob.h>
 #include <wrench/job/CompoundJob.h>
 #include <wrench/job/PilotJob.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+#include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 #include "JobManagerMessage.h"
 
 
@@ -549,7 +551,7 @@ namespace wrench {
             } else {
                 WorkflowTask *task;
                 if (workflow == nullptr) {
-                   throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first +")");
+                    throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first +")");
                 }
                 try {
                     task = workflow->getTaskByID(arg.first);
@@ -721,11 +723,75 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): service does not support pilot jobs");
         }
 
+        try {
+            std::cerr << "CALLING VALIDATE ARGUMENTS\n";
+            compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
+        } catch (ExecutionException &e) {
+            job->compound_job = nullptr;
+            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
+                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+            } else {
+                throw;
+            }
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
 
-        // TODO: CREATE COMPOUND JOB
-        std::shared_ptr<CompoundJob> cjob = nullptr;
+        std::cerr <<"CREATING THE COMPOUNG JOB FOR A PILOT JOB!!\n";
+
+        // TODO: CREATE COMPOUND JOB: Put this in a PilotJob method
+        std::string callback_mailbox = this->mailbox_name;
+        std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
+        cjob->addCustomAction("pilot_job_",
+                              [callback_mailbox, job, compute_service](std::shared_ptr<ActionExecutor> executor) {
+                                  // Create a bare-metal compute service and start it
+                                  auto execution_service = executor->getActionExecutionService();
+
+                                  std::cerr << "PARENT ************" << execution_service->getParentService()->getName() << "\n";
+                                  std::cerr << "PARENT ************" << std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch() << "\n";
+
+                                  std::cerr << "PILOT JOB ACTION STARTING A BM COMPUTE SERVICE\n";
+                                  // TODO: Deal with Properties!
+                                  auto bm_cs =  std::shared_ptr<BareMetalComputeService>(
+                                          new BareMetalComputeService(
+                                                  executor->hostname,
+                                                  execution_service->getComputeResources(),
+                                                  {},
+                                                  {},
+                                                  DBL_MAX,
+                                                  nullptr,
+                                                  "one_shot_bm_",
+                                                  std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()
+                                          ));
+
+                                  bm_cs->simulation = executor->getSimulation();
+                                  bm_cs->start(bm_cs, true, false); // Daemonized, no auto-restart
+                                  job->compute_service = bm_cs;
+
+                                  std::cerr << "******************* " << job->compute_service->getScratch() << "\n";
+
+                                  // Send a call back
+                                  std::cerr << "PILOT JOB ACTION SENDING BACK A MESSAGE STATING THAT PILOT JOB HAS STARTED\n";
+                                  S4U_Mailbox::dputMessage(
+                                          callback_mailbox,
+                                          new ComputeServicePilotJobStartedMessage(
+                                                  job, compute_service,
+                                                  compute_service->getMessagePayloadValue(
+                                                          BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+
+                                  // Sleep FOREVER (will be killed by service above)
+                                  std::cerr << "PILOT JOB ACTION SLEEPING FOREVER\n";
+                                  Simulation::sleep(DBL_MAX);
+
+                              },
+                              [job](std::shared_ptr<ActionExecutor> executor) {
+                                  std::cerr << "PILOT JOB  ACTION TERMINATION METHOD! TERMINATING THE BMCS\n";
+                                  job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
+                              });
 
         job->compound_job = cjob;
+        this->cjob_to_pjob_map[job->compound_job] = job;
+
 
         this->acquireDaemonLock();
         this->jobs_to_dispatch.push_back(job->compound_job);
@@ -1002,6 +1068,16 @@ namespace wrench {
                 auto sjob = this->cjob_to_sjob_map[msg->job];
                 this->cjob_to_sjob_map.erase(msg->job);
                 processStandardJobFailure(sjob, msg->compute_service);
+            } else if (this->cjob_to_pjob_map.find(msg->job) != this->cjob_to_pjob_map.end()) {
+                auto pjob = this->cjob_to_pjob_map[msg->job];
+                auto pjob_action = *(msg->job->getActions().begin());
+                if (std::dynamic_pointer_cast<JobTimeout>(pjob_action->getFailureCause())) {
+                    std::cerr << "IT'S A TIMEOUT!\n";
+                processPilotJobExpiration(pjob, msg->compute_service);
+                } else {
+                processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
+                    std::cerr << "IT'S SOME FAILURE\n";
+                }
             } else {
                 processCompoundJobFailure(msg->job, msg->compute_service);
             }
@@ -1130,6 +1206,27 @@ namespace wrench {
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
         S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(job, compute_service, 0.0));
+    }
+
+    /**
+  * @brief Process a pilot job failing (whatever that means)
+  * @param job: the pilot job that failued
+  * @param compute_service: the compute service on which it was running
+  */
+    void JobManager::processPilotJobFailure(std::shared_ptr<PilotJob> job,
+                                               std::shared_ptr<ComputeService> compute_service,
+                                            std::shared_ptr<FailureCause> cause) {
+        // update job state
+        job->state = PilotJob::State::FAILED;
+        this->num_running_pilot_jobs--;
+
+        // Remove the job from the "dispatched" list and put it in the completed list
+        this->jobs_dispatched.erase(job->compound_job);
+
+        // Forward the notification to the source
+        WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                 new ComputeServicePilotJobFailedMessage(job, compute_service, cause, 0.0));
     }
 
     /**
