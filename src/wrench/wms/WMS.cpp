@@ -340,7 +340,7 @@ namespace wrench {
      */
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
         auto data_movement_manager = std::shared_ptr<DataMovementManager>(
-                new DataMovementManager(this->getSharedPtr<WMS>()));
+                new DataMovementManager(this->hostname, this->mailbox_name));
         data_movement_manager->simulation = this->simulation;
         data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
 

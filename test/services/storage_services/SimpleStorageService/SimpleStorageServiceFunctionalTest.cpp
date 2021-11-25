@@ -344,6 +344,7 @@ private:
                     "Free space on storage service is wrong (" + std::to_string(free_space["/disk100"]) + ") instead of 100.0");
         }
 
+
         // Do a bogus asynchronous file copy (file = nullptr);
         try {
             data_movement_manager->initiateAsynchronousFileCopy(nullptr,
@@ -352,6 +353,8 @@ private:
             throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr file");
         } catch (std::invalid_argument &e) {
         }
+
+
         // Do a bogus asynchronous file copy (src = nullptr);
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
@@ -577,9 +580,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
