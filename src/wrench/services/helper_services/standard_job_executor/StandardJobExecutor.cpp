@@ -680,13 +680,10 @@ namespace wrench {
         }
 
         // Process task completions, if any
-        if (workunit->task != nullptr) { WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)",
-                                                     workunit->task->getID().c_str(),
-                                                     WorkflowTask::stateToString(
-                                                             workunit->task->getInternalState()).c_str());
-
-            // Increase the "completed tasks" count of the job
-            this->job->incrementNumCompletedTasks();
+        if (workunit->task != nullptr) {
+            WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)",
+                        workunit->task->getID().c_str(),
+                        WorkflowTask::stateToString(workunit->task->getInternalState()).c_str());
         }
 
         // Send the callback to the originator if the job has completed

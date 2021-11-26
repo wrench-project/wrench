@@ -344,7 +344,7 @@ namespace wrench {
         data_movement_manager->simulation = this->simulation;
         data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
 
-        // Let my schedulers know who the data movemement manager is
+        // Let my schedulers know who the data movement manager is
         if (this->standard_job_scheduler) {
             this->standard_job_scheduler->setDataMovementManager(
                     data_movement_manager->getSharedPtr<DataMovementManager>());
