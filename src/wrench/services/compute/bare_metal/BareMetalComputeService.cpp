@@ -53,7 +53,6 @@ namespace wrench {
         this->not_ready_actions.clear();
         this->ready_actions.clear();
         this->dispatched_actions.clear();
-        std::cerr << "BM CS CLEANUP\n";
     }
 
     /**
@@ -565,10 +564,8 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
-            std::cerr << "BM CS RECEIVED A SERVICE HAS TERMINATED MSESSAGE\n";
             if (std::dynamic_pointer_cast<ActionExecutionService>(msg->service)) {
                 if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
-                    std::cerr << "RETURNING TRUE! I'll FINISH\n";
                     return false;
                 } else {
                     return true;
@@ -719,7 +716,6 @@ namespace wrench {
         }
         this->current_jobs.clear();
 
-        std::cerr << this->name << ": #### CLEANING UP SCRATCH SPACE!!\n";
         cleanUpScratch();
     }
 
@@ -974,8 +970,6 @@ namespace wrench {
 
     void BareMetalComputeService::terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job,
                                                               ComputeService::TerminationCause termination_cause) {
-
-        std::cerr << "IN BM CS: TERMINATE CURRENT COMPOUND JOB " << job->getName() << " with " << job->getActions().size() << " TASKS \n";
 
         for (auto const &action : job->getActions()) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {

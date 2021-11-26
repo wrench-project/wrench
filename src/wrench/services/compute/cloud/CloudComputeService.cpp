@@ -509,7 +509,6 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::cerr << "IN CC:ISVMDOWN(): STATE= " << vm_pair_it->second.first->getStateAsString() << "\n";
         return (vm_pair_it->second.first->getState() == S4U_VirtualMachine::State::DOWN);
     }
 
@@ -668,7 +667,6 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
-            std::cerr << "CLOUND GOT A SERVICE HAS TERMINATED MESSAGE\n";
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
@@ -1022,7 +1020,6 @@ namespace wrench {
                 }
 
                 // Create a failure detector for the service
-                std::cerr << "CLOUD: CREATE A SERVICE TERMINATION DETECTOR FOR " << std::get<1>(this->vm_list[vm_name])->getName() << "\n";
                 auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
                         new ServiceTerminationDetector(this->hostname, std::get<1>(this->vm_list[vm_name]),
                                                        this->mailbox_name, false, true));
@@ -1343,7 +1340,6 @@ namespace wrench {
             }
         }
 
-        std::cerr << "IN PROCESS BARE METAL COMPUTE SERVICE TERMINATS!!!!1\n";
         if (vm_name.empty()) {
             throw std::runtime_error(
                     "CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown bare_metal_standard_jobs");

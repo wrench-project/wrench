@@ -734,9 +734,6 @@ namespace wrench {
             throw;
         }
 
-        std::cerr <<"CREATING THE COMPOUNG JOB FOR A PILOT JOB!!\n";
-
-        // TODO: CREATE COMPOUND JOB: Put this in a PilotJob method
         std::string callback_mailbox = this->mailbox_name;
         std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
         cjob->addCustomAction("pilot_job_",
@@ -744,10 +741,6 @@ namespace wrench {
                                   // Create a bare-metal compute service and start it
                                   auto execution_service = executor->getActionExecutionService();
 
-                                  std::cerr << "PARENT ************" << execution_service->getParentService()->getName() << "\n";
-                                  std::cerr << "PARENT ************" << std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch() << "\n";
-
-                                  std::cerr << "PILOT JOB ACTION STARTING A BM COMPUTE SERVICE\n";
                                   // TODO: Deal with Properties!
                                   auto bm_cs =  std::shared_ptr<BareMetalComputeService>(
                                           new BareMetalComputeService(
@@ -1062,11 +1055,9 @@ namespace wrench {
                 auto pjob = this->cjob_to_pjob_map[msg->job];
                 auto pjob_action = *(msg->job->getActions().begin());
                 if (std::dynamic_pointer_cast<JobTimeout>(pjob_action->getFailureCause())) {
-                    std::cerr << "IT'S A TIMEOUT!\n";
                     processPilotJobExpiration(pjob, msg->compute_service);
                 } else {
                     processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
-                    std::cerr << "IT'S SOME FAILURE\n";
                 }
             } else {
                 processCompoundJobFailure(msg->job, msg->compute_service);

@@ -385,7 +385,6 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        std::cerr << "GETTING THE ANSWER\n";
         // Get the answer
         std::shared_ptr<SimulationMessage> message = nullptr;
         try {
@@ -393,7 +392,6 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
-        std::cerr << "GOT THE NASWER\n";
         auto msg = std::dynamic_pointer_cast<ComputeServiceSubmitCompoundJobAnswerMessage>(message);
         if (!msg) {
             throw std::runtime_error(
@@ -513,7 +511,6 @@ namespace wrench {
 
         this->scheduler->processJobFailure(batch_job);
 
-        std::cerr << "SENDING BACK A JOB FAILED MESSAGE TO NEXT LEVEL UP\n";
         job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
@@ -637,10 +634,8 @@ namespace wrench {
 
         {
             std::vector<std::shared_ptr<BatchJob>> to_erase;
-            WRENCH_INFO("TERMINATING RUNNING COPOUND JOBS!");
             for (auto const &j : this->running_jobs) {
                 auto compound_job = j->getCompoundJob();
-                WRENCH_INFO("TERMINATING COMOYND JOB %s", compound_job->getName().c_str());
                 terminateRunningCompoundJob(compound_job, termination_cause);
                 // Popping, because I am terminating it, so the executor won't pop, and right now
                 // if I am at the top of the stack!
@@ -1275,7 +1270,6 @@ namespace wrench {
                 this->getScratch()
         ));
 
-        std::cerr << "CREATED A ONE SHOT EXECUTOR WITH SCRACTH " << executor->getScratch() << "\n";
         executor->simulation = this->simulation;
         executor->start(executor, true, false); // Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
@@ -1525,7 +1519,6 @@ namespace wrench {
 
         // Is it running?
         if (is_running) {
-            std::cerr << "TERMINATING A RUNNING COMPOUND JOB\n";
             this->scheduler->processJobTermination(batch_job);
             terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
             this->freeUpResources(batch_job->getResourcesAllocated());
@@ -1533,14 +1526,12 @@ namespace wrench {
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
-            std::cerr << "TERMINATING A PENDING COMPOUND JOB\n";
             this->scheduler->processJobTermination(*batch_pending_it);
             auto to_free = *batch_pending_it;
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
         }
         if (is_waiting) {
-            std::cerr << "TERMINATING A WAITING COMPOUND JOB\n";
             this->scheduler->processJobTermination(batch_job);
             this->waiting_jobs.erase(batch_job);
             this->removeBatchJobFromJobsList(batch_job);
