@@ -113,19 +113,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Increment "the number of completed tasks" counter
-     */
-    void StandardJob::incrementNumCompletedTasks() {
-        this->num_completed_tasks++;
-    }
-
-    /**
      * @brief Get the number of completed tasks in the job
      *
      * @return the number of completed tasks
      */
     unsigned long StandardJob::getNumCompletedTasks() {
-        return this->num_completed_tasks;
+        unsigned long count = 0;
+        for (auto const &t : this->tasks) {
+            if (t->getState() == WorkflowTask::State::COMPLETED) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
