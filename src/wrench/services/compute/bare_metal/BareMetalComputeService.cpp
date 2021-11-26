@@ -53,6 +53,7 @@ namespace wrench {
         this->not_ready_actions.clear();
         this->ready_actions.clear();
         this->dispatched_actions.clear();
+        std::cerr << "BM CS CLEANUP\n";
     }
 
     /**
@@ -564,11 +565,13 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+            std::cerr << "BM CS RECEIVED A SERVICE HAS TERMINATED MSESSAGE\n";
             if (std::dynamic_pointer_cast<ActionExecutionService>(msg->service)) {
                 if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
-                    return true;
-                } else {
+                    std::cerr << "RETURNING TRUE! I'll FINISH\n";
                     return false;
+                } else {
+                    return true;
                 }
             } else {
                 throw std::runtime_error(
