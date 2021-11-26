@@ -160,12 +160,9 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
-        auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+        auto cause = std::dynamic_pointer_cast<wrench::HostError>(real_event->failure_cause);
         if (not cause) {
-            throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
-        }
-        if (cause->getJob() != job) {
-            throw std::runtime_error("Failure cause does not point to the correct job");
+            throw std::runtime_error("Invalid failure cause type: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
 
         // Check that the VM is down
@@ -300,12 +297,9 @@ private:
             throw std::runtime_error("Unexpected workflow execution event!");
         }
         auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
-        auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
+        auto cause = std::dynamic_pointer_cast<wrench::HostError>(real_event->failure_cause);
         if (not cause) {
-            throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: JobKilled)");
-        }
-        if (cause->getJob() != job) {
-            throw std::runtime_error("Failure cause does not point to the correct job");
+            throw std::runtime_error("Invalid failure cause: " + real_event->failure_cause->toString() + " (expected: HostError)");
         }
 
         // Check that the VM is down
@@ -324,6 +318,10 @@ private:
 
         wrench::Simulation::sleep(2000);
 
+        job = job_manager->createStandardJob(this->test->task,
+                                             {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                              {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
+        
         auto vm_cs2 = cloud_service->startVM(vm_name);
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs2);
@@ -452,10 +450,6 @@ private:
             task->addInputFile(this->test->input_file);
             task->addOutputFile(output_file);
 
-            // Create a standard job
-            auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)},
-                                                             {output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
             // Create a VM
             auto vm_name = cloud_service->createVM(task->getMinNumCores(), task->getMemoryRequirement());
@@ -465,6 +459,11 @@ private:
             unsigned long num_vm_start_attempts = 0;
             unsigned long num_job_submission_attempts = 0;
             do {
+
+                // Create a standard job
+                auto job = job_manager->createStandardJob(task, {{this->test->input_file,
+                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                 {output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
                 // Start the VM (sleep 10 and retry if unsuccessful)
                 std::shared_ptr<wrench::BareMetalComputeService> vm_cs;

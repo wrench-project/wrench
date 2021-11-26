@@ -281,9 +281,10 @@ private:
         // Coverage
         one_task_jobs[0]->getEndDate();
 
-        for (int i = 0; i < 5; i++) {
-            if (one_task_jobs[i]->getNumCompletedTasks() != 1) {
-                throw std::runtime_error("A job with one completed task should say it has one completed task");
+        for (auto & one_task_job : one_task_jobs) {
+            if (one_task_job->getNumCompletedTasks() != 1) {
+                throw std::runtime_error("A job with one completed task should say it has one completed task (instead of " +
+                std::to_string(one_task_job->getNumCompletedTasks()) + ")");
             }
         }
 
