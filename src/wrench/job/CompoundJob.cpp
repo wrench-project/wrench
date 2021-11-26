@@ -398,8 +398,6 @@ namespace wrench {
      * @brief Print the task map
      */
     void CompoundJob::printTaskMap() {
-        std::cerr << "JOB TASK MAP:\n";
-        std::cerr << "   TOTAL (" + std::to_string(this->actions.size()) + "): ";
         for (auto const &a : this->actions) {
             std::cerr << a->getName() << " ";
         }

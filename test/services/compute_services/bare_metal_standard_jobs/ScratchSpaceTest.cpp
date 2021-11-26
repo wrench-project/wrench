@@ -625,14 +625,12 @@ private:
       }
 
       // Wait for the pilot job expiration
-      std::cerr << "TEST TEST: WAITING FOR PJOB EXPIRATION\n";
       try {
         event = this->waitForNextEvent();
       } catch (wrench::ExecutionException &e) {
         throw std::runtime_error(
                 "Error while getting and execution event: " + e.getCause()->toString());
       }
-      std::cerr << "TEST TEST: WAITED FOR PJOB EXPIRATION\n";
 
       if (std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
         // success, check if the scratch space size is full again or not, it should be full
@@ -660,10 +658,10 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
-  int argc = 2;
+  int argc = 1;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
-  argv[1] = strdup("--wrench-full-log");
+//  argv[1] = strdup("--wrench-full-log");
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 

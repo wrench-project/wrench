@@ -56,12 +56,6 @@ namespace wrench {
         // Clean up state in case of a restart
         if (this->isSetToAutoRestart()) {
             for (auto host : this->compute_resources) {
-                std::cerr << "HOST = " << host.first << "\n";
-                std::cerr << "---> " << (S4U_VirtualMachine::vm_to_pm_map.find(host.first) !=
-                                         S4U_VirtualMachine::vm_to_pm_map.end()) << "\n";
-                std::cerr << "S4U_VirtualMachine::vm_to_pm_map[XXX] = " << S4U_VirtualMachine::vm_to_pm_map[host.first]
-                          << "\n";
-                std::cerr << "----\n";
                 this->ram_availabilities.insert(
                         std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
                 this->running_thread_counts.insert(std::make_pair(host.first, 0));
@@ -352,12 +346,10 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
-            std::cerr << "ACTION SERVICE EXECUTOR IN MAIN\n";
             /** Dispatch ready actions **/
             this->dispatchReadyActions();
         }
 
-        std::cerr << "DONE WITH MAIN\n";
         // Kill the host state monitor if necessary
         if (Simulation::isEnergySimulationEnabled() or Simulation::isHostShutdownSimulationEnabled()) {
             this->host_state_change_monitor->kill();
@@ -598,7 +590,6 @@ namespace wrench {
                                 "haven't reported back yet");
                     return true;
                 } else {
-                    std::cerr << "CALLING TERAMINTED DUE TO ALL RESOURCES BEING DOWN\n";
                     this->terminate(false, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
                     this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
                     return false;
@@ -606,7 +597,6 @@ namespace wrench {
             }
 
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-                    std::cerr << "CALLING TERAMINTED BECAUSE SERVICE STOPPED\n";
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -677,9 +667,6 @@ namespace wrench {
             std::shared_ptr<FailureCause> cause) {
 
         WRENCH_INFO("Killing action %s", action->getName().c_str());
-
-        std::cerr << "**** " << cause << "\n";
-        std::cerr << "**** " << cause->toString() << "\n";
 
         bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
 
