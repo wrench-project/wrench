@@ -396,11 +396,9 @@ private:
         wrench::Simulation::sleep(1);
 
         // Terminate job2 (which is pending)
-        std::cerr << "TERMINATING JOB 2 - WHICH IS PENDING\n";
         job_manager->terminateJob(job2);
 
         // Terminate job1 (which is running)
-        std::cerr << "TERMINATING JOB 1 - WHICH IS RUNNING\n";
         job_manager->terminateJob(job1);
 
         // Check that job 3 completes
@@ -442,10 +440,10 @@ TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -700,7 +698,6 @@ private:
             }
 
             // Try to terminate the already terminated job
-            std::cerr << "TRYINT TO TERMINATE THE JOB, WHICH IS BOGUS\n";
             try {
                 job_manager->terminateJob(job);
             } catch (wrench::ExecutionException &e) {
@@ -729,10 +726,10 @@ TEST_F(BatchServiceTest, OneStandardJobSubmissionTest) {
 void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1168,7 +1165,6 @@ private:
             }
 
             // Wait for a workflow execution event (pilot job started)
-            std::cerr << "WAITING FOR PILOT STARTED EVENT!\n";
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -1178,10 +1174,8 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobStartedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
-            std::cerr << "GOT PILOT STARTED EVENT!\n";
 
             // Wait for another workflow execution event (pilot job terminated)
-            std::cerr << "WAITING FOR PILOT TERMINATED EVENT!\n";
 
             try {
                 event = this->waitForNextEvent();
@@ -1191,7 +1185,6 @@ private:
             if (not std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
-            std::cerr << "GOT PILOT TERMINATED EVENT!\n";
         }
         return 0;
     }
@@ -1204,10 +1197,10 @@ TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1796,10 +1789,10 @@ TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
 void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -2689,8 +2682,6 @@ private:
             auto job = job_manager->createStandardJob(
                     {task}, {{file1, wrench::FileLocation::LOCATION(this->test->storage_service1)}}, {}, {}, {});
 
-            std::cerr << "SUBMITTING THE JON TO THE PJ'S CS\n";
-            std::cerr << "CS SCRATCJ: " << pilot_job->getComputeService()->getScratch() << "\n";
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), {});
             } catch (wrench::ExecutionException &e) {
@@ -2743,10 +2734,10 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobTimeOutTaskTest) {
 void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -3442,13 +3433,11 @@ private:
         wrench::Simulation::sleep(5);
 
         // Terminate the service
-        std::cerr << "************* STOPPING THE CS **********\n";
         this->test->compute_service->stop(true, wrench::ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
 
         // Sleep 5 seconds
         wrench::Simulation::sleep(5);
 
-        std::cerr << "************* GETTING EXEC EVENTS **********\n";
         // Wait for workflow execution events
         for (int i = 0; i < 3; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
@@ -3463,8 +3452,6 @@ private:
             }
 
             auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
-            std::cerr << "REAL EVENT " << real_event << "\n";
-            std::cerr << "REAL EVENT->failure_cause " << real_event->failure_cause << "\n";
             auto cause = std::dynamic_pointer_cast<wrench::JobKilled>(real_event->failure_cause);
             if (not cause) {
                 throw std::runtime_error("Expected event, but unexpected failure cause: " +
@@ -3489,10 +3476,10 @@ TEST_F(BatchServiceTest, ShutdownWithPendingRunningJobsTest) {
 void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     // Create and initialize a simulation
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
