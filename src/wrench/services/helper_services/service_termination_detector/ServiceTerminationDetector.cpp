@@ -28,8 +28,8 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
                                                                std::string mailbox_to_notify,
                                                                bool notify_on_crash,
                                                                bool notify_on_termination) :
-        Service(host_on_which_to_run, "failure_detector_for_" + service_to_monitor->getName(),
-                "failure_detector_for" + service_to_monitor->getName()) {
+        Service(host_on_which_to_run, "service_termination_detector_for_" + service_to_monitor->getName(),
+                "service_termination_detector_for_" + service_to_monitor->getName()) {
 
     this->service_to_monitor = service_to_monitor;
     this->mailbox_to_notify = mailbox_to_notify;

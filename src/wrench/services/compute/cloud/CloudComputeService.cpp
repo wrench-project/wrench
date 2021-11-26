@@ -995,9 +995,9 @@ namespace wrench {
 
                     // Create the BareMetal service, whose main daemon is on this (stable) host
                     auto plist = vm->getPropertyList();
-                    plist.insert(
-                            std::make_pair(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,
-                                           "true"));
+                    plist.insert(std::make_pair(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,"true"));
+                    plist.insert(std::make_pair(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,"true"));
+
                     std::shared_ptr<BareMetalComputeService> cs = std::shared_ptr<BareMetalComputeService>(
                             new BareMetalComputeService(this->hostname,
                                                         compute_resources,
@@ -1340,6 +1340,8 @@ namespace wrench {
                 break;
             }
         }
+
+        std::cerr << "IN PROCESS BARE METAL COMPUTE SERVICE TERMINATS!!!!1\n";
         if (vm_name.empty()) {
             throw std::runtime_error(
                     "CloudComputeService::processBareMetalComputeServiceTermination(): received a termination notification for an unknown bare_metal_standard_jobs");

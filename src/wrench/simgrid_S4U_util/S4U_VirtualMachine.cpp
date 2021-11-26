@@ -141,10 +141,6 @@ namespace wrench {
      * @return a state
      */
     S4U_VirtualMachine::State S4U_VirtualMachine::getState() {
-        std::cerr << "IN GET STATE S4U\n";
-        std::cerr << "this->vm " << this->vm << "\n";
-        std::cerr << "this->vm " << this->vm->is_on() << "\n";
-        std::cerr << "S4UVM: State from SG: = RUNNING? " << (this->vm->get_state() == simgrid::s4u::VirtualMachine::State::RUNNING) << "\n";
         return this->state;
     }
 
