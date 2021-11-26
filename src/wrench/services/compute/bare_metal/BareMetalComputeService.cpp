@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 #include <wrench/job/CompoundJob.h>
@@ -305,8 +306,8 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
-                       "bare_metal_standard_jobs",
-                       "bare_metal_standard_jobs",
+                       "bare_metal_compound_jobs",
+                       "bare_metal_compound_jobs",
                        scratch_space_mount_point) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -442,7 +443,10 @@ namespace wrench {
                     hostname,
                     std::move(compute_resources),
                     nullptr,
-                    {{ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)}},
+                    {
+                            {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)},
+                            {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)},
+                    },
                     {}
             ));
             this->action_execution_service->setSimulation(this->simulation);
@@ -472,6 +476,17 @@ namespace wrench {
         this->action_execution_service->setParentService(this->getSharedPtr<Service>());
         this->action_execution_service->setSimulation(this->simulation);
         this->action_execution_service->start(this->action_execution_service, true, false);
+
+        if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
+            // Set up a service termination detector for the action execution service if necessary
+            auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
+                    new ServiceTerminationDetector(this->hostname, this->action_execution_service,
+                                                   this->mailbox_name, false, true));
+            termination_detector->setSimulation(this->simulation);
+            termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
+        }
+
+
 
         // Set an alarm for my timely death, if necessary
         if (this->has_ttl) {
@@ -547,6 +562,19 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ActionExecutionServiceActionDoneMessage *>(message.get())) {
             processActionDone(msg->action);
             return true;
+
+        } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+            if (std::dynamic_pointer_cast<ActionExecutionService>(msg->service)) {
+                if (this->getPropertyValueAsBoolean(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                throw std::runtime_error(
+                        "BareMetalComputeService::processNextMessage(): Received a service termination message for "
+                        "a non-action-execution-service service");
+            }
 
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");

@@ -598,13 +598,15 @@ namespace wrench {
                                 "haven't reported back yet");
                     return true;
                 } else {
-                    this->terminate(true, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
+                    std::cerr << "CALLING TERAMINTED DUE TO ALL RESOURCES BEING DOWN\n";
+                    this->terminate(false, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
                     this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
                     return false;
                 }
             }
 
         } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+                    std::cerr << "CALLING TERAMINTED BECAUSE SERVICE STOPPED\n";
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
 
             // This is Synchronous
@@ -655,7 +657,7 @@ namespace wrench {
                     return true;
                 }
 
-                this->terminate(true, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
+                this->terminate(false, ComputeService::TerminationCause::TERMINATION_COMPUTE_SERVICE_TERMINATED);
                 this->exit_code = 1; // Exit code to signify that this is, in essence a crash (in case somebody cares)
                 return false;
             }
