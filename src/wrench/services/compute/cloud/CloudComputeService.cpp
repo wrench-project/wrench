@@ -668,6 +668,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
+            std::cerr << "CLOUND GOT A SERVICE HAS TERMINATED MESSAGE\n";
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
@@ -1021,6 +1022,7 @@ namespace wrench {
                 }
 
                 // Create a failure detector for the service
+                std::cerr << "CLOUD: CREATE A SERVICE TERMINATION DETECTOR FOR " << std::get<1>(this->vm_list[vm_name])->getName() << "\n";
                 auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
                         new ServiceTerminationDetector(this->hostname, std::get<1>(this->vm_list[vm_name]),
                                                        this->mailbox_name, false, true));
