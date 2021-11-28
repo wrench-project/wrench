@@ -105,6 +105,8 @@ namespace wrench {
     public:
         CloudComputeServiceShutdownVMRequestMessage(const std::string &answer_mailbox,
                                                     const std::string &vm_name,
+                                                    bool send_failure_notifications,
+                                                    ComputeService::TerminationCause termination_cause,
                                                     double payload);
 
     public:
@@ -112,6 +114,10 @@ namespace wrench {
         std::string answer_mailbox;
         /** @brief The name of the new VM host */
         std::string vm_name;
+        /** @brief Whether to send failure notifications */
+        bool send_failure_notifications;
+        /** @brief Termination cause (in case failure notifications are sent) */
+        ComputeService::TerminationCause termination_cause;
     };
 
     /**

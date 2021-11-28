@@ -206,7 +206,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage *>(message.get())) {
-            processShutdownVM(msg->answer_mailbox, msg->vm_name);
+            processShutdownVM(msg->answer_mailbox, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {

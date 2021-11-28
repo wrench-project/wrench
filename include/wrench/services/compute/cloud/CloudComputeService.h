@@ -95,6 +95,8 @@ namespace wrench {
 
         virtual void shutdownVM(const std::string &vm_name);
 
+        virtual void shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
+
         virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name);
 
         virtual std::shared_ptr<BareMetalComputeService> getVMComputeService(const std::string &vm_name);
@@ -174,7 +176,10 @@ namespace wrench {
         virtual void
         processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
 
-        virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processShutdownVM(const std::string &answer_mailbox,
+                                       const std::string &vm_name,
+                                       bool send_failure_notifications,
+                                       ComputeService::TerminationCause termination_cause);
 
         virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_name);
 

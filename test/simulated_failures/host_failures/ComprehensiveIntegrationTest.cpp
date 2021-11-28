@@ -169,7 +169,7 @@ public:
 
 private:
 
-    std::map<std::string, std::shared_ptr<wrench::BareMetalComputeService>> vms;
+    std::set<std::string> vms;
     std::map<std::shared_ptr<wrench::BareMetalComputeService>, bool> vm_used;
     ComprehensiveIntegrationHostFailuresTest *test;
     std::shared_ptr<wrench::JobManager> job_manager;
@@ -195,11 +195,10 @@ private:
         if (this->test->faulty_map.find("cloud") != this->test->faulty_map.end()) {
             // Create my sef of VMs
             try {
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 2; i++) { // TODO: MAKE IT 6
                     auto vm_name = this->test->cloud_service->createVM(2, 45);
-                    auto vm_cs = this->test->cloud_service->startVM(vm_name);
-                    this->vms[vm_name] = vm_cs;
-                    this->vm_used[vm_cs] = false;
+                    this->test->cloud_service->startVM(vm_name);
+                    this->vms.insert(vm_name);
                 }
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Should be able to create VMs!!");
@@ -213,8 +212,8 @@ private:
             }
             if (faulty.first == "cloud") {
                 createMonkey("CloudHost1");
-                createMonkey("CloudHost2");
-                createMonkey("CloudHost3");
+//                createMonkey("CloudHost2");
+//                createMonkey("CloudHost3");
 
             } else if (faulty.first == "baremetal") {
                 createMonkey("BareMetalHost1");
@@ -231,9 +230,9 @@ private:
 
             // Try to restart down VMs
             for (auto const &vm : this->vms) {
-                if (this->test->cloud_service->isVMDown(vm.first)) {
+                if (this->test->cloud_service->isVMDown(vm)) {
                     try {
-                        this->test->cloud_service->startVM(vm.first);
+                        this->test->cloud_service->startVM(vm);
                     } catch (wrench::ExecutionException &e) {
                         auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                         if (cause) {
@@ -284,7 +283,7 @@ private:
         // Pick a compute resource (trying the cloud first)
         std::shared_ptr<wrench::ComputeService> target_cs = nullptr;
         for (auto &vm : this->vms) {
-            auto vm_cs = vm.second;
+            auto vm_cs = this->test->cloud_service->getVMComputeService(vm);
             if (vm_cs->isUp() and (not this->vm_used[vm_cs])) {
                 target_cs = vm_cs;
                 this->vm_used[vm_cs] = true;
@@ -417,7 +416,6 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[2] = strdup("--wrench-full-log");
 
-//    argv[1] = strdup("--wrench-full-log");
 
     this->faulty_map = args;
 
@@ -457,8 +455,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         std::string cloudhead = "CloudHead";
         std::vector<std::string> cloudhosts;
         cloudhosts.push_back("CloudHost1");
-        cloudhosts.push_back("CloudHost2");
-        cloudhosts.push_back("CloudHost3");
+//        cloudhosts.push_back("CloudHost2");
+//        cloudhosts.push_back("CloudHost3");
         this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(
                 simulation->add(new wrench::CloudComputeService(
                         cloudhead,

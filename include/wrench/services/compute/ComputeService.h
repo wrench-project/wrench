@@ -63,6 +63,7 @@ namespace wrench {
 
 
         enum TerminationCause {
+            TERMINATION_NONE,
             TERMINATION_COMPUTE_SERVICE_TERMINATED,
             TERMINATION_JOB_KILLED,
             TERMINATION_JOB_TIMEOUT
