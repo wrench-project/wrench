@@ -315,13 +315,12 @@ private:
             // expected
         }
 
-
         wrench::Simulation::sleep(2000);
 
         job = job_manager->createStandardJob(this->test->task,
                                              {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                                               {this->test->output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
-        
+
         auto vm_cs2 = cloud_service->startVM(vm_name);
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, vm_cs2);
