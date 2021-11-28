@@ -30,7 +30,7 @@ namespace wrench {
      * @brief Stop the compute service
      */
      void ComputeService::stop() {
-        this->stop(false, (ComputeService::TerminationCause) 0);
+        this->stop(false, ComputeService::TerminationCause::TERMINATION_NONE);
      }
 
     /**

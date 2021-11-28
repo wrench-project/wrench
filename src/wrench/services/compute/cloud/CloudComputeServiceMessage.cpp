@@ -109,6 +109,8 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param vm_name: the name of the VM host
+     * @param send_failure_notifications: whether to send job failure notifications
+     * @param termination_cause: termination cause (for failure notifications)
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -116,6 +118,8 @@ namespace wrench {
     CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(
             const std::string &answer_mailbox,
             const std::string &vm_name,
+            bool send_failure_notifications,
+            ComputeService::TerminationCause termination_cause,
             double payload) :
             CloudComputeServiceMessage("SHUTDOWN_VM_REQUEST", payload) {
 
@@ -125,6 +129,8 @@ namespace wrench {
         }
         this->answer_mailbox = answer_mailbox;
         this->vm_name = vm_name;
+        this->send_failure_notifications = send_failure_notifications;
+        this->termination_cause = termination_cause;
     }
 
     /**

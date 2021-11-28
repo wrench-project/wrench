@@ -177,6 +177,7 @@ namespace wrench {
         }
     }
 
+
     /**
      * @brief Shutdown an active VM
      *
@@ -186,6 +187,20 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name) {
+        this->shutdownVM(vm_name, false, ComputeService::TerminationCause::TERMINATION_NONE);
+    }
+
+
+    /**
+     * @brief Shutdown an active VM
+     *
+     * @param vm_name: the name of the VM
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_argument
+     */
+    void CloudComputeService::shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
+
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument("CloudComputeService::shutdownVM(): Unknown VM name '" + vm_name + "'");
         }
@@ -198,7 +213,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
                 new CloudComputeServiceShutdownVMRequestMessage(
-                        answer_mailbox, vm_name,
+                        answer_mailbox, vm_name, send_failure_notifications, termination_cause,
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -635,7 +650,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage *>(message.get())) {
-            processShutdownVM(msg->answer_mailbox, msg->vm_name);
+            processShutdownVM(msg->answer_mailbox, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
@@ -801,7 +816,10 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
-    void CloudComputeService::processShutdownVM(const std::string &answer_mailbox, const std::string &vm_name) {
+    void CloudComputeService::processShutdownVM(const std::string &answer_mailbox,
+                                                const std::string &vm_name,
+                                                bool send_failure_notifications,
+                                                ComputeService::TerminationCause termination_cause) {
         WRENCH_INFO("Asked to shutdown VM %s", vm_name.c_str());
 
         CloudComputeServiceShutdownVMAnswerMessage *msg_to_send_back;
@@ -822,7 +840,7 @@ namespace wrench {
         } else {
             std::string pm = vm->getPhysicalHostname();
             // Stop the Compute Service
-            cs->stop();
+            cs->stop(send_failure_notifications, termination_cause);
             // We do not shut down the VM. This will be done when the CloudComputeService is notified
             // of the bare_metal_standard_jobs completion.
             vm->shutdown();
@@ -986,7 +1004,7 @@ namespace wrench {
                 vm->start(picked_host);
 
                 // Create the Compute Service if needed
-                if (vm_pair.second == nullptr) {
+                if ((vm_pair.second == nullptr) or (not vm_pair.second->isUp())){
 
                     // Create the resource set for the bare_metal_standard_jobs
                     std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
