@@ -223,7 +223,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
         auto wms = new NoopWMS(this, hostname, false);
         wms->addWorkflow(workflow);
         this->service = simulation->add(wms);
-        this->dst_mailbox = workflow->getCallbackMailbox();
+        this->dst_mailbox = wms->mailbox_name;
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         wms->addWorkflow(workflow);

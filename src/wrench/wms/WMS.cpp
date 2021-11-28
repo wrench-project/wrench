@@ -442,7 +442,7 @@ namespace wrench {
      * @param message: a string message that will be in the generated TimerEvent
      */
     void WMS::setTimer(double date, std::string message) {
-        Alarm::createAndStartAlarm(this->simulation, date, this->hostname, this->getWorkflow()->callback_mailbox,
+        Alarm::createAndStartAlarm(this->simulation, date, this->hostname, this->mailbox_name,
                                    new AlarmWMSTimerMessage(message, 0), "wms_timer");
     }
 
