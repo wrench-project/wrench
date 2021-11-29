@@ -249,15 +249,18 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+        std::cerr << "XXX " << this->test->storage_service << "\n";
         // Create a job
+        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
-                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                file_locations,
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
+        std::cerr << "XXX " << this->test->storage_service << "\n";
 
         // Submit the job for execution with service-specific args, which is not allowed
         try {
@@ -272,12 +275,14 @@ private:
             }
         }
 
+        std::cerr << "XXX " << this->test->storage_service << "\n";
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
+        std::cerr << "XXX " << this->test->storage_service << "\n";
 
         // Wait for a workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -303,9 +308,10 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -339,9 +345,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(
                     hostname, std::move(compute_services),
-                    {
-
-                    })));
+                    {})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

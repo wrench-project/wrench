@@ -465,7 +465,7 @@ namespace wrench {
     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a HTCondorComputeService:
-    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+    *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}] [, {"taskID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
     *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
     *
     *
@@ -494,6 +494,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): service does not support standard jobs");
         }
 
+
         // Do a sanity check on task states
         for (const auto &t : job->tasks) {
             if ((t->getState() == WorkflowTask::State::COMPLETED) or
@@ -504,36 +505,9 @@ namespace wrench {
             }
         }
 
-        // Do a sanity check on use of scratch space for files specified in file locations
-        for (const auto &fl : job->file_locations) {
-            for (auto const &fl_l : fl.second) {
-                if ((fl_l == FileLocation::SCRATCH) and (not compute_service->hasScratch())) {
-                    throw std::invalid_argument("JobManager():submitJob(): file location for file " +
-                                                fl.first->getID() +
-                                                " is scratch  space, but the compute service to which this " +
-                                                "job is being submitted to doesn't have any!");
-                }
-            }
-        }
 
-        // Do a sanity check on implicit use of scratch space for task input files
-        for (auto const &task : job->tasks) {
-            for (auto const &f : task->getInputFiles()) {
-                if (job->file_locations.find(f) == job->file_locations.end()) {
-                    if (not compute_service->hasScratch()) {
-                        throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
-                    }
-                }
-            }
-            for (auto const &f : task->getOutputFiles()) {
-                if (job->file_locations.find(f) == job->file_locations.end()) {
-                    if (not compute_service->hasScratch()) {
-                        throw std::invalid_argument("JobManager():submitJob(): no file location is specified for file " + f->getID() + " but compute service does not have scratch storage");
-                    }
-                }
-            }
-        }
 
+        // Create the underlying compound job
         job->createUnderlyingCompoundJob(compute_service);
 
         // Tweak the service_specific_arguments
@@ -574,6 +548,16 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
+
+        // If the job uses scratch, then do a sanity check on the CS
+        if (job->usesScratch()) {
+            try {
+                compute_service->validateJobsUseOfScratch(service_specific_args);
+            } catch (std::invalid_argument &e) {
+                throw std::invalid_argument("JobManager()::submitJob(): Job's use of scratch is invalid: " + std::string(e.what()));
+            }
+        }
+
 
 
         // Modify task states

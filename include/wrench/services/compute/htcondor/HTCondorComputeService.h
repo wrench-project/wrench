@@ -61,6 +61,11 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
+        void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) override;
+
+        void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+                                              const std::map<std::string, std::string> &service_specific_args) const;
+
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
         void submitStandardJob(std::shared_ptr<StandardJob> job,

@@ -589,4 +589,15 @@ namespace wrench {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }
 
+
+    /**
+     * @brief Method to validate that a job's use of the scratch space if ok. Throws exception if not.
+     */
+    void ComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
+        if (not this->hasScratch()) {
+            throw std::invalid_argument("Compute service does not have scratch space");
+        }
+    }
+
+
 };

@@ -58,15 +58,17 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTasks();
 
-        unsigned long getMinimumRequiredNumCores();
+        unsigned long getMinimumRequiredNumCores() const;
 
-        unsigned long getMinimumRequiredMemory();
+        unsigned long getMinimumRequiredMemory() const;
 
-        unsigned long getNumCompletedTasks();
+        unsigned long getNumCompletedTasks() const;
 
-        unsigned long getNumTasks();
+        unsigned long getNumTasks() const;
 
         StandardJob::State getState();
+
+        bool usesScratch();
 
         std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
 
@@ -76,8 +78,6 @@ namespace wrench {
 
         /** @brief The job's total computational cost (in flops) */
         double total_flops;
-        /** @brief The number of computational tasks that have completed */
-        unsigned long num_completed_tasks;
 
         /** @brief The file locations that tasks should read/write files from/to. Each file is given a list of locations, in preferred order */
         std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations;
