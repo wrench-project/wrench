@@ -14,7 +14,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/job/PilotJob.h>
-#include <wrench/job/StandardJob.h>
+#include <wrench/job/CompoundJob.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
@@ -37,8 +37,8 @@ namespace wrench {
             std::string &hostname,
             double startup_overhead,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
-            std::map<std::shared_ptr<Job>, std::shared_ptr<ComputeService>> &running_jobs,
-            std::vector<std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>>> &pending_jobs,
+            std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
+            std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
             std::string &reply_mailbox)
             : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
@@ -63,8 +63,8 @@ namespace wrench {
      * @return whether the priority of the left-hand-side workflow job is higher
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(
-            std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>> &lhs,
-            std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>> &rhs) {
+            std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &lhs,
+            std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &rhs) {
         return std::get<0>(lhs)->getPriority() > std::get<0>(rhs)->getPriority();
     }
 
@@ -93,22 +93,13 @@ namespace wrench {
 
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
-            bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+            bool is_standard_job = (std::dynamic_pointer_cast<CompoundJob>(job) != nullptr);
 
             auto target_compute_service = pickTargetComputeService(job, service_specific_arguments);
 
             if (target_compute_service) {
                 job->pushCallbackMailbox(this->reply_mailbox);
-                if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-//                    target_compute_service->submitStandardJob(sjob, service_specific_arguments);
-                    throw std::runtime_error("CANNOT SUBMIT STANDARD JOB");
-                } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                    target_compute_service->submitCompoundJob(cjob, service_specific_arguments);
-                } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                    throw std::runtime_error("CANNOT SUBMIT PILOT JOB");
-//                    auto pjob = std::dynamic_pointer_cast<PilotJob>(job);
-//                    target_compute_service->submitPilotJob(pjob, service_specific_arguments);
-                }
+                target_compute_service->submitCompoundJob(job, service_specific_arguments);
                 this->running_jobs.insert(std::make_pair(job, target_compute_service));
                 scheduled_jobs.push_back(job);
             }
@@ -137,10 +128,10 @@ namespace wrench {
  * @return
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
-            std::shared_ptr<Job> job, std::map<std::string,
+            std::shared_ptr<CompoundJob> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
-        bool is_grid_universe = (service_specific_arguments.find("universe") != service_specific_arguments.end());
+        bool is_grid_universe = (service_specific_arguments.find("-universe") != service_specific_arguments.end());
 
         if (is_grid_universe) {
             return pickTargetComputeServiceGridUniverse(job, service_specific_arguments);
@@ -157,7 +148,7 @@ namespace wrench {
  * @return
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(
-            std::shared_ptr<Job> job, std::map<std::string,
+            std::shared_ptr<CompoundJob> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
@@ -220,16 +211,10 @@ namespace wrench {
  * @return
  */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
-            std::shared_ptr<Job> job, std::map<std::string,
+            std::shared_ptr<CompoundJob> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
-
-        if (std::dynamic_pointer_cast<PilotJob>(job)) {
-            throw std::invalid_argument("HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(): "
-                                        "Non-Grid universe pilot jobs are currently not supported");
-        }
-        auto sjob = std::dynamic_pointer_cast<StandardJob>(job);
 
         // Figure out which batch compute services are available
         for (auto const &cs : this->compute_services) {
@@ -238,7 +223,7 @@ namespace wrench {
                 continue;
             }
             // If job type is not supported, nevermind (shouldn't happen really)
-            if (std::dynamic_pointer_cast<StandardJob>(job) and (not cs->supportsStandardJobs())) {
+            if (std::dynamic_pointer_cast<CompoundJob>(job) and (not cs->supportsCompoundJobs())) {
                 continue;
             }
 
@@ -248,8 +233,15 @@ namespace wrench {
                                             "service-specific arguments for Non-Grid universe jobs are currently not supported");
             }
 
-            bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(sjob->getMinimumRequiredNumCores(),
-                                                                                    sjob->getMinimumRequiredMemory());
+            unsigned long min_required_num_cores = 0;
+            double min_required_memory = 0;
+
+            for (auto const &action : job->getActions()) {
+                min_required_num_cores = (min_required_num_cores < action->getMinNumCores() ? action->getMinNumCores() : min_required_num_cores);
+                min_required_memory = (min_required_memory < action->getMinRAMFootprint() ? action->getMinRAMFootprint() : min_required_memory);
+            }
+            bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
+                                                                                    min_required_memory);
 #if 0
             // Check on RAM constraints
             auto ram_resources = cs->getPerHostAvailableMemoryCapacity();

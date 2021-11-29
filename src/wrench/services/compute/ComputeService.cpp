@@ -29,9 +29,9 @@ namespace wrench {
     /**
      * @brief Stop the compute service
      */
-     void ComputeService::stop() {
+    void ComputeService::stop() {
         this->stop(false, ComputeService::TerminationCause::TERMINATION_NONE);
-     }
+    }
 
     /**
      * @brief Stop the compute service
@@ -114,13 +114,7 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                throw std::runtime_error("CANT SUBMIT A STANDARD JOB!\n");
-            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                throw std::runtime_error("CANT SUBMIT A PILOT JOB!\n");
-            } else if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-                this->submitCompoundJob(cjob, service_specific_args);
-            }
+            this->submitCompoundJob(job, service_specific_args);
         } catch (ExecutionException &e) {
             throw;
         }
@@ -144,7 +138,7 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-                this->terminateCompoundJob(job);
+            this->terminateCompoundJob(job);
         } catch (ExecutionException &e) {
             throw;
         }
@@ -575,7 +569,7 @@ namespace wrench {
     * @brief Checks if the compute service has a scratch space
     * @return true if the compute service has some scratch storage space, false otherwise
     */
-    bool ComputeService::hasScratch() {
+    bool ComputeService::hasScratch() const {
         return (this->scratch_space_storage_service != nullptr);
     }
 
@@ -585,7 +579,7 @@ namespace wrench {
      * @param service_specific_arg: the service-specific arguments
      */
     void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
-                                                          const map<std::string, std::string> &service_specific_args) {
+                                                          map<std::string, std::string> &service_specific_args)  {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }
 

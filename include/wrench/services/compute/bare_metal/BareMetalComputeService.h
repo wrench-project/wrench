@@ -131,7 +131,7 @@ namespace wrench {
         friend class JobManager;
 
         void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
-                                                      const std::map<std::string, std::string> &service_specific_args) override;
+                                                      std::map<std::string, std::string> &service_specific_args) override;
 
 
         BareMetalComputeService(const std::string &hostname,

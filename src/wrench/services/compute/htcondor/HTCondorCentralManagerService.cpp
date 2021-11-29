@@ -82,29 +82,29 @@ namespace wrench {
     }
 
     /**
-     * @brief Submit a standard job to the HTCondor service
+     * @brief Submit a compound job to the HTCondor service
      *
-     * @param job: a standard job
+     * @param job: a compound job
      * @param service_specific_args: service specific arguments
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::submitStandardJob(
-            std::shared_ptr <StandardJob> job,
+    void HTCondorCentralManagerService::submitCompoundJob(
+            std::shared_ptr <CompoundJob> job,
             const std::map <std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_compound_job");
 
         //  send a "run a standard job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(
                     this->mailbox_name,
-                    new ComputeServiceSubmitStandardJobRequestMessage(
+                    new ComputeServiceSubmitCompoundJobRequestMessage(
                             answer_mailbox, job, service_specific_args,
                             this->getMessagePayloadValue(
-                                    HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                    HTCondorCentralManagerServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr <NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -117,64 +117,64 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
-                    "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
+                    "HTCondorCentralManagerService::submitCompoundJob(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
     }
 
-    /**
-     * @brief Asynchronously submit a pilot job to the cloud service
-     *
-     * @param job: a pilot job
-     * @param service_specific_args: service specific arguments
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
-     */
-    void HTCondorCentralManagerService::submitPilotJob(
-            std::shared_ptr <PilotJob> job,
-            const std::map <std::string, std::string> &service_specific_args) {
-        serviceSanityCheck();
-
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
-
-        //  send a "run a pilot job" message to the daemon's mailbox_name
-        try {
-            S4U_Mailbox::putMessage(
-                    this->mailbox_name,
-                    new ComputeServiceSubmitPilotJobRequestMessage(
-                            answer_mailbox, job, service_specific_args,
-                            this->getMessagePayloadValue(
-                                    HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr <NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        // Get the answer
-        std::unique_ptr <SimulationMessage> message = nullptr;
-        try {
-            message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::shared_ptr <NetworkError> &cause) {
-            throw ExecutionException(cause);
-        }
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ComputeService::submitPilotJob(): Received an unexpected [" + message->getName() + "] message!");
-        }
-    }
+//    /**
+//     * @brief Asynchronously submit a pilot job to the cloud service
+//     *
+//     * @param job: a pilot job
+//     * @param service_specific_args: service specific arguments
+//     *
+//     * @throw ExecutionException
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorCentralManagerService::submitPilotJob(
+//            std::shared_ptr <PilotJob> job,
+//            const std::map <std::string, std::string> &service_specific_args) {
+//        serviceSanityCheck();
+//
+//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
+//
+//        //  send a "run a pilot job" message to the daemon's mailbox_name
+//        try {
+//            S4U_Mailbox::putMessage(
+//                    this->mailbox_name,
+//                    new ComputeServiceSubmitPilotJobRequestMessage(
+//                            answer_mailbox, job, service_specific_args,
+//                            this->getMessagePayloadValue(
+//                                    HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+//        } catch (std::shared_ptr <NetworkError> &cause) {
+//            throw ExecutionException(cause);
+//        }
+//
+//        // Get the answer
+//        std::unique_ptr <SimulationMessage> message = nullptr;
+//        try {
+//            message = S4U_Mailbox::getMessage(answer_mailbox);
+//        } catch (std::shared_ptr <NetworkError> &cause) {
+//            throw ExecutionException(cause);
+//        }
+//
+//        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+//            // If no success, throw an exception
+//            if (not msg->success) {
+//                throw ExecutionException(msg->failure_cause);
+//            }
+//        } else {
+//            throw std::runtime_error(
+//                    "ComputeService::submitPilotJob(): Received an unexpected [" + message->getName() + "] message!");
+//        }
+//    }
 
 //    /**
 //     * @brief Terminate a standard job to the compute service (virtual)
@@ -271,25 +271,25 @@ namespace wrench {
             // Do nothing
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+        } else if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobRequestMessage *>(message.get())) {
+            processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
-            processPilotJobStarted(msg->job);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-            processPilotJobCompletion(msg->job);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
-            processStandardJobCompletion(msg->job);
-            return true;
+//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
+//            return true;
+//
+//        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+//            processPilotJobStarted(msg->job);
+//            return true;
+//
+//        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+//            processPilotJobCompletion(msg->job);
+//            return true;
+//
+//        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+//            processStandardJobCompletion(msg->job);
+//            return true;
 
         } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage *>(message.get())) {
             processNegotiatorCompletion(msg->scheduled_jobs);
@@ -301,7 +301,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a submit standard job request
+     * @brief Process a submit compound job request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param job: the job
@@ -309,76 +309,76 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processSubmitStandardJob(
-            const std::string &answer_mailbox, std::shared_ptr <StandardJob> job,
+    void HTCondorCentralManagerService::processSubmitCompoundJob(
+            const std::string &answer_mailbox, std::shared_ptr <CompoundJob> job,
             std::map <std::string, std::string> &service_specific_args) {
         this->pending_jobs.emplace_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
-                new ComputeServiceSubmitStandardJobAnswerMessage(
+                new ComputeServiceSubmitCompoundJobAnswerMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
                         this->getMessagePayloadValue(
-                                HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                HTCondorCentralManagerServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
     }
 
-    /**
-     * @brief Process a submit pilot job request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param job: the job
-     * @param service_specific_args: service specific arguments
-     *
-     * @throw std::runtime_error
-     */
-    void HTCondorCentralManagerService::processSubmitPilotJob(
-            const std::string &answer_mailbox, std::shared_ptr <PilotJob> job,
-            std::map <std::string, std::string> &service_specific_args) {
-        this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
-        this->resources_unavailable = false;
+//    /**
+//     * @brief Process a submit pilot job request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     * @param job: the job
+//     * @param service_specific_args: service specific arguments
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorCentralManagerService::processSubmitPilotJob(
+//            const std::string &answer_mailbox, std::shared_ptr <PilotJob> job,
+//            std::map <std::string, std::string> &service_specific_args) {
+//        this->pending_jobs.push_back(std::make_tuple(job, service_specific_args));
+//        this->resources_unavailable = false;
+//
+//        S4U_Mailbox::dputMessage(
+//                answer_mailbox,
+//                new ComputeServiceSubmitPilotJobAnswerMessage(
+//                        job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
+//                        this->getMessagePayloadValue(
+//                                HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+//    }
 
-        S4U_Mailbox::dputMessage(
-                answer_mailbox,
-                new ComputeServiceSubmitPilotJobAnswerMessage(
-                        job, this->getSharedPtr<HTCondorCentralManagerService>(), true, nullptr,
-                        this->getMessagePayloadValue(
-                                HTCondorCentralManagerServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-    }
+//    /**
+//     * @brief Process a pilot job started event
+//     *
+//     * @param job: the pilot job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr <PilotJob> job) {
+//        // Forward the notification
+//        S4U_Mailbox::dputMessage(
+//                job->popCallbackMailbox(),
+//                new ComputeServicePilotJobStartedMessage(
+//                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+//                        this->getMessagePayloadValue(
+//                                HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+//    }
 
-    /**
-     * @brief Process a pilot job started event
-     *
-     * @param job: the pilot job
-     *
-     * @throw std::runtime_error
-     */
-    void HTCondorCentralManagerService::processPilotJobStarted(std::shared_ptr <PilotJob> job) {
-        // Forward the notification
-        S4U_Mailbox::dputMessage(
-                job->popCallbackMailbox(),
-                new ComputeServicePilotJobStartedMessage(
-                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                        this->getMessagePayloadValue(
-                                HTCondorComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-    }
-
-    /**
-     * @brief Process a pilot job completion
-     *
-     * @param job: the pilot job
-     *
-     * @throw std::runtime_error
-     */
-    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr <PilotJob> job) {
-        // Forward the notification
-        S4U_Mailbox::dputMessage(
-                job->popCallbackMailbox(),
-                new ComputeServicePilotJobExpiredMessage(
-                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                        this->getMessagePayloadValue(
-                                HTCondorComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-    }
+//    /**
+//     * @brief Process a pilot job completion
+//     *
+//     * @param job: the pilot job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void HTCondorCentralManagerService::processPilotJobCompletion(std::shared_ptr <PilotJob> job) {
+//        // Forward the notification
+//        S4U_Mailbox::dputMessage(
+//                job->popCallbackMailbox(),
+//                new ComputeServicePilotJobExpiredMessage(
+//                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+//                        this->getMessagePayloadValue(
+//                                HTCondorComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+//    }
 
     /**
      * @brief Process a standard job completion
@@ -387,19 +387,15 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorCentralManagerService::processStandardJobCompletion(std::shared_ptr <StandardJob> job) {
-        WRENCH_INFO("A standard job has completed: %s", job->getName().c_str());
+    void HTCondorCentralManagerService::processCompoundJobCompletion(std::shared_ptr <CompoundJob> job) {
+        WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
         std::string callback_mailbox = job->popCallbackMailbox();
-
-        for (auto task : job->getTasks()) {
-            WRENCH_INFO("    Task completed: %s (%s)", task->getID().c_str(), callback_mailbox.c_str());
-        }
 
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
-                callback_mailbox, new ComputeServiceStandardJobDoneMessage(
+                callback_mailbox, new ComputeServiceCompoundJobDoneMessage(
                         job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(
-                                HTCondorCentralManagerServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                                HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
@@ -450,8 +446,8 @@ namespace wrench {
             const std::shared_ptr <Job> &job,
             std::map <std::string, std::string> service_specific_arguments) {
         bool is_grid_universe =
-                (service_specific_arguments.find("universe") != service_specific_arguments.end()) and
-                (service_specific_arguments["universe"] == "grid");
+                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
+                (service_specific_arguments["-universe"] == "grid");
         bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
 
         bool found_one = false;
@@ -482,15 +478,17 @@ namespace wrench {
      * @return true or false
      */
     bool HTCondorCentralManagerService::jobCanRunSomewhere(
-            std::shared_ptr <Job> job,
+            std::shared_ptr <CompoundJob> job,
             std::map <std::string, std::string> service_specific_arguments) {
         bool is_grid_universe =
-                (service_specific_arguments.find("universe") != service_specific_arguments.end()) and
-                (service_specific_arguments["universe"] == "grid");
+                (service_specific_arguments.find("-universe") != service_specific_arguments.end()) and
+                (service_specific_arguments["-universe"] == "grid");
         bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
 
+        std::cerr << " IN JOB CAN RUN SOMEWHERE: IS GRID = " << is_grid_universe << "\n";
         bool found_one = false;
         for (auto const &cs : this->compute_services) {
+            std::cerr << "cs->getName(): " << cs->getName() << "\n";
             // Check for type appropriateness
             if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
                 continue;
@@ -498,12 +496,7 @@ namespace wrench {
             if ((not is_grid_universe) and (std::dynamic_pointer_cast<BareMetalComputeService>(cs) == nullptr)) {
                 continue;
             }
-            if (is_standard_job and (not cs->supportsStandardJobs())) {
-                continue;
-            }
-            if ((not is_standard_job) and (not cs->supportsPilotJobs())) {
-                continue;
-            }
+
             // Check for resources for a grid universe job
             if (is_grid_universe) {
                 if (service_specific_arguments.find("-N") == service_specific_arguments.end()) {
@@ -532,6 +525,7 @@ namespace wrench {
                 }
             }
 
+            std::cerr << "XXXX JERE\n";
             if (!is_grid_universe) {
                 auto sjob = std::dynamic_pointer_cast<StandardJob>(job);
                 auto core_resources = cs->getPerHostNumCores();
@@ -556,6 +550,7 @@ namespace wrench {
             break;
         }
 
+        std::cerr << "RETURNING " << found_one << "\n";
         return found_one;
     }
 
