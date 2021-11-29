@@ -84,7 +84,7 @@ namespace wrench {
 
         virtual bool supportsPilotJobs() = 0;
 
-        bool hasScratch();
+        virtual bool hasScratch();
 
         unsigned long getNumHosts();
 
@@ -131,6 +131,8 @@ namespace wrench {
 //        virtual void
 //        submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
+
+
         /**
          * @brief Method to submit a compound job to the service
          *
@@ -154,11 +156,8 @@ namespace wrench {
          */
         virtual void terminateCompoundJob(std::shared_ptr<CompoundJob> job) = 0;
 
-        /**
-         * @brief Method that returns the computer service's scratch space's storage service
-         * @return the scratch space, or nullptr if none
-         */
         std::shared_ptr<StorageService> getScratch();
+
 
 
         ComputeService(const std::string &hostname,
@@ -175,6 +174,8 @@ namespace wrench {
 
         virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
                                           const std::map<std::string, std::string> &service_specific_args);
+
+        virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);
 
         ComputeService(const std::string &hostname,
                        std::string service_name,

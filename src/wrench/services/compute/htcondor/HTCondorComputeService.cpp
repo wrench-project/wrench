@@ -375,7 +375,7 @@ namespace wrench {
         // Submit the job to the central manager
         // Set the job's pre- and post- overhead and submit to the central manager
         if (service_specific_args.find("universe") != service_specific_args.end() and
-        service_specific_args.at("universe") == "grid") {
+            service_specific_args.at("universe") == "grid") {
             job->setPreJobOverheadInSeconds(
                     getPropertyValueAsDouble(HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY));
             job->setPostJobOverheadInSeconds(
@@ -463,6 +463,115 @@ namespace wrench {
         this->central_manager->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
         this->default_property_values.clear();
         this->default_messagepayload_values.clear();
+    }
+
+    /**
+     * @brief Determine whether compute service has scratch
+     * @return
+     */
+    void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
+
+        bool is_grid_job = (service_specific_args.find("-universe") != service_specific_args.end())
+                           and (service_specific_args["-universe"] == "grid");
+
+        if (is_grid_job) {
+            std::set<std::shared_ptr<BatchComputeService>> batch_cses;
+            std::shared_ptr<BatchComputeService> target_cs = nullptr;
+            for (auto const &cs : this->central_manager->compute_services) {
+                if (auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs)) {
+                    batch_cses.insert(batch_cs);
+                    if (service_specific_args.find("-service") != service_specific_args.end()) {
+                        if (service_specific_args["-service"] == batch_cs->getName()) {
+                            target_cs = batch_cs;
+                            break;
+                        }
+                    } else {
+                        target_cs = batch_cs;
+                        break;
+                    }
+                }
+            }
+
+            if (target_cs == nullptr) {
+                throw std::invalid_argument("Couldn't find target batch compute service for grid-universe job");
+            }
+            if (not target_cs->hasScratch()) {
+                throw std::invalid_argument("Target batch compute service (" + target_cs->getName() + ") for grid-universe job does not have scratch space");
+            }
+
+        } else {
+            // Here we must make sure that ALL baremetal compute services have scratch
+            for (auto const &cs : this->central_manager->compute_services) {
+                if (auto bm_cs = std::dynamic_pointer_cast<BareMetalComputeService>(cs)) {
+                    if (not bm_cs->hasScratch()) {
+                        throw std::invalid_argument("At least one bare-metal compute service does not have scratch space");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
+     * @param job: the job that's being submitted
+     * @param service_specific_arg: the service-specific arguments
+     */
+    void HTCondorComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+                                                                  const std::map<std::string, std::string> &service_specific_args) const {
+        // Is the job a grid universe job
+        bool grid_universe = false;
+        if (service_specific_args.find("-universe") != service_specific_args.end()) {
+            if (service_specific_args.at("-universe") != "grid") {
+                throw std::invalid_argument("The value for the '-universe' key can only be 'grid'");
+            }
+            grid_universe = true;
+        }
+
+        if (not grid_universe) {
+            if (not service_specific_args.empty()) {
+                throw std::invalid_argument("A non-grid-universe job cannot have any service-specific arguments");
+            }
+        }
+
+        // At this point, the job is a grid-universe job
+
+        // Determine the target batch compute service
+        std::set<std::shared_ptr<BatchComputeService>> batch_cses;
+        std::shared_ptr<BatchComputeService> target_cs = nullptr;
+        for (auto const &cs : this->central_manager->compute_services) {
+            if (auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs)) {
+                batch_cses.insert(batch_cs);
+            }
+        }
+        if (service_specific_args.find("-service") != service_specific_args.end()) {
+            for (auto const &cs : batch_cses) {
+                if (cs->getName() == service_specific_args.at("-service")) {
+                    target_cs = cs;
+                }
+            }
+        } else {
+            if (batch_cses.size() != 1) {
+                throw std::invalid_argument("'-service' service-specific argument required for grid-universe job as there are more than one batch compute services available");
+            } else {
+                target_cs = *(batch_cses.begin());
+            }
+        }
+        if (target_cs == nullptr) {
+            throw std::invalid_argument("Not able to determine target batch compute service for grid-universe job");
+        }
+
+        // Now, invoke the batch compute service with the arguments (sort of) to validate them
+        auto stripped_service_specific_args = service_specific_args;
+        stripped_service_specific_args.erase("-universe");
+        stripped_service_specific_args.erase("-service"); // which may not be there, but whatever
+        try {
+            target_cs->validateServiceSpecificArguments(compound_job, stripped_service_specific_args);
+        } catch (ExecutionException &e) {
+            throw;
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
     }
 
 

@@ -78,6 +78,9 @@ namespace wrench {
         bool jobCanRunSomewhere(std::shared_ptr<Job> job, std::map<std::string, std::string> service_specific_arguments);
 
     private:
+
+        friend class HTCondorComputeService;
+
         int main() override;
 
         bool processNextMessage();
