@@ -39,6 +39,8 @@ namespace wrench {
                 {HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
+                {HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
                 {HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
@@ -64,18 +66,18 @@ namespace wrench {
         void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) override;
 
         void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
-                                              const std::map<std::string, std::string> &service_specific_args) const;
+                                              std::map<std::string, std::string> &service_specific_args) override;
 
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
-        void submitStandardJob(std::shared_ptr<StandardJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments);
+//        void submitStandardJob(std::shared_ptr<StandardJob> job,
+//                               const std::map<std::string, std::string> &service_specific_arguments);
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments) override {};
+                               const std::map<std::string, std::string> &service_specific_arguments) override;
 
 
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
+//        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
         std::shared_ptr<StorageService> getLocalStorageService() const;
 
@@ -109,11 +111,15 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob>job,
+        void processSubmitCompoundJob(const std::string &answer_mailbox, std::shared_ptr<CompoundJob>job,
                                       const std::map<std::string, std::string> &service_specific_args);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob>job,
-                                   const std::map<std::string, std::string> &service_specific_args);
+
+//        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob>job,
+//                                      const std::map<std::string, std::string> &service_specific_args);
+//
+//        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob>job,
+//                                   const std::map<std::string, std::string> &service_specific_args);
 
         void processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram);
 

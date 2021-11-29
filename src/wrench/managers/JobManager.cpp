@@ -506,6 +506,16 @@ namespace wrench {
         }
 
 
+        // If the job uses scratch, then do a sanity check on the CS
+        if (job->usesScratch()) {
+            try {
+                compute_service->validateJobsUseOfScratch(service_specific_args);
+            } catch (std::invalid_argument &e) {
+                throw std::invalid_argument("JobManager()::submitJob(): Job's use of scratch is invalid: " + std::string(e.what()));
+            }
+        }
+
+        std::cerr << "CREATING COMPOUND\n";
 
         // Create the underlying compound job
         job->createUnderlyingCompoundJob(compute_service);
@@ -536,6 +546,7 @@ namespace wrench {
             }
         }
 
+        std::cerr << "VALIDING ARGS\n";
         try {
             compute_service->validateServiceSpecificArguments(job->compound_job, new_args);
         } catch (ExecutionException &e) {
@@ -548,17 +559,6 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
-
-        // If the job uses scratch, then do a sanity check on the CS
-        if (job->usesScratch()) {
-            try {
-                compute_service->validateJobsUseOfScratch(service_specific_args);
-            } catch (std::invalid_argument &e) {
-                throw std::invalid_argument("JobManager()::submitJob(): Job's use of scratch is invalid: " + std::string(e.what()));
-            }
-        }
-
-
 
         // Modify task states
         job->state = StandardJob::PENDING;
@@ -580,6 +580,8 @@ namespace wrench {
         job->compound_job->setServiceSpecificArguments(new_args);
         job->setParentComputeService(compute_service);
         job->compound_job->setParentComputeService(compute_service);
+
+        std::cerr << "WAITING UP DAEMON\n";
 
         // Send a message to wake up the daemon
         try {
@@ -609,7 +611,7 @@ namespace wrench {
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a HTCondorComputeService:
-     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
+     *           - For a "grid universe" job that will be submitted to a child BatchComputeService: {{"-universe":"grid", {"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"-service":"<string>" (batch service name)}] [, {"actionID":"[node_index:]num_cores"}] [, {"-u":"<string>" (username)}]}
      *           - For a "non-grid universe" job that will be submitted to a child BareMetalComputeService: {}
      *
      *
@@ -1212,6 +1214,8 @@ namespace wrench {
 
         std::set<std::shared_ptr<Job>> dispatched;
 
+        std::cerr << "IN DISPATCH JOB\n";
+
         this->acquireDaemonLock();
         auto it = this->jobs_to_dispatch.begin();
         while (it != this->jobs_to_dispatch.end()) {
@@ -1282,6 +1286,7 @@ namespace wrench {
      */
     void JobManager::dispatchJob(const std::shared_ptr<CompoundJob> job) {
 
+        std::cerr << "DISPATCH JOB()\n";
 
         // Submit the job to the service
         try {

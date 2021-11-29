@@ -162,6 +162,9 @@ namespace wrench {
 
     private:
 
+        double pre_job_overhead;
+        double post_job_overhead;
+
         void assertJobNotSubmitted();
         void assertActionNameDoesNotAlreadyExist(const std::string &name);
 

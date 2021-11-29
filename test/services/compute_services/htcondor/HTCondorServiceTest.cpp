@@ -249,18 +249,15 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        std::cerr << "XXX " << this->test->storage_service << "\n";
         // Create a job
         std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
+        file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
                 file_locations,
-                {std::make_tuple(this->test->input_file,
-                                 wrench::FileLocation::LOCATION(this->test->storage_service),
-                                 wrench::FileLocation::SCRATCH)},
+                {},
                 {}, {});
-
-        std::cerr << "XXX " << this->test->storage_service << "\n";
 
         // Submit the job for execution with service-specific args, which is not allowed
         try {
@@ -268,21 +265,16 @@ private:
             service_specific_args[this->test->task1->getID()] = "2";
             job_manager->submitJob(two_task_job, this->test->compute_service, service_specific_args);
             throw std::runtime_error("Should not have been able to submit a job with service-specific args");
-        } catch (wrench::ExecutionException &e) {
-            auto real_cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
-            if (real_cause == nullptr) {
-                throw std::runtime_error("Should have gotten a NotAllowed failure cause due to service-specific arguments");
-            }
+        } catch (std::invalid_argument &e) {
         }
 
-        std::cerr << "XXX " << this->test->storage_service << "\n";
+        std::cerr << "SUBMITTING\n";
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
-        std::cerr << "XXX " << this->test->storage_service << "\n";
 
         // Wait for a workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -535,7 +527,7 @@ private:
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "1";
         service_specific_arguments["-t"] = "3600";
-        service_specific_arguments["universe"] = "grid";
+        service_specific_arguments["-universe"] = "grid";
 
         job_manager->submitJob(pilot_job, this->test->compute_service, service_specific_arguments);
 
@@ -796,7 +788,7 @@ private:
 
 
         std::map<std::string, std::string> service_specific_arguments;
-        service_specific_arguments["universe"] = "grid";
+        service_specific_arguments["-universe"] = "grid";
         service_specific_arguments["-N"] = "1";
         service_specific_arguments["-c"] = "1";
         service_specific_arguments["-t"] = "3600";
@@ -941,7 +933,7 @@ private:
 
 
         std::map<std::string, std::string> test_service_specs;
-        test_service_specs["universe"] = "grid";
+        test_service_specs["-universe"] = "grid";
 
         // Submit the  job for execution
         try {
@@ -1185,7 +1177,7 @@ private:
 
 
         std::map<std::string, std::string> test_service_specs;
-        test_service_specs["universe"] = "grid";
+        test_service_specs["-universe"] = "grid";
         test_service_specs["-N"] = "1";
         test_service_specs["-c"] = "1";
         test_service_specs["-t"] = "1";
@@ -1321,7 +1313,7 @@ private:
                     {}, {});
 
             std::map<std::string, std::string> test_service_specs;
-            test_service_specs["universe"] = "grid";
+            test_service_specs["-universe"] = "grid";
             test_service_specs["-N"] = "100";
             test_service_specs["-c"] = "1";
             test_service_specs["-t"] = "1";
