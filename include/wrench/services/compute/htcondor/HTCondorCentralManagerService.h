@@ -56,13 +56,13 @@ namespace wrench {
 
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 
-        void submitStandardJob(std::shared_ptr<StandardJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments);
+//        void submitStandardJob(std::shared_ptr<StandardJob> job,
+//                               const std::map<std::string, std::string> &service_specific_arguments);
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_arguments) override {} ;
+                               const std::map<std::string, std::string> &service_specific_arguments) override;
 
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
+//        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) override;
 
 
         ~HTCondorCentralManagerService() override;
@@ -75,7 +75,7 @@ namespace wrench {
 
         bool jobKindIsSupported(const std::shared_ptr<Job>& job, std::map<std::string, std::string> service_specific_arguments);
 
-        bool jobCanRunSomewhere(std::shared_ptr<Job> job, std::map<std::string, std::string> service_specific_arguments);
+        bool jobCanRunSomewhere(std::shared_ptr<CompoundJob> job, std::map<std::string, std::string> service_specific_arguments);
 
     private:
 
@@ -85,7 +85,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+        void processSubmitCompoundJob(const std::string &answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_args);
 
         void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
@@ -95,7 +95,7 @@ namespace wrench {
 
         void processPilotJobCompletion(std::shared_ptr<PilotJob>job);
 
-        void processStandardJobCompletion(std::shared_ptr<StandardJob>job);
+        void processCompoundJobCompletion(std::shared_ptr<CompoundJob>job);
 
         void processNegotiatorCompletion(std::vector<std::shared_ptr<Job>> &pending_jobs);
 
@@ -105,9 +105,9 @@ namespace wrench {
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /** queue of pending jobs **/
-        std::vector<std::tuple<std::shared_ptr<Job>, std::map<std::string, std::string>>> pending_jobs;
+        std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> pending_jobs;
         /** running workflow jobs **/
-        std::map<std::shared_ptr<Job>, std::shared_ptr<ComputeService>> running_jobs;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> running_jobs;
         /** whether a negotiator is dispatching jobs **/
         bool dispatching_jobs = false;
         /** whether a negotiator could not dispatch jobs **/

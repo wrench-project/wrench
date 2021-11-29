@@ -94,7 +94,7 @@ namespace wrench {
      * @param service_specific_arg: the service-specific arguments
      */
     void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
-                                                                   const std::map<std::string, std::string> &service_specific_args) {
+                                                                   std::map<std::string, std::string> &service_specific_args) {
 
         auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
         auto compute_resources = this->action_execution_service->getComputeResources();

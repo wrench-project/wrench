@@ -84,7 +84,7 @@ namespace wrench {
 
         virtual bool supportsPilotJobs() = 0;
 
-        virtual bool hasScratch();
+        virtual bool hasScratch() const;
 
         unsigned long getNumHosts();
 
@@ -173,7 +173,7 @@ namespace wrench {
         void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string>& = {});
 
         virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
-                                          const std::map<std::string, std::string> &service_specific_args);
+                                                      std::map<std::string, std::string> &service_specific_args) ;
 
         virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);
 
