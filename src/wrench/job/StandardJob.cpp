@@ -44,7 +44,6 @@ namespace wrench {
                              std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
             :
             Job("", std::move(job_manager)),
-            num_completed_tasks(0),
             file_locations(file_locations),
             pre_file_copies(pre_file_copies),
             post_file_copies(post_file_copies),
@@ -81,7 +80,7 @@ namespace wrench {
      *        one task in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
      */
-    unsigned long StandardJob::getMinimumRequiredNumCores() {
+    unsigned long StandardJob::getMinimumRequiredNumCores() const {
         unsigned long max_min_num_cores = 1;
         for (auto t : tasks) {
             max_min_num_cores = std::max<unsigned long>(max_min_num_cores, t->getMinNumCores());
@@ -94,7 +93,7 @@ namespace wrench {
      *        one task in the job cannot run if less ram than this minimum is available)
      * @return the number of cores
      */
-    unsigned long StandardJob::getMinimumRequiredMemory() {
+    unsigned long StandardJob::getMinimumRequiredMemory() const {
         unsigned long max_ram = 0;
         for (auto t : tasks) {
             max_ram = std::max<unsigned long>(max_ram, t->getMemoryRequirement());
@@ -108,7 +107,7 @@ namespace wrench {
      *
      * @return the number of tasks
      */
-    unsigned long StandardJob::getNumTasks() {
+    unsigned long StandardJob::getNumTasks() const {
         return this->tasks.size();
     }
 
@@ -117,7 +116,7 @@ namespace wrench {
      *
      * @return the number of completed tasks
      */
-    unsigned long StandardJob::getNumCompletedTasks() {
+    unsigned long StandardJob::getNumCompletedTasks() const {
         unsigned long count = 0;
         for (auto const &t : this->tasks) {
             if (t->getState() == WorkflowTask::State::COMPLETED) {
@@ -765,6 +764,47 @@ namespace wrench {
             task->incrementFailureCount();
         }
 
+    }
+
+    /**
+     * @brief Determines whether the job's spec uses scratch space
+     * @return
+     */
+    bool StandardJob::usesScratch() {
+
+        for (const auto &fl : this->file_locations) {
+            for (auto const &fl_l : fl.second) {
+                if (fl_l == FileLocation::SCRATCH) {
+                    return true;
+                }
+            }
+        }
+
+        for (auto const &task : this->tasks) {
+            for (auto const &f : task->getInputFiles()) {
+                if (this->file_locations.find(f) == this->file_locations.end()) {
+                    return true;
+                }
+            }
+            for (auto const &f : task->getOutputFiles()) {
+                if (this->file_locations.find(f) == this->file_locations.end()) {
+                    return true;
+                }
+            }
+        }
+
+        for (auto const &pfc : this->pre_file_copies) {
+            if ((std::get<1>(pfc) == FileLocation::SCRATCH) or (std::get<2>(pfc) == FileLocation::SCRATCH)) {
+                return true;
+            }
+        }
+
+        for (auto const &pfc : this->post_file_copies) {
+            if ((std::get<1>(pfc) == FileLocation::SCRATCH) or (std::get<2>(pfc) == FileLocation::SCRATCH)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
