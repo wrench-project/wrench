@@ -421,9 +421,9 @@ namespace wrench {
     bool CompoundJob::hasFailed() {
         return (this->actions.size() ==
                 this->state_task_map[Action::State::NOT_READY].size() +
-                        this->state_task_map[Action::State::COMPLETED].size() +
-                        this->state_task_map[Action::State::KILLED].size() +
-                        this->state_task_map[Action::State::FAILED].size());
+                this->state_task_map[Action::State::COMPLETED].size() +
+                this->state_task_map[Action::State::KILLED].size() +
+                this->state_task_map[Action::State::FAILED].size());
     }
 
     /**
@@ -537,6 +537,30 @@ namespace wrench {
      */
     bool CompoundJob::hasAction(const std::string &name) {
         return (this->name_map.find(name) != this->name_map.end());
+    }
+
+    /**
+     * @brief Get the minimum required num cores to run the job
+     * @return a number of cores
+     */
+    unsigned long CompoundJob::getMinimumRequiredNumCores() {
+        unsigned long min_num_cores = 0;
+        for (auto const &action : this->actions) {
+            min_num_cores = (min_num_cores < action->getMinNumCores() ? action->getMinNumCores() : min_num_cores);
+        }
+        return min_num_cores;
+    }
+
+    /**
+   * @brief Get the minimum required amount of memory to run the job
+   * @return a number of bytes
+   */
+    double CompoundJob::getMinimumRequiredMemory() {
+        double min_ram = 0;
+        for (auto const &action : this->actions) {
+            min_ram = (min_ram < action->getMinRAMFootprint() ? action->getMinRAMFootprint() : min_ram);
+        }
+        return min_ram;
     }
 
 

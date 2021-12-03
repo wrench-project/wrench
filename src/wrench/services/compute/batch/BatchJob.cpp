@@ -88,13 +88,7 @@ namespace wrench {
      * @return a size in bytes
      */
     double BatchJob::getMemoryRequirement() {
-        auto job = this->compound_job;
-        double memory_requirement = 0.0;
-            for (auto const &action : job->getActions()) {
-                double ram = action->getMinRAMFootprint();
-                memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
-            }
-        return memory_requirement;
+        return this->compound_job->getMinimumRequiredMemory();
     }
 
     /**

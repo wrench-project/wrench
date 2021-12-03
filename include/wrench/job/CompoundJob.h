@@ -126,6 +126,10 @@ namespace wrench {
 
         void printTaskMap();
 
+        unsigned long getMinimumRequiredNumCores();
+
+        double getMinimumRequiredMemory();
+
         /***********************/
         /** \endcond           */
         /***********************/
