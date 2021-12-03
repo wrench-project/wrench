@@ -376,7 +376,6 @@ namespace wrench {
             return;
         }
 
-        std::cerr << "SUBNMITTING TO CENTRAL MANAGER\n";
         this->central_manager->submitCompoundJob(job, service_specific_args);
 
         // send positive answer
