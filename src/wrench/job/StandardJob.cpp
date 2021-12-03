@@ -650,6 +650,7 @@ namespace wrench {
             auto compute_action = this->task_compute_actions[t];
             t->setComputationStartDate(compute_action->getStartDate());
 
+            std::cerr << "CREATING A TASK START TIME STAMP FOR TASK " << t->getID() << " WITH VALUE " << compute_action->getStartDate() << "\n";
             simulation->getOutput().addTimestampTaskStart(compute_action->getStartDate(), t);
 
             t->setNumCoresAllocated(compute_action->getExecutionHistory().top().num_cores_allocated);
