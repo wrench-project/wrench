@@ -107,15 +107,15 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
-        auto job1 = job_manager->createStandardJob(this->test->task1);
-        job_manager->submitJob(job1, this->test->compute_service);
-        this->waitForAndProcessNextEvent();
-
-        this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 0);
-        auto job2 = job_manager->createStandardJob(this->test->task2);
-        job_manager->submitJob(job2, this->test->compute_service);
-        this->waitForAndProcessNextEvent();
+//        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+//        auto job1 = job_manager->createStandardJob(this->test->task1);
+//        job_manager->submitJob(job1, this->test->compute_service);
+//        this->waitForAndProcessNextEvent();
+//
+//        this->test->task2 = this->getWorkflow()->addTask("task2", 10.0, 1, 1, 0);
+//        auto job2 = job_manager->createStandardJob(this->test->task2);
+//        job_manager->submitJob(job2, this->test->compute_service);
+//        this->waitForAndProcessNextEvent();
 
         this->test->failed_task = this->getWorkflow()->addTask("failed_task", 100000.0, 1, 1, 0);
         this->test->failed_task->addInputFile(this->test->large_input_file);
@@ -216,6 +216,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     // expected timeline: task2_end...failed_task_start...failed_task_failed
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
+    std::cerr << "IN TESTIN: TARCE SIZE = " << timestamp_start_trace.size() << "\n";
     double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
     double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();
