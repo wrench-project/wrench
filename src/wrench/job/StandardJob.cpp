@@ -640,7 +640,6 @@ namespace wrench {
             }
 
             t->updateStartDate(earliest_start_date); // could be -1.0 if there were no input, but will be updated below
-            simulation->getOutput().addTimestampTaskStart(latest_end_date, t);
             t->setReadInputStartDate(earliest_start_date);
             t->setReadInputEndDate(latest_end_date);
 
@@ -649,7 +648,10 @@ namespace wrench {
              */
             // Look at the compute action
             auto compute_action = this->task_compute_actions[t];
-            t->setComputationStartDate(compute_action->getStartDate());  // could be -1.0
+            t->setComputationStartDate(compute_action->getStartDate());
+
+            simulation->getOutput().addTimestampTaskStart(compute_action->getStartDate(), t);
+
             t->setNumCoresAllocated(compute_action->getExecutionHistory().top().num_cores_allocated);
             if (t->getStartDate() == -1.0) {
                 t->updateStartDate(t->getComputationStartDate());
