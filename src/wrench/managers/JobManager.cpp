@@ -745,6 +745,8 @@ namespace wrench {
                                   job->compute_service = bm_cs;
 
                                   // Send a call back
+                                  std::cerr << "ABOUT TO CREATE THE PILOT JOB STARTED MESSAGE\n";
+                                  std::cerr << "CSNAME = " << compute_service->getName() << "\n";
                                   S4U_Mailbox::dputMessage(
                                           callback_mailbox,
                                           new ComputeServicePilotJobStartedMessage(
