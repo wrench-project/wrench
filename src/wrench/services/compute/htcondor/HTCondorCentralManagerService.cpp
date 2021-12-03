@@ -485,10 +485,8 @@ namespace wrench {
                 (service_specific_arguments["-universe"] == "grid");
         bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
 
-        std::cerr << " IN JOB CAN RUN SOMEWHERE: IS GRID = " << is_grid_universe << "\n";
         bool found_one = false;
         for (auto const &cs : this->compute_services) {
-            std::cerr << "cs->getName(): " << cs->getName() << "\n";
             // Check for type appropriateness
             if (is_grid_universe and (std::dynamic_pointer_cast<BatchComputeService>(cs) == nullptr)) {
                 continue;
@@ -525,7 +523,6 @@ namespace wrench {
                 }
             }
 
-            std::cerr << "XXXX JERE\n";
             if (!is_grid_universe) {
                 auto core_resources = cs->getPerHostNumCores();
                 unsigned long max_cores = 0;
@@ -549,7 +546,6 @@ namespace wrench {
             break;
         }
 
-        std::cerr << "RETURNING " << found_one << "\n";
         return found_one;
     }
 
