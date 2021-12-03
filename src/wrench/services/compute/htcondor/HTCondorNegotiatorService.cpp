@@ -233,13 +233,9 @@ namespace wrench {
                                             "service-specific arguments for Non-Grid universe jobs are currently not supported");
             }
 
-            unsigned long min_required_num_cores = 0;
-            double min_required_memory = 0;
+            unsigned long min_required_num_cores = job->getMinimumRequiredNumCores();
+            double min_required_memory = job->getMinimumRequiredMemory();
 
-            for (auto const &action : job->getActions()) {
-                min_required_num_cores = (min_required_num_cores < action->getMinNumCores() ? action->getMinNumCores() : min_required_num_cores);
-                min_required_memory = (min_required_memory < action->getMinRAMFootprint() ? action->getMinRAMFootprint() : min_required_memory);
-            }
             bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
                                                                                     min_required_memory);
 #if 0

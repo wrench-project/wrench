@@ -287,9 +287,9 @@ namespace wrench {
 //            processPilotJobCompletion(msg->job);
 //            return true;
 //
-//        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
-//            processStandardJobCompletion(msg->job);
-//            return true;
+        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobDoneMessage *>(message.get())) {
+            processCompoundJobCompletion(msg->job);
+            return true;
 
         } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage *>(message.get())) {
             processNegotiatorCompletion(msg->scheduled_jobs);
@@ -527,21 +527,20 @@ namespace wrench {
 
             std::cerr << "XXXX JERE\n";
             if (!is_grid_universe) {
-                auto sjob = std::dynamic_pointer_cast<StandardJob>(job);
                 auto core_resources = cs->getPerHostNumCores();
                 unsigned long max_cores = 0;
                 for (auto const &entry : core_resources) {
                     max_cores = std::max<unsigned long>(max_cores, entry.second);
                 }
-                if (max_cores < sjob->getMinimumRequiredNumCores()) {
+                if (max_cores < job->getMinimumRequiredNumCores()) {
                     continue;
                 }
                 auto ram_resources = cs->getMemoryCapacity();
                 double max_ram = 0;
                 for (auto const &entry : ram_resources) {
-                    max_ram = std::max<unsigned long>(max_ram, entry.second);
+                    max_ram = std::max<double>(max_ram, entry.second);
                 }
-                if (max_ram < sjob->getMinimumRequiredMemory()) {
+                if (max_ram < job->getMinimumRequiredMemory()) {
                     continue;
                 }
             }
