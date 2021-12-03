@@ -268,7 +268,6 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        std::cerr << "SUBMITTING\n";
         // Submit the job for execution
         try {
             job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -300,10 +299,10 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -580,10 +579,10 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-logs");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1298,12 +1297,13 @@ private:
 
         {
             // Submit a grid universe job that asks for too much
+            std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+            file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
+            file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
             auto grid_job = job_manager->createStandardJob(
                     {this->test->task1},
-                    (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
-                    {std::make_tuple(this->test->input_file,
-                                     wrench::FileLocation::LOCATION(this->test->storage_service),
-                                     wrench::FileLocation::SCRATCH)},
+                    file_locations,
+                    {},
                     {}, {});
 
             std::map<std::string, std::string> test_service_specs;
@@ -1330,12 +1330,27 @@ private:
             // Submit the job for execution
             try {
                 job_manager->submitJob(ngrid_job, this->test->compute_service, {});
-                throw std::runtime_error("Should not have been able to submit job successfully");
+//                throw std::runtime_error("Should not have been able to submit job successfully");
             } catch (wrench::ExecutionException &e) {
                 auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not real_cause) {
                     throw std::runtime_error("Should have gotten a NotEnoughResources failure cause");
                 }
+            }
+
+            // Wait for next event
+            std::shared_ptr<wrench::ExecutionEvent> event;
+            try {
+                event = this->waitForNextEvent();
+            } catch (wrench::ExecutionException &e) {
+                throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+            }
+            auto real_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event);
+            if (not real_event) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+            if (not std::dynamic_pointer_cast<wrench::NotEnoughResources>(real_event->failure_cause)) {
+                throw std::runtime_error("Unexpected failure cause: " + real_event->failure_cause->toString());
             }
         }
         return 0;

@@ -515,8 +515,6 @@ namespace wrench {
             }
         }
 
-        std::cerr << "CREATING COMPOUND\n";
-
         // Create the underlying compound job
         job->createUnderlyingCompoundJob(compute_service);
 
@@ -546,7 +544,6 @@ namespace wrench {
             }
         }
 
-        std::cerr << "VALIDING ARGS\n";
         try {
             compute_service->validateServiceSpecificArguments(job->compound_job, new_args);
         } catch (ExecutionException &e) {
@@ -580,8 +577,6 @@ namespace wrench {
         job->compound_job->setServiceSpecificArguments(new_args);
         job->setParentComputeService(compute_service);
         job->compound_job->setParentComputeService(compute_service);
-
-        std::cerr << "WAITING UP DAEMON\n";
 
         // Send a message to wake up the daemon
         try {
@@ -745,8 +740,6 @@ namespace wrench {
                                   job->compute_service = bm_cs;
 
                                   // Send a call back
-                                  std::cerr << "ABOUT TO CREATE THE PILOT JOB STARTED MESSAGE\n";
-                                  std::cerr << "CSNAME = " << compute_service->getName() << "\n";
                                   S4U_Mailbox::dputMessage(
                                           callback_mailbox,
                                           new ComputeServicePilotJobStartedMessage(
@@ -1216,8 +1209,6 @@ namespace wrench {
 
         std::set<std::shared_ptr<Job>> dispatched;
 
-        std::cerr << "IN DISPATCH JOB\n";
-
         this->acquireDaemonLock();
         auto it = this->jobs_to_dispatch.begin();
         while (it != this->jobs_to_dispatch.end()) {
@@ -1287,8 +1278,6 @@ namespace wrench {
      * @brief Helper method to dispatch jobs
      */
     void JobManager::dispatchJob(const std::shared_ptr<CompoundJob> job) {
-
-        std::cerr << "DISPATCH JOB()\n";
 
         // Submit the job to the service
         try {
