@@ -274,12 +274,15 @@ private:
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                   {this->test->t4_output_file,
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)}});
+        std::cerr << "HEREHEREHEREHERE\n";
+
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
+        std::cerr << "HEREHEREHEREHERE\n";
 
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
@@ -292,6 +295,8 @@ private:
             throw std::runtime_error("Job should have failed!");
         }
 
+        std::cerr << "HEREHEREHEREHERE 32\n";
+
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
                                                                                               wrench::FileLocation::LOCATION(this->test->backup_storage_service)},
@@ -302,15 +307,26 @@ private:
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
+        std::cerr << "HEREHEREHEREHERE 33\n";
+
 
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        job_manager->terminateJob(job_that_will_be_terminated);
+        std::cerr << "HEREHEREHEREHERE 34\n";
+        try {
+            job_manager->terminateJob(job_that_will_be_terminated);
+        } catch (wrench::ExecutionException &e) {
+            std::cerr << "YES1\n";
+        }
+        std::cerr << "XXXXX AFTER CALL TO TERMINATE JOB\n";
+
 
         auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6);
+        std::cerr << "SUBMITTING JOB\n";
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
+        std::cerr << "STOPPING SERVICE\n";
         this->test->compute_service->stop();
 
         return 0;
@@ -323,10 +339,10 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-logs");
+    argv[1] = strdup("--wrench-full-logs");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -401,12 +417,11 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     t4_history.pop();
 
-// t4's first execution was unsuccessful, only task_start, read_input_start, execution_host, and num_cores_allocated should be set, everything else should be -1
+// t4's first execution was unsuccessful, only task_start, read_input_start, execution_host should be set, everything else should be -1
     wrench::WorkflowTask::WorkflowTaskExecution t4_unsuccessful_execution = t4_history.top();
     ASSERT_NE(t4_unsuccessful_execution.task_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.read_input_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.task_failed, -1.0);
-    ASSERT_EQ(t4_unsuccessful_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t4_unsuccessful_execution.execution_host.c_str(), "ExecutionHost");
 
 // the rest of the values should be set to -1 since the task failed while reading input
@@ -415,6 +430,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.computation_end, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_start, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_end, -1.0);
+    std::cerr << "IN TEST " << t4_unsuccessful_execution.task_end << "\n";
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.task_end, -1.0);
 
 // t5 should have ran then been cleanly_terminated right after computation started
