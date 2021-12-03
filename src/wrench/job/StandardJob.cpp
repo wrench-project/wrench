@@ -588,10 +588,27 @@ namespace wrench {
          * Look at all the tasks
          */
         for (auto &t: this->tasks) {
-            // Set a provisional start date
+            // Set a provisional start date and end date
             t->setStartDate(-1.0);
-            // Set the execution host
-            t->setExecutionHost(this->task_compute_actions[t]->getExecutionHistory().top().execution_host);
+            std::cerr << "Setting END DATE of " << t->getID() << " TO -1\n";
+            t->setEndDate(-1.0);
+
+            /*
+             * Set the execution host
+             */
+            std::string execution_host;
+            for (const auto &a : this->task_file_read_actions[t]) {
+                if (!a->getExecutionHistory().top().execution_host.empty()) {
+                    execution_host = a->getExecutionHistory().top().execution_host;
+                    break;
+                }
+            }
+            if (execution_host.empty()) {
+                execution_host = this->task_compute_actions[t]->getExecutionHistory().top().execution_host;
+            }
+
+            t->setExecutionHost(execution_host);
+
 
             /*
              * Look at file-read actions
@@ -610,15 +627,13 @@ namespace wrench {
 
             if (at_least_one_failed or at_least_one_killed) {
                 t->updateStartDate(earliest_start_date);
+                t->setFailureDate(earliest_failure_date);
                 t->setReadInputStartDate(earliest_start_date);
+                failure_count_increments.insert(t);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
-                    failure_count_increments.insert(t);
-                    t->setFailureDate(earliest_failure_date);
                 } else if (at_least_one_failed) {
-                    t->setFailureDate(earliest_failure_date);
-                    failure_count_increments.insert(t);
                     if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
                 }
                 continue;
@@ -680,6 +695,7 @@ namespace wrench {
             t->setWriteOutputStartDate(earliest_start_date);
             t->setWriteOutputEndDate(latest_end_date);
             state_changes[t] = WorkflowTask::State::COMPLETED;
+            std::cerr << "Setting END DATE of " << t->getID() << " to " <<  latest_end_date << "\n";
             t->setEndDate(latest_end_date);
             simulation->getOutput().addTimestampTaskCompletion(latest_end_date, t);
         }
