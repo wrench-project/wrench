@@ -829,17 +829,9 @@ namespace wrench {
         }
         this->releaseDaemonLock();
 
-        auto it2 = std::find(this->jobs_dispatched.begin(), this->jobs_dispatched.end(), job->compound_job);
-        if (it2 == this->jobs_dispatched.end()) {
-            std::cerr << "JOB DOES NOT EXIST\n";
-        }
-
         try {
-            std::cerr << "JOB MANAGER CALLING terminateJob \n";
             job->getParentComputeService()->terminateJob(job->compound_job);
-            std::cerr << "JOBMANAGER HAS CALLED terminateJob\n";
         } catch (std::exception &e) {
-            std::cerr << "JOB MANAGER THROWING: " << e.what()  <<  "\n";
             throw;
         }
 
@@ -852,8 +844,6 @@ namespace wrench {
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
         job->applyTaskUpdates(state_changes, failure_count_increments);
-
-
     }
 
 

@@ -274,7 +274,6 @@ private:
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                   {this->test->t4_output_file,
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)}});
-        std::cerr << "HEREHEREHEREHERE\n";
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
@@ -282,7 +281,6 @@ private:
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
-        std::cerr << "HEREHEREHEREHERE\n";
 
         std::shared_ptr<wrench::ExecutionEvent> event;
         try {
@@ -294,8 +292,7 @@ private:
         if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Job should have failed!");
         }
-
-        std::cerr << "HEREHEREHEREHERE 32\n";
+        auto t4_history = this->test->t4->getExecutionHistory();
 
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
@@ -307,27 +304,20 @@ private:
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
-        std::cerr << "HEREHEREHEREHERE 33\n";
-
-
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        std::cerr << "HEREHEREHEREHERE 34\n";
-        try {
             job_manager->terminateJob(job_that_will_be_terminated);
-        } catch (wrench::ExecutionException &e) {
-            std::cerr << "YES1\n";
-        }
-        std::cerr << "XXXXX AFTER CALL TO TERMINATE JOB\n";
 
 
         auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6);
-        std::cerr << "SUBMITTING JOB\n";
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        std::cerr << "STOPPING SERVICE\n";
-        this->test->compute_service->stop();
+
+        this->test->compute_service->stop(true, wrench::ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+//        this->test->compute_service->stop();
+
+        this->waitForAndProcessNextEvent();
 
         return 0;
     }
@@ -339,10 +329,10 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     auto simulation = new wrench::Simulation();
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-logs");
+//    argv[1] = strdup("--wrench-full-logs");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -430,7 +420,6 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.computation_end, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_start, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_end, -1.0);
-    std::cerr << "IN TEST " << t4_unsuccessful_execution.task_end << "\n";
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.task_end, -1.0);
 
 // t5 should have ran then been cleanly_terminated right after computation started
@@ -439,17 +428,17 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     auto t5_terminated_execution = t5_history.top();
     ASSERT_NE(t5_terminated_execution.task_start, -1.0);
-    ASSERT_NE(t5_terminated_execution.read_input_start, -1.0);
-    ASSERT_NE(t5_terminated_execution.read_input_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.read_input_start, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.read_input_end, -1.0);
     ASSERT_NE(t5_terminated_execution.computation_start, -1.0);
     ASSERT_NE(t5_terminated_execution.task_terminated, -1.0);
 
-    ASSERT_EQ(t5_terminated_execution.computation_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.write_output_start, -1.0);
-    ASSERT_EQ(t5_terminated_execution.write_output_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.task_failed, -1.0);
-    ASSERT_EQ(t5_terminated_execution.task_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.num_cores_allocated, 2);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.computation_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.write_output_start, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.write_output_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.task_failed, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.task_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.num_cores_allocated, 2);
     ASSERT_STREQ(t5_terminated_execution.execution_host.c_str(), "ExecutionHost");
 
 // t6 should have ran then failed right after computation started because the compute service was stopped
@@ -458,15 +447,15 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     auto t6_failed_execution = t6_history.top();
     ASSERT_NE(t6_failed_execution.task_start, -1.0);
-    ASSERT_NE(t6_failed_execution.read_input_start, -1.0);
-    ASSERT_NE(t6_failed_execution.read_input_end, -1.0);
+    ASSERT_DOUBLE_EQ(t6_failed_execution.read_input_start, -1.0);
+    ASSERT_DOUBLE_EQ(t6_failed_execution.read_input_end, -1.0);
     ASSERT_NE(t6_failed_execution.computation_start, -1.0);
-    ASSERT_NE(t6_failed_execution.task_failed, -1.0);
+    ASSERT_DOUBLE_EQ(t6_failed_execution.task_failed, -1.0);
 
     ASSERT_EQ(t6_failed_execution.computation_end, -1.0);
     ASSERT_EQ(t6_failed_execution.write_output_start, -1.0);
     ASSERT_EQ(t6_failed_execution.write_output_end, -1.0);
-    ASSERT_EQ(t6_failed_execution.task_terminated, -1.0);
+    ASSERT_NE(t6_failed_execution.task_terminated, -1.0);
     ASSERT_EQ(t6_failed_execution.task_end, -1.0);
     ASSERT_EQ(t6_failed_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");

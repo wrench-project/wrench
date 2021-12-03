@@ -474,7 +474,7 @@ namespace wrench {
      */
     void WorkflowTask::updateStartDate(double date) {
         if (not this->execution_history.empty()) {
-            this->execution_history.top().task_end = date;
+            this->execution_history.top().task_start = date;
         } else {
             throw std::runtime_error("WorkflowTask::updateStartDate() cannot be called before WorkflowTask::setStartDate()");
         }
@@ -488,7 +488,6 @@ namespace wrench {
      * @throws std::runtime_error
      */
     void WorkflowTask::setEndDate(double date) {
-        std::cerr << "INTERNAL: SETTING END DATE OF " << this->id << " TO " << date << "\n";
         if (not this->execution_history.empty()) {
             this->execution_history.top().task_end = date;
         } else {

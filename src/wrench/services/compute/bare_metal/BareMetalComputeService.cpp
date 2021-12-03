@@ -595,7 +595,6 @@ namespace wrench {
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_compound_job");
 
-
         //  send a "terminate a compound job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
@@ -614,15 +613,11 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        std::cerr << "GOT THE NASWEr\n";
-
         if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobAnswerMessage *>(message.get())) {
             // If no success, throw an exception
             if (not msg->success) {
-                std::cerr << "THROWING IN HERE\n";
                 throw ExecutionException(msg->failure_cause);
             }
-            std::cerr << " NO EXCEPTION\n";
         } else {
             throw std::runtime_error(
                     "bare_metal_standard_jobs::terminateCompoundJob(): Received an unexpected [" +
@@ -693,7 +688,6 @@ namespace wrench {
         this->setStateToDown();
 
         // Terminate all jobs
-        std::cerr << "================================\n";
         for (auto const &job : this->current_jobs) {
             try {
                 this->terminateCurrentCompoundJob(job, termination_cause);
@@ -701,8 +695,6 @@ namespace wrench {
                 // If we get an exception, nevermind
             }
         }
-        std::cerr << "================================\n";
-
 
         if (send_failure_notifications) {
             // Deal with all jobs
@@ -750,7 +742,9 @@ namespace wrench {
             return;
         }
 
+
         terminateCurrentCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+        this->current_jobs.erase(job);
 
         // reply
         auto answer_message = new ComputeServiceTerminateCompoundJobAnswerMessage(
