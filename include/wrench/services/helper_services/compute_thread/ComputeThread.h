@@ -13,7 +13,6 @@
 
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 
 
 namespace wrench {

@@ -37,7 +37,6 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        friend class StandardJobExecutorTest;
         friend class Simulation;
 
         /***********************/

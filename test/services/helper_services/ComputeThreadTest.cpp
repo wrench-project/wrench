@@ -12,6 +12,7 @@
 #include <wrench-dev.h>
 
 #include <wrench/services/helper_services/compute_thread/ComputeThread.h>
+#include <wrench/services/helper_services/compute_thread/ComputeThreadMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
