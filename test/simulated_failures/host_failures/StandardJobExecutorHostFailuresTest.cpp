@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#if 0
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
@@ -533,3 +534,5 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
      free(argv[i]);
     free(argv);
 }
+
+#endif
