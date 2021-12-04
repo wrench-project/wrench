@@ -55,17 +55,17 @@ namespace wrench {
     }
 
     /**
-     * @brief Compare the priority between two workflow jobs
+     * @brief Compare the priority between two jobs
      *
-     * @param lhs: pointer to a workflow job
-     * @param rhs: pointer to a workflow job
+     * @param lhs: pointer to a job
+     * @param rhs: pointer to a job
      *
-     * @return whether the priority of the left-hand-side workflow job is higher
+     * @return whether the priority of the left-hand-side workflow job is lower
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(
             std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &lhs,
             std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &rhs) {
-        return std::get<0>(lhs)->getPriority() > std::get<0>(rhs)->getPriority();
+        return std::get<0>(lhs)->getPriority() < std::get<0>(rhs)->getPriority();
     }
 
     /**
