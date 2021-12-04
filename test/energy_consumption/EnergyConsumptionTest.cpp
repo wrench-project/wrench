@@ -10,7 +10,6 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-//#include <wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h>
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
@@ -171,35 +170,6 @@ private:
             job_manager->submitJob(job, this->test->compute_service);
             this->waitForAndProcessNextEvent();
 
-//            // Create a StandardJobExecutor that will run stuff on one host and 6 core
-//            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-//                    new wrench::StandardJobExecutor(
-//                            test->simulation,
-//                            my_mailbox,
-//                            wrench::Simulation::getHostnameList()[1],
-//                            job,
-//                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-//                            nullptr,
-//                            false,
-//                            nullptr,
-//                            {},
-//                            {}
-//                    ));
-//            executor->start(executor, true, false); // Daemonized, no auto-restart
-//
-//            // Wait for a message on my mailbox_name
-//            std::shared_ptr<wrench::SimulationMessage> message;
-//            try {
-//                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-//            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-//                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-//            }
-//
-//            // Did we get the expected message?
-//            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-//            if (!msg) {
-//                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-//            }
 
             try {
                 this->simulation->getEnergyConsumed("dummy_unavailable_host");
@@ -379,36 +349,6 @@ private:
             job_manager->submitJob(job, this->test->compute_service);
             this->waitForAndProcessNextEvent();
 
-//            // Create a StandardJobExecutor that will run stuff on one host and 6 core
-//            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-//                    new wrench::StandardJobExecutor(
-//                            test->simulation,
-//                            my_mailbox,
-//                            wrench::Simulation::getHostnameList()[1],
-//                            job,
-//                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-//                            nullptr,
-//                            false,
-//                            nullptr,
-//                            {},
-//                            {}
-//                    ));
-//            executor->start(executor, true, false); // Daemonized, no auto-restart
-
-//            // Wait for a message on my mailbox_name
-//            std::shared_ptr<wrench::SimulationMessage> message;
-//            try {
-//                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-//            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-//                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-//            }
-//
-//            // Did we get the expected message?
-//            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-//            if (!msg) {
-//                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-//            }
-
             try {
                 double value = this->simulation->getEnergyConsumed("MyHost1");
                 throw std::runtime_error("Should not have been able to read the energy without activating energy plugin");
@@ -576,37 +516,6 @@ private:
             job_manager->submitJob(job, this->test->compute_service);
 
             this->waitForAndProcessNextEvent();
-
-//            // Create a StandardJobExecutor that will run stuff on one host and 6 core
-//            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-//                    new wrench::StandardJobExecutor(
-//                            test->simulation,
-//                            my_mailbox,
-//                            wrench::Simulation::getHostnameList()[1],
-//                            job,
-//                            {std::make_pair(wrench::Simulation::getHostnameList()[1],
-//                                            std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-//                            nullptr,
-//                            false,
-//                            nullptr,
-//                            {},
-//                            {}
-//                    ));
-//            executor->start(executor, true, false); // Daemonized, no auto-restart
-//
-//            // Wait for a message on my mailbox_name
-//            std::shared_ptr<wrench::SimulationMessage> message;
-//            try {
-//                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-//            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-//                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-//            }
-//
-//            // Did we get the expected message?
-//            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-//            if (!msg) {
-//                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-//            }
 
             double after = wrench::S4U_Simulation::getClock();
 
@@ -893,36 +802,6 @@ private:
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             std::string my_mailbox = "test_callback_mailbox";
 
-//            // Create a StandardJobExecutor
-//            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-//                    new wrench::StandardJobExecutor(
-//                            test->simulation,
-//                            my_mailbox,
-//                            wrench::Simulation::getHostnameList()[1],
-//                            job1,
-//                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-//                            nullptr,
-//                            false,
-//                            nullptr,
-//                            {},
-//                            {}
-//                    ));
-//            executor->start(executor, true, false); // Daemonized, no auto-restart
-//
-//            // Wait for a message on my mailbox_name
-//            std::shared_ptr<wrench::SimulationMessage> message;
-//            try {
-//                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-//            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-//                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-//            }
-//
-//            // Did we get the expected message?
-//            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-//            if (!msg) {
-//                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-//            }
-
             job_manager->submitJob(job1, this->test->compute_service);
             this->waitForAndProcessNextEvent();
 
@@ -946,34 +825,6 @@ private:
             //run a new job
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             my_mailbox = "test_callback_mailbox";
-
-//            // Create a StandardJobExecutor
-//            executor = std::unique_ptr<wrench::StandardJobExecutor>(
-//                    new wrench::StandardJobExecutor(
-//                            test->simulation,
-//                            my_mailbox,
-//                            wrench::Simulation::getHostnameList()[1],
-//                            job2,
-//                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-//                            nullptr,
-//                            false,
-//                            nullptr,
-//                            {},
-//                            {}
-//                    ));
-//            executor->start(executor, true, false); // Daemonized, no auto-restart
-//
-//            try {
-//                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-//            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-//                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-//            }
-//
-//            // Did we get the expected message?
-//            msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-//            if (!msg) {
-//                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-//            }
 
             job_manager->submitJob(job2, this->test->compute_service);
             this->waitForAndProcessNextEvent();

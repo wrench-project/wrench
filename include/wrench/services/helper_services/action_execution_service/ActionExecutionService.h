@@ -14,8 +14,6 @@
 #include <queue>
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h"
-#include "wrench/services/helper_services/work_unit_executor/Workunit.h"
 #include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
 #include "wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h"
 
