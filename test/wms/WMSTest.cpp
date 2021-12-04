@@ -336,7 +336,6 @@ private:
                                       std::to_string(timer_off_date));
         }
         if (this->counter != 7) {
-            std::cerr << "this->counter = " << this->counter << "\n";
             throw std::runtime_error("Did not get expected TimerEvent");
         }
 

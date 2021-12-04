@@ -1995,7 +1995,7 @@ private:
 
         {
             // Create a sequential task1 that lasts one min and requires 8 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 50, 8, 8, 0);
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 50, 8, 8, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 

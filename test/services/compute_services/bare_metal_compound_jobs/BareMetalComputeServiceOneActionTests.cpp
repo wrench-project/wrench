@@ -1172,7 +1172,6 @@ private:
             (top.state != wrench::Action::State::COMPLETED) or
             (top.ram_allocated != 0.0) or
             (top.physical_execution_host != "Host4")) {
-            std::cerr << "---> " << top.failure_cause->toString() << "\n";
             throw std::runtime_error("Unexpected last history");
         }
         history.pop();
@@ -1186,7 +1185,6 @@ private:
             (top.state != wrench::Action::State::FAILED) or
             (top.ram_allocated != 0.0) or
             (top.physical_execution_host != "Host4")) {
-            std::cerr << "---> " << top.failure_cause->toString() << "\n";
             throw std::runtime_error("Unexpected last history");
         }
 

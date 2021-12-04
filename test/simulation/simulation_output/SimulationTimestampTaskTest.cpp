@@ -142,7 +142,6 @@ private:
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
-        std::cerr << "SUBMITTING JOB THAT WILL FAIL\n";
         job_manager->submitJob(failed_job, this->test->compute_service);
 
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("small_input_file"),
@@ -153,7 +152,6 @@ private:
         std::shared_ptr<wrench::ExecutionEvent> workflow_execution_event;
         try {
             workflow_execution_event = this->waitForNextEvent();
-            std::cerr << "GOT THE EXECUTION EVENT\n";
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error getting the execution event: " + e.getCause()->toString());
         }
@@ -235,7 +233,6 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     // expected timeline: task2_end...failed_task_start...failed_task_failed
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
-    std::cerr << "IN TESTIN: TARGET SIZE = " << timestamp_start_trace.size() << "\n";
     for (auto const &ts : timestamp_start_trace) {
         std::cerr << "  - " << ts->getContent()->getTask()->getID() << ": " << ts->getDate() << "\n";
     }
