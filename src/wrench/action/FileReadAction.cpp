@@ -62,8 +62,8 @@ namespace wrench {
         // File read
         for (unsigned long i=0; i < this->file_locations.size(); i++) {
             try {
-                StorageService::readFile(this->getFile(), this->file_locations[i]);
                 this->used_location = this->file_locations[i];
+                StorageService::readFile(this->getFile(), this->file_locations[i]);
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() -1) {
