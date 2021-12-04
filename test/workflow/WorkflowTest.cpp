@@ -20,10 +20,10 @@ protected:
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
 
         // create simple diamond workflow
-        t1 = workflow->addTask("task-test-01", 1, 1, 1, 0);
-        t2 = workflow->addTask("task-test-02", 1, 1, 1, 0);
-        t3 = workflow->addTask("task-test-03", 1, 1, 1, 0);
-        t4 = workflow->addTask("task-test-04", 1, 1, 1, 0);
+        t1 = workflow->addTask("task1-test-01", 1, 1, 1, 0);
+        t2 = workflow->addTask("task1-test-02", 1, 1, 1, 0);
+        t3 = workflow->addTask("task1-test-03", 1, 1, 1, 0);
+        t4 = workflow->addTask("task1-test-04", 1, 1, 1, 0);
 
         t2->setClusterID("cluster-01");
         t3->setClusterID("cluster-01");
@@ -60,13 +60,13 @@ protected:
 TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_EQ(4, workflow->getNumberOfTasks());
 
-    // testing number of task's parents
+    // testing number of task1's parents
     ASSERT_EQ(0, workflow->getTaskParents(t1).size());
     ASSERT_EQ(1, workflow->getTaskParents(t2).size());
     ASSERT_EQ(1, workflow->getTaskParents(t3).size());
     ASSERT_EQ(2, workflow->getTaskParents(t4).size());
 
-    // testing number of task's children
+    // testing number of task1's children
     ASSERT_EQ(2, workflow->getTaskChildren(t1).size());
     ASSERT_EQ(1, workflow->getTaskChildren(t2).size());
     ASSERT_EQ(1, workflow->getTaskChildren(t3).size());
@@ -84,7 +84,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     ASSERT_EQ(3, workflow->getNumLevels());
 
-    //  Test task "getters"
+    //  Test task1 "getters"
     auto task_map = workflow->getTaskMap();
     ASSERT_EQ(4, task_map.size());
     auto tasks =  workflow->getTasks();
@@ -152,7 +152,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     workflow->removeTask(t1);
 
-    // Create a bogus task using the constructor
+    // Create a bogus task1 using the constructor
 
 }
 
@@ -174,17 +174,17 @@ TEST_F(WorkflowTest, ControlDependency) {
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
-    // testing invalid task creation
-    ASSERT_THROW(workflow->addTask("task-error", -100, 1, 1, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 2, 1, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, -1.0), std::invalid_argument);
+    // testing invalid task1 creation
+    ASSERT_THROW(workflow->addTask("task1-error", -100, 1, 1, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task1-error", 100, 2, 1, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task1-error", 100, 1, 1, -1.0), std::invalid_argument);
 
-    // testing whether a task id exists
-    ASSERT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
-    ASSERT_TRUE(workflow->getTaskByID("task-test-01")->getID() == t1->getID());
+    // testing whether a task1 id exists
+    ASSERT_THROW(workflow->getTaskByID("task1-test-00"), std::invalid_argument);
+    ASSERT_TRUE(workflow->getTaskByID("task1-test-01")->getID() == t1->getID());
 
-    // testing whether a task already exists (check via task id)
-    ASSERT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 0), std::invalid_argument);
+    // testing whether a task1 already exists (check via task1 id)
+    ASSERT_THROW(workflow->addTask("task1-test-01", 1, 1, 1, 0), std::invalid_argument);
 
     // remove tasks
     ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
@@ -217,7 +217,7 @@ TEST_F(WorkflowTest, WorkflowFile) {
 }
 //
 //TEST_F(WorkflowTest, UpdateTaskState) {
-//  // testing update task state
+//  // testing update task1 state
 //  workflow->updateTaskState(t1, wrench::WorkflowTask::State::READY);
 //  ASSERT_EQ(1, workflow->getReadyTasks().size());
 //
@@ -260,10 +260,10 @@ protected:
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
 
         // create simple diamond workflow
-        t1 = workflow->addTask("task-test-01", 1, 1, 1, 0);
-        t2 = workflow->addTask("task-test-02", 1, 1, 1, 0);
-        t3 = workflow->addTask("task-test-03", 1, 1, 1, 0);
-        t4 = workflow->addTask("task-test-04", 1, 1, 1, 0);
+        t1 = workflow->addTask("task1-test-01", 1, 1, 1, 0);
+        t2 = workflow->addTask("task1-test-02", 1, 1, 1, 0);
+        t3 = workflow->addTask("task1-test-03", 1, 1, 1, 0);
+        t4 = workflow->addTask("task1-test-04", 1, 1, 1, 0);
 
         workflow->addControlDependency(t1, t2, true);
         workflow->addControlDependency(t1, t3, true);
@@ -282,13 +282,13 @@ protected:
 TEST_F(AllDependenciesWorkflowTest, AllDependenciesWorkflowStructure) {
     ASSERT_EQ(4, workflow->getNumberOfTasks());
 
-    // testing number of task's parents
+    // testing number of task1's parents
     ASSERT_EQ(0, workflow->getTaskParents(t1).size());
     ASSERT_EQ(1, workflow->getTaskParents(t2).size());
     ASSERT_EQ(2, workflow->getTaskParents(t3).size());
     ASSERT_EQ(3, workflow->getTaskParents(t4).size());
 
-    // testing number of task's children
+    // testing number of task1's children
     ASSERT_EQ(3, workflow->getTaskChildren(t1).size());
     ASSERT_EQ(2, workflow->getTaskChildren(t2).size());
     ASSERT_EQ(1, workflow->getTaskChildren(t3).size());

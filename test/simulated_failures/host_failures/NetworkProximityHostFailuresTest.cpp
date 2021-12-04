@@ -215,7 +215,7 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

@@ -99,7 +99,7 @@ private:
       wrench::WorkflowTask *tasks[8];
       std::shared_ptr<wrench::StandardJob> jobs[8];
       for (int i=0; i < 8; i++) {
-        tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
+        tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i]);
       }
 

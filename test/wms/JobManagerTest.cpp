@@ -210,15 +210,15 @@ private:
 
         try {
             job_manager->createStandardJob(nullptr);
-            throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+            throw std::runtime_error("Should not be able to create a standard job with a nullptr task1 in it");
         } catch (std::invalid_argument &e) {
         }
 
 
-        // Create a job with a nullptr task in it
+        // Create a job with a nullptr task1 in it
         try {
             job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr});
-            throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+            throw std::runtime_error("Should not be able to create a standard job with a nullptr task1 in it");
         } catch (std::invalid_argument &e) {
         }
 
@@ -302,10 +302,10 @@ private:
         } catch (std::invalid_argument &e) {
         }
         
-        // Create a job with not ok task dependencies
+        // Create a job with not ok task1 dependencies
         try {
             job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2});
-            throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
+            throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task1");
         } catch (std::invalid_argument &e) {
         }
 
@@ -493,7 +493,7 @@ private:
         } catch (std::invalid_argument &ignore) {
         }
 
-        // Check task states
+        // Check task1 states
         wrench::WorkflowTask *task1 = this->getWorkflow()->getTaskByID("task1");
         wrench::WorkflowTask *task2 = this->getWorkflow()->getTaskByID("task2");
         if (task1->getState() != wrench::WorkflowTask::State::READY) {
@@ -656,7 +656,7 @@ private:
                     "Should be able to terminate job");
         }
 
-        // Check task states
+        // Check task1 states
         bool t1_and_t2_valid_states;
 
         t1_and_t2_valid_states = ((t1->getState() == wrench::WorkflowTask::State::COMPLETED) and
@@ -665,7 +665,7 @@ private:
                                   (t2->getState() == wrench::WorkflowTask::State::COMPLETED));
 
         if (not t1_and_t2_valid_states) {
-            throw std::runtime_error("Unexpected task1 and task 2 states (" +
+            throw std::runtime_error("Unexpected task1 and task1 2 states (" +
                                      wrench::WorkflowTask::stateToString(t1->getState()) + " and " +
                                      wrench::WorkflowTask::stateToString(t2->getState()) + ")");
         }

@@ -192,7 +192,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -314,7 +314,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

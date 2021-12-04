@@ -45,10 +45,10 @@ protected:
         input_file = workflow->addFile("input_file", 10.0);
         output_file1 = workflow->addFile("output_file1", 10.0);
 
-        // Create one task
+        // Create one task1
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
 
-        // Add file-task dependencies
+        // Add file-task1 dependencies
         task1->addInputFile(input_file);
 
         task1->addOutputFile(output_file1);
@@ -173,7 +173,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

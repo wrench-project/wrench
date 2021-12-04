@@ -80,7 +80,7 @@ protected:
         //task8 = grid_workflow->addTask("grid_task2", 10.0, 1, 1, 0);
 
 
-        // Add file-task dependencies
+        // Add file-task1 dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
@@ -351,7 +351,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -485,7 +485,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -633,7 +633,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -885,7 +885,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service));
     ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     //simulation->getOutput().dumpUnifiedJSON(grid_workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);

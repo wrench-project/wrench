@@ -220,7 +220,7 @@ namespace wrench {
      */
     void WMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         auto standard_job = event->standard_job;
-        WRENCH_INFO("Notified that a %ld-task job has completed", standard_job->getNumTasks());
+        WRENCH_INFO("Notified that a %ld-task1 job has completed", standard_job->getNumTasks());
     }
 
     /**

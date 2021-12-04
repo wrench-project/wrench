@@ -272,7 +272,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
     ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms_limited));
   }
 
-  // Running a "run a single task" simulation
+  // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;

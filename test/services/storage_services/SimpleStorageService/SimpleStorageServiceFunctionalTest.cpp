@@ -651,7 +651,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -813,7 +813,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
     // Staging file_500 on the 1000-byte storage service
     ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -953,7 +953,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
     ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1000, "/disk1000/some_files/")); // coverage
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1158,7 +1158,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
     // Staging file_500 on the 1000-byte storage service
     ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1370,7 +1370,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     // Staging file_500 on the 1000-byte storage service
     ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1622,7 +1622,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
     // Staging file_500 on the 1000-byte storage service
     ASSERT_NO_THROW(simulation->stageFile(file_10, storage_service_1000));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1746,7 +1746,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

@@ -63,6 +63,7 @@ namespace wrench {
         for (unsigned long i=0; i < this->file_locations.size(); i++) {
             try {
                 StorageService::readFile(this->getFile(), this->file_locations[i]);
+                this->used_location = this->file_locations[i];
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() -1) {
@@ -80,6 +81,15 @@ namespace wrench {
      */
     void FileReadAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
         // Nothing to do
+    }
+
+    /**
+     * @brief Return the file location used by the action (or nullptr if action
+     *        has not started, failed, etc.)
+     * @return A storage service
+     */
+    std::shared_ptr<FileLocation> FileReadAction::getUsedFileLocation() {
+        return this->used_location;
     }
 
 }

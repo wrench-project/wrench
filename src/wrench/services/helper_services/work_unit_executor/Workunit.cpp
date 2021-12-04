@@ -187,7 +187,7 @@ namespace wrench {
                                                                     (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {});
         }
 
-        // Create the task work units, if any
+        // Create the task1 work units, if any
         for (auto const &task : job->tasks) {
             task_work_units.push_back(std::make_shared<Workunit>(job,
                                                                  0.0,
@@ -198,7 +198,7 @@ namespace wrench {
                                                                  (std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation> >>) {}));
         }
 
-        // Add dependencies between task work units, if any
+        // Add dependencies between task1 work units, if any
         for (auto const &task_work_unit : task_work_units) {
             WorkflowTask *task = task_work_unit->task;
 

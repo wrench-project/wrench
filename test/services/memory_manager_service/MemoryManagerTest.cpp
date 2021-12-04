@@ -227,8 +227,8 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     auto previous_output_file = workflow->addFile("task0_input", FILE_SIZE * GB);
     int num_tasks = 10;
     for (int i=0; i < num_tasks; i++) {
-        auto task = workflow->addTask("task" + std::to_string(i), 100.0, 1, 1, 0.0);
-        auto output_file = workflow->addFile("task" + std::to_string(i) + "_output", FILE_SIZE * GB);
+        auto task = workflow->addTask("task1" + std::to_string(i), 100.0, 1, 1, 0.0);
+        auto output_file = workflow->addFile("task1" + std::to_string(i) + "_output", FILE_SIZE * GB);
         task->addOutputFile(output_file);
         task->addInputFile(previous_output_file);
         previous_output_file = output_file;
@@ -248,7 +248,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(workflow->getFileByID("task0_input"), storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

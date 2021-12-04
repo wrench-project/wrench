@@ -81,7 +81,7 @@ protected:
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
         task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0);
 
-        // Add file-task dependencies
+        // Add file-task1 dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
 
@@ -140,13 +140,13 @@ private:
             pre_copies.push_back(each_copy);
         }
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(),
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                            pre_copies,
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         try {
             auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
             auto vm_name = cs->createVM(2, 100);
@@ -218,7 +218,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
     }
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Simulation trace
@@ -285,7 +285,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
 
     }
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Simulation trace

@@ -63,7 +63,7 @@ namespace wrench {
         double sleep_time;
         /** @brief File copies to perform before computational tasks begin */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
-        /** @brief Computational task to perform */
+        /** @brief Computational task1 to perform */
         WorkflowTask *task = nullptr;
         /** @brief Locations where computational tasks should read/write files */
         std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations;

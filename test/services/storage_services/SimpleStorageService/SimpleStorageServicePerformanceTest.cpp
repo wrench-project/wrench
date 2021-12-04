@@ -296,7 +296,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
     ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -408,7 +408,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
     ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

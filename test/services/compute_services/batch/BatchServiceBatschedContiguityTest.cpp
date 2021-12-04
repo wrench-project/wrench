@@ -111,7 +111,7 @@ private:
 
             double start_time = wrench::Simulation::getCurrentSimulatedDate();
 
-            // Submit a sequential task that lasts one min and requires 1 host
+            // Submit a sequential task1 that lasts one min and requires 1 host
             job = job_manager->createStandardJob(task1);
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "1";
@@ -123,7 +123,7 @@ private:
                 throw std::runtime_error("Got some exception");
             }
 
-            // Submit a sequential task that lasts one min and requires 2 host
+            // Submit a sequential task1 that lasts one min and requires 2 host
             job = job_manager->createStandardJob(task2);
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "2";
@@ -135,7 +135,7 @@ private:
                 throw std::runtime_error("Got some exception");
             }
 
-            // Submit a sequential task that lasts one min and requires 2 host
+            // Submit a sequential task1 that lasts one min and requires 2 host
             job = job_manager->createStandardJob(task3);
             std::map<std::string, std::string> batch_job_args3;
             batch_job_args3["-N"] = "1";
@@ -147,7 +147,7 @@ private:
                 throw std::runtime_error("Got some exception");
             }
 
-            // Submit a sequential task that lasts one min and requires 2 host
+            // Submit a sequential task1 that lasts one min and requires 2 host
             job = job_manager->createStandardJob(task4);
             std::map<std::string, std::string> batch_job_args4;
             batch_job_args4["-N"] = "2";
@@ -269,7 +269,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());

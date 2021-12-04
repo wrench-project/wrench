@@ -674,7 +674,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "flops": 1.0,
@@ -682,7 +682,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "id": "task1_input",
@@ -787,7 +787,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "flops": 1.0,
@@ -795,7 +795,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "id": "input_file1",
@@ -843,7 +843,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
     EXPECT_TRUE(result_json2 == expected_json2);
 
-    // Generate a workflow where one task forks into two tasks, then those two tasks join into one.
+    // Generate a workflow where one task1 forks into two tasks, then those two tasks join into one.
     std::unique_ptr<wrench::Workflow> fork_join_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
     t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 0);
@@ -927,7 +927,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "flops": 1.0,
@@ -935,7 +935,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "flops": 1.0,
@@ -943,7 +943,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "flops": 1.0,
@@ -951,7 +951,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "id": "task1_input",
@@ -1927,7 +1927,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 },
                 {
                     "flops": 1.0,
@@ -1935,7 +1935,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task"
+                    "type": "task1"
                 }
             ]
         }

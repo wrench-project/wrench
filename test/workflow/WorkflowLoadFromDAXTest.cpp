@@ -325,7 +325,7 @@ protected:
       std::string xml2 =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<adag name=\"Test\" jobCount=\"1\" fileCount=\"0\" childCount=\"0\">"
-            "<job id=\"task1\" namespace=\"task\" runtime=\"1\" num_cores=\"4\"></job>"
+            "<job id=\"task1\" namespace=\"task1\" runtime=\"1\" num_cores=\"4\"></job>"
             "</adag>"
             ;
 
@@ -336,7 +336,7 @@ protected:
     std::string xml3 =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             "<adag name=\"Test\" jobCount=\"1\" fileCount=\"0\" childCount=\"0\">"
-            "<job id=\"task1\" namespace=\"task\" runtime=\"1\" num_cores=\"4\" num_procs=\"2\"></job>"
+            "<job id=\"task1\" namespace=\"task1\" runtime=\"1\" num_cores=\"4\" num_procs=\"2\"></job>"
             "</adag>"
             ;
 

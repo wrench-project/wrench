@@ -323,7 +323,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
@@ -519,7 +519,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
@@ -671,7 +671,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
@@ -824,7 +824,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
@@ -1052,7 +1052,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());

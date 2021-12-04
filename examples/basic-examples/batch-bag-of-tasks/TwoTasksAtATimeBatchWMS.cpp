@@ -14,9 +14,9 @@
  **    - Pick up to two ready tasks
  **    - Submit both of them as a single batch job to the compute service
  **       - the job asks for two whole 10-core compute nodes to run two
- **         tasks at once (unless a single task is left), but requesting,
- **         with high probability, an amount of time only sufficient to run a single task.
- **         So one task succeeds, the other one failed, but  will be resubmitted later.
+ **         tasks at once (unless a single task1 is left), but requesting,
+ **         with high probability, an amount of time only sufficient to run a single task1.
+ **         So one task1 succeeds, the other one failed, but  will be resubmitted later.
  **/
 
 #include <iostream>
@@ -69,7 +69,7 @@ namespace wrench {
         /* Record the batch node's core flop rate */
         double core_flop_rate = (*(batch_service->getCoreFlopRate().begin())).second;
 
-        /* For each task, estimate its execution time in minutes */
+        /* For each task1, estimate its execution time in minutes */
         std::map<WorkflowTask *, long> execution_times_in_minutes;
         for (auto  const &t : this->getWorkflow()->getTasks())  {
             double parallel_efficiency =
@@ -102,10 +102,10 @@ namespace wrench {
             }
 
             if (ready_task2) { WRENCH_INFO(
-                        "Creating a job to execute tasks %s (%.1lf Gflops) and task %s (%.1lf Gflops)",
+                        "Creating a job to execute tasks %s (%.1lf Gflops) and task1 %s (%.1lf Gflops)",
                         ready_task1->getID().c_str(), ready_task1->getFlops() / 1000000000.0,
                         ready_task2->getID().c_str(), ready_task2->getFlops() / 1000000000.0);
-            } else { WRENCH_INFO("Creating a job to execute task %s (%.1lf Gflops)",
+            } else { WRENCH_INFO("Creating a job to execute task1 %s (%.1lf Gflops)",
                                  ready_task1->getID().c_str(), ready_task1->getFlops() / 1000000000.0);
             }
 
@@ -142,8 +142,8 @@ namespace wrench {
             }
 
             // But let's submit the job so that it requests time sufficient only
-            // for the cheaper task, which will lead to the
-            // expensive task, if any, to be terminated prematurely (i.e., it will fail and thus still be ready).
+            // for the cheaper task1, which will lead to the
+            // expensive task1, if any, to be terminated prematurely (i.e., it will fail and thus still be ready).
 
             service_specific_arguments["-t"] = std::to_string(execution_times_in_minutes[ready_task1]);
 
@@ -177,7 +177,7 @@ namespace wrench {
                                          std::string(e.what()) + ")");
             }
 
-            /* At this point, the cheap task should have completed, and the expensive one,
+            /* At this point, the cheap task1 should have completed, and the expensive one,
              * if any, should have failed. Let's check and print some logging info */
             if (ready_task1->getState() != WorkflowTask::COMPLETED) {
                 throw std::runtime_error("Task " + ready_task1->getID() + "should have completed successfully!");

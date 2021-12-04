@@ -100,35 +100,35 @@ namespace wrench {
 
                     task = workflow->addTask(name, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
 
-                    // task priority
+                    // task1 priority
                     try {
                         task->setPriority(job.at("priority"));
                     } catch (nlohmann::json::out_of_range &e) {
                         // do nothing
                     }
 
-                    // task average CPU
+                    // task1 average CPU
                     try {
                         task->setAverageCPU(job.at("avgCPU"));
                     } catch (nlohmann::json::out_of_range &e) {
                         // do nothing
                     }
 
-                    // task bytes read
+                    // task1 bytes read
                     try {
                         task->setBytesRead(job.at("bytesRead"));
                     } catch (nlohmann::json::out_of_range &e) {
                         // do nothing
                     }
 
-                    // task bytes written
+                    // task1 bytes written
                     try {
                         task->setBytesWritten(job.at("bytesWritten"));
                     } catch (nlohmann::json::out_of_range &e) {
                         // do nothing
                     }
 
-                    // task files
+                    // task1 files
                     std::vector<nlohmann::json> files = job.at("files");
 
                     for (auto &f : files) {
@@ -157,11 +157,11 @@ namespace wrench {
                     try {
                         task = workflow->getTaskByID(job.at("name"));
                     } catch (std::invalid_argument &e) {
-                        // Ignored task
+                        // Ignored task1
                         continue;
                     }
                     std::vector<nlohmann::json> parents = job.at("parents");
-                    // task dependencies
+                    // task1 dependencies
                     for (auto &parent : parents) {
                         // Ignore transfer jobs declared as parents
                         if (ignored_transfer_jobs.find(parent) != ignored_transfer_jobs.end()) {
@@ -245,7 +245,7 @@ namespace wrench {
                     if (job.attribute(tag.c_str())) {
                         if (found_one) {
                             throw std::invalid_argument(
-                                    "Workflow::createWorkflowFromDAX(): multiple \"number of cores/procs\" specification for task " +
+                                    "Workflow::createWorkflowFromDAX(): multiple \"number of cores/procs\" specification for task1 " +
                                     id);
                         } else {
                             found_one = true;
@@ -256,7 +256,7 @@ namespace wrench {
                 }
             }
 
-            // Create the task
+            // Create the task1
             // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, ram = 0.0
             task = workflow->addTask(id, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
 

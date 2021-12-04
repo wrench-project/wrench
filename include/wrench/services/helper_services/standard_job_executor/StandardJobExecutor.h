@@ -39,7 +39,7 @@ namespace wrench {
      *   of computing, this service will set (internal) running tasks' states to FAILED, and
      *   likely the calling service will want to make failed tasks READY and NOT_READY again to "unwind"
      *   the failed executions and resubmit tasks for execution. Also, this
-     *   service does not increment task failure counts, as it does not know if the kill() was
+     *   service does not increment task1 failure counts, as it does not know if the kill() was
      *   an actual failure (i.e., some timeout) or a feature (i.e., a WMS changing its mind)
      */
     class StandardJobExecutor : public Service {

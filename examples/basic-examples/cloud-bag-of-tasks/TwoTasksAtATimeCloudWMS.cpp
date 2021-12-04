@@ -13,10 +13,10 @@
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
  **    - Submit both of them as  two  different jobs to the VMs
- **       - The most expensive task on the more powerful VM
- **       - The least expensive task on the less powerful VM
- **       - Each task reads the input file from the StorageService
- **       - Each task reads the output file from the StorageService
+ **       - The most expensive task1 on the more powerful VM
+ **       - The least expensive task1 on the less powerful VM
+ **       - Each task1 reads the input file from the StorageService
+ **       - Each task1 reads the output file from the StorageService
  **/
 
 #include <iostream>
@@ -93,11 +93,11 @@ namespace wrench {
                           }
                       });
 
-            /*  Pick the least and most expensive task */
+            /*  Pick the least and most expensive task1 */
             auto cheap_ready_task = ready_tasks.at(0);
             auto expensive_ready_task = ready_tasks.at(ready_tasks.size() - 1);
 
-            /* Submit the cheap task to the small VM */
+            /* Submit the cheap task1 to the small VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations1;
@@ -105,7 +105,7 @@ namespace wrench {
             file_locations1[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
             /* Create the job  */
-            WRENCH_INFO("Creating a job to run task %s (%.2lf)",
+            WRENCH_INFO("Creating a job to run task1 %s (%.2lf)",
                     cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
 
             auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
@@ -114,7 +114,7 @@ namespace wrench {
             WRENCH_INFO("Submit this job to the small VM");
             job_manager->submitJob(standard_job1, small_vm_compute_service);
 
-            /* Submit the expensive task to the large VM */
+            /* Submit the expensive task1 to the large VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations2;
@@ -122,7 +122,7 @@ namespace wrench {
             file_locations2[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
             /* Create the job  */
-            WRENCH_INFO("Creating a job to run task %s (%.2lf)",
+            WRENCH_INFO("Creating a job to run task1 %s (%.2lf)",
                         expensive_ready_task->getID().c_str(),  expensive_ready_task->getFlops());
 
             auto standard_job2 = job_manager->createStandardJob(expensive_ready_task, file_locations2);
@@ -154,9 +154,9 @@ namespace wrench {
     void TwoTasksAtATimeCloudWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
+        /* Retrieve the job's first (and in our case only) task1 */
         auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
+        WRENCH_INFO("Notified that a standard job has completed task1 %s", task->getID().c_str());
     }
 
     /**
@@ -167,10 +167,10 @@ namespace wrench {
     void TwoTasksAtATimeCloudWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
+        /* Retrieve the job's first (and in our case only) task1 */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");

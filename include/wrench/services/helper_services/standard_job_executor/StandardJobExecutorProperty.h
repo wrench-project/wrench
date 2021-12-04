@@ -26,7 +26,7 @@ namespace wrench {
 
     public:
 
-        /** @brief The number of seconds to start a task (default = 0) **/
+        /** @brief The number of seconds to start a task1 (default = 0) **/
         DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
 
         /** @brief The number of bytes in the control message sent by the executor to provide the set of files stored in the scratch **/
@@ -34,13 +34,13 @@ namespace wrench {
 
 
         /** @brief The algorithm that decides how many cores are given to
-         *         a computational task. Possible values are:
+         *         a computational task1. Possible values are:
          *                  - maximum (default)
          *                  - minimum
          **/
         DECLARE_PROPERTY_NAME(CORE_ALLOCATION_ALGORITHM);
 
-        /** @brief The algorithm that decides which ready computational task,
+        /** @brief The algorithm that decides which ready computational task1,
          *         in case multiple tasks are ready, should run first. Possible values are:
          *                  - maximum_flops (default)
          *                  - maximum_minimum_cores
@@ -48,7 +48,7 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(TASK_SELECTION_ALGORITHM);
 
-        /** @brief The algorithm that decides on which host a task should
+        /** @brief The algorithm that decides on which host a task1 should
          *         be placed. Possible values are:
          *                  - best_fit (default)
          */
