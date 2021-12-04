@@ -123,5 +123,5 @@ int main(int argc, char **argv) {
 //        std::cerr << "Written output to file " + filename << "\n";
 //    }
 
-    exit(0);
+    return 0;
 }
