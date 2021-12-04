@@ -189,7 +189,7 @@ void S4U_DaemonTest::do_basic_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -265,7 +265,7 @@ void S4U_DaemonTest::do_noCleanup_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

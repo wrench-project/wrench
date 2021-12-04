@@ -12,10 +12,10 @@
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
  **    - Submit both of them as part of a single job to the first available bare_metal_standard_jobs so tbat:
- **       - The most expensive task uses 6 cores
- **       - The least expensive task uses 4 cores
- **       - Each task reads the input file from the StorageService
- **       - Each task reads the output file from the StorageService
+ **       - The most expensive task1 uses 6 cores
+ **       - The least expensive task1 uses 4 cores
+ **       - Each task1 reads the input file from the StorageService
+ **       - Each task1 reads the output file from the StorageService
  **/
 
 #include <iostream>
@@ -86,7 +86,7 @@ namespace wrench {
                           }
                       });
 
-            /*  Pick the least and most expensive task */
+            /*  Pick the least and most expensive task1 */
             auto cheap_ready_task = ready_tasks.at(0);
             auto expensive_ready_task = ready_tasks.at(ready_tasks.size() - 1);
 
@@ -96,7 +96,7 @@ namespace wrench {
                             cheap_ready_task->getID().c_str(),
                             expensive_ready_task->getID().c_str());
             } else  {
-                WRENCH_INFO("Creating a job for task %s",
+                WRENCH_INFO("Creating a job for task1 %s",
                             cheap_ready_task->getID().c_str());
             }
 
@@ -118,8 +118,8 @@ namespace wrench {
             service_specific_args[cheap_ready_task->getID()] = "4"; // 4 cores, run on any host
             service_specific_args[expensive_ready_task->getID()] = "6"; // 6 cores, run on any host
 
-            WRENCH_INFO("Submitting the job, asking for %s cores for task %s, and "
-                        "%s cores for task %s",
+            WRENCH_INFO("Submitting the job, asking for %s cores for task1 %s, and "
+                        "%s cores for task1 %s",
                         service_specific_args[cheap_ready_task->getID()].c_str(),
                         cheap_ready_task->getID().c_str(),
                         service_specific_args[expensive_ready_task->getID()].c_str(),
@@ -149,7 +149,7 @@ namespace wrench {
         auto job = event->standard_job;
         /* Retrieve the job's tasks */
         for (auto const &task : job->getTasks()) {
-            WRENCH_INFO("Notified that a standard job has completed task %s",
+            WRENCH_INFO("Notified that a standard job has completed task1 %s",
                         task->getID().c_str());
         }
     }

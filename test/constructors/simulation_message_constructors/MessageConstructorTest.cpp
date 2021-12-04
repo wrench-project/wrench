@@ -32,7 +32,7 @@ protected:
     MessageConstructorTest() {
         workflow = new wrench::Workflow();
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
-        task = workflow->addTask("task", 1, 1, 1, 0);
+        task = workflow->addTask("task1", 1, 1, 1, 0);
         file = workflow->addFile("file", 1);
         storage_service = std::shared_ptr<wrench::StorageService>((wrench::StorageService *)(1234), [](void *ptr){});
         location = std::shared_ptr<wrench::FileLocation>((wrench::FileLocation *)1234);

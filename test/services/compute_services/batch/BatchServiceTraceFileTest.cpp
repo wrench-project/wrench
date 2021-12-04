@@ -217,7 +217,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -305,7 +305,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -406,7 +406,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -466,7 +466,7 @@ private:
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10); //number of cores per task
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the batch service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
@@ -491,7 +491,7 @@ private:
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10); //number of cores per task
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the batch service
         job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
@@ -770,13 +770,13 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
 
-    // Access task completion task stamps
+    // Access task1 completion task1 stamps
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     for (auto const &ts : trace) {
         auto task = ts->getContent()->getTask();
@@ -846,7 +846,7 @@ private:
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(10);  // Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10);  //number of cores per task
+        batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the batch service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
@@ -948,7 +948,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -1010,7 +1010,7 @@ private:
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(10);  // Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10);  //number of cores per task
+        batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the batch service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
@@ -1113,7 +1113,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -1200,7 +1200,7 @@ private:
         // Create the batch-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10); //number of cores per task
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the batch service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
@@ -1226,7 +1226,7 @@ private:
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
-        batch_job_args["-c"] = std::to_string(10); //number of cores per task
+        batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the batch service
         job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
@@ -1691,7 +1691,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());

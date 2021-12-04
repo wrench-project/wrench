@@ -28,9 +28,9 @@ namespace wrench {
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies locations where input/output files should be read/written
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         before task executions begin
+     *                         before task1 executions begin
      * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         after task executions end
+     *                         after task1 executions end
      * @param cleanup_file_deletions: a vector of tuples that specify which file copies should be removed from which
      *                         locations. This will happen regardless of whether the job succeeds or fails
      *
@@ -77,7 +77,7 @@ namespace wrench {
 
     /**
      * @brief Returns the minimum number of cores required to run the job (i.e., at least
-     *        one task in the job cannot run if fewer cores than this minimum are available)
+     *        one task1 in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() const {
@@ -90,7 +90,7 @@ namespace wrench {
 
     /**
      * @brief Returns the minimum RAM capacity required to run the job (i.e., at least
-     *        one task in the job cannot run if less ram than this minimum is available)
+     *        one task1 in the job cannot run if less ram than this minimum is available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredMemory() const {
@@ -248,7 +248,7 @@ namespace wrench {
             cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), target_location));
         }
 
-        // Create the task actions
+        // Create the task1 actions
         for (auto const &task : this->tasks) {
             auto compute_action = cjob->addComputeAction("task_" + task->getID(), task->getFlops(), task->getMemoryRequirement(),
                                                          task->getMinNumCores(), task->getMaxNumCores(), task->getParallelModel());
@@ -348,7 +348,7 @@ namespace wrench {
 
         }
 
-        // Add all inter-task dependencies
+        // Add all inter-task1 dependencies
         for (auto const &parent_task : this->tasks) {
             for (auto const &child_task : parent_task->getChildren()) {
                 if (task_compute_actions.find(child_task) == task_compute_actions.end()) {
@@ -498,9 +498,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
-     * @param necessary_state_changes: the set of task state changes to apply
-     * @param necessary_failure_count_increments: the set ot task failure count increments to apply
+     * @brief Compute all task1 updates based on the state of the underlying compound job (also updates timing information and other task1 information)
+     * @param necessary_state_changes: the set of task1 state changes to apply
+     * @param necessary_failure_count_increments: the set ot task1 failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
      * @param simulation: the simulation (to add timestamps!)
      */
@@ -588,6 +588,8 @@ namespace wrench {
          */
         for (auto &t: this->tasks) {
 
+            std::cerr << "IN PROCESS ACTION " << t->getID() << "\n";
+
             // Set a provisional start date and end date
             t->setStartDate(-1.0);
             t->setEndDate(-1.0);
@@ -612,6 +614,28 @@ namespace wrench {
              * Look at file-read actions
              */
 
+            // Create fileread time stamps
+            for (auto const &a : this->task_file_read_actions[t]) {
+                auto fra = std::dynamic_pointer_cast<FileReadAction>(a);
+                switch (a->getState()) {
+                    case Action::NOT_READY:
+                    case Action::READY:
+                        break;
+                    case Action::STARTED:
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get());
+                        break;
+                    case Action::COMPLETED:
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get());
+                        simulation->getOutput().addTimestampFileReadCompletion(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get());
+                        break;
+                    case Action::KILLED:
+                    case Action::FAILED:
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get());
+                        simulation->getOutput().addTimestampFileReadFailure(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get());
+                        break;
+                }
+            }
+
             bool at_least_one_failed, at_least_one_killed;
             std::shared_ptr<FailureCause> failure_cause;
             double earliest_start_date, latest_end_date, earliest_failure_date;
@@ -630,11 +654,15 @@ namespace wrench {
                 t->setReadInputStartDate(earliest_start_date);
                 failure_count_increments.insert(t);
                 state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
+                simulation->getOutput().addTimestampTaskStart(earliest_start_date, t);
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                     t->setTerminationDate(earliest_failure_date);
+                    simulation->getOutput().addTimestampTaskTermination(earliest_failure_date, t);
                 } else if (at_least_one_failed) {
                     if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
+
+                    simulation->getOutput().addTimestampTaskFailure(earliest_failure_date, t);
                 }
                 continue;
             }
@@ -650,7 +678,6 @@ namespace wrench {
             auto compute_action = this->task_compute_actions[t];
             t->setComputationStartDate(compute_action->getStartDate());
 
-            std::cerr << "CREATING A TASK START TIME STAMP FOR TASK " << t->getID() << " WITH VALUE " << compute_action->getStartDate() << "\n";
             simulation->getOutput().addTimestampTaskStart(compute_action->getStartDate(), t);
 
             t->setNumCoresAllocated(compute_action->getExecutionHistory().top().num_cores_allocated);
@@ -662,7 +689,9 @@ namespace wrench {
                 if (not job_failure_cause) job_failure_cause = compute_action->getFailureCause();
                 if (compute_action->getState() == Action::State::KILLED) {
                     t->setTerminationDate(compute_action->getEndDate());
+                    simulation->getOutput().addTimestampTaskTermination(compute_action->getEndDate(), t);
                 } else {
+                    simulation->getOutput().addTimestampTaskFailure(compute_action->getEndDate(), t);
                     t->setFailureDate(compute_action->getEndDate());
                 }
                 failure_count_increments.insert(t);
@@ -675,6 +704,28 @@ namespace wrench {
             /*
              * Look at the file write actions
              */
+
+            // Create filewrite time stamps
+            for (auto const &a : this->task_file_write_actions[t]) {
+                auto fwa = std::dynamic_pointer_cast<FileWriteAction>(a);
+                switch (a->getState()) {
+                    case Action::NOT_READY:
+                    case Action::READY:
+                        break;
+                    case Action::STARTED:
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get());
+                        break;
+                    case Action::COMPLETED:
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get());
+                        simulation->getOutput().addTimestampFileWriteCompletion(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get());
+                        break;
+                    case Action::KILLED:
+                    case Action::FAILED:
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get());
+                        simulation->getOutput().addTimestampFileWriteFailure(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get());
+                        break;
+                }
+            }
 
             this->analyzeActions(this->task_file_write_actions[t],
                                  &at_least_one_failed,
@@ -692,8 +743,10 @@ namespace wrench {
                     job_failure_cause = std::make_shared<JobKilled>(this->shared_this);
                     failure_count_increments.insert(t);
                     t->setFailureDate(earliest_failure_date);
+                    simulation->getOutput().addTimestampTaskTermination(earliest_failure_date, t);
                 } else if (at_least_one_failed) {
                     t->setFailureDate(earliest_failure_date);
+                    simulation->getOutput().addTimestampTaskFailure(earliest_failure_date, t);
                     failure_count_increments.insert(t);
                     if (job_failure_cause == nullptr) job_failure_cause = failure_cause;
                 }
@@ -707,6 +760,7 @@ namespace wrench {
             t->setWriteOutputEndDate(latest_end_date);
             state_changes[t] = WorkflowTask::State::COMPLETED;
             t->setEndDate(latest_end_date);
+            std::cerr << "CREATING COMPLITION TS FOR " << t->getID() << "\n";
             simulation->getOutput().addTimestampTaskCompletion(latest_end_date, t);
         }
 
@@ -768,13 +822,13 @@ namespace wrench {
     void StandardJob::applyTaskUpdates(map<WorkflowTask *, WorkflowTask::State> &state_changes,
                                        set<WorkflowTask *> &failure_count_increments) {
 
-        // Update task states
+        // Update task1 states
         for (auto &state_update : state_changes) {
             WorkflowTask *task = state_update.first;
             task->setState(state_update.second);
         }
 
-        // Update task readiness-es
+        // Update task1 readiness-es
         for (auto &state_update : state_changes) {
             WorkflowTask *task = state_update.first;
             task->updateReadiness();
@@ -785,7 +839,7 @@ namespace wrench {
             }
         }
 
-        // Update task failure counts if any
+        // Update task1 failure counts if any
         for (auto task : failure_count_increments) {
             task->incrementFailureCount();
         }

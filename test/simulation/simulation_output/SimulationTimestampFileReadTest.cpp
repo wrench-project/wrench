@@ -25,9 +25,7 @@ public:
     wrench::WorkflowFile *file_3;
     wrench::WorkflowFile *xl_file;
 
-    wrench::WorkflowTask *task = nullptr;
-
-
+    wrench::WorkflowTask *task1 = nullptr;
 
     void do_SimulationTimestampFileReadBasic_test();
 
@@ -108,12 +106,12 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
-        this->test->task->addInputFile(this->test->file_1);
-        this->test->task->addInputFile(this->test->file_2);
-        this->test->task->addInputFile(this->test->file_3);
-        this->test->task->addInputFile(this->test->xl_file);
-        auto job1 = job_manager->createStandardJob(this->test->task,
+        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        this->test->task1->addInputFile(this->test->file_1);
+        this->test->task1->addInputFile(this->test->file_2);
+        this->test->task1->addInputFile(this->test->file_3);
+        this->test->task1->addInputFile(this->test->xl_file);
+        auto job1 = job_manager->createStandardJob(this->test->task1,
                 {{this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->file_2, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->file_3, wrench::FileLocation::LOCATION(this->test->storage_service)},
@@ -188,7 +186,6 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     ASSERT_NO_THROW(simulation->launch());
 
-
     int expected_start_timestamps = 4;
     int expected_failure_timestamps = 0;
     int expected_completion_timestamps = 4;
@@ -247,7 +244,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
         // file should be set
         ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
 
-        //task should be set
+        //task1 should be set
         ASSERT_EQ(fc.first->getTask(), fc.second->getTask());
     }
 
@@ -256,59 +253,59 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     // test constructors for invalid arguments
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadStart(0.0,
-                         nullptr,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service,
-                                 task), std::invalid_argument);
+                                                                   nullptr,
+                                                                   wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                   service,
+                                                                   task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadStart(0.0,
-                         this->file_1,
-                                 nullptr,
-                                 service,
-                                 task), std::invalid_argument);
+                                                                   this->file_1,
+                                                                   nullptr,
+                                                                   service,
+                                                                   task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadStart(0.0,
-                         this->file_1,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 nullptr,
-                                 task), std::invalid_argument);
+                                                                   this->file_1,
+                                                                   wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                   nullptr,
+                                                                   task1), std::invalid_argument);
 
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadFailure(0.0,
-                         nullptr,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service,
-                                 task), std::invalid_argument);
+                                                                     nullptr,
+                                                                     wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                     service,
+                                                                     task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadFailure(0.0,
-                         this->file_1,
-                                 nullptr,
-                                 service,
-                                 task), std::invalid_argument);
+                                                                     this->file_1,
+                                                                     nullptr,
+                                                                     service,
+                                                                     task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadFailure(0.0,
-                         this->file_1,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 nullptr,
-                                 task), std::invalid_argument);
+                                                                     this->file_1,
+                                                                     wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                     nullptr,
+                                                                     task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadCompletion(0.0,
-                         nullptr,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 service,
-                                 task), std::invalid_argument);
+                                                                        nullptr,
+                                                                        wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                        service,
+                                                                        task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadCompletion(0.0,
-                         this->file_1,
-                                 nullptr,
-                                 service,
-                                 task), std::invalid_argument);
+                                                                        this->file_1,
+                                                                        nullptr,
+                                                                        service,
+                                                                        task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadCompletion(0.0,
-                         this->file_1,
-                                 wrench::FileLocation::LOCATION(this->storage_service).get(),
-                                 nullptr,
-                                 task), std::invalid_argument);
+                                                                        this->file_1,
+                                                                        wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                        nullptr,
+                                                                        task1), std::invalid_argument);
 
     delete simulation;
     for (int i=0; i < argc; i++)

@@ -54,7 +54,7 @@ namespace wrench {
                     child = getTask(workflow->getTaskChildren(child));
                 }
 
-                // create clustered task
+                // create clustered task1
                 if (not pipelined_tasks.empty()) {
                     pipelined_tasks.insert(task->getID());
                     task->setClusterID(cluster_id);
@@ -64,11 +64,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the first task from a vector of tasks
+     * @brief Get the first task1 from a vector of tasks
      *
      * @param tasks: a vector of WorkflowTask
      *
-     * @return The first task of the vector
+     * @return The first task1 of the vector
      */
     WorkflowTask *SimplePipelineClustering::getTask(std::vector<WorkflowTask *> tasks) {
         if (tasks.size() <= 1) {

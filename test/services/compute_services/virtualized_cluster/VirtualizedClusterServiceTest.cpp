@@ -86,7 +86,7 @@ protected:
         task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0);
         task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0);
 
-        // Add file-task dependencies
+        // Add file-task1 dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
@@ -267,7 +267,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
@@ -345,7 +345,7 @@ private:
             throw std::runtime_error("A just started VM should be running");
         }
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         try {
             job_manager->submitJob(two_task_job, vm_cs);
         } catch (wrench::ExecutionException &e) {
@@ -422,7 +422,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -475,7 +475,7 @@ private:
         // Start the VM
         auto vm_cs = cs->startVM(vm_name);
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
@@ -484,7 +484,7 @@ private:
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         try {
             job_manager->submitJob(two_task_job, vm_cs);
         } catch (wrench::ExecutionException &e) {
@@ -549,7 +549,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -584,7 +584,7 @@ private:
         auto job_manager = this->createJobManager();
         auto cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1, this->test->task2}, (std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
@@ -592,7 +592,7 @@ private:
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         try {
             std::string src_host = "QuadCoreHost";
             auto vm_name = cs->createVM(2, 10);
@@ -711,7 +711,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     simulation->stageFile(input_file, storage_service);
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -824,7 +824,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -931,7 +931,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1001,7 +1001,7 @@ private:
         }
 
 
-        // Create a one-task job
+        // Create a one-task1 job
         std::map<wrench::WorkflowFile*,std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
@@ -1174,7 +1174,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1297,7 +1297,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1456,7 +1456,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1559,7 +1559,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1688,7 +1688,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1819,7 +1819,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     simulation->add(new wrench::FileRegistryService(hostname));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

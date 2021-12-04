@@ -10,7 +10,7 @@
 /**
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
- **    - Pick a ready task if any
+ **    - Pick a ready task1 if any
  **    - Submit it to the first available bare_metal_standard_jobs as a job in a way that
  **       - Uses 10 cores
  **       - Reads the input file from the StorageService
@@ -75,8 +75,8 @@ namespace wrench {
 
             for (auto ready_task : ready_tasks) {
 
-                /* Create a standard job for the task */
-                WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
+                /* Create a standard job for the task1 */
+                WRENCH_INFO("Creating a job for task1 %s", ready_task->getID().c_str());
 
                 /* First, we need to create a map of file locations, stating for each file
                  * where is should be read/written */
@@ -102,7 +102,7 @@ namespace wrench {
 
 
                 std::map<std::string, std::string> compute_args;
-                compute_args[ready_task->getID()] = "1"; // 1 core per task
+                compute_args[ready_task->getID()] = "1"; // 1 core per task1
 
                 /* Create the job  */
                 auto standard_job = job_manager->createStandardJob({ready_task}, file_locations,
@@ -145,8 +145,8 @@ namespace wrench {
     void NFSPipelineWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);WRENCH_INFO("Notified that a standard job has completed task %s",
+        /* Retrieve the job's first (and in our case only) task1 */
+        auto task = job->getTasks().at(0);WRENCH_INFO("Notified that a standard job has completed task1 %s",
                                                       task->getID().c_str());
     }
 
@@ -158,10 +158,10 @@ namespace wrench {
     void NFSPipelineWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
+        /* Retrieve the job's first (and in our case only) task1 */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");

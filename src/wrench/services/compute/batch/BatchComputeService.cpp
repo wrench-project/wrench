@@ -1664,7 +1664,7 @@ namespace wrench {
                                                                std::map<std::string, std::string> &service_specific_args) {
         // Check that -N, -t, and -c are specified
         // -user is optional
-        // everything else must be a task
+        // everything else must be a task1
         bool found_dash_N = false;
         bool found_dash_t = false;
         bool found_dash_c = false;
@@ -1714,7 +1714,7 @@ namespace wrench {
                     }
                 }
                 if (not found_task) {
-                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}: Job does not have any task with name " + key);
+                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}: Job does not have any task1 with name " + key);
                 }
             }
         }

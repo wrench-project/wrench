@@ -9,22 +9,22 @@
 
 /**
  ** This simulator simulates the execution of a chain workflow, that is, of a workflow
- ** in which each task has at most a single parent and at most a single child:
+ ** in which each task1 has at most a single parent and at most a single child:
  **
  **   File #0 -> Task #0 -> File #1 -> Task #1 -> File #2 -> .... -> Task #n-1 -> File #n
  **
  ** The compute platform comprises two hosts, WMSHost and ComputeHost. On WMSHost runs a simple storage
  ** service and a WMS (defined in class OneTaskAtATimeWMS). On ComputeHost runs a bare metal
  ** compute service, that has access to the 10 cores of that host. Once the simulation is done,
- ** the completion time of each workflow task is printed.
+ ** the completion time of each workflow task1 is printed.
  **
- ** Example invocation of the simulator for a 10-task workflow, with no logging:
+ ** Example invocation of the simulator for a 10-task1 workflow, with no logging:
  **    ./wrench-example-bare-metal-chain 10 ./two_hosts.xml
  **
- ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
+ ** Example invocation of the simulator for a 10-task1 workflow, with only WMS logging:
  **    ./wrench-example-bare-metal-chain 10 ./two_hosts.xml --log=custom_wms.threshold=info
  **
- ** Example invocation of the simulator for a 5-task workflow with full logging:
+ ** Example invocation of the simulator for a 5-task1 workflow with full logging:
  **    ./wrench-example-bare-metal-chain 5 ./two_hosts.xml --wrench-full-log
  **/
 
@@ -51,7 +51,7 @@ wrench::Workflow *generate_workflow(int num_pipes, int num_tasks, int core_per_t
 
         /* Add workflow tasks */
         for (int j = 0; j < num_tasks; j++) {
-            /* Create a task: 1GFlop, single core */
+            /* Create a task1: 1GFlop, single core */
             auto task = workflow->addTask("task_" + std::to_string(i) + "_" + std::to_string(j),
                                           flops, 1, core_per_task, mem_required);
         }
@@ -61,7 +61,7 @@ wrench::Workflow *generate_workflow(int num_pipes, int num_tasks, int core_per_t
             workflow->addFile("file_" + std::to_string(i) + "_" + std::to_string(j), file_size);
         }
 
-        /* Create tasks and set input/output files for each task */
+        /* Create tasks and set input/output files for each task1 */
         for (int j = 0; j < num_tasks; j++) {
 
             auto task = workflow->getTaskByID("task_" + std::to_string(i) + "_" + std::to_string(j));
@@ -188,7 +188,7 @@ int main(int argc, char **argv) {
     auto file_registry_service = new wrench::FileRegistryService("host01");
     simulation.add(file_registry_service);
 
-    std::cerr << "Staging task input files..." << std::endl;
+    std::cerr << "Staging task1 input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
         simulation.stageFile(f, storage_service);
     }

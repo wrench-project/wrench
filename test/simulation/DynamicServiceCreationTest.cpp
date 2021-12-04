@@ -64,7 +64,7 @@ protected:
         task4->setClusterID("ID2");
         task5->setClusterID("ID2");
 
-        // Add file-task dependencies
+        // Add file-task1 dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
@@ -212,7 +212,7 @@ private:
                         {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
-                    throw std::runtime_error("A one-task job should say it has one task");
+                    throw std::runtime_error("A one-task1 job should say it has one task1");
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
@@ -239,7 +239,7 @@ private:
 
         for (auto & j : one_task_jobs) {
             if (j->getNumCompletedTasks() != 1) {
-                throw std::runtime_error("A job with one completed task should say it has one completed task");
+                throw std::runtime_error("A job with one completed task1 should say it has one completed task1");
             }
         }
 
@@ -300,7 +300,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

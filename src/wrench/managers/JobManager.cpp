@@ -100,10 +100,10 @@ namespace wrench {
      * @param file_locations: a map that specifies locations where input/output files, if any, should be read/written.
      *         When empty, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         before task executions begin. The ComputeService::SCRATCH constant can be
+     *                         before task1 executions begin. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
      * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         after task executions end. The ComputeService::SCRATCH constant can be
+     *                         after task1 executions end. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
      * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be completed
      *                                at the end of the job. The ComputeService::SCRATCH constant can be
@@ -140,10 +140,10 @@ namespace wrench {
      *                        input/output files should be read/written.
      *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         before task executions begin. The ComputeService::SCRATCH constant can be
+     *                         before task1 executions begin. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
      * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         after task executions end. The ComputeService::SCRATCH constant can be
+     *                         after task1 executions end. The ComputeService::SCRATCH constant can be
      *                         used to mean "the scratch storage space of the ComputeService".
      * @param cleanup_file_deletions: a vector of file tuples that specify file deletion operations that should be
      *                                completed at the end of the job. The ComputeService::SCRATCH constant can be
@@ -161,7 +161,7 @@ namespace wrench {
         // Do a sanity check of everything (looking for nullptr)
         for (auto t : tasks) {
             if (t == nullptr) {
-                throw std::invalid_argument("JobManager::createStandardJob(): nullptr task in the task vector");
+                throw std::invalid_argument("JobManager::createStandardJob(): nullptr task1 in the task1 vector");
             }
         }
 
@@ -307,7 +307,7 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param task: a task (which must be ready)
+     * @param task: a task1 (which must be ready)
      * @param file_locations: a map that specifies locations where input/output files should be read/written.
      *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
@@ -330,7 +330,7 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param task: a task (which must be ready)
+     * @param task: a task1 (which must be ready)
      * @param file_locations: a map that specifies, for each file, a list of locations, in preference order, where
      *                input/output files should be read/written.
      *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
@@ -354,7 +354,7 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param task: a task (which must be ready)
+     * @param task: a task1 (which must be ready)
      *
      * @return the standard job
      *
@@ -453,14 +453,14 @@ namespace wrench {
     * @param compute_service: a compute service
     * @param service_specific_args: arguments specific for compute services:
     *      - to a BareMetalComputeService: {{"taskID", "[hostname:][num_cores]}, ...}
-    *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
-    *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
-    *           - If a "hostname" value is provided for a task, then the service will run the task on that
+    *           - If no value is provided for a task1, then the service will choose a host and use as many cores as possible on that host.
+    *           - If a "" value is provided for a task1, then the service will choose a host and use as many cores as possible on that host.
+    *           - If a "hostname" value is provided for a task1, then the service will run the task1 on that
     *             host, using as many of its cores as possible
-    *           - If a "num_cores" value is provided for a task, then the service will run that task with
+    *           - If a "num_cores" value is provided for a task1, then the service will run that task1 with
     *             this many cores, but will choose the host on which to run it.
-    *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
-    *             task with the specified number of cores on that host.
+    *           - If a "hostname:num_cores" value is provided for a task1, then the service will run that
+    *             task1 with the specified number of cores on that host.
     *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"taskID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
     *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
     *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
@@ -495,11 +495,11 @@ namespace wrench {
         }
 
 
-        // Do a sanity check on task states
+        // Do a sanity check on task1 states
         for (const auto &t : job->tasks) {
             if ((t->getState() == WorkflowTask::State::COMPLETED) or
                 (t->getState() == WorkflowTask::State::PENDING)) {
-                throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
+                throw std::invalid_argument("JobManager()::submitJob(): task1 " + t->getID() +
                                             " cannot be submitted as part of a standard job because its state is " +
                                             WorkflowTask::stateToString(t->getState()));
             }
@@ -527,13 +527,13 @@ namespace wrench {
         }
 
         for (const auto &arg : service_specific_args) {
-            // Any key that doesn't start with a "-" is a task ID
+            // Any key that doesn't start with a "-" is a task1 ID
             if (arg.first.rfind("-", 0) == 0) {
                 new_args[arg.first] = arg.second;
             } else {
                 WorkflowTask *task;
                 if (workflow == nullptr) {
-                    throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first +")");
+                    throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task1 ID " + arg.first +")");
                 }
                 try {
                     task = workflow->getTaskByID(arg.first);
@@ -557,7 +557,7 @@ namespace wrench {
             throw;
         }
 
-        // Modify task states
+        // Modify task1 states
         job->state = StandardJob::PENDING;
         for (auto const &t : job->tasks) {
             t->setState(WorkflowTask::State::PENDING);
@@ -594,14 +594,14 @@ namespace wrench {
      * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
      *      - to a BareMetalComputeService: {{"actionID", "[hostname:][num_cores]}, ...}
-     *           - If no value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
-     *           - If a "" value is provided for a task, then the service will choose a host and use as many cores as possible on that host.
-     *           - If a "hostname" value is provided for a task, then the service will run the task on that
+     *           - If no value is provided for a task1, then the service will choose a host and use as many cores as possible on that host.
+     *           - If a "" value is provided for a task1, then the service will choose a host and use as many cores as possible on that host.
+     *           - If a "hostname" value is provided for a task1, then the service will run the task1 on that
      *             host, using as many of its cores as possible
-     *           - If a "num_cores" value is provided for a task, then the service will run that task with
+     *           - If a "num_cores" value is provided for a task1, then the service will run that task1 with
      *             this many cores, but will choose the host on which to run it.
-     *           - If a "hostname:num_cores" value is provided for a task, then the service will run that
-     *             task with the specified number of cores on that host.
+     *           - If a "hostname:num_cores" value is provided for a task1, then the service will run that
+     *             task1 with the specified number of cores on that host.
      *      - to a BatchComputeService: {{"-t":"<int>" (requested number of minutes)},{"-N":"<int>" (number of requested hosts)},{"-c":"<int>" (number of requested cores per host)}[,{"actionID":"[node_index:]num_cores"}] [,{"-u":"<string>" (username)}]}
      *      - to a VirtualizedClusterComputeService: {} (jobs should not be submitted directly to the service)}
      *      - to a CloudComputeService: {} (jobs should not be submitted directly to the service)}
@@ -838,7 +838,7 @@ namespace wrench {
         job->compound_job->state = CompoundJob::State::DISCONTINUED;
         job->state = StandardJob::State::TERMINATED;
 
-        // Update task states based on compound job
+        // Update task1 states based on compound job
         std::map<WorkflowTask *, WorkflowTask::State> state_changes;
         std::set<WorkflowTask *> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;

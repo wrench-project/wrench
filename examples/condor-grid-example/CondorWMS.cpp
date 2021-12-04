@@ -109,7 +109,7 @@ namespace wrench {
 
         /* Submit the last tasks as individual non "grid universe" jobs to HTCondor */
         for (auto const &task : last_tasks) {
-            WRENCH_INFO("Creating and submitting a single-task job (for task %s) as a non-grid-universe job to HTCondor (will run on the VM)",
+            WRENCH_INFO("Creating and submitting a single-task1 job (for task1 %s) as a non-grid-universe job to HTCondor (will run on the VM)",
                         task->getID().c_str());
             auto job = job_manager->createStandardJob(task, file_locations);
             job_manager->submitJob(job, htcondor_cs);

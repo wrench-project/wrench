@@ -68,8 +68,8 @@ protected:
         input_file = workflow->addFile("input_file", 10000.0);
         output_file = workflow->addFile("output_file", 20000.0);
 
-        // Create one task
-        task = workflow->addTask("task", 3600, 1, 1, 0);
+        // Create one task1
+        task = workflow->addTask("task1", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
@@ -284,7 +284,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
     ASSERT_THROW(wms->addWorkflow(this->workflow), std::invalid_argument);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
     delete simulation;
@@ -432,14 +432,14 @@ private:
 
         std::shared_ptr<wrench::StandardJob> job = nullptr;
 
-        // Create a job with nullptr task (and no file copies)
+        // Create a job with nullptr task1 (and no file copies)
         try {
             job = job_manager->createStandardJob(nullptr,
                                                  {{test->input_file,  wrench::FileLocation::LOCATION(
                                                          (test->storage_service1))},
                                                   {test->output_file, wrench::FileLocation::LOCATION(
                                                           (test->storage_service1))}});
-            throw std::runtime_error("Should not be able to create a job with an empty task");
+            throw std::runtime_error("Should not be able to create a job with an empty task1");
         } catch (std::invalid_argument &e) {
         }
 
@@ -450,7 +450,7 @@ private:
                                                          (test->storage_service1))},
                                                   {test->output_file, wrench::FileLocation::LOCATION(
                                                           (test->storage_service1))}});
-            throw std::runtime_error("Should not be able to create a job with an empty task vector");
+            throw std::runtime_error("Should not be able to create a job with an empty task1 vector");
         } catch (std::invalid_argument &e) {
         }
 
@@ -465,7 +465,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Create another task
+        // Create another task1
         wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job with nullptrs in file locations
@@ -927,7 +927,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check that the output trace makes sense
@@ -1095,7 +1095,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check that the output trace makes sense
@@ -1213,7 +1213,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_t
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check that the output trace makes sense
@@ -1369,7 +1369,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check that the output trace makes sense
@@ -1520,7 +1520,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1644,7 +1644,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1767,7 +1767,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     ASSERT_EQ(this->task->getFailureCount(), 1);
@@ -1802,7 +1802,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Create another task
+        // Create another task1
         wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
@@ -1889,7 +1889,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -2006,7 +2006,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -2121,7 +2121,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -2249,7 +2249,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

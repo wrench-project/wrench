@@ -101,7 +101,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, SimulationTimestampTaskStart) with a SimulationTimestampTaskStart object
      */
     void SimulationTimestampTask::setEndpoints() {
-        // find the SimulationTimestampTaskStart object containing the same task
+        // find the SimulationTimestampTaskStart object containing the same task1
         auto pending_tasks_itr = pending_task_timestamps.find(this->task->getID());
 
         if (pending_tasks_itr != pending_task_timestamps.end()) {
@@ -126,7 +126,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampTaskStart::SimulationTimestampTaskStart(double date, WorkflowTask *task) : SimulationTimestampTask(date, task) {
-        WRENCH_DEBUG("Inserting a Taskstart timestamp for task '%s'", task->getID().c_str());
+        WRENCH_DEBUG("Inserting a Taskstart timestamp for task1 '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument(
@@ -147,7 +147,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampTaskFailure::SimulationTimestampTaskFailure(double date, WorkflowTask *task) : SimulationTimestampTask(date, task) {
-        WRENCH_DEBUG("Inserting a TaskFailure timestamp for task '%s'", task->getID().c_str());
+        WRENCH_DEBUG("Inserting a TaskFailure timestamp for task1 '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument(
@@ -164,7 +164,7 @@ namespace wrench {
      */
     SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(double date, WorkflowTask *task) : SimulationTimestampTask(
             date, task) {
-        WRENCH_DEBUG("Inserting a TaskCompletion timestamp for task '%s'", task->getID().c_str());
+        WRENCH_DEBUG("Inserting a TaskCompletion timestamp for task1 '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument(
@@ -181,7 +181,7 @@ namespace wrench {
      */
     SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, WorkflowTask *task)
             : SimulationTimestampTask(date, task) {
-        WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task '%s'", task->getID().c_str());
+        WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task1 '%s'", task->getID().c_str());
 
         if (task == nullptr) {
             throw std::invalid_argument(
@@ -346,7 +346,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file read
      * @param src_location: the source location
      * @param service: service requesting file read
-     * @param task: a task associated to  this file read (or nullptr)
+     * @param task: a task1 associated to  this file read (or nullptr)
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(double date, WorkflowFile *file,
                                                              FileLocation *src_location,
@@ -381,7 +381,7 @@ namespace wrench {
     }
 
     /**
-     * @brief retrieves task associated w/ file read
+     * @brief retrieves task1 associated w/ file read
      * @return a pointer to the WorkflowTask associated with this timestamp
      */
     WorkflowTask *SimulationTimestampFileRead::getTask() {
@@ -405,7 +405,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileReadFailure, SimulationTimestampFileReadTerminated, SimulationTimestampFileReadStart) with a SimulationTimestampFileReadStart object
      */
     void SimulationTimestampFileRead::setEndpoints() {
-        // find the SimulationTimestampFileRead object containing the same task
+        // find the SimulationTimestampFileRead object containing the same task1
         auto pending_reads_itr = pending_file_reads.find(File(this->file, this->source, this->service));
         if (pending_reads_itr != pending_file_reads.end()) {
             // set my endpoint to the SimulationTimestampFileReadStart
@@ -429,7 +429,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
-     * @param task: a  task associated to  this file read (or nullptr)
+     * @param task: a  task1 associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(double date,
@@ -509,7 +509,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file write
      * @param dst_location: the destination location
      * @param service: service requesting file write
-     * @param task: a  task associated to  this file read (or nullptr)
+     * @param task: a  task1 associated to  this file read (or nullptr)
      */
     SimulationTimestampFileWrite::SimulationTimestampFileWrite(double date,
                                                                WorkflowFile *file,
@@ -545,7 +545,7 @@ namespace wrench {
     }
 
     /**
-     * @brief retrieves task associated w/ file write
+     * @brief retrieves task1 associated w/ file write
      * @return a pointer to the WorkflowTask associated with this timestamp
      */
     WorkflowTask *SimulationTimestampFileWrite::getTask() {
@@ -569,7 +569,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileWriteFailure, SimulationTimestampFileWriteTerminated, SimulationTimestampFileWriteStart) with a SimulationTimestampFileWriteStart object
      */
     void SimulationTimestampFileWrite::setEndpoints() {
-        // find the SimulationTimestampFileWrite object containing the same task
+        // find the SimulationTimestampFileWrite object containing the same task1
         auto pending_writes_itr = pending_file_writes.find(File(this->file, this->destination, this->service));
         if (pending_writes_itr != pending_file_writes.end()) {
             // set my endpoint to the SimulationTimestampFileWriteStart
@@ -593,7 +593,7 @@ namespace wrench {
      * @param file: the WorkflowFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
-     * @param task: a  task associated to  this file read (or nullptr)
+     * @param task: a  task1 associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
     SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(double date, WorkflowFile *file,
@@ -733,7 +733,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampDiskReadFailure, SimulationTimestampDiskReadTerminated, SimulationTimestampDiskReadStart) with a SimulationTimestampDiskReadStart object
      */
     void SimulationTimestampDiskRead::setEndpoints() {
-        // find the SimulationTimestampDiskRead object containing the same task
+        // find the SimulationTimestampDiskRead object containing the same task1
         auto pending_disk_reads_itr = pending_disk_reads.find(DiskAccess(this->hostname, this->mount, this->counter));
         if (pending_disk_reads_itr != pending_disk_reads.end()) {
             // set my endpoint to the SimulationTimestampDiskReadStart
@@ -896,7 +896,7 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampDiskWriteFailure, SimulationTimestampDiskWriteTerminated, SimulationTimestampDiskWriteStart) with a SimulationTimestampDiskWriteStart object
      */
     void SimulationTimestampDiskWrite::setEndpoints() {
-        // find the SimulationTimestampDiskWrite object containing the same task
+        // find the SimulationTimestampDiskWrite object containing the same task1
         auto pending_disk_writes_itr = pending_disk_writes.find(DiskAccess(this->hostname, this->mount, this->counter));
         if (pending_disk_writes_itr != pending_disk_writes.end()) {
             // set my endpoint to the SimulationTimestampDiskWriteStart

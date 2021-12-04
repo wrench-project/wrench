@@ -170,18 +170,18 @@ private:
 
         std::shared_ptr<wrench::StandardJobExecutor> executor;
 
-        // Create a sequential task that lasts one hour
-        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
-        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+        // Create a sequential task1 that lasts one hour
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies, post-copies and post-deletions (not useful, but this is testing after all)
         auto job = job_manager->createStandardJob(
-                {task},
+                {task1},
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                        {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                        {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                 this->test->storage_service2)}
                 },
                 {},
@@ -340,7 +340,7 @@ private:
         }
 
         // Create a bogus StandardJobExecutor (not enough Cores specified)
-        this->getWorkflow()->removeTask(task);
+        this->getWorkflow()->removeTask(task1);
         wrench::WorkflowTask *task_too_many_cores = this->getWorkflow()->addTask("task_too_many_cores", 3600, 20, 20, 0);
         task_too_many_cores->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task_too_many_cores->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
@@ -427,17 +427,17 @@ private:
 
         // Finally do one that works
         this->getWorkflow()->removeTask(task_too_much_ram);
-        task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
-        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+        task1 = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         job = job_manager->createStandardJob(
-                {task},
+                {task1},
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                        {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                        {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                 this->test->storage_service2)}
                 },
                 {},
@@ -542,7 +542,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -577,18 +577,18 @@ private:
         auto job_manager = this->createJobManager();
 
         {
-            // Create a sequential task that lasts one hour
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
-            task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            // Create a sequential task1 that lasts one hour
+            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
+            task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
             auto job = job_manager->createStandardJob(
-                    {task},
+                    {task1},
                     {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                            {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                     this->test->storage_service1)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                            {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service2)}
                     },
                     {},
@@ -641,7 +641,7 @@ private:
 
             double observed_duration = after - before;
 
-            double expected_duration = task->getFlops() + 1 * thread_startup_overhead;
+            double expected_duration = task1->getFlops() + 1 * thread_startup_overhead;
 
             // Does the job completion time make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(before + expected_duration, after, 0.2)) {
@@ -650,18 +650,18 @@ private:
                                          std::to_string(after) + ")");
             }
 
-            // Doe the task-stored time information look good
-            if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task->getStartDate(), EPSILON)) {
-//          std::cerr << "START: " << task->getStartDate() << std::endl;
+            // Doe the task1-stored time information look good
+            if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task1->getStartDate(), EPSILON)) {
+//          std::cerr << "START: " << task1->getStartDate() << std::endl;
                 throw std::runtime_error(
-                        "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()) + "| " +
+                        "Case 1: Unexpected task1 start date: " + std::to_string(task1->getStartDate()) + "| " +
                         "before: " + std::to_string(before));
             }
 
             // Note that we have to subtract the last thread startup overhead (for file deletions)
-            if (!StandardJobExecutorTest::isJustABitGreater(task->getEndDate(), after, EPSILON)) {
+            if (!StandardJobExecutorTest::isJustABitGreater(task1->getEndDate(), after, EPSILON)) {
                 throw std::runtime_error(
-                        "Case 1: Unexpected task end date: " + std::to_string(task->getEndDate()) +
+                        "Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()) +
                         " (expected: " + std::to_string(after) + ")");
             }
 
@@ -677,7 +677,7 @@ private:
                 throw std::runtime_error("The output file has not been erased from the specified storage service");
             }
 
-//        this->getWorkflow()->removeTask(task);
+//        this->getWorkflow()->removeTask(task1);
         }
 
         return 0;
@@ -739,7 +739,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -779,19 +779,19 @@ private:
         std::shared_ptr<wrench::StandardJobExecutor> executor;
 
         {
-            // Create a sequential task that lasts one hour and requires 1 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
-            task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            // Create a sequential task1 that lasts one hour and requires 1 cores
+            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
+            task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
             auto job = job_manager->createStandardJob(
-                    {task},
+                    {task1},
                     {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                            {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                     this->test->storage_service1)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                            {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service2)}
                     },
                     {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
@@ -858,7 +858,7 @@ private:
             }
 
 //        this->test->storage_service2->deleteFile(workflow->getFileByID("input_file"));
-//        this->getWorkflow()->removeTask(task);
+//        this->getWorkflow()->removeTask(task1);
 
         }
 
@@ -920,7 +920,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -961,19 +961,19 @@ private:
         std::shared_ptr<wrench::StandardJobExecutor> executor;
 
         {
-            // Create a sequential task that lasts one hour and requires 1 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
-            task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-            task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+            // Create a sequential task1 that lasts one hour and requires 1 cores
+            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
+            task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+            task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
             auto job = job_manager->createStandardJob(
-                    {task},
+                    {task1},
                     {
-                            {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                            {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                     this->test->storage_service2)},
-                            {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                            {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                     this->test->storage_service2)}
                     },
                     {},
@@ -1041,7 +1041,7 @@ private:
                         "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
             }
 
-//        this->getWorkflow()->removeTask(task);
+//        this->getWorkflow()->removeTask(task1);
 
         }
 
@@ -1102,7 +1102,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -1231,7 +1231,7 @@ private:
                 (t2->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
                 (t3->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
                 (t4->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED)) {
-                throw std::runtime_error("Unexpected task states!");
+                throw std::runtime_error("Unexpected task1 states!");
             }
 
 //        this->getWorkflow()->removeTask(t1);
@@ -1295,7 +1295,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
 
 /*******************************************************************************************/
 /**  ONE MULTI-CORE TASK SIMULATION TEST : CASE 1                                         **/
-/**  Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
+/**  Case 1: Create a multicore task1 with perfect parallel efficiency that lasts one hour **/
 /*******************************************************************************************/
 
 class OneMultiCoreTaskTestWMSCase1 : public wrench::WMS {
@@ -1316,17 +1316,17 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 3600, 1, 10, 0);
-        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 3600, 1, 10, 0);
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob
         auto job = job_manager->createStandardJob(
-                task,
+                task1,
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                        {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                        {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)}
                 });
 
@@ -1368,11 +1368,11 @@ private:
 
         double observed_duration = after - before;
 
-        double expected_duration = task->getFlops() / 6;
-        // Does the task completion time make sense?
+        double expected_duration = task1->getFlops() / 6;
+        // Does the task1 completion time make sense?
         if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
             throw std::runtime_error(
-                    "Case 1: Unexpected task duration (should be around " + std::to_string(expected_duration) +
+                    "Case 1: Unexpected task1 duration (should be around " + std::to_string(expected_duration) +
                     " but is " +
                     std::to_string(observed_duration) + ")");
         }
@@ -1433,7 +1433,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -1447,7 +1447,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase1_test() {
 
 /*******************************************************************************************/
 /**  ONE MULTI-CORE TASK SIMULATION TEST : CASE 2                                         **/
-/**  Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour     **/
+/**  Case 2: Create a multicore task1 with 50% parallel efficiency that lasts one hour     **/
 /*******************************************************************************************/
 
 class OneMultiCoreTaskTestWMSCase2 : public wrench::WMS {
@@ -1468,23 +1468,23 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        auto task = this->getWorkflow()->addTask("task2", 3600, 1, 10, 0);
+        auto task1 = this->getWorkflow()->addTask("task2", 3600, 1, 10, 0);
         double parallel_efficiency = 0.5;
-        task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
+        task1->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
         // coverage
-        if (std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(task->getParallelModel())->getEfficiency() != 0.5) {
-            throw std::runtime_error("Couldn't get back the parallel efficiency for the task model");
+        if (std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(task1->getParallelModel())->getEfficiency() != 0.5) {
+            throw std::runtime_error("Couldn't get back the parallel efficiency for the task1 model");
         };
-        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob
         auto job = job_manager->createStandardJob(
-                task,
+                task1,
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                        {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                        {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)}
                 });
 
@@ -1528,12 +1528,12 @@ private:
 
         double observed_duration = after - before;
 
-        double expected_duration = task->getFlops() / (10 * parallel_efficiency);
+        double expected_duration = task1->getFlops() / (10 * parallel_efficiency);
 
-        // Does the task completion time make sense?
+        // Does the task1 completion time make sense?
         if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
             throw std::runtime_error(
-                    "Case 2: Unexpected task duration (should be around " + std::to_string(expected_duration) +
+                    "Case 2: Unexpected task1 duration (should be around " + std::to_string(expected_duration) +
                     " but is " +
                     std::to_string(observed_duration) + ")");
         }
@@ -1594,7 +1594,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -1608,7 +1608,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase2_test() {
 
 /*******************************************************************************************************/
 /**  ONE MULTI-CORE TASK SIMULATION TEST : CASE 3                                                     **/
-/**  Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
+/**  Case 3: Create a multicore task1 with 50% parallel efficiency and include thread startup overhead **/
 /*******************************************************************************************************/
 
 class OneMultiCoreTaskTestWMSCase3 : public wrench::WMS {
@@ -1629,19 +1629,19 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        auto task = this->getWorkflow()->addTask("task3", 3600, 1, 10, 0);
+        auto task1 = this->getWorkflow()->addTask("task3", 3600, 1, 10, 0);
         double  parallel_efficiency = 0.5;
-        task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(parallel_efficiency));
-        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
-        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
+        task1->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(parallel_efficiency));
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob
         auto job = job_manager->createStandardJob(
-                task,
+                task1,
                 {
-                        {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
+                        {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)},
-                        {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
+                        {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(
                                 this->test->storage_service1)}
                 });
 
@@ -1686,9 +1686,9 @@ private:
         double observed_duration = after - before;
 
         double expected_duration =
-                10 * thread_startup_overhead + task->getFlops() / (10 * parallel_efficiency);
+                10 * thread_startup_overhead + task1->getFlops() / (10 * parallel_efficiency);
 
-        // Does the task completion time make sense?
+        // Does the task1 completion time make sense?
         if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
             throw std::runtime_error(
                     "Case 3: Unexpected job duration (should be around " + std::to_string(expected_duration) +
@@ -1752,7 +1752,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestCase3_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -1854,7 +1854,7 @@ private:
 
             double expected_duration = task1->getFlops() / 6 + task2->getFlops() / 6;
 
-            // Does the task completion time make sense?
+            // Does the task1 completion time make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 1: Unexpected job duration (should be around " +
@@ -1862,7 +1862,7 @@ private:
                         std::to_string(observed_duration) + ")");
             }
 
-            // Do individual task completion times make sense?
+            // Do individual task1 completion times make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(),
                                                             EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
@@ -1956,7 +1956,7 @@ private:
                         std::to_string(observed_duration) + ")");
             }
 
-            // Do individual task completion times make sense?
+            // Do individual task1 completion times make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(),
                                                             EPSILON)) {
                 throw std::runtime_error("Case 2: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
@@ -2056,7 +2056,7 @@ private:
                         std::to_string(observed_duration) + ")");
             }
 
-            // Do the individual task completion times make sense
+            // Do the individual task1 completion times make sense
             if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6.0, task1->getEndDate(),
                                                             EPSILON)) {
                 throw std::runtime_error("Case 3: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
@@ -2138,7 +2138,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -2247,7 +2247,7 @@ public:
 
             double expected_duration = std::max(task1->getFlops() / 6, task2->getFlops() / 6);
 
-            // Does the task completion time make sense?
+            // Does the task1 completion time make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration, EPSILON)) {
                 throw std::runtime_error(
                         "Case 1: Unexpected job duration (should be around " +
@@ -2255,7 +2255,7 @@ public:
                         std::to_string(observed_duration) + ")");
             }
 
-            // Do individual task completion times make sense?
+            // Do individual task1 completion times make sense?
             if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops() / 6, task1->getEndDate(),
                                                             EPSILON)) {
                 throw std::runtime_error("Case 1: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
@@ -2359,7 +2359,7 @@ public:
                         std::to_string(observed_duration) + ")");
             }
 
-//        // Do individual task completion times make sense?
+//        // Do individual task1 completion times make sense?
 //        if (!StandardJobExecutorTest::isJustABitGreater(before + task1->getFlops()/6, task1->getEndDate())) {
 //          throw std::runtime_error("Case 2: Unexpected task1 end date: " + std::to_string(task1->getEndDate()));
 //        }
@@ -2429,7 +2429,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -2465,7 +2465,7 @@ private:
 
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service1));
-        /**  Create a 4-task job and kill it **/
+        /**  Create a 4-task1 job and kill it **/
         {
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1.1", 3600, 6, 6, 0);
             wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task1.2", 1000, 2, 2, 0);
@@ -2588,7 +2588,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -2624,7 +2624,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        /**  Create a 4-task job and kill it **/
+        /**  Create a 4-task1 job and kill it **/
         {
             wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1.1", 3600, 6, 6, 0);
             wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task1.2", 1000, 2, 2, 0);
@@ -2745,7 +2745,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -2793,15 +2793,15 @@ private:
 
         for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) { WRENCH_INFO("Trial %lu", trial);
 
-            /**  Create a 4-task job and kill it **/
+            /**  Create a 4-task1 job and kill it **/
             {
-                wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".1", 3600,
+                wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1" + std::to_string(trial) + ".1", 3600,
                                                                            6, 6, 0);
-                wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".2", 1000,
+                wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task1" + std::to_string(trial) + ".2", 1000,
                                                                            2, 2, 0);
-                wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".3", 800,
+                wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task1" + std::to_string(trial) + ".3", 800,
                                                                            7, 7, 0);
-                wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task" + std::to_string(trial) + ".4", 600,
+                wrench::WorkflowTask *task4 = this->getWorkflow()->addTask("task1" + std::to_string(trial) + ".4", 600,
                                                                            2, 2, 0);
                 task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
 //          task1->addOutputFile(workflow->getFileByID("output_file"));
@@ -2922,7 +2922,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -3114,7 +3114,7 @@ void StandardJobExecutorTest::do_NoTaskTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());

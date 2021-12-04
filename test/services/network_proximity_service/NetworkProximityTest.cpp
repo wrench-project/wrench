@@ -45,8 +45,8 @@ protected:
         input_file = workflow->addFile("input_file", 10000.0);
         output_file = workflow->addFile("output_file", 20000.0);
 
-        // Create one task
-        task = workflow->addTask("task", 3600, 1, 1, 0 );
+        // Create one task1
+        task = workflow->addTask("task1", 3600, 1, 1, 0 );
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
@@ -304,7 +304,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -463,7 +463,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -645,7 +645,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -822,7 +822,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-//  // Running a "run a single task" simulation
+//  // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 

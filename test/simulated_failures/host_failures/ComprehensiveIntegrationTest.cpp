@@ -257,7 +257,7 @@ private:
 
     bool scheduleAReadyTask() {
 
-        // Find a ready task
+        // Find a ready task1
         wrench::WorkflowTask *task = nullptr;
         for (auto const &t : this->getWorkflow()->getTasks()) {
             if (t->getState() == wrench::WorkflowTask::READY) {
@@ -266,7 +266,7 @@ private:
             }
         }
         if (not task) {
-            return false; // no ready task right now
+            return false; // no ready task1 right now
         }
 
         // Pick a storage service
@@ -309,8 +309,8 @@ private:
         });
         this->job_manager->submitJob(job, target_cs);
 
-//        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
-//                    task->getID().c_str(),
+//        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
+//                    task1->getID().c_str(),
 //                    target_cs->getName().c_str(),
 //                    target_storage_service->getName().c_str());
         return true;
@@ -471,7 +471,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     // Create workflow tasks and stage input file
     srand(666);
     for (int i=0; i < NUM_TASKS; i++) {
-//        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
+//        auto task1 = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
         auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 40);
         auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
         auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
@@ -497,7 +497,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     wms->addWorkflow(workflow);
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

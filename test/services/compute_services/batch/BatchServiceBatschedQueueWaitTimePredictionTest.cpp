@@ -154,8 +154,8 @@ private:
         auto job_manager = this->createJobManager();
 
         {
-            // Create a sequential task that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 0);
+            // Create a sequential task1 that lasts one min and requires 2 cores
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -299,7 +299,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -339,8 +339,8 @@ private:
 
         {
 
-            // Create a sequential task that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 0);
+            // Create a sequential task1 that lasts one min and requires 2 cores
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -474,7 +474,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -514,8 +514,8 @@ private:
 
         {
 
-            // Create a sequential task that lasts 5 minutes and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 0);
+            // Create a sequential task1 that lasts 5 minutes and requires 2 cores
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -579,8 +579,8 @@ private:
 
         {
 
-            // Create a sequential task that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 60, 2, 2, 0);
+            // Create a sequential task1 that lasts one min and requires 2 cores
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 60, 2, 2, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -701,7 +701,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
@@ -742,7 +742,7 @@ private:
         {
 
             // Submit the first job for 300 seconds and using 4 full cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 0);
+            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file1"));
 
@@ -977,7 +977,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());

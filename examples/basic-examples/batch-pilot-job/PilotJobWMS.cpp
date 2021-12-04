@@ -11,10 +11,10 @@
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **
  **  - Creates a pilot job, but not long enough to accommodate both tasks
- **  - Submit the first task to the pilot job  as a standard job
+ **  - Submit the first task1 to the pilot job  as a standard job
  **  - Intermediate file is kept in the batch compute service's scratch space!
- **  - Submit the second task to the pilot job  as a standard job
- **  - The pilot job will expire because the second task completes, and the
+ **  - Submit the second task1 to the pilot job  as a standard job
+ **  - The pilot job will expire because the second task1 completes, and the
  **    WMS gives up
  **/
 
@@ -75,7 +75,7 @@ namespace wrench {
         auto file_1 = this->getWorkflow()->getFileByID("file_1");
         auto file_2 = this->getWorkflow()->getFileByID("file_2");
 
-        /* For each task, estimate its execution time in minutes */
+        /* For each task1, estimate its execution time in minutes */
         std::map<WorkflowTask *, long> execution_times_in_minutes;
         for (auto  const &t : this->getWorkflow()->getTasks())  {
             double parallel_efficiency =
@@ -153,7 +153,7 @@ namespace wrench {
     void PilotJobWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
+        /* Retrieve the job's first (and in our case only) task1 */
         WRENCH_INFO("Notified that a standard job has failed due to: %s ",
                     event->failure_cause->toString().c_str());
     }

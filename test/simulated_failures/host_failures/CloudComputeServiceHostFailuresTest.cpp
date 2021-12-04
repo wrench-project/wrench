@@ -49,8 +49,8 @@ protected:
         input_file = workflow->addFile("input_file", 10000.0);
         output_file = workflow->addFile("output_file", 20000.0);
 
-        // Create one task
-        task = workflow->addTask("task", 3600, 1, 1, 0);
+        // Create one task1
+        task = workflow->addTask("task1", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
@@ -228,7 +228,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(this->input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -381,7 +381,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -442,7 +442,7 @@ private:
             switch2->setSimulation(this->simulation);
             switch2->start(switch1, true, false); // Daemonized, no auto-restart
 
-            // Add a task to the workflow
+            // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 50, 1, 1, 0);
             auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 2000);
 
@@ -546,7 +546,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

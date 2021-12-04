@@ -227,7 +227,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
@@ -433,7 +433,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 

@@ -106,7 +106,7 @@ namespace wrench {
      * @param actions: a set of actions (which typically belong to the same compound job)
      * @param service_specific_args: optional service-specific arguments
      *
-     *    These arguments are provided as a map of strings, indexed by task IDs. These
+     *    These arguments are provided as a map of strings, indexed by task1 IDs. These
      *    strings are formatted as "[hostname:][num_cores]" (e.g., "somehost:12", "somehost","6", "").
      *
      *      - If a value is not provided for an action, then the service will choose a host and use as many cores as possible on that host.

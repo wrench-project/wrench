@@ -114,7 +114,7 @@ namespace wrench {
             }
         }
 
-        // Validate that there are enough resources for each task
+        // Validate that there are enough resources for each task1
         for (auto const &action : cjob->getActions()) {
             if ((action->getMinRAMFootprint() > max_ram) or
                 (action->getMinNumCores() > max_cores)) {

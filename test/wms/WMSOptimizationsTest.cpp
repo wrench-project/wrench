@@ -210,7 +210,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
       ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
   }
 
-  // Running a "run a single task" simulation
+  // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
   for (auto t : simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()) {
@@ -349,7 +349,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service));
     }
 
-  // Running a "run a single task" simulation
+  // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
   auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();

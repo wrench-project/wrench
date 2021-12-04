@@ -150,8 +150,8 @@ void WorkunitExecutorTest::do_WorkunitConstructor_test() {
     wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
     wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 10000000.0);
 
-    // Create a task
-    auto task = this->workflow->addTask("task", 1.0, 1, 1, 0.0);
+    // Create a task1
+    auto task = this->workflow->addTask("task1", 1.0, 1, 1, 0.0);
 
     {
         std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_file_copies;
@@ -377,7 +377,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create some  standard job
-        auto task = this->getWorkflow()->addTask("task", 3600, 1, 1, 0);
+        auto task = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
         auto job = job_manager->createStandardJob(task);
@@ -491,7 +491,7 @@ void WorkunitExecutorTest::do_WorkunitExecutorConstructor_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());

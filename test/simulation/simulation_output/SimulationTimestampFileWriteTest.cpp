@@ -250,7 +250,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
         // file should be set
         ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
 
-        //task should be set
+        //task1 should be set
         ASSERT_EQ(fc.first->getTask(), fc.second->getTask());
     }
 
