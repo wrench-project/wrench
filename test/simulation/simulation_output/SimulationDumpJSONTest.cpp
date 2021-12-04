@@ -674,7 +674,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "flops": 1.0,
@@ -682,7 +682,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "id": "task1_input",
@@ -718,7 +718,10 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json1["workflow_graph"]["edges"].begin(), expected_json1["workflow_graph"]["edges"].end(), compareLinks);
     std::sort(expected_json1["workflow_graph"]["vertices"].begin(), expected_json1["workflow_graph"]["vertices"].end(), compareNodes);
 
+    std::cerr << "RESULT: " << result_json1 << "\n";
+    std::cerr << "EXPECTED: " << expected_json1 << "\n";
     EXPECT_TRUE(result_json1 == expected_json1);
+
 
     // Generate a workflow with two tasks, two input files, and four output files. Both tasks use both input files and produce two output files each.
     std::unique_ptr<wrench::Workflow> two_tasks_use_all_files_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
@@ -787,7 +790,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "flops": 1.0,
@@ -795,7 +798,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "id": "input_file1",
@@ -927,7 +930,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "flops": 1.0,
@@ -935,7 +938,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "flops": 1.0,
@@ -943,7 +946,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "flops": 1.0,
@@ -951,7 +954,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "id": "task1_input",
@@ -1927,7 +1930,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 },
                 {
                     "flops": 1.0,
@@ -1935,7 +1938,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
                     "max_cores": 1,
                     "memory_manager_service": 0.0,
                     "min_cores": 1,
-                    "type": "task1"
+                    "type": "task"
                 }
             ]
         }

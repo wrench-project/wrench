@@ -233,9 +233,9 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     // expected timeline: task2_end...failed_task_start...failed_task_failed
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
-    for (auto const &ts : timestamp_start_trace) {
-        std::cerr << "  - " << ts->getContent()->getTask()->getID() << ": " << ts->getDate() << "\n";
-    }
+//    for (auto const &ts : timestamp_start_trace) {
+//        std::cerr << "  - " << ts->getContent()->getTask()->getID() << ": " << ts->getDate() << "\n";
+//    }
     double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
     double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();

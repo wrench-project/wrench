@@ -91,29 +91,29 @@ namespace wrench {
 
             /*  Pick a random index and tasks */
             int index = dist(rng) % ready_tasks.size();
-            auto ready_task = ready_tasks.at(index);
+            auto ready_task1 = ready_tasks.at(index);
             auto ready_task2 = (ready_tasks.size() > 1 ? ready_tasks.at((index + 1) % ready_tasks.size()) : nullptr);
 
             /* Swap the tasks if ready_task2 is cheaper than ready_task 1, for the  sake of the example */
-            if (ready_task2 and (ready_task2->getFlops() < ready_task->getFlops())) {
-                auto tmp = ready_task;
-                ready_task = ready_task2;
+            if (ready_task2 and (ready_task2->getFlops() < ready_task1->getFlops())) {
+                auto tmp = ready_task1;
+                ready_task1 = ready_task2;
                 ready_task2 = tmp;
             }
 
             if (ready_task2) { WRENCH_INFO(
                         "Creating a job to execute tasks %s (%.1lf Gflops) and task %s (%.1lf Gflops)",
-                        ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0,
+                        ready_task1->getID().c_str(), ready_task1->getFlops() / 1000000000.0,
                         ready_task2->getID().c_str(), ready_task2->getFlops() / 1000000000.0);
             } else { WRENCH_INFO("Creating a job to execute task %s (%.1lf Gflops)",
-                                 ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0);
+                                 ready_task1->getID().c_str(), ready_task1->getFlops() / 1000000000.0);
             }
 
             /* Create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-            file_locations[ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            file_locations[ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations[ready_task1->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations[ready_task1->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             if (ready_task2) {
                 file_locations[ready_task2->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
                 file_locations[ready_task2->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
