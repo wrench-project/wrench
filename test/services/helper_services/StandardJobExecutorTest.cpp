@@ -170,7 +170,7 @@ private:
 
         std::shared_ptr<wrench::StandardJobExecutor> executor;
 
-        // Create a sequential task1 that lasts one hour
+        // Create a sequential task that lasts one hour
         wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 3600, 1, 1, 0);
         task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));

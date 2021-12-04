@@ -25,12 +25,12 @@ namespace wrench {
 
 
     /**
-     * @brief Create and add a new computational task1 to the workflow
+     * @brief Create and add a new computational task to the workflow
      *
      * @param id: a unique string id
      * @param flops: number of flops
-     * @param min_num_cores: the minimum number of cores required to run the task1
-     * @param max_num_cores: the maximum number of cores that can be used by the task1 (use INT_MAX for infinity)
+     * @param min_num_cores: the minimum number of cores required to run the task
+     * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
      * @param memory_requirement: memory_manager_service requirement (in bytes)
      *
      * @return the WorkflowTask instance
@@ -48,7 +48,7 @@ namespace wrench {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
 
-        // Check that the task1 doesn't really exist
+        // Check that the task doesn't really exist
         if (tasks.find(id) != tasks.end()) {
             throw std::invalid_argument("Workflow::addTask(): Task ID '" + id + "' already exists");
         }
@@ -56,10 +56,10 @@ namespace wrench {
         // Create the WorkflowTask object
         auto task = new WorkflowTask(id, flops, min_num_cores, max_num_cores,
                                      memory_requirement);
-        // Associate the workflow to the task1
+        // Associate the workflow to the task
         task->workflow = this;
 
-        task->toplevel = 0; // upon creation, a task1 is an exit task1
+        task->toplevel = 0; // upon creation, a task is an exit task
 
         // Create a DAG node for it
         this->dag.addVertex(task);
@@ -80,7 +80,7 @@ namespace wrench {
 
         if (file->getOutputOf() != nullptr) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
-                                        file->getID() + " cannot be removed because it is output of task1 " +
+                                        file->getID() + " cannot be removed because it is output of task " +
                                         file->getOutputOf()->getID());
         }
 
@@ -94,10 +94,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Remove a task1 from the workflow. WARNING: this method de-allocated
-     *        memory_manager_service for the task1, making any pointer to the task1 invalid
+     * @brief Remove a task from the workflow. WARNING: this method de-allocated
+     *        memory_manager_service for the task, making any pointer to the task invalid
      *
-     * @param task: a task1
+     * @param task: a task
      *
      * @throw std::invalid_argument
      */
@@ -107,7 +107,7 @@ namespace wrench {
             throw std::invalid_argument("Workflow::removeTask(): Invalid arguments");
         }
 
-        // check that task1 exists (this should never happen)
+        // check that task exists (this should never happen)
         if (tasks.find(task->id) == tasks.end()) {
             throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
         }
@@ -120,16 +120,16 @@ namespace wrench {
             f->setOutputOf(nullptr);
         }
 
-        // Get the task1 children
+        // Get the task children
         auto children = this->dag.getChildren(task);
 
-        // Remove the task1 from the DAG
+        // Remove the task from the DAG
         this->dag.removeVertex(task);
 
-        // Remove the task1 from the master list
+        // Remove the task from the master list
         tasks.erase(tasks.find(task->id));
 
-        // Brute-force update of the top-level of all the children of the removed task1
+        // Brute-force update of the top-level of all the children of the removed task
         for (auto const &child : children) {
             child->updateTopLevel();
         }
@@ -141,7 +141,7 @@ namespace wrench {
      *
      * @param id: a string id
      *
-     * @return a workflow task1 (or throws a std::invalid_argument if not found)
+     * @return a workflow task (or throws a std::invalid_argument if not found)
      *
      * @throw std::invalid_argument
      */
@@ -156,8 +156,8 @@ namespace wrench {
      * @brief Create a control dependency between two workflow tasks. Will not
      *        do anything if there is already a path between the two tasks.
      *
-     * @param src: the parent task1
-     * @param dst: the child task1
+     * @param src: the parent task
+     * @param dst: the child task
      * @param redundant_dependencies: whether DAG redundant dependencies should be kept in the graph
      *
      * @throw std::invalid_argument
@@ -184,8 +184,8 @@ namespace wrench {
 
     /**
      * @brief Remove a control dependency between tasks  (does nothing if none)
-     * @param src: the source task1
-     * @param dst: the destination task1
+     * @param src: the source task
+     * @param dst: the destination task
      */
     void  Workflow::removeControlDependency(WorkflowTask *src, WorkflowTask *dst) {
         if ((src == nullptr) || (dst == nullptr)) {
@@ -289,10 +289,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether one source is an ancestor of a destination task1
+     * @brief Determine whether one source is an ancestor of a destination task
      *
-     * @param src: the source task1
-     * @param dst: the destination task1
+     * @param src: the source task
+     * @param dst: the destination task
      *
      * @return true if there is a path from src to dst, false otherwise
      */
@@ -349,7 +349,7 @@ namespace wrench {
                     if (task_map.find(task->getClusterID()) == task_map.end()) {
                         task_map[task->getClusterID()] = {task};
                     } else {
-                        // add to clustered task1
+                        // add to clustered task
                         task_map[task->getClusterID()].push_back(task);
                     }
                 }
@@ -430,9 +430,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of children for a task1
+     * @brief Get the list of children for a task
      *
-     * @param task: a workflow task1
+     * @param task: a workflow task
      *
      * @return a vector of tasks
      */
@@ -444,9 +444,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of children for a task1
+     * @brief Get the number of children for a task
      *
-     * @param task: a workflow task1
+     * @param task: a workflow task
      *
      * @return a number of children
      */
@@ -458,9 +458,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of parents for a task1
+     * @brief Get the list of parents for a task
      *
-     * @param task: a workflow task1
+     * @param task: a workflow task
      *
      * @return a vector of tasks
      */
@@ -472,9 +472,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of parents for a task1
+     * @brief Get the number of parents for a task
      *
-     * @param task: a workflow task1
+     * @param task: a workflow task
      *
      * @return a number of parents
      */

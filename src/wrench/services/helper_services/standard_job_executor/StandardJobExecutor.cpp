@@ -420,7 +420,7 @@ namespace wrench {
 //        }
 //      }
 
-        // Get an ordered (by the task1 selection algorithm) list of the ready workunits
+        // Get an ordered (by the task selection algorithm) list of the ready workunits
         std::vector<std::shared_ptr<Workunit>> sorted_ready_workunits = sortReadyWorkunits();
 
 //      std::cerr << "** SORTED\n";
@@ -679,9 +679,9 @@ namespace wrench {
                     "workunit in the running workunit list");
         }
 
-        // Process task1 completions, if any
+        // Process task completions, if any
         if (workunit->task != nullptr) {
-            WRENCH_INFO("A workunit executor completed task1 %s (and its state is: %s)",
+            WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)",
                         workunit->task->getID().c_str(),
                         WorkflowTask::stateToString(workunit->task->getInternalState()).c_str());
         }
@@ -713,8 +713,8 @@ namespace wrench {
                     if (child->task != nullptr) {
                         if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                             throw std::runtime_error(
-                                    "StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task1 state " +
-                                    std::to_string(child->task->getInternalState()) + " for task1 " +
+                                    "StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
+                                    std::to_string(child->task->getInternalState()) + " for task " +
                                     child->task->getID());
                         }
                     }
@@ -858,12 +858,12 @@ namespace wrench {
         // Update RAM availabilities and running thread counts
         if (workunit->task) {
             this->ram_availabilities[workunit_executor->getHostname()] += workunit->task->getMemoryRequirement();
-            // Reset the internal task1 state to READY (it may have been completed actually, but we just redo the whole workunit)
+            // Reset the internal task state to READY (it may have been completed actually, but we just redo the whole workunit)
             workunit->task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         }
 
         // Put the WorkUnit back in the ready list (at the end)
-        WRENCH_INFO("Putting task1 back in the ready queue");
+        WRENCH_INFO("Putting task back in the ready queue");
         this->running_workunits.erase(workunit);
         this->ready_workunits.insert(workunit);
     }

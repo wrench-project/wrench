@@ -240,7 +240,7 @@ namespace wrench {
      * @brief Update the action's state
      */
     void Action::updateState() {
-        // Do nothing if task1 state is neither ready nor not ready
+        // Do nothing if task state is neither ready nor not ready
         if (this->execution_history.top().state != Action::State::NOT_READY and this->execution_history.top().state != Action::State::READY) {
             return;
         }

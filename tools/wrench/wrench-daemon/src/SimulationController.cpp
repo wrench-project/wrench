@@ -318,7 +318,7 @@ namespace wrench {
      *         "job_name": ["string", "The job's name"]
      *       },
      *       "json_output": {
-     *         "tasks": ["list<string>", "A list of task1 names"]
+     *         "tasks": ["list<string>", "A list of task names"]
      *       }
      *     }
      * }
@@ -500,7 +500,7 @@ namespace wrench {
      *     {
      *       "purpose": "Create a new standard job",
      *       "json_input": {
-     *         "tasks": ["list<string>", "List of task1 names"]
+     *         "tasks": ["list<string>", "List of task names"]
      *       },
      *       "json_output": {
      *         "job_name": ["string", "The new job's name"]
@@ -570,13 +570,13 @@ namespace wrench {
      *   "REST_func": "createTask",
      *   "documentation":
      *     {
-     *       "purpose": "Create a new task1",
+     *       "purpose": "Create a new task",
      *       "json_input": {
-     *         "name": ["string", "The task1's name"],
-     *         "flops": ["double", "The task1's flops"],
-     *         "min_num_cores": ["double", "The task1's minimum number of cores"],
-     *         "max_num_cores": ["double", "The task1's maximum number of cores"],
-     *         "memory": ["double", "The task1's memory requirement"]
+     *         "name": ["string", "The task's name"],
+     *         "flops": ["double", "The task's flops"],
+     *         "min_num_cores": ["double", "The task's minimum number of cores"],
+     *         "max_num_cores": ["double", "The task's maximum number of cores"],
+     *         "memory": ["double", "The task's memory requirement"]
      *       },
      *       "json_output": {
      *       }
@@ -603,12 +603,12 @@ namespace wrench {
      *   "REST_func": "taskGetFlops",
      *   "documentation":
      *     {
-     *       "purpose": "Get a task1's flops",
+     *       "purpose": "Get a task's flops",
      *       "json_input": {
-     *         "name": ["string", "The task1's name"]
+     *         "name": ["string", "The task's name"]
      *       },
      *       "json_output": {
-     *         "flops": ["double", "The task1's flops"]
+     *         "flops": ["double", "The task's flops"]
      *       }
      *     }
      * }
@@ -629,12 +629,12 @@ namespace wrench {
      *   "REST_func": "taskGetMinNumCores",
      *   "documentation":
      *     {
-     *       "purpose": "Get a task1's minimum number of cores",
+     *       "purpose": "Get a task's minimum number of cores",
      *       "json_input": {
-     *         "name": ["string", "The task1's name"]
+     *         "name": ["string", "The task's name"]
      *       },
      *       "json_output": {
-     *         "min_num_cores": ["double", "The task1's minimum number of cores"]
+     *         "min_num_cores": ["double", "The task's minimum number of cores"]
      *       }
      *     }
      * }
@@ -655,12 +655,12 @@ namespace wrench {
      *   "REST_func": "taskGetMaxNumCores",
      *   "documentation":
      *     {
-     *       "purpose": "Get a task1's maximum number of cores",
+     *       "purpose": "Get a task's maximum number of cores",
      *       "json_input": {
-     *         "name": ["string", "The task1's name"]
+     *         "name": ["string", "The task's name"]
      *       },
      *       "json_output": {
-     *         "max_num_cores": ["double", "The task1's maximum number of cores"]
+     *         "max_num_cores": ["double", "The task's maximum number of cores"]
      *       }
      *     }
      * }
@@ -681,12 +681,12 @@ namespace wrench {
      *   "REST_func": "taskGetMemory",
      *   "documentation":
      *     {
-     *       "purpose": "Get a task1's memory requirement",
+     *       "purpose": "Get a task's memory requirement",
      *       "json_input": {
-     *         "name": ["string", "The task1's name"]
+     *         "name": ["string", "The task's name"]
      *       },
      *       "json_output": {
-     *         "memory": ["double", "The task1's memory requirement in bytes"]
+     *         "memory": ["double", "The task's memory requirement in bytes"]
      *       }
      *     }
      * }
@@ -759,9 +759,9 @@ namespace wrench {
      *   "REST_func": "addInputFile",
      *   "documentation":
      *     {
-     *       "purpose": "Add an input file to a task1",
+     *       "purpose": "Add an input file to a task",
      *       "json_input": {
-     *         "task1": ["string", "The task1's ID"],
+     *         "task": ["string", "The task's ID"],
      *         "file": ["string", "The input file's ID"]
      *       },
      *       "json_output": {
@@ -771,7 +771,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addInputFile(json data) {
-        auto task = this->getWorkflow()->getTaskByID(data["task1"]);
+        auto task = this->getWorkflow()->getTaskByID(data["task"]);
         auto file = this->getWorkflow()->getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
@@ -786,9 +786,9 @@ namespace wrench {
      *   "REST_func": "addOutputFile",
      *   "documentation":
      *     {
-     *       "purpose": "Add an output file to a task1",
+     *       "purpose": "Add an output file to a task",
      *       "json_input": {
-     *         "task1": ["string", "The task1's ID"],
+     *         "task": ["string", "The task's ID"],
      *         "file": ["string", "The output file's ID"]
      *       },
      *       "json_output": {
@@ -798,7 +798,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addOutputFile(json data) {
-        auto task = this->getWorkflow()->getTaskByID(data["task1"]);
+        auto task = this->getWorkflow()->getTaskByID(data["task"]);
         auto file = this->getWorkflow()->getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
@@ -813,9 +813,9 @@ namespace wrench {
      *   "REST_func": "getTaskInputFiles",
      *   "documentation":
      *     {
-     *       "purpose": "Return the list of input files for a given task1",
+     *       "purpose": "Return the list of input files for a given task",
      *       "json_input": {
-     *         "task1": ["string", "The task1's ID"]
+     *         "task": ["string", "The task's ID"]
      *       },
      *       "json_output": {
      *         "files": ["list<string>", "A list of input files"]
@@ -825,7 +825,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskInputFiles(json data) {
-        auto task = this->getWorkflow()->getTaskByID(data["task1"]);
+        auto task = this->getWorkflow()->getTaskByID(data["task"]);
         auto files = task->getInputFiles();
         json answer;
         std::vector<std::string> file_names;

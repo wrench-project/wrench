@@ -28,9 +28,9 @@ namespace wrench {
      *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies locations where input/output files should be read/written
      * @param pre_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         before task1 executions begin
+     *                         before task executions begin
      * @param post_file_copies: a vector of tuples that specify which file copy operations should be completed
-     *                         after task1 executions end
+     *                         after task executions end
      * @param cleanup_file_deletions: a vector of tuples that specify which file copies should be removed from which
      *                         locations. This will happen regardless of whether the job succeeds or fails
      *
@@ -77,7 +77,7 @@ namespace wrench {
 
     /**
      * @brief Returns the minimum number of cores required to run the job (i.e., at least
-     *        one task1 in the job cannot run if fewer cores than this minimum are available)
+     *        one task in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() const {
@@ -90,7 +90,7 @@ namespace wrench {
 
     /**
      * @brief Returns the minimum RAM capacity required to run the job (i.e., at least
-     *        one task1 in the job cannot run if less ram than this minimum is available)
+     *        one task in the job cannot run if less ram than this minimum is available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredMemory() const {
@@ -248,7 +248,7 @@ namespace wrench {
             cleanup_actions.push_back(cjob->addFileDeleteAction("", std::get<0>(fc), target_location));
         }
 
-        // Create the task1 actions
+        // Create the task actions
         for (auto const &task : this->tasks) {
             auto compute_action = cjob->addComputeAction("task_" + task->getID(), task->getFlops(), task->getMemoryRequirement(),
                                                          task->getMinNumCores(), task->getMaxNumCores(), task->getParallelModel());
@@ -348,7 +348,7 @@ namespace wrench {
 
         }
 
-        // Add all inter-task1 dependencies
+        // Add all inter-task dependencies
         for (auto const &parent_task : this->tasks) {
             for (auto const &child_task : parent_task->getChildren()) {
                 if (task_compute_actions.find(child_task) == task_compute_actions.end()) {
@@ -498,9 +498,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Compute all task1 updates based on the state of the underlying compound job (also updates timing information and other task1 information)
-     * @param necessary_state_changes: the set of task1 state changes to apply
-     * @param necessary_failure_count_increments: the set ot task1 failure count increments to apply
+     * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
+     * @param necessary_state_changes: the set of task state changes to apply
+     * @param necessary_failure_count_increments: the set ot task failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
      * @param simulation: the simulation (to add timestamps!)
      */
@@ -819,13 +819,13 @@ namespace wrench {
     void StandardJob::applyTaskUpdates(map<WorkflowTask *, WorkflowTask::State> &state_changes,
                                        set<WorkflowTask *> &failure_count_increments) {
 
-        // Update task1 states
+        // Update task states
         for (auto &state_update : state_changes) {
             WorkflowTask *task = state_update.first;
             task->setState(state_update.second);
         }
 
-        // Update task1 readiness-es
+        // Update task readiness-es
         for (auto &state_update : state_changes) {
             WorkflowTask *task = state_update.first;
             task->updateReadiness();
@@ -836,7 +836,7 @@ namespace wrench {
             }
         }
 
-        // Update task1 failure counts if any
+        // Update task failure counts if any
         for (auto task : failure_count_increments) {
             task->incrementFailureCount();
         }

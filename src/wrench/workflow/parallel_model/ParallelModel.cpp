@@ -21,10 +21,10 @@ namespace wrench {
 
     /**
      * @brief Create an instance of an "Amdahl" parallel model
-     * @param alpha: the fraction (i.e., a number between 0.0 and 1.0) of the task1's
+     * @param alpha: the fraction (i.e., a number between 0.0 and 1.0) of the task's
      *         work that is perfectly parallelizable. Setting this value to 0 means
-     *         that the task1 is purely sequential, and setting it to 1 means that the
-     *         task1 is perfectly parallelizable.
+     *         that the task is purely sequential, and setting it to 1 means that the
+     *         task is perfectly parallelizable.
      *
      * @return a model instance
      **/

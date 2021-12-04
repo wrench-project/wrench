@@ -10,7 +10,7 @@
 /**
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
- **    - Pick a ready task1 if any
+ **    - Pick a ready task if any
  **    - Submit it to the first available bare_metal_standard_jobs as a job in a way that
  **       - Uses 10 cores
  **       - Reads the input file from the StorageService

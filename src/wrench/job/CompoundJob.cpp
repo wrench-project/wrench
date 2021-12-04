@@ -279,7 +279,7 @@ namespace wrench {
             throw std::invalid_argument("CompoundJob::addDependency(): Arguments cannot be nullptr");
         }
         if (parent == child) {
-            throw std::invalid_argument("CompoundJob::addDependency(): Cannot add a dependency between a task1 and itself");
+            throw std::invalid_argument("CompoundJob::addDependency(): Cannot add a dependency between a task and itself");
         }
         if (parent->getJob() != this->shared_this or child->getJob() != this->shared_this) {
             throw std::invalid_argument("CompoundJob::addDependency(): Both actions must belong to this job");
@@ -395,7 +395,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Print the task1 map
+     * @brief Print the task map
      */
     void CompoundJob::printTaskMap() {
         for (auto const &a : this->actions) {

@@ -9,7 +9,7 @@
 
 /**
  ** This simulator simulates the execution of a bag-of-tasks workflow, that is, of a workflow
- ** in which each task1 has its own input file and its own output file, and tasks can be
+ ** in which each task has its own input file and its own output file, and tasks can be
  ** executed completely independently
  **
  **   InputFile #0 -> Task #0 -> OutputFile #1
@@ -19,12 +19,12 @@
  ** The compute platform comprises two hosts, WMSHost and ComputeHost. On WMSHost runs a simple storage
  ** service and a WMS (defined in class TwoTasksAtATimeWMS). On ComputeHost runs a bare metal
  ** compute service, that has access to the 10 cores of that host. Once the simulation is done,
- ** the completion time of each workflow task1 is printed.
+ ** the completion time of each workflow task is printed.
  **
- ** Example invocation of the simulator for a 10-task1 workflow, with no logging:
+ ** Example invocation of the simulator for a 10-task workflow, with no logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml
  **
- ** Example invocation of the simulator for a 10-task1 workflow, with only WMS logging:
+ ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task1 workflow with full logging:

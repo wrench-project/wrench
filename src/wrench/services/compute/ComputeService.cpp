@@ -90,8 +90,8 @@ namespace wrench {
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
      *      - to a bare_metal_standard_jobs: {}
-     *          - If no entry is provided for an actionID, the service will pick on which host and with how many cores to run the task1
-     *          - If a number of cores is provided (e.g., {"action1", "12"}), the service will pick the host on which to run the task1
+     *          - If no entry is provided for an actionID, the service will pick on which host and with how many cores to run the task
+     *          - If a number of cores is provided (e.g., {"action1", "12"}), the service will pick the host on which to run the task
      *          - If a hostname and a number of cores is provided (e.g., {"action1", "host1:12"}, the service will run the action on that host
      *            with the specified number of cores
      *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}], [{actionID:[host[:num_cores]]}

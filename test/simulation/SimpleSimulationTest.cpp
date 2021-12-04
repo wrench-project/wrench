@@ -65,7 +65,7 @@ protected:
         task4->setClusterID("ID2");
         task5->setClusterID("ID2");
 
-        // Add file-task1 dependencies
+        // Add file-task dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
@@ -171,7 +171,7 @@ private:
             throw std::runtime_error("Should have exactly three clusters");
         }
 
-        // Create a bogus standard job with an empty task1 list for coverage
+        // Create a bogus standard job with an empty task list for coverage
         try {
             job_manager->createStandardJob({});
             throw std::runtime_error("Should not be able to create a job with an empty task1 list");
@@ -435,7 +435,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task1" simulation
+    // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

@@ -25,10 +25,10 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param id: the task1 id
-     * @param flops: the task1's number of flops
-     * @param min_cores: the minimum number of cores required for running the task1
-     * @param max_cores: the maximum number of cores that the task1 can use (infinity: ULONG_MAX)
+     * @param id: the task id
+     * @param flops: the task's number of flops
+     * @param min_cores: the minimum number of cores required for running the task
+     * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param spec: the multi-core parallel performance model
      * @param memory_requirement: memory_manager_service requirement in bytes
      */
@@ -44,29 +44,29 @@ namespace wrench {
 //            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
 //            internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
-        // The default is that the task1 is perfectly parallelizable
+        // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
     }
 
     /**
-     * @brief Add an input file to the task1
+     * @brief Add an input file to the task
      *
      * @param file: the file
      * @throw std::invalid_argument
      */
     void WorkflowTask::addInputFile(WorkflowFile *file) {
-        WRENCH_DEBUG("Adding file '%s' as input to task1 %s", file->getID().c_str(), this->getID().c_str());
+        WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
-        // If the file is alreadxy an input file of the task1, complain
+        // If the file is alreadxy an input file of the task, complain
         if (this->input_files.find(file->getID()) != this->input_files.end()) {
             throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() +
-                                        "' is already an input file of task1 '" + this->getID() + "'");
+                                        "' is already an input file of task '" + this->getID() + "'");
         }
 
-        // If file is already an output file of the task1, complain
+        // If file is already an output file of the task, complain
         if (this->output_files.find(file->getID()) != this->output_files.end()) {
             throw std::invalid_argument(" WorkflowTask::addInputFile(): File ID '" + file->getID() +
-                                        "' is already an output file of task1 '" + this->getID() + "'");
+                                        "' is already an output file of task '" + this->getID() + "'");
         }
 
         // Add the file
@@ -80,23 +80,23 @@ namespace wrench {
     }
 
     /**
-     * @brief Add an output file to the task1
+     * @brief Add an output file to the task
      *
      * @param file: the file
      */
     void WorkflowTask::addOutputFile(WorkflowFile *file) {
-        WRENCH_DEBUG("Adding file '%s' as output t task1 %s", file->getID().c_str(), this->getID().c_str());
+        WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
         if (this->input_files.find(file->getID()) != this->input_files.end()) {
             throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
-                                        "' is already an input file of task1 '" + this->getID() + "'");
+                                        "' is already an input file of task '" + this->getID() + "'");
         }
 
-        // If the file is already output of another task1, complain
+        // If the file is already output of another task, complain
         if (file->getOutputOf() != nullptr) {
             throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
-                                        "' is already an output file of another task1 (task1 '" +
+                                        "' is already an output file of another task (task '" +
                                         file->getOutputOf()->getID() + "')");
         }
 
@@ -110,7 +110,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the id of the task1
+     * @brief Get the id of the task
      *
      * @return an id as a string
      */
@@ -119,7 +119,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of flops of the task1
+     * @brief Get the number of flops of the task
      *
      * @return a number of flops
      */
@@ -128,7 +128,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the minimum number of cores required for running the task1
+     * @brief Get the minimum number of cores required for running the task
      *
      * @return a number of cores
      */
@@ -137,7 +137,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the maximum number of cores that the task1 can use
+     * @brief Get the maximum number of cores that the task can use
      *
      * @return a number of cores
      */
@@ -146,7 +146,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory_manager_service requirement of the task1
+     * @brief Get the memory_manager_service requirement of the task
      *
      * @return a memory_manager_service requirement (in bytes)
      */
@@ -155,7 +155,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of children of a task1
+     * @brief Get the number of children of a task
      *
      * @return a number of children
      */
@@ -164,7 +164,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the children of a task1
+     * @brief Get the children of a task
      *
      * @return a list of workflow tasks
      */
@@ -173,7 +173,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of parents of a task1
+     * @brief Get the number of parents of a task
      *
      * @return a number of parents
      */
@@ -182,7 +182,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the parents of a task1
+     * @brief Get the parents of a task
      *
      * @return a list of workflow tasks
      */
@@ -191,16 +191,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the state of the task1
+     * @brief Get the state of the task
      *
-     * @return a task1 state
+     * @return a task state
      */
     WorkflowTask::State WorkflowTask::getState() const {
         return this->visible_state;
     }
 
     /**
-    * @brief Get the state of the task1 as a string
+    * @brief Get the state of the task as a string
     *
     * @return a string
     */
@@ -220,26 +220,26 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the state of the task1
+    * @brief Get the state of the task
     *
-    * @return a task1 state
+    * @return a task state
     */
     WorkflowTask::State WorkflowTask::getUpcomingState() const {
         return this->upcoming_visible_state;
     }
 
     /**
-     * @brief Get the state of the task1 (as known to the "internal" layer)
+     * @brief Get the state of the task (as known to the "internal" layer)
      *
-     * @return a task1 state
+     * @return a task state
      */
     WorkflowTask::InternalState WorkflowTask::getInternalState() const {
         return this->internal_state;
     }
 
     /**
-     * @brief Convert task1 state to a string (useful for output, debugging, logging, etc.)
-     * @param state: task1 state
+     * @brief Convert task state to a string (useful for output, debugging, logging, etc.)
+     * @param state: task state
      * @return a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::State state) {
@@ -260,7 +260,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a task1 internal state as a string
+     * @brief Get a task internal state as a string
      *
      * @param internal_state: the internal state
      *
@@ -284,7 +284,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the workflow that contains the task1
+     * @brief Get the workflow that contains the task
      * @return a workflow
      */
     Workflow *WorkflowTask::getWorkflow() const {
@@ -292,9 +292,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the internal state of the task1
+     * @brief Set the internal state of the task
      *
-     * @param state: the task1's internal state
+     * @param state: the task's internal state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
 //      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
@@ -302,9 +302,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the visible state of the task1
+     * @brief Set the visible state of the task
      *
-     * @param state: the task1 state
+     * @param state: the task state
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
 
@@ -352,16 +352,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the upcoming visible state of the task1
+     * @brief Set the upcoming visible state of the task
      *
-     * @param state: the task1 state
+     * @param state: the task state
      */
     void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
         this->upcoming_visible_state = state;
     }
 
     /**
-     * @brief Set the task1's containing job
+     * @brief Set the task's containing job
      *
      * @param job: the job
      */
@@ -370,7 +370,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task1's containing job
+     * @brief Get the task's containing job
      * @return job: the job
      */
     Job *WorkflowTask::getJob() const {
@@ -378,7 +378,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the cluster Id for the task1
+     * @brief Get the cluster Id for the task
      * @return a cluster id, or an empty string
      */
     std::string WorkflowTask::getClusterID() const {
@@ -386,80 +386,80 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the cluster id for the task1
+     * @brief Set the cluster id for the task
      *
-     * @param id: cluster id the task1 belongs to
+     * @param id: cluster id the task belongs to
      */
     void WorkflowTask::setClusterID(std::string id) {
         this->cluster_id = id;
     }
 
     /**
-     * @brief Get the task1 priority. By default, priority is 0.
-     * @return the task1 priority
+     * @brief Get the task priority. By default, priority is 0.
+     * @return the task priority
      */
     unsigned long WorkflowTask::getPriority() const {
         return this->priority;
     }
 
     /**
-     * @brief Set the task1 priority
-     * @param priority: task1 priority
+     * @brief Set the task priority
+     * @param priority: task priority
      */
     void WorkflowTask::setPriority(long priority) {
         this->priority = priority;
     }
 
     /**
-     * @brief Get the task1 average CPU usage
-     * @return the task1 average CPU usage
+     * @brief Get the task average CPU usage
+     * @return the task average CPU usage
      */
     double WorkflowTask::getAverageCPU() const {
         return this->average_cpu;
     }
 
     /**
-     * @brief Set the task1 average CPU usage
-     * @param average_cpu: task1 average CPU usage
+     * @brief Set the task average CPU usage
+     * @param average_cpu: task average CPU usage
      */
     void WorkflowTask::setAverageCPU(double average_cpu) {
         this->average_cpu = average_cpu;
     }
 
     /**
-     * @brief Get the number of bytes read by the task1
-     * @return number of bytes read by the task1 in KB
+     * @brief Get the number of bytes read by the task
+     * @return number of bytes read by the task in KB
      */
     unsigned long WorkflowTask::getBytesRead() const {
         return this->bytes_read;
     }
 
     /**
-     * @brief Set the number of bytes read by the task1
-     * @param bytes_read: number of bytes read by the task1 in KB
+     * @brief Set the number of bytes read by the task
+     * @param bytes_read: number of bytes read by the task in KB
      */
     void WorkflowTask::setBytesRead(unsigned long bytes_read) {
         this->bytes_read = bytes_read;
     }
 
     /**
-     * @brief Get the number of bytes written by the task1
-     * @return number of bytes written by the task1 in KB
+     * @brief Get the number of bytes written by the task
+     * @return number of bytes written by the task in KB
      */
     unsigned long WorkflowTask::getBytesWritten() const {
         return this->bytes_written;
     }
 
     /**
-     * @brief Set the number of bytes written by the task1
-     * @param bytes_written: number of bytes written by the task1 in KB
+     * @brief Set the number of bytes written by the task
+     * @param bytes_written: number of bytes written by the task in KB
      */
     void WorkflowTask::setBytesWritten(unsigned long bytes_written) {
         this->bytes_written = bytes_written;
     }
 
     /**
-     * @brief Set the task1's start date (which pushing a new execution history!)
+     * @brief Set the task's start date (which pushing a new execution history!)
      *
      * @param date: the start date
      */
@@ -468,7 +468,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Update the task1's start date.
+     * @brief Update the task's start date.
      *
      * @param date: the start date
      */
@@ -482,7 +482,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task1's end date
+     * @brief Set the task's end date
      *
      * @param date: the end date
      * @throws std::runtime_error
@@ -558,7 +558,7 @@ namespace wrench {
     /**
      * @brief Set the date when the write output portion of a WorkflowTask has begun
      *
-     * @param date: the date when the write output portion of a task1 has begun
+     * @param date: the date when the write output portion of a task has begun
      * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputStartDate(double date) {
@@ -573,7 +573,7 @@ namespace wrench {
     /**
      * @brief Set the date when the write output portion of a WorkflowTask has completed
      *
-     * @param date: the date when the write output portion of a task1 has completed
+     * @param date: the date when the write output portion of a task has completed
      * @throws std::runtime_error
      */
     void WorkflowTask::setWriteOutputEndDate(double date) {
@@ -586,9 +586,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the date when the task1 has failed
+     * @brief Set the date when the task has failed
      *
-     * @param date: the date when the task1 has failed
+     * @param date: the date when the task has failed
      */
     void WorkflowTask::setFailureDate(double date) {
         if (not this->execution_history.empty()) {
@@ -600,9 +600,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the date when the task1 was terminated
+     * @brief Set the date when the task was terminated
      *
-     * @param date: the date when the task1 was terminated
+     * @param date: the date when the task was terminated
      */
     void WorkflowTask::setTerminationDate(double date) {
         if (not this->execution_history.empty()) {
@@ -614,16 +614,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the execution history of this task1
+     * @brief Get the execution history of this task
      *
-     * @return a stack of WorkflowTaskExecution objects, one for each attempted execution of the task1
+     * @return a stack of WorkflowTaskExecution objects, one for each attempted execution of the task
      */
     std::stack<WorkflowTask::WorkflowTaskExecution> WorkflowTask::getExecutionHistory() const {
         return this->execution_history;
     }
 
     /**
-     * @brief Get the number of times a task1 has failed
+     * @brief Get the number of times a task has failed
      *
      * @return a failure count
      */
@@ -632,14 +632,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Increment the failure count of a task1
+     * @brief Increment the failure count of a task
      */
     void WorkflowTask::incrementFailureCount() {
         this->failure_count++;
     }
 
     /**
-     * @brief Get the list of input WorkflowFile objects for the task1
+     * @brief Get the list of input WorkflowFile objects for the task
      * @return a list workflow files
      */
     std::vector<WorkflowFile *> WorkflowTask::getInputFiles() const {
@@ -652,7 +652,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of output WorkflowFile objects for the task1
+     * @brief Get the list of output WorkflowFile objects for the task
      * @return a list of workflow files
      */
     std::vector<WorkflowFile *> WorkflowTask::getOutputFiles() const {
@@ -665,16 +665,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task1's most recent start date
-     * @return a start date (-1 if task1 has not started yet)
+     * @brief Get the task's most recent start date
+     * @return a start date (-1 if task has not started yet)
      */
     double WorkflowTask::getStartDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().task_start : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent end date
-     * @return a end date (-1 if task1 has not completed yet or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent end date
+     * @return a end date (-1 if task has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getEndDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().task_end : -1.0;
@@ -682,55 +682,55 @@ namespace wrench {
 
     /**
      * @brief Get the tasks's most recent computation start date
-     * @return the date when the computation portion of a task1 started (-1 if computation has not started yet or if no execution history exists for this task1 yet)
+     * @return the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getComputationStartDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().computation_start : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent computation end date
-     * @return the date when the computation portion of a task1 ended (-1 if computation has not ended yet or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent computation end date
+     * @return the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getComputationEndDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().computation_end : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent read input start date
-     * @return the date when the read input portion of the task1 has begun (-1 if it has not yet begun or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent read input start date
+     * @return the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet)
      */
     double WorkflowTask::getReadInputStartDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().read_input_start : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent read input end date
-     * @return the date when the read input portion of the task1 has completed (-1 if it has not begun or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent read input end date
+     * @return the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet)
      */
     double WorkflowTask::getReadInputEndDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().read_input_end : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent write output start date
-     * @return the date when the write output portion of a task1 has begun (-1 if it has not yet started or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent write output start date
+     * @return the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet)
      */
     double WorkflowTask::getWriteOutputStartDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().write_output_start : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent write output end date
-     * @return the date when the write output portion of a task1 has completed (-1 if it has not completed yet or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent write output end date
+     * @return the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getWriteOutputEndDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().write_output_end : -1.0;
     }
 
     /**
-     * @brief Get the task1's most recent failure date
-     * @return the date when the task1 failed (-1 if it didn't fail or if no execution history exists for this task1 yet)
+     * @brief Get the task's most recent failure date
+     * @return the date when the task failed (-1 if it didn't fail or if no execution history exists for this task yet)
      */
     double WorkflowTask::getFailureDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
@@ -738,15 +738,15 @@ namespace wrench {
 
     /**
      * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
-     * @return the date when the task1 was terminated (-1 if it wasn't terminated or if not execution history exists for this task1 yet)
+     * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
      */
     double WorkflowTask::getTerminationDate() const {
         return (not this->execution_history.empty()) ? this->execution_history.top().task_terminated : -1.0;
     }
 
     /**
-     * @brief Update the task1's top level (looking only at the parents, and updating children)
-     * @return the task1's updated top level
+     * @brief Update the task's top level (looking only at the parents, and updating children)
+     * @return the task's updated top level
      */
     unsigned long WorkflowTask::updateTopLevel() {
         std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
@@ -767,7 +767,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the task1's top level (max number of hops on a reverse path up to an entry task1. Entry
+     * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
      *        tasks have a top-level of 0)
      * @return
      */
@@ -776,8 +776,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the name of the host on which the task1 has most recently been executed, or "" if
-     *        the task1 has never been executed yet. Could be a virtual hostname.
+     * @brief Returns the name of the host on which the task has most recently been executed, or "" if
+     *        the task has never been executed yet. Could be a virtual hostname.
      * @return hostname
      */
     std::string WorkflowTask::getExecutionHost() const {
@@ -785,8 +785,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Returns the name of the PHYSICAL host on which the task1 has most recently been executed, or "" if
-    *        the task1 has never been executed yet.
+    * @brief Returns the name of the PHYSICAL host on which the task has most recently been executed, or "" if
+    *        the task has never been executed yet.
     * @return hostname
     */
     std::string WorkflowTask::getPhysicalExecutionHost() const {
@@ -794,7 +794,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the number of cores allocated for this task1's most recent execution or 0 if an execution attempt was never made
+     * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
      * @return number of cores
      */
     unsigned long WorkflowTask::getNumCoresAllocated() const {
@@ -802,7 +802,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the host on which this task1 is running.If the hostname is a VM name, then
+     * @brief Sets the host on which this task is running.If the hostname is a VM name, then
      * the corresponding physical host name will be set!
      * @param hostname: the host name
      */
@@ -825,8 +825,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the number of cores allocated for this task1
-     * @param num_cores: the number of cores allocated to this task1
+     * @brief Sets the number of cores allocated for this task
+     * @param num_cores: the number of cores allocated to this task
      */
     void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
         if (not this->execution_history.empty()) {
@@ -838,7 +838,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task1's color ("" if none)
+     * @brief Get the task's color ("" if none)
      * @return A color string in  "#rrggbb" format
      */
     std::string WorkflowTask::getColor() const {
@@ -846,7 +846,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task1's color
+     * @brief Set the task's color
      * @param color A color string in  "#rrggbb" format
      */
     void WorkflowTask::setColor(std::string color) {
@@ -854,7 +854,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task1's parallel model
+     * @brief Set the task's parallel model
      * @param model: a parallel model
      */
     void WorkflowTask::setParallelModel(std::shared_ptr<ParallelModel> model) {
@@ -862,7 +862,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task1's parallel model
+     * @brief Get the task's parallel model
      * @return the parallel model
      */
     std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() const {
@@ -870,7 +870,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Update task1 readiness
+     * @brief Update task readiness
      */
     void WorkflowTask::updateReadiness() {
         if (this->getState() == WorkflowTask::State::NOT_READY) {

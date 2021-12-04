@@ -154,7 +154,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
     ASSERT_THROW(t1->setNumCoresAllocated(10), std::runtime_error);
     ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
 
-    // getting the execution_host before a task1 has run at least once should return an empty string
+    // getting the execution_host before a task has run at least once should return an empty string
     ASSERT_TRUE(t1->getExecutionHost().empty());
     ASSERT_TRUE(t1->getPhysicalExecutionHost().empty());
 
@@ -277,7 +277,7 @@ private:
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
-        // while large_input_file is being read, we delete small_input_file so that the one task1 job will fail
+        // while large_input_file is being read, we delete small_input_file so that the one task job will fail
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
@@ -414,7 +414,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_NE(t4_unsuccessful_execution.task_failed, -1.0);
     ASSERT_STREQ(t4_unsuccessful_execution.execution_host.c_str(), "ExecutionHost");
 
-// the rest of the values should be set to -1 since the task1 failed while reading input
+// the rest of the values should be set to -1 since the task failed while reading input
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.read_input_end, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.computation_start, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.computation_end, -1.0);

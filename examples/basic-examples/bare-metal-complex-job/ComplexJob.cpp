@@ -8,7 +8,7 @@
  */
 
 /**
- ** This simulator simulates the execution of a one-task1 workflow, where the task1  is:
+ ** This simulator simulates the execution of a one-task workflow, where the task  is:
  **
  **   {InFile #0, InFile #1} -> Task -> {OutFile #0, OutFile #1}
  **
@@ -16,7 +16,7 @@
  ** On WMSHost runs a WMS (defined in class ComplexJobWMS). On ComputeHost runs a bare metal
  ** compute service, that has access to the 10 cores of that host. On StorageHost1 and
  ** StorageHost2 run two storage services.  Once the simulation is done,
- ** the completion time of each workflow task1 is printed.
+ ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml
@@ -24,7 +24,7 @@
  ** Example invocation of the simulator with only WMS logging:
  **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml --log=custom_wms.threshold=info
  **
- ** Example invocation of the simulator for a 5-task1 workflow with full logging:
+ ** Example invocation of the simulator for a 5-task workflow with full logging:
  **    ./wrench-example-bare-metal-complex-job ./four_hosts.xml --wrench-full-log
  **/
 
@@ -67,8 +67,8 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     wrench::Workflow workflow;
 
-    /* Add the workflow task1 and files */
-    auto task = workflow.addTask("task1", 10000000000.0, 1, 10, 10000000);
+    /* Add the workflow task and files */
+    auto task = workflow.addTask("task", 10000000000.0, 1, 10, 10000000);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     task->addInputFile(workflow.addFile("infile_1", 100000000));
     task->addInputFile(workflow.addFile("infile_2", 10000000));
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
-    std::cerr << "Staging task1 input files..." << std::endl;
+    std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f : workflow.getInputFiles()) {
         simulation.stageFile(f, storage_service1);
     }
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     /* Simulation results can be examined via simulation.output, which provides access to traces
-     * of events. In the code below, we print the  retrieve the trace of all task1 completion events, print how
+     * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     for (auto const &item : trace) {
