@@ -197,7 +197,6 @@ namespace wrench {
         /* End Resources information in batch */
 
         // Vector of one-shot bare-metal compute services
-//        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
         std::set<std::shared_ptr<BareMetalComputeServiceOneShot>> running_bare_metal_one_shot_compute_services;
 
         // Vector of one-shot bare-metal compute services (which is cleared periodically)

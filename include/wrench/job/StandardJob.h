@@ -105,7 +105,6 @@ namespace wrench {
 
     private:
 
-        friend class StandardJobExecutor;
         friend class BareMetalComputeService;
         friend class JobManager;
         friend class ExecutionEvent;

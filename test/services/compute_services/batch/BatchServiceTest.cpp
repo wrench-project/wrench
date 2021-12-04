@@ -2164,7 +2164,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
             new wrench::BatchComputeService(
                     hostname,
                     {"Host1", "Host2", "Host3", "Host4"}, "",
-                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+                    {{wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2322,7 +2322,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
             new wrench::BatchComputeService(
                     hostname,
                     {"Host1", "Host2", "Host3", "Host4"}, "",
-                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+                    {{wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
@@ -2582,7 +2582,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
             new wrench::BatchComputeService(
                     hostname,
                     {"Host1", "Host2", "Host3", "Host4"}, "",
-                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
+                    {{wrench::BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;

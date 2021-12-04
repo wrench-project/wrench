@@ -83,17 +83,12 @@ set(HEADER_FILES
         include/wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h
         include/wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h
         include/wrench/services/compute/htcondor/HTCondorNegotiatorService.h
-        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.h
-        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.h
-        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.h
         include/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h
         include/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h
         include/wrench/services/helper_services/action_execution_service/ActionExecutionService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h
-        include/wrench/services/helper_services/work_unit_executor/Workunit.h
-        include/wrench/services/helper_services/work_unit_executor/WorkunitExecutor.h
         include/wrench/services/helper_services/action_executor/ActionExecutor.h
         include/wrench/services/helper_services/action_executor/ActionExecutorMessage.h
         include/wrench/services/file_registry/FileRegistryService.h
@@ -204,18 +199,13 @@ set(SOURCE_FILES
         src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
         src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
         src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
-        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutor.cpp
-        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
         src/wrench/services/helper_services/action_execution_service/ActionExecutionService.cpp
         src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.cpp
         src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.cpp
-        include/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessage.h
-        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.cpp
-        src/wrench/services/helper_services/standard_job_executor/StandardJobExecutorProperty.cpp
         src/wrench/services/helper_services/compute_thread/ComputeThread.cpp
+        src/wrench/services/helper_services/compute_thread/ComputeThreadMessage.cpp
         include/wrench/services/helper_services/compute_thread/ComputeThread.h
-        src/wrench/services/helper_services/work_unit_executor/Workunit.cpp
-        src/wrench/services/helper_services/work_unit_executor/WorkunitExecutor.cpp
+        include/wrench/services/helper_services/compute_thread/ComputeThreadMessage.h
         src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
         src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
         src/wrench/logging/TerminalOutput.cpp
@@ -317,8 +307,6 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestampTypes.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/util/PointerUtil.cpp
-        src/wrench/util/PointerUtil.cpp
         src/wrench/util/UnitParser.cpp
         src/wrench/wms/WMS.cpp
         src/wrench/wms/WMSMessage.cpp
@@ -394,7 +382,6 @@ set(TEST_FILES
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestStandardJobs.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestPilotJobs.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp
-        test/services/helper_services/StandardJobExecutorTest.cpp
         test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
         test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
@@ -404,7 +391,6 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
-        test/services/helper_services/WorkunitExecutorTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
         test/services/compute_services/batch/HomeGrownTimeLineTest.cpp
@@ -460,7 +446,6 @@ set(TEST_FILES
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
         test/simulated_failures/host_failures/BareMetalComputeServiceHostFailuresTest.cpp
         test/simulated_failures/host_failures/CloudComputeServiceHostFailuresTest.cpp
-        test/simulated_failures/host_failures/StandardJobExecutorHostFailuresTest.cpp
         test/simulated_failures/host_failures/NetworkProximityHostFailuresTest.cpp
         test/simulated_failures/host_failures/StorageServiceReStartHostFailuresTest.cpp
         test/simulated_failures/link_failures/FileRegistryLinkFailuresTest.cpp
