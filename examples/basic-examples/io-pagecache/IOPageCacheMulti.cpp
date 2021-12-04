@@ -229,5 +229,5 @@ int main(int argc, char **argv) {
 //        simulation.getMemoryManagerByHost("host01")->export_log("multi/" + sub_dir + to_string(no_pipelines) + "_sim_mem.csv");
     }
 
-    exit(0);
+    return 0;
 }

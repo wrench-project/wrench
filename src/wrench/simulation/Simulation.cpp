@@ -78,11 +78,13 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
+        std::cerr << " IN SIMULAITON SHUTDOWN\n";
         this->s4u_simulation->shutdown();
         // Clearing all tracked service, which will cause all services that are not
         // pointed to by main() to be deleted.
         Service::clearTrackedServices();
         this->compute_services.clear();
+        std::cerr << "OUT OF SIMULAITON SHUTDIWN\n";
     }
 
     /**

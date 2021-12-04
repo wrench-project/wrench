@@ -1538,9 +1538,9 @@ namespace wrench {
      * @brief Destructor
      */
     SimulationOutput::~SimulationOutput() {
-        for (auto t : this->traces) {
-            delete t.second;
-        }
+//        for (auto t : this->traces) {
+//            delete t.second;
+//        }
         this->traces.clear();
     }
 
