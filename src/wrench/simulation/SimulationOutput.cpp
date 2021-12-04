@@ -208,6 +208,7 @@ namespace wrench {
 
         std::ofstream output(file_path);
         output << std::setw(4) << unified_json << std::endl;
+
         output.close();
     }
 
