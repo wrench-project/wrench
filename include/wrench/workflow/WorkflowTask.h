@@ -26,7 +26,7 @@
 namespace wrench {
 
     /**
-     * @brief A computational task1 in a Workflow
+     * @brief A computational task in a Workflow
      */
     class WorkflowTask {
 
@@ -213,7 +213,7 @@ namespace wrench {
         void setNumCoresAllocated(unsigned long num_cores);
 
         /**
-         * @brief A data structure that keeps track of a task1's execution event times
+         * @brief A data structure that keeps track of a task's execution event times
          */
         struct WorkflowTaskExecution {
             /** @brief Task's start time **/
@@ -263,7 +263,7 @@ namespace wrench {
         friend class Workflow;
 
         std::string id;                    // Task ID
-        std::string cluster_id;            // ID for clustered task1
+        std::string cluster_id;            // ID for clustered task
         std::string color;                 // A RGB color formatted as "#rrggbb"
         double flops;                      // Number of flops
         double average_cpu = -1;           // Average CPU utilization
@@ -274,9 +274,9 @@ namespace wrench {
         std::shared_ptr<ParallelModel> parallel_model;
         double memory_requirement;
         unsigned long priority = 0;        // Task priority
-        unsigned long toplevel;            // 0 if entry task1
+        unsigned long toplevel;            // 0 if entry task
         unsigned int failure_count = 0;    // Number of times the tasks has failed
-        std::string execution_host;        // Host on which the task1 executed ("" if not executed successfully - yet)
+        std::string execution_host;        // Host on which the task executed ("" if not executed successfully - yet)
         State visible_state;               // To be exposed to developer level
         State upcoming_visible_state;      // A visible state that will become active once a WMS has process a previously sent workflow execution event
         InternalState internal_state;      // Not to be exposed to developer level

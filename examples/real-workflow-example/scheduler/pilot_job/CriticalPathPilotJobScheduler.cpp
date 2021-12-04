@@ -63,7 +63,7 @@ namespace wrench {
       }
 
       // Submit a pilot job
-      // TODO: Henri added the factor 2 below because running with the "one task1" example,
+      // TODO: Henri added the factor 2 below because running with the "one task" example,
       // TODO: the pilot job was just a bit too short and the WMS was in an infinite loop
       // TODO: (which is an annoying but simulation-valid behavior)
       double pilot_job_duration = 2.0 * flops / target_service->getCoreFlopRate()[0];

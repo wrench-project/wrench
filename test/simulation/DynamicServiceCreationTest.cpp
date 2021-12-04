@@ -64,7 +64,7 @@ protected:
         task4->setClusterID("ID2");
         task5->setClusterID("ID2");
 
-        // Add file-task1 dependencies
+        // Add file-task dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
@@ -300,7 +300,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task1" simulation
+    // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

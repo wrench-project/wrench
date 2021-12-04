@@ -18,7 +18,7 @@
 namespace wrench {
 
     /**
-     * @brief A class that defines a custom parallel task1 performance model.
+     * @brief A class that defines a custom parallel task performance model.
      */
     class CustomParallelModel : public ParallelModel {
 

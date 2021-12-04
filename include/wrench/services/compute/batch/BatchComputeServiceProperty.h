@@ -22,7 +22,7 @@ namespace wrench {
 
     public:
         /**
-         * @brief The overhead to start a task1 execution, in seconds
+         * @brief The overhead to start a task execution, in seconds
          */
         DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
 
@@ -61,7 +61,7 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
-        /** @brief The algorithm to pick which ready computational task1 (within a standard job
+        /** @brief The algorithm to pick which ready computational task (within a standard job
          *         executed by the batch service), in case multiple tasks are ready, should run first. This is typically
          *         not managed by a batch scheduler, but by some application-level script that executes
          *         a set of tasks within compute resources allocated by the batch scheduler. Possible values are:

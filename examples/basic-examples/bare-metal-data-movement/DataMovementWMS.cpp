@@ -9,12 +9,12 @@
 
 /**
  ** A Workflow Management System (WMS) implementation that operates on a workflow
- ** with a single task1 that has two input files and two output files as follows:
+ ** with a single task that has two input files and two output files as follows:
  ** 
  **  - Copy the first input file from the first storage service to the second one
- **  - Runs the task1 so that it produces its output files on the second storage service
- **  - Copy the task1's first output file to the first storage service
- **  - Delete the task1's second output file on the second storage service
+ **  - Runs the task so that it produces its output files on the second storage service
+ **  - Copy the task's first output file to the first storage service
+ **  - Delete the task's second output file on the second storage service
  **/
 
 #include <iostream>
@@ -77,8 +77,8 @@ namespace wrench {
             storage_service1 = *(this->getAvailableStorageServices().begin()++);
         }
 
-        /* Get references to the task1 and files */
-        auto task = this->getWorkflow()->getTaskByID("task1");
+        /* Get references to the task and files */
+        auto task = this->getWorkflow()->getTaskByID("task");
         auto infile_1 = this->getWorkflow()->getFileByID("infile_1");
         auto infile_2 = this->getWorkflow()->getFileByID("infile_2");
         auto outfile_1 = this->getWorkflow()->getFileByID("outfile_1");
@@ -93,7 +93,7 @@ namespace wrench {
 
 
         /* Now let's create a map of file locations, stating for each file
-         * where is should be read/written while the task1 executes */
+         * where is should be read/written while the task executes */
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
 
         file_locations[infile_1] = FileLocation::LOCATION(storage_service2);

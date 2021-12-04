@@ -185,7 +185,7 @@ void S4U_VirtualMachineTest::do_basic_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task1" simulation
+    // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
