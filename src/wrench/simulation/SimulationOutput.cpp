@@ -45,14 +45,14 @@ namespace wrench {
      * @brief Object representing an instance when a WorkflowTask was run.
      */
     typedef struct WorkflowTaskExecutionInstance {
-        /* @brief  a task ID */
+        /* @brief  a task1 ID */
         std::string task_id;
         /* @brief number of allocated cores */
         unsigned long long num_cores_allocated;
         /* @brief vertical position in gantt chart display */
         unsigned long long vertical_position;
 
-        /* @brief task geometry in gantt chart display */
+        /* @brief task1 geometry in gantt chart display */
         std::pair<double, double> whole_task;
         /** @brief file read geometry in gantt chart display */
         std::pair<double, double> read;
@@ -66,22 +66,22 @@ namespace wrench {
         /* @brief file write operations */
         std::vector <std::tuple<double, double, std::string>> writes;
 
-        /* @brief whether the task has failed */
+        /* @brief whether the task1 has failed */
         double failed;
-        /* @brief whether the task was terminated */
+        /* @brief whether the task1 was terminated */
         double terminated;
 
-        /* @brief name of the host that ran the task */
+        /* @brief name of the host that ran the task1 */
         std::string hostname;
-        /* @brief flop rate of the host that ran the task */
+        /* @brief flop rate of the host that ran the task1 */
         double host_flop_rate;
-        /* @brief RAM capacity of the host that ran the task */
+        /* @brief RAM capacity of the host that ran the task1 */
         double host_memory;
-        /* @brief number of cores of the host that ran the task */
+        /* @brief number of cores of the host that ran the task1 */
         unsigned long long host_num_cores;
 
         /* 
-         * @brief get the task end time
+         * @brief get the task1 end time
          *
          * @return a date
          */
@@ -331,8 +331,8 @@ namespace wrench {
      *        position to plot each rectangle.
      * 
      * Recursive backtracking search for a valid gantt chart layout. This algorithm looks for a
-     *              vertical position to place each task execution event such that it doesn't overlap with
-     *              any other task.
+     *              vertical position to place each task1 execution event such that it doesn't overlap with
+     *              any other task1.
      *
      * @param data: JSON workflow execution data
      * @param index: the index of the workflow execution data up to where we would like to check for a valid layout
@@ -356,7 +356,7 @@ namespace wrench {
 //      for (int i=0; i < index; i++) {
 //        spaces += "  ";
 //      }
-//      std::cout << spaces + "task = " << index <<"\n";
+//      std::cout << spaces + "task1 = " << index <<"\n";
 
         /*
          * For each possible vertical position that an event can be in, we perform a check to see that its vertical
@@ -429,8 +429,8 @@ namespace wrench {
      * 
      * Searches for a possible gantt chart layout to represent host utilization. If a layout is found
      *              (no tasks overlap), then information about where to plot what is added to the JSON object. Note
-     *              that this is a possible layout and does not reflect what task ran on what core specifically. For
-     *              example, we may hav a task that was allocated 2-cores on a idle 4-core host. The task, when plotted
+     *              that this is a possible layout and does not reflect what task1 ran on what core specifically. For
+     *              example, we may hav a task1 that was allocated 2-cores on a idle 4-core host. The task1, when plotted
      *              on the gantt chart may end up in 1 of 3 positions (using cores 0 and 1, 1 and 2, or 2 and 3).
      * @param data: JSON workflow execution data
      *
@@ -448,7 +448,7 @@ namespace wrench {
      */
 
     /**
-      * @brief Writes WorkflowTask execution history for each task to a file, formatted as a JSON array.
+      * @brief Writes WorkflowTask execution history for each task1 to a file, formatted as a JSON array.
       * 
       * The JSON array has the following format:
       *
@@ -509,8 +509,8 @@ namespace wrench {
       *   In this situation, the function will go through the entire search space until all possible layouts are evaluated.
       *   For a large Workflow, this may take a very long time.
       *
-      *   If a host utilization layout is able to be generated, the 'vertical_position' values will be set for each task run,
-      *   and the task can be plotted as a rectangle on a graph where the y-axis denotes the number of cores - 1, and the x-axis denotes the
+      *   If a host utilization layout is able to be generated, the 'vertical_position' values will be set for each task1 run,
+      *   and the task1 can be plotted as a rectangle on a graph where the y-axis denotes the number of cores - 1, and the x-axis denotes the
       *   workflow execution timeline. The vertical_position specifies the bottom of the rectangle. num_cores_allocated specifies the height
       *   of the rectangle.
       *
@@ -623,7 +623,7 @@ namespace wrench {
             }
         }
 
-        // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
+        // For each attempted execution of a task1, add a WorkflowTaskExecutionInstance to the list.
         for (auto const &task : tasks) {
             auto execution_history = task->getExecutionHistory();
 
@@ -710,7 +710,7 @@ namespace wrench {
     /**
      * @brief Writes a JSON graph representation of the Workflow to a file.
      * 
-     * A node is added for each WorkflowTask and WorkflowFile. A WorkflowTask will have the type "task" and
+     * A node is added for each WorkflowTask and WorkflowFile. A WorkflowTask will have the type "task1" and
      *  a WorkflowFile will have the type "file". A directed link is added for each dependency in the Workflow.
      *
      * <pre>
@@ -718,7 +718,7 @@ namespace wrench {
      *      "workflow_graph": {
      *          vertices: [
      *              {
-     *                  type: <"task">,
+     *                  type: <"task1">,
      *                  id: <string>,
      *                  flops: <double>,
      *                  min_cores: <unsigned_long>,
@@ -760,10 +760,10 @@ namespace wrench {
         nlohmann::json vertices;
         nlohmann::json edges;
 
-        // add the task vertices
+        // add the task1 vertices
         for (const auto &task : workflow->getTasks()) {
             vertices.push_back({
-                                       {"type",                   "task"},
+                                       {"type",                   "task1"},
                                        {"id",                     task->getID()},
                                        {"flops",                  task->getFlops()},
                                        {"min_cores",              task->getMinNumCores()},
@@ -783,7 +783,7 @@ namespace wrench {
 
         // add the edges
         for (const auto &task : workflow->getTasks()) {
-            // create edges between input files (if any) and the current task
+            // create edges between input files (if any) and the current task1
             for (const auto &input_file : task->getInputFiles()) {
                 edges.push_back({
                                         {"source", input_file->getID()},
@@ -795,13 +795,13 @@ namespace wrench {
             bool has_children = task->getNumberOfChildren() > 0;
 
             if (has_output_files) {
-                // create the edges between current task and its output files (if any)
+                // create the edges between current task1 and its output files (if any)
                 for (const auto &output_file : task->getOutputFiles()) {
                     edges.push_back({{"source", task->getID()},
                                      {"target", output_file->getID()}});
                 }
             } else if (has_children) {
-                // then create the edges from the current task to its children tasks (if it has not output files)
+                // then create the edges from the current task1 to its children tasks (if it has not output files)
                 for (const auto &child : workflow->getTaskChildren(task)) {
                     edges.push_back({
                                             {"source", task->getID()},
@@ -1547,7 +1547,7 @@ namespace wrench {
      * @brief Constructor
      */
     SimulationOutput::SimulationOutput() {
-        // By default enable all task timestamps
+        // By default enable all task1 timestamps
         this->setEnabled<SimulationTimestampTaskStart>(true);
         this->setEnabled<SimulationTimestampTaskFailure>(true);
         this->setEnabled<SimulationTimestampTaskCompletion>(true);
@@ -1587,8 +1587,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a task start timestamp
-     * @param task: a workflow task
+     * @brief Add a task1 start timestamp
+     * @param task: a workflow task1
      */
     void SimulationOutput::addTimestampTaskStart(double date, WorkflowTask *task) {
         if (this->isEnabled<SimulationTimestampTaskStart>()) {
@@ -1597,8 +1597,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a task start failure
-     * @param task: a workflow task
+     * @brief Add a task1 start failure
+     * @param task: a workflow task1
      */
     void SimulationOutput::addTimestampTaskFailure(double date, WorkflowTask *task) {
         if (this->isEnabled<SimulationTimestampTaskFailure>()) {
@@ -1607,8 +1607,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a task start completion
-     * @param task: a workflow task
+     * @brief Add a task1 start completion
+     * @param task: a workflow task1
      */
     void SimulationOutput::addTimestampTaskCompletion(double date, WorkflowTask *task) {
         if (this->isEnabled<SimulationTimestampTaskCompletion>()) {
@@ -1617,8 +1617,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Add a task start termination
-    * @param task: a workflow task
+    * @brief Add a task1 start termination
+    * @param task: a workflow task1
     */
     void SimulationOutput::addTimestampTaskTermination(double date, WorkflowTask *task) {
         if (this->isEnabled<SimulationTimestampTaskTermination>()) {
@@ -1631,7 +1631,7 @@ namespace wrench {
      * @param file: a workflow file
      * @param src: the source location
      * @param service: the source storage service
-     * @param task: the workflow task for which this read is done (or nullptr);
+     * @param task: the workflow task1 for which this read is done (or nullptr);
      */
     void SimulationOutput::addTimestampFileReadStart(double date,
                                                      WorkflowFile *file,
@@ -1649,7 +1649,7 @@ namespace wrench {
     * @param file: a workflow file
     * @param src: the source location
     * @param service: the source storage service
-    * @param task: the workflow task for which this read is done (or nullptr);
+    * @param task: the workflow task1 for which this read is done (or nullptr);
     */
     void SimulationOutput::addTimestampFileReadFailure(double date,
                                                        WorkflowFile *file,
@@ -1667,7 +1667,7 @@ namespace wrench {
     * @param file: a workflow file
     * @param src: the source location
     * @param service: the source storage service
-    * @param task: the workflow task for which this read is done (or nullptr);
+    * @param task: the workflow task1 for which this read is done (or nullptr);
     */
     void
     SimulationOutput::addTimestampFileReadCompletion(double date,
@@ -1686,7 +1686,7 @@ namespace wrench {
      * @param file: a workflow file
      * @param src: the target location
      * @param service: the target storage service
-     * @param task: the workflow task for which this write is done (or nullptr);
+     * @param task: the workflow task1 for which this write is done (or nullptr);
      */
     void SimulationOutput::addTimestampFileWriteStart(double date,
                                                       WorkflowFile *file,
@@ -1704,7 +1704,7 @@ namespace wrench {
     * @param file: a workflow file
     * @param src: the target location
     * @param service: the target storage service
-    * @param task: the workflow task for which this write is done (or nullptr);
+    * @param task: the workflow task1 for which this write is done (or nullptr);
     */
     void SimulationOutput::addTimestampFileWriteFailure(double date,
                                                         WorkflowFile *file,
@@ -1722,7 +1722,7 @@ namespace wrench {
     * @param file: a workflow file
     * @param src: the target location
     * @param service: the target storage service
-    * @param task: the workflow task for which this write is done (or nullptr);
+    * @param task: the workflow task1 for which this write is done (or nullptr);
     */
     void
     SimulationOutput::addTimestampFileWriteCompletion(double date,
@@ -1972,7 +1972,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Enable or Disable the insertion of task-related timestamps in
+     * @brief Enable or Disable the insertion of task1-related timestamps in
      *        the simulation output (enabled by default)
      * @param enabled true to enable, false to disable
      */

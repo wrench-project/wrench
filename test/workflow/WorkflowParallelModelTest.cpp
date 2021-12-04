@@ -66,7 +66,7 @@ private:
     int main() {
         auto job_manager = this->createJobManager();
 
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTaskByID("task"));
+        auto job = job_manager->createStandardJob(this->getWorkflow()->getTaskByID("task1"));
         job_manager->submitJob(job, this->test->compute_service);
 
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -121,7 +121,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     auto workflow = new wrench::Workflow();
     double work = 100.0;
     double alpha = 0.3;
-    this->task = workflow->addTask("task", work, 1, 4, 0.0);
+    this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::AMDAHL(alpha));
 
     auto parallel_model = task->getParallelModel();
@@ -137,7 +137,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     double expected_makespan = (alpha * work)  / 4 + (1 - alpha) * work;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
-        throw std::runtime_error("Unexpected task makespan: " + std::to_string(makespan) +
+        throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
         " instead of " + std::to_string(expected_makespan));
     }
 
@@ -186,7 +186,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     auto workflow = new wrench::Workflow();
     double work = 100.0;
     double efficiency = 0.3;
-    this->task = workflow->addTask("task", work, 1, 4, 0.0);
+    this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(efficiency));
 
     auto parallel_model = task->getParallelModel();
@@ -204,7 +204,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     WRENCH_INFO("--> %lf %lf\n", makespan, expected_makespan);
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
-        throw std::runtime_error("Unexpected task makespan: " + std::to_string(makespan) +
+        throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
                                  " instead of " + std::to_string(expected_makespan));
     }
 
@@ -252,7 +252,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
 
     auto workflow = new wrench::Workflow();
     double work = 100.0;
-    this->task = workflow->addTask("task", work, 1, 4, 0.0);
+    this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
             [] (double work, unsigned long num_threads) {
                 std::vector<double> works;
@@ -276,7 +276,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     double expected_makespan = 40.0;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
-        throw std::runtime_error("Unexpected task makespan: " + std::to_string(makespan) +
+        throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
                                  " instead of " + std::to_string(expected_makespan));
     }
 

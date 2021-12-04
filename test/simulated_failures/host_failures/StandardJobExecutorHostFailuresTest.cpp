@@ -46,8 +46,8 @@ protected:
         input_file = workflow->addFile("input_file", 10000.0);
         output_file = workflow->addFile("output_file", 20000.0);
 
-        // Create one task
-        task = workflow->addTask("task", 3600, 1, 1, 0);
+        // Create one task1
+        task = workflow->addTask("task1", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
@@ -230,7 +230,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -365,7 +365,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorOneFailureCausin
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -420,7 +420,7 @@ private:
             switch2->setSimulation(this->simulation);
             switch2->start(switch2, true, false); // Daemonized, no auto-restart
 
-            // Add a task to the workflow
+            // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 0);
             auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 2000);
             task->addInputFile(this->test->input_file);
@@ -525,7 +525,7 @@ void StandardJobExecutorHostFailuresTest::do_StandardJobExecutorRandomFailures_t
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(stable_host)));
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;

@@ -32,7 +32,7 @@ namespace wrench {
 
                 if (task->getClusterID().empty() && task->getFailureCount() > 0) continue;
 
-                WRENCH_INFO("Ungrouping task %s due to failure", task->getID().c_str());
+                WRENCH_INFO("Ungrouping task1 %s due to failure", task->getID().c_str());
                 task->setClusterID(task->getID());
                 ++count;
             }

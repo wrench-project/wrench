@@ -92,7 +92,7 @@ protected:
         task7 = workflow->addTask("task_7_8s_1_to_4_cores", 8.0, 1, 4, 0);
         task8 = workflow->addTask("task_8_8s_2_to_4_cores", 8.0, 2, 4, 0);
 
-        // Add file-task dependencies
+        // Add file-task1 dependencies
         task1->addInputFile(input_file);
         task2->addInputFile(input_file);
         task3->addInputFile(input_file);
@@ -184,7 +184,7 @@ private:
         // Create a pilot job
         auto pilot = job_manager->createPilotJob();
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         try {
             job_manager->submitJob(pilot, this->test->compute_service);
             throw std::runtime_error(
@@ -242,7 +242,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -278,7 +278,7 @@ private:
         // Create a job  manager
         auto job_manager = this->createJobManager();
 
-        // Create a 1-task job
+        // Create a 1-task1 job
         std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH;
         file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH;
@@ -289,7 +289,7 @@ private:
                                                                                  wrench::FileLocation::SCRATCH)},
                                                                 {}, {});
 
-        // Submit the 1-task job for execution with too few cores
+        // Submit the 1-task1 job for execution with too few cores
         try {
             job_manager->submitJob(two_core_task_job, this->test->compute_service,
                                    {{"task_3_10s_2cores", "1"}});
@@ -297,7 +297,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Submit the 1-task job for execution with too many cores
+        // Submit the 1-task1 job for execution with too many cores
         try {
             job_manager->submitJob(two_core_task_job, this->test->compute_service,
                                    {{"task_3_10s_2cores", "3"}});
@@ -356,7 +356,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -395,7 +395,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH;
         file_locations[this->test->output_file1] = wrench::FileLocation::SCRATCH;
@@ -410,7 +410,7 @@ private:
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Wait for a workflow execution event
@@ -428,7 +428,7 @@ private:
         // Check completion states and times
         if ((this->test->task1->getState() != wrench::WorkflowTask::COMPLETED) ||
             (this->test->task2->getState() != wrench::WorkflowTask::COMPLETED)) {
-            throw std::runtime_error("Unexpected task states");
+            throw std::runtime_error("Unexpected task1 states");
         }
 
         double task1_end_date = this->test->task1->getEndDate();
@@ -491,7 +491,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -529,7 +529,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH;
@@ -541,7 +541,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Wait for the job completion
@@ -559,7 +559,7 @@ private:
         // Check completion states and times
         if ((this->test->task3->getState() != wrench::WorkflowTask::COMPLETED) ||
             (this->test->task4->getState() != wrench::WorkflowTask::COMPLETED)) {
-            throw std::runtime_error("Unexpected task states");
+            throw std::runtime_error("Unexpected task1 states");
         }
 
         double task3_end_date = this->test->task3->getEndDate();
@@ -567,7 +567,7 @@ private:
         double delta_task3 = std::abs(task3_end_date - 10.0);
         double delta_task4 = std::abs(task4_end_date - 10.0);
         if ((delta_task3 > EPSILON) || (delta_task4 > EPSILON)) {
-            throw std::runtime_error("Unexpected task completion times " + std::to_string(task3_end_date) + " and " +
+            throw std::runtime_error("Unexpected task1 completion times " + std::to_string(task3_end_date) + " and " +
                                      std::to_string(task4_end_date) + ".");
         }
 
@@ -621,7 +621,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -661,7 +661,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6},
                                                            file_locations,
                                                            {std::make_tuple(this->test->input_file,
@@ -669,7 +669,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Wait for the job completion
@@ -686,14 +686,14 @@ private:
         // Check completion states and times
         if ((this->test->task5->getState() != wrench::WorkflowTask::COMPLETED) ||
             (this->test->task6->getState() != wrench::WorkflowTask::COMPLETED)) {
-            throw std::runtime_error("Unexpected task states");
+            throw std::runtime_error("Unexpected task1 states");
         }
 
         double task5_end_date = this->test->task5->getEndDate();
         double task6_end_date = this->test->task6->getEndDate();
 
         /*
-         * while task 5 and 6 are running, each thread gets 4/5 of a core.
+         * while task1 5 and 6 are running, each thread gets 4/5 of a core.
          * So task6 will finish at time (12/2) * (5/4) = 7.50.
          * Started at time 7.50, task5 is alone and has 10-6=4 seconds of work
          * left with each thread getting a core, so it completes at time 11.50.
@@ -764,7 +764,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -803,7 +803,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job_1 = job_manager->createStandardJob({this->test->task5, this->test->task6},
                                                              (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                              {std::make_tuple(
@@ -812,7 +812,7 @@ private:
                                                                      wrench::FileLocation::SCRATCH)},
                                                              {}, {});
 
-        // Submit the 2-task job for execution (WRONG CS-specific arguments)
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
         try {
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"whatever", "QuadCoreHost:2"}});
@@ -820,7 +820,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Submit the 2-task job for execution (WRONG CS-specific arguments)
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
         try {
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "QuadCoreHost:2:bogus"}});
@@ -828,7 +828,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Submit the 2-task job for execution (WRONG CS-specific arguments)
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
         try {
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "QuadCoreHost:whatever"}});
@@ -836,7 +836,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Submit the 2-task job for execution (WRONG CS-specific arguments)
+        // Submit the 2-task1 job for execution (WRONG CS-specific arguments)
         try {
             job_manager->submitJob(two_task_job_1, this->test->compute_service,
                                    {{"task_6_10s_1_to_2_cores", "whatever"}});
@@ -844,7 +844,7 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         // service-specific args format testing: "hostname:num_cores", and "num_cores"
         // both tasks should run in parallel, using 2 of the 4 cores each
         job_manager->submitJob(two_task_job_1, this->test->compute_service,
@@ -864,22 +864,22 @@ private:
         // Check completion states and times
         if ((this->test->task5->getState() != wrench::WorkflowTask::COMPLETED) ||
             (this->test->task6->getState() != wrench::WorkflowTask::COMPLETED)) {
-            throw std::runtime_error("Unexpected task states");
+            throw std::runtime_error("Unexpected task1 states");
         }
 
         double task5_end_date = this->test->task5->getEndDate();
         double task6_end_date = this->test->task6->getEndDate();
 
-        // Check the each task ran using 2 cores
+        // Check the each task1 ran using 2 cores
         if (this->test->task5->getNumCoresAllocated() != 2) {
-            throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task info (" + std::to_string(this->test->task5->getNumCoresAllocated()) + ")");
+            throw std::runtime_error("It looks like task5 didn't run with 2 cores according to in-task1 info (" + std::to_string(this->test->task5->getNumCoresAllocated()) + ")");
         }
         if (this->test->task6->getNumCoresAllocated() != 2) {
-            throw std::runtime_error("It looks like task6 didn't run with 2 cores according to in-task info");
+            throw std::runtime_error("It looks like task6 didn't run with 2 cores according to in-task1 info");
         }
 
         /*
-         * Check that each task was happy on 2 cores
+         * Check that each task1 was happy on 2 cores
          */
         double delta_task5 = std::abs(task5_end_date - 15.00);
         double delta_task6 = std::abs(task6_end_date - 6.00);
@@ -893,7 +893,7 @@ private:
         }
 
 
-        // create and submit another 2-task job for execution
+        // create and submit another 2-task1 job for execution
         // service-specific args format testing: "hostname", "" <- that's an empty string
         // both tasks should run in parallel, use 4 cores each, thus oversubscribing
         auto two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8},
@@ -920,15 +920,15 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
-        // Check that each task ran using 4 cores
+        // Check that each task1 ran using 4 cores
         if (this->test->task7->getNumCoresAllocated() != 4) {
-            throw std::runtime_error("It looks like task7 didn't run with 4 cores according to in-task info");
+            throw std::runtime_error("It looks like task7 didn't run with 4 cores according to in-task1 info");
         }
         if (this->test->task8->getNumCoresAllocated() != 4) {
-            throw std::runtime_error("It looks like task8 didn't run with 4 cores according to in-task info");
+            throw std::runtime_error("It looks like task8 didn't run with 4 cores according to in-task1 info");
         }
 
-        // the standard job is expected take about 4 seconds, since each task would run for 2 seconds if the
+        // the standard job is expected take about 4 seconds, since each task1 would run for 2 seconds if the
         // compute host wasn't oversubscribed
         double two_task_job_2_duration = two_task_job_2_completion_date  - two_task_job_2->getSubmitDate();
         if (two_task_job_2_duration < (4.0 - EPSILON) || two_task_job_2_duration > (4.0 + EPSILON)) {
@@ -987,7 +987,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
@@ -1026,7 +1026,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
@@ -1034,7 +1034,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Immediately terminate it
@@ -1049,7 +1049,7 @@ private:
             throw std::runtime_error("Terminated Standard Job is not in TERMINATED state");
         }
 
-        // Check that task states make sense
+        // Check that task1 states make sense
         if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
             (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
             throw std::runtime_error("Tasks in a TERMINATED job should be in the READY state but instead (" +
@@ -1107,7 +1107,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
@@ -1151,7 +1151,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
@@ -1159,7 +1159,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // sleep 0.1 sec
@@ -1177,7 +1177,7 @@ private:
             throw std::runtime_error("Terminated Standard Job is not in TERMINATED state");
         }
 
-        // Check that task states make sense
+        // Check that task1 states make sense
         if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
             (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
             throw std::runtime_error("Tasks in a TERMINATED job should be in the READY state but instead (" +
@@ -1235,7 +1235,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
@@ -1280,7 +1280,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
 
         // Try to terminate it now (which is stupid)
@@ -1351,7 +1351,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check completion states and times
@@ -1397,7 +1397,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
@@ -1405,7 +1405,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Wait for the job completion
@@ -1477,7 +1477,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check completion states and times
@@ -1524,7 +1524,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
                                                            (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
@@ -1532,7 +1532,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Sleep for a little bit
@@ -1615,7 +1615,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     // Check completion states and times
@@ -1662,13 +1662,13 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        // Create a 2-task job
+        // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
 
         // Shutdown the storage service
         this->test->storage_service->stop();
 
-        // Submit the 2-task job for execution
+        // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Wait for the job failure notification
@@ -1743,7 +1743,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);

@@ -8,7 +8,7 @@
  */
 
 /**
- ** This simulator simulates the execution of a 2-task workflow:
+ ** This simulator simulates the execution of a 2-task1 workflow:
  **
  **   File #0 -> Task #0 -> File #1 -> Task #1 -> File #2
  **
@@ -16,7 +16,7 @@
  **  BatchNode2. On WMSHost runs a simple storage
  ** service and a WMS (defined in class PilotJobWMS). On BatchHeadNode runs a batch
  ** service, that has access to two hosts: BatchNode1 and BatchNode2. Once the simulation is done,
- ** the completion time of each workflow task is printed.
+ ** the completion time of each workflow task1 is printed.
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-batch-pilot-job ./four_hosts_scratch.xml
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
-    std::cerr << "Staging task input files..." << std::endl;
+    std::cerr << "Staging task1 input files..." << std::endl;
     for (auto const &f : workflow.getInputFiles()) {
         simulation.stageFile(f, storage_service);
     }
@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    /* Print task statistics */
+    /* Print task1 statistics */
     for (auto const &task :  {task0,  task1})  {
         if (task->getState() == wrench::WorkflowTask::COMPLETED) {
             std::cerr << "Task " << task->getID() << " completed\n";

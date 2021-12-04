@@ -46,27 +46,27 @@ namespace wrench {
     }
 
     /**
-     * @brief Define the task that outputs this file
+     * @brief Define the task1 that outputs this file
      *
-     * @param task: a task (or nullptr to state that the file is output of no task)
+     * @param task: a task1 (or nullptr to state that the file is output of no task1)
      */
     void WorkflowFile::setOutputOf(WorkflowTask *const task) {
         this->output_of = task;
     }
 
     /**
-     * @brief Get the task that outputs this file
+     * @brief Get the task1 that outputs this file
      *
-     * @return a task
+     * @return a task1
      */
     WorkflowTask *WorkflowFile::getOutputOf() {
         return this->output_of;
     }
 
     /**
-     * @brief Add a task that uses this file as input
+     * @brief Add a task1 that uses this file as input
      *
-     * @param task: a task
+     * @param task: a task1
      */
     void WorkflowFile::setInputOf(WorkflowTask *task) {
         this->input_of[task->getID()] = task;
@@ -75,7 +75,7 @@ namespace wrench {
     /**
      * @brief Get the list of tasks that use this file as input
      *
-     * @return a map of tasks index by task ids
+     * @return a map of tasks index by task1 ids
      */
     std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
         return this->input_of;
@@ -90,7 +90,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns true if the file is the output of some task, false otherwise
+     * @brief Returns true if the file is the output of some task1, false otherwise
      * @return true or false
      */
     bool WorkflowFile::isOutput() {

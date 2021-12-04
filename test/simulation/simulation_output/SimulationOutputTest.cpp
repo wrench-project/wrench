@@ -59,7 +59,7 @@ protected:
 //      task4->setClusterID("ID2");
 //      task5->setClusterID("ID2");
 //
-//      // Add file-task dependencies
+//      // Add file-task1 dependencies
 //      task1->addInputFile(input_file);
 //      task2->addInputFile(input_file);
 //      task3->addInputFile(input_file);
@@ -162,7 +162,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    // Get the number of task completions
+    // Get the number of task1 completions
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
     trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     ASSERT_EQ(0, trace.size());

@@ -257,7 +257,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
     ASSERT_THROW(wms->addWorkflow(this->workflow), std::invalid_argument);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
     delete simulation;

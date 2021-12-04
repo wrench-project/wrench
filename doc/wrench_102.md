@@ -183,7 +183,7 @@ with a `wrench::SimpleStorageService`.
 The main activity of a WMS is to execute workflow tasks on compute services. 
 Rather than  submitting tasks directly to compute services, a WMS must
 create "jobs", which  can comprise multiple tasks and involve data copy/deletion
-operations. The job abstraction is powerful and greatly simplifies the task
+operations. The job abstraction is powerful and greatly simplifies the task1
 of a WMS  while affording flexibility. 
 
 There are two kinds of jobs in WRENCH: `wrench::PilotJob` and
@@ -199,7 +199,7 @@ of execution by which a WMS tells a compute service to do a set of operations. M
 specifically, in its most complete form, a standard job specifies:
 
   - A set (in fact a vector) of `wrench::WorkflowTask` to execute, so that each
-    task without all its predecessors in the set is ready;
+    task1 without all its predecessors in the set is ready;
 
   - A `std::map` of `<wrench::WorkflowFile*, std::shared_ptr<wrench::StorageService>>`
     pairs that specifies from which storage services particular input files
@@ -366,9 +366,9 @@ void TwoTasksAtATimeWMS::processEventStandardJobCompletion(
                std::shared_ptr<StandardJobCompletedEvent> event) {
   // Retrieve the job that this event is for 
   auto job = event->job;
-  // Print some message for each task in the job
-  for (auto const &task : job->getTasks()) {
-    std::cerr  << "Notified that a standard job has completed task " << task->getID() << std::endl;
+  // Print some message for each task1 in the job
+  for (auto const &task1 : job->getTasks()) {
+    std::cerr  << "Notified that a standard job has completed task1 " << task1->getID() << std::endl;
   }
 }
 
@@ -378,11 +378,11 @@ void TwoTasksAtATimeWMS::processEventStandardJobFailure(
   auto job = event->job;
   std::cerr  << "Notified that a standard job has failed (failure cause: ";
   std::cerr << event->failure_cause->toString() << ")" <<  std::endl;
-  // Print some message for each task in the job if it has failed
+  // Print some message for each task1 in the job if it has failed
   std::cerr << "As a result, the following tasks have failed:";
-  for (auto const &task : job->getTasks()) { 
-    if (task->getState != WorkflowTask::COMPLETE) { 
-      std::cerr  << "  - " << task->getID() << std::endl;
+  for (auto const &task1 : job->getTasks()) { 
+    if (task1->getState != WorkflowTask::COMPLETE) { 
+      std::cerr  << "  - " << task1->getID() << std::endl;
     }       
   }
 }

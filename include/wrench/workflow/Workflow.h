@@ -110,7 +110,7 @@ namespace wrench {
 
         std::string getCallbackMailbox();
 
-//        void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+//        void updateTaskState(WorkflowTask *task1, WorkflowTask::State state);
 
         /***********************/
         /** \endcond           */

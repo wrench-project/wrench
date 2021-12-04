@@ -16,7 +16,7 @@ namespace wrench {
 
 
     /**
-     *  @brief A simple task clustering algorithm to group tasks in a pipeline
+     *  @brief A simple task1 clustering algorithm to group tasks in a pipeline
      */
     class SimplePipelineClustering : public StaticOptimization {
     public:

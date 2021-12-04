@@ -97,7 +97,7 @@ private:
         wrench::WorkflowTask *tasks[8];
         std::shared_ptr<wrench::StandardJob> jobs[8];
         for (int i=0; i < 8; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
+            tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
@@ -176,7 +176,7 @@ private:
         for (int i=0; i < 8; i++) {
             double delta = std::abs(actual_completion_times[i] - expected_completion_times[i]);
             if (delta > EPSILON) {
-                throw std::runtime_error("Unexpected job completion time for the job containing task " +
+                throw std::runtime_error("Unexpected job completion time for the job containing task1 " +
                                          tasks[i]->getID() +
                                          ": " +
                                          std::to_string(actual_completion_times[i]) +
@@ -272,7 +272,7 @@ private:
         wrench::WorkflowTask *tasks[9];
         std::shared_ptr<wrench::StandardJob> jobs[9];
         for (int i=0; i < 9; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 0);
+            tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 

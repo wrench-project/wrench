@@ -27,7 +27,7 @@ namespace wrench {
      * @brief Constructor 
      * @param job: the job that is done
      * @param compute_service: the ComputeService on which it ran 
-     * @param necessary_state_changes: necessary task state changes
+     * @param necessary_state_changes: necessary task1 state changes
      */
     JobManagerStandardJobCompletedMessage::JobManagerStandardJobCompletedMessage(std::shared_ptr<StandardJob> job,
                                                                                  std::shared_ptr<ComputeService> compute_service,
@@ -43,8 +43,8 @@ namespace wrench {
      * @brief Constructor 
      * @param job: the job that has failed
      * @param compute_service: the ComputeService on which it ran 
-     * @param necessary_state_changes: necessary task state changes
-     * @param necessary_failure_count_increments: necessary task failure count increments
+     * @param necessary_state_changes: necessary task1 state changes
+     * @param necessary_failure_count_increments: necessary task1 failure count increments
      * @param cause: the cause of the failure
      */
     JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(std::shared_ptr<StandardJob> job,

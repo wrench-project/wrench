@@ -35,15 +35,15 @@ protected:
     WorkflowTaskTest() {
         workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-        t1 = workflow->addTask("task-01", 100000, 1, 1, 0);
-        t2 = workflow->addTask("task-02", 100, 2, 4, 0);
+        t1 = workflow->addTask("task1-01", 100000, 1, 1, 0);
+        t2 = workflow->addTask("task1-02", 100, 2, 4, 0);
         t2->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
         t2->setAverageCPU(90.2);
 
         workflow->addControlDependency(t1, t2);
 
         // t3 is created in InputOutputFile test..
-        t4 = workflow->addTask("task-04", 10, 1, 3, 0);
+        t4 = workflow->addTask("task1-04", 10, 1, 3, 0);
 
 
         large_input_file = workflow->addFile("large_input_file", 1000000);
@@ -57,8 +57,8 @@ protected:
         t4->setBytesWritten(1000);
         t4->setAverageCPU(50.5);
 
-        t5 = workflow->addTask("task-05", 100, 1, 2, 0);
-        t6 = workflow->addTask("task-06", 100, 1, 3, 0);
+        t5 = workflow->addTask("task1-05", 100, 1, 2, 0);
+        t6 = workflow->addTask("task1-06", 100, 1, 3, 0);
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -94,8 +94,8 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
     ASSERT_EQ(t1->getWorkflow(), workflow.get());
 
     ASSERT_NE(t1->getID(), t2->getID());
-    ASSERT_EQ(t1->getID(), "task-01");
-    ASSERT_NE(t2->getID(), "task-01");
+    ASSERT_EQ(t1->getID(), "task1-01");
+    ASSERT_NE(t2->getID(), "task1-01");
 
     ASSERT_GT(t1->getFlops(), t2->getFlops());
 
@@ -154,7 +154,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
     ASSERT_THROW(t1->setNumCoresAllocated(10), std::runtime_error);
     ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
 
-    // getting the execution_host before a task has run at least once should return an empty string
+    // getting the execution_host before a task1 has run at least once should return an empty string
     ASSERT_TRUE(t1->getExecutionHost().empty());
     ASSERT_TRUE(t1->getPhysicalExecutionHost().empty());
 
@@ -224,7 +224,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
     ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
     ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
 
-    wrench::WorkflowTask *t3 = workflow->addTask("task-03", 50, 2, 4, 0);
+    wrench::WorkflowTask *t3 = workflow->addTask("task1-03", 50, 2, 4, 0);
     t3->addInputFile(f2);
 
     ASSERT_EQ(t3->getNumberOfParents(), 1);
@@ -277,7 +277,7 @@ private:
 
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
-        // while large_input_file is being read, we delete small_input_file so that the one task job will fail
+        // while large_input_file is being read, we delete small_input_file so that the one task1 job will fail
         wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
@@ -414,7 +414,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_NE(t4_unsuccessful_execution.task_failed, -1.0);
     ASSERT_STREQ(t4_unsuccessful_execution.execution_host.c_str(), "ExecutionHost");
 
-// the rest of the values should be set to -1 since the task failed while reading input
+// the rest of the values should be set to -1 since the task1 failed while reading input
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.read_input_end, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.computation_start, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.computation_end, -1.0);

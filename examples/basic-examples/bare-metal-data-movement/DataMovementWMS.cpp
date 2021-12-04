@@ -9,12 +9,12 @@
 
 /**
  ** A Workflow Management System (WMS) implementation that operates on a workflow
- ** with a single task that has two input files and two output files as follows:
+ ** with a single task1 that has two input files and two output files as follows:
  ** 
  **  - Copy the first input file from the first storage service to the second one
- **  - Runs the task so that it produces its output files on the second storage service
- **  - Copy the task's first output file to the first storage service
- **  - Delete the task's second output file on the second storage service
+ **  - Runs the task1 so that it produces its output files on the second storage service
+ **  - Copy the task1's first output file to the first storage service
+ **  - Delete the task1's second output file on the second storage service
  **/
 
 #include <iostream>
@@ -77,8 +77,8 @@ namespace wrench {
             storage_service1 = *(this->getAvailableStorageServices().begin()++);
         }
 
-        /* Get references to the task and files */
-        auto task = this->getWorkflow()->getTaskByID("task");
+        /* Get references to the task1 and files */
+        auto task = this->getWorkflow()->getTaskByID("task1");
         auto infile_1 = this->getWorkflow()->getFileByID("infile_1");
         auto infile_2 = this->getWorkflow()->getFileByID("infile_2");
         auto outfile_1 = this->getWorkflow()->getFileByID("outfile_1");
@@ -93,7 +93,7 @@ namespace wrench {
 
 
         /* Now let's create a map of file locations, stating for each file
-         * where is should be read/written while the task executes */
+         * where is should be read/written while the task1 executes */
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
 
         file_locations[infile_1] = FileLocation::LOCATION(storage_service2);
@@ -102,7 +102,7 @@ namespace wrench {
         file_locations[outfile_2] = FileLocation::LOCATION(storage_service2);
 
         /* Create the standard job */
-        WRENCH_INFO("Creating a  job to execute task %s", task->getID().c_str());
+        WRENCH_INFO("Creating a  job to execute task1 %s", task->getID().c_str());
         auto job = job_manager->createStandardJob(task, file_locations);
 
         /* Submit the job to the compute service */
@@ -157,9 +157,9 @@ namespace wrench {
     void DataMovementWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
+        /* Retrieve the job's first (and in our case only) task1 */
         auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
+        WRENCH_INFO("Notified that a standard job has completed task1 %s", task->getID().c_str());
     }
 
     /**
@@ -170,10 +170,10 @@ namespace wrench {
     void DataMovementWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task */
+        /* Retrieve the job's first (and in our case only) task1 */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");

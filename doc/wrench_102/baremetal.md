@@ -35,27 +35,27 @@ In some cases, the WMS may want to influence or enforce resource
 allocations for the tasks in the jobs. For this purpose,  the
 `wrench::JobManager::submitJob()` method takes an optional
 **service-specific argument**. This  argument is a `std::map<std::string,
-std::string>` of key-value pairs. The key is a task ID, and the value is
-the service-specific argument for that task.
+std::string>` of key-value pairs. The key is a task1 ID, and the value is
+the service-specific argument for that task1.
 
-For each task, an optional argument can be provided as a string formatted
+For each task1, an optional argument can be provided as a string formatted
 as "hostname:num_cores", "hostname", or "num_cores", where "hostname" is the name
 of one of the service's compute hosts and "num_cores" is an integer (e.g., "host1:10",
 "host1", "10"):
 
-  - If no value is provided for a task, or if the value is the empty string, then the bare-metal
-    service will choose the host on which the task should be executed (typically the host with
-    the lowest current load), and will execute the task with as many cores as possible on that host. 
+  - If no value is provided for a task1, or if the value is the empty string, then the bare-metal
+    service will choose the host on which the task1 should be executed (typically the host with
+    the lowest current load), and will execute the task1 with as many cores as possible on that host. 
   
-  - If a "hostname" value is provided for a task, then the bare-metal service will execute the
-    task on that host, and will execute the task with as many cores as possible on that host.
+  - If a "hostname" value is provided for a task1, then the bare-metal service will execute the
+    task1 on that host, and will execute the task1 with as many cores as possible on that host.
 
-  - If a "num_cores" value is provided for a task, then the bare-metal
-    service will choose the host on which the task should be executed (typically the host with
-    the lowest current load), and will execute the task with the specified number of cores. 
+  - If a "num_cores" value is provided for a task1, then the bare-metal
+    service will choose the host on which the task1 should be executed (typically the host with
+    the lowest current load), and will execute the task1 with the specified number of cores. 
 
-  - If a "hostname:num_cores" value is provided for a task, then the bare-metal service
-   will execute the task on that host with the specified number of cores.
+  - If a "hostname:num_cores" value is provided for a task1, then the bare-metal service
+   will execute the task1 on that host with the specified number of cores.
 
 
 In the above  example, for instance, the job  submission could be done  as: 
@@ -83,7 +83,7 @@ job_manager->submitJob(job, baremetal_cs, service_specific_args);
 [...]
 ~~~~~~~~~~~~~
 
-If the service-specific arguments are invalid (e.g., invalid hostname, unknown task, 
+If the service-specific arguments are invalid (e.g., invalid hostname, unknown task1, 
 number of cores too large), the `wrench::JobManager::submitJob()` method 
 throws a `wrench::ExecutionException`.
 

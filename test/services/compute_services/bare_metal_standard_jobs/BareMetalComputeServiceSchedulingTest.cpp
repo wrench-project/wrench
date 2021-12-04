@@ -32,7 +32,7 @@ public:
     std::shared_ptr<wrench::ComputeService> cs_fcfs_aggressive_maximum_maximum_flops_best_fit = nullptr;
     // "minimum" core allocation
     std::shared_ptr<wrench::ComputeService> cs_fcfs_aggressive_minimum_maximum_flops_best_fit = nullptr;
-    // "maximum_minimum_cores" task selection
+    // "maximum_minimum_cores" task1 selection
     std::shared_ptr<wrench::ComputeService> cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = nullptr;
 
     void do_RAMPressure_test();
