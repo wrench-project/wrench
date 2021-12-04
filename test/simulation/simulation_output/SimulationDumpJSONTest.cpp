@@ -718,8 +718,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json1["workflow_graph"]["edges"].begin(), expected_json1["workflow_graph"]["edges"].end(), compareLinks);
     std::sort(expected_json1["workflow_graph"]["vertices"].begin(), expected_json1["workflow_graph"]["vertices"].end(), compareNodes);
 
-    std::cerr << "RESULT: " << result_json1 << "\n";
-    std::cerr << "EXPECTED: " << expected_json1 << "\n";
     EXPECT_TRUE(result_json1 == expected_json1);
 
 
