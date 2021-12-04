@@ -13,10 +13,10 @@
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
  **    - Submit both of them as  two  different jobs to the VMs
- **       - The most expensive task1 on the more powerful VM
- **       - The least expensive task1 on the less powerful VM
- **       - Each task1 reads the input file from the StorageService
- **       - Each task1 reads the output file from the StorageService
+ **       - The most expensive task on the more powerful VM
+ **       - The least expensive task on the less powerful VM
+ **       - Each task reads the input file from the StorageService
+ **       - Each task reads the output file from the StorageService
  **/
 
 #include <iostream>
@@ -93,11 +93,11 @@ namespace wrench {
                           }
                       });
 
-            /*  Pick the least and most expensive task1 */
+            /*  Pick the least and most expensive task */
             auto cheap_ready_task = ready_tasks.at(0);
             auto expensive_ready_task = ready_tasks.at(ready_tasks.size() - 1);
 
-            /* Submit the cheap task1 to the small VM */
+            /* Submit the cheap task to the small VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations1;

@@ -28,8 +28,8 @@ namespace wrench {
      * @brief Create an abstract workflow based on a DAX file
      *
      * @param filename: the path to the DAX file
-     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task1's computation is purely flops.
-     *                             This is needed because DAX files specify task1 execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because DAX files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
      *                             compute speeds in flops/sec). The times in the DAX file are thus assumed to be
@@ -41,12 +41,12 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             would likely pass "false". (default is false)
-     * @param min_cores_per_task: If the DAX file does not specify a number of cores for a task1, the minimum number of
-     *                            cores on which the task1 can run is set to this value. (default is 1)
-     * @param max_cores_per_task: If the DAX file does not specify a number of cores for a task1, the maximum number of
-     *                            cores on which the task1 can run is set to this value. (default is 1)
+     * @param min_cores_per_task: If the DAX file does not specify a number of cores for a task, the minimum number of
+     *                            cores on which the task can run is set to this value. (default is 1)
+     * @param max_cores_per_task: If the DAX file does not specify a number of cores for a task, the maximum number of
+     *                            cores on which the task can run is set to this value. (default is 1)
      * @param enforce_num_cores: Use the min_cores_per_task and max_cores_per_task values even if the DAX file specifies
-     *                           a number of cores for a task1. (default is false)
+     *                           a number of cores for a task. (default is false)
      *
      * @return a workflow
      *
@@ -62,8 +62,8 @@ namespace wrench {
      * @brief Create an abstract workflow based on a JSON file
      *
      * @param filename: the path to the JSON file
-     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task1's computation is purely flops.
-     *                             This is needed because JSON files specify task1 execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because JSON files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
      *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
@@ -75,12 +75,12 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             would likely pass "false".
-     * @param min_cores_per_task: If the JSON file does not specify a number of cores for a task1, the minimum number of
-     *                            cores on which the task1 can run is set to this value. (default is 1)
-     * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task1, the maximum number of
-     *                            cores on which the task1 can run is set to this value. (default is 1)
+     * @param min_cores_per_task: If the JSON file does not specify a number of cores for a task, the minimum number of
+     *                            cores on which the task can run is set to this value. (default is 1)
+     * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task, the maximum number of
+     *                            cores on which the task can run is set to this value. (default is 1)
      * @param enforce_num_cores: Use the min_cores_per_task and max_cores_per_task values even if the JSON file specifies
-     *                           a number of cores for a task1. (default is false)
+     *                           a number of cores for a task. (default is false)
      * @return a workflow
      * @throw std::invalid_argument
      *
@@ -95,8 +95,8 @@ namespace wrench {
      * @brief Create an NON-abstract workflow based on a JSON file
      *
      * @param filename: the path to the JSON file
-     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task1's computation is purely flops.
-     *                             This is needed because JSON files specify task1 execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because JSON files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
      *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
@@ -108,12 +108,12 @@ namespace wrench {
      *                             force these "redundant" dependencies to be added as edges in the workflow. Passing
      *                             redundant_dependencies=false will ignore these "redundant" dependencies. Most users
      *                             woudl likely pass "false".
-     * @param min_cores_per_task: If the JSON file does not specify a number of cores for a task1, the minimum number of
-     *                            cores on which the task1 can run is set to this value. (default is 1)
-     * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task1, the maximum number of
-     *                            cores on which the task1 can run is set to this value. (default is 1)
+     * @param min_cores_per_task: If the JSON file does not specify a number of cores for a task, the minimum number of
+     *                            cores on which the task can run is set to this value. (default is 1)
+     * @param max_cores_per_task: If the JSON file does not specify a number of cores for a task, the maximum number of
+     *                            cores on which the task can run is set to this value. (default is 1)
      * @param enforce_num_cores: Use the min_cores_per_task and max_cores_per_task values even if the JSON file specifies
-     *                           a number of cores for a task1. (default is false)
+     *                           a number of cores for a task. (default is false)
      *
      * @return a workflow
      * @throw std::invalid_argument

@@ -741,7 +741,7 @@ namespace wrench {
         // Check that the file is not the output of anything
         if (file->isOutput()) {
             throw std::runtime_error(
-                    "Simulation::stageFile(): Cannot stage a file that's the output of task1 that hasn't executed yet");
+                    "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
         }
 
         // Put the file on the storage service (not via the service daemon)

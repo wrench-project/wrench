@@ -18,8 +18,8 @@ WRENCH_LOG_CATEGORY(dag_of_tasks, "Log category for DagOfTasks");
 namespace wrench {
 
 /**
- * @brief Method to add a task1 vertex to the DAG
- * @param task: the task1
+ * @brief Method to add a task vertex to the DAG
+ * @param task: the task
  */
     void wrench::DagOfTasks::addVertex(const wrench::WorkflowTask *task) {
 
@@ -28,22 +28,22 @@ namespace wrench {
         boost::add_vertex(p, this->dag);
         // Update the vertex vector
         this->task_list.push_back(task);
-        // Set the task1's vertex id in the task1 map
+        // Set the task's vertex id in the task map
         this->task_map[task] =  this->task_list.size() - 1;
     }
 
 /**
- * @brief Method to remove a task1 vertex from the DAG
- * @param task: the task1
+ * @brief Method to remove a task vertex from the DAG
+ * @param task: the task
  */
     void wrench::DagOfTasks::removeVertex(wrench::WorkflowTask *task) {
         // Find the vertex
         if (this->task_map[task] >= this->task_list.size()) {
             throw std::runtime_error("wrench::DagOfTasks::removeVertex(): Trying to remove a non-existing vertex");
         }
-        // Remove the correspond task1 list item
+        // Remove the correspond task list item
         this->task_list.erase(this->task_list.begin() + this->task_map[task]);
-        // Update subsequent task1's vertex indices
+        // Update subsequent task's vertex indices
         for (auto it = this->task_list.begin()  +  this->task_map[task]; it != this->task_list.end(); ++it) {
             this->task_map[*it]--;
         }
@@ -57,9 +57,9 @@ namespace wrench {
 
 
 /**
- * @brief Method to add an edge between to task1 vertices
- * @param src: the source task1
- * @param dst: the destination task1
+ * @brief Method to add an edge between to task vertices
+ * @param src: the source task
+ * @param dst: the destination task
  */
     void wrench::DagOfTasks::addEdge( wrench::WorkflowTask *src,  wrench::WorkflowTask *dst) {
         // Check that vertices exist
@@ -76,9 +76,9 @@ namespace wrench {
     }
 
 /**
- * @brief Remove an edge between two task1 vertices
- * @param src: the source task1
- * @param dst: the destination task1
+ * @brief Remove an edge between two task vertices
+ * @param src: the source task
+ * @param dst: the destination task
  */
     void wrench::DagOfTasks::removeEdge( wrench::WorkflowTask *src,  wrench::WorkflowTask *dst) {
         // Check that vertices exist
@@ -94,9 +94,9 @@ namespace wrench {
     }
 
 /**
- * @brief Method to check whether a path exists between to task1 vertices
- * @param src: the source task1
- * @param dst: the destination task1
+ * @brief Method to check whether a path exists between to task vertices
+ * @param src: the source task
+ * @param dst: the destination task
  * @return true if there is a path between the tasks
  */
     bool wrench::DagOfTasks::doesPathExist(const wrench::WorkflowTask *src,  const wrench::WorkflowTask *dst) {
@@ -129,9 +129,9 @@ namespace wrench {
     }
 
     /**
- * @brief Method to check whether an edge exists between to task1 vertices
- * @param src: the source task1
- * @param dst: the destination task1
+ * @brief Method to check whether an edge exists between to task vertices
+ * @param src: the source task
+ * @param dst: the destination task
  * @return true if there is a path between the tasks
  */
     bool wrench::DagOfTasks::doesEdgeExist(const wrench::WorkflowTask *src,  const wrench::WorkflowTask *dst) {
@@ -152,8 +152,8 @@ namespace wrench {
     }
 
 /**
- * @brief Method to get the number of children of a task1 vertex
- * @param task: the task1
+ * @brief Method to get the number of children of a task vertex
+ * @param task: the task
  * @return a number children
  */
     long wrench::DagOfTasks::getNumberOfChildren(const WorkflowTask *task) {
@@ -171,8 +171,8 @@ namespace wrench {
     }
 
 /**
- * @brief Method to get the children of a task1 vertex
- * @param task: the task1
+ * @brief Method to get the children of a task vertex
+ * @param task: the task
  * @return the children
  */
     std::vector<WorkflowTask *> wrench::DagOfTasks::getChildren(const WorkflowTask *task) {
@@ -191,8 +191,8 @@ namespace wrench {
     }
 
 /**
- * @brief Method to get the number of parents of a task1 vertex
- * @param task: the task1
+ * @brief Method to get the number of parents of a task vertex
+ * @param task: the task
  * @return a number parents
  */
     long wrench::DagOfTasks::getNumberOfParents(const WorkflowTask *task) {
@@ -210,8 +210,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to get the parents of a task1 vertex
-     * @param task: the task1
+     * @brief Method to get the parents of a task vertex
+     * @param task: the task
      * @return the parents
      */
     std::vector< WorkflowTask *> wrench::DagOfTasks::getParents(const WorkflowTask *task) {

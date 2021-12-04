@@ -219,7 +219,7 @@ namespace wrench {
     /**
     * @brief Main method of the worker thread daemon
     *
-    * @return 1 if a task1 failure timestamp should be generated, 0 otherwise
+    * @return 1 if a task failure timestamp should be generated, 0 otherwise
     *
     * @throw std::runtime_error
     */
@@ -355,7 +355,7 @@ namespace wrench {
             }
         }
 
-        /** Perform the computational task1 if any **/
+        /** Perform the computational task if any **/
         if (this->workunit->task != nullptr) {
             auto task = this->workunit->task;
 
@@ -367,12 +367,12 @@ namespace wrench {
 
             this->simulation->getOutput().addTimestampTaskStart(Simulation::getCurrentSimulatedDate(), task);
 //            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
-//                    new SimulationTimestampTaskStart(task1));
+//                    new SimulationTimestampTaskStart(task));
             this->task_start_timestamp_has_been_inserted = true;
 
             // Read  all input files
             if (not task->getInputFiles().empty()) {
-                WRENCH_INFO("Reading the %ld input files for task1 %s",
+                WRENCH_INFO("Reading the %ld input files for task %s",
                             task->getInputFiles().size(), task->getID().c_str());
             }
             try {
@@ -425,7 +425,7 @@ namespace wrench {
                         if (not isFileRead) {
                             StorageService::readFile(f, l);
                         }
-//                        this->simulation->getOutput().addTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task1);
+//                        this->simulation->getOutput().addTimestampFileReadStart(f, l.get(), l->getStorageService().get(), task);
 //                        StorageService::readFile(f, l);
 
                     } catch (ExecutionException &e) {
@@ -443,8 +443,8 @@ namespace wrench {
             }
             WRENCH_INFO("Reading done")
 
-            // Run the task1's computation (which can be multicore)
-            WRENCH_INFO("Executing task1 %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(),
+            // Run the task's computation (which can be multicore)
+            WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(),
                         this->num_cores, S4U_Simulation::getHostName().c_str());
 
             try {
@@ -457,7 +457,7 @@ namespace wrench {
             }
 
             if (not task->getOutputFiles().empty()) {
-                WRENCH_INFO("Writing the %ld output files for task1 %s",
+                WRENCH_INFO("Writing the %ld output files for task %s",
                             task->getOutputFiles().size(),
                             task->getID().c_str());
             }
@@ -518,7 +518,7 @@ namespace wrench {
 
             this->task_completion_timestamp_should_be_generated = true;
 //            this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
-//                    new SimulationTimestampTaskCompletion(task1));
+//                    new SimulationTimestampTaskCompletion(task));
             task->setEndDate(S4U_Simulation::getClock());
 
             // Deal with Children
@@ -536,7 +536,7 @@ namespace wrench {
             }
         }
 
-        WRENCH_INFO("Done with the task1's computation");
+        WRENCH_INFO("Done with the task's computation");
 
         /** Perform all post file copies operations */
         // TODO: This is sequential right now, but probably it should be concurrent in some fashion

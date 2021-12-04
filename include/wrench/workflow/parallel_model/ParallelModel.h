@@ -18,7 +18,7 @@ namespace wrench {
 
     /**
      * @brief A virtual class (with convenient static methods) to define 
-     *        parallel task1 performance models
+     *        parallel task performance models
      */
     class ParallelModel {
 
@@ -34,7 +34,7 @@ namespace wrench {
 
         /**
          * @brief A method the, for this parallel model, computes how much work each thread that is
-         * part of a parallel task1 should do
+         * part of a parallel task should do
          *
          * @param total_work: the total amount of work (in flops)
          * @param num_threads: the number of threads

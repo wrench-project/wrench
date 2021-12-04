@@ -17,7 +17,7 @@
 namespace wrench {
 
     /**
-     * @brief A class the implemens a constant-efficiency parallel task1 performance model
+     * @brief A class the implemens a constant-efficiency parallel task performance model
      */
     class ConstantEfficiencyParallelModel : public ParallelModel {
 

@@ -266,7 +266,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-  // Running a "run a single task1" simulation
+  // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
   ASSERT_NO_THROW(simulation->launch());
@@ -303,11 +303,11 @@ private:
       auto job_manager = this->createJobManager();
 
       {
-        // Create a sequential task1 that lasts one min and requires 1 cores
+        // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 0);
         task1->addInputFile(this->getWorkflow()->getFileByID("input_file1"));
 
-        // Create a sequential task1 that lasts one min and requires 1 cores
+        // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 60, 1, 1, 0);
         task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
 
@@ -492,7 +492,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
   ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
 
-  // Running a "run a single task1" simulation
+  // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
   ASSERT_NO_THROW(simulation->launch());
@@ -554,15 +554,15 @@ private:
         throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
       }
 
-      // Create a sequential task1 that lasts one min and requires 1 cores
+      // Create a sequential task that lasts one min and requires 1 cores
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 0);
       task1->addInputFile(this->getWorkflow()->getFileByID("input_file1"));
 
-      // Create a sequential task1 that lasts one min and requires 1 cores
+      // Create a sequential task that lasts one min and requires 1 cores
       wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 360, 1, 1, 0);
       task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
 
-      // Create a sequential task1 that lasts one min and requires 1 cores
+      // Create a sequential task that lasts one min and requires 1 cores
       wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task3", 600, 1, 1, 0);
       task3->addInputFile(this->getWorkflow()->getFileByID("input_file3"));
 
@@ -706,7 +706,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
   ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service1));
 
-  // Running a "run a single task1" simulation
+  // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
   ASSERT_NO_THROW(simulation->launch());
@@ -761,7 +761,7 @@ private:
       // Create a first job that:
       //   - copies file "input" to the scratch space
       //   - runs task1 and then task2 (10 second each)
-      //   - (task1 2 needs "input")
+      //   - (task 2 needs "input")
       auto job1 = job_manager->createStandardJob(
               {task1, task2}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
               {std::make_tuple(file,
@@ -850,7 +850,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(file, storage_service1));
 
-  // Running a "run a single task1" simulation
+  // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
@@ -912,7 +912,7 @@ private:
         );
       }
 
-      // Create a task1
+      // Create a task
       wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10, 1, 1, 0); // 10 seconds
       task1->addInputFile(file1);
 
@@ -1077,7 +1077,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(file2, storage_service2));
 
-  // Running a "run a single task1" simulation
+  // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;

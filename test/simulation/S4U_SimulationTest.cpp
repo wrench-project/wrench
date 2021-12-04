@@ -257,7 +257,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    // Running a "run a single task1" simulation
+    // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
