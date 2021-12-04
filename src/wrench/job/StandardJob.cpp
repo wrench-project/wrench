@@ -588,8 +588,6 @@ namespace wrench {
          */
         for (auto &t: this->tasks) {
 
-            std::cerr << "IN PROCESS ACTION " << t->getID() << "\n";
-
             // Set a provisional start date and end date
             t->setStartDate(-1.0);
             t->setEndDate(-1.0);
@@ -760,7 +758,6 @@ namespace wrench {
             t->setWriteOutputEndDate(latest_end_date);
             state_changes[t] = WorkflowTask::State::COMPLETED;
             t->setEndDate(latest_end_date);
-            std::cerr << "CREATING COMPLITION TS FOR " << t->getID() << "\n";
             simulation->getOutput().addTimestampTaskCompletion(latest_end_date, t);
         }
 
