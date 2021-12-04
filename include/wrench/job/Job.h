@@ -101,8 +101,8 @@ namespace wrench {
         /** @brief Whether the job has already been submitted to the job manager */
         bool already_submitted_to_job_manager = false;
 
-        /** @brief The job's priority */
-        double priority;
+        /** @brief The job's priority (the higher the number, the higher the priority) */
+        double priority = 0.0;
 
     private:
 //        bool forward_notification_to_original_source;
