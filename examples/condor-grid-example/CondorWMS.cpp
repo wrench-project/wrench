@@ -98,7 +98,7 @@ namespace wrench {
         auto grid_universe_job = job_manager->createStandardJob(first_tasks, file_locations);
         WRENCH_INFO("Submitting the job as a grid-universe job to HTCondor, asking for 3 compute nodes");
         std::map<std::string, std::string> htcondor_service_specific_arguments;
-        htcondor_service_specific_arguments["universe"] = "grid";
+        htcondor_service_specific_arguments["-universe"] = "grid";
         htcondor_service_specific_arguments["-N"] = "3";
         htcondor_service_specific_arguments["-c"] = "5";
         htcondor_service_specific_arguments["-t"] = "3600";
