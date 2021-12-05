@@ -97,11 +97,11 @@ int main(int argc, char **argv) {
     /* Create a list of compute services that will be used by the WMS */
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
 
-    /* Instantiate a batch service, to be started on some host in the simulation platform.
-     * A batch service is an abstraction of a compute service that corresponds to
-     * batch-scheduled platforms in which jobs are submitted to a queue and dispatched
+    /* Instantiate a batch_standard_and_pilot_jobs service, to be started on some host in the simulation platform.
+     * A batch_standard_and_pilot_jobs service is an abstraction of a compute service that corresponds to
+     * batch_standard_and_pilot_jobs-scheduled platforms in which jobs are submitted to a queue and dispatched
      * to compute nodes according to various scheduling algorithms.
-     * In this example, this particular batch service has no scratch storage space (mount point = "").
+     * In this example, this particular batch_standard_and_pilot_jobs service has no scratch storage space (mount point = "").
      * The last argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
      * list. In this example, one specifies that the message that will be send to the service to
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
      */
     std::string batch_front_end_host = "Host2";
 
-    /* Add the batch service to the simulation, catching a possible exception */
+    /* Add the batch_standard_and_pilot_jobs service to the simulation, catching a possible exception */
     try {
         auto batch_service = simulation.add(new wrench::BatchComputeService(
                 batch_front_end_host, hostname_list, "",
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
 
     /* Instantiate a WMS, to be started on some host (wms_host), which is responsible
      * for executing the workflow, and uses a scheduler (BatchStandardJobScheduler). That scheduler
-     * is instantiated with the batch service, the list of hosts available for running
+     * is instantiated with the batch_standard_and_pilot_jobs service, the list of hosts available for running
      * tasks, and also provided a pointer to the simulation object.
      *
      * The WMS implementation is in SimpleWMS.[cpp|h].

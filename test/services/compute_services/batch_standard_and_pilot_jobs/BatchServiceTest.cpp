@@ -966,12 +966,12 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_1 = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(18000 / 60); // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_1, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()),
                                batch_job_args);
 
@@ -990,13 +990,13 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_2 = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(18000 / 60); // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_2, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()),
                                batch_job_args);
 
@@ -1139,7 +1139,7 @@ private:
             // Coverage
             pilot_job->getPriority();
 
-            // Submit a pilot job with bogus batch jobs
+            // Submit a pilot job with bogus batch_standard_and_pilot_jobs jobs
             try {
                 job_manager->submitJob(pilot_job, this->test->compute_service,
                                        bogus_batch_job_args);

@@ -15,8 +15,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param job: the compound job corresponding to the batch job
-     * @param job_id: the batch job id
+     * @param job: the compound job corresponding to the batch_standard_and_pilot_jobs job
+     * @param job_id: the batch_standard_and_pilot_jobs job id
      * @param time_in_minutes: the requested execution time in minutes
      * @param num_nodes: the requested number of compute nodes (hosts)
      * @param cores_per_node: the requested number of cores per node
@@ -100,7 +100,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the compound job corresponding to this batch job
+     * @brief Get the compound job corresponding to this batch_standard_and_pilot_jobs job
      * @return a compound job
      */
     std::shared_ptr<CompoundJob> BatchJob::getCompoundJob() {
@@ -108,7 +108,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the id of this batch job
+     * @brief Get the id of this batch_standard_and_pilot_jobs job
      * @return a string id
      */
     unsigned long BatchJob::getJobID() {
@@ -125,7 +125,7 @@ namespace wrench {
 
 
     /**
-     * @brief Set the batch job's begin timestamp
+     * @brief Set the batch_standard_and_pilot_jobs job's begin timestamp
      * @param time_stamp: a date
      */
     void BatchJob::setBeginTimestamp(double time_stamp) {
@@ -134,7 +134,7 @@ namespace wrench {
 
 
     /**
-     * @brief Get the batch job's begin timestamp
+     * @brief Get the batch_standard_and_pilot_jobs job's begin timestamp
      * @return a date
      */
     double BatchJob::getBeginTimestamp() {
@@ -142,7 +142,7 @@ namespace wrench {
     }
 
 /**
-     * @brief Get the batch job's end timestamp
+     * @brief Get the batch_standard_and_pilot_jobs job's end timestamp
      * @return a date
      */
     double BatchJob::getEndingTimestamp() {
@@ -150,7 +150,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the batch job's end timestamp
+     * @brief Set the batch_standard_and_pilot_jobs job's end timestamp
      * @param time_stamp: a date
      */
     void BatchJob::setEndingTimestamp(double time_stamp) {
@@ -163,7 +163,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the resources allocated to this batch job
+     * @brief Get the resources allocated to this batch_standard_and_pilot_jobs job
      * @return a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
     std::map<std::string, std::tuple<unsigned long, double>> BatchJob::getResourcesAllocated() {
@@ -171,7 +171,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the resources allocated to this batch job
+     * @brief Set the resources allocated to this batch_standard_and_pilot_jobs job
      * @param resources: a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
     void BatchJob::setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {

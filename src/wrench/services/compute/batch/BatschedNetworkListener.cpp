@@ -58,7 +58,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param batch_service: the batch service
+    * @param batch_service: the batch_standard_and_pilot_jobs service
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param data_to_send: data to send
@@ -104,7 +104,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Send an "execute" message to the batch service
+     * @brief Send an "execute" message to the batch_standard_and_pilot_jobs service
      * @param answer_mailbox: mailbox on which ack will be received
      * @param execute_job_reply_data: message to send
      */
@@ -119,8 +119,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Send a "query answer" message to the batch service
-     * @param estimated_waiting_time: batch queue wait time estimate
+     * @brief Send a "query answer" message to the batch_standard_and_pilot_jobs service
+     * @param estimated_waiting_time: batch_standard_and_pilot_jobs queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time) {
       try {

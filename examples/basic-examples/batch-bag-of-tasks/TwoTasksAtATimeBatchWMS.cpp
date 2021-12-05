@@ -12,7 +12,7 @@
  **
  **  - While the workflow is not done, repeat:
  **    - Pick up to two ready tasks
- **    - Submit both of them as a single batch job to the compute service
+ **    - Submit both of them as a single batch_standard_and_pilot_jobs job to the compute service
  **       - the job asks for two whole 10-core compute nodes to run two
  **         tasks at once (unless a single task is left), but requesting,
  **         with high probability, an amount of time only sufficient to run a single task.
@@ -42,7 +42,7 @@ namespace wrench {
             storage_services,
             {}, nullptr,
             hostname,
-            "two-tasks-at-a-time-batch") {}
+            "two-tasks-at-a-time-batch_standard_and_pilot_jobs") {}
 
     /**
      * @brief main method of the TwoTasksAtATimeBatchWMS daemon
@@ -66,7 +66,7 @@ namespace wrench {
         auto batch_service = *(this->getAvailableComputeServices<BatchComputeService>().begin());
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
-        /* Record the batch node's core flop rate */
+        /* Record the batch_standard_and_pilot_jobs node's core flop rate */
         double core_flop_rate = (*(batch_service->getCoreFlopRate().begin())).second;
 
         /* For each task, estimate its execution time in minutes */

@@ -28,11 +28,11 @@ namespace wrench {
 
     /**
      * @brief Method to process a job submission
-     * @param batch_job: the newly submitted batch job
+     * @param batch_job: the newly submitted batch_standard_and_pilot_jobs job
      */
     void CONSERVATIVEBFBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
 
-        WRENCH_INFO("Scheduling a new batch job, %lu, that needs %lu nodes",
+        WRENCH_INFO("Scheduling a new batch_standard_and_pilot_jobs job, %lu, that needs %lu nodes",
                     batch_job->getJobID(),  batch_job->getRequestedNumNodes());
 
         // Update the time origin
@@ -46,7 +46,7 @@ namespace wrench {
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
-        WRENCH_INFO("Scheduled batch job %lu on %lu from time %u to %u",
+        WRENCH_INFO("Scheduled batch_standard_and_pilot_jobs job %lu on %lu from time %u to %u",
                     batch_job->getJobID(), batch_job->getRequestedNumNodes(),
                     batch_job->conservative_bf_start_date, batch_job->conservative_bf_expected_end_date);
 #ifdef PRINT_SCHEDULE
@@ -80,7 +80,7 @@ namespace wrench {
                 continue;
             }
 
-            // Get the workflow job associated to the picked batch job
+            // Get the workflow job associated to the picked batch_standard_and_pilot_jobs job
             std::shared_ptr<CompoundJob> compound_job = batch_job->getCompoundJob();
 
             // Find on which resources to actually run the job
@@ -92,12 +92,12 @@ namespace wrench {
             if (resources.empty()) {
                 // Hmmm... we don't have the resources right now... we should get an update soon....
                 return;
-//                throw std::runtime_error("Can't run batch job " + std::to_string(batch_job->getJobID()) +  " right now, this shouldn't happen!");
+//                throw std::runtime_error("Can't run batch_standard_and_pilot_jobs job " + std::to_string(batch_job->getJobID()) +  " right now, this shouldn't happen!");
             }
 
-            WRENCH_INFO("Starting batch job %lu ", batch_job->getJobID());
+            WRENCH_INFO("Starting batch_standard_and_pilot_jobs job %lu ", batch_job->getJobID());
 
-            // Remove the job from the batch queue
+            // Remove the job from the batch_standard_and_pilot_jobs queue
             this->cs->removeJobFromBatchQueue(batch_job);
 
             // Add it to the running list
@@ -121,7 +121,7 @@ namespace wrench {
         this->schedule->print();
 #endif
 
-        // For each job in the order of the batch queue:
+        // For each job in the order of the batch_standard_and_pilot_jobs queue:
         //   - remove the job from the schedule
         //   - re-insert it as early as possible
 
@@ -129,7 +129,7 @@ namespace wrench {
         auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
         this->schedule->setTimeOrigin(now);
 
-        // Go through the batch queue
+        // Go through the batch_standard_and_pilot_jobs queue
         for (auto const &batch_job : this->cs->batch_queue) {
 //            WRENCH_INFO("DEALING WITH JOB %lu", batch_job->getJobID());
 
@@ -165,7 +165,7 @@ namespace wrench {
             this->schedule->add(now, batch_job->conservative_bf_expected_end_date, batch_job);
         }
 
-        // Add in all other jobs as early as possible in batch queue order
+        // Add in all other jobs as early as possible in batch_standard_and_pilot_jobs queue order
         for (auto const &batch_job : this->cs->batch_queue) {
             auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
             // Insert it in the schedule
@@ -186,7 +186,7 @@ namespace wrench {
      * @param batch_job: the job that completed
      */
     void CONSERVATIVEBFBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
-        WRENCH_INFO("Notified of completion of batch job, %lu", batch_job->getJobID());
+        WRENCH_INFO("Notified of completion of batch_standard_and_pilot_jobs job, %lu", batch_job->getJobID());
 
         auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
         this->schedule->setTimeOrigin(now);

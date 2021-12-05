@@ -21,7 +21,7 @@ namespace wrench {
 /***********************/
 
     /**
-     * @brief A class that defines a conservative backfilling batch scheduler
+     * @brief A class that defines a conservative backfilling batch_standard_and_pilot_jobs scheduler
      */
     class CONSERVATIVEBFBatchScheduler : public HomegrownBatchScheduler {
 

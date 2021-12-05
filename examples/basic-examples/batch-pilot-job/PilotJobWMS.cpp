@@ -12,7 +12,7 @@
  **
  **  - Creates a pilot job, but not long enough to accommodate both tasks
  **  - Submit the first task to the pilot job  as a standard job
- **  - Intermediate file is kept in the batch compute service's scratch space!
+ **  - Intermediate file is kept in the batch_standard_and_pilot_jobs compute service's scratch space!
  **  - Submit the second task to the pilot job  as a standard job
  **  - The pilot job will expire because the second task completes, and the
  **    WMS gives up
@@ -41,7 +41,7 @@ namespace wrench {
             storage_services,
             {}, nullptr,
             hostname,
-            "two-tasks-at-a-time-batch") {}
+            "two-tasks-at-a-time-batch_standard_and_pilot_jobs") {}
 
     /**
      * @brief main method of the PilotJobWMS daemon
@@ -65,7 +65,7 @@ namespace wrench {
         auto batch_service = *(this->getAvailableComputeServices<BatchComputeService>().begin());
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
-        /* Record the batch node's core flop rate */
+        /* Record the batch_standard_and_pilot_jobs node's core flop rate */
         double core_flop_rate = (*(batch_service->getCoreFlopRate().begin())).second;
 
         /*  Get references to tasks and files */

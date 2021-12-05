@@ -15,7 +15,7 @@ WRENCH_LOG_CATEGORY(batch_scheduler, "Log category for Batch Scheduler");
 namespace wrench {
 
     /**
-     * @brief Schedule and run a set of ready tasks on the batch service
+     * @brief Schedule and run a set of ready tasks on the batch_standard_and_pilot_jobs service
      *
      * @param compute_services: a set of compute services available to run jobs
      * @param ready_tasks: a set of (ready) workflow tasks
@@ -34,7 +34,7 @@ namespace wrench {
       auto batch_service = std::dynamic_pointer_cast<BatchComputeService>(compute_service);
 
       if (not(batch_service)) {
-        throw std::runtime_error("This example Batch Scheduler can only handle a batch service");
+        throw std::runtime_error("This example Batch Scheduler can only handle a batch_standard_and_pilot_jobs service");
       }
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());

@@ -84,7 +84,7 @@ namespace wrench {
             }
         }
 
-        // Determine if there is at least one batch service
+        // Determine if there is at least one batch_standard_and_pilot_jobs service
         bool at_least_one_batch_service = false;
         for (auto const &cs: compute_services) {
             if (std::dynamic_pointer_cast<BatchComputeService>(cs)) {
@@ -407,10 +407,10 @@ namespace wrench {
 //            }
 //
 //            if (target_cs == nullptr) {
-//                throw std::invalid_argument("Couldn't find target batch compute service for grid-universe job");
+//                throw std::invalid_argument("Couldn't find target batch_standard_and_pilot_jobs compute service for grid-universe job");
 //            }
 //            if (not target_cs->hasScratch()) {
-//                throw std::invalid_argument("Target batch compute service (" + target_cs->getName() + ") for grid-universe job does not have scratch space");
+//                throw std::invalid_argument("Target batch_standard_and_pilot_jobs compute service (" + target_cs->getName() + ") for grid-universe job does not have scratch space");
 //            }
 //
 //        } else {
@@ -450,7 +450,7 @@ namespace wrench {
 
         // At this point, the job is a grid-universe job
 
-        // Determine the target batch compute service
+        // Determine the target batch_standard_and_pilot_jobs compute service
         std::set<std::shared_ptr<BatchComputeService>> batch_cses;
         std::shared_ptr<BatchComputeService> target_cs = nullptr;
         for (auto const &cs : this->central_manager->compute_services) {
@@ -466,16 +466,16 @@ namespace wrench {
             }
         } else {
             if (batch_cses.size() != 1) {
-                throw std::invalid_argument("'-service' service-specific argument required for grid-universe job as there are more than one batch compute services available");
+                throw std::invalid_argument("'-service' service-specific argument required for grid-universe job as there are more than one batch_standard_and_pilot_jobs compute services available");
             } else {
                 target_cs = *(batch_cses.begin());
             }
         }
         if (target_cs == nullptr) {
-            throw std::invalid_argument("Not able to determine target batch compute service for grid-universe job");
+            throw std::invalid_argument("Not able to determine target batch_standard_and_pilot_jobs compute service for grid-universe job");
         }
 
-        // Now, invoke the batch compute service with the arguments (sort of) to validate them
+        // Now, invoke the batch_standard_and_pilot_jobs compute service with the arguments (sort of) to validate them
         auto stripped_service_specific_args = service_specific_args;
         stripped_service_specific_args.erase("-universe");
         stripped_service_specific_args.erase("-service"); // which may not be there, but whatever

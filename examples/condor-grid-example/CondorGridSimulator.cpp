@@ -16,7 +16,7 @@
 
 /**
  ** This simulator simulates the execution of 10 independent tasks on HTCondor,
- ** where HTCondor has access for a batch compute service and a bare-metal compute
+ ** where HTCondor has access for a batch_standard_and_pilot_jobs compute service and a bare-metal compute
  ** service that runs on a VM.
  **
  ** Example invocation of the simulator with useful WMS logging:
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     // Create a storage service on the WMS host, that will host all data
     auto local_ss = simulation.add(new wrench::SimpleStorageService("WMSHost", {"/"}));
 
-    // Create a 4-node batch service
+    // Create a 4-node batch_standard_and_pilot_jobs service
     auto batch_cs = simulation.add(new wrench::BatchComputeService(
             "BatchHeadNode",
             {"BatchNode1", "BatchNode2", "BatchNode3", "BatchNode4"},

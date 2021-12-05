@@ -21,8 +21,8 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the name of the host on which the trace file replayer will be started
-     * @param batch_service: the batch service to which it submits jobs
-     * @param num_cores_per_node: the number of cores per host on the batch service
+     * @param batch_service: the batch_standard_and_pilot_jobs service to which it submits jobs
+     * @param num_cores_per_node: the number of cores per host on the batch_standard_and_pilot_jobs service
      * @param use_actual_runtimes_as_requested_runtimes: if true, use actual runtimes as requested runtimes
      * @param workload_trace: the workload trace to be replayed
      */
@@ -111,7 +111,7 @@ namespace wrench {
             }
             job_count++;
 
-            // Create the batch-specific argument
+            // Create the batch_standard_and_pilot_jobs-specific argument
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = std::to_string(num_nodes); // Number of nodes/taks
             batch_job_args["-t"] = std::to_string(1 + requested_time / 60); // Time in minutes (note the +1)
@@ -119,7 +119,7 @@ namespace wrench {
             batch_job_args["-u"] = username; // username
             batch_job_args["-color"] = "green";
 
-            // Submit this job to the batch service
+            // Submit this job to the batch_standard_and_pilot_jobs service
             WRENCH_INFO("#%lu: Submitting a [-N:%s, -t:%s, -c:%s, -u:%s] job",
                         counter++,
                         batch_job_args["-N"].c_str(),
