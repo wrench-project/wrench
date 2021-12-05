@@ -360,5 +360,13 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Determine whether the action uses scratch
+     * @return true if the action uses scratch, false otherwise
+     */
+    bool Action::usesScratch() const {
+        return false;
+    }
+
 
 }

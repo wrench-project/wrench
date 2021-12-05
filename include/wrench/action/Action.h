@@ -59,6 +59,8 @@ namespace wrench {
         virtual unsigned long getMaxNumCores() const;
         virtual double getMinRAMFootprint() const;
 
+        virtual bool usesScratch() const;
+
         void setPriority(double priority);
         double getPriority() const;
 

@@ -26,6 +26,8 @@ namespace wrench {
         std::shared_ptr<FileLocation> getSourceFileLocation() const;
         std::shared_ptr<FileLocation> getDestinationFileLocation() const;
 
+        bool usesScratch() const override;
+
     protected:
         friend class CompoundJob;
 
