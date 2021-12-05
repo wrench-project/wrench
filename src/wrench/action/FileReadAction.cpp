@@ -88,8 +88,21 @@ namespace wrench {
      *        has not started, failed, etc.)
      * @return A storage service
      */
-    std::shared_ptr<FileLocation> FileReadAction::getUsedFileLocation() {
+    std::shared_ptr<FileLocation> FileReadAction::getUsedFileLocation() const {
         return this->used_location;
+    }
+
+    /**
+      * @brief Determine whether the action uses scratch
+      * @return true if the action uses scratch, false otherwise
+      */
+    bool FileReadAction::usesScratch() const {
+        for (auto const &fl : this->file_locations) {
+            if (fl == FileLocation::SCRATCH) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

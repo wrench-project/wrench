@@ -130,6 +130,8 @@ namespace wrench {
 
         double getMinimumRequiredMemory();
 
+        bool usesScratch();
+
         /***********************/
         /** \endcond           */
         /***********************/

@@ -72,4 +72,13 @@ namespace wrench {
         // Nothing to do
     }
 
+    /**
+  * @brief Determine whether the action uses scratch
+  * @return true if the action uses scratch, false otherwise
+  */
+    bool FileWriteAction::usesScratch() const {
+        return (this->file_location == FileLocation::SCRATCH);
+    }
+
+
 }

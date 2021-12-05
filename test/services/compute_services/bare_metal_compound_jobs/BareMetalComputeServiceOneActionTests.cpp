@@ -37,6 +37,7 @@ public:
     void do_OneFileReadActionFileNotThere_test();
     void do_OneSleepActionServiceDown_test();
     void do_OneSleepActionServiceSuspended_test();
+    void do_OneSleepActionBadScratch_test();
 
 protected:
     BareMetalComputeServiceOneActionTest() {
@@ -1653,3 +1654,105 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     free(argv);
 }
 
+
+/**********************************************************************/
+/**  ONE SLEEP ACTION BAD SCRATCH TEST                               **/
+/**********************************************************************/
+
+class ServiceBadScratchTestWMS : public wrench::WMS {
+public:
+    ServiceBadScratchTestWMS(BareMetalComputeServiceOneActionTest *test,
+                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                   std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceOneActionTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("my_job");
+        auto action = job->addFileCopyAction("my_file_copy",this->test->input_file,
+                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                             wrench::FileLocation::SCRATCH);
+
+        // Submit the job
+        try {
+            job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Shouldn't be able to submit that job to a service that does not have scratch");
+        } catch (std::invalid_argument &ignore) {
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneActionTest, BadScratch) {
+    DO_TEST_WITH_FORK(do_OneSleepActionBadScratch_test);
+}
+
+void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
+    // Create and initialize a simulation
+    auto *simulation = new wrench::Simulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_action_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {""},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ServiceBadScratchTestWMS(
+                    this,
+                    {compute_service}, {
+                            storage_service1
+                    }, hostname)));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+    // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
