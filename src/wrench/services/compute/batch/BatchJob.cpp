@@ -28,7 +28,7 @@ namespace wrench {
                        unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
-                    "BatchJob::BatchJob(): StandardJob cannot be null"
+                    "BatchJob::BatchJob(): job cannot be null"
             );
         }
         this->compound_job = job;

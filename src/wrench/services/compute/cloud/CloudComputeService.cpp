@@ -404,93 +404,6 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief Submit a standard job to the cloud service
-//     *
-//     * @param job: a standard job
-//     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
-//     *
-//     * @throw ExecutionException
-//     * @throw std::invalid_argument
-//     * @throw std::runtime_error
-//     */
-//    void CloudComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
-//                                                const std::map<std::string, std::string> &service_specific_args) {
-//        assertServiceIsUp();
-//
-//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
-//
-//        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
-//                answer_mailbox,
-//                new ComputeServiceSubmitStandardJobRequestMessage(
-//                        answer_mailbox, job, service_specific_args,
-//                        this->getMessagePayloadValue(
-//                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-//
-//        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(answer_message.get())) {
-//            // If no success, throw an exception
-//            if (not msg->success) {
-//                throw ExecutionException(msg->failure_cause);
-//            }
-//        } else {
-//            throw std::runtime_error(
-//                    "ComputeService::submitStandardJob(): Received an unexpected [" + msg->getName() + "] message!");
-//        }
-//    }
-
-//    /**
-//     * @brief Asynchronously submit a pilot job to the cloud service
-//     *
-//     * @param job: a pilot job
-//     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
-//     *
-//     * @throw ExecutionException
-//     * @throw std::runtime_error
-//     */
-//    void CloudComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
-//                                             const std::map<std::string, std::string> &service_specific_args) {
-//        assertServiceIsUp();
-//
-//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
-//
-//        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
-//                answer_mailbox,
-//                new ComputeServiceSubmitPilotJobRequestMessage(
-//                        answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
-//                                CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-//
-//        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
-//            // If no success, throw an exception
-//            if (not msg->success) {
-//                throw ExecutionException(msg->failure_cause);
-//            } else {
-//                return;
-//            }
-//        } else {
-//            throw std::runtime_error(
-//                    "CloudComputeService::submitPilotJob(): Received an unexpected [" + msg->getName() + "] message!");
-//        }
-//    }
-
-//    /**
-//     * @brief Terminate a standard job to the compute service (virtual)
-//     * @param job: the standard job
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void CloudComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
-//        throw std::runtime_error("CloudComputeService::terminateStandardJob(): Not implemented!");
-//    }
-//
-//    /**
-//     * @brief non-implemented
-//     * @param job: a pilot job to (supposedly) terminate
-//     */
-//    void CloudComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
-//        throw std::runtime_error(
-//                "CloudComputeService::terminatePilotJob(): not implemented because CloudComputeService never supports pilot jobs");
-//    }
-
     /**
      * @brief Method to check whether a VM is currently running
      * @param vm_name: the name of the VM
@@ -668,14 +581,6 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<CloudComputeServiceDestroyVMRequestMessage *>(message.get())) {
             processDestroyVM(msg->answer_mailbox, msg->vm_name);
             return true;
-
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-//            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
-//
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
             processIsThereAtLeastOneHostWithAvailableResources(msg->answer_mailbox, msg->num_cores, msg->ram);
