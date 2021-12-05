@@ -18,18 +18,18 @@
  **
  ** The compute platform comprises four hosts, WMSHost,  BatchHeadNode, BatchNode1, and
  **  BatchNode2. On WMSHost runs a simple storage
- ** service and a WMS (defined in class TwoTasksAtATimeBatchWMS). On BatchHeadNode runs a batch
+ ** service and a WMS (defined in class TwoTasksAtATimeBatchWMS). On BatchHeadNode runs a batch_standard_and_pilot_jobs
  ** service, that has access to two hosts: BatchNode1 and BatchNode2. Once the simulation is done,
  ** the completion time of each workflow task1 is printed.
  **
  ** Example invocation of the simulator for a 10-task1 workflow, with no logging:
- **    ./wrench-example-batch-bag-of-tasks 10 ./four_hosts.xml
+ **    ./wrench-example-batch_standard_and_pilot_jobs-bag-of-tasks 10 ./four_hosts.xml
  **
  ** Example invocation of the simulator for a 10-task1 workflow, with only WMS logging:
- **    ./wrench-example-batch-bag-of-tasks 10 ./four_hosts.xml --log=custom_wms.threshold=info
+ **    ./wrench-example-batch_standard_and_pilot_jobs-bag-of-tasks 10 ./four_hosts.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator for a 6-task1 workflow with full logging:
- **    ./wrench-example-batch-bag-of-tasks 6 ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-batch_standard_and_pilot_jobs-bag-of-tasks 6 ./four_hosts.xml --wrench-full-log
  **/
 
 
@@ -105,10 +105,10 @@ int main(int argc, char **argv) {
     auto storage_service = simulation.add(new wrench::SimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a batch compute service, and add it to the simulation.
+    /* Instantiate a batch_standard_and_pilot_jobs compute service, and add it to the simulation.
      * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
-     * to a batch scheduled cluster, which responds to job submission requests by placing them
-     * in a batch queue, and granting them exclusive access to compute resources.
+     * to a batch_standard_and_pilot_jobs scheduled cluster, which responds to job submission requests by placing them
+     * in a batch_standard_and_pilot_jobs queue, and granting them exclusive access to compute resources.
      * This particular service is started on BatchProviderHost, uses BatchHost1 and BatchHost2
      * as hardware resources, and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */

@@ -20,7 +20,7 @@
 namespace wrench {
 
     /**
-     * @brief A class that implements a FCFS batch scheduler
+     * @brief A class that implements a FCFS batch_standard_and_pilot_jobs scheduler
      */
     class FCFSBatchScheduler : public HomegrownBatchScheduler {
 
@@ -29,7 +29,7 @@ namespace wrench {
         /**
          * @brief Constructor
          *
-         * @param cs: the batch compute service for which this scheduler is operating
+         * @param cs: the batch_standard_and_pilot_jobs compute service for which this scheduler is operating
          */
         explicit FCFSBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {}
 

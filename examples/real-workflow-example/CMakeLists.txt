@@ -27,7 +27,7 @@ endif()
 
 install(TARGETS wrench-example-real-workflow-cloud DESTINATION bin)
 
-# batch example
+# batch_standard_and_pilot_jobs example
 set(APP_BATCH_FILES SimpleSimulatorBatch.cpp)
 add_executable(wrench-example-real-workflow-batch ${SOURCE_FILES} ${APP_BATCH_FILES})
 if (ENABLE_BATSCHED)

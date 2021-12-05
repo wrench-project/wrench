@@ -144,12 +144,12 @@ namespace wrench {
                     throw std::invalid_argument(
                             "startBatsched(): Scheduling algorithm " +
                             this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
-                            " not supported by the batch service");
+                            " not supported by the batch_standard_and_pilot_jobs service");
                 case 2:
                     throw std::invalid_argument(
                             "startBatsched(): Queuing option " +
                             this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM) +
-                            "not supported by the batch service");
+                            "not supported by the batch_standard_and_pilot_jobs service");
                 case 3:
                     throw std::runtime_error(
                             "startBatsched(): Cannot start the batsched process");
@@ -464,7 +464,7 @@ namespace wrench {
     /**
      * @brief Appends a job to the CSV Output file
      *
-     * @param batch_job: the batch job
+     * @param batch_job: the batch_standard_and_pilot_jobs job
      * @param status: "COMPLETED", "TERMINATED" (by user), "FAILED" (timeout)
      */
     void BatschedBatchScheduler::appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status) {

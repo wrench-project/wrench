@@ -16,7 +16,7 @@
 namespace wrench {
 
     /**
-     * @brief A batch Scheduler
+     * @brief A batch_standard_and_pilot_jobs Scheduler
      */
     class BatchStandardJobScheduler : public StandardJobScheduler {
 

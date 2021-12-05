@@ -19,7 +19,7 @@ namespace wrench {
 /***********************/
 
     /**
-     * @brief A class that defines a batsched batch scheduler
+     * @brief A class that defines a batsched batch_standard_and_pilot_jobs scheduler
      */
     class BatschedBatchScheduler : public BatchScheduler {
 
@@ -53,31 +53,31 @@ namespace wrench {
 
         /**
          * @brief Method to process a job submission
-         * @param batch_job: the batch job that was submitted
+         * @param batch_job: the batch_standard_and_pilot_jobs job that was submitted
          */
         void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to process a job failure
-         * @param batch_job: the batch job that has failed
+         * @param batch_job: the batch_standard_and_pilot_jobs job that has failed
          */
         void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to process a job completion
-         * @param batch_job: the batch job that has completed
+         * @param batch_job: the batch_standard_and_pilot_jobs job that has completed
          */
         void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
          * @brief Method to process a job termination
-         * @param batch_job: the batch job that was terminated
+         * @param batch_job: the batch_standard_and_pilot_jobs job that was terminated
          */
         void processJobTermination(std::shared_ptr<BatchJob> batch_job) override;
 
         /**
         * @brief Method to process a job termination when the job is already forgotten (useful for batsched)
-        * @param job_id: the id of the batch job that was terminated
+        * @param job_id: the id of the batch_standard_and_pilot_jobs job that was terminated
         */
         void processUnknownJobTermination(std::string job_id) override;
 

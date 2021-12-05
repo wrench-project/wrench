@@ -66,7 +66,7 @@ namespace wrench {
         WRENCH_INFO("Adding the VM's bare-metal compute service to HTCondor");
         htcondor_cs->addComputeService(vm_cs);
 
-        WRENCH_INFO("At this point, HTCondor has access to one batch compute service and one bare-metal service (which runs on a VM)");
+        WRENCH_INFO("At this point, HTCondor has access to one batch_standard_and_pilot_jobs compute service and one bare-metal service (which runs on a VM)");
 
         // Create a map of files, which are all supposed to be on the local SS
         std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
@@ -102,7 +102,7 @@ namespace wrench {
         htcondor_service_specific_arguments["-N"] = "3";
         htcondor_service_specific_arguments["-c"] = "5";
         htcondor_service_specific_arguments["-t"] = "3600";
-        // This argument below is not required, as there is a single batch service in this example
+        // This argument below is not required, as there is a single batch_standard_and_pilot_jobs service in this example
         htcondor_service_specific_arguments["-service"] = batch_cs->getName();
         job_manager->submitJob(grid_universe_job, htcondor_cs, htcondor_service_specific_arguments);
         WRENCH_INFO("Job submitted!");

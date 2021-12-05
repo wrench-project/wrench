@@ -10,8 +10,8 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A batch job, which encapsulates a Job and additional information
-     *        used by a batch
+     * @brief A batch_standard_and_pilot_jobs job, which encapsulates a Job and additional information
+     *        used by a batch_standard_and_pilot_jobs
      */
     class BatchJob {
     public:
