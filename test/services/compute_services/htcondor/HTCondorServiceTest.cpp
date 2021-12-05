@@ -606,7 +606,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
                                     wrench::Simulation::getHostMemoryCapacity(execution_host)))},
             "/scratch"));
 
-    // Create a batch compute service
+    // Create a batch_standard_and_pilot_jobs compute service
     auto batch_compute_service = simulation->add(new wrench::BatchComputeService(execution_host,
                                                                                  {execution_host},
                                                                                  "/scratch2"));
@@ -861,7 +861,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(batch_service);
 
-    // Create a HTCondor Service with batch service
+    // Create a HTCondor Service with batch_standard_and_pilot_jobs service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(
                     hostname,  std::move(compute_services),

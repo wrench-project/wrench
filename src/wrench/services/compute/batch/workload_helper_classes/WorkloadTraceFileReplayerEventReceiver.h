@@ -21,8 +21,8 @@ namespace wrench {
     class BatchComputeService;
 
     /**
-     * @brief A WMS that only submits a single job to a given batch service, which is used
-     *        to implement batch workload replay
+     * @brief A WMS that only submits a single job to a given batch_standard_and_pilot_jobs service, which is used
+     *        to implement batch_standard_and_pilot_jobs workload replay
      */
     class WorkloadTraceFileReplayerEventReceiver : public WMS {
 

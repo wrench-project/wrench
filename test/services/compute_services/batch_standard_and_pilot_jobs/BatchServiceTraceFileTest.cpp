@@ -343,7 +343,7 @@ private:
 
         wrench::Simulation::sleep(20);
 
-        // Shutdown the batch service
+        // Shutdown the batch_standard_and_pilot_jobs service
         (*(this->getAvailableComputeServices<wrench::ComputeService>().begin()))->stop();
 
         // At this point there should be some warning messages from the
@@ -462,12 +462,12 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
@@ -486,13 +486,13 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_4_nodes = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
@@ -842,12 +842,12 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(10);  // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
@@ -1006,12 +1006,12 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args["-N"] = std::to_string(2);     // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(10);  // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
@@ -1196,12 +1196,12 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_2_nodes = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 
@@ -1221,13 +1221,13 @@ private:
         // Create a Standard Job with only the tasks
         auto standard_job_4_nodes = job_manager->createStandardJob(tasks);
 
-        // Create the batch-specific argument
+        // Create the batch_standard_and_pilot_jobs-specific argument
         batch_job_args.clear();
         batch_job_args["-N"] = std::to_string(4); // Number of nodes/tasks
         batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
-        // Submit this job to the batch service
+        // Submit this job to the batch_standard_and_pilot_jobs service
         job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
 
 

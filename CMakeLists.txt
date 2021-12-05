@@ -393,14 +393,14 @@ set(TEST_FILES
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
-        test/services/compute_services/batch/HomeGrownTimeLineTest.cpp
-        test/services/compute_services/batch/BatchServiceTest.cpp
-        test/services/compute_services/batch/BatchServiceFCFSTest.cpp
-        test/services/compute_services/batch/BatchServiceCONSERVATIVEBFTest.cpp
-        test/services/compute_services/batch/BatchServiceTraceFileTest.cpp
-        test/services/compute_services/batch/BatchServiceOutputCSVFileTest.cpp
-        test/services/compute_services/batch/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
-        test/services/compute_services/batch/BatchServiceBatschedContiguityTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceCONSERVATIVEBFTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTraceFileTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceOutputCSVFileTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
         test/wms/WMSTest.cpp
