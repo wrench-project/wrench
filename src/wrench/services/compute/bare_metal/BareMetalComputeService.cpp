@@ -234,58 +234,6 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief Asynchronously submit a pilot job to the compute service. This will raise
-//     *        a ExecutionException as this service does not support pilot jobs.
-//     *
-//     * @param job: a pilot job
-//     * @param service_specific_args: service specific arguments (only {} is supported)
-//     *
-//     * @throw ExecutionException
-//     * @throw std::runtime_error
-//     */
-//    void BareMetalComputeService::submitPilotJob(
-//            std::shared_ptr<PilotJob> job,
-//            const std::map<std::string, std::string> &service_specific_args) {
-//        assertServiceIsUp();
-//
-//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
-//
-//        // Send a "run a pilot job" message to the daemon's mailbox_name
-//        try {
-//            S4U_Mailbox::putMessage(
-//                    this->mailbox_name,
-//                    new ComputeServiceSubmitPilotJobRequestMessage(
-//                            answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
-//                                    BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            throw ExecutionException(cause);
-//        }
-//
-//        // Wait for a reply
-//        std::unique_ptr<SimulationMessage> message = nullptr;
-//
-//        try {
-//            message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            throw ExecutionException(cause);
-//        }
-//
-//        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
-//            // If no success, throw an exception
-//            if (not msg->success) {
-//                throw ExecutionException(msg->failure_cause);
-//            } else {
-//                return;
-//            }
-//
-//        } else {
-//            throw std::runtime_error(
-//                    "bare_metal_standard_jobs::submitPilotJob(): Received an unexpected [" + message->getName() +
-//                    "] message!");
-//        }
-//    }
-
 
     /**
      * @brief Constructor
