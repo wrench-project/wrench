@@ -84,4 +84,14 @@ namespace wrench {
         // Nothing to do
     }
 
+
+    /**
+     * @brief Determine whether the action uses scratch
+     * @return true if the action uses scratch, false otherwise
+     */
+    bool FileCopyAction::usesScratch() const {
+        return (this->src_file_location == FileLocation::SCRATCH or this->dst_file_location == FileLocation::SCRATCH);
+    }
+
+
 }

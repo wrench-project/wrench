@@ -563,6 +563,18 @@ namespace wrench {
         return min_ram;
     }
 
+    /**
+     * @brief Determine whether the job uses scratch
+     * @return true if the job uses scratch, false otherwise
+     */
+    bool CompoundJob::usesScratch() {
+        for (auto const &a: this->actions) {
+            if (a->usesScratch()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 }

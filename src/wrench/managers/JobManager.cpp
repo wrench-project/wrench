@@ -585,6 +585,15 @@ namespace wrench {
             throw;
         }
 
+        // If the job uses scratch, then do a sanity check on the CS
+        if (job->usesScratch()) {
+            try {
+                compute_service->validateJobsUseOfScratch(service_specific_args);
+            } catch (std::invalid_argument &e) {
+                throw std::invalid_argument("JobManager()::submitJob(): Job's use of scratch is invalid: " + std::string(e.what()));
+            }
+        }
+
         job->state = CompoundJob::State::SUBMITTED;
         this->acquireDaemonLock();
         this->jobs_to_dispatch.push_back(job);
