@@ -111,11 +111,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-//        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override {} ;
-
         void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) override;
-
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 

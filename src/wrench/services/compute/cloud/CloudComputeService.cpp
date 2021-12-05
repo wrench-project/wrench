@@ -404,73 +404,73 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Submit a standard job to the cloud service
-     *
-     * @param job: a standard job
-     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
-     *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void CloudComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
-                                                const std::map<std::string, std::string> &service_specific_args) {
-        assertServiceIsUp();
+//    /**
+//     * @brief Submit a standard job to the cloud service
+//     *
+//     * @param job: a standard job
+//     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
+//     *
+//     * @throw ExecutionException
+//     * @throw std::invalid_argument
+//     * @throw std::runtime_error
+//     */
+//    void CloudComputeService::submitStandardJob(std::shared_ptr<StandardJob> job,
+//                                                const std::map<std::string, std::string> &service_specific_args) {
+//        assertServiceIsUp();
+//
+//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
+//
+//        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+//                answer_mailbox,
+//                new ComputeServiceSubmitStandardJobRequestMessage(
+//                        answer_mailbox, job, service_specific_args,
+//                        this->getMessagePayloadValue(
+//                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+//
+//        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(answer_message.get())) {
+//            // If no success, throw an exception
+//            if (not msg->success) {
+//                throw ExecutionException(msg->failure_cause);
+//            }
+//        } else {
+//            throw std::runtime_error(
+//                    "ComputeService::submitStandardJob(): Received an unexpected [" + msg->getName() + "] message!");
+//        }
+//    }
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
-
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
-                answer_mailbox,
-                new ComputeServiceSubmitStandardJobRequestMessage(
-                        answer_mailbox, job, service_specific_args,
-                        this->getMessagePayloadValue(
-                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(answer_message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            }
-        } else {
-            throw std::runtime_error(
-                    "ComputeService::submitStandardJob(): Received an unexpected [" + msg->getName() + "] message!");
-        }
-    }
-
-    /**
-     * @brief Asynchronously submit a pilot job to the cloud service
-     *
-     * @param job: a pilot job
-     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
-     *
-     * @throw ExecutionException
-     * @throw std::runtime_error
-     */
-    void CloudComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
-                                             const std::map<std::string, std::string> &service_specific_args) {
-        assertServiceIsUp();
-
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
-
-        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
-                answer_mailbox,
-                new ComputeServiceSubmitPilotJobRequestMessage(
-                        answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
-                                CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-
-        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
-            // If no success, throw an exception
-            if (not msg->success) {
-                throw ExecutionException(msg->failure_cause);
-            } else {
-                return;
-            }
-        } else {
-            throw std::runtime_error(
-                    "CloudComputeService::submitPilotJob(): Received an unexpected [" + msg->getName() + "] message!");
-        }
-    }
+//    /**
+//     * @brief Asynchronously submit a pilot job to the cloud service
+//     *
+//     * @param job: a pilot job
+//     * @param service_specific_args: always {} (i.e., no service-specific arguments supported)
+//     *
+//     * @throw ExecutionException
+//     * @throw std::runtime_error
+//     */
+//    void CloudComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
+//                                             const std::map<std::string, std::string> &service_specific_args) {
+//        assertServiceIsUp();
+//
+//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
+//
+//        std::shared_ptr<SimulationMessage> answer_message = sendRequest(
+//                answer_mailbox,
+//                new ComputeServiceSubmitPilotJobRequestMessage(
+//                        answer_mailbox, job, service_specific_args, this->getMessagePayloadValue(
+//                                CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+//
+//        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
+//            // If no success, throw an exception
+//            if (not msg->success) {
+//                throw ExecutionException(msg->failure_cause);
+//            } else {
+//                return;
+//            }
+//        } else {
+//            throw std::runtime_error(
+//                    "CloudComputeService::submitPilotJob(): Received an unexpected [" + msg->getName() + "] message!");
+//        }
+//    }
 
 //    /**
 //     * @brief Terminate a standard job to the compute service (virtual)
@@ -1174,59 +1174,6 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox, msg_to_send_back);
     }
 
-
-//    /**
-//     * @brief Process a submit standard job request
-//     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     * @param job: the job
-//     * @param service_specific_args: service specific arguments
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void
-//    CloudComputeService::processSubmitStandardJob(const std::string &answer_mailbox,
-//                                                  std::shared_ptr<StandardJob> job,
-//                                                  std::map<std::string, std::string> &service_specific_args) {
-//        if (not this->supportsStandardJobs()) {
-//            S4U_Mailbox::dputMessage(
-//                    answer_mailbox, new ComputeServiceSubmitStandardJobAnswerMessage(
-//                            job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
-//                                    new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
-//                            this->getMessagePayloadValue(
-//                                    CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-//
-//        } else {
-//            throw std::runtime_error(
-//                    "CloudComputeService::processSubmitPilotJob(): A Cloud service should never support standard jobs");
-//        }
-//    }
-
-//    /**
-//     * @brief Process a submit pilot job request
-//     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     * @param job: the job
-//     * @param service_specific_args: service specific arguments
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void CloudComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-//                                                    std::shared_ptr<PilotJob> job,
-//                                                    std::map<std::string, std::string> &service_specific_args) {
-//        if (not this->supportsPilotJobs()) {
-//            S4U_Mailbox::dputMessage(
-//                    answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-//                            job, this->getSharedPtr<CloudComputeService>(), false, std::shared_ptr<FailureCause>(
-//                                    new JobTypeNotSupported(job, this->getSharedPtr<CloudComputeService>())),
-//                            this->getMessagePayloadValue(
-//                                    CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-//
-//        } else {
-//            throw std::runtime_error(
-//                    "CloudComputeService::processSubmitPilotJob(): A Cloud service should never support pilot jobs");
-//        }
-//    }
 
     /**
      * @brief Process a "get resource information message"

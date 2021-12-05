@@ -141,13 +141,13 @@ namespace wrench {
         virtual void
         submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
 
-        /**
-         * @brief Method to submit a pilot job to the service
-         *
-         * @param job: The job being submitted
-         * @param service_specific_arguments: the set of service-specific arguments
-         */
-        virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) {}; // TODO: REMOVE
+//        /**
+//         * @brief Method to submit a pilot job to the service
+//         *
+//         * @param job: The job being submitted
+//         * @param service_specific_arguments: the set of service-specific arguments
+//         */
+//        virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) {}; // TODO: REMOVE
 
         /**
          * @brief Method to terminate a compound job
