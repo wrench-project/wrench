@@ -385,67 +385,6 @@ namespace wrench {
         return job;
     }
 
-//    /**
-//     * @brief Helper method to validate a job submission
-//     * @param job: the job to submit
-//     * @param compute_service: the compute service
-//     * @param service_specific_args: the service-specific arguments
-//     */
-//    void JobManager::validateJobSubmission(std::shared_ptr<Job> job,
-//                                           std::shared_ptr<ComputeService> compute_service,
-//                                           std::map<std::string, std::string> service_specific_args) {
-//
-//        if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-//            validateCompoundJobSubmission(cjob, compute_service, service_specific_args);
-//        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-//            validatePilotJobSubmission(pjob, compute_service, service_specific_args);
-//        }
-//    }
-
-//    /**
-//     * @brief Helper method to validate a compound job submission
-//     * @param job: the compound job to submit
-//     * @param compute_service: the compute service
-//     * @param service_specific_args: the service-specific arguments
-//     */
-//    void JobManager::validateJobSubmission(std::shared_ptr<CompoundJob> job,
-//                                                   std::shared_ptr<ComputeService> compute_service,
-//                                                   std::map<std::string, std::string> service_specific_args) {
-//
-//        /* make sure that service arguments are provided for valid actions in the jobs */
-//        for (auto const &arg : service_specific_args) {
-//            bool found = false;
-//            for (auto const &action : job->getActions()) {
-//                if (action->getName() == arg.first) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//            if (not found) {
-//                throw std::invalid_argument(
-//                        "JobManager::validateCompoundJobSubmission(): Service-specific argument provided for action with name '" +
-//                        arg.first + "' but there is no action with such name in the job");
-//            }
-//        }
-//
-//        // Invoke the validation method on the service
-//        compute_service->validateServiceSpecificArguments(job, service_specific_args);
-//
-//    }
-
-//    /**
-//    * @brief Helper method to validate a pilot job submission
-//    * @param job: the job to submit
-//    * @param compute_service: the compute service
-//    * @param service_specific_args: the service-specific arguments
-//    */
-//    void JobManager::validatePilotJobSubmission(std::shared_ptr<PilotJob> job,
-//                                                std::shared_ptr<ComputeService> compute_service,
-//                                                std::map<std::string, std::string> service_specific_args) {
-//        throw std::runtime_error("JobManager::validatePilotJobSubmission(): TO IMPLEMENT!");
-//    }
-
-
     /**
     * @brief Submit a standard job to a compute service
     *
