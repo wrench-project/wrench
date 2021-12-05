@@ -226,14 +226,6 @@ namespace wrench {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-//            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
-//
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
-
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);

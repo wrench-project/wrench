@@ -1235,22 +1235,10 @@ namespace wrench {
             unsigned long allocated_time,
             unsigned long cores_per_node_asked_for) {
 
-//        if (auto sjob = std::dynamic_pointer_cast<StandardJob>(workflow_job)) {
         WRENCH_INFO(
                 "Creating a BareMetalComputeServiceOneShot for a compound job on %ld nodes with %ld cores per node",
                 num_nodes_allocated, cores_per_node_asked_for);
 
-
-        // Create a bare-metal-service job executor
-
-//        BareMetalComputeServiceOneShot(std::shared_ptr<CompoundJob> job,
-//        const std::string &hostname,
-//        std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-//        std::map<std::string, std::string> property_list,
-//        std::map<std::string, double> messagepayload_list,
-//        double ttl,
-//        std::shared_ptr<PilotJob> pj, std::string suffix,
-//                std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
         compound_job->pushCallbackMailbox(this->mailbox_name);
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(new

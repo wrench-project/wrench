@@ -167,72 +167,6 @@ namespace wrench {
     }
 
 
-//    /**
-//     * @brief Asynchronously submit a pilot job to the cloud service
-//     *
-//     * @param job: a pilot job
-//     * @param service_specific_args: service specific arguments
-//     *
-//     * @throw ExecutionException
-//     * @throw std::runtime_error
-//     */
-//    void HTCondorComputeService::submitPilotJob(std::shared_ptr<PilotJob> job,
-//                                                const std::map<std::string, std::string> &service_specific_args) {
-//        serviceSanityCheck();
-//
-//        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
-//
-//        //  send a "run a pilot job" message to the daemon's mailbox_name
-//        try {
-//            S4U_Mailbox::putMessage(
-//                    this->mailbox_name,
-//                    new ComputeServiceSubmitPilotJobRequestMessage(
-//                            answer_mailbox, job, service_specific_args,
-//                            this->getMessagePayloadValue(
-//                                    HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            throw ExecutionException(cause);
-//        }
-//
-//        // Get the answer
-//        std::unique_ptr<SimulationMessage> message = nullptr;
-//        try {
-//            message = S4U_Mailbox::getMessage(answer_mailbox);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            throw ExecutionException(cause);
-//        }
-//
-//        if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
-//            // If no success, throw an exception
-//            if (not msg->success) {
-//                throw ExecutionException(msg->failure_cause);
-//            }
-//        } else {
-//            throw std::runtime_error(
-//                    "ComputeService::submitPilotJob(): Received an unexpected [" + message->getName() + "] message!");
-//        }
-//    }
-
-//    /**
-//     * @brief Terminate a standard job to the compute service (virtual)
-//     * @param job: the job
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void HTCondorComputeService::terminateStandardJob(std::shared_ptr<StandardJob> job) {
-//        throw std::runtime_error("HTCondorComputeService::terminateStandardJob(): Not implemented yet!");
-//    }
-//
-//    /**
-//     * @brief Terminate a pilot job to the compute service
-//     * @param job: the job
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void HTCondorComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
-//        throw std::runtime_error("HTCondorComputeService::terminatePilotJob(): Not implemented yet!");
-//    }
-
     /**
      * @brief Get the service's local storage service
      * @return the local storage service object
@@ -314,14 +248,6 @@ namespace wrench {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
             
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-//            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
-//
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
-
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
