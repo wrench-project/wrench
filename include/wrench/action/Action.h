@@ -21,6 +21,9 @@ namespace wrench {
     class FailureCause;
     class ActionExecutor;
 
+    /**
+     * @brief An abstract class that implements the concept of an action
+     */
     class Action {
 
     public:
@@ -115,22 +118,31 @@ namespace wrench {
         virtual ~Action() = default;
         Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
 
+        /**
+        * @brief Method to execute the task
+        * @param action_executor: the executor that executes this action
+        */
         virtual void execute(std::shared_ptr<ActionExecutor> action_executor) = 0;
+        /**
+         * @brief Method called when the task terminates
+         * @param action_executor:  the executor that executes this action
+         */
         virtual void terminate(std::shared_ptr<ActionExecutor> action_executor) = 0;
 
         void setSharedPtrThis(std::shared_ptr<Action> shared_ptr_this);
 
+        void updateState();
 
-
-        bool simulate_computation_as_sleep;
+        /** @brief The thread creation overhead in seconds */
         double thread_creation_overhead;
+        /** @brief Whether to simulate the computation as sleep */
+        bool simulate_computation_as_sleep;
+
+    private:
+
 
         std::set<std::shared_ptr<Action>> parents;
         std::set<std::shared_ptr<Action>> children;
-
-        void updateState();
-
-    private:
 
         double priority;
 

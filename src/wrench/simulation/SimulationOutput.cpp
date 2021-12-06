@@ -1589,6 +1589,7 @@ namespace wrench {
 
     /**
      * @brief Add a task start timestamp
+     * @param date: the date
      * @param task: a workflow task
      */
     void SimulationOutput::addTimestampTaskStart(double date, WorkflowTask *task) {
@@ -1599,6 +1600,7 @@ namespace wrench {
 
     /**
      * @brief Add a task start failure
+     * @param date: the date
      * @param task: a workflow task
      */
     void SimulationOutput::addTimestampTaskFailure(double date, WorkflowTask *task) {
@@ -1609,6 +1611,7 @@ namespace wrench {
 
     /**
      * @brief Add a task start completion
+     * @param date: the date
      * @param task: a workflow task
      */
     void SimulationOutput::addTimestampTaskCompletion(double date, WorkflowTask *task) {
@@ -1619,6 +1622,7 @@ namespace wrench {
 
     /**
     * @brief Add a task start termination
+    * @param date: the date
     * @param task: a workflow task
     */
     void SimulationOutput::addTimestampTaskTermination(double date, WorkflowTask *task) {
@@ -1629,6 +1633,7 @@ namespace wrench {
 
     /**
      * @brief Add a file read start timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param service: the source storage service
@@ -1647,6 +1652,7 @@ namespace wrench {
 
     /**
     * @brief Add a file read failure timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the source location
     * @param service: the source storage service
@@ -1665,6 +1671,7 @@ namespace wrench {
 
     /**
     * @brief Add a file read completion timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the source location
     * @param service: the source storage service
@@ -1684,6 +1691,7 @@ namespace wrench {
 
     /**
      * @brief Add a file write start timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the target location
      * @param service: the target storage service
@@ -1702,6 +1710,7 @@ namespace wrench {
 
     /**
     * @brief Add a file write failure timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the target location
     * @param service: the target storage service
@@ -1720,6 +1729,7 @@ namespace wrench {
 
     /**
     * @brief Add a file write completion timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the target location
     * @param service: the target storage service
@@ -1739,6 +1749,7 @@ namespace wrench {
 
     /**
      * @brief Add a file copy start timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the target location
@@ -1754,6 +1765,7 @@ namespace wrench {
 
     /**
      * @brief Add a file copy failure timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the target location
@@ -1770,6 +1782,7 @@ namespace wrench {
 
     /**
      * @brief Add a file copy completion timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the target location
@@ -1786,6 +1799,7 @@ namespace wrench {
 
     /**
      * @brief Add a file read start timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
@@ -1804,6 +1818,7 @@ namespace wrench {
 
     /**
      * @brief Add a file read failure timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
@@ -1821,6 +1836,7 @@ namespace wrench {
 
     /**
      * @brief Add a file read completion timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
@@ -1838,6 +1854,7 @@ namespace wrench {
 
     /**
      * @brief Add a file write start timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
@@ -1855,6 +1872,7 @@ namespace wrench {
 
     /**
      * @brief Add a file write failure timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
@@ -1872,6 +1890,7 @@ namespace wrench {
 
     /**
     * @brief Add a file write completion timestamp
+    * @param date: the date
     * @param hostname: hostname being read from
     * @param mount: mountpoint of disk
     * @param bytes: number of bytes read
@@ -1889,6 +1908,7 @@ namespace wrench {
 
     /**
      * @brief Add a pstate change/set timestamp
+     * @param date: the date
      * @param hostname: a hostname
      * @param pstate: a pstate index
      */
@@ -1901,6 +1921,7 @@ namespace wrench {
 
     /**
      * @brief Add an energy consumption timestamp
+     * @param date: the date
      * @param hostname: a hostname
      * @param joules: consumption in joules
      */
@@ -1938,6 +1959,7 @@ namespace wrench {
 
     /**
      * @brief Add a link usage timestamp
+     * @param date: the date
      * @param linkname: a linkname
      * @param bytes_per_second: link usage in bytes_per_second
      */

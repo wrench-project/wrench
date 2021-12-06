@@ -114,8 +114,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the action's (visible) state
-     * @param state: the state
+     * @brief Sets the action's state to a new value
+     * @param new_state: the new state
      */
     void Action::setState(Action::State new_state) {
         auto old_state = this->execution_history.top().state;
@@ -214,7 +214,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Creat a new execution data structure (e.g., after a restart)
+     * @brief Create a new execution data structure (e.g., after a restart)
+     * @param state: the action state
      */
     void Action::newExecution(Action::State state) {
         Action::State old_state;
@@ -284,7 +285,7 @@ namespace wrench {
 
     /**
      * @brief Set the shared_ptr to this
-     * @param
+     * @param shared_ptr: the shared_ptr to this
      */
     void Action::setSharedPtrThis(std::shared_ptr<Action> shared_ptr) {
         this->shared_ptr_this = std::move(shared_ptr);

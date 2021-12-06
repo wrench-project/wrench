@@ -17,7 +17,7 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    *
+    * @param message: the failure message
     */
     FatalFailure::FatalFailure(std::string message) {
         this->message = message;

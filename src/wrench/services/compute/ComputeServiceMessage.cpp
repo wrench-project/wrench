@@ -261,6 +261,7 @@ namespace wrench {
      * @brief Constructor
      * @param job: a pilot job that has failed
      * @param cs: the compute service on which the pilot job has failed
+     * @param cause: the failure cause
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument

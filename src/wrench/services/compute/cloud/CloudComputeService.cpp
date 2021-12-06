@@ -195,6 +195,8 @@ namespace wrench {
      * @brief Shutdown an active VM
      *
      * @param vm_name: the name of the VM
+     * @param send_failure_notifications: whether to send the failure notifications
+     * @param termination_cause: the termination cause (if failure notifications are sent)
      *
      * @throw ExecutionException
      * @throw std::invalid_argument
@@ -720,6 +722,8 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_name: the name of the VM
+     * @param send_failure_notifications: whether to send failure notifications
+     * @param termination_cause: termination cause (if failure notifications are sent)
      */
     void CloudComputeService::processShutdownVM(const std::string &answer_mailbox,
                                                 const std::string &vm_name,
@@ -1151,8 +1155,10 @@ namespace wrench {
     }
 
     /**
-    * @brief Terminate all VMs.
-    */
+     * @brief Terminate all VMs.
+     * @param send_failure_notifications: whether to send failure notifications
+     * @param termination_cause: the termination cause (if failure notifications are sent)
+     */
     void CloudComputeService::stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         WRENCH_INFO("Stopping Cloud Service");
         for (auto &vm : this->vm_list) {
@@ -1258,6 +1264,30 @@ namespace wrench {
             throw std::invalid_argument("Inalid VM_RESOURCE_ALLOCATION_ALGORITHM property specification: " +
                                         vm_resource_allocation_algorithm);
         }
+    }
+
+    /**
+     * @brief Returns true if the service supports standard jobs
+     * @return true or false
+     */
+    bool CloudComputeService::supportsStandardJobs() {
+        return false;
+    }
+
+    /**
+     * @brief Returns true if the service supports compound jobs
+     * @return true or false
+     */
+    bool CloudComputeService::supportsCompoundJobs() {
+        return false;
+    }
+
+    /**
+     * @brief Returns true if the service supports pilot jobs
+     * @return true or false
+     */
+    bool CloudComputeService::supportsPilotJobs() {
+        return false;
     }
 
 }

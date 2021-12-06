@@ -28,6 +28,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param reply_mailbox: the reply mailbox
      * @param action: the action to perform
      * @param payload: the message size in bytes
      */
@@ -57,6 +58,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param reply_mailbox: the reply mailbox
      * @param action: the action to terminate
      * @param termination_cause: the termination cause
      * @param payload: the message size in bytes

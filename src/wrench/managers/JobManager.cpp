@@ -35,7 +35,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param wms: the wms for which this manager is working
+     * @param hostname: the name of host on which the job manager will run
+     * @param creator_mailbox: the mailbox of the manager's creator
      */
     JobManager::JobManager(std::string hostname, std::string &creator_mailbox) :
             Service(hostname, "job_manager", "job_manager") {
@@ -1151,8 +1152,6 @@ namespace wrench {
      */
     std::shared_ptr<CompoundJob> JobManager::createCompoundJob(std::string name) {
         auto job = std::shared_ptr<CompoundJob>(new CompoundJob(name, this->getSharedPtr<JobManager>()));
-        job->shared_this = job;
-//        job->workflow = this->wms->getWorkflow();
         return job;
     }
 

@@ -46,6 +46,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param endpoint: an corresponding "end" timestamp or "start" timestamp
      */
     SimulationTimestampPair::SimulationTimestampPair(double date, SimulationTimestampPair *endpoint)
@@ -63,6 +64,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param task: a pointer to the WorkflowTask associated with this timestamp
      * @throw std::invalid_argument
      */
@@ -122,6 +124,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      * @throw std::invalid_argument
      */
@@ -143,6 +146,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      * @throw std::invalid_argument
      */
@@ -160,6 +164,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      */
     SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(double date, WorkflowTask *task) : SimulationTimestampTask(
@@ -177,6 +182,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      */
     SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, WorkflowTask *task)
@@ -194,6 +200,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file copy
      * @param src_location: the source location
      * @param dst_location: the destination location
@@ -266,6 +273,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file copy
      * @param src: the source location
      * @param dst: the destination location
@@ -292,6 +300,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: A workflow file
      * @param src: the source location
      * @param dst: the destination location
@@ -317,6 +326,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the destination location
@@ -343,6 +353,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file read
      * @param src_location: the source location
      * @param service: service requesting file read
@@ -426,6 +437,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
@@ -456,6 +468,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
@@ -481,6 +494,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
@@ -506,6 +520,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file write
      * @param dst_location: the destination location
      * @param service: service requesting file write
@@ -590,6 +605,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
@@ -620,6 +636,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
@@ -645,6 +662,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param file: the WorkflowFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
@@ -670,6 +688,7 @@ namespace wrench {
 
     /**
  * @brief Constructor
+ * @param date: the date
  * @param hostname: hostname being read from
  * @param mount: mountpoint of disk
  * @param bytes: number of bytes read
@@ -754,6 +773,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: hostname of disk being read
      * @param mount: mount point of disk being read
      * @param bytes: number of bytes read
@@ -783,6 +803,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: hostname of disk being read
      * @param mount: mount point of disk being read
      * @param bytes: number of bytes read
@@ -808,6 +829,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: hostname of disk being read
      * @param mount: mount point of disk being read
      * @param bytes: number of bytes read
@@ -833,12 +855,13 @@ namespace wrench {
     }
 
     /**
- * @brief Constructor
- * @param hostname: hostname being write from
- * @param mount: mountpoint of disk
- * @param bytes: number of bytes written
- * @param counter: an integer ID
- */
+     * @brief Constructor
+     * @param date: the date
+     * @param hostname: hostname being write from
+     * @param mount: mountpoint of disk
+     * @param bytes: number of bytes written
+     * @param counter: an integer ID
+     */
     SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(double date, std::string hostname,
                                                                std::string mount,
                                                                double bytes,
@@ -917,6 +940,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: hostname of disk being write
      * @param mount: mount point of disk being write
      * @param bytes: number of bytes write
@@ -946,6 +970,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: hostname of disk being write
      * @param mount: mount point of disk being write
      * @param bytes: number of bytes write
@@ -971,6 +996,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: hostname of disk being write
      * @param mount: mount point of disk being write
      * @param bytes: number of bytes write
@@ -1028,6 +1054,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: the host on which this energy consumption timestamp applies to
      * @param joules: the energy consumption in joules 
      */
@@ -1059,6 +1086,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param linkname: the link for which this bandwidth usage timestamp applies to
      * @param bytes_per_second: the bandwidth usage in bytes per second
      */

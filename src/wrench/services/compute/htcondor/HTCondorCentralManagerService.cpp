@@ -483,4 +483,29 @@ namespace wrench {
         return found_one;
     }
 
+    /**
+  * @brief Returns true if the service supports standard jobs
+  * @return true or false
+  */
+    bool HTCondorCentralManagerService::supportsStandardJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports compound jobs
+     * @return true or false
+     */
+    bool HTCondorCentralManagerService::supportsCompoundJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports pilot jobs
+     * @return true or false
+     */
+    bool HTCondorCentralManagerService::supportsPilotJobs() {
+        return false;
+    }
+
+
 }

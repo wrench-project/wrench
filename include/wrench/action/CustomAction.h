@@ -16,6 +16,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A class that implements a custom action
+     */
     class CustomAction : public Action {
 
     public:

@@ -74,6 +74,9 @@ namespace wrench {
         double getDate();
 
     protected:
+        /**
+         * @brief Date
+         */
         double date = -0.1;
 
     private:

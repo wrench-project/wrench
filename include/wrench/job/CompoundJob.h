@@ -13,9 +13,9 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <memory>
 
 #include <wrench/action/Action.h>
-
 
 #include "Job.h"
 
@@ -42,7 +42,7 @@ namespace wrench {
     /**
      * @brief A compound job
      */
-    class CompoundJob : public Job {
+class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob> {
 
     public:
 
@@ -60,6 +60,8 @@ namespace wrench {
              */
             DISCONTINUED
         };
+
+        std::shared_ptr<CompoundJob> getSharedPtr() {return this->shared_from_this(); }
 
         std::set<std::shared_ptr<Action>> getActions();
         CompoundJob::State getState();
@@ -150,7 +152,7 @@ namespace wrench {
 
         bool isReady();
 
-        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
+//        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
         std::set<std::shared_ptr<Action>> actions;
         std::map<std::string, std::shared_ptr<Action>> name_map;
 
