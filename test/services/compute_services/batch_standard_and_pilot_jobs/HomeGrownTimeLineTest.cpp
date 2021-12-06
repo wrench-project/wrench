@@ -27,7 +27,28 @@ public:
 
 
 protected:
-    BatchServiceAvailabilityTimeLineTest() = default;
+    BatchServiceAvailabilityTimeLineTest() {
+
+        // Create the simplest workflow
+        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
+                          "       </host>  "
+                          "   </zone> "
+                          "</platform>";
+        // Create a four-host 10-core platform file
+        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        fprintf(platform_file, "%s", xml.c_str());
+        fclose(platform_file);
+
+    }
+
+    std::unique_ptr<wrench::Workflow> workflow;
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
 
@@ -35,6 +56,51 @@ protected:
 /**********************************************************************/
 /**  NODE AVAILABILITY TIMELINE TEST                                 **/
 /**********************************************************************/
+
+class NodeAvailabilityTimelineTestWMS : public wrench::WMS {
+
+public:
+    NodeAvailabilityTimelineTestWMS(
+                               std::string hostname) :
+            wrench::WMS(nullptr, nullptr,
+                        {}, {}, {}, nullptr, hostname, "test") {
+    }
+
+
+private:
+
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        auto tl = new wrench::NodeAvailabilityTimeLine(10);
+
+        std::shared_ptr<wrench::CompoundJob> wj1 = job_manager->createCompoundJob("wj1");
+
+        auto bj1 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj1, 1, 10, 5, 1, "who", 0, 0));
+
+        tl->add(0, 10.0, bj1);
+
+        // Note that there is check on the validity of the interval in terms of the number of nodes
+//        auto wj2 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
+        std::shared_ptr<wrench::CompoundJob> wj2 = job_manager->createCompoundJob("wj2");
+        auto bj2 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 2, 20, 20, 1, "who", 0, 0));
+        tl->add(10.0, 30.0, bj2);
+
+        // Can even have weird nonsensical start and end...
+//        auto wj3 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
+        std::shared_ptr<wrench::CompoundJob> wj3 = job_manager->createCompoundJob("wj3");
+        auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
+        tl->add(500.0, 30.0, bj3);
+
+        tl->print();
+        tl->clear();
+
+        return 0;
+    }
+};
 
 TEST_F(BatchServiceAvailabilityTimeLineTest, NodeAvailabilityTimeLineTest)
 {
@@ -44,32 +110,32 @@ TEST_F(BatchServiceAvailabilityTimeLineTest, NodeAvailabilityTimeLineTest)
 void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
-    auto tl = new wrench::NodeAvailabilityTimeLine(10);
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
 
-    auto wj1 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
+    simulation->init(&argc, argv);
 
-    auto bj1 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj1, 1, 10, 5, 1, "who", 0, 0));
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    tl->add(0, 10.0, bj1);
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-    // Note that there is check on the validity of the interval in terms of the number of nodes
-    auto wj2 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
-    auto bj2 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 2, 20, 20, 1, "who", 0, 0));
-    tl->add(10.0, 30.0, bj2);
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new NodeAvailabilityTimelineTestWMS(hostname)));
 
-    // Can even have weird nonsensical start and end...
-    auto wj3 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
-    auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
-    tl->add(500.0, 30.0, bj3);
+    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    tl->print();
-    tl->clear();
+    simulation->launch();
+
+    delete simulation;
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -81,6 +147,49 @@ void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test(
 /**  CORE AVAILABILITY TIMELINE TEST                                 **/
 /**********************************************************************/
 
+class CoreAvailabilityTimelineTestWMS : public wrench::WMS {
+
+public:
+    CoreAvailabilityTimelineTestWMS(
+            std::string hostname) :
+            wrench::WMS(nullptr, nullptr,
+                        {}, {}, {}, nullptr, hostname, "test") {
+    }
+
+
+private:
+
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        auto tl = new wrench::CoreAvailabilityTimeLine(10, 6);
+
+        auto wj1 = job_manager->createCompoundJob("wj1");
+
+        auto bj1 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj1, 1, 10, 5, 1, "who", 0, 0));
+
+        tl->add(0, 10.0, bj1);
+
+        // Note that there is check on the validity of the interval in terms of the number of nodes
+        auto wj2 = job_manager->createCompoundJob("wj2");
+        auto bj2 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 2, 20, 20, 1, "who", 0, 0));
+        tl->add(10.0, 30.0, bj2);
+
+        // Can even have weird nonsensical start and end...
+        auto wj3 = job_manager->createCompoundJob("wj3");
+        auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
+        tl->add(500.0, 30.0, bj3);
+
+        tl->print();
+        tl->clear();
+
+        return 0;
+    }
+};
+
 TEST_F(BatchServiceAvailabilityTimeLineTest, CoreAvailabilityTimeLineTest)
 {
     DO_TEST_WITH_FORK(do_CoreAvailabilityTimeLineTest_test);
@@ -89,32 +198,32 @@ TEST_F(BatchServiceAvailabilityTimeLineTest, CoreAvailabilityTimeLineTest)
 void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    argv[1] = strdup("--wrench-full-log");
 
-    auto tl = new wrench::CoreAvailabilityTimeLine(10, 6);
+    // Create and initialize a simulation
+    auto simulation = new wrench::Simulation();
 
-    auto wj1 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
+    simulation->init(&argc, argv);
 
-    auto bj1 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj1, 1, 10, 5, 1, "who", 0, 0));
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    tl->add(0, 10.0, bj1);
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-    // Note that there is check on the validity of the interval in terms of the number of nodes
-    auto wj2 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
-    auto bj2 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 2, 20, 20, 1, "who", 0, 0));
-    tl->add(10.0, 30.0, bj2);
+    // Create a WMS
+    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new CoreAvailabilityTimelineTestWMS(hostname)));
 
-    // Can even have weird nonsensical start and end...
-    auto wj3 = std::shared_ptr<wrench::CompoundJob>((wrench::CompoundJob *)(1234), [](void *ptr){});
-    auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
-    tl->add(500.0, 30.0, bj3);
+    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-    tl->print();
-    tl->clear();
+    simulation->launch();
+
+    delete simulation;
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
