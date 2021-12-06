@@ -393,6 +393,7 @@ set(TEST_FILES
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
+        test/services/compute_services/batch_compound_jobs/BatchComputeServiceOneActionTests.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp

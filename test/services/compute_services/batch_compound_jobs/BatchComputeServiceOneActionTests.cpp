@@ -14,9 +14,9 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
-WRENCH_LOG_CATEGORY(bare_metal_compute_service_one_action_test, "Log category for BareMetalComputeServiceOneAction test");
+WRENCH_LOG_CATEGORY(batch_compute_service_one_action_test, "Log category for BatchComputeServiceOneAction test");
 
-class BareMetalComputeServiceOneActionTest : public ::testing::Test {
+class BatchComputeServiceOneActionTest : public ::testing::Test {
 public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
@@ -24,23 +24,22 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
-    std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::BatchComputeService> compute_service = nullptr;
 
     void do_BadSetup_test();
-    void do_Noop_test();
     void do_OneSleepAction_test();
     void do_OneComputeActionNotEnoughResources_test();
     void do_OneComputeActionBogusServiceSpecificArgs_test();
     void do_OneSleepActionServiceCrashed_test();
     void do_OneSleepJobTermination_test();
-    void do_OneSleepActionServiceCrashedRestarted_test();
+    void do_OneSleepJobExpiration_test();
     void do_OneFileReadActionFileNotThere_test();
     void do_OneSleepActionServiceDown_test();
     void do_OneSleepActionServiceSuspended_test();
     void do_OneSleepActionBadScratch_test();
 
 protected:
-    BareMetalComputeServiceOneActionTest() {
+    BatchComputeServiceOneActionTest() {
 
         // Create the simplest workflow
         workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
@@ -127,18 +126,18 @@ protected:
 /**  BAD SETUP SIMULATION TEST                                       **/
 /**********************************************************************/
 
-class BareMetalBadSetupTestWMS : public wrench::WMS {
+class BatchBadSetupTestWMS : public wrench::WMS {
 public:
-    BareMetalBadSetupTestWMS(BareMetalComputeServiceOneActionTest *test,
-                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                    std::string &hostname) :
+    BatchBadSetupTestWMS(BatchComputeServiceOneActionTest *test,
+                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                         std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -146,247 +145,95 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, BadSetup) {
+TEST_F(BatchComputeServiceOneActionTest, BadSetup) {
     DO_TEST_WITH_FORK(do_BadSetup_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
-    // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+void BatchComputeServiceOneActionTest::do_BadSetup_test() {
+    wrench::Simulation simulation;
 
     int argc = 0;
     auto **argv = (char **) calloc(argc, sizeof(char *));
 
-    ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+    ASSERT_THROW(simulation.init(&argc, argv), std::invalid_argument);
     free(argv);
 
     argc = 1;
-    ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation.init(&argc, nullptr), std::invalid_argument);
 
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation.instantiatePlatform(platform_file_path), std::runtime_error);
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation.launch(), std::runtime_error);
 
     argc = 1;
     argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
 //    argv[1] = strdup("--wrench-full-log");
 
-    simulation->init(&argc, argv);
+    simulation.init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_NO_THROW(simulation.instantiatePlatform(platform_file_path));
 
     // Empty resource list
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                (std::map<std::string, std::tuple<unsigned long, double>>) {},
-                                                {})), std::invalid_argument);
+    ASSERT_THROW(compute_service = simulation.add(
+            new wrench::BatchComputeService("Host1",
+                                            {},
+                                            {})), std::invalid_argument);
 
     // Bad hostname
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("bogus",
-                                                {std::make_pair("Host1",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {})), std::invalid_argument);
+    ASSERT_THROW(compute_service = simulation.add(
+            new wrench::BatchComputeService("bogus",
+                                            {""},
+                                            {})), std::invalid_argument);
 
     // Get a hostname
     std::string hostname = "Host1";
 
     // Bad resource hostname
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("bogus",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))}, "",
-                                                {})), std::invalid_argument);
-
-    // Bad number of cores
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname,
-                                                                std::make_tuple(0,
-                                                                                wrench::ComputeService::ALL_RAM))}, "",
-                                                {})), std::invalid_argument);
-
-    // Bad number of cores
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname,
-                                                                std::make_tuple(100,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {})), std::invalid_argument);
-
-
-    // Bad RAM
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("RAMHost",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                -1.0))},
-                                                {})), std::invalid_argument);
-
-    // Bad RAM
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("RAMHost",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                100000.0))},
-                                                {})), std::invalid_argument);
+    ASSERT_THROW(compute_service = simulation.add(
+            new wrench::BatchComputeService(hostname,
+                                            {"bogus"}, "",
+                                            {})), std::invalid_argument);
 
     // Bad PROPERTIES
-    ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair("RAMHost",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                100000.0))},
-                                                "",
-                                                {
-                                                        std::make_pair(
-                                                                wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
-                                                                "-1.0")
-                                                },
-                                                {})), std::invalid_argument);
+    ASSERT_THROW(compute_service = simulation.add(
+            new wrench::BatchComputeService(hostname,
+                                            {"RAMHost"},
+                                            "",
+                                            {
+                                                    std::make_pair(
+                                                            wrench::BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                                                            "-1.0")
+                                            },
+                                            {})), std::invalid_argument);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new BareMetalBadSetupTestWMS(this,
-                                                              {}, {}, hostname)));
-
-    ASSERT_THROW(wms->addWorkflow(nullptr), std::invalid_argument);
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
-    ASSERT_THROW(wms->addWorkflow(this->workflow), std::invalid_argument);
-
-    // Running a "run a single task1" simulation
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-
-    delete simulation;
+    auto wms = simulation.add(new BatchBadSetupTestWMS(this, {}, {}, hostname));
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
 
-/**********************************************************************/
-/**  NOOP SIMULATION TEST                                            **/
-/**********************************************************************/
-
-class BareMetalNoopTestWMS : public wrench::WMS {
-public:
-    BareMetalNoopTestWMS(BareMetalComputeServiceOneActionTest *test,
-                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
-    }
-
-private:
-    BareMetalComputeServiceOneActionTest *test;
-
-    int main() {
-
-        wrench::TerminalOutput::disableColor(); // just for increasing stupid coverage
-
-        // Create a job manager
-        auto job_manager = this->createJobManager();
-
-        // Create a data movement manager
-        auto data_movement_manager = this->createDataMovementManager();
-
-        // Stop the Job Manager manually, just for kicks
-        job_manager->stop();
-
-        // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop();
-
-        wrench::Simulation::sleep(1);
-
-        // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
-
-        return 0;
-    }
-};
-
-TEST_F(BareMetalComputeServiceOneActionTest, Noop) {
-    DO_TEST_WITH_FORK(do_Noop_test);
-}
-
-void BareMetalComputeServiceOneActionTest::do_Noop_test() {
-    // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
-
-    int argc = 1;
-    auto argv = (char **) calloc(argc, sizeof(char *));
-    argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
-
-    ASSERT_NO_THROW(simulation->init(&argc, argv));
-
-    // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
-
-    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
-
-    // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-    ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {})));
-
-    // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-    ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
-
-    // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    std::string hostname = "Host1";
-    ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalNoopTestWMS(
-                    this,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "do nothing" simulation
-    ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
-
-    for (int i=0; i < argc; i++)
-        free(argv[i]);
-    free(argv);
-}
 
 
 /**********************************************************************/
 /**  ONE SLEEP ACTION TEST                                           **/
 /**********************************************************************/
 
-class BareMetalOneSleepActionTestWMS : public wrench::WMS {
+class BatchOneSleepActionTestWMS : public wrench::WMS {
 public:
-    BareMetalOneSleepActionTestWMS(BareMetalComputeServiceOneActionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+    BatchOneSleepActionTestWMS(BatchComputeServiceOneActionTest *test,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                               std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -399,7 +246,28 @@ private:
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
         auto action = job->addSleepAction("my_sleep", 10.0);
-        job_manager->submitJob(job, this->test->compute_service, {});
+
+        // No service-specific arguments
+        try {
+            job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Should not be able to submit job with empty service-specific arguments");
+        } catch (std::invalid_argument &ignore) {
+        }
+
+        // Missing service-specific arguments
+        std::map<std::string, std::string> service_specific_args;
+        service_specific_args["-N"] = "1";
+        service_specific_args["-c"] = "1";
+        try {
+            job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+            throw std::runtime_error("Should not be able to submit job with missing service-specific arguments");
+        } catch (std::invalid_argument &ignore) {
+        }
+
+
+        service_specific_args["-t"] = "60";
+        job_manager->submitJob(job, this->test->compute_service, service_specific_args);
+
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
@@ -442,17 +310,17 @@ private:
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->stop();
 
         return 0;
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, OneSleepAction) {
+TEST_F(BatchComputeServiceOneActionTest, OneSleepAction) {
     DO_TEST_WITH_FORK(do_OneSleepAction_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -473,12 +341,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -490,7 +356,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalOneSleepActionTestWMS(
+            new BatchOneSleepActionTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -522,18 +388,18 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
 /**  ONE COMPUTE ACTION NOT ENOUGH RESOURCES TEST                    **/
 /**********************************************************************/
 
-class BareMetalOneComputeActionNotEnoughResourcesTestWMS : public wrench::WMS {
+class BatchOneComputeActionNotEnoughResourcesTestWMS : public wrench::WMS {
 public:
-    BareMetalOneComputeActionNotEnoughResourcesTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                              std::string &hostname) :
+    BatchOneComputeActionNotEnoughResourcesTestWMS(BatchComputeServiceOneActionTest *test,
+                                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                   std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -543,60 +409,87 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-        // Create a compound job that asks for too many cores
+        // Create a job that requires 1 node / core
         auto job1 = job_manager->createCompoundJob("my_job1");
-        // Create a compute action that asks for too many cores
-        auto action1 = job1->addComputeAction("my_computation", 1000.0, 0.0, 100, 100,
-                                              wrench::ParallelModel::AMDAHL(1.0));
-        // Create a compound job that asks for too much RAM
-        auto job2 = job_manager->createCompoundJob("my_job2");
-        // Create a compute action that asks for too many cores
-        auto action2 = job2->addComputeAction("my_computation", 1000.0, 1000.0, 1, 1,
+        auto action1 = job1->addComputeAction("my_computation", 1000.0, 0.0, 1, 1,
                                               wrench::ParallelModel::AMDAHL(1.0));
 
-        std::vector<std::shared_ptr<wrench::CompoundJob>> jobs = {job1, job2};
-
-        for (auto const &job : jobs) {
-
-            // Submit the job
-            try {
-                job_manager->submitJob(job, this->test->compute_service, {});
-                throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
-            } catch (wrench::ExecutionException &e) {
-                auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
-                if (not cause) {
-                    throw std::runtime_error("Unexpected failure cause");
-                }
-                if (cause->getJob() != job) {
-                    throw std::runtime_error("Unexpected job in failure cause");
-                }
-                if (cause->getService() != this->test->compute_service) {
-                    throw std::runtime_error("Unexpected service in failure cause");
-                }
+        // Submit it but ask for too many resources
+        std::map<std::string, std::string> service_specific_arguments;
+        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-N"] = "2";
+        service_specific_arguments["-c"] = "1";
+        try {
+            job_manager->submitJob(job1, this->test->compute_service, service_specific_arguments);
+            throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
+        } catch (wrench::ExecutionException &e) {
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not failure_cause) {
+                throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
             }
         }
 
+        // Submit it but ask for too many resources
+        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-N"] = "1";
+        service_specific_arguments["-c"] = "100";
+        try {
+            job_manager->submitJob(job1, this->test->compute_service, service_specific_arguments);
+            throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
+        } catch (wrench::ExecutionException &e) {
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not failure_cause) {
+                throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
+            }
+        }
 
-        // Stop the Job Manager manually, just for kicks
-        job_manager->stop();
+        // Create a job that requires 1 node / core, but with a an action that requires 2 cores
+        auto job2 = job_manager->createCompoundJob("my_job2");
+        auto action2 = job2->addComputeAction("my_computation_2cores", 1000.0, 0.0, 2, 2,
+                                              wrench::ParallelModel::AMDAHL(1.0));
 
-        // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop();
+        // Submit it but ask for too many resources
+        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-N"] = "1";
+        service_specific_arguments["-c"] = "1";
+        try {
+            job_manager->submitJob(job2, this->test->compute_service, service_specific_arguments);
+            throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
+        } catch (wrench::ExecutionException &e) {
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not failure_cause) {
+                throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
+            }
+        }
 
-        wrench::Simulation::sleep(1);
+        // Create a job that requires 1 node / core, but with a an action that requires too much RAM
+        auto job3 = job_manager->createCompoundJob("my_job3");
+        auto action3 = job3->addComputeAction("my_computation_too_much_ram", 1000.0, 100000000.0, 1, 1,
+                                              wrench::ParallelModel::AMDAHL(1.0));
 
-        // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        // Submit it but ask for too many resources
+        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-N"] = "1";
+        service_specific_arguments["-c"] = "1";
+        try {
+            job_manager->submitJob(job3, this->test->compute_service, service_specific_arguments);
+            throw std::runtime_error("Shouldn't be able to submit a job that asks for too many resources");
+        } catch (wrench::ExecutionException &e) {
+            auto failure_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
+            if (not failure_cause) {
+                throw std::runtime_error("Unexpected failure cause " + e.getCause()->toString());
+            }
+        }
 
         return 0;
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionNotEnoughResources) {
+TEST_F(BatchComputeServiceOneActionTest, OneComputeActionNotEnoughResources) {
     DO_TEST_WITH_FORK(do_OneComputeActionNotEnoughResources_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_test() {
+void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -617,12 +510,10 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                100.0))},
-                                                {"/scratch"},
-                                                {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -634,7 +525,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalOneComputeActionNotEnoughResourcesTestWMS(
+            new BatchOneComputeActionNotEnoughResourcesTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -668,18 +559,18 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
 /**  ONE COMPUTE ACTION BOGUS SERVICE-SPECIFIC ARGS TEST             **/
 /**********************************************************************/
 
-class BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS : public wrench::WMS {
+class BatchOneComputeActionBogusServiceSpecificArgsTestWMS : public wrench::WMS {
 public:
-    BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                    std::string &hostname) :
+    BatchOneComputeActionBogusServiceSpecificArgsTestWMS(BatchComputeServiceOneActionTest *test,
+                                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                         std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -726,17 +617,17 @@ private:
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->stop();
 
         return 0;
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionBogusServiceSpecificArgs) {
+TEST_F(BatchComputeServiceOneActionTest, OneComputeActionBogusServiceSpecificArgs) {
     DO_TEST_WITH_FORK(do_OneComputeActionBogusServiceSpecificArgs_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificArgs_test() {
+void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificArgs_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -757,12 +648,10 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                100.0))},
-                                                {"/scratch"},
-                                                {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -774,7 +663,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalOneComputeActionBogusServiceSpecificArgsTestWMS(
+            new BatchOneComputeActionBogusServiceSpecificArgsTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -808,18 +697,18 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
 /**  ONE COMPUTE ACTION SERVICE CRASHED TEST                         **/
 /**********************************************************************/
 
-class BareMetalServiceCrashedTestWMS : public wrench::WMS {
+class BatchServiceCrashedTestWMS : public wrench::WMS {
 public:
-    BareMetalServiceCrashedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+    BatchServiceCrashedTestWMS(BatchComputeServiceOneActionTest *test,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                               std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -832,12 +721,17 @@ private:
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
         auto action = job->addSleepAction("my_sleep", 10.0);
-        job_manager->submitJob(job, this->test->compute_service, {});
+
+        std::map<std::string, std::string> service_specific_arguments;
+        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-N"] = "1";
+        service_specific_arguments["-c"] = "3";
+        job_manager->submitJob(job, this->test->compute_service, service_specific_arguments);
 
         // Sleep 1 sec
         wrench::Simulation::sleep(1.0);
 
-        // Kill the BareMetalComputeService
+        // Kill the BatchComputeService
         wrench::Simulation::turnOffHost("Host4");
 
         // Wait for the workflow execution event
@@ -882,17 +776,17 @@ private:
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->stop();
 
         return 0;
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, ServiceCrashed) {
+TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
     DO_TEST_WITH_FORK(do_OneSleepActionServiceCrashed_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -914,12 +808,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -931,7 +823,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalServiceCrashedTestWMS(
+            new BatchServiceCrashedTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -964,18 +856,18 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
 /**  ONE COMPUTE ACTION TERMINATION TEST                             **/
 /**********************************************************************/
 
-class BareMetalJobTerminationTestWMS : public wrench::WMS {
+class BatchJobTerminationTestWMS : public wrench::WMS {
 public:
-    BareMetalJobTerminationTestWMS(BareMetalComputeServiceOneActionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+    BatchJobTerminationTestWMS(BatchComputeServiceOneActionTest *test,
+                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                               std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -991,7 +883,13 @@ private:
             throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
         auto action = job->addSleepAction("my_sleep", 10.0);
-        job_manager->submitJob(job, this->test->compute_service, {});
+
+        std::map<std::string, std::string> service_specific_arguments;
+        service_specific_arguments["-t"] = "60";
+        service_specific_arguments["-N"] = "1";
+        service_specific_arguments["-c"] = "1";
+
+        job_manager->submitJob(job, this->test->compute_service, service_specific_arguments);
 
         // Check job state
         if (job->getState() != wrench::CompoundJob::State::SUBMITTED) {
@@ -1021,11 +919,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, JobTermination) {
+TEST_F(BatchComputeServiceOneActionTest, JobTermination) {
     DO_TEST_WITH_FORK(do_OneSleepJobTermination_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -1047,12 +945,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1064,7 +960,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalJobTerminationTestWMS(
+            new BatchJobTerminationTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -1094,21 +990,21 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
 
 
 /**********************************************************************/
-/**  ONE SLEEP ACTION SERVICE CRASHED RESTARTED TEST               **/
+/**  ONE COMPUTE ACTION EXPIRATION TEST                             **/
 /**********************************************************************/
 
-class BareMetalServiceCrashedRestartedTestWMS : public wrench::WMS {
+class BatchJobExpirationTestWMS : public wrench::WMS {
 public:
-    BareMetalServiceCrashedRestartedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) :
+    BatchJobExpirationTestWMS(BatchComputeServiceOneActionTest *test,
+                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                              std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -1120,29 +1016,31 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addSleepAction("my_sleep", 10.0);
-        job_manager->submitJob(job, this->test->compute_service, {});
+        if (job->getState() != wrench::CompoundJob::State::NOT_SUBMITTED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+        auto action = job->addSleepAction("my_sleep", 100.0);
 
-        // Sleep 1 sec
-        wrench::Simulation::sleep(1.0);
+        std::map<std::string, std::string> service_specific_arguments;
+        service_specific_arguments["-t"] = "1";
+        service_specific_arguments["-N"] = "1";
+        service_specific_arguments["-c"] = "1";
 
-        // Kill the compute host
-        wrench::Simulation::turnOffHost("Host4");
+        job_manager->submitJob(job, this->test->compute_service, service_specific_arguments);
 
-        // Sleep 1 sec
-        wrench::Simulation::sleep(1.0);
-
-        // Restart the compute host
-        wrench::Simulation::turnOnHost("Host4");
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::SUBMITTED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
-        if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
+        if (not std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
 
         // Check event content
-        auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event);
+        auto real_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event);
         if (real_event->job != job) {
             throw std::runtime_error("Event's job isn't the right job!");
         }
@@ -1150,72 +1048,35 @@ private:
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
 
+        // Check job state
+        if (job->getState() != wrench::CompoundJob::State::DISCONTINUED) {
+            throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
+        }
+
         // Chek action stuff
-        if (action->getState() != wrench::Action::State::COMPLETED) {
+        if (action->getState() != wrench::Action::State::KILLED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
         }
-
-        if ((std::abs<double>(action->getStartDate() - 2.0) > 0.0001) or (std::abs<double>(action->getEndDate() - 12.0) > 0.0001)) {
-            throw std::runtime_error("Unexpected action start/end dates");
+        if (not std::dynamic_pointer_cast<wrench::JobTimeout>(action->getFailureCause())) {
+            throw std::runtime_error("Unexpected action failure cause " + action->getFailureCause()->toString());
         }
-
-        // Check action history
-        auto history = action->getExecutionHistory();
-        if (history.size() != 2) {
-            throw std::runtime_error("Unexpected execution history size");
-        }
-        auto top = history.top();
-        if ((top.failure_cause != nullptr) or
-            (std::abs<double>(top.start_date - 2.0) > 0.0001) or
-            (std::abs<double>(top.end_date - 12.0) > 0.0001) or
-            (top.execution_host != "Host4") or
-            (top.num_cores_allocated != 0) or
-            (top.state != wrench::Action::State::COMPLETED) or
-            (top.ram_allocated != 0.0) or
-            (top.physical_execution_host != "Host4")) {
-            throw std::runtime_error("Unexpected last history");
-        }
-        history.pop();
-        top = history.top();
-        if ((top.failure_cause == nullptr) or
-            (std::dynamic_pointer_cast<wrench::HostError>(top.failure_cause) == nullptr) or
-            (std::abs<double>(top.start_date - 0.0) > 0.0001) or
-            (std::abs<double>(top.end_date - 1.0) > 0.0001) or
-            (top.execution_host != "Host4") or
-            (top.num_cores_allocated != 0) or
-            (top.state != wrench::Action::State::FAILED) or
-            (top.ram_allocated != 0.0) or
-            (top.physical_execution_host != "Host4")) {
-            throw std::runtime_error("Unexpected last history");
-        }
-
-        // Stop the Job Manager manually, just for kicks
-        job_manager->stop();
-
-        // Stop the Data Movement Manager manually, just for kicks
-        data_movement_manager->stop();
-
-        wrench::Simulation::sleep(1);
-
-        // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
 
         return 0;
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, ServiceCrashedRestarted) {
-    DO_TEST_WITH_FORK(do_OneSleepActionServiceCrashedRestarted_test);
+TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
+    DO_TEST_WITH_FORK(do_OneSleepJobExpiration_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestarted_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-    argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[1] = strdup("--wrench-host-shutdown-simulation");
 //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -1230,12 +1091,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1247,13 +1106,14 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalServiceCrashedRestartedTestWMS(
+            new BatchJobExpirationTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1278,18 +1138,18 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
 /**  ONE FILE READ ACTION SERVICE FILE NOT THERE TEST               **/
 /**********************************************************************/
 
-class BareMetalServiceFileNotThereTestWMS : public wrench::WMS {
+class BatchServiceFileNotThereTestWMS : public wrench::WMS {
 public:
-    BareMetalServiceFileNotThereTestWMS(BareMetalComputeServiceOneActionTest *test,
-                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                               std::string &hostname) :
+    BatchServiceFileNotThereTestWMS(BatchComputeServiceOneActionTest *test,
+                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                    std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -1303,7 +1163,13 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
         auto action = job->addFileReadAction("my_file_read", this->test->input_file,
                                              wrench::FileLocation::LOCATION(this->test->storage_service1));
-        job_manager->submitJob(job, this->test->compute_service, {});
+
+        std::map<std::string, std::string> service_specific_args;
+        service_specific_args["-t"] = "60";
+        service_specific_args["-N"] = "1";
+        service_specific_args["-c"] = "1";
+
+        job_manager->submitJob(job, this->test->compute_service, service_specific_args);
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
@@ -1353,25 +1219,24 @@ private:
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->stop();
 
         return 0;
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, FileNotThere) {
+TEST_F(BatchComputeServiceOneActionTest, FileNotThere) {
     DO_TEST_WITH_FORK(do_OneFileReadActionFileNotThere_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
+void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1385,12 +1250,10 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1402,7 +1265,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalServiceFileNotThereTestWMS(
+            new BatchServiceFileNotThereTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -1425,18 +1288,18 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
 /**  ONE SLEEP ACTION SERVICE DOWN TEST                              **/
 /**********************************************************************/
 
-class BareMetalServiceServiceDownTestWMS : public wrench::WMS {
+class BatchServiceServiceDownTestWMS : public wrench::WMS {
 public:
-    BareMetalServiceServiceDownTestWMS(BareMetalComputeServiceOneActionTest *test,
-                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                              std::string &hostname) :
+    BatchServiceServiceDownTestWMS(BatchComputeServiceOneActionTest *test,
+                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                   std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -1476,11 +1339,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, ServiceDown) {
+TEST_F(BatchComputeServiceOneActionTest, ServiceDown) {
     DO_TEST_WITH_FORK(do_OneSleepActionServiceDown_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -1502,12 +1365,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1519,7 +1380,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalServiceServiceDownTestWMS(
+            new BatchServiceServiceDownTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -1542,18 +1403,18 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
 /**  ONE SLEEP ACTION SERVICE SUSPENDED TEST                         **/
 /**********************************************************************/
 
-class BareMetalServiceServiceSuspendedTestWMS : public wrench::WMS {
+class BatchServiceServiceSuspendedTestWMS : public wrench::WMS {
 public:
-    BareMetalServiceServiceSuspendedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) :
+    BatchServiceServiceSuspendedTestWMS(BatchComputeServiceOneActionTest *test,
+                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                        std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -1593,11 +1454,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, ServiceSuspended) {
+TEST_F(BatchComputeServiceOneActionTest, ServiceSuspended) {
     DO_TEST_WITH_FORK(do_OneSleepActionServiceSuspended_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -1619,12 +1480,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {"/scratch"},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1636,7 +1495,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalServiceServiceSuspendedTestWMS(
+            new BatchServiceServiceSuspendedTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
@@ -1659,18 +1518,18 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
 /**  ONE SLEEP ACTION BAD SCRATCH TEST                               **/
 /**********************************************************************/
 
-class BareMetalServiceBadScratchTestWMS : public wrench::WMS {
+class BatchServiceBadScratchTestWMS : public wrench::WMS {
 public:
-    BareMetalServiceBadScratchTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   std::string &hostname) :
+    BatchServiceBadScratchTestWMS(BatchComputeServiceOneActionTest *test,
+                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                  std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
 private:
-    BareMetalComputeServiceOneActionTest *test;
+    BatchComputeServiceOneActionTest *test;
 
     int main() {
 
@@ -1697,11 +1556,11 @@ private:
     }
 };
 
-TEST_F(BareMetalComputeServiceOneActionTest, BadScratch) {
+TEST_F(BatchComputeServiceOneActionTest, BadScratch) {
     DO_TEST_WITH_FORK(do_OneSleepActionBadScratch_test);
 }
 
-void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
+void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create and initialize a simulation
     auto *simulation = new wrench::Simulation();
 
@@ -1722,12 +1581,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {""},
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+            new wrench::BatchComputeService("Host3",
+                                            {"Host4"},
+                                            {""},
+                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -1739,7 +1596,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalServiceBadScratchTestWMS(
+            new BatchServiceBadScratchTestWMS(
                     this,
                     {compute_service}, {
                             storage_service1
