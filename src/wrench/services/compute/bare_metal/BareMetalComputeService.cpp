@@ -91,7 +91,7 @@ namespace wrench {
     /**
      * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
      * @param job: the job that's being submitted
-     * @param service_specific_arg: the service-specific arguments
+     * @param service_specific_args: the service-specific arguments
      */
     void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                                    std::map<std::string, std::string> &service_specific_args) {
@@ -266,7 +266,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_hosts:: the names of the hosts available as compute resources (the service
+     * @param compute_hosts: the names of the hosts available as compute resources (the service
      *        will use all the cores and all the RAM of each host)
      * @param scratch_space_mount_point: the compute service's scratch space's mount point ("" means none)
      * @param property_list: a property list ({} means "use all defaults")
@@ -303,6 +303,7 @@ namespace wrench {
      * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
+     * @param scratch_space: the scratch storage service
      *
      * @throw std::invalid_argument
      */
@@ -330,7 +331,7 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_hosts:: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
+     * @param compute_resources:: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -578,11 +579,12 @@ namespace wrench {
     *
     * @param answer_mailbox: the mailbox to which the answer message should be sent
     * @param job: the job
-    * @param service_specific_args: service specific arguments
+    * @param service_specific_arguments: service specific arguments
     *
     */
     void BareMetalComputeService::processSubmitCompoundJob(
-            const std::string &answer_mailbox, std::shared_ptr<CompoundJob> job,
+            const std::string &answer_mailbox,
+            std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a compound job with %ld actions", job->getActions().size());
 
@@ -631,6 +633,8 @@ namespace wrench {
 
     /**
      * @brief Terminate the daemon, dealing with pending/running job
+     * @param send_failure_notifications: whether to send failure notifications
+     * @param termination_cause: termination cause (if failure notifications are sent)
      */
     void BareMetalComputeService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         this->setStateToDown();
@@ -964,6 +968,30 @@ namespace wrench {
             }
         }
 //        this->current_jobs.erase(job);
+    }
+
+    /**
+     * @brief Returns true if the service supports standard jobs
+     * @return true or false
+     */
+    bool BareMetalComputeService::supportsStandardJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports compound jobs
+     * @return true or false
+     */
+    bool BareMetalComputeService::supportsCompoundJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports pilot jobs
+     * @return true or false
+     */
+    bool BareMetalComputeService::supportsPilotJobs() {
+        return false;
     }
 
 }

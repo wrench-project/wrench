@@ -109,7 +109,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to terminate the task
+     * @brief Method called when the task terminates
      * @param action_executor:  the executor that executes this action
      */
     void ComputeAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {

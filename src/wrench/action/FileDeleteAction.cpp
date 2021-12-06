@@ -65,7 +65,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to terminate the action
+     * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
     void FileDeleteAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {

@@ -20,6 +20,9 @@ namespace wrench {
     class FileLocation;
     class FileRegistryService;
 
+    /**
+     * @brief A class that implements a file registry (add entry) action
+     */
     class FileRegistryAddEntryAction : public FileRegistryAction {
 
     public:

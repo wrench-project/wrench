@@ -1647,6 +1647,11 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Method to validate a job's service-specific arguments
+     * @param job: the job
+     * @param service_specific_args: the service-specific arguments
+     */
     void BatchComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                                std::map<std::string, std::string> &service_specific_args) {
         // Check that -N, -t, and -c are specified
@@ -1723,6 +1728,30 @@ namespace wrench {
             throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
         }
 
+    }
+
+    /**
+     * @brief Returns true if the service supports standard jobs
+     * @return true or false
+     */
+    bool BatchComputeService::supportsStandardJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports compound jobs
+     * @return true or false
+     */
+    bool BatchComputeService::supportsCompoundJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports pilot jobs
+     * @return true or false
+     */
+    bool BatchComputeService::supportsPilotJobs() {
+        return true;
     }
 
 }

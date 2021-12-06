@@ -16,6 +16,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief A class that implements a sleep action
+     */
     class SleepAction : public Action {
 
     public:

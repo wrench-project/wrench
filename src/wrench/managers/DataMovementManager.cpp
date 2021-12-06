@@ -29,7 +29,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param wms: the WMS that uses this data movement manager
+     * @param hostname: the hostname on which the data movement manager is to run
+     * @param creator_mailbox: the mailbox of the manager's creator
      */
     DataMovementManager::DataMovementManager(std::string hostname, std::string &creator_mailbox) :
             Service(hostname, "data_movement_manager", "data_movement_manager") {

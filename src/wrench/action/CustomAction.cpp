@@ -19,8 +19,8 @@ namespace wrench {
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param job: the job this action belongs to
-    * @param lambda: a lambda that implements the action's execution
-    * @param lambda: a lambda that implements the action's termination (typically a no-op)
+    * @param lambda_execute: a lambda that implements the action's execution
+    * @param lambda_terminate: a lambda that implements the action's termination (typically a no-op)
     */
     CustomAction::CustomAction(const std::string& name, std::shared_ptr<CompoundJob> job,
                                const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
@@ -39,7 +39,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to terminate the action (called if the action executor is killed)
+     * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
     void CustomAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {

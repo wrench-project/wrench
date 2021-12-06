@@ -70,6 +70,7 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(TTL_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state its time-to-live **/
         DECLARE_MESSAGEPAYLOAD_NAME(TTL_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the daemon to request information on its resources **/
         DECLARE_MESSAGEPAYLOAD_NAME(RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state information on its resources **/
         DECLARE_MESSAGEPAYLOAD_NAME(RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD);

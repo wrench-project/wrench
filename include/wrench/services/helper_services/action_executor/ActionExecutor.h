@@ -50,7 +50,7 @@ namespace wrench {
 
         std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
 
-    protected:
+    private:
 
         std::shared_ptr<Action> action;
         std::shared_ptr<ActionExecutionService> action_execution_service;
