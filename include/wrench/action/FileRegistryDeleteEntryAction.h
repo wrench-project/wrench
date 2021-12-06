@@ -30,6 +30,14 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
+        /**
+        * @brief Constructor
+        * @param name: the action's name
+        * @param job: the job this action belongs to
+        * @param file_registry_service: the file registry service to update
+        * @param file: the file
+        * @param file_location: the file location
+        */
         FileRegistryDeleteEntryAction(const std::string& name, std::shared_ptr<CompoundJob> job,
                                 std::shared_ptr<FileRegistryService> file_registry_service,
                                 WorkflowFile *file,

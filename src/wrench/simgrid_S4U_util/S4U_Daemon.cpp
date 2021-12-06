@@ -214,7 +214,7 @@ namespace wrench {
             if (not this->isSetToAutoRestart()) {
                 auto life_saver = this->life_saver;
                 this->life_saver = nullptr;
-                Service::increaseNumCompletedServicesCount();
+//                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
                 MessageManager::cleanUpMessages(this->mailbox_name);
 #endif

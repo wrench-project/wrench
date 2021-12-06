@@ -67,9 +67,9 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
 
         void setStateToDown();
 
-        static void increaseNumCompletedServicesCount();
-        static void clearTrackedServices();
-        static void cleanupTrackedServices();
+//        static void increaseNumCompletedServicesCount();
+//        static void clearTrackedServices();
+//        static void cleanupTrackedServices();
 
         /***********************/
         /** \endcond           */
