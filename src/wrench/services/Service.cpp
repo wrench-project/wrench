@@ -28,14 +28,14 @@ WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 namespace wrench {
 
 //    std::unordered_map<Service *, std::shared_ptr<Service>> Service::service_shared_ptr_map;
-    unsigned long Service::num_terminated_services = 0;
+//    unsigned long Service::num_terminated_services = 0;
 
-    /**
-     * @brief Increase the completed service count
-     */
-    void Service::increaseNumCompletedServicesCount() {
-        Service::num_terminated_services++;
-    }
+//    /**
+//     * @brief Increase the completed service count
+//     */
+//    void Service::increaseNumCompletedServicesCount() {
+//        Service::num_terminated_services++;
+//    }
 
 //    /**
 //     * @brief Forget all tracked services

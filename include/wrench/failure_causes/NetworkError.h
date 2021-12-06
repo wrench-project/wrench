@@ -50,7 +50,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        std::string toString();
+        std::string toString() override;
         bool whileReceiving();
         bool whileSending();
         bool isTimeout();

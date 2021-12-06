@@ -921,6 +921,11 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Method for terminating a current compound job
+     * @param job: the job
+     * @param termination_cause: the sermination cause
+     */
     void BareMetalComputeService::terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job,
                                                               ComputeService::TerminationCause termination_cause) {
 

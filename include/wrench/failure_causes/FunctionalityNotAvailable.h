@@ -41,7 +41,7 @@ namespace wrench {
 
         std::shared_ptr<Service>  getService();
         std::string getFunctionalityName();
-        std::string toString();
+        std::string toString() override;
 
     private:
         std::shared_ptr<Service>  service;

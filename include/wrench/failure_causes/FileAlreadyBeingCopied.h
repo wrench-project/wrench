@@ -46,7 +46,7 @@ namespace wrench {
         WorkflowFile *getFile();
         std::shared_ptr<FileLocation> getSourceLocation();
         std::shared_ptr<FileLocation> getDestinationLocation();
-        std::string toString();
+        std::string toString() override;
 
     private:
         WorkflowFile *file;

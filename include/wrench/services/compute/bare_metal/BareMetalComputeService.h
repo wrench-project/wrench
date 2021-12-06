@@ -172,7 +172,7 @@ namespace wrench {
 
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
-        void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
+//        void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
 
         // Cleanup the scratch if I am a pilot job
         void cleanUpScratch();
@@ -196,7 +196,7 @@ namespace wrench {
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
+//        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 
         void processSubmitCompoundJob(const std::string &answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
@@ -204,17 +204,17 @@ namespace wrench {
         void processIsThereAtLeastOneHostWithAvailableResources(
                 const std::string &answer_mailbox, unsigned long num_cores, double ram);
 
-        std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
-                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
-                                                              std::set<std::string> &hosts_to_avoid);
+//        std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
+//                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
+//                                                              std::set<std::string> &hosts_to_avoid);
 
-        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
-
-        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
+//        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
+//
+//        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-        bool areAllComputeResourcesDownWithNoWUERunning();
+//        bool areAllComputeResourcesDownWithNoWUERunning();
 
         static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 
