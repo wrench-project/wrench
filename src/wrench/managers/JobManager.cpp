@@ -654,18 +654,7 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): service does not support pilot jobs");
         }
 
-        try {
-            compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
-        } catch (ExecutionException &e) {
-            job->compound_job = nullptr;
-            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
-                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
-            } else {
-                throw;
-            }
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+
 
         std::string callback_mailbox = this->mailbox_name;
         std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
@@ -708,6 +697,21 @@ namespace wrench {
                               });
 
         job->compound_job = cjob;
+
+        try {
+            compute_service->validateServiceSpecificArguments(job->compound_job, service_specific_args);
+        } catch (ExecutionException &e) {
+            job->compound_job = nullptr;
+            if (std::dynamic_pointer_cast<NotEnoughResources>(e.getCause())) {
+                throw ExecutionException(std::shared_ptr<NotEnoughResources>(new NotEnoughResources(job, compute_service)));
+            } else {
+                throw;
+            }
+        } catch (std::invalid_argument &e) {
+            throw;
+        }
+
+
         this->cjob_to_pjob_map[job->compound_job] = job;
 
 
