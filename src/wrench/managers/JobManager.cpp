@@ -563,6 +563,10 @@ namespace wrench {
             throw std::invalid_argument("JobManager::submitJob(): Job was previously submitted");
         }
 
+        if (job->actions.empty()) {
+            throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that has any actions");
+        }
+
         try {
             compute_service->assertServiceIsUp();
         } catch (ExecutionException &e) {

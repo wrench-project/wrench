@@ -1684,6 +1684,9 @@ namespace wrench {
                 if (this->num_cores_per_node < num_cores) {
                     throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
                 }
+                if (job->getMinimumRequiredNumCores() > num_cores) {
+                    throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
+                }
             } else if (key == "-u") {
                 // nothing
             } else if (key == "-color") {
@@ -1713,6 +1716,11 @@ namespace wrench {
         }
         if (not found_dash_c) {
             throw std::invalid_argument("Compute service requires a '-c' service-specific argument");
+        }
+
+        // Double check that memory requirements of all tasks can be met
+        if (job->getMinimumRequiredMemory() > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first)) {
+            throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
         }
 
     }
