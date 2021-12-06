@@ -386,9 +386,11 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+        std::shared_ptr<wrench::BareMetalComputeService> cs;
+
         try {
             std::shared_ptr<wrench::CompoundJob> compound_job = nullptr;
-            job_manager->submitJob(compound_job, std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *) (1234), [](void *ptr){}), {});
+            job_manager->submitJob(compound_job, cs, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr job");
         } catch (std::invalid_argument &e) {
         }

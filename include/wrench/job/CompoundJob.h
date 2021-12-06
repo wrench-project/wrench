@@ -61,7 +61,11 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
             DISCONTINUED
         };
 
-        std::shared_ptr<CompoundJob> getSharedPtr() {return this->shared_from_this(); }
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<CompoundJob> getSharedPtr() { return this->shared_from_this(); }
 
         std::set<std::shared_ptr<Action>> getActions();
         CompoundJob::State getState();
