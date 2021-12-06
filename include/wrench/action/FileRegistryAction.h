@@ -33,6 +33,9 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
+        /**
+         * @brief File registry action type enum
+         */
         enum Type {
             ADD,
             DELETE

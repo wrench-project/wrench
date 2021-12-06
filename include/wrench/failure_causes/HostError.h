@@ -38,7 +38,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        std::string toString();
+        std::string toString() override;
 
     private:
         std::string hostname;

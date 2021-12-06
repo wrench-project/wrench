@@ -61,6 +61,9 @@ namespace wrench {
         /***********************/
 
 
+        /**
+         * @brief Job termination cause enum
+         */
         enum TerminationCause {
             TERMINATION_NONE,
             TERMINATION_COMPUTE_SERVICE_TERMINATED,

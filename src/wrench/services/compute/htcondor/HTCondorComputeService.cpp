@@ -452,5 +452,29 @@ namespace wrench {
 
     }
 
+    /**
+ * @brief Returns true if the service supports standard jobs
+ * @return true or false
+ */
+    bool HTCondorComputeService::supportsStandardJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports compound jobs
+     * @return true or false
+     */
+    bool HTCondorComputeService::supportsCompoundJobs() {
+        return true;
+    }
+
+    /**
+     * @brief Returns true if the service supports pilot jobs
+     * @return true or false
+     */
+    bool HTCondorComputeService::supportsPilotJobs() {
+        return true;
+    }
+
 
 }
