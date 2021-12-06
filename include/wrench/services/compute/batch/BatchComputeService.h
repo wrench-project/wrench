@@ -112,9 +112,9 @@ namespace wrench {
                             std::map<std::string, double> messagepayload_list = {}
         );
 
-        bool supportsStandardJobs() override { return true; };
-        bool supportsCompoundJobs() override {return true; } ;
-        bool supportsPilotJobs() override {return true; };
+        bool supportsStandardJobs() override;
+        bool supportsCompoundJobs() override;
+        bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -293,9 +293,6 @@ namespace wrench {
 
         // process a batch_standard_and_pilot_jobs bach_job tiemout event
         void processAlarmJobTimeout(std::shared_ptr<BatchJob>bach_job);
-
-        //Process pilot job timeout
-        void processPilotJobTimeout(std::shared_ptr<PilotJob> job);
 
         //free up resources
         void freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources);

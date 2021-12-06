@@ -24,7 +24,7 @@ namespace wrench {
      * @brief Constructor
      * @param ack_mailbox: mailbox to which the DaemonStoppedMessage ack will be sent. No ack will be sent if ack_mailbox=""
      * @param send_failure_notifications: whether the service should send failure notifications before terminating
-     * @param cause: the failure cause for notifications, if any
+     * @param termination_cause: the termination cause (if failure notifications are sent)
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments

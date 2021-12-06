@@ -102,25 +102,8 @@ namespace wrench {
 
 
     /**
-     * @brief Submit a set of actions to the compute service
-     * @param actions: a set of actions (which typically belong to the same compound job)
-     * @param service_specific_args: optional service-specific arguments
-     *
-     *    These arguments are provided as a map of strings, indexed by task IDs. These
-     *    strings are formatted as "[hostname:][num_cores]" (e.g., "somehost:12", "somehost","6", "").
-     *
-     *      - If a value is not provided for an action, then the service will choose a host and use as many cores as possible on that host.
-     *      - If a "" value is provided for an action, then the service will choose a host and use as many cores as possible on that host.
-     *      - If a "hostname" value is provided for an action, then the service will run the action on that
-     *        host, using as many of its cores as possible
-     *      - If a "num_cores" value is provided for an action, then the service will run that action with
-     *        this many cores, but will choose the host on which to run it.
-     *      - If a "hostname:num_cores" value is provided for an action, then the service will run that
-     *        action with this many cores on that host.
-     *
-     * @throw ExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
+     * @brief Submit an action to the action execution service service
+     * @param action: an action
      */
     void ActionExecutionService::submitAction(const std::shared_ptr<Action> &action) {
 
@@ -739,9 +722,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously terminate a standard job previously submitted to the compute service
+     * @brief Synchronously terminate an action
      *
-     * @param job: a standard job
+     * @param action: an action
      * @param termination_cause: termination cause
      *
      * @throw ExecutionException
@@ -999,9 +982,11 @@ namespace wrench {
 
 
 /**
- * @brief Determine wether there is at least one host with (currently) available resources
+ * @brief Determine whether there is at least one host with (currently) available resources
  * @param num_cores: the desired number of cores
  * @param ram: the desired RAM
+ *
+ * @return true or false
  */
     bool ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
                                                                              double ram) {
@@ -1035,6 +1020,7 @@ namespace wrench {
     /**
      * @brief Process a "get resource description message"
      * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @return resource information map
      */
     std::map<std::string, std::map<std::string, double>> ActionExecutionService::getResourceInformation() {
         // Build a dictionary
@@ -1159,7 +1145,7 @@ namespace wrench {
 
     /**
      * @brief Set parent service
-     * @param service: the parent service
+     * @param parent: the parent service
      */
     void ActionExecutionService::setParentService(std::shared_ptr<Service> parent) {
         this->parent_service = std::move(parent);

@@ -19,6 +19,9 @@ namespace wrench {
     class WorkflowFile;
     class FileLocation;
 
+    /**
+     * @brief A class that implements a file deletion action
+     */
     class FileDeleteAction : public Action {
 
     public:

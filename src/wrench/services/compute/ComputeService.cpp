@@ -576,9 +576,9 @@ namespace wrench {
     /**
      * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
      * @param job: the job that's being submitted
-     * @param service_specific_arg: the service-specific arguments
+     * @param service_specific_args: the service-specific arguments
      */
-    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                           map<std::string, std::string> &service_specific_args)  {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }
@@ -586,6 +586,7 @@ namespace wrench {
 
     /**
      * @brief Method to validate that a job's use of the scratch space if ok. Throws exception if not.
+     * @param service_specific_args: the job;'s service-specific arguments (useful for some services)
      */
     void ComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
         if (not this->hasScratch()) {

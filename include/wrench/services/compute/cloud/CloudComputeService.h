@@ -74,9 +74,9 @@ namespace wrench {
                             std::map<std::string, std::string> property_list = {},
                             std::map<std::string, double> messagepayload_list = {});
 
-        virtual bool supportsStandardJobs() override { return false; };
-        virtual bool supportsCompoundJobs() override {return false; };
-        virtual bool supportsPilotJobs() override {return false; };
+        virtual bool supportsStandardJobs() override;
+        virtual bool supportsCompoundJobs() override;
+        virtual bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond DEVELOPER    */

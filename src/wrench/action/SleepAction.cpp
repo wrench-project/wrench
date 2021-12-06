@@ -20,7 +20,7 @@ namespace wrench {
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param job: the job this action belongs to
-    * @param sleep: the time to sleep, in seconds
+    * @param sleep_time: the time to sleep, in seconds
     */
     SleepAction::SleepAction(const std::string& name, std::shared_ptr<CompoundJob> job, double sleep_time) :
             Action(name, "sleep_", std::move(job)), sleep_time(sleep_time) {
@@ -48,7 +48,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to terminate the action
+     * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
     void SleepAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {

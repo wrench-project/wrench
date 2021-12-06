@@ -155,11 +155,13 @@ namespace wrench {
             return nullptr;
         }
 
+
+        /** @brief A boolean that indicates if the service is in the middle of shutting down **/
         bool shutting_down = false;
+        /** @brief A useful map of services to their shared_ptr **/
+        static std::unordered_map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
 
     private:
-
-        static std::unordered_map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
 
 
         static unsigned long num_terminated_services;

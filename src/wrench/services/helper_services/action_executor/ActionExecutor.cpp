@@ -30,6 +30,7 @@ namespace wrench {
      * @param ram_footprint: the RAM footprint
      * @param callback_mailbox: the callback mailbox to which a "action done" or "action failed" message will be sent
      * @param action: the action to perform
+     * @param action_execution_service: the parent action execution service
      */
     ActionExecutor::ActionExecutor(
             std::string hostname,

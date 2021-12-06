@@ -380,57 +380,20 @@ namespace wrench {
 
     /**
      * @brief Determine whether compute service has scratch
+     * @param service_specific_args: the service-specific arguments (useful for some services)
      * @return
      */
     void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
 
         throw std::invalid_argument("Jobs submitted to an HT-Condor compute service cannot make use of scratch");
-//        bool is_grid_job = (service_specific_args.find("-universe") != service_specific_args.end())
-//                           and (service_specific_args["-universe"] == "grid");
-//
-//        if (is_grid_job) {
-//            std::set<std::shared_ptr<BatchComputeService>> batch_cses;
-//            std::shared_ptr<BatchComputeService> target_cs = nullptr;
-//            for (auto const &cs : this->central_manager->compute_services) {
-//                if (auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs)) {
-//                    batch_cses.insert(batch_cs);
-//                    if (service_specific_args.find("-service") != service_specific_args.end()) {
-//                        if (service_specific_args["-service"] == batch_cs->getName()) {
-//                            target_cs = batch_cs;
-//                            break;
-//                        }
-//                    } else {
-//                        target_cs = batch_cs;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            if (target_cs == nullptr) {
-//                throw std::invalid_argument("Couldn't find target batch_standard_and_pilot_jobs compute service for grid-universe job");
-//            }
-//            if (not target_cs->hasScratch()) {
-//                throw std::invalid_argument("Target batch_standard_and_pilot_jobs compute service (" + target_cs->getName() + ") for grid-universe job does not have scratch space");
-//            }
-//
-//        } else {
-//            // Here we must make sure that ALL baremetal compute services have scratch
-//            for (auto const &cs : this->central_manager->compute_services) {
-//                if (auto bm_cs = std::dynamic_pointer_cast<BareMetalComputeService>(cs)) {
-//                    if (not bm_cs->hasScratch()) {
-//                        throw std::invalid_argument("At least one bare-metal compute service does not have scratch space");
-//                    }
-//                }
-//            }
-//        }
     }
 
     /**
      * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
      * @param job: the job that's being submitted
-     * @param service_specific_arg: the service-specific arguments
+     * @param service_specific_args: the service-specific arguments
      */
-    void HTCondorComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+    void HTCondorComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                                   std::map<std::string, std::string> &service_specific_args) {
         // Is the job a grid universe job
         bool grid_universe = false;
@@ -480,7 +443,7 @@ namespace wrench {
         stripped_service_specific_args.erase("-universe");
         stripped_service_specific_args.erase("-service"); // which may not be there, but whatever
         try {
-            target_cs->validateServiceSpecificArguments(compound_job, stripped_service_specific_args);
+            target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
         } catch (ExecutionException &e) {
             throw;
         } catch (std::invalid_argument &e) {

@@ -103,9 +103,9 @@ namespace wrench {
                                 std::map<std::string, double> messagepayload_list = {}
         );
 
-        virtual bool supportsStandardJobs() override { return true; };
-        virtual bool supportsCompoundJobs() override {return true; };
-        virtual bool supportsPilotJobs() override {return false; };
+        virtual bool supportsStandardJobs() override;
+        virtual bool supportsCompoundJobs() override;
+        virtual bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond INTERNAL     */
@@ -117,9 +117,6 @@ namespace wrench {
 
         ~BareMetalComputeService();
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
     protected:
         friend class JobManager;
@@ -154,12 +151,11 @@ namespace wrench {
                               std::shared_ptr<PilotJob> pj);
 
 
-        double ttl;
-        bool has_ttl;
-        double death_date;
-        std::shared_ptr<Alarm> death_alarm = nullptr;
+    protected:
 
+        std::shared_ptr<Alarm> death_alarm = nullptr;
         std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
+
 
         std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
 
@@ -169,6 +165,11 @@ namespace wrench {
         std::vector<std::shared_ptr<Action>> ready_actions;
         std::set<std::shared_ptr<Action>> dispatched_actions;
         std::map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
+
+        double ttl;
+        double death_date;
+        bool has_ttl;
+
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
         void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
@@ -223,6 +224,10 @@ namespace wrench {
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
 
         std::shared_ptr<ActionExecutionService> action_execution_service;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     };
 };

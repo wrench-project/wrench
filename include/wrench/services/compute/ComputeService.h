@@ -77,10 +77,22 @@ namespace wrench {
 
         void terminateJob(std::shared_ptr<CompoundJob> job);
 
+        /**
+         * @brief Returns true if the service supports standard jobs
+         * @return true or false
+         */
         virtual bool supportsStandardJobs() = 0;
 
+        /**
+         * @brief Returns true if the service supports pilot jobs
+         * @return true or false
+         */
         virtual bool supportsCompoundJobs() = 0;
 
+        /**
+         * @brief Returns true if the service supports compound jobs
+         * @return true or false
+         */
         virtual bool supportsPilotJobs() = 0;
 
         virtual bool hasScratch() const;
@@ -153,7 +165,7 @@ namespace wrench {
 
         void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string>& = {});
 
-        virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
+        virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                       std::map<std::string, std::string> &service_specific_args) ;
 
         virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);

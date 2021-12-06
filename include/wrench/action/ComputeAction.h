@@ -19,6 +19,9 @@ namespace wrench {
     class ComputeThread;
     class ParallelModel;
 
+    /**
+     * @brief A class that implements a compute action
+     */
     class ComputeAction : public Action {
 
     public:
