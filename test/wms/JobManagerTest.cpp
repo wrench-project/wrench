@@ -386,7 +386,8 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        std::shared_ptr<wrench::BareMetalComputeService> cs;
+        std::shared_ptr<wrench::BareMetalComputeService> cs =
+                simulation->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, "", {}, {}));
 
         try {
             std::shared_ptr<wrench::CompoundJob> compound_job = nullptr;
