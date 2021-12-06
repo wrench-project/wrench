@@ -64,7 +64,7 @@ protected:
 
 
 
-TEST_F(MessageConstructorTest, SimulationMessages) {
+TEST_F(MessageConstructorTest, DISABLED_SimulationMessages) {
 
     wrench::SimulationMessage *msg = nullptr;
     ASSERT_NO_THROW(msg = new wrench::SimulationMessage("name", 666));
@@ -76,7 +76,7 @@ TEST_F(MessageConstructorTest, SimulationMessages) {
 
 }
 
-TEST_F(MessageConstructorTest, FileRegistryMessages) {
+TEST_F(MessageConstructorTest, DISABLED_FileRegistryMessages) {
 
     ASSERT_NO_THROW(new wrench::FileRegistryFileLookupRequestMessage("mailbox", file, 666));
     ASSERT_THROW(new wrench::FileRegistryFileLookupRequestMessage("", file, 666), std::invalid_argument);
@@ -118,7 +118,7 @@ TEST_F(MessageConstructorTest, FileRegistryMessages) {
     ASSERT_THROW(new wrench::FileRegistryFileLookupByProximityAnswerMessage(file, "", {{}}, 666), std::invalid_argument);
 }
 
-TEST_F(MessageConstructorTest, ComputeServiceMessages) {
+TEST_F(MessageConstructorTest, DISABLED_ComputeServiceMessages) {
 
     std::map<std::string, std::string> args;
     args.insert(std::make_pair("a","b"));
@@ -159,7 +159,7 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 }
 
 
-TEST_F(MessageConstructorTest, CloudComputeServiceMessages) {
+TEST_F(MessageConstructorTest, DISABLED_CloudComputeServiceMessages) {
 
     ASSERT_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage("mailbox", 600));
     ASSERT_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
@@ -215,7 +215,7 @@ TEST_F(MessageConstructorTest, CloudComputeServiceMessages) {
 }
 
 
-TEST_F(MessageConstructorTest, StorageServiceMessages) {
+TEST_F(MessageConstructorTest, DISABLED_StorageServiceMessages) {
     ASSERT_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage("mailbox", 666));
     ASSERT_THROW(new wrench::StorageServiceFreeSpaceRequestMessage("", 666), std::invalid_argument);
 
@@ -291,7 +291,7 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
     ASSERT_THROW(new wrench::StorageServiceFileContentChunkMessage(nullptr, 666, true), std::invalid_argument);
 }
 
-TEST_F(MessageConstructorTest, NetworkProximityMessages) {
+TEST_F(MessageConstructorTest, DISABLED_NetworkProximityMessages) {
 
     ASSERT_NO_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a","b"), 666));
     ASSERT_THROW(new wrench::NetworkProximityLookupRequestMessage("", std::make_pair("a","b"), 666), std::invalid_argument);
@@ -319,18 +319,18 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
 
 
-TEST_F(MessageConstructorTest, BatchComputeServiceMessages) {
+TEST_F(MessageConstructorTest, DISABLED_BatchComputeServiceMessages) {
 
 //  ASSERT_NO_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox", "foo", 666));
 //  ASSERT_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox", "", 666), std::invalid_argument);
-
+//
 //  ASSERT_NO_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", workflow_job, "foo", 666));
 //  ASSERT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("", workflow_job, "foo", 666), std::invalid_argument);
 //  ASSERT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", nullptr, "foo", 666), std::invalid_argument);
 //  ASSERT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", workflow_job, "", 666), std::invalid_argument);
-
+//
 //  ASSERT_NO_THROW(new wrench::BatchJobReplyFromSchedulerMessage("reply", 666));
-
+//
 //  ASSERT_NO_THROW(new wrench::BatchSchedReadyMessage("mailbox", 666));
 //  ASSERT_THROW(new wrench::BatchSchedReadyMessage("", 666), std::invalid_argument);
 
@@ -340,11 +340,11 @@ TEST_F(MessageConstructorTest, BatchComputeServiceMessages) {
 
     ASSERT_NO_THROW(new wrench::BatchQueryAnswerMessage(1.0, 666));
 
-//    ASSERT_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", batch_job, 666));
-//    ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
-//    ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
-//    ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
-//    ASSERT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", batch_job, 666));
+    ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
+    ASSERT_THROW(new wrench::BatchComputeServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
+    ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
+    ASSERT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
 
 
 //  ASSERT_NO_THROW(new wrench::AlarmNotifyBatschedMessage("job_id", 666));
