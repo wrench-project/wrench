@@ -53,7 +53,7 @@ void SimulationDaemon::run() {
  *
  * @param daemon_logging true if daemon logging should be printed
  * @param simulation_port_number port number on which this daemon is listening
- * @param simulation_controller the simulation controller
+ * @param simulation_controller the simulation execution_controller
  * @param simulation_thread the simulation thread
  */
 SimulationDaemon::SimulationDaemon(

@@ -15,6 +15,7 @@
 
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
+#include <wrench/execution_controller/ExecutionControllerMessage.h>
 #include "services/storage/StorageServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
 #include "wrench.h"
@@ -97,7 +98,7 @@ namespace wrench {
                 return std::shared_ptr<FileCopyFailedEvent>(
                         new FileCopyFailedEvent(m->file, m->src, m->dst, m->failure_cause));
             }
-        } else if (auto m = dynamic_cast<AlarmWMSTimerMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<ExecutionControllerAlarmTimerMessage*>(message.get())) {
             return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
         } else {
             throw std::runtime_error(

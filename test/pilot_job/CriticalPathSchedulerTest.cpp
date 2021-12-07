@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../examples/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.h"
+#include "../../examples/workflow_api/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.h"
 
 namespace wrench {
     class CriticalPathSchedulerTest : public ::testing::Test {

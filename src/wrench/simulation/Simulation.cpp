@@ -425,7 +425,7 @@ namespace wrench {
             this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
         }
 
-        // Start all services (and the WMS)
+        // Start all services (including execution controllers)
         try {
             this->startAllProcesses();
         } catch (std::runtime_error &e) {
@@ -468,52 +468,57 @@ namespace wrench {
             throw std::runtime_error("Simulation platform has not been setup");
         }
 
-        // Check that there is a WMS
-        if (this->wmses.empty()) {
+        // Check that there is at least one execution controller
+        if (this->execution_controllers.empty()) {
             throw std::runtime_error(
-                    "A WMS should have been instantiated and passed to Simulation.setWMS()");
+                    "An execution controller should have been instantiated and passed to Simulation.setWMS()");
         }
 
         // Check that every WMS has a workflow
-        for (const auto &wms : this->wmses) {
-            if (wms->getWorkflow() == nullptr) {
-                throw std::runtime_error(
-                        "The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
+        for (const auto &execution_controller : this->execution_controllers) {
+            if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {
+                if (wms->getWorkflow() == nullptr) {
+                    throw std::runtime_error(
+                            "A WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
+                }
             }
         }
 
         // Check that WMSs can do their work
-        for (auto &wms : this->wmses) {
-            // Check that at least one StorageService is running (only needed if there are files in the workflow),
-            if (not wms->workflow->getFiles().empty()) {
-                bool one_storage_service_running = false;
-                for (const auto &storage_service : this->storage_services) {
-                    if (storage_service->state == Service::UP) {
-                        one_storage_service_running = true;
-                        break;
+        for (const auto &execution_controller : this->execution_controllers) {
+            if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {
+                // Check that at least one StorageService is running (only needed if there are files in the workflow),
+                if (not wms->workflow->getFiles().empty()) {
+                    bool one_storage_service_running = false;
+                    for (const auto &storage_service : this->storage_services) {
+                        if (storage_service->state == Service::UP) {
+                            one_storage_service_running = true;
+                            break;
+                        }
+                    }
+                    if (not one_storage_service_running) {
+                        throw std::runtime_error(
+                                "At least one StorageService should have been instantiated add passed to Simulation.add()");
                     }
                 }
-                if (not one_storage_service_running) {
-                    throw std::runtime_error(
-                            "At least one StorageService should have been instantiated add passed to Simulation.add()");
-                }
-            }
 
-            // Check that a FileRegistryService is running if needed
-            if (not wms->workflow->getInputFiles().empty()) {
-                if (this->file_registry_services.empty()) {
-                    throw std::runtime_error(
-                            "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
-                            "because there are workflow input files to be staged.");
-                }
-            }
-
-            // Check that each input file is staged on the file registry services
-            for (auto file : wms->workflow->getInputFiles()) {
-                for (auto frs : this->file_registry_services) {
-                    if (frs->entries.find(file) == frs->entries.end()) {
+                // Check that a FileRegistryService is running if needed
+                if (not wms->workflow->getInputFiles().empty()) {
+                    if (this->file_registry_services.empty()) {
                         throw std::runtime_error(
-                                "Workflow input file " + file->getID() + " is not staged on any storage service!");
+                                "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
+                                "because there are workflow input files to be staged.");
+                    }
+                }
+
+                // Check that each input file is staged on the file registry services
+                for (auto file : wms->workflow->getInputFiles()) {
+                    for (auto frs : this->file_registry_services) {
+                        if (frs->entries.find(file) == frs->entries.end()) {
+                            throw std::runtime_error(
+                                    "Workflow input file " + file->getID() +
+                                    " is not staged on any storage service!");
+                        }
                     }
                 }
             }
@@ -527,9 +532,9 @@ namespace wrench {
      */
     void Simulation::startAllProcesses() {
         try {
-            // Start the WMSes
-            for (const auto &wms : this->wmses) {
-                wms->start(wms, false, false);  // Not daemonized, no auto-restart
+            // Start the execution controllers
+            for (const auto &execution_controller : this->execution_controllers) {
+                execution_controller->start(execution_controller, false, false);  // Not daemonized, no auto-restart
             }
 
             // Start the compute services
@@ -616,18 +621,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a WMS to the simulation.
+     * @brief Add an Execution Controller to the simulation.
      *
-     * @param service: a WMS
+     * @param service: an execution controller
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(std::shared_ptr<WMS> service) {
+    void Simulation::addService(std::shared_ptr<ExecutionController> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        this->wmses.insert(service);
+        this->execution_controllers.insert(service);
     }
 
     /**
@@ -1260,7 +1265,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new compute service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1290,7 +1295,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new storage service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new storage service during  execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1316,7 +1321,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new network proximity service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new network proximity service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1342,7 +1347,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new file registry service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new file registry service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
