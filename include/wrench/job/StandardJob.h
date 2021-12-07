@@ -37,9 +37,10 @@ namespace wrench {
      * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a ComputeService
      * by a WMS (via a JobManager)
      */
-    class StandardJob : public Job {
+    class StandardJob : public Job, public std::enable_shared_from_this<StandardJob> {
 
     public:
+
         /** @brief Standard job states */
         enum State {
             /** @brief Not submitted yet */
@@ -89,6 +90,12 @@ namespace wrench {
         /** @brief The ordered file deletion operations to perform at the end */
         std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
 
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<StandardJob> getSharedPtr() { return this->shared_from_this(); }
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -135,8 +142,6 @@ namespace wrench {
         State state;
         double pre_overhead = 0.0;
         double post_overhead = 0.0;
-
-        std::shared_ptr<StandardJob> shared_this;
 
         std::shared_ptr<CompoundJob> compound_job;
         std::shared_ptr<Action> pre_overhead_action = nullptr;

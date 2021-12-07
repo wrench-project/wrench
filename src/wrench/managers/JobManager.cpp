@@ -40,7 +40,6 @@ namespace wrench {
      */
     JobManager::JobManager(std::string hostname, std::string &creator_mailbox) :
             Service(hostname, "job_manager", "job_manager") {
-//        this->wms = wms;
         this->creator_mailbox = creator_mailbox;
     }
 
@@ -50,15 +49,6 @@ namespace wrench {
     JobManager::~JobManager() {
         this->jobs_to_dispatch.clear();
         this->jobs_dispatched.clear();
-
-//        this->pending_standard_jobs.clear();
-//        this->running_standard_jobs.clear();
-//        this->completed_standard_jobs.clear();
-//        this->failed_standard_jobs.clear();
-//
-//        this->pending_pilot_jobs.clear();
-//        this->running_pilot_jobs.clear();
-//        this->completed_pilot_jobs.clear();
     }
 
     /**
@@ -68,15 +58,6 @@ namespace wrench {
         this->killActor();
         this->jobs_to_dispatch.clear();
         this->jobs_dispatched.clear();
-
-//        this->pending_standard_jobs.clear();
-//        this->running_standard_jobs.clear();
-//        this->completed_standard_jobs.clear();
-//        this->failed_standard_jobs.clear();
-//
-//        this->pending_pilot_jobs.clear();
-//        this->running_pilot_jobs.clear();
-//        this->completed_pilot_jobs.clear();
     }
 
     /**
@@ -115,10 +96,11 @@ namespace wrench {
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
             std::vector<WorkflowTask *> tasks,
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations,
+            const std::map<WorkflowFile *, std::shared_ptr<FileLocation>>& file_locations,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
+
         // Transform the non-vector file location map into a vector file location map
         std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations_vector;
         for (auto const &e : file_locations) {
@@ -128,8 +110,11 @@ namespace wrench {
         }
 
         // Call the vectorized method
-        return createStandardJob(tasks, file_locations_vector, pre_file_copies, post_file_copies,
-                                 cleanup_file_deletions);
+        return createStandardJob(std::move(tasks),
+                                 file_locations_vector,
+                                 std::move(pre_file_copies),
+                                 std::move(post_file_copies),
+                                 std::move(cleanup_file_deletions));
     }
 
     /**
@@ -237,8 +222,6 @@ namespace wrench {
         auto job = std::shared_ptr<StandardJob>(
                 new StandardJob(this->getSharedPtr<JobManager>(), tasks, file_locations, pre_file_copies,
                                 post_file_copies, cleanup_file_deletions));
-        job->shared_this = job;
-
         return job;
     }
 

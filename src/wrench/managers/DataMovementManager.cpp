@@ -25,7 +25,6 @@ WRENCH_LOG_CATEGORY(wrench_core_data_movement_manager, "Log category for Data Mo
 
 namespace wrench {
 
-
     /**
      * @brief Constructor
      *
