@@ -558,16 +558,15 @@ namespace wrench {
      * @param job
      */
     void BatchComputeService::processCompoundJobTimeout(std::shared_ptr<CompoundJob> compound_job) {
-        // TODO: Do a map?
-        for (auto it = this->running_bare_metal_one_shot_compute_services.begin();
-             it != this->running_bare_metal_one_shot_compute_services.end(); it++) {
-            if ((*it)->job == compound_job) {
-                // I'll get a bunch fo failure notifications, which is fine
-                (*it)->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
-//                this->running_bare_metal_one_shot_compute_services.erase(it);
-                break;
-            }
+
+        if (this->running_bare_metal_one_shot_compute_services.find(compound_job) ==
+        this->running_bare_metal_one_shot_compute_services.end()) {
+            throw std::runtime_error("BatchComputeService::processCompoundJobTimeout(): Unknown compound job");
         }
+
+        auto executor = this->running_bare_metal_one_shot_compute_services[compound_job];
+        WRENCH_INFO("Terminating a one-shot bare-metal service (due to a time out)");
+        executor->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
     }
 
     /**
@@ -575,20 +574,14 @@ namespace wrench {
     * @param job: the job
     */
     void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause) {
-        BareMetalComputeServiceOneShot *executor = nullptr;
-        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>>::iterator it;
-        for (it = this->running_bare_metal_one_shot_compute_services.begin();
-             it != this->running_bare_metal_one_shot_compute_services.end(); it++) {
-            if (((*it))->job == job) {
-                executor = (it->get());
-            }
-        }
-        if (executor == nullptr) {
-            throw std::runtime_error(
-                    "BatchComputeService::terminateCurrentCompoundJob(): Cannot find one-shot bare-metal compute service corresponding to job being terminated");
+
+        if (this->running_bare_metal_one_shot_compute_services.find(job) ==
+            this->running_bare_metal_one_shot_compute_services.end()) {
+            throw std::runtime_error("BatchComputeService::terminateRunningCompoundJob(): Unknown compound job");
         }
 
-        // Terminate the executor
+        auto executor = this->running_bare_metal_one_shot_compute_services[job];
+
         WRENCH_INFO("Terminating a one-shot bare-metal service");
         executor->stop(false, termination_cause); // failure notifications sent by me later, if needed
     }
@@ -930,23 +923,9 @@ namespace wrench {
     void BatchComputeService::processCompoundJobCompletion(
             std::shared_ptr<BareMetalComputeServiceOneShot> executor,
             std::shared_ptr<CompoundJob> job) {
-        bool executor_on_the_list = false;
-        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>>::iterator it;
 
-        for (it = this->running_bare_metal_one_shot_compute_services.begin();
-             it != this->running_bare_metal_one_shot_compute_services.end(); it++) {
-            if (*it == executor) {
-                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_bare_metal_one_shot_compute_services),
-                                                       &(this->finished_bare_metal_one_shot_compute_services));
-                executor_on_the_list = true;
-                this->compound_job_alarms[job]->kill();
-                this->compound_job_alarms.erase(job);
-                break;
-            }
-        }
-        this->finished_bare_metal_one_shot_compute_services.clear();
-
-        if (not executor_on_the_list) {
+        if (this->running_bare_metal_one_shot_compute_services.find(job) ==
+            this->running_bare_metal_one_shot_compute_services.end()) {
             // warning
             WRENCH_WARN(
                     "BatchComputeService::processCompoundJobCompletion(): Received a compound job completion, but "
@@ -954,6 +933,10 @@ namespace wrench {
                     "completion and time-outs.. ignoring")
             return;
         }
+
+        this->running_bare_metal_one_shot_compute_services.erase(job);
+        this->compound_job_alarms[job]->kill();
+        this->compound_job_alarms.erase(job);
 
         // Look for the corresponding batch_standard_and_pilot_jobs job
         if (this->running_jobs.find(job) == this->running_jobs.end()) {
@@ -1010,26 +993,18 @@ namespace wrench {
     void BatchComputeService::processCompoundJobFailure(std::shared_ptr<BareMetalComputeServiceOneShot> executor,
                                                         std::shared_ptr<CompoundJob> job,
                                                         std::shared_ptr<FailureCause> cause) {
-        bool executor_on_the_list = false;
-        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>>::iterator it;
-        for (it = this->running_bare_metal_one_shot_compute_services.begin();
-             it != this->running_bare_metal_one_shot_compute_services.end(); it++) {
-            if ((*it) == executor) {
-                PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_bare_metal_one_shot_compute_services),
-                                                       &(this->finished_bare_metal_one_shot_compute_services));
-                executor_on_the_list = true;
-                this->compound_job_alarms[job]->kill();
-                this->compound_job_alarms.erase(job);
-                break;
-            }
-        }
-        this->finished_bare_metal_one_shot_compute_services.clear();
 
-        if (not executor_on_the_list) {
+
+        if (this->running_bare_metal_one_shot_compute_services.find(job) ==
+            this->running_bare_metal_one_shot_compute_services.end()) {
             throw std::runtime_error(
                     "BatchComputeService::processCompoundJobFailure(): Received a compound job failure, "
                     "but the executor is not in the executor list");
         }
+
+        this->running_bare_metal_one_shot_compute_services.erase(job);
+        this->compound_job_alarms[job]->kill();
+        this->compound_job_alarms.erase(job);
 
         // Free up resources (by finding the corresponding BatchJob)
         if (this->running_jobs.find(job) == this->running_jobs.end()) {
@@ -1104,7 +1079,7 @@ namespace wrench {
         executor->start(executor, true, false); // Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
         batch_job->setEndingTimestamp(S4U_Simulation::getClock() + allocated_time);
-        this->running_bare_metal_one_shot_compute_services.insert(executor);
+        this->running_bare_metal_one_shot_compute_services[compound_job] = executor;
 
 //          this->running_jobs.insert(std::move(batch_job_ptr));
         this->timeslots.push_back(batch_job->getEndingTimestamp());
