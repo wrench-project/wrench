@@ -119,7 +119,7 @@ namespace wrench {
      */
     void Action::setState(Action::State new_state) {
         auto old_state = this->execution_history.top().state;
-        this->job->updateStateActionMap(this->shared_ptr_this, old_state, new_state);
+        this->job->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
 //        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
         this->execution_history.top().state = new_state;
     }
@@ -281,14 +281,6 @@ namespace wrench {
      */
     double Action::getMinRAMFootprint() const {
         return 0.0;
-    }
-
-    /**
-     * @brief Set the shared_ptr to this
-     * @param shared_ptr: the shared_ptr to this
-     */
-    void Action::setSharedPtrThis(std::shared_ptr<Action> shared_ptr) {
-        this->shared_ptr_this = std::move(shared_ptr);
     }
 
     /**

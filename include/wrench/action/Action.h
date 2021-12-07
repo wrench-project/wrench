@@ -24,7 +24,7 @@ namespace wrench {
     /**
      * @brief An abstract class that implements the concept of an action
      */
-    class Action {
+    class Action : public std::enable_shared_from_this<Action> {
 
     public:
 
@@ -96,6 +96,11 @@ namespace wrench {
 
         std::stack<Action::ActionExecution> &getExecutionHistory();
 
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<Action> getSharedPtr() { return this->shared_from_this(); }
 
     protected:
 
@@ -129,8 +134,6 @@ namespace wrench {
          */
         virtual void terminate(std::shared_ptr<ActionExecutor> action_executor) = 0;
 
-        void setSharedPtrThis(std::shared_ptr<Action> shared_ptr_this);
-
         void updateState();
 
         /** @brief The thread creation overhead in seconds */
@@ -146,8 +149,6 @@ namespace wrench {
 
         double priority;
 
-        std::shared_ptr<Action> shared_ptr_this;
-
         std::string name;
         std::shared_ptr<CompoundJob> job;
 
@@ -159,6 +160,5 @@ namespace wrench {
 
     };
 }
-
 
 #endif //WRENCH_ACTION_H
