@@ -48,5 +48,4 @@ namespace wrench {
     /***********************/
 };
 
-
 #endif //WRENCH_NOT_ALLOWED_H

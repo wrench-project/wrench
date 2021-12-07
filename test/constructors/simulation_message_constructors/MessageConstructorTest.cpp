@@ -124,11 +124,11 @@ private:
         auto failure_cause = std::shared_ptr<wrench::FatalFailure>(new wrench::FatalFailure("msg"));
         auto network_proximity_daemon = std::shared_ptr<wrench::NetworkProximityDaemon>(
                 new wrench::NetworkProximityDaemon(this->simulation, "Host1",
-                "mailbox",
-                 10.0, 1.0,
-                 1.0, {}));
+                                                   "mailbox",
+                                                   10.0, 1.0,
+                                                   1.0, {}));
         auto batch_job = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(compound_job, 1, 10, 1,
-                1, "me", 10.0, 0.0));
+                                                                                1, "me", 10.0, 0.0));
 
 
         auto msg = new wrench::SimulationMessage("name", 666);
@@ -215,8 +215,6 @@ private:
         CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("", 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::map<std::string, double>({{"aa", 2.3}, {"bb", 4.5}}))}, 666));
-
-//        CUSTOM_NO_THROW(new wrench::ComputeServiceInformationMessage(workflow_job, "info", 666));
 
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage("mailbox", 600));
@@ -391,7 +389,7 @@ TEST_F(MessageConstructorTest, AllMessages) {
 void MessageConstructorTest::do_MessageConstruction_test() {
 
 
-        // Create and initialize a simulation
+    // Create and initialize a simulation
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
