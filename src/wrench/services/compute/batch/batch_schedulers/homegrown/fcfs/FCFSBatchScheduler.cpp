@@ -186,10 +186,11 @@ namespace wrench {
 
         // Update core availabilities for jobs that are currently running
         for (auto job : cs->running_jobs) {
-            double time_to_finish = std::max<double>(0, job->getBeginTimestamp() +
-                                                        job->getRequestedTime() -
+            auto batch_job = job.second;
+            double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
+                                                        batch_job->getRequestedTime() -
                                                         cs->simulation->getCurrentSimulatedDate());
-            for (auto resource : job->getResourcesAllocated()) {
+            for (auto resource : batch_job->getResourcesAllocated()) {
                 std::string hostname = resource.first;
                 unsigned long num_cores = std::get<0>(resource.second);
                 double ram = std::get<1>(resource.second);
@@ -369,7 +370,7 @@ namespace wrench {
             this->cs->removeJobFromBatchQueue(batch_job);
 
             // Add it to the running list
-            this->cs->running_jobs.insert(batch_job);
+            this->cs->running_jobs[batch_job->getCompoundJob()]  = batch_job;
 
             // Start it!
             this->cs->startJob(resources, compound_job, batch_job, num_nodes_asked_for, requested_time,

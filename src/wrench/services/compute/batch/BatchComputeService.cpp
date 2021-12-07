@@ -245,14 +245,15 @@ namespace wrench {
         // Go through the currently running jobs
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> queue_state;
         for (auto const &j : this->running_jobs) {
+            auto batch_job = j.second;
             auto tuple = std::make_tuple(
-                    j->getUsername(),
-                    j->getCompoundJob()->getName(),
-                    j->getRequestedNumNodes(),
-                    j->getRequestedCoresPerNode(),
-                    j->getRequestedTime(),
-                    j->getArrivalTimestamp(),
-                    j->getBeginTimestamp()
+                    batch_job->getUsername(),
+                    batch_job->getCompoundJob()->getName(),
+                    batch_job->getRequestedNumNodes(),
+                    batch_job->getRequestedCoresPerNode(),
+                    batch_job->getRequestedTime(),
+                    batch_job->getArrivalTimestamp(),
+                    batch_job->getBeginTimestamp()
             );
             queue_state.push_back(tuple);
         }
@@ -499,14 +500,7 @@ namespace wrench {
                                                                  std::shared_ptr<FailureCause> cause) {
         WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
-        // TODO: Replace my a map
-        std::shared_ptr<BatchJob> batch_job = nullptr;
-        for (auto const &j : this->all_jobs) {
-            if (j->getCompoundJob() == job) {
-                batch_job = j;
-                break;
-            }
-        }
+        std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
         this->scheduler->processJobFailure(batch_job);
 
@@ -541,54 +535,33 @@ namespace wrench {
      * @param job
      */
     void BatchComputeService::removeJobFromRunningList(std::shared_ptr<BatchJob> job) {
-        if (this->running_jobs.find(job) == this->running_jobs.end()) {
+        if (this->running_jobs.find(job->getCompoundJob()) == this->running_jobs.end()) {
             throw std::runtime_error("BatchComputeService::removeJobFromRunningList(): Cannot find job!");
         }
-        this->running_jobs.erase(job);
+        this->running_jobs.erase(job->getCompoundJob());
     }
 
     /**
      *
      * @param job
      */
-    void BatchComputeService::removeBatchJobFromJobsList(std::shared_ptr<BatchJob> job) {
-        if (job == nullptr) {
+    void BatchComputeService::removeBatchJobFromJobsList(std::shared_ptr<BatchJob> batch_job) {
+        if (batch_job == nullptr) {
             return;
         }
-
-        // TODO: Replace this by some map?
-        for (auto const &j: this->all_jobs) {
-            if (j->getCompoundJob() == job->getCompoundJob()) {
-                this->all_jobs.erase(j);
-                break;
-            }
-        }
+        this->all_jobs.erase(batch_job->getCompoundJob());
     }
 
-//    /**
-//     *
-//     * @param job
-//     */
-//    void BatchComputeService::processPilotJobTimeout(std::shared_ptr<PilotJob> job) {
-//        auto cs = job->getComputeService();
-//        if (cs == nullptr) {
-//            throw std::runtime_error(
-//                    "BatchComputeService::terminate(): can't find compute service associated to pilot job");
-//        }
-//        try {
-//            cs->stop(false);
-//        } catch (wrench::ExecutionException &e) {}
-//    }
 
     /**
      *
      * @param job
      */
-    void BatchComputeService::processCompoundJobTimeout(std::shared_ptr<CompoundJob> job) {
+    void BatchComputeService::processCompoundJobTimeout(std::shared_ptr<CompoundJob> compound_job) {
         // TODO: Do a map?
         for (auto it = this->running_bare_metal_one_shot_compute_services.begin();
              it != this->running_bare_metal_one_shot_compute_services.end(); it++) {
-            if ((*it)->job == job) {
+            if ((*it)->job == compound_job) {
                 // I'll get a bunch fo failure notifications, which is fine
                 (*it)->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
 //                this->running_bare_metal_one_shot_compute_services.erase(it);
@@ -634,7 +607,8 @@ namespace wrench {
         {
             std::vector<std::shared_ptr<BatchJob>> to_erase;
             for (auto const &j : this->running_jobs) {
-                auto compound_job = j->getCompoundJob();
+                auto bach_job = j.second;
+                auto compound_job = bach_job->getCompoundJob();
                 terminateRunningCompoundJob(compound_job, termination_cause);
                 // Popping, because I am terminating it, so the executor won't pop, and right now
                 // if I am at the top of the stack!
@@ -644,15 +618,15 @@ namespace wrench {
                 if (send_failure_notifications) {
                     WRENCH_INFO("SENDING FAILURE NOTIFICATION");
                     this->sendCompoundJobFailureNotification(
-                            compound_job, std::to_string(j->getJobID()),
+                            compound_job, std::to_string(bach_job->getJobID()),
                             std::shared_ptr<FailureCause>(
                                     new JobKilled(compound_job)));
                 }
-                to_erase.push_back(j);
+                to_erase.push_back(bach_job);
             }
 
             for (auto const &j : to_erase) {
-                this->running_jobs.erase(j);
+                this->running_jobs.erase(j->getCompoundJob());
                 this->removeBatchJobFromJobsList(j);
             }
             to_erase.clear();
@@ -939,130 +913,12 @@ namespace wrench {
         job->setRequestedTime(job->getRequestedTime() +
                               this->getPropertyValueAsUnsignedLong(
                                       BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY));
-        this->all_jobs.insert(job);
+        this->all_jobs[job->getCompoundJob()] = job;
         this->batch_queue.push_back(job);
 
         this->scheduler->processJobSubmission(job);
     }
 
-//    /**
-//     * @brief Process a pilot job completion
-//     *
-//     * @param job: the pilot job
-//     */
-//    void BatchComputeService::processPilotJobCompletion(std::shared_ptr<PilotJob> job) {
-//        // Remove the job from the running job list
-//        std::shared_ptr<BatchJob> batch_job = nullptr;
-//        for (auto const &rj : this->running_jobs) {
-//            if (rj->getCompoundJob() == job) {
-//                batch_job = rj;
-//                break;
-//            }
-//        }
-//
-//        if (batch_job == nullptr) {
-//            throw std::runtime_error(
-//                    "BatchComputeService::processPilotJobCompletion():  Pilot job completion message received "
-//                    "but no such pilot jobs found in queue"
-//            );
-//        }
-//
-//        this->removeJobFromRunningList(batch_job);
-//        this->freeUpResources(batch_job->getResourcesAllocated());
-//        if (this->pilot_job_alarms[job->getName()] != nullptr) {
-//            this->pilot_job_alarms[job->getName()]->kill();
-//            this->pilot_job_alarms.erase(job->getName());
-//        }
-//
-//        // Let the scheduler know about the job completion
-//        this->scheduler->processJobCompletion(batch_job);
-//
-//        // Forward the notification
-//        try {
-//            this->sendPilotJobExpirationNotification(job);
-//        } catch (std::runtime_error &e) {}
-//    }
-
-//    /**
-//     * @brief Process a pilot job termination request
-//     *
-//     * @param job: the job to terminate
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     */
-//    void BatchComputeService::processPilotJobTerminationRequest(
-//            std::shared_ptr<PilotJob> job, std::string answer_mailbox) {
-//        std::string job_id;
-//        for (auto it = this->batch_queue.begin(); it != this->batch_queue.end(); it++) {
-//            if ((*it)->getCompoundJob() == job) {
-//                auto *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-//                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
-//                        this->getMessagePayloadValue(
-//                                BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-//                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//
-//                // notify scheduler of job termination
-//                this->scheduler->processJobTermination(*it);
-//
-//                std::shared_ptr<BatchJob> to_erase = *it;
-//                this->batch_queue.erase(it);
-//                this->removeBatchJobFromJobsList(to_erase);
-//                return;
-//            }
-//        }
-//
-//        for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
-//            if ((*it2)->getCompoundJob() == job) {
-//                auto answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-//                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
-//                        this->getMessagePayloadValue(
-//                                BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-//                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//                // forward this notification to batsched
-//                this->scheduler->processJobTermination(*it2);
-//                auto to_erase = *it2;
-//                this->waiting_jobs.erase(it2);
-//                this->removeBatchJobFromJobsList(to_erase);
-//                return;
-//            }
-//        }
-//
-//        for (auto it1 = this->running_jobs.begin(); it1 != this->running_jobs.end();) {
-//            if ((*it1)->getCompoundJob() == job) {
-//                this->processPilotJobTimeout(std::dynamic_pointer_cast<PilotJob>((*it1)->getCompoundJob()));
-//                // Update the cores count in the available resources
-//                std::map<std::string, std::tuple<unsigned long, double>> resources = (*it1)->getResourcesAllocated();
-//                for (auto r : resources) {
-//                    this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
-//                }
-//                auto answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-//                        job, this->getSharedPtr<BatchComputeService>(), true, nullptr,
-//                        this->getMessagePayloadValue(
-//                                BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-//                S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//
-//
-//                this->scheduler->processJobTermination(*it1);
-//
-//                //this is the list of unique pointers
-//                auto to_erase = *it1;
-//                this->running_jobs.erase(it1);
-//                this->removeBatchJobFromJobsList(to_erase);
-//                return;
-//            } else {
-//                ++it1;
-//            }
-//        }
-//
-//        // If we got here, we're in trouble
-//        WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
-//        std::string msg = "Job cannot be terminated because it's neither pending nor running";
-//        auto answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-//                job, this->getSharedPtr<BatchComputeService>(), false,
-//                std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
-//                this->getMessagePayloadValue(
-//                        BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//    }
 
     /**
      * @brief Process a standard job completion
@@ -1100,19 +956,13 @@ namespace wrench {
         }
 
         // Look for the corresponding batch_standard_and_pilot_jobs job
-        std::shared_ptr<BatchJob> batch_job = nullptr;
-        for (auto const &rj : this->running_jobs) {
-            if (rj->getCompoundJob() == job) {
-                batch_job = rj;
-                break;
-            }
-        }
-
-        if (batch_job == nullptr) {
+        if (this->running_jobs.find(job) == this->running_jobs.end()) {
             throw std::runtime_error(
                     "BatchComputeService::processCompoundJobCompletion(): Received a compound job completion, "
                     "but the job is not in the running job list");
         }
+
+        auto batch_job = this->running_jobs[job];
 
         WRENCH_INFO("A compound job executor has completed job %s", job->getName().c_str());
 
@@ -1182,19 +1032,12 @@ namespace wrench {
         }
 
         // Free up resources (by finding the corresponding BatchJob)
-        std::shared_ptr<BatchJob> batch_job = nullptr;
-        // TODO: to a map
-        for (auto const &rj : this->running_jobs) {
-            if (rj->getCompoundJob() == job) {
-                batch_job = rj;
-            }
-        }
-
-        if (batch_job == nullptr) {
+        if (this->running_jobs.find(job) == this->running_jobs.end()) {
             throw std::runtime_error(
                     "BatchComputeService::processCompoundJobFailure(): Received a compound job failure, "
                     "but the job is not in the running job list");
         }
+        auto batch_job = this->running_jobs[job];
 
         this->freeUpResources(batch_job->getResourcesAllocated());
         this->removeJobFromRunningList(batch_job);
@@ -1276,73 +1119,7 @@ namespace wrench {
                                                                       this->mailbox_name, msg,
                                                                       "batch_standard");
         compound_job_alarms[compound_job] = alarm_ptr;
-        return;
 
-//        } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(workflow_job)) {
-//            // pilot job
-//            WRENCH_INFO(
-//                    "Allocating %ld nodes with %ld cores per node to a pilot job for %lu seconds",
-//                    num_nodes_allocated, cores_per_node_asked_for, allocated_time);
-//
-//            std::vector<std::string> nodes_for_pilot_job = {};
-//            for (auto r : resources) {
-//                nodes_for_pilot_job.push_back(std::get<0>(r));
-//            }
-//            std::string host_to_run_on = nodes_for_pilot_job[0];
-//
-//            //set the ending timestamp of the batchjob (pilotjob)
-//
-//            // Create and launch a compute service for the pilot job
-//            // (We use a TTL for user information purposes, but an alarm will take care of this)
-//            std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-//                    new BareMetalComputeService(
-//                            host_to_run_on,
-//                            resources,
-//                            {{BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
-//                             {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,    "false"}},
-//                            {},
-//                            allocated_time, pjob, "pilot_job", getScratch()
-//                    ));
-//            cs->setSimulation(this->simulation);
-//            pjob->setComputeService(cs);
-//
-//            try {
-//                cs->start(cs, true, false); // Daemonized, no auto-restart
-//                batch_job->setBeginTimestamp(S4U_Simulation::getClock());
-//                double ending_timestamp = S4U_Simulation::getClock() + (double) allocated_time;
-//                batch_job->setEndingTimestamp(ending_timestamp);
-//            } catch (std::runtime_error &e) {
-//                throw;
-//            }
-//
-//            // Put the job in the running queue
-////          this->running_jobs.insert(std::move(batch_job_ptr));
-//            this->timeslots.push_back(batch_job->getEndingTimestamp());
-//
-//            //remember the allocated resources for the job
-//            batch_job->setAllocatedResources(resources);
-//
-//            // Send the "Pilot job has started" callback
-//            // Note the getCallbackMailbox instead of the popCallbackMailbox, because
-//            // there will be another callback upon termination.
-//            S4U_Mailbox::dputMessage(
-//                    pjob->getCallbackMailbox(),
-//                    new ComputeServicePilotJobStartedMessage(
-//                            pjob, this->getSharedPtr<BatchComputeService>(),
-//                            this->getMessagePayloadValue(
-//                                    BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-//
-//            SimulationMessage *msg =
-//                    new AlarmJobTimeOutMessage(batch_job, 0);
-//
-//            std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
-//                                                                          batch_job->getEndingTimestamp(),
-//                                                                          host_to_run_on,
-//                                                                          this->mailbox_name, msg,
-//                                                                          "batch_pilot");
-//
-//            this->pilot_job_alarms[pjob->getName()] = alarm_ptr;
-//        }
     }
 
     /**
@@ -1450,40 +1227,40 @@ namespace wrench {
         std::shared_ptr<BatchJob> batch_job = nullptr;
         // Is it running?
         bool is_running = false;
-        // TODO: ALL BELOW in maps!
-        for (auto const &j : this->running_jobs) {
-            auto cj = j->getCompoundJob();
-            if (cj == job) {
-                batch_job = j;
-                is_running = true;
-                break;
-            }
+        bool is_pending = false;
+        bool is_waiting = false;
+        auto batch_pending_it = this->batch_queue.end();
+
+        if (this->running_jobs.find(job) != this->running_jobs.end()) {
+            batch_job = this->running_jobs[job];
+            is_running = true;
         }
 
-        bool is_pending = false;
-        auto batch_pending_it = this->batch_queue.end();
-        if (batch_job == nullptr) {
-            // Is it pending?
-            for (auto it1 = this->batch_queue.begin(); it1 != this->batch_queue.end(); it1++) {
-                auto compound_job = (*it1)->getCompoundJob();
-                if (compound_job == job) {
-                    batch_pending_it = it1;
-                    is_pending = true;
-                    break;
+        if (not is_running) {
+
+            if (batch_job == nullptr) {
+                // Is it pending?
+                for (auto it1 = this->batch_queue.begin(); it1 != this->batch_queue.end(); it1++) {
+                    auto compound_job = (*it1)->getCompoundJob();
+                    if (compound_job == job) {
+                        batch_pending_it = it1;
+                        is_pending = true;
+                        break;
+                    }
                 }
             }
-        }
 
-        bool is_waiting = false;
-
-        if (batch_job == nullptr && batch_pending_it == this->batch_queue.end()) {
-            // Is it waiting?
-            for (auto const &j : this->waiting_jobs) {
-                auto compound_job = j->getCompoundJob();
-                if (compound_job == job) {
-                    batch_job = j;
-                    is_waiting = true;
-                    break;
+            if (not is_pending) {
+                if (batch_job == nullptr && batch_pending_it == this->batch_queue.end()) {
+                    // Is it waiting?
+                    for (auto const &j : this->waiting_jobs) {
+                        auto compound_job = j->getCompoundJob();
+                        if (compound_job == job) {
+                            batch_job = j;
+                            is_waiting = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -1509,11 +1286,11 @@ namespace wrench {
             this->scheduler->processJobTermination(batch_job);
             terminateRunningCompoundJob(job, ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
             this->freeUpResources(batch_job->getResourcesAllocated());
-            this->running_jobs.erase(batch_job);
+            this->running_jobs.erase(batch_job->getCompoundJob());
             this->removeBatchJobFromJobsList(batch_job);
         }
         if (is_pending) {
-            this->scheduler->processJobTermination(*batch_pending_it);
+            this->scheduler->processJobTermination((*batch_pending_it));
             auto to_free = *batch_pending_it;
             this->batch_queue.erase(batch_pending_it);
             this->removeBatchJobFromJobsList(to_free);
@@ -1536,28 +1313,25 @@ namespace wrench {
      * @brief Process a Batch bach_job timeout
      * @param bach_job: the batch_standard_and_pilot_jobs bach_job
      */
-    void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> bach_job) {
-        if (this->running_jobs.find(bach_job) == this->running_jobs.end()) {
+    void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> batch_job) {
+
+        std::shared_ptr<CompoundJob> compound_job = nullptr;
+
+        for (auto const &j : this->running_jobs) {
+            if (j.second == batch_job) {
+                compound_job = j.first;
+                break;
+            }
+        }
+        if (not compound_job) {
             // time out
             WRENCH_INFO(
                     "BatchComputeService::processAlarmJobTimeout(): Received a time out message for an unknown "
                     "batch_standard_and_pilot_jobs bach_job (%ld)... ignoring",
-                    (unsigned long) bach_job.get());
+                    (unsigned long) batch_job.get());
             return;
         }
-        auto compound_job = bach_job->getCompoundJob();
-
         this->processCompoundJobTimeout(compound_job);
-
-        // We will get job failed messages stuff and process then
-//        this->removeJobFromRunningList(bach_job);
-//        this->freeUpResources(bach_job->getResourcesAllocated());
-//        this->sendCompoundJobFailureNotification(compound_job,
-//                                                 std::to_string(bach_job->getJobID()),
-//                                                 std::shared_ptr<FailureCause>(
-//                                                         new JobTimeout(bach_job->getCompoundJob())));
-        return;
-
 
     }
 
@@ -1575,7 +1349,7 @@ namespace wrench {
                 batch_job = (*it1);
                 compound_job = batch_job->getCompoundJob();
                 this->waiting_jobs.erase(batch_job);
-                this->running_jobs.insert(batch_job);
+                this->running_jobs[batch_job->getCompoundJob()] = batch_job;
                 break;
             }
         }
