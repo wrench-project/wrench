@@ -141,10 +141,6 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
 
-//        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override {};
-
-//        void terminatePilotJob(std::shared_ptr<PilotJob> job) override {};
-
     private:
         friend class WorkloadTraceFileReplayer;
         friend class FCFSBatchScheduler;
@@ -163,14 +159,8 @@ namespace wrench {
                             std::string suffix
         );
 
-        // helper function
-
         //submits a standard job
         void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &batch_job_args) override;
-
-
-        // helper function
-        void terminateWorkflowJob(std::shared_ptr<Job> job);
 
         // terminate a standard job
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
@@ -183,9 +173,6 @@ namespace wrench {
         //create alarms for compound jobs
         std::map<std::shared_ptr<CompoundJob>,std::shared_ptr<Alarm>> compound_job_alarms;
 
-//        //alarms for pilot jobs (only one pilot job alarm)
-//        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
-
         /* Resources information in batch_standard_and_pilot_jobs */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
@@ -197,17 +184,12 @@ namespace wrench {
         /* End Resources information in batch_standard_and_pilot_jobs */
 
         // Vector of one-shot bare-metal compute services
-        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>> running_bare_metal_one_shot_compute_services;
-
-        // Vector of one-shot bare-metal compute services (which is cleared periodically)
-        std::set<std::shared_ptr<BareMetalComputeServiceOneShot>> finished_bare_metal_one_shot_compute_services;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BareMetalComputeServiceOneShot>> running_bare_metal_one_shot_compute_services;
 
         // Master List of batch_standard_and_pilot_jobs jobs
-//        std::set<std::shared_ptr<BatchJob>>  all_jobs;
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> all_jobs;
 
         //A set of running batch_standard_and_pilot_jobs jobs
-//        std::set<std::shared_ptr<BatchJob>> running_jobs;
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> running_jobs;
 
         // The batch_standard_and_pilot_jobs queue
@@ -274,9 +256,6 @@ namespace wrench {
 
         //Terminate the batch_standard_and_pilot_jobs service (this is usually for pilot jobs when they act as a batch_standard_and_pilot_jobs service)
         void cleanup(bool has_returned_from_main, int return_value) override;
-
-//        // Terminate currently running pilot jobs
-//        void terminateRunningPilotJobs();
 
         // Terminate
         void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
