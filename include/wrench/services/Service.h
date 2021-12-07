@@ -130,32 +130,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         template <class T>
         std::shared_ptr<T> getSharedPtr() {
             return std::dynamic_pointer_cast<T>(this->shared_from_this());
-//            if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
-//                throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
-//                                         "if the service has not been started, in which case this method shouldn't have been called");
-//            }
-//            auto shared_ptr = std::dynamic_pointer_cast<T>(Service::service_shared_ptr_map[this]);
-//            if (not shared_ptr) {
-//                throw std::runtime_error("Service::getSharedPtr(): Invalid provided template");
-//            }
-//            return shared_ptr;
         }
-
-//        /**
-//         * @brief Method to retrieve the shared_ptr to a service based on the service's name (not efficient)
-//         * @tparam T: the class of the service (the base class is Service)
-//         * @param name: the service's name
-//         * @return a shared_ptr (or nullptr if not found)
-//         */
-//        template <class T>
-//        static std::shared_ptr<T> getServiceByName(std::string name) {
-//            for (auto const &s : Service::service_shared_ptr_map) {
-//                if (s.first->getName() == name) {
-//                    return std::dynamic_pointer_cast<T>(s.second);
-//                }
-//            }
-//            return nullptr;
-//        }
 
 
         /** @brief A boolean that indicates if the service is in the middle of shutting down **/
