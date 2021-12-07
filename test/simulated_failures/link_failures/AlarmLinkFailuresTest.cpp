@@ -17,6 +17,7 @@
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 #include "../failure_test_util/ResourceSwitcher.h"
 #include <wms/WMSMessage.h>
+#include <wrench/execution_controller/ExecutionControllerMessage.h>
 
 WRENCH_LOG_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailuresTest");
 
@@ -79,7 +80,7 @@ private:
         // Create an Alarm service that will go of in 10 seconds
         std::string mailbox = this->getWorkflow()->getCallbackMailbox();
         wrench::Alarm::createAndStartAlarm(this->simulation, 10,"Host2", mailbox,
-                                           new wrench::AlarmWMSTimerMessage("hello", 10000), "wms_timer");
+                                           new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
         // Start the link killer that will turn off link1 in 20 seconds
         auto switcher = std::shared_ptr<wrench::ResourceSwitcher>(

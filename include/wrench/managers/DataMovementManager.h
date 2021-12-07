@@ -19,6 +19,7 @@ namespace wrench {
     class Workflow;
     class WorkflowFile;
     class StorageService;
+    class ExecutionController;
     class WMS;
 
     /***********************/
@@ -26,7 +27,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A helper daemon (co-located with a WMS) that handles data movement operations
+     * @brief A helper daemon (co-located with an execution controler) that handles data movement operations
      */
     class DataMovementManager : public Service {
 
@@ -54,6 +55,7 @@ namespace wrench {
         /***********************/
 
         friend class WMS;
+        friend class ExecutionController;
 
         explicit DataMovementManager(std::string hostname, std::string &creator_mailbox);
 
@@ -65,9 +67,7 @@ namespace wrench {
 
         int main() override;
 
-//        std::shared_ptr<WMS> wms = nullptr;
         std::string &getCreatorMailbox();
-
 
         std::string creator_mailbox;
 

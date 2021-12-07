@@ -24,6 +24,8 @@ namespace wrench {
 
     class WMS;
 
+    class ExecutionController;
+
     class Workflow;
 
     class WorkflowTask;
@@ -48,13 +50,12 @@ namespace wrench {
 
 
     /**
- * @brief A helper daemon (co-located with and explicitly started by a WMS), which is used to
+ * @brief A helper daemon (co-located with and explicitly started by an execution controller), which is used to
  *        handle all job executions
  */
     class JobManager : public Service {
 
     public:
-
 
         void stop() override;
 
@@ -108,13 +109,6 @@ namespace wrench {
 
         void terminateJob(std::shared_ptr<PilotJob> job);
 
-
-//        void forgetJob(Job *job);
-
-//        std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
-
-//        std::shared_ptr<WMS> getWMS();
-
         std::string &getCreatorMailbox();
 
         unsigned long getNumRunningPilotJobs();
@@ -127,9 +121,9 @@ namespace wrench {
 
     protected:
 
+        friend class ExecutionController;
         friend class WMS;
 
-//        explicit JobManager(std::shared_ptr<WMS> wms);
         explicit JobManager(std::string hostname, std::string &creator_mailbox);
 
         /***********************/
