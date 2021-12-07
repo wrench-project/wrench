@@ -24,7 +24,7 @@
  *
  * @param full_log: whether to show all simulation log
  * @param platform_xml: XML platform description (an XML string - not a file path)
- * @param controller_host: hostname of the host that will run the controller
+ * @param controller_host: hostname of the host that will run the execution_controller
  * @param sleep_us: number of microseconds to sleep at each iteration of the main loop
  */
 void SimulationLauncher::createSimulation(bool full_log,
@@ -63,16 +63,16 @@ void SimulationLauncher::createSimulation(bool full_log,
             throw std::runtime_error(e.what());
         }
 
-        // Check that the controller host exists
+        // Check that the execution_controller host exists
         if (not wrench::Simulation::doesHostExist(controller_host)) {
-            throw std::runtime_error("The platform does not contain a (controller) host with name " + controller_host);
+            throw std::runtime_error("The platform does not contain a (execution_controller) host with name " + controller_host);
         }
 
-        // Create a controller and add it to the simulation
+        // Create a execution_controller and add it to the simulation
         this->controller = simulation.add(
                 new wrench::SimulationController(controller_host, sleep_us));
 
-        // Add an empty workflow to the controller
+        // Add an empty workflow to the execution_controller
         this->controller->addWorkflow(new wrench::Workflow());
 
     } catch (std::exception &e) {

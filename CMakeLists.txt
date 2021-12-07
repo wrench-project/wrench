@@ -185,6 +185,8 @@ set(HEADER_FILES
         include/wrench/workflow/parallel_model/AmdahlParallelModel.h
         include/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h
         include/wrench/workflow/parallel_model/CustomParallelModel.h
+        include/wrench/execution_controller/ExecutionController.h
+        include/wrench/execution_controller/ExecutionControllerMessage.h
         )
 
 # source files
@@ -351,6 +353,8 @@ set(SOURCE_FILES
         src/wrench/action/FileRegistryAction.cpp
         src/wrench/action/ComputeAction.cpp
         src/wrench/job/Job.cpp
+        src/wrench/execution_controller/ExecutionController.cpp
+        src/wrench/execution_controller/ExecutionControllerMessage.cpp
         )
 
 # test files
@@ -432,7 +436,7 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         test/misc/BogusMessageTest.cpp
-        examples/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
+        examples/workflow_api/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp

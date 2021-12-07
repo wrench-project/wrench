@@ -1,20 +1,21 @@
 # list of examples
 set(EXAMPLES_CMAKEFILES_TXT
-        examples/basic-examples/bare-metal-chain/CMakeLists.txt
-        examples/basic-examples/bare-metal-chain-scratch/CMakeLists.txt
-        examples/basic-examples/bare-metal-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeLists.txt
-        examples/basic-examples/bare-metal-multicore-tasks/CMakeLists.txt
-        examples/basic-examples/bare-metal-complex-job/CMakeLists.txt
-        examples/basic-examples/bare-metal-data-movement/CMakeLists.txt
-        examples/basic-examples/cloud-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/cloud-bag-of-tasks-energy/CMakeLists.txt
-        examples/basic-examples/virtualized-cluster-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/batch-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/batch-pilot-job/CMakeLists.txt
-        examples/real-workflow-example/CMakeLists.txt
-        examples/condor-grid-example/CMakeLists.txt
-        examples/basic-examples/io-pagecache/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-chain/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-multicore-tasks/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-complex-job/CMakeLists.txt
+        examples/workflow_api/basic-examples/bare-metal-data-movement/CMakeLists.txt
+        examples/workflow_api/basic-examples/cloud-bag-of-tasks/CMakeLists.txt
+        examples/workflow_api/basic-examples/cloud-bag-of-tasks-energy/CMakeLists.txt
+        examples/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/CMakeLists.txt
+        examples/workflow_api/basic-examples/batch-bag-of-tasks/CMakeLists.txt
+        examples/workflow_api/basic-examples/batch-pilot-job/CMakeLists.txt
+        examples/workflow_api/real-workflow-example/CMakeLists.txt
+        examples/workflow_api/condor-grid-example/CMakeLists.txt
+        examples/workflow_api/basic-examples/io-pagecache/CMakeLists.txt
+        examples/action_api/multi-action-multi-job-example/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})

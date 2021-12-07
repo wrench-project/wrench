@@ -35,7 +35,7 @@ using json = nlohmann::json;
  * @param simulation_logging true if simulation logging should be printed
  * @param daemon_logging true if daemon logging should be printed
  * @param port_number port number on which to listen
- * @param sleep_us number of micro-seconds or real time that the simulation daemon's simulation controller
+ * @param sleep_us number of micro-seconds or real time that the simulation daemon's simulation execution_controller
  *        thread should sleep at each iteration
  */
 WRENCHDaemon::WRENCHDaemon(bool simulation_logging,
@@ -146,7 +146,7 @@ std::string readStringFromSharedMemorySegment(int shm_segment_id) {
  *       "purpose": "Start a new simulation",
  *       "json_input": {
  *         "platform_xml": ["string", "XML description of the simulated platform (using the SimGrid DTD)"],
- *         "controller_hostname": ["string", "Name of the host in the simulated platform that runs the simulation controller"]
+ *         "controller_hostname": ["string", "Name of the host in the simulated platform that runs the simulation execution_controller"]
  *       },
  *       "json_output": {
  *         "port_number": ["int", "port number to which all subsequent HTTP Post requests should be sent"]

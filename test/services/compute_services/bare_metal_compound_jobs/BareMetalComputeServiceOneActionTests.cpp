@@ -127,13 +127,11 @@ protected:
 /**  BAD SETUP SIMULATION TEST                                       **/
 /**********************************************************************/
 
-class BareMetalBadSetupTestWMS : public wrench::WMS {
+class BareMetalBadSetupTestExecutionController : public wrench::ExecutionController {
 public:
-    BareMetalBadSetupTestWMS(BareMetalComputeServiceOneActionTest *test,
-                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+    BareMetalBadSetupTestExecutionController(BareMetalComputeServiceOneActionTest *test,
                     std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -165,7 +163,9 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
 
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
+
     ASSERT_THROW(simulation->launch(), std::runtime_error);
+
 
     argc = 1;
     argv = (char **) calloc(argc, sizeof(char *));
@@ -249,17 +249,12 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
                                                 },
                                                 {})), std::invalid_argument);
 
-    // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new BareMetalBadSetupTestWMS(this,
-                                                              {}, {}, hostname)));
+    // Create an Execution Controller
+    std::shared_ptr<wrench::ExecutionController> controller = nullptr;
+    ASSERT_NO_THROW(controller = simulation->add(new BareMetalBadSetupTestExecutionController(this, hostname)));
 
-    ASSERT_THROW(wms->addWorkflow(nullptr), std::invalid_argument);
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
-    ASSERT_THROW(wms->addWorkflow(this->workflow), std::invalid_argument);
-
-    // Running a "run a single task1" simulation
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    // Run a do nothing simulation, because why not
+    ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
 

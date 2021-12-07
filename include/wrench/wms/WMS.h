@@ -12,7 +12,7 @@
 
 #include "wrench/services/metering/EnergyMeterService.h"
 #include "wrench/services/metering/BandwidthMeterService.h"
-#include "wrench/services/Service.h"
+#include "wrench/execution_controller/ExecutionController.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
@@ -42,7 +42,7 @@ namespace wrench {
     /**
      * @brief A workflow management system (WMS)
      */
-    class WMS : public Service {
+    class WMS : public ExecutionController {
 
     public:
         void addWorkflow(Workflow *workflow, double start_time = 0);
@@ -72,15 +72,6 @@ namespace wrench {
 
 
         void checkDeferredStart();
-
-        void setTimer(double date, std::string message);
-
-        std::shared_ptr<JobManager> createJobManager();
-        std::shared_ptr<DataMovementManager> createDataMovementManager();
-        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
-        std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::vector<std::string> &hostnames, double measurement_period);
-        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::map<std::string, double> &measurement_periods);
-        std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period);
 
         void runDynamicOptimizations();
 
@@ -112,27 +103,6 @@ namespace wrench {
             return to_return;
         }
 
-        // The template specialization below does not compile with gcc, hence the above method!
-        
-//        /**
-//         * @brief Obtain the list of compute services available to the WMS
-//         * @tparam CloudComputeService
-//         * @return a set of compute services
-//         * @return
-//         */
-//        template <>
-//        std::set<std::shared_ptr<CloudComputeService>> getAvailableComputeServices<CloudComputeService>() {
-//            std::set<std::shared_ptr<CloudComputeService>> to_return;
-//            for (auto const &h : this->compute_services) {
-//                auto shared_ptr_cloud = std::dynamic_pointer_cast<CloudComputeService>(h);
-//                auto shared_ptr_vc = std::dynamic_pointer_cast<VirtualizedClusterComputeService>(h);
-//                if (shared_ptr_cloud and (not shared_ptr_vc)) {
-//                    to_return.insert(shared_ptr_cloud);
-//                }
-//            }
-//            return to_return;
-//        }
-
 
         std::set<std::shared_ptr<StorageService>> getAvailableStorageServices();
         std::set<std::shared_ptr<NetworkProximityService>> getAvailableNetworkProximityServices();
@@ -140,8 +110,7 @@ namespace wrench {
 
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
-        std::shared_ptr<ExecutionEvent>  waitForNextEvent();
-        std::shared_ptr<ExecutionEvent>  waitForNextEvent(double timeout);
+
         virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
 
         virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
@@ -155,6 +124,9 @@ namespace wrench {
         virtual void processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
 
         virtual void processEventTimer(std::shared_ptr<TimerEvent>);
+
+        std::shared_ptr<JobManager> createJobManager() override;
+        std::shared_ptr<DataMovementManager> createDataMovementManager() override;
 
         /***********************/
         /** \endcond           */
@@ -198,8 +170,8 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-    private:
-        virtual int main() = 0;
+//    private:
+//        virtual int main() override = 0 ;
 
     };
 

@@ -32,7 +32,7 @@ namespace wrench {
             WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "SimulationController"), sleep_us(sleep_us) {}
 
     /**
-     * @brief Simulation controller's main method
+     * @brief Simulation execution_controller's main method
      * 
      * @return exit code
      */
@@ -226,7 +226,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::waitForNextSimulationEvent(json data) {
-        // Set the time horizon to -1, to signify the "wait for next event" to the controller
+        // Set the time horizon to -1, to signify the "wait for next event" to the execution_controller
         time_horizon_to_reach = -1.0;
         // Wait for and grab the next event
         std::pair<double, std::shared_ptr<wrench::ExecutionEvent>> event;

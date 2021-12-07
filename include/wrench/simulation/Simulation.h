@@ -33,7 +33,7 @@ namespace wrench {
     class BareMetalComputeService;
     class CloudComputeService;
     class VirtualizedClusterComputeService;
-    class WMS;
+    class ExecutionController;
     class WorkflowFile;
     class SimulationOutput;
     class S4U_Simulation;
@@ -170,7 +170,7 @@ namespace wrench {
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
-        std::set<std::shared_ptr<WMS>> wmses;
+        std::set<std::shared_ptr<ExecutionController>> execution_controllers;
 
         std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
 
@@ -198,7 +198,7 @@ namespace wrench {
         void addService(std::shared_ptr<ComputeService> service);
         void addService(std::shared_ptr<StorageService> service);
         void addService(std::shared_ptr<NetworkProximityService> service);
-        void addService(std::shared_ptr<WMS> service);
+        void addService(std::shared_ptr<ExecutionController> service);
         void addService(std::shared_ptr<FileRegistryService> service);
         void addService(std::shared_ptr<EnergyMeterService> service);
         void addService(std::shared_ptr<BandwidthMeterService> service);
