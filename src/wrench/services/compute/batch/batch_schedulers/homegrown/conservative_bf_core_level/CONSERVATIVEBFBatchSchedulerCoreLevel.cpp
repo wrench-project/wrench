@@ -110,7 +110,7 @@ namespace wrench {
             this->cs->removeJobFromBatchQueue(batch_job);
 
             // Add it to the running list
-            this->cs->running_jobs.insert(batch_job);
+            this->cs->running_jobs[batch_job->getCompoundJob()] = batch_job;
 
             // Start it!
             this->cs->startJob(resources, compound_job, batch_job, num_nodes_asked_for, requested_time,

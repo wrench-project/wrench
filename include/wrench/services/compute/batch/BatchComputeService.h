@@ -203,10 +203,12 @@ namespace wrench {
         std::set<std::shared_ptr<BareMetalComputeServiceOneShot>> finished_bare_metal_one_shot_compute_services;
 
         // Master List of batch_standard_and_pilot_jobs jobs
-        std::set<std::shared_ptr<BatchJob>>  all_jobs;
+//        std::set<std::shared_ptr<BatchJob>>  all_jobs;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> all_jobs;
 
         //A set of running batch_standard_and_pilot_jobs jobs
-        std::set<std::shared_ptr<BatchJob>> running_jobs;
+//        std::set<std::shared_ptr<BatchJob>> running_jobs;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> running_jobs;
 
         // The batch_standard_and_pilot_jobs queue
         std::deque<std::shared_ptr<BatchJob>> batch_queue;
