@@ -63,7 +63,7 @@ namespace wrench {
         std::shared_ptr<CompoundJob> createCompoundJob(std::string name);
 
         std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
+                                                       const std::map<WorkflowFile *, std::shared_ptr<FileLocation> >& file_locations,
                                                        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
                                                        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
                                                        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);

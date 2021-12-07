@@ -262,7 +262,6 @@ namespace wrench {
     void CompoundJob::addAction(std::shared_ptr<Action> action) {
         assertJobNotSubmitted();
         assertActionNameDoesNotAlreadyExist(action->getName());
-        action->setSharedPtrThis(action);
         action->setState(Action::State::READY);
         this->actions.insert(action);
         this->name_map[action->getName()] = action;
