@@ -63,13 +63,13 @@ namespace wrench {
     */
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file,
+        StorageServiceFileLookupRequestMessage(std::string answer_mailbox, std::shared_ptr<DataFile>file,
                                                std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to lookup */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The file location (hopefully) */
         std::shared_ptr<FileLocation> location;
     };
@@ -79,10 +79,10 @@ namespace wrench {
      */
     class StorageServiceFileLookupAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileLookupAnswerMessage(WorkflowFile *file, bool file_is_available, double payload);
+        StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile>file, bool file_is_available, double payload);
 
         /** @brief The file that was looked up */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief Whether the file was found */
         bool file_is_available;
     };
@@ -93,14 +93,14 @@ namespace wrench {
     class StorageServiceFileDeleteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
-                                               WorkflowFile *file,
+                                               std::shared_ptr<DataFile>file,
                                                std::shared_ptr<FileLocation> location,
                                                double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to delete */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The location where the file will be deleted */
         std::shared_ptr<FileLocation> location;
     };
@@ -110,14 +110,14 @@ namespace wrench {
      */
     class StorageServiceFileDeleteAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
+        StorageServiceFileDeleteAnswerMessage(std::shared_ptr<DataFile>file,
                                               std::shared_ptr<StorageService> storage_service,
                                               bool success,
                                               std::shared_ptr<FailureCause> failure_cause,
                                               double payload);
 
         /** @brief The file that was deleted (or not) */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The storage service on which the deletion happened (or not) */
         std::shared_ptr<StorageService> storage_service;
         /** @brief Whether the deletion was successful */
@@ -131,7 +131,7 @@ namespace wrench {
     */
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file,
+        StorageServiceFileCopyRequestMessage(std::string answer_mailbox, std::shared_ptr<DataFile>file,
                                              std::shared_ptr<FileLocation> src,
                                              std::shared_ptr<FileLocation> dst,
                                              std::shared_ptr<FileRegistryService> file_registry_service,
@@ -140,7 +140,7 @@ namespace wrench {
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to copy */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
@@ -154,7 +154,7 @@ namespace wrench {
      */
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
+        StorageServiceFileCopyAnswerMessage(std::shared_ptr<DataFile>file,
                                             std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst,
                                             std::shared_ptr<FileRegistryService> file_registry_service,
@@ -163,7 +163,7 @@ namespace wrench {
                                             double payload);
 
         /** @brief The file was was copied, or not */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
@@ -187,7 +187,7 @@ namespace wrench {
     class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
-                                              WorkflowFile *file,
+                                              std::shared_ptr<DataFile>file,
                                               std::shared_ptr<FileLocation> location,
                                               unsigned long buffer_size,
                                               double payload);
@@ -195,7 +195,7 @@ namespace wrench {
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to write */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The location to write the file to */
         std::shared_ptr<FileLocation> location;
         /** @brief The buffer size to use */
@@ -207,7 +207,7 @@ namespace wrench {
      */
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
+        StorageServiceFileWriteAnswerMessage(std::shared_ptr<DataFile>file,
                                              std::shared_ptr<FileLocation> location,
                                              bool success,
                                              std::shared_ptr<FailureCause> failure_cause,
@@ -215,7 +215,7 @@ namespace wrench {
                                              double payload);
 
         /** @brief The workflow file that should be written */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The location at which the file should be written */
         std::shared_ptr<FileLocation> location;
         /** @brief Whether the write operation request was accepted or not */
@@ -233,7 +233,7 @@ namespace wrench {
     public:
         StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                              std::string mailbox_to_receive_the_file_content,
-                                             WorkflowFile *file,
+                                             std::shared_ptr<DataFile>file,
                                              std::shared_ptr<FileLocation> location,
                                              unsigned long buffer_size,
                                              double payload);
@@ -243,7 +243,7 @@ namespace wrench {
         /** @brief The mailbox to which the file content should be sent */
         std::string mailbox_to_receive_the_file_content;
         /** @brief The file to read */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The location from which to  read the file */
        std::shared_ptr<FileLocation> location;
         /** @brief The requested buffer size */
@@ -255,14 +255,14 @@ namespace wrench {
      */
     class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileReadAnswerMessage(WorkflowFile *file,
+        StorageServiceFileReadAnswerMessage(std::shared_ptr<DataFile>file,
                                             std::shared_ptr<FileLocation> location,
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
                                             double payload);
 
         /** @brief The file that was read */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The location of the file */
         std::shared_ptr<FileLocation> location;
         /** @brief Whether the read operation was successful or not */
@@ -276,11 +276,11 @@ namespace wrench {
     */
     class StorageServiceFileContentChunkMessage : public StorageServiceMessage {
     public:
-        explicit StorageServiceFileContentChunkMessage(WorkflowFile *file,
+        explicit StorageServiceFileContentChunkMessage(std::shared_ptr<DataFile>file,
                 unsigned long chunk_size, bool last_chunk);
 
         /** @brief The file */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief Whether this is the last file chunk */
         bool last_chunk;
     };

@@ -16,7 +16,7 @@
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
     class FileLocation;
     class FileRegistryService;
 
@@ -26,7 +26,7 @@ namespace wrench {
     class FileRegistryAction : public Action {
 
     public:
-        WorkflowFile *getFile() const;
+        std::shared_ptr<DataFile>getFile() const;
         std::shared_ptr<FileLocation> getFileLocation() const;
         std::shared_ptr<FileRegistryService> getFileRegistryService() const;
 
@@ -45,7 +45,7 @@ namespace wrench {
                            const std::string& name,
                            std::shared_ptr<CompoundJob> job,
                            std::shared_ptr<FileRegistryService> file_registry_service,
-                           WorkflowFile *file,
+                           std::shared_ptr<DataFile>file,
                            std::shared_ptr<FileLocation> file_location);
 
 
@@ -55,7 +55,7 @@ namespace wrench {
     private:
         FileRegistryAction::Type type;
         std::shared_ptr<FileRegistryService> file_registry_service;
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         std::shared_ptr<FileLocation> file_location;
 
     };

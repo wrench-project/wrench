@@ -10,7 +10,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FileAlreadyBeingCopied.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_already_being_copied, "Log category for FileAlreadyBeingCopied");
@@ -23,7 +23,7 @@ namespace wrench {
      * @param src: the source location
      * @param dst: the destination location
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file,
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(std::shared_ptr<DataFile>file,
                                                    std::shared_ptr<FileLocation> src,
                                                    std::shared_ptr<FileLocation> dst) {
         this->file = file;
@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Getter
      * @return the file
      */
-    WorkflowFile *FileAlreadyBeingCopied::getFile() {
+    std::shared_ptr<DataFile>FileAlreadyBeingCopied::getFile() {
         return this->file;
     }
 

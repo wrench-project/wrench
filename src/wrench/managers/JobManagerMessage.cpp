@@ -31,7 +31,7 @@ namespace wrench {
      */
     JobManagerStandardJobCompletedMessage::JobManagerStandardJobCompletedMessage(std::shared_ptr<StandardJob> job,
                                                                                  std::shared_ptr<ComputeService> compute_service,
-                                                                                 std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes)
+                                                                                 std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes)
             :
             JobManagerMessage("JobManagerStandardJobCompletedMessage") {
         this->job = std::move(job);
@@ -49,8 +49,8 @@ namespace wrench {
      */
     JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(std::shared_ptr<StandardJob> job,
                                                                            std::shared_ptr<ComputeService> compute_service,
-                                                                           std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
-                                                                           std::set<WorkflowTask *> necessary_failure_count_increments,
+                                                                           std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes,
+                                                                           std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments,
                                                                            std::shared_ptr<FailureCause> cause) :
             JobManagerMessage("JobManagerStandardJobFailedMessage") {
         this->job = std::move(job);

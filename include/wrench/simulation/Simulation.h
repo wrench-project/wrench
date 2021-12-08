@@ -34,7 +34,7 @@ namespace wrench {
     class CloudComputeService;
     class VirtualizedClusterComputeService;
     class ExecutionController;
-    class WorkflowFile;
+    class DataFile;
     class SimulationOutput;
     class S4U_Simulation;
     class FileLocation;
@@ -92,8 +92,8 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss);
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
+        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> ss);
+        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -142,9 +142,9 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
-        void readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
-        void writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
-        void writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void readWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void writebackWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void writeThroughWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location);
         MemoryManager* getMemoryManagerByHost(std::string hostname);
 
         static double getMemoryCapacity();
@@ -188,7 +188,7 @@ namespace wrench {
 
         static int unique_disk_sequence_number;
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location);
 
         void platformSanityCheck();
         void checkSimulationSetup();

@@ -103,10 +103,10 @@ private:
 
         for (auto const &cs : compute_services) {
 
-            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask(cs->getName() + "task1", 59, 1, 1, 0);
-            wrench::WorkflowTask *task2 = this->getWorkflow()->addTask(cs->getName() + "task2", 118, 1, 1, 0);
-            wrench::WorkflowTask *task3 = this->getWorkflow()->addTask(cs->getName() + "task3", 59, 1, 1, 0);
-            wrench::WorkflowTask *task4 = this->getWorkflow()->addTask(cs->getName() + "task4", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask(cs->getName() + "task1", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask(cs->getName() + "task2", 118, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task3 = this->getWorkflow()->addTask(cs->getName() + "task3", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task4 = this->getWorkflow()->addTask(cs->getName() + "task4", 59, 1, 1, 0);
             std::shared_ptr<wrench::StandardJob> job;
 
             double start_time = wrench::Simulation::getCurrentSimulatedDate();
@@ -174,7 +174,7 @@ private:
                 auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event);
 
                 if (real_event) {
-                    wrench::WorkflowTask *task = *(real_event->standard_job->getTasks().begin());
+                    std::shared_ptr<wrench::WorkflowTask> task = *(real_event->standard_job->getTasks().begin());
                     if (task == task4) {
                         double now = wrench::Simulation::getCurrentSimulatedDate();
                         contiguous = (now >= start_time + 120);

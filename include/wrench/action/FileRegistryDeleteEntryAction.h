@@ -16,7 +16,7 @@
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
     class FileLocation;
     class FileRegistryService;
 
@@ -40,7 +40,7 @@ namespace wrench {
         */
         FileRegistryDeleteEntryAction(const std::string& name, std::shared_ptr<CompoundJob> job,
                                 std::shared_ptr<FileRegistryService> file_registry_service,
-                                WorkflowFile *file,
+                                std::shared_ptr<DataFile>file,
                                 std::shared_ptr<FileLocation> file_location) :
                                 FileRegistryAction(FileRegistryAction::DELETE, name, std::move(job), std::move(file_registry_service), file, std::move(file_location)) {}
 
@@ -49,7 +49,7 @@ namespace wrench {
 
     private:
         std::shared_ptr<FileRegistryService> file_registry_service;
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         std::shared_ptr<FileLocation> file_location;
 
     };

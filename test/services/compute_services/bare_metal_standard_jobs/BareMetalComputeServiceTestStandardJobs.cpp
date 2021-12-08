@@ -23,22 +23,22 @@ WRENCH_LOG_CATEGORY(bare_metal_compute_service_test_standard_jobs, "Log category
 class BareMetalComputeServiceTestStandardJobs : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *input_file;
+    std::shared_ptr<wrench::DataFile> input_file;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
-    wrench::WorkflowFile *output_file5;
-    wrench::WorkflowFile *output_file6;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
-    wrench::WorkflowTask *task7;
-    wrench::WorkflowTask *task8;
+    std::shared_ptr<wrench::DataFile> output_file1;
+    std::shared_ptr<wrench::DataFile> output_file2;
+    std::shared_ptr<wrench::DataFile> output_file3;
+    std::shared_ptr<wrench::DataFile> output_file4;
+    std::shared_ptr<wrench::DataFile> output_file5;
+    std::shared_ptr<wrench::DataFile> output_file6;
+    std::shared_ptr<wrench::WorkflowTask> task1;
+    std::shared_ptr<wrench::WorkflowTask> task2;
+    std::shared_ptr<wrench::WorkflowTask> task3;
+    std::shared_ptr<wrench::WorkflowTask> task4;
+    std::shared_ptr<wrench::WorkflowTask> task5;
+    std::shared_ptr<wrench::WorkflowTask> task6;
+    std::shared_ptr<wrench::WorkflowTask> task7;
+    std::shared_ptr<wrench::WorkflowTask> task8;
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
@@ -279,7 +279,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a 1-task1 job
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH;
         file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH;
         auto two_core_task_job = job_manager->createStandardJob({this->test->task3},
@@ -396,7 +396,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::SCRATCH;
         file_locations[this->test->output_file1] = wrench::FileLocation::SCRATCH;
         file_locations[this->test->output_file2] = wrench::FileLocation::SCRATCH;
@@ -530,7 +530,7 @@ private:
         auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file3] = wrench::FileLocation::SCRATCH;
         file_locations[this->test->output_file4] = wrench::FileLocation::SCRATCH;
@@ -660,7 +660,7 @@ private:
 
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6},
                                                            file_locations,
@@ -805,7 +805,7 @@ private:
 
         // Create a 2-task1 job
         auto two_task_job_1 = job_manager->createStandardJob({this->test->task5, this->test->task6},
-                                                             (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                             (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                              {std::make_tuple(
                                                                      this->test->input_file,
                                                                      wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -897,7 +897,7 @@ private:
         // service-specific args format testing: "hostname", "" <- that's an empty string
         // both tasks should run in parallel, use 4 cores each, thus oversubscribing
         auto two_task_job_2 = job_manager->createStandardJob({this->test->task7, this->test->task8},
-                                                             (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                             (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                              {std::make_tuple(this->test->input_file,
                                                                               wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                               wrench::FileLocation::SCRATCH)},
@@ -1028,7 +1028,7 @@ private:
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
-                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                           (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                             wrench::FileLocation::SCRATCH)},
@@ -1153,7 +1153,7 @@ private:
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
-                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                           (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                             wrench::FileLocation::SCRATCH)},
@@ -1399,7 +1399,7 @@ private:
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
-                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                           (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                             wrench::FileLocation::SCRATCH)},
@@ -1526,7 +1526,7 @@ private:
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
-                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                           (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                            {std::make_tuple(this->test->input_file,
                                                                             wrench::FileLocation::LOCATION(this->test->storage_service),
                                                                             wrench::FileLocation::SCRATCH)},

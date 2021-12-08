@@ -158,7 +158,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -291,7 +291,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -337,7 +337,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -460,7 +460,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -503,7 +503,7 @@ private:
         {
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -584,7 +584,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -737,7 +737,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -784,13 +784,13 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job1 = job_manager->createStandardJob(task1);
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job2 = job_manager->createStandardJob(task2);
@@ -914,7 +914,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));

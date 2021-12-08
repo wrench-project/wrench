@@ -37,11 +37,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(std::shared_ptr<JobManager> job_manager,
-                             std::vector<WorkflowTask *> tasks,
-                             std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
-                             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
-                             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
-                             std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
+                             std::vector<std::shared_ptr<WorkflowTask>> tasks,
+                             std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
+                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
+                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
+                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
             :
             Job("", std::move(job_manager)),
             file_locations(file_locations),
@@ -53,7 +53,7 @@ namespace wrench {
         // Check that this is a ready sub-graph
         for (auto t : tasks) {
             if (t->getState() != WorkflowTask::State::READY) {
-                std::vector<WorkflowTask *> parents = t->getWorkflow()->getTaskParents(t);
+                std::vector<std::shared_ptr<WorkflowTask>> parents = t->getWorkflow()->getTaskParents(t);
                 for (auto parent : parents) {
                     if (parent->getState() != WorkflowTask::State::COMPLETED) {
                         if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
@@ -131,7 +131,7 @@ namespace wrench {
      *
      * @return a vector of workflow tasks
      */
-    std::vector<WorkflowTask *> StandardJob::getTasks() {
+    std::vector<std::shared_ptr<WorkflowTask>> StandardJob::getTasks() {
         return this->tasks;
     }
 
@@ -140,7 +140,7 @@ namespace wrench {
      *
      * @return a map of files to storage services
      */
-    std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> StandardJob::getFileLocations() {
+    std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> StandardJob::getFileLocations() {
         return this->file_locations;
     }
 
@@ -398,7 +398,7 @@ namespace wrench {
 
         if (not task_compute_actions.empty()) {
             for (auto const &tca : task_compute_actions) {
-                WorkflowTask *task = tca.first;
+                auto task = tca.first;
                 if (not task_file_read_actions[task].empty()) {
                     for (auto const &tfra : task_file_read_actions[task]) {
                         cjob->addActionDependency(pre_file_copies_to_tasks, tfra);
@@ -504,8 +504,8 @@ namespace wrench {
      * @param job_failure_cause: the job failure cause, if any
      * @param simulation: the simulation (to add timestamps!)
      */
-    void StandardJob::processCompoundJobOutcome(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
-                                                std::set<WorkflowTask *> &failure_count_increments,
+    void StandardJob::processCompoundJobOutcome(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                                std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                                 std::shared_ptr<FailureCause> &job_failure_cause,
                                                 Simulation *simulation) {
         switch(this->state) {
@@ -816,18 +816,18 @@ namespace wrench {
      * @param state_changes: state changes
      * @param failure_count_increments: failure_cound_increments
      */
-    void StandardJob::applyTaskUpdates(map<WorkflowTask *, WorkflowTask::State> &state_changes,
-                                       set<WorkflowTask *> &failure_count_increments) {
+    void StandardJob::applyTaskUpdates(map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                       set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
 
         // Update task states
         for (auto &state_update : state_changes) {
-            WorkflowTask *task = state_update.first;
+            std::shared_ptr<WorkflowTask>task = state_update.first;
             task->setState(state_update.second);
         }
 
         // Update task readiness-es
         for (auto &state_update : state_changes) {
-            WorkflowTask *task = state_update.first;
+            std::shared_ptr<WorkflowTask>task = state_update.first;
             task->updateReadiness();
             if (task->getState() == WorkflowTask::State::COMPLETED) {
                 for (auto const &child : task->getChildren()) {

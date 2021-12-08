@@ -87,39 +87,39 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void addTimestampTaskStart(double date, WorkflowTask *task);
+        void addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask>task);
 
-        void addTimestampTaskFailure(double date, WorkflowTask *task);
+        void addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask>task);
 
-        void addTimestampTaskCompletion(double date, WorkflowTask *task);
+        void addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask>task);
 
-        void addTimestampTaskTermination(double date, WorkflowTask *task);
+        void addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask>task);
 
-        void addTimestampFileReadStart(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
-                                       WorkflowTask *task = nullptr);
+        void addTimestampFileReadStart(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+                                       std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileReadFailure(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
-                                         WorkflowTask *task = nullptr);
+        void addTimestampFileReadFailure(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+                                         std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileReadCompletion(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
-                                            WorkflowTask *task = nullptr);
+        void addTimestampFileReadCompletion(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+                                            std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileWriteStart(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
-                                        WorkflowTask *task = nullptr);
+        void addTimestampFileWriteStart(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+                                        std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileWriteFailure(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
-                                          WorkflowTask *task = nullptr);
+        void addTimestampFileWriteFailure(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+                                          std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileWriteCompletion(double date, WorkflowFile *file, FileLocation *src, StorageService *service,
-                                             WorkflowTask *task = nullptr);
+        void addTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+                                             std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileCopyStart(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,
                                        std::shared_ptr<FileLocation> dst);
 
-        void addTimestampFileCopyFailure(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,
                                          std::shared_ptr<FileLocation> dst);
 
-        void addTimestampFileCopyCompletion(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst);
 
         void

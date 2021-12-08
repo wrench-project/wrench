@@ -69,7 +69,7 @@ namespace wrench {
         WRENCH_INFO("At this point, HTCondor has access to one batch_standard_and_pilot_jobs compute service and one bare-metal service (which runs on a VM)");
 
         // Create a map of files, which are all supposed to be on the local SS
-        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+        std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         for (auto const &t : this->getWorkflow()->getTasks()) {
             for (auto const &f : t->getInputFiles()) {
                 file_locations[f] = wrench::FileLocation::LOCATION(ss);
@@ -80,8 +80,8 @@ namespace wrench {
         }
 
         // Split the tasks into two groups
-        std::vector<wrench::WorkflowTask *> first_tasks;
-        std::vector<wrench::WorkflowTask *> last_tasks;
+        std::vector<wrench::std::shared_ptr<WorkflowTask>> first_tasks;
+        std::vector<wrench::std::shared_ptr<WorkflowTask>> last_tasks;
         unsigned long task_count = 0;
         unsigned long num_tasks = this->getWorkflow()->getTasks().size();
         for (auto const &t : this->getWorkflow()->getTasks()) {

@@ -33,9 +33,9 @@ namespace wrench {
         void schedulePilotJobs(const std::set<std::shared_ptr<ComputeService>> &compute_services) override;
 
     protected:
-        double getFlops(Workflow *, const std::vector<WorkflowTask *> &);
+        double getFlops(Workflow *, const std::vector<std::shared_ptr<WorkflowTask>> &);
 
-        unsigned long getMaxParallelization(Workflow *, const std::set<WorkflowTask *> &);
+        unsigned long getMaxParallelization(Workflow *, const std::set<std::shared_ptr<WorkflowTask>> &);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -43,7 +43,7 @@ namespace wrench {
     private:
         Workflow *workflow;
 
-        std::map<WorkflowTask *, double> flopsMap;
+        std::map<std::shared_ptr<WorkflowTask>, double> flopsMap;
 
         int num_running_pilot_jobs = 0;
 

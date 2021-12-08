@@ -28,9 +28,9 @@ public:
     wrench::Workflow *workflow;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file;
-    wrench::WorkflowTask *task;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file;
+    std::shared_ptr<wrench::WorkflowTask> task;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 

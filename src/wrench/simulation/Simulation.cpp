@@ -24,7 +24,7 @@
 #include "simgrid/plugins/energy.h"
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 #include <wrench/services/memory/MemoryManager.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -704,7 +704,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> storage_service) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
     }
 
@@ -718,7 +718,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
+    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> storage_service,
                                std::string directory_absolute_path) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
     }
@@ -728,7 +728,7 @@ namespace wrench {
      * @param file: the file
      * @param location: the location
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -741,12 +741,6 @@ namespace wrench {
         if (this->file_registry_services.empty()) {
             throw std::runtime_error(
                     "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
-        // Check that the file is not the output of anything
-        if (file->isOutput()) {
-            throw std::runtime_error(
-                    "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
         }
 
         // Put the file on the storage service (not via the service daemon)
@@ -853,7 +847,7 @@ namespace wrench {
      * @param n_bytes: number of read bytes
      * @param location: file location
      */
-    void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
+    void Simulation::readWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -898,7 +892,7 @@ namespace wrench {
      * @param is_dirty: true or false
      */
     void
-    Simulation::writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location,
+    Simulation::writebackWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location,
                                          bool is_dirty) {
         std::string hostname = getHostName();
 
@@ -948,7 +942,7 @@ namespace wrench {
      * @param n_bytes: number of written bytes
      * @param location: file location
      */
-    void Simulation::writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes,
+    void Simulation::writeThroughWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes,
                                                  std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 

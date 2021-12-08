@@ -73,7 +73,7 @@ namespace wrench {
                     new CompoundJobFailedEvent(m->job, m->compute_service, m->cause));
 
         } else if (auto m = dynamic_cast<JobManagerStandardJobCompletedMessage*>(message.get())) {
-            std::set<WorkflowTask*> failure_count_increments;
+            std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
             m->job->applyTaskUpdates(m->necessary_state_changes, failure_count_increments);
             return std::shared_ptr<StandardJobCompletedEvent>(
                     new StandardJobCompletedEvent(m->job, m->compute_service));

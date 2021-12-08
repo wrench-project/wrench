@@ -98,7 +98,7 @@ namespace wrench {
 
         std::shared_ptr<Service> parent_service = nullptr;
 
-        std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
+        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         // Set of running jobs
         std::set<std::shared_ptr<Action> > running_actions;

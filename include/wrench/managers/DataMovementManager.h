@@ -17,7 +17,7 @@
 namespace wrench {
 
     class Workflow;
-    class WorkflowFile;
+    class DataFile;
     class StorageService;
     class ExecutionController;
     class WMS;
@@ -37,12 +37,12 @@ namespace wrench {
 
         void kill();
 
-        void initiateAsynchronousFileCopy(WorkflowFile *file,
+        void initiateAsynchronousFileCopy(std::shared_ptr<DataFile>file,
                                           std::shared_ptr<FileLocation> src,
                                           std::shared_ptr<FileLocation> dst,
                                           std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
 
-        void doSynchronousFileCopy(WorkflowFile *file,
+        void doSynchronousFileCopy(std::shared_ptr<DataFile>file,
                                    std::shared_ptr<FileLocation> src,
                                    std::shared_ptr<FileLocation> dst,
                                    std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
@@ -74,12 +74,12 @@ namespace wrench {
         bool processNextMessage();
 
         struct CopyRequestSpecs {
-            WorkflowFile *file;
+            std::shared_ptr<DataFile>file;
             std::shared_ptr<FileLocation> src;
             std::shared_ptr<FileLocation> dst;
             std::shared_ptr<FileRegistryService> file_registry_service;
 
-            CopyRequestSpecs(WorkflowFile *file,
+            CopyRequestSpecs(std::shared_ptr<DataFile>file,
                              std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
                              std::shared_ptr<FileRegistryService> file_registry_service) :

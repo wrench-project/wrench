@@ -73,7 +73,7 @@ namespace wrench {
 
         /* First, we need to create a map of file locations, stating for each file
          * where is should be read/written */
-        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+        std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         // Set each file's location to the compute service's scratch space
         for (auto const &file : this->getWorkflow()->getFiles()) {
             file_locations[file] = FileLocation::SCRATCH;

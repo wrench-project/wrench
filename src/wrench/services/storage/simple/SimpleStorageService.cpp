@@ -20,7 +20,7 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
@@ -255,7 +255,7 @@ namespace wrench {
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::shared_ptr <FileLocation> location,
+    bool SimpleStorageService::processFileWriteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
                                                        std::string answer_mailbox, unsigned long buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr <FailureCause> failure_cause = nullptr;
@@ -355,7 +355,7 @@ namespace wrench {
      * @param buffer_size: the buffer_size to use
      * @return
      */
-    bool SimpleStorageService::processFileReadRequest(WorkflowFile *file,
+    bool SimpleStorageService::processFileReadRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> location,
                                                       std::string answer_mailbox,
                                                       std::string mailbox_to_receive_the_file_content,
@@ -426,7 +426,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @return
      */
-    bool SimpleStorageService::processFileCopyRequest(WorkflowFile *file,
+    bool SimpleStorageService::processFileCopyRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> src_location,
                                                       std::shared_ptr <FileLocation> dst_location,
                                                       std::string answer_mailbox) {
@@ -543,7 +543,7 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr <FileTransferThread> ftt,
-                                                                     WorkflowFile *file,
+                                                                     std::shared_ptr<DataFile>file,
                                                                      std::string src_mailbox,
                                                                      std::shared_ptr <FileLocation> src_location,
                                                                      std::string dst_mailbox,
@@ -627,7 +627,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the notification should be sent
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFileDeleteRequest(WorkflowFile *file,
+    bool SimpleStorageService::processFileDeleteRequest(std::shared_ptr<DataFile>file,
                                                         std::shared_ptr <FileLocation> location,
                                                         std::string answer_mailbox) {
         std::shared_ptr <FailureCause> failure_cause = nullptr;

@@ -70,7 +70,7 @@ namespace wrench {
         double core_flop_rate = (*(batch_service->getCoreFlopRate().begin())).second;
 
         /* For each task, estimate its execution time in minutes */
-        std::map<WorkflowTask *, long> execution_times_in_minutes;
+        std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_minutes;
         for (auto  const &t : this->getWorkflow()->getTasks())  {
             double parallel_efficiency =
                     std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
@@ -111,7 +111,7 @@ namespace wrench {
 
             /* Create a map of file locations, stating for each file
              * where is should be read/written */
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
             file_locations[ready_task1->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations[ready_task1->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             if (ready_task2) {

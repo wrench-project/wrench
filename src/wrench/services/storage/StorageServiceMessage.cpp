@@ -9,7 +9,7 @@
 
 
 #include "StorageServiceMessage.h"
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simulation/SimulationOutput.h>
@@ -76,7 +76,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
-                                                                                   WorkflowFile *file,
+                                                                                   std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
             : StorageServiceMessage("FILE_LOOKUP_REQUEST",
@@ -98,7 +98,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(WorkflowFile *file,
+    StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile>file,
                                                                                  bool file_is_available,
                                                                                  double payload)
             : StorageServiceMessage(
@@ -122,7 +122,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
-                                                                                   WorkflowFile *file,
+                                                                                   std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
             : StorageServiceMessage("FILE_DELETE_REQUEST",
@@ -147,7 +147,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
+    StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<StorageService> storage_service,
                                                                                  bool success,
                                                                                  std::shared_ptr<FailureCause> failure_cause,
@@ -178,7 +178,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
-                                                                               WorkflowFile *file,
+                                                                               std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
@@ -214,7 +214,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
+    StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(std::shared_ptr<DataFile>file,
                                                                              std::shared_ptr<FileLocation> src,
                                                                              std::shared_ptr<FileLocation> dst,
                                                                              std::shared_ptr<FileRegistryService> file_registry_service,
@@ -251,7 +251,7 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
-                                                                                 WorkflowFile *file,
+                                                                                 std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  unsigned long buffer_size,
                                                                                  double payload)
@@ -280,7 +280,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
+    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
@@ -315,7 +315,7 @@ namespace wrench {
    */
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                                                                std::string mailbox_to_receive_the_file_content,
-                                                                               WorkflowFile *file,
+                                                                               std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(
@@ -343,7 +343,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
+    StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(std::shared_ptr<DataFile>file,
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
@@ -368,7 +368,7 @@ namespace wrench {
     * @param last_chunk: whether this is the last chunk in the file
     */
     StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
-            WorkflowFile *file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(
+            std::shared_ptr<DataFile>file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(
             "FILE_CHUNK", chunk_size) {
         if (file == nullptr) {
             throw std::invalid_argument(

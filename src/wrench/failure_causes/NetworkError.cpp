@@ -10,7 +10,7 @@
 #include <wrench/failure_causes/NetworkError.h>
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/job/Job.h>
 #include <wrench/services/compute/ComputeService.h>
 

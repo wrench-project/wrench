@@ -38,14 +38,14 @@ namespace wrench {
         // data members
         Workflow *workflow;
         std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-        WorkflowTask *t1, *t2, *t3, *t4, *t5, *t6;
+        std::shared_ptr<WorkflowTask>t1, t2, t3, t4, t5, t6;
     };
 
     TEST_F(CriticalPathSchedulerTest, GetTotalFlops) {
       std::unique_ptr<CriticalPathPilotJobScheduler> scheduler(
               new CriticalPathPilotJobScheduler(workflow));
 
-      std::vector<WorkflowTask *> tasks;
+      std::vector<std::shared_ptr<WorkflowTask>> tasks;
       tasks.push_back(t1);
       tasks.push_back(t2);
       tasks.push_back(t3);
@@ -69,7 +69,7 @@ namespace wrench {
       std::unique_ptr<CriticalPathPilotJobScheduler> scheduler(
               new CriticalPathPilotJobScheduler(workflow));
 
-      std::set<WorkflowTask *> tasks = {t1};
+      std::set<std::shared_ptr<WorkflowTask>> tasks = {t1};
 
       ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 

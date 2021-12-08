@@ -10,7 +10,7 @@
 #include <wrench/failure_causes/NoScratchSpace.h>
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_no_scratch_space, "Log category for NoScratchSpace");
 

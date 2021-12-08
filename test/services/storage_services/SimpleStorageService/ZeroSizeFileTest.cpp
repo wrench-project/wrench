@@ -8,7 +8,7 @@
 class SimpleStorageServiceZeroSizeFileTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::DataFile> file;
 
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 

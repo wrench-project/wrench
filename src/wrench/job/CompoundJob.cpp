@@ -130,7 +130,7 @@ namespace wrench {
      * @return a file read action
      */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
-                                                                   WorkflowFile *file,
+                                                                   std::shared_ptr<DataFile>file,
                                                                    std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->getSharedPtr(), file, {std::move(file_location)}));
@@ -146,7 +146,7 @@ namespace wrench {
     * @return a file read action
     */
     std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(std::string name,
-                                                                   WorkflowFile *file,
+                                                                   std::shared_ptr<DataFile>file,
                                                                    std::vector<std::shared_ptr<FileLocation>> file_locations) {
         auto new_action = std::shared_ptr<FileReadAction>(
                 new FileReadAction(name, this->getSharedPtr(), file, std::move(file_locations)));
@@ -162,7 +162,7 @@ namespace wrench {
     * @return a file write action
     */
     std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(std::string name,
-                                                                     WorkflowFile *file,
+                                                                     std::shared_ptr<DataFile>file,
                                                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileWriteAction>(
                 new FileWriteAction(name, this->getSharedPtr(), file, {std::move(file_location)}));
@@ -179,7 +179,7 @@ namespace wrench {
     * @return a file copy action
     */
     std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(std::string name,
-                                                                   WorkflowFile *file,
+                                                                   std::shared_ptr<DataFile>file,
                                                                    std::shared_ptr<FileLocation> src_file_location,
                                                                    std::shared_ptr<FileLocation> dst_file_location) {
         auto new_action = std::shared_ptr<FileCopyAction>(
@@ -196,7 +196,7 @@ namespace wrench {
     * @return a file delete action
     */
     std::shared_ptr<FileDeleteAction>
-    CompoundJob::addFileDeleteAction(std::string name, WorkflowFile *file,
+    CompoundJob::addFileDeleteAction(std::string name, std::shared_ptr<DataFile>file,
                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, this->getSharedPtr(), file, std::move(file_location)));
@@ -213,7 +213,7 @@ namespace wrench {
      */
     std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
             std::shared_ptr<FileRegistryService> file_registry,
-            WorkflowFile *file,
+            std::shared_ptr<DataFile>file,
             std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileRegistryAddEntryAction>(
                 new FileRegistryAddEntryAction(name, this->getSharedPtr(), std::move(file_registry), file, std::move(file_location)));
@@ -230,7 +230,7 @@ namespace wrench {
      */
     std::shared_ptr<FileRegistryDeleteEntryAction> CompoundJob::addFileRegistryDeleteEntryAction(
             std::shared_ptr<FileRegistryService> file_registry,
-            WorkflowFile *file,
+            std::shared_ptr<DataFile>file,
             std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileRegistryDeleteEntryAction>(
                 new FileRegistryDeleteEntryAction(name, this->getSharedPtr(), std::move(file_registry), file, std::move(file_location)));

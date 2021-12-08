@@ -98,7 +98,7 @@ private:
 
         // Create 4 1-min tasks and submit them as various shaped jobs
 
-        wrench::WorkflowTask *tasks[4];
+        std::shared_ptr<wrench::WorkflowTask> tasks[4];
         std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
@@ -266,7 +266,7 @@ private:
 
         unsigned int random = this->test->seed;
 
-        wrench::WorkflowTask *tasks[NUM_JOBS];
+        std::shared_ptr<wrench::WorkflowTask> tasks[NUM_JOBS];
         std::shared_ptr<wrench::StandardJob> jobs[NUM_JOBS];
         // Create 4 1-min tasks and submit them as various shaped jobs
         for (int i=0; i < NUM_JOBS; i++) {
@@ -442,7 +442,7 @@ private:
 
         // Create 4 tasks and submit them as three various shaped jobs
 
-        wrench::WorkflowTask *tasks[4];
+        std::shared_ptr<wrench::WorkflowTask> tasks[4];
         std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
@@ -611,7 +611,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::WorkflowTask *tasks[5];
+        std::shared_ptr<wrench::WorkflowTask> tasks[5];
         std::shared_ptr<wrench::StandardJob> jobs[5];
         for (int i=0; i < 5; i++) {
             tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
@@ -782,7 +782,7 @@ private:
 
         // Create 4 1-min tasks and submit them as various shaped jobs
 
-        wrench::WorkflowTask *tasks[4];
+        std::shared_ptr<wrench::WorkflowTask> tasks[4];
         std::shared_ptr<wrench::StandardJob> jobs[4];
         for (int i=0; i < 4; i++) {
             tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
@@ -960,7 +960,7 @@ private:
 
         unsigned int random = this->test->seed;
 
-        wrench::WorkflowTask *tasks[NUM_JOBS_CORE_LEVEL];
+        std::shared_ptr<wrench::WorkflowTask> tasks[NUM_JOBS_CORE_LEVEL];
         std::shared_ptr<wrench::StandardJob> jobs[NUM_JOBS_CORE_LEVEL];
         // Create 4 1-min tasks and submit them as various shaped jobs
         for (int i=0; i < NUM_JOBS_CORE_LEVEL; i++) {

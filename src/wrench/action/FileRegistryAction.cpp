@@ -11,7 +11,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/action/Action.h>
 #include <wrench/action/FileRegistryAction.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/exceptions/ExecutionException.h>
@@ -35,7 +35,7 @@ namespace wrench {
     FileRegistryAction::FileRegistryAction(FileRegistryAction::Type type,
                                            const std::string& name, std::shared_ptr<CompoundJob> job,
                                      std::shared_ptr<FileRegistryService> file_registry_service,
-                                     WorkflowFile *file,
+                                     std::shared_ptr<DataFile>file,
                                      std::shared_ptr<FileLocation> file_location) :
             Action(name, "file_registry", job),
             type(type), file_registry_service(std::move(file_registry_service)), file(std::move(file)), file_location(std::move(file_location)) {
@@ -54,7 +54,7 @@ namespace wrench {
      * @brief Returns the action's file
      * @return the file
      */
-    WorkflowFile *FileRegistryAction::getFile() const {
+    std::shared_ptr<DataFile>FileRegistryAction::getFile() const {
         return this->file;
     }
 

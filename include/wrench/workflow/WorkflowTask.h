@@ -13,9 +13,11 @@
 #include <map>
 #include <stack>
 #include <set>
+#include <memory>
+
 
 #include "wrench/job/Job.h"
-#include "wrench/workflow/WorkflowFile.h"
+#include "wrench/data_file/DataFile.h"
 #include "wrench/workflow/parallel_model/ParallelModel.h"
 #include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
 #include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
@@ -28,7 +30,7 @@ namespace wrench {
     /**
      * @brief A computational task in a Workflow
      */
-    class WorkflowTask {
+    class WorkflowTask : public std::enable_shared_from_this<WorkflowTask> {
 
     public:
         const std::string& getID() const;
@@ -45,19 +47,21 @@ namespace wrench {
 
         double getMemoryRequirement() const;
 
-        unsigned long getNumberOfChildren() const;
+        unsigned long getNumberOfChildren();
 
-        std::vector<WorkflowTask *> getChildren() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getChildren();
 
-        unsigned long getNumberOfParents() const;
+        unsigned long getNumberOfParents();
 
-        std::vector<WorkflowTask *> getParents() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getParents();
 
-        void addInputFile(WorkflowFile *file);
+        void addInputFile(std::shared_ptr<DataFile>file);
 
-        void addOutputFile(WorkflowFile *file);
+        void addOutputFile(std::shared_ptr<DataFile>file);
 
         unsigned int getFailureCount();
+
+        std::shared_ptr<WorkflowTask> getSharedPtr() { return this->shared_from_this(); }
 
 
         /***********************/
@@ -104,9 +108,9 @@ namespace wrench {
 
         unsigned long getBytesWritten() const;
 
-        std::vector<WorkflowFile *> getInputFiles() const;
+        std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
 
-        std::vector<WorkflowFile *> getOutputFiles() const;
+        std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
 
         unsigned long getTopLevel() const;
 
@@ -283,8 +287,8 @@ namespace wrench {
 
         Workflow *workflow;                // Containing workflow
 
-        std::map<std::string, WorkflowFile *> output_files;   // List of output files
-        std::map<std::string, WorkflowFile *> input_files;    // List of input files
+        std::map<std::string, std::shared_ptr<DataFile>> output_files;   // List of output files
+        std::map<std::string, std::shared_ptr<DataFile>> input_files;    // List of input files
 
         // Private constructor (called by Workflow)
         WorkflowTask(std::string id,

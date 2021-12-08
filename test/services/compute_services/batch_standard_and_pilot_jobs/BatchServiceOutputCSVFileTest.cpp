@@ -95,7 +95,7 @@ private:
       auto job_manager = this->createJobManager();
 
       // Create 4 tasks and submit them as various shaped jobs
-      wrench::WorkflowTask *tasks[8];
+      std::shared_ptr<wrench::WorkflowTask> tasks[8];
       std::shared_ptr<wrench::StandardJob> jobs[8];
       for (int i=0; i < 8; i++) {
         tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);

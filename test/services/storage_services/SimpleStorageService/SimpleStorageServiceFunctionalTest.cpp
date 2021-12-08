@@ -20,10 +20,10 @@ WRENCH_LOG_CATEGORY(simple_storage_service_functional_test, "Log category for Si
 class SimpleStorageServiceFunctionalTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_1;
-    wrench::WorkflowFile *file_10;
-    wrench::WorkflowFile *file_100;
-    wrench::WorkflowFile *file_500;
+    std::shared_ptr<wrench::DataFile> file_1;
+    std::shared_ptr<wrench::DataFile> file_10;
+    std::shared_ptr<wrench::DataFile> file_100;
+    std::shared_ptr<wrench::DataFile> file_500;
     std::shared_ptr<wrench::StorageService> storage_service_100 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_510 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_1000 = nullptr;
@@ -242,7 +242,7 @@ private:
 
             // Bogus read
             try {
-                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> locations;
                 locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
                 wrench::StorageService::readFiles(locations);
                 throw std::runtime_error("Should not be able to read nullptr file");
@@ -251,7 +251,7 @@ private:
 
             // Read a file on a storage service
             try {
-                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> locations;
                 locations[this->test->file_10] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
                 wrench::StorageService::readFiles(locations);
             } catch (wrench::ExecutionException &e) {
@@ -260,7 +260,7 @@ private:
 
             // Read a file on a storage service that doesn't have that file
             try {
-                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> locations;
                 locations[this->test->file_100] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
                 wrench::StorageService::readFiles(locations);
                 throw std::runtime_error("Should not be able to read a file unavailable a storage service");
@@ -272,7 +272,7 @@ private:
 
             // Bogus write
             try {
-                std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> locations;
+                std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> locations;
                 locations[nullptr] = wrench::FileLocation::LOCATION(this->test->storage_service_100);
                 wrench::StorageService::writeFiles(locations);
                 throw std::runtime_error("Should not be able to write nullptr file");
