@@ -22,20 +22,20 @@ WRENCH_LOG_CATEGORY(htcondor_service_test, "Log category for HTCondorServiceTest
 class HTCondorServiceTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *input_file2;
-    wrench::WorkflowFile *input_file3;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
-    wrench::WorkflowTask *task7;
-    //wrench::WorkflowTask *task8;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> input_file2;
+    std::shared_ptr<wrench::DataFile> input_file3;
+    std::shared_ptr<wrench::DataFile> output_file1;
+    std::shared_ptr<wrench::DataFile> output_file2;
+    std::shared_ptr<wrench::DataFile> output_file3;
+    std::shared_ptr<wrench::WorkflowTask> task1;
+    std::shared_ptr<wrench::WorkflowTask> task2;
+    std::shared_ptr<wrench::WorkflowTask> task3;
+    std::shared_ptr<wrench::WorkflowTask> task4;
+    std::shared_ptr<wrench::WorkflowTask> task5;
+    std::shared_ptr<wrench::WorkflowTask> task6;
+    std::shared_ptr<wrench::WorkflowTask> task7;
+    //std::shared_ptr<wrench::WorkflowTask> task8;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
@@ -250,7 +250,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
         auto two_task_job = job_manager->createStandardJob(
@@ -397,7 +397,7 @@ private:
         htcondor_cs->addComputeService(bm_cs);
 
         // Create a job
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
         auto two_task_job = job_manager->createStandardJob(
@@ -542,7 +542,7 @@ private:
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
-                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
@@ -671,7 +671,7 @@ private:
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
-                {this->test->task1}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                {this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -777,7 +777,7 @@ private:
 
 
         auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
-        std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file2] = wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService());
         std::shared_ptr<wrench::StandardJob>grid_job = job_manager->createStandardJob(
                 {this->test->task7},
@@ -926,7 +926,7 @@ private:
 
         auto grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -1054,7 +1054,7 @@ private:
 
         auto grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -1297,7 +1297,7 @@ private:
 
         {
             // Submit a grid universe job that asks for too much
-            std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>> file_locations;
+            std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
             file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
             file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
             auto grid_job = job_manager->createStandardJob(

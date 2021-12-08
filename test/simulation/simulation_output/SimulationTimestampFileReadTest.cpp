@@ -20,12 +20,12 @@ public:
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
 
-    wrench::WorkflowFile *file_1;
-    wrench::WorkflowFile *file_2;
-    wrench::WorkflowFile *file_3;
-    wrench::WorkflowFile *xl_file;
+    std::shared_ptr<wrench::DataFile> file_1;
+    std::shared_ptr<wrench::DataFile> file_2;
+    std::shared_ptr<wrench::DataFile> file_3;
+    std::shared_ptr<wrench::DataFile> xl_file;
 
-    wrench::WorkflowTask *task1 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> task1 = nullptr;
 
     void do_SimulationTimestampFileReadBasic_test();
 
@@ -177,7 +177,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
     //stage files
-    std::set<wrench::WorkflowFile *> files_to_stage = {file_1, file_2, file_3, xl_file};
+    std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1, file_2, file_3, xl_file};
 
     for (auto const &f  : files_to_stage) {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service));

@@ -31,7 +31,7 @@ namespace wrench {
                 std::string cluster_id = "PIPELINE_CLUSTER_" + std::to_string(id++);
 
                 // explore parent
-                WorkflowTask *parent = getTask(workflow->getTaskParents(task));
+                std::shared_ptr<WorkflowTask>parent = getTask(workflow->getTaskParents(task));
                 while (parent && pipelined_tasks.find(parent->getID()) == pipelined_tasks.end()
                        && parent->getNumberOfChildren() == 1) {
 
@@ -43,7 +43,7 @@ namespace wrench {
                 }
 
                 // explore child
-                WorkflowTask *child = getTask(workflow->getTaskChildren(task));
+                std::shared_ptr<WorkflowTask>child = getTask(workflow->getTaskChildren(task));
                 while (child && pipelined_tasks.find(child->getID()) == pipelined_tasks.end()
                        && child->getNumberOfParents() == 1) {
 
@@ -70,7 +70,7 @@ namespace wrench {
      *
      * @return The first task1 of the vector
      */
-    WorkflowTask *SimplePipelineClustering::getTask(std::vector<WorkflowTask *> tasks) {
+    std::shared_ptr<WorkflowTask>SimplePipelineClustering::getTask(std::vector<std::shared_ptr<WorkflowTask>> tasks) {
         if (tasks.size() <= 1) {
             return not tasks.empty() ? tasks[0] : nullptr;
         }

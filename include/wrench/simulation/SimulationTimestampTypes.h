@@ -11,6 +11,7 @@
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
 
+#include "wrench/data_file//DataFile.h"
 #include "wrench/workflow/WorkflowTask.h"
 #include <unordered_map>
 
@@ -19,7 +20,7 @@ using namespace std;
 /** \cond              */
 /***********************/
 
-typedef std::tuple<void *, void *, void *> File;
+typedef std::tuple<std::shared_ptr<wrench::DataFile>, void *, void *> File;
 typedef std::tuple<std::string, std::string, int> DiskAccess;
 
 namespace std {
@@ -28,7 +29,7 @@ namespace std {
     public :
         size_t operator()(const File &file ) const
         {
-            return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+            return std::hash<void *>()(std::get<0>(file).get()) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
         }
     };
 
@@ -56,7 +57,7 @@ namespace wrench {
     /**
      * @brief File, Source, Whoami used to be hashed as key for unordered multimap for ongoing file operations.
      */
-    ///typedef std::tuple<WorkflowFile *, FileLocation *, StorageService *> File;
+    ///typedef std::tuple<std::shared_ptr<DataFile>, FileLocation *, StorageService *> File;
 
     /**
      *
@@ -112,17 +113,17 @@ namespace wrench {
     class SimulationTimestampTask : public SimulationTimestampPair {
 
     public:
-        WorkflowTask *getTask();
+        std::shared_ptr<WorkflowTask>getTask();
         SimulationTimestampTask *getEndpoint() override;
 
     protected:
         static std::map<std::string, SimulationTimestampTask *> pending_task_timestamps;
         void setEndpoints();
-        SimulationTimestampTask(double date, WorkflowTask *task);
+        SimulationTimestampTask(double date, std::shared_ptr<WorkflowTask>task);
 
     private:
         friend class SimulationOutput;
-        WorkflowTask *task;
+        std::shared_ptr<WorkflowTask>task;
     };
 
     /**
@@ -131,7 +132,7 @@ namespace wrench {
     class SimulationTimestampTaskStart : public SimulationTimestampTask {
     private:
         friend class SimulationOutput;
-        SimulationTimestampTaskStart(double date, WorkflowTask *task);
+        SimulationTimestampTaskStart(double date, std::shared_ptr<WorkflowTask>task);
     };
 
     /**
@@ -140,7 +141,7 @@ namespace wrench {
     class SimulationTimestampTaskFailure : public SimulationTimestampTask {
     private:
         friend class SimulationOutput;
-        SimulationTimestampTaskFailure(double date, WorkflowTask *task);
+        SimulationTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask>task);
     };
 
     /**
@@ -149,7 +150,7 @@ namespace wrench {
     class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
     private:
         friend class SimulationOutput;
-        SimulationTimestampTaskCompletion(double date, WorkflowTask *task);
+        SimulationTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask>task);
     };
 
     /**
@@ -158,7 +159,7 @@ namespace wrench {
      class SimulationTimestampTaskTermination : public SimulationTimestampTask {
      private:
          friend class SimulationOutput;
-         SimulationTimestampTaskTermination(double date, WorkflowTask *);
+         SimulationTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask>);
      };
 
     class SimulationTimestampFileReadStart;
@@ -174,19 +175,19 @@ namespace wrench {
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampFileRead *getEndpoint() override;
-        WorkflowFile *getFile();
+        std::shared_ptr<DataFile>getFile();
         FileLocation *getSource();
         StorageService *getService();
-        WorkflowTask *getTask();
+        std::shared_ptr<WorkflowTask>getTask();
 
     protected:
         /**
-         * @brief The WorkflowFile that was being read
+         * @brief The DataFile that was being read
          */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
 
         /**
-         * @brief The location where the WorkflowFile was being read from
+         * @brief The location where the DataFile was being read from
          */
         FileLocation *source;
 
@@ -198,17 +199,17 @@ namespace wrench {
         /**
          * @brief Task tied to read
          */
-         WorkflowTask *task;
+         std::shared_ptr<WorkflowTask>task;
 
         /**
          * @brief the data structure that holds the ongoing file reads.
          */
         ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, WorkflowTask *>> pending_file_reads;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, std::shared_ptr<WorkflowTask>>> pending_file_reads;
 
         void setEndpoints();
         friend class SimulationOutput;
-        SimulationTimestampFileRead(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileRead(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     class SimulationTimestampFileReadFailure;
@@ -220,7 +221,7 @@ namespace wrench {
     class SimulationTimestampFileReadStart : public SimulationTimestampFileRead {
     public:
         friend class SimulationOutput;
-        SimulationTimestampFileReadStart(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileReadStart(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
 
         friend class SimulationTimestampFileReadFailure;
         friend class SimulationTimestampFileReadCompletion;
@@ -232,7 +233,7 @@ namespace wrench {
     class SimulationTimestampFileReadFailure : public SimulationTimestampFileRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileReadFailure(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileReadFailure(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     /**
@@ -241,7 +242,7 @@ namespace wrench {
     class SimulationTimestampFileReadCompletion : public SimulationTimestampFileRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileReadCompletion(double date, WorkflowFile *file, FileLocation *src, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileReadCompletion(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     class SimulationTimestampFileWriteStart;
@@ -257,19 +258,19 @@ namespace wrench {
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampFileWrite *getEndpoint() override;
-        WorkflowFile *getFile();
+        std::shared_ptr<DataFile>getFile();
         FileLocation *getDestination();
         StorageService *getService();
-        WorkflowTask *getTask();
+        std::shared_ptr<WorkflowTask>getTask();
 
     protected:
         /**
-         * @brief The WorkflowFile that was being write
+         * @brief The DataFile that was being write
          */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
 
         /**
-         * @brief The location where the WorkflowFile was being write from
+         * @brief The location where the DataFile was being write from
          */
         FileLocation *destination;
 
@@ -281,18 +282,18 @@ namespace wrench {
         /**
          * @brief Task associated with write
          */
-         WorkflowTask *task;
+         std::shared_ptr<WorkflowTask>task;
 
         /**
          * @brief the data structure that holds the ongoing file writes.
          */
         ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>, decltype(&file_hash)> pending_file_writes;
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, WorkflowTask *>> pending_file_writes;
+        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, std::shared_ptr<WorkflowTask>>> pending_file_writes;
 
         void setEndpoints();
 
         friend class SimulationOutput;
-        SimulationTimestampFileWrite(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWrite(double date, std::shared_ptr<DataFile>file, FileLocation *dst, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     class SimulationTimestampFileWriteFailure;
@@ -306,7 +307,7 @@ namespace wrench {
         friend class SimulationOutput;
         friend class SimulationTimestampFileWriteFailure;
         friend class SimulationTimestampFileWriteCompletion;
-        SimulationTimestampFileWriteStart(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWriteStart(double date, std::shared_ptr<DataFile>file, FileLocation *dst, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     /**
@@ -315,7 +316,7 @@ namespace wrench {
     class SimulationTimestampFileWriteFailure : public SimulationTimestampFileWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileWriteFailure(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWriteFailure(double date, std::shared_ptr<DataFile>file, FileLocation *dst, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     /**
@@ -324,7 +325,7 @@ namespace wrench {
     class SimulationTimestampFileWriteCompletion : public SimulationTimestampFileWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileWriteCompletion(double date, WorkflowFile *file, FileLocation *dst, StorageService *service, WorkflowTask *task = nullptr);
+        SimulationTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile>file, FileLocation *dst, StorageService *service, std::shared_ptr<WorkflowTask>task = nullptr);
     };
 
     class SimulationTimestampFileCopyStart;
@@ -340,25 +341,25 @@ namespace wrench {
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampFileCopy *getEndpoint() override;
-        WorkflowFile *getFile();
+        std::shared_ptr<DataFile>getFile();
         std::shared_ptr<FileLocation> getSource();
         std::shared_ptr<FileLocation> getDestination();
 
     protected:
-        SimulationTimestampFileCopy(double date, WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopy(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
 
         /**
-         * @brief The WorkflowFile that was being copied
+         * @brief The DataFile that was being copied
          */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile> file;
 
         /**
-         * @brief The location where the WorkflowFile was being copied from
+         * @brief The location where the DataFile was being copied from
          */
         std::shared_ptr<FileLocation> source;
 
         /**
-         * @brief The location where the WorkflowFile was being copied to
+         * @brief The location where the DataFile was being copied to
          */
         std::shared_ptr<FileLocation> destination;
 
@@ -381,7 +382,7 @@ namespace wrench {
         friend class SimulationOutput;
         friend class SimulationTimestampFileCopyFailure;
         friend class SimulationTimestampFileCopyCompletion;
-        SimulationTimestampFileCopyStart(double date, WorkflowFile *file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopyStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src, std::shared_ptr<FileLocation> dst);
     };
 
     /**
@@ -390,7 +391,7 @@ namespace wrench {
     class SimulationTimestampFileCopyFailure : public SimulationTimestampFileCopy {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileCopyFailure(double date, WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopyFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
     };
 
     /**
@@ -399,7 +400,7 @@ namespace wrench {
     class SimulationTimestampFileCopyCompletion : public SimulationTimestampFileCopy {
     private:
         friend class SimulationOutput;
-        SimulationTimestampFileCopyCompletion(double date, WorkflowFile *file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
+        SimulationTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<FileLocation> dst);
     };
 
     class SimulationTimestampDiskReadStart;

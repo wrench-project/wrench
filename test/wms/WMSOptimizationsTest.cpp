@@ -62,13 +62,13 @@ protected:
 
     wrench::Workflow *createWorkflow() {
       wrench::Workflow *workflow;
-      wrench::WorkflowFile *input_file;
-      wrench::WorkflowFile *output_file1;
-      wrench::WorkflowFile *output_file2;
-      wrench::WorkflowFile *output_file3;
-      wrench::WorkflowTask *task1;
-      wrench::WorkflowTask *task2;
-      wrench::WorkflowTask *task3;
+      std::shared_ptr<wrench::DataFile> input_file;
+      std::shared_ptr<wrench::DataFile> output_file1;
+      std::shared_ptr<wrench::DataFile> output_file2;
+      std::shared_ptr<wrench::DataFile> output_file3;
+      std::shared_ptr<wrench::WorkflowTask> task1;
+      std::shared_ptr<wrench::WorkflowTask> task2;
+      std::shared_ptr<wrench::WorkflowTask> task3;
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -131,7 +131,7 @@ private:
 
       while (true) {
         // Get the ready clustered tasks
-        std::map<std::string, std::vector<wrench::WorkflowTask *>> ready_clustered_tasks = this->getWorkflow()->getReadyClusters();
+        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> ready_clustered_tasks = this->getWorkflow()->getReadyClusters();
 
         // Get the available compute services
         auto compute_services = this->getAvailableComputeServices<wrench::ComputeService>();
@@ -257,7 +257,7 @@ private:
     WMSOptimizationsTest *test;
 
     struct TaskPriorityComparator {
-        bool operator()(wrench::WorkflowTask *&lhs, wrench::WorkflowTask *&rhs) {
+        bool operator()(std::shared_ptr<wrench::WorkflowTask> &lhs, std::shared_ptr<wrench::WorkflowTask> &rhs) {
           return lhs->getPriority() > rhs->getPriority();
         }
     };
@@ -269,7 +269,7 @@ private:
 
       while (true) {
         // Get the ready tasks
-        std::vector<wrench::WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
         auto compute_services = this->getAvailableComputeServices<wrench::ComputeService>();

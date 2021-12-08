@@ -95,14 +95,14 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            std::vector<WorkflowTask *> tasks,
-            const std::map<WorkflowFile *, std::shared_ptr<FileLocation>>& file_locations,
-            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
+            std::vector<std::shared_ptr<WorkflowTask>> tasks,
+            const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>& file_locations,
+            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
 
         // Transform the non-vector file location map into a vector file location map
-        std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations_vector;
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations_vector;
         for (auto const &e : file_locations) {
             std::vector<std::shared_ptr<FileLocation>> v;
             v.push_back(e.second);
@@ -139,11 +139,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            std::vector<WorkflowTask *> tasks,
-            std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations,
-            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-            std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
+            std::vector<std::shared_ptr<WorkflowTask>> tasks,
+            std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations,
+            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+            std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions) {
         // Do a sanity check of everything (looking for nullptr)
         for (auto t : tasks) {
             if (t == nullptr) {
@@ -238,8 +238,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            std::vector<WorkflowTask *> tasks,
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
+            std::vector<std::shared_ptr<WorkflowTask>> tasks,
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation> > file_locations) {
         if (tasks.empty()) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments (empty tasks argument!)");
         }
@@ -260,8 +260,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            std::vector<WorkflowTask *> tasks,
-            std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations) {
+            std::vector<std::shared_ptr<WorkflowTask>> tasks,
+            std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations) {
         if (tasks.empty()) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments (empty tasks argument!)");
         }
@@ -279,12 +279,12 @@ namespace wrench {
   * @throw std::invalid_argument
   */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            std::vector<WorkflowTask *> tasks) {
+            std::vector<std::shared_ptr<WorkflowTask>> tasks) {
         if (tasks.empty()) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments (empty tasks argument!)");
         }
 
-        return this->createStandardJob(tasks, (std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>) {},
+        return this->createStandardJob(tasks, (std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>>) {},
                                        {}, {}, {});
     }
 
@@ -300,13 +300,13 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            WorkflowTask *task,
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations) {
+            std::shared_ptr<WorkflowTask>task,
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation> > file_locations) {
         if (task == nullptr) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
         }
 
-        std::vector<WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
         tasks.push_back(task);
         return this->createStandardJob(tasks, file_locations);
     }
@@ -324,13 +324,13 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            WorkflowTask *task,
-            std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations) {
+            std::shared_ptr<WorkflowTask>task,
+            std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations) {
         if (task == nullptr) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
         }
 
-        std::vector<WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
         tasks.push_back(task);
         return this->createStandardJob(tasks, file_locations);
     }
@@ -345,14 +345,14 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<StandardJob> JobManager::createStandardJob(
-            WorkflowTask *task) {
+            std::shared_ptr<WorkflowTask>task) {
         if (task == nullptr) {
             throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
         }
 
-        std::vector<WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
         tasks.push_back(task);
-        return this->createStandardJob(tasks, std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>>{});
+        return this->createStandardJob(tasks, std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>>{});
     }
 
 
@@ -454,7 +454,7 @@ namespace wrench {
             if (arg.first.rfind("-", 0) == 0) {
                 new_args[arg.first] = arg.second;
             } else {
-                WorkflowTask *task;
+                std::shared_ptr<WorkflowTask> task;
                 if (workflow == nullptr) {
                     throw std::invalid_argument("JobManager::submitJob():  invalid service-specific argument {" + arg.first + "," + arg.second + "} (unknown task ID " + arg.first +")");
                 }
@@ -779,8 +779,8 @@ namespace wrench {
         job->state = StandardJob::State::TERMINATED;
 
         // Update task states based on compound job
-        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
-        std::set<WorkflowTask *> failure_count_increments;
+        std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
+        std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
         job->applyTaskUpdates(state_changes, failure_count_increments);
@@ -1008,8 +1008,8 @@ namespace wrench {
         job->end_date = Simulation::getCurrentSimulatedDate();
 
         // Analyze compound job
-        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
-        std::set<WorkflowTask *> failure_count_increments;
+        std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
+        std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
@@ -1042,8 +1042,8 @@ namespace wrench {
         job->end_date = Simulation::getCurrentSimulatedDate();
 
         // Analyze compound job
-        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
-        std::set<WorkflowTask *> failure_count_increments;
+        std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
+        std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
@@ -1175,8 +1175,8 @@ namespace wrench {
                         }
                     } else {
                         auto sjob = this->cjob_to_sjob_map[cjob];
-                        std::map<WorkflowTask *, WorkflowTask::State> state_changes;
-                        std::set<WorkflowTask *> failure_count_increments;
+                        std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> state_changes;
+                        std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
                         // Set all tasks to not-ready (will be fixed later)
                         for (auto const &t : sjob->getTasks()) {
                             state_changes[t] = WorkflowTask::State::NOT_READY;

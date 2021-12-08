@@ -39,7 +39,7 @@ namespace wrench {
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
-                                           WorkflowFile *file,
+                                           std::shared_ptr<DataFile>file,
                                            std::string src_mailbox,
                                            std::shared_ptr<FileLocation> dst_location,
                                            std::string answer_mailbox_if_read,
@@ -76,7 +76,7 @@ namespace wrench {
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
-                                           WorkflowFile *file,
+                                           std::shared_ptr<DataFile>file,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::string dst_mailbox,
                                            std::string answer_mailbox_if_read,
@@ -113,7 +113,7 @@ namespace wrench {
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
-                                           WorkflowFile *file,
+                                           std::shared_ptr<DataFile>file,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::shared_ptr<FileLocation> dst_location,
                                            std::string answer_mailbox_if_read,
@@ -246,7 +246,7 @@ namespace wrench {
     *
     * @throw shared_ptr<FailureCause>
     */
-    void FileTransferThread::receiveFileFromNetwork(WorkflowFile *file,
+    void FileTransferThread::receiveFileFromNetwork(std::shared_ptr<DataFile>file,
                                                     std::string mailbox,
                                                     std::shared_ptr<FileLocation> location) {
         /** Ideal Fluid model buffer size */
@@ -341,7 +341,7 @@ namespace wrench {
      *
      * @throw shared_ptr<FailureCause>
      */
-    void FileTransferThread::sendLocalFileToNetwork(WorkflowFile *file,
+    void FileTransferThread::sendLocalFileToNetwork(std::shared_ptr<DataFile>file,
                                                     std::shared_ptr<FileLocation> location,
                                                     std::string mailbox) {
         /** Ideal Fluid model buffer size */
@@ -398,7 +398,7 @@ namespace wrench {
      * @param src_location: the source location
      * @param dst_location: the destination location
      */
-    void FileTransferThread::copyFileLocally(WorkflowFile *file,
+    void FileTransferThread::copyFileLocally(std::shared_ptr<DataFile>file,
                                              std::shared_ptr<FileLocation> src_location,
                                              std::shared_ptr<FileLocation> dst_location) {
         double remaining = file->getSize();
@@ -448,7 +448,7 @@ namespace wrench {
      * @param dst_location: the destination location
      * @param downloader_buffer_size: buffer size of the downloader (0 means use "ideal fluid model")
      */
-    void FileTransferThread::downloadFileFromStorageService(WorkflowFile *file,
+    void FileTransferThread::downloadFileFromStorageService(std::shared_ptr<DataFile>file,
                                                             std::shared_ptr<FileLocation> src_location,
                                                             std::shared_ptr<FileLocation> dst_location) {
         if (file == nullptr) {

@@ -11,7 +11,7 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FailureCause.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_not_found, "Log category for FileNotFound");
 
@@ -22,7 +22,7 @@ namespace wrench {
      * @param file: the file that could not be found
      * @param location: the location at which it could not be found (could be nullptr)
      */
-    FileNotFound::FileNotFound(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    FileNotFound::FileNotFound(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         this->file = file;
         this->location = location;
     }
@@ -31,7 +31,7 @@ namespace wrench {
      * @brief Getter
      * @return the file
      */
-    WorkflowFile *FileNotFound::getFile() {
+    std::shared_ptr<DataFile>FileNotFound::getFile() {
         return this->file;
     }
 

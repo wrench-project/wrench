@@ -10,8 +10,8 @@
 class SimpleStorageServiceDeleteRegisterTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_1;
-    wrench::WorkflowFile *file_2;
+    std::shared_ptr<wrench::DataFile> file_1;
+    std::shared_ptr<wrench::DataFile> file_2;
 
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
@@ -81,8 +81,8 @@ private:
         auto storage_service = *(this->getAvailableStorageServices().begin());
 
         // register both files
-        wrench::WorkflowFile *file_1 = this->test->file_1;
-        wrench::WorkflowFile *file_2 = this->test->file_2;
+        std::shared_ptr<wrench::DataFile> file_1 = this->test->file_1;
+        std::shared_ptr<wrench::DataFile> file_2 = this->test->file_2;
 
         file_registry_service->addEntry(file_1, wrench::FileLocation::LOCATION(storage_service));
         file_registry_service->addEntry(file_2, wrench::FileLocation::LOCATION(storage_service));

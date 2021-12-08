@@ -25,7 +25,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudStandardJobScheduler::scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                  const std::vector<WorkflowTask *> &tasks) {
+                                                  const std::vector<std::shared_ptr<WorkflowTask>> &tasks) {
 
         // Check that the right compute_services is passed
         if (compute_services.size() != 1) {
@@ -96,7 +96,7 @@ namespace wrench {
             WRENCH_INFO("Submitting task '%s' for execution on a VM", task->getID().c_str());
 
             // Submitting the task
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
             for (auto f : task->getInputFiles()) {
                 file_locations[f] = (FileLocation::LOCATION(default_storage_service));
             }

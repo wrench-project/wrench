@@ -30,7 +30,7 @@ namespace wrench {
 
     class WorkflowTask;
 
-    class WorkflowFile;
+    class DataFile;
 
     class Job;
 
@@ -63,34 +63,34 @@ namespace wrench {
 
         std::shared_ptr<CompoundJob> createCompoundJob(std::string name);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       const std::map<WorkflowFile *, std::shared_ptr<FileLocation> >& file_locations,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<std::shared_ptr<WorkflowTask>> tasks,
+                                                       const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation> >& file_locations,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<std::shared_ptr<WorkflowTask>> tasks,
+                                                       std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
 
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<std::shared_ptr<WorkflowTask>> tasks,
+                                                       std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<std::shared_ptr<WorkflowTask>> tasks,
+                                                       std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(WorkflowTask *task,
-                                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(std::shared_ptr<WorkflowTask>task,
+                                                       std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(WorkflowTask *task,
-                                                       std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(std::shared_ptr<WorkflowTask>task,
+                                                       std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks);
+        std::shared_ptr<StandardJob> createStandardJob(std::vector<std::shared_ptr<WorkflowTask>> tasks);
 
-        std::shared_ptr<StandardJob> createStandardJob(WorkflowTask *task);
+        std::shared_ptr<StandardJob> createStandardJob(std::shared_ptr<WorkflowTask>task);
 
         std::shared_ptr<PilotJob> createPilotJob();
 

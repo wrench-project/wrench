@@ -94,7 +94,7 @@ namespace wrench {
 
         /* Now let's create a map of file locations, stating for each file
          * where is should be read/written while the task executes */
-        std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+        std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
 
         file_locations[infile_1] = FileLocation::LOCATION(storage_service2);
         file_locations[infile_2] = FileLocation::LOCATION(storage_service1);

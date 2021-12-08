@@ -83,7 +83,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void StorageService::createFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void StorageService::createFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
@@ -97,7 +97,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void StorageService::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void StorageService::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
@@ -108,7 +108,7 @@ namespace wrench {
      * @param mountpoint: a mount point
      * @param directory: a directory
      */
-    void StorageService::stageFile(WorkflowFile *file, std::string mountpoint, std::string directory) {
+    void StorageService::stageFile(std::shared_ptr<DataFile>file, std::string mountpoint, std::string directory) {
         auto fs = this->file_systems[mountpoint].get();
 
         try {
@@ -181,7 +181,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_arguments
      */
-    bool StorageService::lookupFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    bool StorageService::lookupFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
         }
@@ -229,7 +229,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_arguments
      */
-    void StorageService::readFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void StorageService::readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
@@ -322,7 +322,7 @@ namespace wrench {
      *
      * @throw ExecutionException
      */
-    void StorageService::writeFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void StorageService::writeFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
@@ -408,7 +408,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw ExecutionException
      */
-    void StorageService::readFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations) {
+    void StorageService::readFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(READ, std::move(locations));
     }
 
@@ -420,7 +420,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw ExecutionException
      */
-    void StorageService::writeFiles(std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations) {
+    void StorageService::writeFiles(std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         StorageService::writeOrReadFiles(WRITE, std::move(locations));
     }
 
@@ -434,7 +434,7 @@ namespace wrench {
      * @throw ExecutionException
      */
     void StorageService::writeOrReadFiles(FileOperation action,
-                                          std::map<WorkflowFile *, std::shared_ptr<FileLocation>> locations) {
+                                          std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
         for (auto const &f : locations) {
             if ((f.first == nullptr) or (f.second == nullptr)) {
                 throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid argument");
@@ -442,7 +442,7 @@ namespace wrench {
         }
 
         // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
-        std::map<std::string, WorkflowFile *> sorted_files;
+        std::map<std::string, std::shared_ptr<DataFile>> sorted_files;
         for (auto const &f : locations) {
             sorted_files[f.first->getID()] = f.first;
         }
@@ -484,7 +484,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(WorkflowFile *file,
+    void StorageService::deleteFile(std::shared_ptr<DataFile>file,
                                     std::shared_ptr<FileLocation> location,
                                     std::shared_ptr<FileRegistryService> file_registry_service) {
         if ((file == nullptr) or (location == nullptr)) {
@@ -545,7 +545,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_argument
      */
-    void StorageService::copyFile(WorkflowFile *file,
+    void StorageService::copyFile(std::shared_ptr<DataFile>file,
                                   std::shared_ptr<FileLocation> src_location,
                                   std::shared_ptr<FileLocation> dst_location) {
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
@@ -606,7 +606,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file,
+    void StorageService::initiateFileCopy(std::string answer_mailbox, std::shared_ptr<DataFile>file,
                                           std::shared_ptr<FileLocation> src_location,
                                           std::shared_ptr<FileLocation> dst_location) {
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {

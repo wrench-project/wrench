@@ -71,7 +71,7 @@ namespace wrench {
         /* While the workflow isn't done, repeat the main loop */
         while (not this->getWorkflow()->isDone()) {
 
-            std::vector<wrench::WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<wrench::std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
 
             for (auto ready_task : ready_tasks) {
 
@@ -80,9 +80,9 @@ namespace wrench {
 
                 /* First, we need to create a map of file locations, stating for each file
                  * where is should be read/written */
-                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
-                std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
-                std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
+                std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
+                std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
+                std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
 
                 for (auto input_file : ready_task->getInputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {

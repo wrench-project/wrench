@@ -17,19 +17,19 @@ class SimpleSimulationTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
-    wrench::WorkflowFile *output_file5;
-    wrench::WorkflowFile *output_file6;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file1;
+    std::shared_ptr<wrench::DataFile> output_file2;
+    std::shared_ptr<wrench::DataFile> output_file3;
+    std::shared_ptr<wrench::DataFile> output_file4;
+    std::shared_ptr<wrench::DataFile> output_file5;
+    std::shared_ptr<wrench::DataFile> output_file6;
+    std::shared_ptr<wrench::WorkflowTask> task1;
+    std::shared_ptr<wrench::WorkflowTask> task2;
+    std::shared_ptr<wrench::WorkflowTask> task3;
+    std::shared_ptr<wrench::WorkflowTask> task4;
+    std::shared_ptr<wrench::WorkflowTask> task5;
+    std::shared_ptr<wrench::WorkflowTask> task6;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
@@ -161,19 +161,20 @@ private:
         // Get a file registry service
         auto file_registry_service = this->getAvailableFileRegistryService();
 
-        std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks = this->test->workflow->getReadyTasks();
         if (tasks.size() != 5) {
             throw std::runtime_error("Should have five tasks ready to run, due to dependencies");
         }
 
-        std::map<std::string, std::vector<wrench::WorkflowTask *>> clustered_tasks = this->test->workflow->getReadyClusters();
+        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> clustered_tasks = this->test->workflow->getReadyClusters();
         if (clustered_tasks.size() != 3) {
             throw std::runtime_error("Should have exactly three clusters");
         }
 
         // Create a bogus standard job with an empty task list for coverage
         try {
-            job_manager->createStandardJob({});
+            std::vector<std::shared_ptr<wrench::WorkflowTask>> empty;
+            job_manager->createStandardJob(empty);
             throw std::runtime_error("Should not be able to create a job with an empty task1 list");
         } catch (std::invalid_argument &e) {
         }

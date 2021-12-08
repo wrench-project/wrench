@@ -22,7 +22,7 @@ namespace wrench {
 
     class WorkflowTask;
 
-    class WorkflowFile;
+    class DataFile;
 
     class StandardJob;
 
@@ -52,7 +52,7 @@ namespace wrench {
          * @param src: destination location
          * @param failure_cause: a failure cause
          */
-        FileCopyFailedEvent(WorkflowFile *file,
+        FileCopyFailedEvent(std::shared_ptr<DataFile>file,
                             std::shared_ptr<FileLocation> src,
                             std::shared_ptr<FileLocation> dst,
                             std::shared_ptr<FailureCause> failure_cause
@@ -63,7 +63,7 @@ namespace wrench {
     public:
 
         /** @brief The workflow file that has failed to be copied */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */

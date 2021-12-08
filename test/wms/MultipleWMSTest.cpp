@@ -62,11 +62,11 @@ protected:
 
     wrench::Workflow *createWorkflow() {
         wrench::Workflow *workflow;
-        wrench::WorkflowFile *input_file;
-        wrench::WorkflowFile *output_file1;
-        wrench::WorkflowFile *output_file2;
-        wrench::WorkflowTask *task1;
-        wrench::WorkflowTask *task2;
+        std::shared_ptr<wrench::DataFile> input_file;
+        std::shared_ptr<wrench::DataFile> output_file1;
+        std::shared_ptr<wrench::DataFile> output_file2;
+        std::shared_ptr<wrench::WorkflowTask> task1;
+        std::shared_ptr<wrench::WorkflowTask> task2;
 
         // Create the simplest workflow
         workflow = new wrench::Workflow();
@@ -131,9 +131,9 @@ private:
         // Get the cloud service
         auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
 
-        std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
+        std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
         for (auto it : this->getWorkflow()->getInputFileMap()) {
-            std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
+            std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
                     std::make_tuple(it.second,
                                     wrench::FileLocation::LOCATION(this->test->storage_service),
                                     wrench::FileLocation::SCRATCH);
@@ -142,7 +142,7 @@ private:
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(),
-                                                           (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                           (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                                                            pre_copies,
                                                            {}, {});
 

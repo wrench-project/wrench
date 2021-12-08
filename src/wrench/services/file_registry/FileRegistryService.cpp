@@ -19,7 +19,7 @@
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include "FileRegistryMessage.h"
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
 #include <wrench/failure_causes/NetworkError.h>
@@ -58,7 +58,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(WorkflowFile *file) {
+    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(std::shared_ptr<DataFile>file) {
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
         }
@@ -105,7 +105,7 @@ namespace wrench {
      * @return a map of <distance , file location> pairs
      */
     std::map<double, std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(
-            WorkflowFile *file,
+            std::shared_ptr<DataFile>file,
             std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service) {
 
@@ -163,7 +163,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntry(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
         }
@@ -207,7 +207,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::removeEntry(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
         }
@@ -374,7 +374,7 @@ namespace wrench {
      * @param file: a file
      * @param storage_service: a storage_service
      */
-    void FileRegistryService::addEntryToDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntryToDatabase(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
                     location->getStorageService()->getHostname().c_str());
         if (this->entries.find(file) == this->entries.end()) {
@@ -395,7 +395,7 @@ namespace wrench {
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    bool FileRegistryService::removeEntryFromDatabase(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         WRENCH_INFO("Removing file (%s) from the file registry", file->getID().c_str());
         if (this->entries.find(file) != this->entries.end()) {
             for (auto const &l : this->entries[file]) {

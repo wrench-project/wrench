@@ -22,7 +22,7 @@ namespace wrench {
 
     class WorkflowTask;
 
-    class WorkflowFile;
+    class DataFile;
 
     class StandardJob;
 
@@ -53,7 +53,7 @@ namespace wrench {
          * @param file_registry_service: a file registry service
          * @param file_registry_service_updated: whether the file registry service has been updated
          */
-        FileCopyCompletedEvent(WorkflowFile *file,
+        FileCopyCompletedEvent(std::shared_ptr<DataFile>file,
                                std::shared_ptr<FileLocation> src,
                                std::shared_ptr<FileLocation> dst,
                                std::shared_ptr<FileRegistryService> file_registry_service,
@@ -64,7 +64,7 @@ namespace wrench {
 
     public:
         /** @brief The workflow file that has successfully been copied */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */

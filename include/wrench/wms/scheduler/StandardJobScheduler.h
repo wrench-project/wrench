@@ -54,7 +54,7 @@ namespace wrench {
          * @param tasks: the set of tasks to be executed
          */
         virtual void scheduleTasks(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                   const std::vector<WorkflowTask *> &tasks) = 0;
+                                   const std::vector<std::shared_ptr<WorkflowTask>> &tasks) = 0;
 
         /***********************/
         /** \cond DEVELOPER    */

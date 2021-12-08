@@ -18,7 +18,7 @@
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -33,18 +33,18 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        StorageServiceNotEnoughSpace(WorkflowFile *file, std::shared_ptr<StorageService>  storage_service);
+        StorageServiceNotEnoughSpace(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService>  storage_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        WorkflowFile *getFile();
+        std::shared_ptr<DataFile>getFile();
         std::shared_ptr<StorageService>  getStorageService();
         std::string toString() override;
 
 
     private:
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         std::shared_ptr<StorageService>  storage_service;
     };
 

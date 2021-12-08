@@ -27,7 +27,7 @@ namespace wrench {
         void process(Workflow *workflow);
 
     private:
-        WorkflowTask *getTask(std::vector<WorkflowTask *> tasks);
+        std::shared_ptr<WorkflowTask>getTask(std::vector<std::shared_ptr<WorkflowTask>> tasks);
         /***********************/
         /** \endcond           */
         /***********************/

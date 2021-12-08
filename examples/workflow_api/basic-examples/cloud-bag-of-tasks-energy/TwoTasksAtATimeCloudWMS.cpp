@@ -84,7 +84,7 @@ namespace wrench {
 
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const WorkflowTask *t1, const WorkflowTask  *t2) -> bool {
+                      [](const std::shared_ptr<WorkflowTask>t1, const WorkflowTask  *t2) -> bool {
 
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1 > (uintptr_t) t2);
@@ -100,7 +100,7 @@ namespace wrench {
             /* Submit the cheap task to the small VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations1;
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations1;
             file_locations1[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations1[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 
@@ -117,7 +117,7 @@ namespace wrench {
             /* Submit the expensive task1 to the large VM */
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations2;
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations2;
             file_locations2[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations2[expensive_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
 

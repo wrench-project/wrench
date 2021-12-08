@@ -17,7 +17,7 @@
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
     class FileLocation;
 
     /***********************/
@@ -36,20 +36,20 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(WorkflowFile *file,
+        FileAlreadyBeingCopied(std::shared_ptr<DataFile>file,
                                std::shared_ptr<FileLocation> src,
                                std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        WorkflowFile *getFile();
+        std::shared_ptr<DataFile>getFile();
         std::shared_ptr<FileLocation> getSourceLocation();
         std::shared_ptr<FileLocation> getDestinationLocation();
         std::string toString() override;
 
     private:
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         std::shared_ptr<FileLocation> src_location;
         std::shared_ptr<FileLocation> dst_location;
     };

@@ -445,7 +445,7 @@ private:
         // At this point, using the fcfs algorithm, a 2-node 30-min job should complete around t=1.5 hours
         // and 4-node 30-min job should complete around t=2.5 hours
 
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         std::map<std::string, std::string> batch_job_args;
 
         // Create and submit a job that needs 2 nodes and 30 minutes
@@ -825,7 +825,7 @@ private:
 
         wrench::Simulation::sleep(10);
 
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         std::map<std::string, std::string> batch_job_args;
 
         // Create and submit a job that needs 2 nodes and 10 minutes
@@ -989,7 +989,7 @@ private:
 
         wrench::Simulation::sleep(10);
 
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         std::map<std::string, std::string> batch_job_args;
 
         // Create and submit a job that needs 2 nodes and 10 minutes
@@ -1179,7 +1179,7 @@ private:
         // At this point, using the fcfs algorithm, a 2-node 30-min job should complete around t=1.5 hours
         // and 4-node 30-min job should complete around t=2.5 hours
 
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         std::map<std::string, std::string> batch_job_args;
 
         // Create and submit a job that needs 2 nodes and 30 minutes

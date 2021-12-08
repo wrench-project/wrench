@@ -101,24 +101,24 @@ namespace wrench {
 
         unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(WorkflowFile *file, std::shared_ptr <FileLocation> location,
+        bool processFileDeleteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
                                       std::string answer_mailbox);
 
-        bool processFileWriteRequest(WorkflowFile *file, std::shared_ptr <FileLocation>, std::string answer_mailbox,
+        bool processFileWriteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation>, std::string answer_mailbox,
                                      unsigned long buffer_size);
 
         bool
-        processFileReadRequest(WorkflowFile *file, std::shared_ptr <FileLocation> location, std::string answer_mailbox,
+        processFileReadRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location, std::string answer_mailbox,
                                std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
-        bool processFileCopyRequest(WorkflowFile *file,
+        bool processFileCopyRequest(std::shared_ptr<DataFile>file,
                                     std::shared_ptr <FileLocation> src,
                                     std::shared_ptr <FileLocation> dst,
                                     std::string answer_mailbox);
 
         bool processFileTransferThreadNotification(
                 std::shared_ptr <FileTransferThread> ftt,
-                WorkflowFile *file,
+                std::shared_ptr<DataFile>file,
                 std::string src_mailbox,
                 std::shared_ptr <FileLocation> src_location,
                 std::string dst_mailbox,

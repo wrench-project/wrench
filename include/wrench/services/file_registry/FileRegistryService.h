@@ -22,7 +22,7 @@
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
 
     class StorageService;
 
@@ -63,15 +63,15 @@ namespace wrench {
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
+        std::set<std::shared_ptr<FileLocation>> lookupEntry(std::shared_ptr<DataFile>file);
 
         std::map<double, std::shared_ptr<FileLocation>> lookupEntry(
-                WorkflowFile *file, std::string reference_host,
+                std::shared_ptr<DataFile>file, std::string reference_host,
                 std::shared_ptr <NetworkProximityService> network_proximity_service);
 
-        void addEntry(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        void addEntry(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
-        void removeEntry(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        void removeEntry(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
         /****************************/
         /** \endcond                */
@@ -90,15 +90,15 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        void addEntryToDatabase(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
-        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        bool removeEntryFromDatabase(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
         int main() override;
 
         bool processNextMessage();
 
-        std::map<WorkflowFile *, std::set < std::shared_ptr < FileLocation>>>
+        std::map<std::shared_ptr<DataFile>, std::set < std::shared_ptr < FileLocation>>>
         entries;
     };
 
