@@ -135,7 +135,6 @@ set(HEADER_FILES
         include/wrench/wms/scheduler/PilotJobScheduler.h
         include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
-        include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
         include/wrench/execution_events/ExecutionEvent.h
         include/wrench/execution_events/CompoundJobCompletedEvent.h
@@ -187,6 +186,7 @@ set(HEADER_FILES
         include/wrench/workflow/parallel_model/CustomParallelModel.h
         include/wrench/execution_controller/ExecutionController.h
         include/wrench/execution_controller/ExecutionControllerMessage.h
+        include/wrench/data_file/DataFile.h
         )
 
 # source files
@@ -315,7 +315,6 @@ set(SOURCE_FILES
         src/wrench/wms/WMSMessage.h
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/DagOfTasks.cpp
-        src/wrench/workflow/WorkflowFile.cpp
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/parallel_model/ParallelModel.cpp
         src/wrench/workflow/parallel_model/AmdahlParallelModel.cpp
@@ -355,6 +354,7 @@ set(SOURCE_FILES
         src/wrench/job/Job.cpp
         src/wrench/execution_controller/ExecutionController.cpp
         src/wrench/execution_controller/ExecutionControllerMessage.cpp
+        src/wrench/data_file/DataFile.cpp
         )
 
 # test files

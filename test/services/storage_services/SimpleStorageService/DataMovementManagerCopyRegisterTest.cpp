@@ -14,13 +14,13 @@ WRENCH_LOG_CATEGORY(data_movement_manager_copy_register_test, "Log category for 
 class DataMovementManagerCopyRegisterTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *src_file_1;
-    wrench::WorkflowFile *src_file_2;
-    wrench::WorkflowFile *src_file_3;
+    std::shared_ptr<wrench::DataFile> src_file_1;
+    std::shared_ptr<wrench::DataFile> src_file_2;
+    std::shared_ptr<wrench::DataFile> src_file_3;
 
-    wrench::WorkflowFile *src2_file_1;
-    wrench::WorkflowFile *src2_file_2;
-    wrench::WorkflowFile *src2_file_3;
+    std::shared_ptr<wrench::DataFile> src2_file_1;
+    std::shared_ptr<wrench::DataFile> src2_file_2;
+    std::shared_ptr<wrench::DataFile> src2_file_3;
 
     std::shared_ptr<wrench::StorageService> dst_storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> src_storage_service = nullptr;

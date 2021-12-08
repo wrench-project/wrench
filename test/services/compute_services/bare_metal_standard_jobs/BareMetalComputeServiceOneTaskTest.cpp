@@ -18,9 +18,9 @@ WRENCH_LOG_CATEGORY(bare_metal_compute_service_test, "Log category for BareMetal
 
 class BareMetalComputeServiceOneTaskTest : public ::testing::Test {
 public:
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file;
-    wrench::WorkflowTask *task;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file;
+    std::shared_ptr<wrench::WorkflowTask> task;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
@@ -445,7 +445,8 @@ private:
 
         // Create a job with an empty vector of tasks (and no file copies)
         try {
-            job = job_manager->createStandardJob({},
+            std::vector<std::shared_ptr<wrench::WorkflowTask>> empty;
+            job = job_manager->createStandardJob(empty,
                                                  {{test->input_file,  wrench::FileLocation::LOCATION(
                                                          (test->storage_service1))},
                                                   {test->output_file, wrench::FileLocation::LOCATION(
@@ -456,7 +457,7 @@ private:
 
         // Create a job with a vector of empty tasks (and no file copies)
         try {
-            job = job_manager->createStandardJob({nullptr, nullptr},
+            job = job_manager->createStandardJob((std::vector<std::shared_ptr<wrench::WorkflowTask>>){nullptr, nullptr},
                                                  {{test->input_file,  wrench::FileLocation::LOCATION(
                                                          (test->storage_service1))},
                                                   {test->output_file, wrench::FileLocation::LOCATION(
@@ -466,7 +467,7 @@ private:
         }
 
         // Create another task1
-        wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
+        std::shared_ptr<wrench::WorkflowTask> task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job with nullptrs in file locations
         try {
@@ -976,7 +977,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        std::map<wrench::WorkflowFile*, std::vector<std::shared_ptr<wrench::FileLocation>>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::vector<std::shared_ptr<wrench::FileLocation>>> file_locations;
         file_locations[test->input_file] = {};
         // First location won't work, but second will
         file_locations[test->input_file].push_back(wrench::FileLocation::LOCATION(test->storage_service2, "/disk2"));
@@ -1419,7 +1420,7 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob({},
-                                                  (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                  (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                   {std::make_tuple(test->input_file,
                                                                    wrench::FileLocation::LOCATION(
                                                                            test->storage_service1),
@@ -1553,7 +1554,7 @@ private:
 
         // Create a job
         auto job = job_manager->createStandardJob({},
-                                                  (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){},
+                                                  (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
                                                   {std::make_tuple(test->input_file,
                                                                    wrench::FileLocation::LOCATION(
                                                                            test->storage_service1),
@@ -1680,7 +1681,7 @@ private:
                                            wrench::FileLocation::LOCATION(test->storage_service1));
 
         // Create a job ubmit the job
-        std::map<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[test->input_file] = wrench::FileLocation::LOCATION(test->storage_service2);
         file_locations[test->output_file] = wrench::FileLocation::LOCATION(test->storage_service2);
         auto job = job_manager->createStandardJob(test->task, file_locations);
@@ -1803,7 +1804,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create another task1
-        wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
+        std::shared_ptr<wrench::WorkflowTask> task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
         auto job = job_manager->createStandardJob(task_big);
@@ -1920,7 +1921,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
+        std::shared_ptr<wrench::WorkflowTask> task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 2048);
 
         // Create a job
         auto job = job_manager->createStandardJob(task_big);

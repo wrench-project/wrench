@@ -17,7 +17,7 @@
 #include <vector>
 #include <wrench/workflow/Workflow.h>
 #include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 
 #include "Job.h"
 
@@ -29,7 +29,7 @@ namespace wrench {
     /** \cond DEVELOPER    */
     /***********************/
 
-    class WorkflowFile;
+    class DataFile;
     class WorkflowTask;
     class Action;
 
@@ -57,7 +57,7 @@ namespace wrench {
                     TERMINATED
         };
 
-        std::vector<WorkflowTask *> getTasks();
+        std::vector<std::shared_ptr<WorkflowTask>> getTasks();
 
         unsigned long getMinimumRequiredNumCores() const;
 
@@ -71,24 +71,24 @@ namespace wrench {
 
         bool usesScratch();
 
-        std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
 
 
         /** @brief The job's computational tasks */
-        std::vector<WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
 
         /** @brief The job's total computational cost (in flops) */
         double total_flops;
 
         /** @brief The file locations that tasks should read/write files from/to. Each file is given a list of locations, in preferred order */
-        std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations;
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations;
 
         /** @brief The ordered file copy operations to perform before computational tasks */
-        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies;
+        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> pre_file_copies;
         /** @brief The ordered file copy operations to perform after computational tasks */
-        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> post_file_copies;
+        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>  >> post_file_copies;
         /** @brief The ordered file deletion operations to perform at the end */
-        std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
+        std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions;
 
         /**
          * @brief Get the shared pointer for this object
@@ -117,18 +117,18 @@ namespace wrench {
         friend class ExecutionEvent;
 
         StandardJob(std::shared_ptr<JobManager> job_manager,
-                    std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
-                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &pre_file_copies,
-                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &post_file_copies,
-                    std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
+                    std::vector<std::shared_ptr<WorkflowTask>> tasks, std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
+                    std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &pre_file_copies,
+                    std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  , std::shared_ptr<FileLocation>>> &post_file_copies,
+                    std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions);
 
         void createUnderlyingCompoundJob(const std::shared_ptr<ComputeService>& compute_service);
-        void processCompoundJobOutcome(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
-                                       std::set<WorkflowTask *> &failure_count_increments,
+        void processCompoundJobOutcome(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                       std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                        std::shared_ptr<FailureCause> &job_failure_cause,
                                        Simulation *simulation);
-        void applyTaskUpdates(std::map<WorkflowTask *, WorkflowTask::State> &state_changes,
-                                std::set<WorkflowTask *> &failure_count_increments);
+        void applyTaskUpdates(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
+                                std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
 
         void analyzeActions(std::vector<std::shared_ptr<Action>> actions,
                                          bool *at_least_one_failed,
@@ -147,9 +147,9 @@ namespace wrench {
         std::shared_ptr<Action> pre_overhead_action = nullptr;
         std::shared_ptr<Action> post_overhead_action = nullptr;
         std::vector<std::shared_ptr<Action>> pre_file_copy_actions;
-        std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
-        std::map<WorkflowTask*, std::shared_ptr<Action>> task_compute_actions;
-        std::map<WorkflowTask*, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
+        std::map<std::shared_ptr<WorkflowTask>, std::vector<std::shared_ptr<Action>>> task_file_read_actions;
+        std::map<std::shared_ptr<WorkflowTask>, std::shared_ptr<Action>> task_compute_actions;
+        std::map<std::shared_ptr<WorkflowTask>, std::vector<std::shared_ptr<Action>>> task_file_write_actions;
         std::vector<std::shared_ptr<Action>> post_file_copy_actions;
         std::vector<std::shared_ptr<Action>> cleanup_actions;
         std::shared_ptr<Action> scratch_cleanup = nullptr;

@@ -34,7 +34,7 @@ class ComputeActionExecutorTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
-    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
 
     void do_ComputeActionExecutorSuccessTest_test();

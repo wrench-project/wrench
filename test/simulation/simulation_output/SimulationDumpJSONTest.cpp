@@ -27,10 +27,10 @@
 class SimulationDumpJSONTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowTask *t1 = nullptr;
-    wrench::WorkflowTask *t2 = nullptr;
-    wrench::WorkflowTask *t3 = nullptr;
-    wrench::WorkflowTask *t4 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> t1 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> t2 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> t3 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> t4 = nullptr;
 
     void do_SimulationDumpWorkflowExecutionJSON_test();
     void do_SimulationDumpWorkflowGraphJSON_test();
@@ -1247,7 +1247,7 @@ public:
 
 private:
     SimulationDumpJSONTest *test;
-    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::DataFile> file;
 
     int main() {
         //creating the bandwidth meter service
@@ -1306,9 +1306,9 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     storage_services_list.insert(server_storage_service);
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
-    //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
+    //std::shared_ptr<wrench::DataFile> file = new wrench::WorkflowFile("test_file", 10*GB);
     std::unique_ptr<wrench::Workflow> link_usage_workflow = std::make_unique<wrench::Workflow>();
-    wrench::WorkflowTask *single_task;
+    std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
 

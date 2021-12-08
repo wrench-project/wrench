@@ -16,7 +16,7 @@
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
     class FileLocation;
 
     /**
@@ -25,7 +25,7 @@ namespace wrench {
     class FileCopyAction : public Action {
 
     public:
-        WorkflowFile *getFile() const;
+        std::shared_ptr<DataFile>getFile() const;
         std::shared_ptr<FileLocation> getSourceFileLocation() const;
         std::shared_ptr<FileLocation> getDestinationFileLocation() const;
 
@@ -35,7 +35,7 @@ namespace wrench {
         friend class CompoundJob;
 
         FileCopyAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                WorkflowFile *file,
+                                std::shared_ptr<DataFile>file,
                                 std::shared_ptr<FileLocation> src_file_location,
                                 std::shared_ptr<FileLocation> dst_file_location);
 
@@ -44,7 +44,7 @@ namespace wrench {
         void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
         std::shared_ptr<FileLocation> src_file_location;
         std::shared_ptr<FileLocation> dst_file_location;
 

@@ -157,7 +157,7 @@ namespace wrench {
         std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
 
 
-        std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
+        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
@@ -172,7 +172,7 @@ namespace wrench {
 
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
-//        void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
+//        void storeFilesStoredInScratch(std::set<std::shared_ptr<DataFile>> scratch_files);
 
         // Cleanup the scratch if I am a pilot job
         void cleanUpScratch();
@@ -204,7 +204,7 @@ namespace wrench {
         void processIsThereAtLeastOneHostWithAvailableResources(
                 const std::string &answer_mailbox, unsigned long num_cores, double ram);
 
-//        std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
+//        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<WorkflowTask>task,
 //                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
 //                                                              std::set<std::string> &hosts_to_avoid);
 

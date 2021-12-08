@@ -54,7 +54,7 @@ namespace wrench {
      * @param file: the file
      * @throw std::invalid_argument
      */
-    void WorkflowTask::addInputFile(WorkflowFile *file) {
+    void WorkflowTask::addInputFile(std::shared_ptr<DataFile>file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
@@ -71,11 +71,11 @@ namespace wrench {
 
         // Add the file
         this->input_files[file->getID()] = file;
-        file->setInputOf(this);
+        this->workflow->task_input_files[file].insert(this->getSharedPtr());
 
         // Add control dependency
-        if (file->getOutputOf()) {
-            workflow->addControlDependency(file->getOutputOf(), this);
+        if (this->workflow->task_output_files.find(file) != this->workflow->task_output_files.end()) {
+            workflow->addControlDependency(this->workflow->task_output_files[file], this->getSharedPtr());
         }
     }
 
@@ -84,7 +84,7 @@ namespace wrench {
      *
      * @param file: the file
      */
-    void WorkflowTask::addOutputFile(WorkflowFile *file) {
+    void WorkflowTask::addOutputFile(std::shared_ptr<DataFile>file) {
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -94,18 +94,18 @@ namespace wrench {
         }
 
         // If the file is already output of another task, complain
-        if (file->getOutputOf() != nullptr) {
+        if (this->workflow->isFileOutputOfSomeTask(file)) {
             throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
                                         "' is already an output file of another task (task '" +
-                                        file->getOutputOf()->getID() + "')");
+                                                this->workflow->getTaskThatOutputs(file)->getID() + "')");
         }
 
         // Otherwise proceeed
         this->output_files[file->getID()] = file;
-        file->setOutputOf(this);
+        this->workflow->task_output_files[file] = this->getSharedPtr();
 
-        for (auto const &x : file->getInputOf()) {
-            workflow->addControlDependency(this, x.second);
+        for (auto const &x : this->workflow->getTasksThatInput(file)) {
+            workflow->addControlDependency(this->getSharedPtr(), x);
         }
     }
 
@@ -159,8 +159,8 @@ namespace wrench {
      *
      * @return a number of children
      */
-    unsigned long WorkflowTask::getNumberOfChildren() const {
-        return this->workflow->getTaskNumberOfChildren(this);
+    unsigned long WorkflowTask::getNumberOfChildren() {
+        return this->workflow->getTaskNumberOfChildren(this->getSharedPtr());
     }
 
     /**
@@ -168,8 +168,8 @@ namespace wrench {
      *
      * @return a list of workflow tasks
      */
-    std::vector<WorkflowTask *> WorkflowTask::getChildren() const {
-        return this->getWorkflow()->getTaskChildren(this);
+    std::vector<std::shared_ptr<WorkflowTask>> WorkflowTask::getChildren() {
+        return this->getWorkflow()->getTaskChildren(this->getSharedPtr());
     }
 
     /**
@@ -177,8 +177,8 @@ namespace wrench {
      *
      * @return a number of parents
      */
-    unsigned long WorkflowTask::getNumberOfParents() const {
-        return this->workflow->getTaskNumberOfParents(this);
+    unsigned long WorkflowTask::getNumberOfParents() {
+        return this->workflow->getTaskNumberOfParents(this->getSharedPtr());
     }
 
     /**
@@ -186,8 +186,8 @@ namespace wrench {
      *
      * @return a list of workflow tasks
      */
-    std::vector<WorkflowTask *> WorkflowTask::getParents() const {
-        return this->getWorkflow()->getTaskParents(this);
+    std::vector<std::shared_ptr<WorkflowTask>> WorkflowTask::getParents() {
+        return this->getWorkflow()->getTaskParents(this->getSharedPtr());
     }
 
     /**
@@ -639,11 +639,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of input WorkflowFile objects for the task
+     * @brief Get the list of input DataFile objects for the task
      * @return a list workflow files
      */
-    std::vector<WorkflowFile *> WorkflowTask::getInputFiles() const {
-        std::vector<WorkflowFile *> input;
+    std::vector<std::shared_ptr<DataFile>> WorkflowTask::getInputFiles() const {
+        std::vector<std::shared_ptr<DataFile>> input;
 
         for (auto f: this->input_files) {
             input.push_back(f.second);
@@ -652,11 +652,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of output WorkflowFile objects for the task
+     * @brief Get the list of output DataFile objects for the task
      * @return a list of workflow files
      */
-    std::vector<WorkflowFile *> WorkflowTask::getOutputFiles() const {
-        std::vector<WorkflowFile *> output;
+    std::vector<std::shared_ptr<DataFile>> WorkflowTask::getOutputFiles() const {
+        std::vector<std::shared_ptr<DataFile>> output;
 
         for (auto f: this->output_files) {
             output.push_back(f.second);
@@ -749,7 +749,7 @@ namespace wrench {
      * @return the task's updated top level
      */
     unsigned long WorkflowTask::updateTopLevel() {
-        std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
+        std::vector<std::shared_ptr<WorkflowTask>> parents = this->workflow->getTaskParents(this->getSharedPtr());
         if (parents.empty()) {
             this->toplevel = 0;
         } else {
@@ -759,7 +759,7 @@ namespace wrench {
             }
             this->toplevel = 1 + max_toplevel;
         }
-        std::vector<WorkflowTask *> children = this->workflow->getTaskChildren(this);
+        std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
         for (auto child : children) {
             child->updateTopLevel();
         }

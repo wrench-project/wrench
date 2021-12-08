@@ -154,7 +154,7 @@ private:
 
         {
             // Create a sequential task1 that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -167,11 +167,11 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
@@ -292,8 +292,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -339,7 +339,7 @@ private:
         {
 
             // Create a sequential task1 that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -352,11 +352,11 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
@@ -466,8 +466,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> output_file = this->workflow->addFile("output_file", 20000.0);
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -514,7 +514,7 @@ private:
         {
 
             // Create a sequential task1 that lasts 5 minutes and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -527,11 +527,11 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
@@ -579,7 +579,7 @@ private:
         {
 
             // Create a sequential task1 that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 60, 2, 2, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 60, 2, 2, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
@@ -592,11 +592,11 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
@@ -692,8 +692,8 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
             this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> output_file = this->workflow->addFile("output_file", 20000.0);
 
     ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
@@ -741,7 +741,7 @@ private:
         {
 
             // Submit the first job for 300 seconds and using 4 full cores
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task->addOutputFile(this->getWorkflow()->getFileByID("output_file1"));
 
@@ -754,11 +754,11 @@ private:
                             {*(task->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
 
@@ -776,7 +776,7 @@ private:
 
 
             // Submit the second job for next 300 seconds and using 2 cores
-            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask("task1", 299, 1, 1, 0);
             task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task1->addOutputFile(this->getWorkflow()->getFileByID("output_file2"));
 
@@ -789,11 +789,11 @@ private:
                             {*(task1->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task1->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args1;
@@ -809,7 +809,7 @@ private:
             }
 
             // Submit the third job for next 300 seconds and using 4 cores
-            wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 299, 1, 1, 0);
             task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
             task2->addOutputFile(this->getWorkflow()->getFileByID("output_file3"));
 
@@ -821,11 +821,11 @@ private:
                             {*(task2->getInputFiles().begin()),  wrench::FileLocation::LOCATION(this->test->storage_service1)},
                             {*(task2->getOutputFiles().begin()), wrench::FileLocation::LOCATION(this->test->storage_service1)}
                     },
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>(
                             this->getWorkflow()->getFileByID("input_file"), wrench::FileLocation::LOCATION(this->test->storage_service1),
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
-                    {std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
+                    {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
                                                                                                  wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args2;

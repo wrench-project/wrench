@@ -27,9 +27,9 @@ WRENCH_LOG_CATEGORY(simple_storage_service_performance_test, "Log category for S
 class SimpleStorageServicePerformanceTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_1;
-    wrench::WorkflowFile *file_2;
-    wrench::WorkflowFile *file_3;
+    std::shared_ptr<wrench::DataFile> file_1;
+    std::shared_ptr<wrench::DataFile> file_2;
+    std::shared_ptr<wrench::DataFile> file_3;
     std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
 

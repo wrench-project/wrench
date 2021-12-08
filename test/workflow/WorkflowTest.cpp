@@ -53,8 +53,8 @@ protected:
     // data members
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4;
-    wrench::WorkflowFile *f1, *f2, *f3, *f4, *f5;
+    std::shared_ptr<wrench::WorkflowTask> t1, t2, t3, t4;
+    std::shared_ptr<wrench::DataFile> f1, f2, f3, f4, f5;
 };
 
 TEST_F(WorkflowTest, WorkflowStructure) {
@@ -115,7 +115,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_THROW(workflow->getTaskNumberOfChildren(nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->getTaskNumberOfParents(nullptr), std::invalid_argument);
     // Get tasks with a given top-level
-    std::vector<wrench::WorkflowTask *> top_level_equal_to_1_or_2;
+    std::vector<std::shared_ptr<wrench::WorkflowTask> > top_level_equal_to_1_or_2;
     top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1, 2);
     ASSERT_EQ(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t1),
               top_level_equal_to_1_or_2.end());
@@ -191,7 +191,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     workflow->removeTask(t1);
 
     auto bogus_workflow = new wrench::Workflow();
-    wrench::WorkflowTask *bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
+    std::shared_ptr<wrench::WorkflowTask> bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(-2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(-2.0)), std::invalid_argument);
@@ -215,6 +215,7 @@ TEST_F(WorkflowTest, WorkflowFile) {
 
     ASSERT_EQ(workflow->getInputFiles().size(), 1);
 }
+
 //
 //TEST_F(WorkflowTest, UpdateTaskState) {
 //  // testing update task1 state
@@ -276,7 +277,7 @@ protected:
     // data members
     std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4;
+    std::shared_ptr<wrench::WorkflowTask> t1, t2, t3, t4;
 };
 
 TEST_F(AllDependenciesWorkflowTest, AllDependenciesWorkflowStructure) {

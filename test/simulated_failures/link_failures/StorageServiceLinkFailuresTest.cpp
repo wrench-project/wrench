@@ -29,7 +29,7 @@ WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for Storag
 class StorageServiceLinkFailuresTest : public ::testing::Test {
 
 public:
-    std::vector<wrench::WorkflowFile *> files;
+    std::vector<std::shared_ptr<wrench::DataFile> > files;
     std::vector<std::shared_ptr<wrench::StorageService>> storage_services;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
@@ -112,7 +112,7 @@ private:
 
     std::shared_ptr<wrench::DataMovementManager> data_movement_manager;
 
-    wrench::WorkflowFile *findRandomFileOnStorageService(std::shared_ptr<wrench::StorageService> ss) {
+    std::shared_ptr<wrench::DataFile> findRandomFileOnStorageService(std::shared_ptr<wrench::StorageService> ss) {
         std::uniform_int_distribution<unsigned long> dist_files(0, this->test->files.size()-1);
 
         for (int trial = 0; trial < NUM_FILES; trial++) {

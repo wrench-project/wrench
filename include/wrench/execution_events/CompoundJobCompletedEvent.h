@@ -24,7 +24,7 @@ namespace wrench {
 
     class WorkflowTask;
 
-    class WorkflowFile;
+    class DataFile;
 
     class CompoundJob;
 

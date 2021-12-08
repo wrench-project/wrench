@@ -105,7 +105,7 @@ protected:
     std::unique_ptr<wrench::Workflow> workflow;
 
 public:
-    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
 
 };

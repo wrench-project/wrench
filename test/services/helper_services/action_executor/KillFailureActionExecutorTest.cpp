@@ -35,8 +35,8 @@ class KillFailActionExecutorTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
-    wrench::WorkflowFile *file;
-    wrench::WorkflowFile *file_to_write;
+    std::shared_ptr<wrench::DataFile> file;
+    std::shared_ptr<wrench::DataFile> file_to_write;
     std::shared_ptr<wrench::StorageService> ss1;
     std::shared_ptr<wrench::StorageService> ss2;
 

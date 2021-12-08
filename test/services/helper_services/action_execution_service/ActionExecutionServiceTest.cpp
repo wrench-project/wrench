@@ -35,7 +35,7 @@ class ActionExecutionServiceTest : public ::testing::Test {
 
 public:
     wrench::Simulation *simulation;
-    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
 
     void do_ActionExecutionServiceOneActionSuccessTest_test();

@@ -34,7 +34,7 @@ protected:
 
     // data members
     wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4, *t5;
+    std::shared_ptr<wrench::WorkflowTask> t1, *t2, *t3, *t4, *t5;
 };
 
 TEST_F(SimplePipelineClusteringTest, GroupTasks) {
@@ -44,7 +44,7 @@ TEST_F(SimplePipelineClusteringTest, GroupTasks) {
 
   opt->process(workflow);
 
-  std::map<std::string, std::vector<wrench::WorkflowTask *>> map = workflow->getReadyTasks();
+  std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> map = workflow->getReadyTasks();
   ASSERT_EQ(map.size(), 1);
 
   ASSERT_EQ(map.begin()->second.size(), 3);

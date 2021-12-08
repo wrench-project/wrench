@@ -9,7 +9,7 @@
 
 
 #include <wrench/logging/TerminalOutput.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/job/Job.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/compute/ComputeService.h>
@@ -25,7 +25,7 @@ namespace wrench {
      * @param file: the file that could not be written
      * @param storage_service:  the storage service that ran out of spacee
      */
-    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file,
+    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(std::shared_ptr<DataFile>file,
                                                                std::shared_ptr<StorageService> storage_service) {
         this->file = file;
         this->storage_service = storage_service;
@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Getter
      * @return the file
      */
-    WorkflowFile *StorageServiceNotEnoughSpace::getFile() {
+    std::shared_ptr<DataFile>StorageServiceNotEnoughSpace::getFile() {
         return this->file;
     }
 

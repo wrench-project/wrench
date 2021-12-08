@@ -73,11 +73,11 @@ namespace wrench {
         while (not this->getWorkflow()->isDone()) {
 
             /* Get the ready tasks */
-            std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
 
             /* Sort them by increasing flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const WorkflowTask *t1, const WorkflowTask  *t2) -> bool {
+                      [](const std::shared_ptr<WorkflowTask>t1, const WorkflowTask  *t2) -> bool {
 
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1 > (uintptr_t) t2);
@@ -102,7 +102,7 @@ namespace wrench {
 
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
-            std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+            std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
             file_locations[cheap_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations[cheap_ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             file_locations[expensive_ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);

@@ -21,8 +21,8 @@ public:
     std::shared_ptr<wrench::ComputeService> cs_batch = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
-    wrench::WorkflowFile *small_file = nullptr;
-    wrench::WorkflowFile *big_file = nullptr;
+    std::shared_ptr<wrench::DataFile> small_file = nullptr;
+    std::shared_ptr<wrench::DataFile> big_file = nullptr;
 
     void do_DefaultHandlerWMS_test();
     void do_CustomHandlerWMS_test();
@@ -123,7 +123,7 @@ private:
         // Get the list of pending pilot jobs
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -277,7 +277,7 @@ private:
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -295,7 +295,7 @@ private:
         }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();

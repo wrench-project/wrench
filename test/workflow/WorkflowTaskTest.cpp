@@ -26,8 +26,8 @@ public:
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
     std::unique_ptr<wrench::Workflow> workflow;
-    wrench::WorkflowTask *t1, *t2, *t4, *t5, *t6;
-    wrench::WorkflowFile *large_input_file, *small_input_file, *t4_output_file;
+    std::shared_ptr<wrench::WorkflowTask> t1, t2, t4, t5, t6;
+    std::shared_ptr<wrench::DataFile> large_input_file, small_input_file, t4_output_file;
 
     void do_WorkflowTaskExecutionHistory_test();
 
@@ -209,8 +209,8 @@ TEST_F(WorkflowTaskTest, GetSet) {
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
-    wrench::WorkflowFile *f1 = workflow->addFile("file-01", 10);
-    wrench::WorkflowFile *f2 = workflow->addFile("file-02", 100);
+    std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 10);
+    std::shared_ptr<wrench::DataFile> f2 = workflow->addFile("file-02", 100);
 
     t1->addInputFile(f1);
     t1->addOutputFile(f2);
@@ -224,7 +224,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
     ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
     ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
 
-    wrench::WorkflowTask *t3 = workflow->addTask("task1-03", 50, 2, 4, 0);
+    std::shared_ptr<wrench::WorkflowTask> t3 = workflow->addTask("task1-03", 50, 2, 4, 0);
     t3->addInputFile(f2);
 
     ASSERT_EQ(t3->getNumberOfParents(), 1);

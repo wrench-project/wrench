@@ -16,12 +16,12 @@ public:
     std::shared_ptr<wrench::StorageService> backup_storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
-    wrench::WorkflowTask *task1 = nullptr;
-    wrench::WorkflowTask *task2 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> task1 = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> task2 = nullptr;
 
-    wrench::WorkflowTask *failed_task = nullptr;
-    wrench::WorkflowFile *small_input_file = nullptr;
-    wrench::WorkflowFile *large_input_file = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> failed_task = nullptr;
+    std::shared_ptr<wrench::DataFile> small_input_file = nullptr;
+    std::shared_ptr<wrench::DataFile> large_input_file = nullptr;
 
 
     void do_SimulationTimestampTaskBasic_test();

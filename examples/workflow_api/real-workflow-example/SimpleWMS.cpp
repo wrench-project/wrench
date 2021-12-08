@@ -67,7 +67,7 @@ namespace wrench {
       while (true) {
 
         // Get the ready tasks
-        std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
+        std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
         auto compute_services = this->getAvailableComputeServices<ComputeService>();

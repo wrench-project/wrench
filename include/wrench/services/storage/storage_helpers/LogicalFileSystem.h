@@ -16,7 +16,7 @@
 #include <set>
 
 
-#include "wrench/workflow/WorkflowFile.h"
+#include <wrench/data_file/DataFile.h>
 
 namespace wrench {
 
@@ -41,29 +41,29 @@ namespace wrench {
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void reserveSpace(WorkflowFile *file, std::string absolute_path);
-        void unreserveSpace(WorkflowFile *file, std::string absolute_path);
+        void reserveSpace(std::shared_ptr<DataFile>file, std::string absolute_path);
+        void unreserveSpace(std::shared_ptr<DataFile>file, std::string absolute_path);
 
         void createDirectory(std::string absolute_path);
         bool doesDirectoryExist(std::string absolute_path);
         bool isDirectoryEmpty(std::string absolute_path);
         void removeEmptyDirectory(std::string absolute_path);
-        void storeFileInDirectory(WorkflowFile *file, std::string absolute_path);
-        void removeFileFromDirectory(WorkflowFile *file, std::string absolute_path);
+        void storeFileInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path);
+        void removeFileFromDirectory(std::shared_ptr<DataFile>file, std::string absolute_path);
         void removeAllFilesInDirectory(std::string absolute_path);
-        bool isFileInDirectory(WorkflowFile *file, std::string absolute_path);
-        std::set<WorkflowFile *> listFilesInDirectory(std::string absolute_path);
+        bool isFileInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path);
+        std::set<std::shared_ptr<DataFile>> listFilesInDirectory(std::string absolute_path);
 
 
     private:
 
         friend class StorageService;
 
-        void stageFile(WorkflowFile *file, std::string absolute_path);
+        void stageFile(std::shared_ptr<DataFile>file, std::string absolute_path);
 
         static std::map<std::string, StorageService*> mount_points;
 
-        std::map<std::string, std::set<WorkflowFile*>> content;
+        std::map<std::string, std::set<std::shared_ptr<DataFile>>> content;
 
         std::string hostname;
         StorageService *storage_service;
@@ -98,7 +98,7 @@ namespace wrench {
             }
         }
 
-        void assertFileIsInDirectory(WorkflowFile *file, std::string absolute_path) {
+        void assertFileIsInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path) {
             assertDirectoryExist(absolute_path);
             if (this->content[absolute_path].find(file) == this->content[absolute_path].end()) {
                 throw std::invalid_argument("LogicalFileSystem::assertFileIsInDirectory(): File " + file->getID() +

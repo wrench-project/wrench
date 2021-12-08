@@ -57,7 +57,7 @@
 
 // Workflow
 #include "wrench/workflow/WorkflowTask.h"
-#include "wrench/workflow/WorkflowFile.h"
+#include "wrench/data_file/DataFile.h"
 
 // Actions
 #include "wrench/action/Action.h"

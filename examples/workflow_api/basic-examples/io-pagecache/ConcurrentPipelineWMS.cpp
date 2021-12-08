@@ -67,7 +67,7 @@ namespace wrench {
         /* While the workflow isn't done, repeat the main loop */
         while (not this->getWorkflow()->isDone()) {
 
-            std::vector<wrench::WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<wrench::std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
 
             for (auto ready_task : ready_tasks) {
 
@@ -76,7 +76,7 @@ namespace wrench {
 
                 /* First, we need to create a map of file locations, stating for each file
                  * where is should be read/written */
-                std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations;
+                std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
 
                 for (auto input_file : ready_task->getInputFiles()) {
                     file_locations[input_file] = FileLocation::LOCATION(storage_service);

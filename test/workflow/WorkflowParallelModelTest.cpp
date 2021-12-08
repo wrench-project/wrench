@@ -22,7 +22,7 @@ class ParallelModelTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    wrench::WorkflowTask *task = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> task = nullptr;
 
     void do_AdmdahlParallelModelTest_test();
     void do_ConstantEfficiencyParallelModelTest_test();

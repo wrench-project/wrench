@@ -35,7 +35,7 @@ protected:
 
     // data members
     wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4;
+    std::shared_ptr<wrench::WorkflowTask> t1, *t2, *t3, *t4;
 };
 
 TEST_F(FailureDynamicClusteringTest, UngroupFailedTasks) {

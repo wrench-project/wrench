@@ -8,8 +8,8 @@
 class SimpleStorageServiceChunkingTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_size_0;
-    wrench::WorkflowFile *file_size_100;
+    std::shared_ptr<wrench::DataFile> file_size_0;
+    std::shared_ptr<wrench::DataFile> file_size_100;
 
     std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;

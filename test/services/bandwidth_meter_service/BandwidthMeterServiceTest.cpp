@@ -83,7 +83,7 @@ public:
 
 private:
     BandwidthMeterServiceTest *test;
-    wrench::WorkflowFile *file;
+    std::shared_ptr<wrench::DataFile> file;
 
     int main() {
         // Linknames
@@ -183,9 +183,9 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     storage_services_list.insert(server_storage_service);
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
-    //wrench::WorkflowFile *file = new wrench::WorkflowFile("test_file", 10*GB);
+    //std::shared_ptr<wrench::DataFile> file = new wrench::WorkflowFile("test_file", 10*GB);
     std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-    wrench::WorkflowTask *single_task;
+    std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
 

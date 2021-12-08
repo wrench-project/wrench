@@ -76,7 +76,7 @@ namespace wrench {
     class JobManagerStandardJobCompletedMessage : public JobManagerMessage {
     public:
         JobManagerStandardJobCompletedMessage(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
-                                              std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes);
+                                              std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes);
 
 
         /** @brief The job that is done */
@@ -84,7 +84,7 @@ namespace wrench {
         /** @brief The compute service on which the job ran */
         std::shared_ptr<ComputeService> compute_service;
         /** @brief The necessary task1 state changes */
-        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+        std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes;
     };
 
     /**
@@ -93,8 +93,8 @@ namespace wrench {
     class JobManagerStandardJobFailedMessage : public JobManagerMessage {
     public:
         JobManagerStandardJobFailedMessage(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
-                                           std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
-                                           std::set<WorkflowTask *> necessary_failure_count_increments,
+                                           std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes,
+                                           std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments,
                                            std::shared_ptr<FailureCause> cause);
 
 
@@ -103,9 +103,9 @@ namespace wrench {
         /** @brief The compute service on which the job has failed */
         std::shared_ptr<ComputeService> compute_service;
         /** @brief The task1 state change that should be made */
-        std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+        std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes;
         /** @brief The tasks whose failure counts need to be incremented */
-        std::set<WorkflowTask *> necessary_failure_count_increments;
+        std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
     };

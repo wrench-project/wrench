@@ -11,7 +11,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/action/Action.h>
 #include <wrench/action/FileReadAction.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/exceptions/ExecutionException.h>
 
@@ -30,7 +30,7 @@ namespace wrench {
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     */
     FileReadAction::FileReadAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                WorkflowFile *file,
+                                std::shared_ptr<DataFile>file,
                                    std::vector<std::shared_ptr<FileLocation>> file_locations) : Action(name, "file_read_", job),
                                 file(std::move(file)), file_locations(std::move(file_locations)) {
     }
@@ -39,7 +39,7 @@ namespace wrench {
      * @brief Returns the action's file
      * @return the file
      */
-    WorkflowFile *FileReadAction::getFile() const {
+    std::shared_ptr<DataFile>FileReadAction::getFile() const {
         return this->file;
     }
 

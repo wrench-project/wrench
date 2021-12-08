@@ -49,8 +49,11 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
         // Create and handle a bogus workflow
-        this->workflow = std::shared_ptr<Workflow>(new Workflow());
-        this->addWorkflow(this->workflow.get());
+
+        auto tmp = new Workflow();
+        std::cerr << "TMP = " << tmp << "\n";
+//        this->workflow = std::shared_ptr<Workflow>(tmp);
+        this->addWorkflow(tmp);
 
         // Create the dual WMS that will just receive workflow execution events so that I don't have to
         std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
@@ -89,11 +92,11 @@ namespace wrench {
             int num_nodes = std::get<5>(job);
 
             // Create the set of tasks
-            std::vector<WorkflowTask *> to_submit;
+            std::vector<std::shared_ptr<WorkflowTask>> to_submit;
             for (int i = 0; i < num_nodes; i++) {
                 double time_fudge = 1; // 1 second seems to make it all work!
                 double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
-                WorkflowTask *task = workflow->addTask(
+                auto task = workflow->addTask(
                         this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
                         task_flops,
                         num_cores_per_node, num_cores_per_node,

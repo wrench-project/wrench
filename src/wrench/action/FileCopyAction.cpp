@@ -11,7 +11,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/action/Action.h>
 #include <wrench/action/FileCopyAction.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/exceptions/ExecutionException.h>
 
@@ -31,7 +31,7 @@ namespace wrench {
     * @param dst_file_location: the location to which the file should be written
     */
     FileCopyAction::FileCopyAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                     WorkflowFile *file,
+                                     std::shared_ptr<DataFile>file,
                                      std::shared_ptr<FileLocation> src_file_location,
                                      std::shared_ptr<FileLocation> dst_file_location) :
             Action(name, "file_copy_", std::move(job)),
@@ -44,7 +44,7 @@ namespace wrench {
      * @brief Returns the action's file
      * @return the file
      */
-    WorkflowFile *FileCopyAction::getFile() const {
+    std::shared_ptr<DataFile>FileCopyAction::getFile() const {
         return this->file;
     }
 

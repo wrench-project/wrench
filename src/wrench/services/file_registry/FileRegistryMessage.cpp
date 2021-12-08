@@ -29,7 +29,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(std::string answer_mailbox,
-                                                                               WorkflowFile *file, double payload) :
+                                                                               std::shared_ptr<DataFile>file, double payload) :
             FileRegistryMessage("FILE_LOOKUP_REQUEST", payload) {
 
         if ((answer_mailbox == "") || file == nullptr) {
@@ -46,7 +46,7 @@ namespace wrench {
      * @param locations: the set of locations for the file
      * @param payload: the message size in bytes
      */
-    FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(WorkflowFile *file,
+    FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(std::shared_ptr<DataFile>file,
                                                                              std::set<std::shared_ptr<FileLocation>> locations,
                                                                              double payload) :
             FileRegistryMessage("FILE_LOOKUP_ANSWER", payload) {
@@ -67,7 +67,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
-            std::string answer_mailbox, WorkflowFile *file, std::string reference_host,
+            std::string answer_mailbox, std::shared_ptr<DataFile>file, std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) :
             FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_REQUEST", payload) {
         if ((file == nullptr) || (answer_mailbox == "") || (reference_host == "") ||
@@ -89,7 +89,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(
-            WorkflowFile *file, std::string reference_host,
+            std::shared_ptr<DataFile>file, std::string reference_host,
             std::map<double, std::shared_ptr<FileLocation>> locations,
             double payload) :
             FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_ANSWER", payload) {
@@ -110,7 +110,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox,
-                                                                                 WorkflowFile *file,
+                                                                                 std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  double payload) :
             FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload) {
@@ -143,7 +143,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(std::string answer_mailbox,
-                                                                           WorkflowFile *file,
+                                                                           std::shared_ptr<DataFile>file,
                                                                            std::shared_ptr<FileLocation> location,
                                                                            double payload) :
             FileRegistryMessage("ADD_ENTRY_REQUEST", payload) {

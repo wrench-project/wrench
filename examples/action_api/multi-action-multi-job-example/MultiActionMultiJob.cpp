@@ -102,19 +102,8 @@ int main(int argc, char **argv) {
             "CloudHeadHost", {"CloudHost1"}, "/scratch/", {}, {}));
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
-
     auto wms = simulation.add(
             new wrench::MultiActionMultiJobController("UserHost", baremetal_service, cloud_service, storage_service);
-
-    /* Associate the workflow to the WMS */
-    wms->addWorkflow(&workflow);
-
-    /* Instantiate a file registry service to be started on WMSHost. This service is
-     * essentially a replica catalog that stores <file , storage service> pairs so that
-     * any service, in particular a WMS, can discover where workflow files are stored. */
-    std::cerr << "Instantiating a FileRegistryService on WMSHost ..." << std::endl;
-    auto file_registry_service = new wrench::FileRegistryService("WMSHost");
-    simulation.add(file_registry_service);
 
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated

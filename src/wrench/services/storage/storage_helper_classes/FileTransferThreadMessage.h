@@ -64,7 +64,7 @@ namespace wrench {
          * @param failure_cause: the failure cause (nullptr if success)
          */
         FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
-                                              WorkflowFile *file,
+                                              std::shared_ptr<DataFile>file,
                                               std::string src_mailbox,
                                               std::shared_ptr<FileLocation> src_location,
                                               std::string dst_mailbox,
@@ -87,7 +87,7 @@ namespace wrench {
         /** @brief File transfer thread that sent this message */
         std::shared_ptr<FileTransferThread> file_transfer_thread;
         /** @brief File that was being communicated */
-        WorkflowFile *file;
+        std::shared_ptr<DataFile>file;
 
         /** @brief Source mailbox (or "" if source wasn't a mailbox) */
         std::string src_mailbox;

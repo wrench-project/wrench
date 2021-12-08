@@ -101,7 +101,7 @@ private:
     int main() {
 
         // Create a bunch of files
-        std::vector<wrench::WorkflowFile *> files;
+        std::vector<std::shared_ptr<wrench::DataFile> > files;
         for (unsigned int i=0; i < NUM_FILES; i++) {
             files.push_back(this->getWorkflow()->addFile("file_" + std::to_string(i) , 100.0));
         }

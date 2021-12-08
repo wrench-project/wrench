@@ -342,8 +342,8 @@ private:
 
     int main() {
 
-      wrench::WorkflowFile *file1 = this->getWorkflow()->addFile("file1", 100.0);
-      wrench::WorkflowFile * nullptr_file = nullptr;
+      std::shared_ptr<wrench::DataFile> file1 = this->getWorkflow()->addFile("file1", 100.0);
+      std::shared_ptr<wrench::DataFile>  nullptr_file = nullptr;
       auto frs = this->getAvailableFileRegistryService();
       auto nps = *(this->getAvailableNetworkProximityServices().begin());
 

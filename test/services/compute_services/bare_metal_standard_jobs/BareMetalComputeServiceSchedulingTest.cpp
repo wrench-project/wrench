@@ -114,7 +114,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a few tasks
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         tasks.push_back(this->getWorkflow()->addTask("task1", 60, 1, 1, 500));
         tasks.push_back(this->getWorkflow()->addTask("task2", 60, 1, 1, 600));
         tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 500));
@@ -136,7 +136,7 @@ private:
 
 
         // Wait for completions
-        std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
+        std::map<std::shared_ptr<wrench::WorkflowTask>, std::tuple<double,double>> times;
         for (int i=0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
@@ -266,7 +266,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a few tasks
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 500));
         tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 500));
         tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 500));
@@ -281,7 +281,7 @@ private:
         }
 
         // Wait for completions
-        std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
+        std::map<std::shared_ptr<wrench::WorkflowTask> , std::tuple<double,double>> times;
         for (int i=0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
@@ -296,7 +296,7 @@ private:
             }
 
             auto job = real_event->standard_job;
-            wrench::WorkflowTask *task = *(job->getTasks().begin());
+            std::shared_ptr<wrench::WorkflowTask> task = *(job->getTasks().begin());
             double start_time = task->getStartDate();
             double end_time = task->getEndDate();
             times.insert(std::make_pair(task, std::make_tuple(start_time, end_time)));
@@ -401,7 +401,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a few tasks
-        std::vector<wrench::WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 100));
         tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 100));
         tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 100));
@@ -416,7 +416,7 @@ private:
         }
 
         // Wait for completions
-        std::map<wrench::WorkflowTask*, std::tuple<double,double>> times;
+        std::map<std::shared_ptr<wrench::WorkflowTask> , std::tuple<double,double>> times;
         for (int i=0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
@@ -431,7 +431,7 @@ private:
             }
 
             auto job = real_event->standard_job;
-            wrench::WorkflowTask *task = *(job->getTasks().begin());
+            std::shared_ptr<wrench::WorkflowTask> task = *(job->getTasks().begin());
             double start_time = task->getStartDate();
             double end_time = task->getEndDate();
             times.insert(std::make_pair(task, std::make_tuple(start_time, end_time)));

@@ -63,7 +63,7 @@ namespace wrench {
             throw std::invalid_argument("Workflow::createWorkflowFromJson(): Could not find a workflow exit");
         }
 
-        wrench::WorkflowTask *task;
+        std::shared_ptr<wrench::WorkflowTask> task;
 
         for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
             if (it.key() == "jobs") {
@@ -135,7 +135,7 @@ namespace wrench {
                         double size = f.at("size");
                         std::string link = f.at("link");
                         std::string id = f.at("name");
-                        wrench::WorkflowFile *workflow_file = nullptr;
+                        std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
                         // Check whether the file already exists
                         try {
                             workflow_file = workflow->getFileByID(id);
@@ -172,7 +172,7 @@ namespace wrench {
                             continue;
                         }
                         try {
-                            WorkflowTask *parent_task = workflow->getTaskByID(parent);
+                            auto parent_task = workflow->getTaskByID(parent);
                             workflow->addControlDependency(parent_task, task, redundant_dependencies);
                         } catch (std::invalid_argument &e) {
                             // do nothing
@@ -228,7 +228,6 @@ namespace wrench {
 
         // Iterate through the "job" nodes
         for (pugi::xml_node job = dag.child("job"); job; job = job.next_sibling("job")) {
-            WorkflowTask *task;
             // Get the job attributes
             std::string id = job.attribute("id").value();
             std::string name = job.attribute("name").value();
@@ -258,7 +257,7 @@ namespace wrench {
 
             // Create the task
             // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, ram = 0.0
-            task = workflow->addTask(id, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
+            auto task = workflow->addTask(id, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
 
             // Go through the children "uses" nodes
             for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
@@ -269,7 +268,7 @@ namespace wrench {
                 double size = std::strtod(uses.attribute("size").value(), nullptr);
                 std::string link = uses.attribute("link").value();
                 // Check whether the file already exists
-                WorkflowFile *file = nullptr;
+                std::shared_ptr<DataFile> file = nullptr;
                 try {
                     file = workflow->getFileByID(id);
                 } catch (std::invalid_argument &e) {
@@ -288,13 +287,13 @@ namespace wrench {
         // Iterate through the "child" nodes to handle control dependencies
         for (pugi::xml_node child = dag.child("child"); child; child = child.next_sibling("child")) {
 
-            WorkflowTask *child_task = workflow->getTaskByID(child.attribute("ref").value());
+            auto child_task = workflow->getTaskByID(child.attribute("ref").value());
 
             // Go through the children "parent" nodes
             for (pugi::xml_node parent = child.child("parent"); parent; parent = parent.next_sibling("parent")) {
                 std::string parent_id = parent.attribute("ref").value();
 
-                WorkflowTask *parent_task = workflow->getTaskByID(parent_id);
+                auto parent_task = workflow->getTaskByID(parent_id);
                 workflow->addControlDependency(parent_task, child_task, redundant_dependencies);
             }
         }

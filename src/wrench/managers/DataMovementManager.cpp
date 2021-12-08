@@ -15,7 +15,7 @@
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <services/storage/StorageServiceMessage.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/wms/WMS.h>
 #include <wrench/managers/DataMovementManager.h>
 #include  <wrench/failure_causes/FileAlreadyBeingCopied.h>
@@ -70,7 +70,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
+    void DataMovementManager::initiateAsynchronousFileCopy(std::shared_ptr<DataFile>file,
                                                            std::shared_ptr<FileLocation> src,
                                                            std::shared_ptr<FileLocation> dst,
                                                            std::shared_ptr<FileRegistryService> file_registry_service) {
@@ -112,7 +112,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
+    void DataMovementManager::doSynchronousFileCopy(std::shared_ptr<DataFile>file,
                                                     std::shared_ptr<FileLocation> src,
                                                     std::shared_ptr<FileLocation> dst,
                                                     std::shared_ptr<FileRegistryService> file_registry_service) {

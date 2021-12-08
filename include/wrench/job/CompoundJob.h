@@ -39,6 +39,8 @@ namespace wrench {
     class CustomAction;
     class ActionExecutor;
 
+    class DataFile;
+
     /**
      * @brief A compound job
      */
@@ -75,30 +77,30 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          WorkflowFile *file,
+                                                          std::shared_ptr<DataFile>file,
                                                           std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          WorkflowFile *file,
+                                                          std::shared_ptr<DataFile>file,
                                                           std::vector<std::shared_ptr<FileLocation>> file_locations);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(std::string name,
-                                                            WorkflowFile *file,
+                                                            std::shared_ptr<DataFile>file,
                                                             std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileCopyAction> addFileCopyAction(std::string name,
-                                                            WorkflowFile *file,
+                                                            std::shared_ptr<DataFile>file,
                                                             std::shared_ptr<FileLocation> src_file_location,
                                                             std::shared_ptr<FileLocation> dst_file_location);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(std::string name,
-                                                          WorkflowFile *file,
+                                                          std::shared_ptr<DataFile>file,
                                                           std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::shared_ptr<FileRegistryService> file_registry, WorkflowFile *file,
+        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile>file,
                                                                                 std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::shared_ptr<FileRegistryService> file_registry, WorkflowFile *file,
+        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,

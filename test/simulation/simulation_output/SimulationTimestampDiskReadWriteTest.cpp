@@ -18,7 +18,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
 
-    wrench::WorkflowFile *file_1;
+    std::shared_ptr<wrench::DataFile> file_1;
 
     void do_SimulationTimestampDiskReadWriteBasic_test();
 
@@ -144,7 +144,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
 
 
     //stage files
-    std::set<wrench::WorkflowFile *> files_to_stage = {file_1};
+    std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1};
 
     for (auto const &f  : files_to_stage) {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service_1));

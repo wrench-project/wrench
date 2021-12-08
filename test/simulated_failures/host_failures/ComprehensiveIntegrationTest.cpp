@@ -258,7 +258,7 @@ private:
     bool scheduleAReadyTask() {
 
         // Find a ready task1
-        wrench::WorkflowTask *task = nullptr;
+        std::shared_ptr<wrench::WorkflowTask> task = nullptr;
         for (auto const &t : this->getWorkflow()->getTasks()) {
             if (t->getState() == wrench::WorkflowTask::READY) {
                 task = t;

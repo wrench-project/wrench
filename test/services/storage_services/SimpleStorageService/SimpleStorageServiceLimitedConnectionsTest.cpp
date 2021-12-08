@@ -28,7 +28,7 @@ WRENCH_LOG_CATEGORY(simple_storage_service_limited_connection_test, "Log categor
 class SimpleStorageServiceLimitedConnectionsTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *files[NUM_PARALLEL_TRANSFERS];
+    std::shared_ptr<wrench::DataFile> files[NUM_PARALLEL_TRANSFERS];
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_wms_unlimited = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_wms_limited = nullptr;

@@ -18,9 +18,9 @@ WRENCH_LOG_CATEGORY(bare_metal_compute_service_one_action_test, "Log category fo
 
 class BareMetalComputeServiceOneActionTest : public ::testing::Test {
 public:
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file;
-    wrench::WorkflowTask *task;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file;
+    std::shared_ptr<wrench::WorkflowTask> task;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
