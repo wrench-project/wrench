@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     /* Print all task1 execution information */
-    std::vector<wrench::WorkflowTask*> tasks = {task_default, task_constant_efficiency, task_amdahl};
+    std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = {task_default, task_constant_efficiency, task_amdahl};
     for (auto const &task : tasks) {
         std::cerr << "Task " + task->getID() + ": ";
         std::cerr << task->getFlops() << " on " << task->getNumCoresAllocated() <<" ran in ";
