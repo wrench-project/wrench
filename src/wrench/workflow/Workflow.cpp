@@ -518,18 +518,14 @@ namespace wrench {
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getInputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> input_files;
         for (auto const &f : this->files) {
-            std::cerr << "LOOKING AT FILE " << f.second->getID() << "\n";
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
-            std::cerr << "It's NOT INPUT TO ANY TASK!\n";
                 continue;
             }
             // If the file is output to a task, then it can't be what we want
             if (this->task_output_files.find(f.second) != this->task_output_files.end()) {
-            std::cerr << "It's OUTPUT  TO A TASK!\n";
               continue;
             }
-            std::cerr << "YEAR!\n";
             input_files[f.second->getID()] = f.second;
         }
         return input_files;

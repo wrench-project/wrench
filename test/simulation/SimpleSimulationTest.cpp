@@ -430,9 +430,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     file_registry_service->setNetworkTimeoutValue(100.0);
     file_registry_service->getNetworkTimeoutValue();
 
-    // Staging an invalid file on the storage service
-    ASSERT_THROW(simulation->stageFile(output_file1, storage_service), std::runtime_error);
-
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
