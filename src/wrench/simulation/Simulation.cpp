@@ -75,9 +75,6 @@ namespace wrench {
             std::cerr << "SIGABRT handler setup failed... uncaught exceptions will lead to unclean terminations\n";
         }
 
-        // Clear all data files
-        Simulation::data_files.clear();
-
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
     }
@@ -103,6 +100,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
+
+        if (Simulation::initialized) {
+            throw std::runtime_error("Simulation::init(): Simulation already initialized");
+        }
+
         if (*argc < 1) {
             throw std::invalid_argument("Simulation::init(): Invalid argc argument (must be >= 1)");
         }
@@ -116,7 +118,6 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
-        std::cerr << "CLEARING DATA FILES!\n";
         Simulation::data_files.clear();
 
         // By  default, logs are disabled
