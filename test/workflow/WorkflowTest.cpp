@@ -10,12 +10,19 @@
 #include <gtest/gtest.h>
 
 #include <wrench/data_file/DataFile.h>
+#include <wrench/simulation/Simulation.h>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/Workflow.h>
 
 class WorkflowTest : public ::testing::Test {
 protected:
+    ~WorkflowTest() {
+        std::cerr << "CLEARING WORFKLOW\n";
+        workflow->clear();
+    }
+
     WorkflowTest() {
+        std::cerr << "CREATING WORKFLOW\n";
         workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
@@ -150,7 +157,10 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     workflow->removeTask(t1);
 
-    // Create a bogus task1 using the constructor
+    std::cerr << "FINISHING TEST: #FILES IN WORKFLOWS " << wrench::Simulation::data_files.size() << "\n";
+    for (const auto &f : wrench::Simulation::data_files) {
+        std::cerr << "  - " << f.second->getID() << "\n";
+    }
 
 }
 
