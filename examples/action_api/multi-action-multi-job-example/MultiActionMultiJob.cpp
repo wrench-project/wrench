@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation.add(
-            new wrench::MultiActionMultiJobController("UserHost", baremetal_service, cloud_service, storage_service);
+            new MultiActionMultiJobController("UserHost", baremetal_service, cloud_service, storage_service);
 
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated
