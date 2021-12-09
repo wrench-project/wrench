@@ -35,7 +35,9 @@ namespace wrench {
 
     public:
 
+
         static std::shared_ptr<Workflow> createWorkflow();
+        void clear();
 
         /**
          * @brief Get the shared pointer for this object
@@ -129,6 +131,8 @@ namespace wrench {
 
         Workflow();
 
+
+
         struct Vertex{ std::shared_ptr<WorkflowTask>task;};
         typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Vertex> DAG;
         typedef boost::graph_traits<DAG>::vertex_descriptor vertex_t;
@@ -142,6 +146,8 @@ namespace wrench {
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<WorkflowTask>> task_output_files;
         std::map<std::shared_ptr<DataFile>, std::set<std::shared_ptr<WorkflowTask>>> task_input_files;
 
+        /* Set of files (also kept track by the simulation!) */
+        std::set<std::shared_ptr<DataFile>> data_files;
 
         std::string callback_mailbox;
         ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any

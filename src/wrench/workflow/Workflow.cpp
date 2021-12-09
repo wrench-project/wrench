@@ -20,6 +20,27 @@ WRENCH_LOG_CATEGORY(wrench_core_workflow, "Log category for Workflow");
 
 namespace wrench {
 
+    /**
+     * @brief Method that will delete all workflow tasks and all files used
+     *         by these tasks
+     */
+    void Workflow::clear() {
+        std::set<std::shared_ptr<DataFile>> to_remove;
+        for (auto const &t : this->tasks) {
+            for (auto const &f: t.second->getInputFiles()) {
+                to_remove.insert(f);
+            }
+            for (auto const &f: t.second->getOutputFiles()) {
+                to_remove.insert(f);
+            }
+        }
+        for (auto const &f : to_remove) {
+            std::cerr << "REMOVE FILE " << f->getID() << "\n";
+            this->simulation->removeFile(f);
+            this->data_files.erase(f);
+        }
+        this->tasks.clear();
+    }
 
     /**
      * @brief Create and add a new computational task to the workflow
@@ -90,11 +111,11 @@ namespace wrench {
         this->task_output_files.erase(file);
         this->task_input_files.erase(file);
         this->simulation->removeFile(file);
+        this->data_files.erase(file);
     }
 
     /**
-     * @brief Remove a task from the workflow. WARNING: this method de-allocated
-     *        memory_manager_service for the task, making any pointer to the task invalid
+     * @brief Remove a task from the workflow.
      *
      * @param task: a task
      *
@@ -702,7 +723,8 @@ namespace wrench {
      * @return a file
      */
     std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
-        return this->simulation->addFile(id, size);
+        auto data_file = this->simulation->addFile(id, size);
+        this->data_files.insert(data_file);
     }
 
     /**
