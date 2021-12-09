@@ -168,6 +168,11 @@ namespace wrench {
             throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
         }
 
+        if (this->dag.doesPathExist(dst, src)) {
+            throw std::runtime_error("Workflow::addControlDependency(): Adding dependency between task " + src->getID() +
+            " and " + dst->getID() + " would create a cycle in the workflow graph");
+        }
+
         if (redundant_dependencies || not this->dag.doesPathExist(src, dst)) {
 
             WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
