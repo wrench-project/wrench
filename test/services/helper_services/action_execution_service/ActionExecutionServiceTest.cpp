@@ -34,7 +34,7 @@ WRENCH_LOG_CATEGORY(action_scheduler_test, "Log category for ActionExecutionServ
 class ActionExecutionServiceTest : public ::testing::Test {
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
 
@@ -114,7 +114,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -204,7 +204,7 @@ TEST_F(ActionExecutionServiceTest, OneActionSuccess) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -216,7 +216,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
@@ -231,11 +231,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -326,7 +326,7 @@ TEST_F(ActionExecutionServiceTest, OneActionTerminate) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -338,7 +338,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
@@ -353,11 +353,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -496,7 +496,7 @@ TEST_F(ActionExecutionServiceTest, OneActionCrashRestart) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -508,7 +508,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
@@ -523,11 +523,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceOneActionCrashRestartTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -626,7 +626,7 @@ TEST_F(ActionExecutionServiceTest, OneActionCrashNoRestart) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestartTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -638,7 +638,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
@@ -653,11 +653,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -760,7 +760,7 @@ TEST_F(ActionExecutionServiceTest, OneActionFailure) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -772,7 +772,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
@@ -787,11 +787,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -870,7 +870,7 @@ TEST_F(ActionExecutionServiceTest, OneActionNotEnoughResources) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughResourcesTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -882,7 +882,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
@@ -897,11 +897,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1038,7 +1038,7 @@ TEST_F(ActionExecutionServiceTest, ThreeActionsInSequence) {
 void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequenceTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1050,7 +1050,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host4", {"/"}));
@@ -1065,11 +1065,11 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     ASSERT_NO_THROW(wms = simulation->add(
             new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

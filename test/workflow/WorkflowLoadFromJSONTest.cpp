@@ -3187,9 +3187,8 @@ protected:
 };
 
 TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    wrench::Workflow *workflow = nullptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
                  std::invalid_argument);

@@ -31,7 +31,7 @@ class BatchServiceOutputCSVFileTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_SimpleOutputCSVFile_test();
 
@@ -39,7 +39,7 @@ protected:
     BatchServiceOutputCSVFileTest() {
 
       // Create the simplest workflow
-      workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+      workflow = wrench::Workflow::createWorkflow();
 
       // Create a four-host 10-core platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -67,7 +67,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -179,7 +179,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
 
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -221,7 +221,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
           new SimpleOutputCSVFileTestWMS(
                   this,  {compute_service}, hostname)));
 
-  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
   ASSERT_NO_THROW(simulation->launch());
 
@@ -242,7 +242,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
   ASSERT_EQ(green_count, 2);
   ASSERT_EQ(red_count, 8);
 
-  delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

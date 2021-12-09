@@ -42,9 +42,9 @@
  * @return 0 on success, non-zero otherwise
  */
 
-wrench::Workflow *generate_workflow(int num_pipes, int num_tasks, int core_per_task,
+std::shared_ptr<wrench::Workflow> generate_workflow(int num_pipes, int num_tasks, int core_per_task,
                                     long flops, long file_size, long mem_required) {
-    wrench::Workflow *workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
 
     for (int i = 0; i < num_pipes; i++) {
 
@@ -102,8 +102,8 @@ int main(int argc, char **argv) {
 
     int num_tasks = 3;
 
-    wrench::Simulation simulation;
-    simulation.init(&argc, argv);
+    auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
 
     if (argc < 4) {
         std::cerr << "Usage: " << argv[0]
@@ -130,38 +130,38 @@ int main(int argc, char **argv) {
     }
 
     std::cerr << "Instantiating simulated platform..." << std::endl;
-    simulation.instantiatePlatform(argv[3]);
+    simulation->instantiatePlatform(argv[3]);
 
     /* Declare a workflow */
-    wrench::Workflow *workflow = generate_workflow(1, num_tasks, 1, cpu_time_sec * 1000000000,
+    auto workflow = generate_workflow(1, num_tasks, 1, cpu_time_sec * 1000000000,
                                                    file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
-    auto storage_service = simulation.add(new wrench::SimpleStorageService(
+    auto storage_service = simulation->add(new wrench::SimpleStorageService(
             "host01", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
 
     std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;
-    auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
+    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "host01", {"host01"}, "", {}, {}));
 
-    auto wms = simulation.add(
+    auto wms = simulation->add(
             new wrench::ConcurrentPipelineWMS({baremetal_service}, {storage_service}, "host01"));
 
     wms->addWorkflow(workflow);
 
     std::cerr << "Instantiating a FileRegistryService on host01 ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("host01");
-    simulation.add(file_registry_service);
+    simulation->add(file_registry_service);
 
     std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
-        simulation.stageFile(f, storage_service);
+        simulation->stageFile(f, storage_service);
     }
 
-    /* Launch the simulation. This call only returns when the simulation is complete. */
+    /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
-        simulation.launch();
+        simulation->launch();
     } catch (std::runtime_error &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return 1;
@@ -175,13 +175,13 @@ int main(int argc, char **argv) {
 
     {
         std::string filename = "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_time.csv";
-        export_output_single(simulation.getOutput(), num_tasks, filename);
+        export_output_single(simulation->getOutput(), num_tasks, filename);
         std::cerr << "Written output to file " + filename << "\n";
     }
 
     if (wrench::Simulation::isPageCachingEnabled()) {
         std::string filename = "output_single_" + sub_dir + to_string(file_size_gb) + "gb_sim_mem.csv";
-        simulation.getMemoryManagerByHost("host01")->export_log(filename);
+        simulation->getMemoryManagerByHost("host01")->export_log(filename);
         std::cerr << "Written output to file " + filename << "\n";
     }
 

@@ -93,7 +93,7 @@ TEST_F(ParallelModelTest, AmdahlParallelModelTest) {
 }
 
 void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -118,7 +118,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
             this, wms_host)));
 
-    auto workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
     double work = 100.0;
     double alpha = 0.3;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
@@ -141,7 +141,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
         " instead of " + std::to_string(expected_makespan));
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -158,7 +158,7 @@ TEST_F(ParallelModelTest, ConstantEfficiencyParallelModelTest) {
 }
 
 void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -183,7 +183,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
             this, wms_host)));
 
-    auto workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
     double work = 100.0;
     double efficiency = 0.3;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
@@ -208,7 +208,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
                                  " instead of " + std::to_string(expected_makespan));
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -225,7 +225,7 @@ TEST_F(ParallelModelTest, CustomParallelModelTest) {
 }
 
 void ParallelModelTest::do_CustomParallelModelTest_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -250,7 +250,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
             this, wms_host)));
 
-    auto workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
     double work = 100.0;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
@@ -280,7 +280,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
                                  " instead of " + std::to_string(expected_makespan));
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

@@ -8,8 +8,6 @@
  */
 
 #include <pugixml.hpp>
-#include <nlohmann/json.hpp>
-#include <wrench/util/UnitParser.h>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 #include <wrench/simulation/Simulation.h>
@@ -17,7 +15,6 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/workflow/Workflow.h>
-#include <wrench/workflow/DagOfTasks.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow, "Log category for Workflow");
 
@@ -57,7 +54,7 @@ namespace wrench {
         auto task = std::shared_ptr<WorkflowTask>(new WorkflowTask(id, flops, min_num_cores, max_num_cores,
                                      memory_requirement));
         // Associate the workflow to the task
-        task->workflow = this;
+        task->workflow = this->getSharedPtr();
 
         task->toplevel = 0; // upon creation, a task is an exit task
 
@@ -264,7 +261,6 @@ namespace wrench {
      */
     Workflow::Workflow() {
         this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
-        this->simulation = nullptr;
     }
 
     /**
@@ -725,6 +721,17 @@ namespace wrench {
      */
     std::shared_ptr<DataFile> Workflow::getFileByID(const std::string &id) {
         return this->simulation->getFileByID(id);
+    }
+
+    /**
+     * @brief Create a workflow instance
+     * @return
+     */
+    std::shared_ptr<Workflow> Workflow::createWorkflow() {
+//        if (not Simulation::isInitialized()) {
+//            throw std::runtime_error("Cannot create a workflow before the simulation is initialized");
+//        }
+        return std::shared_ptr<Workflow>(new Workflow());
     }
 
 

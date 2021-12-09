@@ -86,7 +86,7 @@ namespace wrench {
 
         Job *getJob() const;
 
-        Workflow *getWorkflow() const;
+        std::shared_ptr<Workflow> getWorkflow() const;
 
         std::string getClusterID() const;
 
@@ -285,7 +285,7 @@ namespace wrench {
         State upcoming_visible_state;      // A visible state that will become active once a WMS has process a previously sent workflow execution event
         InternalState internal_state;      // Not to be exposed to developer level
 
-        Workflow *workflow;                // Containing workflow
+        std::shared_ptr<Workflow> workflow;                // Containing workflow
 
         std::map<std::string, std::shared_ptr<DataFile>> output_files;   // List of output files
         std::map<std::string, std::shared_ptr<DataFile>> input_files;    // List of input files

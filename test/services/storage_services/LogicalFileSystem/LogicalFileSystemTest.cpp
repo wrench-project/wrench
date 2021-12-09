@@ -53,8 +53,7 @@ TEST_F(LogicalFileSystemTest, BasicTests) {
 
 void LogicalFileSystemTest::do_BasicTests() {
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
-    auto workflow = new wrench::Workflow();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
@@ -62,6 +61,7 @@ void LogicalFileSystemTest::do_BasicTests() {
 //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
+    auto workflow = wrench::Workflow::createWorkflow();
 
     // set up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
@@ -99,7 +99,6 @@ void LogicalFileSystemTest::do_BasicTests() {
     auto file1 = workflow->addFile("file1", 10000);
     ASSERT_THROW(fs1->reserveSpace(file, "/files/"), std::invalid_argument);
 
-    delete simulation;
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

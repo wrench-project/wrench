@@ -22,7 +22,7 @@ public:
 protected:
     SimpleStorageServiceDeleteRegisterTest() {
         // simple workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // create the files
         file_1 = workflow->addFile("file_1", FILE_SIZE);
@@ -54,7 +54,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 class SimpleStorageServiceDeleteRegisterTestWMS : public wrench::WMS {
@@ -119,7 +119,7 @@ TEST_F(SimpleStorageServiceDeleteRegisterTest, DeleteAndRegister) {
 
 void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     // ??
     int argc = 1;
@@ -162,7 +162,7 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

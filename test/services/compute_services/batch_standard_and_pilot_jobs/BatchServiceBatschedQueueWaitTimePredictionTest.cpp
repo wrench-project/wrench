@@ -43,7 +43,7 @@ protected:
     BatchServiceBatschedQueueWaitTimePredictionTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -122,7 +122,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -246,7 +246,7 @@ TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBrokenE
 void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -284,7 +284,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
             this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
@@ -303,7 +303,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -427,7 +427,7 @@ TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBasicEs
 void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -461,7 +461,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobBasicEstimateWaitingTimeTestWMS(
             this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -478,7 +478,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -654,7 +654,7 @@ TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobEstimat
 void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaitingTimeTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -695,7 +695,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
     std::shared_ptr<wrench::DataFile> output_file = this->workflow->addFile("output_file", 20000.0);
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -705,7 +705,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -928,7 +928,7 @@ TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobLittleC
 void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -962,7 +962,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobLittleComplexEstimateWaitingTimeTestWMS(
             this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -981,7 +981,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

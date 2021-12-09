@@ -61,7 +61,7 @@ protected:
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
 
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         file_1 = workflow->addFile("file_1", 100.0);
         file_2 = workflow->addFile("file_2", 100.0);
@@ -72,7 +72,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 /**********************************************************************/
@@ -154,7 +154,7 @@ TEST_F(SimulationTimestampFileCopyTest, SimulationTimestampFileCopyBasicTest) {
 }
 
 void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -186,7 +186,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
             this, {compute_service}, {source_storage_service, destination_storage_service, }, file_registry_service, host1
     )));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     //stage files
     std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1, file_2, file_3, xl_file, too_large_file};
@@ -315,7 +315,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
 
 
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

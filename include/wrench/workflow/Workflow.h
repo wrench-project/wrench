@@ -31,10 +31,18 @@ namespace wrench {
     /**
      * @brief A workflow (to be executed by a WMS)
      */
-    class Workflow {
+    class Workflow : public std::enable_shared_from_this<Workflow>  {
 
     public:
-        Workflow();
+
+        static std::shared_ptr<Workflow> createWorkflow();
+
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<Workflow> getSharedPtr() { return this->shared_from_this(); }
+
 
         std::shared_ptr<WorkflowTask> addTask(std::string, double flops,
                               unsigned long min_num_cores,
@@ -116,8 +124,10 @@ namespace wrench {
 
     private:
         friend class WMS;
-
+        friend class Simulation;
         friend class WorkflowTask;
+
+        Workflow();
 
         struct Vertex{ std::shared_ptr<WorkflowTask>task;};
         typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Vertex> DAG;

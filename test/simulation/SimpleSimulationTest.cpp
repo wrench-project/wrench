@@ -16,7 +16,7 @@
 class SimpleSimulationTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::shared_ptr<wrench::DataFile> input_file;
     std::shared_ptr<wrench::DataFile> output_file1;
     std::shared_ptr<wrench::DataFile> output_file2;
@@ -32,7 +32,6 @@ public:
     std::shared_ptr<wrench::WorkflowTask> task6;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_getReadyTasksTest_test();
 
@@ -40,8 +39,7 @@ protected:
 
     SimpleSimulationTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -339,7 +337,7 @@ TEST_F(SimpleSimulationTest, SimpleSimulationReadyTasksTestWMS) {
 void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -436,7 +434,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

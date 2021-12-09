@@ -34,7 +34,7 @@ WRENCH_LOG_CATEGORY(kill_fail_action_executor_test, "Log category for KillFailAc
 class KillFailActionExecutorTest : public ::testing::Test {
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::DataFile> file_to_write;
     std::shared_ptr<wrench::StorageService> ss1;
@@ -124,7 +124,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -332,7 +332,7 @@ TEST_F(KillFailActionExecutorTest, FailCustom) {
 void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep_time, bool kill, std::string action_type) {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -344,7 +344,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
@@ -363,11 +363,11 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     ASSERT_NO_THROW(wms = simulation->add(
             new KillFailActionExecutorTestWMS(this, "Host1", sleep_time, kill, action_type)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

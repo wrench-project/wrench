@@ -34,9 +34,9 @@
 #include <wrench/services/memory/MemoryManager.h>
 #include "NFSPipelineWMS.h" // WMS implementation
 
-wrench::Workflow *workflow_multithread(int num_pipes, int num_tasks, int core_per_task,
+std::shared_ptr<wrench::Workflow> workflow_multithread(int num_pipes, int num_tasks, int core_per_task,
                                        long flops, long file_size, long mem_required) {
-    auto workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
 
     for (int i = 0; i < num_pipes; i++) {
 
@@ -102,8 +102,8 @@ int main(int argc, char **argv) {
 
     int num_task = 3;
 
-    wrench::Simulation simulation;
-    simulation.init(&argc, argv);
+    auto simulation = wrench::Simulation::createSimulation();;
+    simulation->init(&argc, argv);
 
     if (argc < 5) {
         std::cerr << "Usage: " << argv[0]
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     }
 
     std::cerr << "Instantiating simulated platform..." << std::endl;
-    simulation.instantiatePlatform(argv[4]);
+    simulation->instantiatePlatform(argv[4]);
 
     int no_pipelines = 0;
     try {
@@ -145,17 +145,17 @@ int main(int argc, char **argv) {
                                                    file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on storage_host..." << std::endl;
-    auto server_storage_service = simulation.add(new wrench::SimpleStorageService(
+    auto server_storage_service = simulation->add(new wrench::SimpleStorageService(
             "storage_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
 
-    auto client_storage_service = simulation.add(new wrench::SimpleStorageService(
+    auto client_storage_service = simulation->add(new wrench::SimpleStorageService(
             "compute_host", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000"}}, {}));
 
     std::cerr << "Instantiating a bare-metal compute service on compute_host..." << std::endl;
-    auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
+    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "compute_host", {"compute_host"}, "", {}, {}));
 
-    auto wms = simulation.add(
+    auto wms = simulation->add(
             new wrench::NFSPipelineWMS({baremetal_service}, client_storage_service, server_storage_service,
                     "compute_host"));
 
@@ -163,18 +163,18 @@ int main(int argc, char **argv) {
 
     std::cerr << "Instantiating a FileRegistryService on compute_host ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("compute_host");
-    simulation.add(file_registry_service);
+    simulation->add(file_registry_service);
 
     std::cerr << "Staging task1 input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
-        simulation.stageFile(f, server_storage_service);
+        simulation->stageFile(f, server_storage_service);
     }
 
-    /* Launch the simulation. This call only returns when the simulation is complete. */
+    /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     try {
-        simulation.launch();
+        simulation->launch();
     } catch (std::runtime_error &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return 1;
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     std::string sub_dir = "original";
-    if (simulation.isPageCachingEnabled()) {
+    if (simulation->isPageCachingEnabled()) {
         sub_dir = "pagecache";
     }
 
@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
     fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start)/ 1000);
     fclose(time_log_file);
 
-//    simulation.getOutput().dumpUnifiedJSON(workflow,
+//    simulation->getOutput().dumpUnifiedJSON(workflow,
 //                                           "nfs/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
 
     return 0;

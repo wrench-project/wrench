@@ -42,6 +42,11 @@ namespace wrench {
     bool Simulation::host_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
 
+    bool Simulation::initialized = false;
+
+    std::map<std::string, std::shared_ptr<DataFile>> Simulation::data_files;
+
+
     /**
      * \cond
      */
@@ -69,6 +74,9 @@ namespace wrench {
         if (previous_handler == SIG_ERR) {
             std::cerr << "SIGABRT handler setup failed... uncaught exceptions will lead to unclean terminations\n";
         }
+
+        // Clear all data files
+        Simulation::data_files.clear();
 
         // Create the S4U simulation wrapper
         this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
@@ -108,6 +116,8 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
+        std::cerr << "CLEARING DATA FILES!\n";
+        Simulation::data_files.clear();
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
@@ -128,9 +138,9 @@ namespace wrench {
                 xbt_log_control_set("root.thresh:info");
             } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
                 sg_host_energy_plugin_init();
-                this->energy_enabled = true;
+                Simulation::energy_enabled = true;
             } else if (not strcmp(argv[i], "--wrench-host-shutdown-simulation")) {
-                this->host_shutdown_enabled = true;
+                Simulation::host_shutdown_enabled = true;
             } else if ((not strcmp(argv[i], "--help-wrench")) or
                        (not strcmp(argv[i], "--wrench-help"))) {
                 wrench_help_requested = true;
@@ -231,6 +241,8 @@ namespace wrench {
             argv[*argc] = strdup("--help");
             (*argc)++;
         }
+
+        Simulation::initialized = true;
     }
 
     /**
@@ -488,7 +500,7 @@ namespace wrench {
         for (const auto &execution_controller : this->execution_controllers) {
             if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {
                 // Check that at least one StorageService is running (only needed if there are files in the workflow),
-                if (not this->data_files.empty()) {
+                if (not Simulation::data_files.empty()) {
                     bool one_storage_service_running = false;
                     for (const auto &storage_service : this->storage_services) {
                         if (storage_service->state == Service::UP) {
@@ -1485,7 +1497,7 @@ namespace wrench {
       * @return a reference to the map of files in the simulation, indexed by file ID
       */
     std::map<std::string, std::shared_ptr<DataFile>> &Simulation::getFileMap() {
-        return this->data_files;
+        return Simulation::data_files;
     }
 
     /**
@@ -1498,10 +1510,10 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     std::shared_ptr<DataFile> Simulation::getFileByID(const std::string &id) {
-        if (this->data_files.find(id) == this->data_files.end()) {
+        if (Simulation::data_files.find(id) == Simulation::data_files.end()) {
             throw std::invalid_argument("Workflow::getFileByID(): Unknown DataFile ID " + id);
         } else {
-            return this->data_files[id];
+            return Simulation::data_files[id];
         }
     }
 
@@ -1522,7 +1534,7 @@ namespace wrench {
         }
 
         // Create the DataFile object
-        if (this->data_files.find(id) != this->data_files.end()) {
+        if (Simulation::data_files.find(id) != Simulation::data_files.end()) {
             throw std::invalid_argument("Simulation::addFile(): DataFile with id '" +
                                         id + "' already exists");
         }
@@ -1530,7 +1542,7 @@ namespace wrench {
         auto file = std::shared_ptr<DataFile>(new DataFile(id, size));
 
         // Add if to the set of workflow files
-        this->data_files[file->id] = file;
+        Simulation::data_files[file->id] = file;
 
         return file;
     }
@@ -1540,10 +1552,26 @@ namespace wrench {
      * @param file : file to remove
      */
     void Simulation::removeFile(std::shared_ptr<DataFile> file) {
-        if (this->data_files.find(file->getID()) == this->data_files.end()) {
+        if (Simulation::data_files.find(file->getID()) == Simulation::data_files.end()) {
             throw std::invalid_argument("Simulation::removeFile(): Unknown file");
         }
-        this->data_files.erase(file->getID());
+        Simulation::data_files.erase(file->getID());
+    }
+
+    /**
+     * @brief Determine if the simulation has been initialized
+     * @return  true or false
+     */
+    bool Simulation::isInitialized() {
+        return Simulation::initialized;
+    }
+
+    /**
+     * @brief Create a simulation
+     * @return a simulation
+     */
+    std::shared_ptr<Simulation> Simulation::createSimulation() {
+        return std::shared_ptr<Simulation>(new Simulation);
     }
 
 }

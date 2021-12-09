@@ -235,7 +235,7 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
 
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -252,13 +252,13 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this,"Host2"));
 
     // Create a bogus workflow
-    auto workflow =  std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-    this->wms1->addWorkflow(workflow.get());
-    this->wms2->addWorkflow(workflow.get());
+    auto workflow =  wrench::Workflow::createWorkflow();
+    this->wms1->addWorkflow(workflow);
+    this->wms2->addWorkflow(workflow);
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

@@ -34,7 +34,7 @@ protected:
     DataMovementManagerCopyRegisterTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         src_file_1 = workflow->addFile("file_1", FILE_SIZE);
@@ -87,7 +87,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 /**********************************************************************/
@@ -331,7 +331,7 @@ TEST_F(DataMovementManagerCopyRegisterTest, CopyAndRegister) {
 
 void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
@@ -381,7 +381,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

@@ -42,7 +42,7 @@ protected:
     SimpleStorageServiceLimitedConnectionsTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow = wrench::Workflow::createWorkflow();
 
       // Create the files
       for (size_t i=0; i < NUM_PARALLEL_TRANSFERS; i++) {
@@ -103,7 +103,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -218,7 +218,7 @@ TEST_F(SimpleStorageServiceLimitedConnectionsTest, ConcurrencyFileCopies) {
 void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test() {
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -275,7 +275,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
-  delete simulation;
+
   for (int i=0; i < argc; i++)
      free(argv[i]);
   free(argv);

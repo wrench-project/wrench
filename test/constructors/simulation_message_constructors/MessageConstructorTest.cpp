@@ -56,7 +56,7 @@ protected:
     MessageConstructorTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -87,7 +87,7 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 public:
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::shared_ptr<wrench::StorageService> storage_service;
     std::shared_ptr<wrench::ComputeService> compute_service;
     std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
@@ -396,7 +396,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
 //    argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     simulation->init(&argc, argv);
 
@@ -415,11 +415,11 @@ void MessageConstructorTest::do_MessageConstruction_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     CUSTOM_NO_THROW(wms = simulation->add(new MessageConstructorTestWMS(this, hostname)));
 
-    CUSTOM_NO_THROW(wms->addWorkflow(workflow.get()));
+    CUSTOM_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

@@ -26,7 +26,7 @@ class BatchServiceCONSERVATIVE_BFTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-//    wrench::Simulation *simulation;
+//    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_SimpleCONSERVATIVE_BF_test();
     void do_LargeCONSERVATIVE_BF_test(int seed);
@@ -41,7 +41,7 @@ protected:
     BatchServiceCONSERVATIVE_BFTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -69,7 +69,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -201,7 +201,7 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, SimpleCONSERVATIVE_BFTest)
 void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -227,11 +227,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
             new SimpleCONSERVATIVE_BFTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -373,7 +373,7 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BFTest)
 void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -403,11 +403,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
             new LargeCONSERVATIVE_BFTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -549,7 +549,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
 
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -576,11 +576,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
             new SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -719,7 +719,7 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, BatschedBrokenTest)
 void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -746,11 +746,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
             new BatschedBrokenTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -894,7 +894,7 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, SimpleCONSERVATIVE_BF_CORE_LEVELTest)
 void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -921,11 +921,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test()
             new SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1069,7 +1069,7 @@ TEST_F(BatchServiceCONSERVATIVE_BFTest, LargeCONSERVATIVE_BF_CORE_LEVELTest)
 void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_CORE_LEVEL_test(int seed) {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1099,11 +1099,11 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_CORE_LEVEL_test(in
             new LargeCONSERVATIVE_BF_CORE_LEVELTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

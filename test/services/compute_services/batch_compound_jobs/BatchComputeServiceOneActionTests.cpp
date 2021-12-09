@@ -42,8 +42,7 @@ protected:
     BatchComputeServiceOneActionTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
@@ -117,8 +116,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -150,39 +148,39 @@ TEST_F(BatchComputeServiceOneActionTest, BadSetup) {
 }
 
 void BatchComputeServiceOneActionTest::do_BadSetup_test() {
-    wrench::Simulation simulation;
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
     auto **argv = (char **) calloc(argc, sizeof(char *));
 
-    ASSERT_THROW(simulation.init(&argc, argv), std::invalid_argument);
+    ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
     free(argv);
 
     argc = 1;
-    ASSERT_THROW(simulation.init(&argc, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
 
-    ASSERT_THROW(simulation.instantiatePlatform(platform_file_path), std::runtime_error);
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
-    ASSERT_THROW(simulation.launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
 
     argc = 1;
     argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
 //    argv[1] = strdup("--wrench-full-log");
 
-    simulation.init(&argc, argv);
+    simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_NO_THROW(simulation.instantiatePlatform(platform_file_path));
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Empty resource list
-    ASSERT_THROW(compute_service = simulation.add(
+    ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService("Host1",
                                             {},
                                             {})), std::invalid_argument);
 
     // Bad hostname
-    ASSERT_THROW(compute_service = simulation.add(
+    ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService("bogus",
                                             {""},
                                             {})), std::invalid_argument);
@@ -191,13 +189,13 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
     std::string hostname = "Host1";
 
     // Bad resource hostname
-    ASSERT_THROW(compute_service = simulation.add(
+    ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"bogus"}, "",
                                             {})), std::invalid_argument);
 
     // Bad PROPERTIES
-    ASSERT_THROW(compute_service = simulation.add(
+    ASSERT_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"RAMHost"},
                                             "",
@@ -209,7 +207,7 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
                                             {})), std::invalid_argument);
 
     // Create a WMS
-    auto wms = simulation.add(new BatchBadSetupTestWMS(this, {}, {}, hostname));
+    auto wms = simulation->add(new BatchBadSetupTestWMS(this, {}, {}, hostname));
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -322,7 +320,7 @@ TEST_F(BatchComputeServiceOneActionTest, OneSleepAction) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -376,7 +374,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -491,7 +489,7 @@ TEST_F(BatchComputeServiceOneActionTest, OneComputeActionNotEnoughResources) {
 
 void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -546,7 +544,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -629,7 +627,7 @@ TEST_F(BatchComputeServiceOneActionTest, OneComputeActionBogusServiceSpecificArg
 
 void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificArgs_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -684,7 +682,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -788,7 +786,7 @@ TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -844,7 +842,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -925,7 +923,7 @@ TEST_F(BatchComputeServiceOneActionTest, JobTermination) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -981,7 +979,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1071,7 +1069,7 @@ TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1127,7 +1125,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1231,7 +1229,7 @@ TEST_F(BatchComputeServiceOneActionTest, FileNotThere) {
 
 void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1276,7 +1274,7 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1345,7 +1343,7 @@ TEST_F(BatchComputeServiceOneActionTest, ServiceDown) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1391,7 +1389,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1460,7 +1458,7 @@ TEST_F(BatchComputeServiceOneActionTest, ServiceSuspended) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1506,7 +1504,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1562,7 +1560,7 @@ TEST_F(BatchComputeServiceOneActionTest, BadScratch) {
 
 void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1607,7 +1605,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

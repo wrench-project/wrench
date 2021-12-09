@@ -78,8 +78,7 @@ protected:
     SimpleStorageServicePerformanceTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         file_1 = workflow->addFile("file_1", FILE_SIZE);
@@ -131,8 +130,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -256,7 +254,7 @@ TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
 void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double buffer_size) {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -299,7 +297,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -375,7 +373,7 @@ TEST_F(SimpleStorageServicePerformanceTest, FileRead) {
 void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -411,7 +409,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

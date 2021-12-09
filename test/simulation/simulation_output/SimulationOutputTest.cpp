@@ -16,7 +16,7 @@
 class SimulationOutputTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 /*    std::shared_ptr<wrench::DataFile> input_file;
     std::shared_ptr<wrench::DataFile> output_file1;
     std::shared_ptr<wrench::DataFile> output_file2;
@@ -37,7 +37,7 @@ protected:
 
     SimulationOutputTest() {
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
 //      // Create the files
 //      input_file = workflow->addFile("input_file", 10.0);
@@ -139,7 +139,7 @@ TEST_F(SimulationOutputTest, EmptySimulationOutputTest) {
 void SimulationOutputTest::do_emptyTrace_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -167,7 +167,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
     trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     ASSERT_EQ(0, trace.size());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

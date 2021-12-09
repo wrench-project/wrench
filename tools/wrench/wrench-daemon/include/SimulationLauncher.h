@@ -36,7 +36,7 @@ public:
     std::shared_ptr <wrench::SimulationController> getController() const { return this->controller; }
 
 private:
-    wrench::Simulation simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
     std::shared_ptr <wrench::SimulationController> controller;
     bool launch_error = false;
     std::string launch_error_message;

@@ -29,7 +29,7 @@ namespace wrench {
          *
          * @param workflow: the workflow
          */
-        virtual void process(Workflow *workflow) = 0;
+        virtual void process(std::shared_ptr<Workflow> workflow) = 0;
 
         /***********************/
         /** \cond INTERNAL     */

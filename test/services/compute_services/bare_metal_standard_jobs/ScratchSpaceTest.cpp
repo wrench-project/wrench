@@ -29,7 +29,7 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_BogusScratchSpace_test();
 
@@ -49,7 +49,7 @@ protected:
     ScratchSpaceTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -97,7 +97,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -114,7 +114,7 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -136,7 +136,7 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
                                                 "/scratch_bogus", {})),
                  std::invalid_argument);
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -218,7 +218,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -256,7 +256,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
             new SimpleScratchSpaceTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -271,7 +271,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -431,7 +431,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -483,7 +483,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
             new SimpleScratchSpaceFailureTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -499,7 +499,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -659,7 +659,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -695,7 +695,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
             new PilotJobScratchSpaceTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -713,7 +713,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -811,7 +811,7 @@ TEST_F(ScratchSpaceTest, RaceConditionTest) {
 void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -840,8 +840,8 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
             new ScratchSpaceRaceConditionTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
 
-//  wrench::Workflow *workflow = new wrench::Workflow();
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+//  std::shared_ptr<wrench::Workflow> workflow = wrench::Workflow::createWorkflow()
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -855,7 +855,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1027,7 +1027,7 @@ TEST_F(ScratchSpaceTest, ScratchNonScratchPartitionsTest) {
 void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1062,8 +1062,8 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
             new ScratchNonScratchPartitionsTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
 
-//  auto workflow = new wrench::Workflow();
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+//  auto workflow = wrench::Workflow::createWorkflow()
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1082,7 +1082,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

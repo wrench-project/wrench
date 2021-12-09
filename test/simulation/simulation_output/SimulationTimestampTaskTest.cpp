@@ -88,11 +88,11 @@ protected:
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
 
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -169,7 +169,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
 }
 
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -195,7 +195,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
             this, {compute_service}, {storage_service}, wms_host
     )));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -283,7 +283,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(0.0,nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(0.0,nullptr), std::invalid_argument);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -362,7 +362,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskMultipleTest) {
 
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -390,7 +390,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
             this, {compute_service}, {storage_service, backup_storage_service}, wms_host
     )));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -495,7 +495,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 
     ASSERT_GT(failed_task_completion_date_1, failed_task_start_date_2);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -556,7 +556,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskTerminateAndFailTest)
 }
 
 void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -584,7 +584,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
             this, {compute_service}, {storage_service}, wms_host
     )));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -624,7 +624,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
     ASSERT_EQ(std::floor(failed_task_start->getDate()), 10);
     ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

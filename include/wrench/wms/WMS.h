@@ -45,8 +45,8 @@ namespace wrench {
     class WMS : public ExecutionController {
 
     public:
-        void addWorkflow(Workflow *workflow, double start_time = 0);
-        Workflow *getWorkflow();
+        void addWorkflow(std::shared_ptr<Workflow> workflow, double start_time = 0);
+        std::shared_ptr<Workflow> getWorkflow();
         PilotJobScheduler *getPilotJobScheduler();
         StandardJobScheduler *getStandardJobScheduler();
 
@@ -142,7 +142,7 @@ namespace wrench {
         friend class JobManager;
 
         /** @brief The workflow to execute */
-        Workflow *workflow;
+        std::shared_ptr<Workflow> workflow;
         /** @brief the WMS simulated start time */
         double start_time;
         /** @brief List of available compute services */

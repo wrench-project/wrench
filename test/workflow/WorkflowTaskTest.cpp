@@ -25,7 +25,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service = nullptr, backup_storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::shared_ptr<wrench::WorkflowTask> t1, t2, t4, t5, t6;
     std::shared_ptr<wrench::DataFile> large_input_file, small_input_file, t4_output_file;
 
@@ -33,7 +33,7 @@ public:
 
 protected:
     WorkflowTaskTest() {
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         t1 = workflow->addTask("task1-01", 100000, 1, 1, 0);
         t2 = workflow->addTask("task1-02", 100, 2, 4, 0);
@@ -91,7 +91,7 @@ protected:
 
 TEST_F(WorkflowTaskTest, TaskStructure) {
     // WorkflowTask structure sanity check
-    ASSERT_EQ(t1->getWorkflow(), workflow.get());
+    ASSERT_EQ(t1->getWorkflow(), workflow);
 
     ASSERT_NE(t1->getID(), t2->getID());
     ASSERT_EQ(t1->getID(), "task1-01");
@@ -328,7 +328,7 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 }
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -360,7 +360,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
             this, {compute_service}, {storage_service, backup_storage_service}, wms_host
     )));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -460,7 +460,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_EQ(t6_failed_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
