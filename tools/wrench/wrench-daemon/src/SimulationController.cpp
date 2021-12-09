@@ -440,7 +440,7 @@ namespace wrench {
             throw std::runtime_error("Unknown storage service " + ss_name);
         }
 
-        WorkflowFile *file;
+        std::shared_ptr<DataFile> file;
         try {
             file = this->getWorkflow()->getFileByID(filename);
         } catch (std::invalid_argument &e) {
