@@ -230,6 +230,7 @@ namespace wrench {
 
         static bool initialized;
 
+    public: // TODO: REDO PRIVATE
         /* Map of files */
         static std::map<std::string, std::shared_ptr<DataFile>> data_files;
 

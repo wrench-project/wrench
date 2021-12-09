@@ -118,7 +118,6 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
-        Simulation::data_files.clear();
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");

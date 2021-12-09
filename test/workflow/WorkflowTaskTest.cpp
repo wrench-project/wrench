@@ -32,7 +32,13 @@ public:
     void do_WorkflowTaskExecutionHistory_test();
 
 protected:
+
+    ~WorkflowTaskTest() {
+      workflow->clear();
+    }
+
     WorkflowTaskTest() {
+
         workflow = wrench::Workflow::createWorkflow();
 
         t1 = workflow->addTask("task1-01", 100000, 1, 1, 0);
@@ -90,6 +96,8 @@ protected:
 };
 
 TEST_F(WorkflowTaskTest, TaskStructure) {
+
+
     // WorkflowTask structure sanity check
     ASSERT_EQ(t1->getWorkflow(), workflow);
 
@@ -120,9 +128,11 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
     ASSERT_EQ(t2->getChildren().size(), 0);
 
     ASSERT_EQ(t1->getClusterID(), "");
+
 }
 
 TEST_F(WorkflowTaskTest, GetSet) {
+
     t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_NOT_READY);
     ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
@@ -209,6 +219,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
+
     std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 10);
     std::shared_ptr<wrench::DataFile> f2 = workflow->addFile("file-02", 100);
 
