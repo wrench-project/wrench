@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <memory>
 
 
 #include <wrench/data_file/DataFile.h>
