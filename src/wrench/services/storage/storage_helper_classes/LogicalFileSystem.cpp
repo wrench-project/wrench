@@ -281,7 +281,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::stageFile(std::shared_ptr<DataFile>file, std::string absolute_path) {
+    void LogicalFileSystem::stageFile(std::shared_ptr<DataFile> file, std::string absolute_path) {
 
         // If Space is not sufficient, forget it
         if (this->occupied_space + file->getSize() > this->total_capacity) {
