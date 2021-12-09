@@ -774,11 +774,11 @@ namespace wrench {
         }
 
         // add the file vertices
-        for (const auto &file : workflow->getFiles()) {
+        for (const auto &file : workflow->getFileMap()) {
             vertices.push_back({
                                        {"type", "file"},
-                                       {"id",   file->getID()},
-                                       {"size", file->getSize()}
+                                       {"id",   file.first},
+                                       {"size", file.second->getSize()}
                                });
         }
 

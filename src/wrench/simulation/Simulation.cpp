@@ -488,7 +488,7 @@ namespace wrench {
         for (const auto &execution_controller : this->execution_controllers) {
             if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {
                 // Check that at least one StorageService is running (only needed if there are files in the workflow),
-                if (not wms->workflow->getFiles().empty()) {
+                if (not this->data_files.empty()) {
                     bool one_storage_service_running = false;
                     for (const auto &storage_service : this->storage_services) {
                         if (storage_service->state == Service::UP) {
@@ -498,7 +498,8 @@ namespace wrench {
                     }
                     if (not one_storage_service_running) {
                         throw std::runtime_error(
-                                "At least one StorageService should have been instantiated add passed to Simulation.add()");
+                                "At least one StorageService should have been instantiated add passed to Simulation.add() because "
+                                "the simulation has files and they need to be stored somewhere!!");
                     }
                 }
 
@@ -1476,6 +1477,73 @@ namespace wrench {
                 }
             }
         }
+    }
+
+    /**
+      * @brief Get the list of all files in the simulation
+      *
+      * @return a reference to the map of files in the simulation, indexed by file ID
+      */
+    std::map<std::string, std::shared_ptr<DataFile>> &Simulation::getFileMap() {
+        return this->data_files;
+    }
+
+    /**
+    * @brief Find a DataFile based on its ID
+    *
+    * @param id: a string id
+    *
+    * @return the DataFile instance (or throws a std::invalid_argument if not found)
+    *
+    * @throw std::invalid_argument
+    */
+    std::shared_ptr<DataFile> Simulation::getFileByID(const std::string &id) {
+        if (this->data_files.find(id) == this->data_files.end()) {
+            throw std::invalid_argument("Workflow::getFileByID(): Unknown DataFile ID " + id);
+        } else {
+            return this->data_files[id];
+        }
+    }
+
+    /**
+     * @brief Add a new file to the simulation (use at your own peril if you're using the workflow API - use Workflow::addFile() instead)
+     *
+     * @param id: a unique string id
+     * @param size: a file size in bytes
+     *
+     * @return the DataFile instance
+     *
+     * @throw std::invalid_argument
+     */
+    std::shared_ptr<DataFile> Simulation::addFile(const std::string id, double size) {
+
+        if (size < 0) {
+            throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
+        }
+
+        // Create the DataFile object
+        if (this->data_files.find(id) != this->data_files.end()) {
+            throw std::invalid_argument("Simulation::addFile(): DataFile with id '" +
+                                        id + "' already exists");
+        }
+
+        auto file = std::shared_ptr<DataFile>(new DataFile(id, size));
+
+        // Add if to the set of workflow files
+        this->data_files[file->id] = file;
+
+        return file;
+    }
+
+    /**
+     * @brief Remove a file from the simulation (use at your own peril if you're using the workflow API - use Workflow::removeFile() instead)
+     * @param file : file to remove
+     */
+    void Simulation::removeFile(std::shared_ptr<DataFile> file) {
+        if (this->data_files.find(file->getID()) == this->data_files.end()) {
+            throw std::invalid_argument("Simulation::removeFile(): Unknown file");
+        }
+        this->data_files.erase(file->getID());
     }
 
 }
