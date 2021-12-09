@@ -71,7 +71,7 @@ namespace wrench {
         /* While the workflow isn't done, repeat the main loop */
         while (not this->getWorkflow()->isDone()) {
 
-            std::vector<wrench::std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
 
             for (auto ready_task : ready_tasks) {
 

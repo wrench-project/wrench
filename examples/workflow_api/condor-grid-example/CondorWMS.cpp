@@ -80,8 +80,8 @@ namespace wrench {
         }
 
         // Split the tasks into two groups
-        std::vector<wrench::std::shared_ptr<WorkflowTask>> first_tasks;
-        std::vector<wrench::std::shared_ptr<WorkflowTask>> last_tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> first_tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> last_tasks;
         unsigned long task_count = 0;
         unsigned long num_tasks = this->getWorkflow()->getTasks().size();
         for (auto const &t : this->getWorkflow()->getTasks()) {
