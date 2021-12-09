@@ -206,7 +206,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
 //  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
-TEST_F(WorkflowTest, WorkflowFile) {
+TEST_F(WorkflowTest, DataFile) {
     ASSERT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
     ASSERT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
 
