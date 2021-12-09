@@ -142,8 +142,8 @@ private:
             }
         }
         //copying file to force link usage.
-        auto file = *(this->getWorkflow()->getFiles().begin());
-        data_manager->doSynchronousFileCopy(file,
+        auto file = *(this->getWorkflow()->getFileMap().begin());
+        data_manager->doSynchronousFileCopy(file.second,
                                             wrench::FileLocation::LOCATION(client_storage_service),
                                             wrench::FileLocation::LOCATION(server_storage_service));
 

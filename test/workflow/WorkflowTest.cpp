@@ -101,7 +101,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     // Test file "getters"
     auto file_map = workflow->getFileMap();
     ASSERT_EQ(5, file_map.size());
-    auto files = workflow->getFiles();
+    auto files = workflow->getFileMap();
     ASSERT_EQ(5, files.size());
     auto ifile_map = workflow->getInputFileMap();
     ASSERT_EQ(1, ifile_map.size());

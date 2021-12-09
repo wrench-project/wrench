@@ -360,7 +360,7 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
   ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX("bogus", "1f", false, 2, 10), std::invalid_argument);
   ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->dax_file_path, "1f", false, 2, 10));
   ASSERT_EQ(workflow->getNumberOfTasks(), 36);
-  ASSERT_EQ(workflow->getFiles().size(), 56);
+  ASSERT_EQ(workflow->getFileMap().size(), 56);
 
   unsigned long num_input_files = workflow->getTaskByID("ID00000")->getInputFiles().size();
   unsigned long num_output_files = workflow->getTaskByID("ID00000")->getOutputFiles().size();

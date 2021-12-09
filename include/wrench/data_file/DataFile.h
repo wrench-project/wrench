@@ -28,7 +28,7 @@ namespace wrench {
 
     protected:
 
-        friend class Workflow; // TODO: Simulation instead
+        friend class Simulation;
         DataFile(std::string id, double size);
 
         std::string id;
