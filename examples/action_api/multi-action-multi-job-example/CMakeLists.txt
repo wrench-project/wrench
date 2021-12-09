@@ -1,6 +1,6 @@
 set(SOURCE_FILES
-        MultiActionMultiJobWMS.h
-        MultiActionMultiJobWMS.cpp
+        MultiActionMultiJobController.h
+        MultiActionMultiJobController.cpp
         MultiActionMultiJob.cpp
         )
 
