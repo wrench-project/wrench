@@ -510,7 +510,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::createStandardJob(json data) {
-        std::vector<WorkflowTask *> tasks;
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
 
         for (auto const &name : data["tasks"]) {
             tasks.push_back(this->getWorkflow()->getTaskByID(name));
