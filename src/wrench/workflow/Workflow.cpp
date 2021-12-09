@@ -725,6 +725,7 @@ namespace wrench {
     std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
         auto data_file = this->simulation->addFile(id, size);
         this->data_files.insert(data_file);
+        return data_file;
     }
 
     /**
