@@ -30,7 +30,7 @@ protected:
     BatchServiceAvailabilityTimeLineTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -47,7 +47,7 @@ protected:
 
     }
 
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
@@ -116,7 +116,7 @@ void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test(
     argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     simulation->init(&argc, argv);
 
@@ -131,11 +131,11 @@ void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test(
     ASSERT_NO_THROW(wms = simulation->add(
             new NodeAvailabilityTimelineTestWMS(hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -204,7 +204,7 @@ void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test(
     argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     simulation->init(&argc, argv);
 
@@ -219,11 +219,11 @@ void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test(
     ASSERT_NO_THROW(wms = simulation->add(
             new CoreAvailabilityTimelineTestWMS(hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

@@ -33,7 +33,7 @@ protected:
     FileRegistryTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow = wrench::Workflow::createWorkflow();
 
       // Create a one-host platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -112,7 +112,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -269,7 +269,7 @@ TEST_F(FileRegistryTest, SimpleFunctionality) {
 void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -313,7 +313,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
   // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
-  delete simulation;
+
 
   for (int i=0; i < argc; i++)
      free(argv[i]);
@@ -447,7 +447,7 @@ TEST_F(FileRegistryTest, LookupEntry) {
 void FileRegistryTest::do_lookupEntry_Test() {
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -486,7 +486,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   ASSERT_NO_THROW(simulation->launch());
 
-  delete simulation;
+
 
   for (int i=0; i < argc; i++)
      free(argv[i]);

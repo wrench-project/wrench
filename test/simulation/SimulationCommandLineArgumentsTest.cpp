@@ -16,10 +16,9 @@
 class SimulationCommandLineArgumentsTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_versionArgument_test();
 
@@ -38,8 +37,8 @@ public:
 protected:
     SimulationCommandLineArgumentsTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -93,7 +92,7 @@ TEST_F(SimulationCommandLineArgumentsTest, VersionArgument) {
 
 void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -139,7 +138,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
 
     ASSERT_GE(linecount, 2);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -157,7 +156,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpWrenchArgument) {
 
 void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -194,7 +193,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     ASSERT_GE(linecount, 5);
     ASSERT_LE(linecount, 15);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -210,7 +209,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpSimGridArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -250,7 +249,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     ASSERT_GE(linecount, 100);
     ASSERT_LE(linecount, 300);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -268,7 +267,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpArgument) {
 
 void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -280,7 +279,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     ASSERT_EQ(argc, 2);
     ASSERT_EQ(!strcmp(argv[1], "--help"), 1);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -296,7 +295,7 @@ TEST_F(SimulationCommandLineArgumentsTest, NoColorArgument) {
 
 void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -348,7 +347,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     ASSERT_EQ(found_color, false);
 
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -370,7 +369,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     xbt_log_control_set("root.thresh:info");
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -413,7 +412,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     // Just in case
     xbt_log_control_set("root.thresh:critical");
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -432,7 +431,7 @@ TEST_F(SimulationCommandLineArgumentsTest, ActivateEnergyArgument) {
 
 void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -451,7 +450,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
 
     simulation->launch();
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

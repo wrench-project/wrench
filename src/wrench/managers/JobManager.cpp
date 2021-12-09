@@ -444,7 +444,9 @@ namespace wrench {
         // Tweak the service_specific_arguments
         std::map<std::string, std::string> new_args;
 
-        Workflow* workflow = nullptr;
+        std::shared_ptr<Workflow>
+
+        workflow = nullptr;
         if (not job->getTasks().empty()) {
             workflow = (*(job->getTasks().begin()))->getWorkflow();
         }

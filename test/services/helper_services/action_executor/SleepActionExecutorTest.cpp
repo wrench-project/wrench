@@ -26,7 +26,7 @@ WRENCH_LOG_CATEGORY(sleep_action_executor_test, "Log category for SleepActionExe
 class SleepActionExecutorTest : public ::testing::Test {
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_SleepActionExecutorSuccessTest_test();
 
@@ -99,7 +99,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -179,7 +179,7 @@ TEST_F(SleepActionExecutorTest, SuccessTest) {
 void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -194,11 +194,11 @@ void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new SleepActionExecutorSuccessTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
+    ASSERT_NO_THROW(wms->addWorkflow(wrench::Workflow::createWorkflow()));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

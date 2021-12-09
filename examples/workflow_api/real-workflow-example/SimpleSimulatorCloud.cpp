@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     /*
      * Declaration of the top-level WRENCH simulation object
      */
-    wrench::Simulation simulation;
+    auto simulation = wrench::Simulation::createSimulation();;
 
     /*
      * Initialization of the simulation, which may entail extracting WRENCH-specific and
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
      * Two special command-line arguments are --help-wrench and --help-simgrid, which print
      * details about available command-line arguments.
      */
-    simulation.init(&argc, argv);
+    simulation->init(&argc, argv);
 
     /*
      * Parsing of the command-line arguments for this WRENCH simulation
@@ -58,8 +58,8 @@ int main(int argc, char **argv) {
     char *workflow_file = argv[2];
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
-    std::cerr << "Loading workflow..." << std::endl;
-    wrench::Workflow *workflow;
+    std::cerr << "Loading workflow->.." << std::endl;
+    std::shared_ptr<wrench::Workflow> workflow;
     if (ends_with(workflow_file, "dax")) {
         workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(workflow_file, "1000Gf");
     } else if (ends_with(workflow_file,"json")) {
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
     /* Reading and parsing the platform description file to instantiate a simulated platform */
     std::cerr << "Instantiating SimGrid platform..." << std::endl;
-    simulation.instantiatePlatform(platform_file);
+    simulation->instantiatePlatform(platform_file);
 
     /* Get a vector of all the hosts in the simulated platform */
     std::vector<std::string> hostname_list = wrench::Simulation::getHostnameList();
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
     std::set<std::shared_ptr<wrench::StorageService>> storage_services;
 
     /* Instantiate a storage service, to be started on some host in the simulated platform,
-     * and adding it to the simulation.  A wrench::StorageService is an abstraction of a service on
+     * and adding it to the simulation->  A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on Host3 in the
      * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
      */
     std::string storage_host = "Fafard";
     std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-    auto storage_service = simulation.add(new wrench::SimpleStorageService(storage_host, {"/"}));
+    auto storage_service = simulation->add(new wrench::SimpleStorageService(storage_host, {"/"}));
     storage_services.insert(storage_service);
 
     /* Construct a list of hosts (in the example only one host) on which the
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 
     /* Add the cloud service to the simulation, catching a possible exception */
     try {
-        auto cloud_service = simulation.add(new wrench::CloudComputeService(
+        auto cloud_service = simulation->add(new wrench::CloudComputeService(
                 wms_host, execution_hosts, "", {},
                 {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}}));
         compute_services.insert(cloud_service);
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
      *
      * The WMS implementation is in SimpleWMS.[cpp|h].
      */
-    auto wms = simulation.add(
+    auto wms = simulation->add(
             new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
                     new wrench::CloudStandardJobScheduler(storage_service)),
                                   nullptr, compute_services, storage_services, wms_host));
@@ -151,18 +151,18 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
     wrench::FileRegistryService *file_registry_service =
             new wrench::FileRegistryService(file_registry_service_host);
-    simulation.add(file_registry_service);
+    simulation->add(file_registry_service);
 
     // TRYING NETWORK PROXIMITY SERVICE WITH VIVALDI....
     std::vector<std::string> hostname_list_copy(hostname_list);
     std::string hostname_copy(hostname_list[0]);
-    wrench::NetworkProximityService *NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, {
+    auto NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, {
             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,                 "alltoall"},
             {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,          "1.0"},
             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,           "600"},
             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}});
 
-    simulation.add(NPS);
+    simulation->add(NPS);
     /* It is necessary to store, or "stage", input files for the first task(s) of the workflow on some storage
      * service, so that workflow execution can be initiated. The getInputFiles() method of the Workflow class
      * returns the set of all workflow files that are not generated by workflow tasks, and thus are only input files.
@@ -171,29 +171,29 @@ int main(int argc, char **argv) {
     std::cerr << "Staging input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
         try {
-            simulation.stageFile(f, storage_service);
+            simulation->stageFile(f, storage_service);
         } catch (std::runtime_error &e) {
             std::cerr << "Exception: " << e.what() << std::endl;
             return 0;
         }
     }
 
-    /* Launch the simulation. This call only returns when the simulation is complete. */
+    /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
-        simulation.launch();
+        simulation->launch();
     } catch (std::runtime_error &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return 0;
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    /* Simulation results can be examined via simulation.output, which provides access to traces
+    /* Simulation results can be examined via simulation->output, which provides access to traces
      * of events. In the code below, we retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event.
      */
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
-    trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
+    trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
     std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getID() << std::endl;
 

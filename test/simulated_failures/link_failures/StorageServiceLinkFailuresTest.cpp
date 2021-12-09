@@ -39,7 +39,7 @@ protected:
     StorageServiceLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -86,7 +86,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -328,7 +328,7 @@ TEST_F(StorageServiceLinkFailuresTest, SimpleRandomTest) {
 void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -413,7 +413,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

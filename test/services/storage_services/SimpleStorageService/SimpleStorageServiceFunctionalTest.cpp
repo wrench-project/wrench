@@ -49,8 +49,7 @@ protected:
     SimpleStorageServiceFunctionalTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         file_1 = workflow->addFile("file_1", 1.0);
@@ -86,8 +85,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -579,7 +577,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, BasicFunctionality) {
 void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -654,7 +652,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -768,7 +766,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopy) {
 void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -816,7 +814,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -910,7 +908,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopy) {
 void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -956,7 +954,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1110,7 +1108,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopyFailures) {
 void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1161,7 +1159,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1322,7 +1320,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopyFailures) {
 void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1373,7 +1371,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1585,7 +1583,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, Partitions) {
 void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1625,7 +1623,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1700,7 +1698,7 @@ TEST_F(SimpleStorageServiceFunctionalTest, FileWrite) {
 void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1749,7 +1747,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

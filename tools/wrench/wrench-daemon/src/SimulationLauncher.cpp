@@ -43,8 +43,10 @@ void SimulationLauncher::createSimulation(bool full_log,
             argv[1] = strdup("--wrench-full-log");
         }
 
+        simulation = wrench::Simulation::createSimulation();
+
         // Let WRENCH grab its own command-line arguments, if any
-        simulation.init(&argc, argv);
+        simulation->init(&argc, argv);
 
         // Create tmp XML platform file
         std::string platform_file_path = "/tmp/wrench_daemon_platform_file_" + std::to_string(getpid()) + ".xml";
@@ -54,7 +56,7 @@ void SimulationLauncher::createSimulation(bool full_log,
 
         // Instantiate Simulated Platform
         try {
-            simulation.instantiatePlatform(platform_file_path);
+            simulation->instantiatePlatform(platform_file_path);
             // Erase the XML platform file
             remove(platform_file_path.c_str());
         } catch (std::exception &e) {
@@ -69,11 +71,11 @@ void SimulationLauncher::createSimulation(bool full_log,
         }
 
         // Create a execution_controller and add it to the simulation
-        this->controller = simulation.add(
+        this->controller = simulation->add(
                 new wrench::SimulationController(controller_host, sleep_us));
 
         // Add an empty workflow to the execution_controller
-        this->controller->addWorkflow(new wrench::Workflow());
+        this->controller->addWorkflow(wrench::Workflow::createWorkflow());
 
     } catch (std::exception &e) {
         // Set error flag and error message
@@ -87,5 +89,5 @@ void SimulationLauncher::createSimulation(bool full_log,
  * @brief Method to launch the simulation
  */
 void SimulationLauncher::launchSimulation() {
-    this->simulation.launch();
+    this->simulation->launch();
 }

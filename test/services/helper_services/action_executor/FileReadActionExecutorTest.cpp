@@ -29,7 +29,7 @@ WRENCH_LOG_CATEGORY(file_read_action_executor_test, "Log category for FileReadAc
 class FileReadActionExecutorTest : public ::testing::Test {
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_FileReadActionExecutorSuccessTest_test();
     void do_FileReadActionExecutorMultipleAttemptsSuccessTest_test();
@@ -106,7 +106,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 public:
     std::shared_ptr<wrench::DataFile> file;
@@ -190,7 +190,7 @@ TEST_F(FileReadActionExecutorTest, SuccessTest) {
 void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -205,7 +205,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
-    workflow = std::make_unique<wrench::Workflow>();
+    workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
@@ -216,11 +216,11 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     wms = simulation->add(new FileReadActionExecutorSuccessTestWMS(this, "Host1"));
 
-    wms->addWorkflow(workflow.get());
+    wms->addWorkflow(workflow);
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -294,7 +294,7 @@ TEST_F(FileReadActionExecutorTest, MultipleAttemptsSuccessTest) {
 void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSuccessTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -309,7 +309,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
-    workflow = std::make_unique<wrench::Workflow>();
+    workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
@@ -320,11 +320,11 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     std::shared_ptr<wrench::WMS> wms = nullptr;
     wms = simulation->add(new FileReadActionExecutorMultipleAttemptsSuccessTestWMS(this, "Host1"));
 
-    wms->addWorkflow(workflow.get());
+    wms->addWorkflow(workflow);
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -410,7 +410,7 @@ TEST_F(FileReadActionExecutorTest, MissingFileTest) {
 void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -426,7 +426,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
-    workflow = std::make_unique<wrench::Workflow>();
+    workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
@@ -436,11 +436,11 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     ASSERT_NO_THROW(wms = simulation->add(
             new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
+    ASSERT_NO_THROW(wms->addWorkflow(wrench::Workflow::createWorkflow()));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -533,7 +533,7 @@ TEST_F(FileReadActionExecutorTest, KillingStorageServiceTest) {
 void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -549,7 +549,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
-    workflow = std::make_unique<wrench::Workflow>();
+    workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
@@ -561,11 +561,11 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     ASSERT_NO_THROW(wms = simulation->add(
             new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(new wrench::Workflow()));
+    ASSERT_NO_THROW(wms->addWorkflow(wrench::Workflow::createWorkflow()));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

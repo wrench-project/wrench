@@ -138,7 +138,7 @@ TEST_F(BadPlatformTest, BadPlatformFile) {
 void BadPlatformTest::do_badPlatformFileTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -147,7 +147,7 @@ void BadPlatformTest::do_badPlatformFileTest_test() {
 
     ASSERT_THROW(simulation->instantiatePlatform("/bogus"), std::invalid_argument);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -177,7 +177,7 @@ TEST_F(BadPlatformTest, BadPlatform) {
 void BadPlatformTest::do_badPlatformTest_test(std::string xml) {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -190,7 +190,7 @@ void BadPlatformTest::do_badPlatformTest_test(std::string xml) {
     fclose(platform_file);
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

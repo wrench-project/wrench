@@ -24,8 +24,7 @@ WRENCH_LOG_CATEGORY(failure_detector_host_failure_test, "Log category for Failur
 class FailureDetectorHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_FailureDetectorForSleeperTest_test();
     void do_FailureDetectorForComputerTest_test();
@@ -34,8 +33,8 @@ protected:
 
     FailureDetectorHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
         std::string trace_file_content = "PERIODICITY 100\n"
@@ -170,7 +169,7 @@ TEST_F(FailureDetectorHostFailuresTest, FailureDetectorForSleeperTest) {
 void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -195,7 +194,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -292,7 +291,7 @@ TEST_F(FailureDetectorHostFailuresTest, FailureDetectorForComputerTest) {
 void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -317,7 +316,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

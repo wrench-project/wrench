@@ -48,11 +48,14 @@ namespace wrench {
     class Simulation {
 
     public:
-        Simulation();
+
+        static std::shared_ptr<Simulation> createSimulation();
 
         ~Simulation();
 
         void init(int *, char **);
+
+        static bool isInitialized();
 
         void instantiatePlatform(std::string);
         void instantiatePlatform(const std::function<void()>&);
@@ -65,8 +68,6 @@ namespace wrench {
 
         std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         void removeFile(std::shared_ptr<DataFile>file);
-
-
         std::shared_ptr<DataFile> getFileByID(const std::string &id);
         std::shared_ptr<DataFile> addFile(std::string, double);
 
@@ -168,11 +169,13 @@ namespace wrench {
         static bool isEnergySimulationEnabled();
 
 
-            /***********************/
+        /***********************/
         /** \endcond           */
         /***********************/
 
     private:
+
+        Simulation();
 
         SimulationOutput output;
 
@@ -220,12 +223,15 @@ namespace wrench {
 
         unsigned int on_state_change_callback_id;
 
+
         static bool energy_enabled;
         static bool host_shutdown_enabled;
         static bool pagecache_enabled;
 
+        static bool initialized;
+
         /* Map of files */
-        std::map<std::string, std::shared_ptr<DataFile>> data_files;
+        static std::map<std::string, std::shared_ptr<DataFile>> data_files;
 
     };
 

@@ -60,8 +60,8 @@ protected:
         fclose(platform_file);
     }
 
-    wrench::Workflow *createWorkflow() {
-        wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> createWorkflow() {
+        std::shared_ptr<wrench::Workflow> workflow;
         std::shared_ptr<wrench::DataFile> input_file;
         std::shared_ptr<wrench::DataFile> output_file1;
         std::shared_ptr<wrench::DataFile> output_file2;
@@ -69,8 +69,8 @@ protected:
         std::shared_ptr<wrench::WorkflowTask> task2;
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
-        workflow_unique_ptrs.push_back(std::unique_ptr<wrench::Workflow>(workflow));
+        workflow = wrench::Workflow::createWorkflow();
+        workflows.push_back(workflow);
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -90,7 +90,7 @@ protected:
 
         return workflow;
     }
-    std::vector<std::unique_ptr<wrench::Workflow>> workflow_unique_ptrs;
+    std::vector<std::shared_ptr<wrench::Workflow>> workflows;
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
@@ -178,7 +178,7 @@ TEST_F(MultipleWMSTest, DeferredWMSStartTestWMS) {
 
 void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -202,7 +202,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
             {})));
 
     // Create a WMS
-    wrench::Workflow *workflow = this->createWorkflow();
+    auto workflow = this->createWorkflow();
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -224,7 +224,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     // Simulation trace
     ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 100);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -232,7 +232,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
 
 void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -256,7 +256,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
                                             {})));
 
     // Create a WMS
-    wrench::Workflow *workflow = this->createWorkflow();
+    auto workflow = this->createWorkflow();
     std::shared_ptr<wrench::WMS> wms1 = nullptr;
     ASSERT_NO_THROW(wms1 = simulation->add(
             new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -264,7 +264,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     ASSERT_NO_THROW(wms1->addWorkflow(workflow, 100));
 
     // Create a second WMS
-    wrench::Workflow *workflow2 = this->createWorkflow();
+    auto workflow2 = this->createWorkflow();
     std::shared_ptr<wrench::WMS> wms2 = nullptr;
     ASSERT_NO_THROW(wms2 = simulation->add(
             new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -291,7 +291,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     // Simulation trace
     ASSERT_GT(wrench::Simulation::getCurrentSimulatedDate(), 1000);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

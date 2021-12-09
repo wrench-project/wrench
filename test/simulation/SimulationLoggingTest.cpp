@@ -19,10 +19,9 @@ WRENCH_LOG_CATEGORY(simulation_logging_test, "Log category for Simulation Loggin
 class SimulationLoggingTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_logging_test();
 
@@ -30,8 +29,8 @@ protected:
 
     SimulationLoggingTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -94,7 +93,7 @@ void SimulationLoggingTest::do_logging_test() {
     xbt_log_control_set("simulation_logging_test.thresh:debug");
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -105,11 +104,11 @@ void SimulationLoggingTest::do_logging_test() {
     std::string hostname = "DualCoreHost";
 
     auto wms = simulation->add(new SimulationLoggingWMS(this, hostname));
-    wms->addWorkflow(new wrench::Workflow(), 0);
+    wms->addWorkflow(wrench::Workflow::createWorkflow(), 0);
 
     simulation->launch();
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

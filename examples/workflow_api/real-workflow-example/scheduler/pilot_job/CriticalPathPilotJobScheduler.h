@@ -25,7 +25,7 @@ namespace wrench {
 
     public:
 
-        explicit CriticalPathPilotJobScheduler(Workflow *workflow) : workflow(workflow) {}
+        explicit CriticalPathPilotJobScheduler(std::shared_ptr<Workflow> workflow) : workflow(workflow) {}
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -33,15 +33,16 @@ namespace wrench {
         void schedulePilotJobs(const std::set<std::shared_ptr<ComputeService>> &compute_services) override;
 
     protected:
-        double getFlops(Workflow *, const std::vector<std::shared_ptr<WorkflowTask>> &);
+        double getFlops(std::shared_ptr<Workflow> workflow, const std::vector<std::shared_ptr<WorkflowTask>> &);
 
-        unsigned long getMaxParallelization(Workflow *, const std::set<std::shared_ptr<WorkflowTask>> &);
+        unsigned long getMaxParallelization(std::shared_ptr<Workflow> workflow, const std::set<std::shared_ptr<WorkflowTask>> &);
+
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-        Workflow *workflow;
+        std::shared_ptr<Workflow> workflow;
 
         std::map<std::shared_ptr<WorkflowTask>, double> flopsMap;
 

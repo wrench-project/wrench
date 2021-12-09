@@ -166,7 +166,7 @@ namespace wrench {
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
-    void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
+    void SimulationOutput::dumpUnifiedJSON(std::shared_ptr<Workflow> workflow, std::string file_path,
                                            bool include_platform,
                                            bool include_workflow_exec,
                                            bool include_workflow_graph,
@@ -524,7 +524,7 @@ namespace wrench {
       *
       * @throws std::invalid_argument
       */
-    void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow,
+    void SimulationOutput::dumpWorkflowExecutionJSON(std::shared_ptr<Workflow> workflow,
                                                      std::string file_path,
                                                      bool generate_host_utilization_layout,
                                                      bool writing_file) {
@@ -749,7 +749,7 @@ namespace wrench {
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow,
+    void SimulationOutput::dumpWorkflowGraphJSON(std::shared_ptr<wrench::Workflow> workflow,
                                                  std::string file_path,
                                                  bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {

@@ -16,8 +16,7 @@
 class WorkflowTest : public ::testing::Test {
 protected:
     WorkflowTest() {
-        workflow = new wrench::Workflow();
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
+        workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
         t1 = workflow->addTask("task1-test-01", 1, 1, 1, 0);
@@ -51,8 +50,7 @@ protected:
     }
 
     // data members
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::shared_ptr<wrench::WorkflowTask> t1, t2, t3, t4;
     std::shared_ptr<wrench::DataFile> f1, f2, f3, f4, f5;
 };
@@ -190,7 +188,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
     workflow->removeTask(t1);
 
-    auto bogus_workflow = new wrench::Workflow();
+    auto bogus_workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WorkflowTask> bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(-2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(2.0)), std::invalid_argument);
@@ -198,7 +196,6 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(2.0)), std::invalid_argument);
     ASSERT_THROW(workflow->removeTask(bogus), std::invalid_argument);
     bogus_workflow->removeTask(bogus);
-    delete bogus_workflow;
 
     ASSERT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
@@ -257,8 +254,7 @@ TEST_F(WorkflowTest, Export) {
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
     AllDependenciesWorkflowTest() {
-        workflow = new wrench::Workflow();
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
+        workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
         t1 = workflow->addTask("task1-test-01", 1, 1, 1, 0);
@@ -275,8 +271,7 @@ protected:
     }
 
     // data members
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::shared_ptr<wrench::WorkflowTask> t1, t2, t3, t4;
 };
 

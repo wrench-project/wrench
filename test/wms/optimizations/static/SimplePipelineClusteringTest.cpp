@@ -17,7 +17,7 @@
 class SimplePipelineClusteringTest : public ::testing::Test {
 protected:
     SimplePipelineClusteringTest() {
-      workflow = new wrench::Workflow();
+      workflow = wrench::Workflow::createWorkflow();
 
       // create simple diamond workflow
       t1 = workflow->addTask("task-test-01", 1);
@@ -33,7 +33,7 @@ protected:
     }
 
     // data members
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::shared_ptr<wrench::WorkflowTask> t1, *t2, *t3, *t4, *t5;
 };
 

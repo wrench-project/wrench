@@ -228,7 +228,7 @@ protected:
         fprintf(platform_file6, "%s", xml6.c_str());
         fclose(platform_file6);
 
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -245,7 +245,7 @@ protected:
     std::string link_usage_json_file_path = UNIQUE_TMP_PATH_PREFIX + "link_usage.json";
     std::string disk_operations_json_file_path = UNIQUE_TMP_PATH_PREFIX + "disk_operations.json";
     std::string unified_json_file_path = UNIQUE_TMP_PATH_PREFIX + "unified_output.json";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -301,13 +301,13 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
-    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+    auto simulation = wrench::Simulation::createSimulation();
 
     simulation->init(&argc, argv);
 
     simulation->instantiatePlatform(platform_file_path);
 
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -406,9 +406,9 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     )"_json;
 
     EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(nullptr, execution_data_json_file_path), std::invalid_argument);
-    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), ""), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, ""), std::invalid_argument);
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, false));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, false));
 
     std::ifstream json_file(execution_data_json_file_path);
     nlohmann::json result_json;
@@ -442,7 +442,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
-    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+    auto simulation = wrench::Simulation::createSimulation();
 
     simulation->init(&argc, argv);
 
@@ -450,7 +450,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     std::ifstream json_file;
 
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -479,7 +479,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true));
 
     json_file = std::ifstream("host_utilization_layout.json");
     nlohmann::json result_json1;
@@ -488,7 +488,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     EXPECT_TRUE(compareObjects(result_json1,expected_json1));
 
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
+    workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -515,7 +515,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true));
 
     json_file = std::ifstream("host_utilization_layout.json");
     nlohmann::json result_json2;
@@ -524,7 +524,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     EXPECT_TRUE(compareObjects(result_json2,expected_json2));
 
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
+    workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -569,7 +569,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     )"_json;
 
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true));
 
     json_file = std::ifstream("host_utilization_layout.json");
     nlohmann::json result_json3;
@@ -578,7 +578,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     EXPECT_TRUE(compareObjects(result_json3,expected_json3));
 
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
+    workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -596,7 +596,7 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t2->setExecutionHost("host1");
     t2->setNumCoresAllocated(10);
 
-    //EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path, true), std::runtime_error);
+    //EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true), std::runtime_error);
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -620,17 +620,16 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
 
-    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+    auto simulation = wrench::Simulation::createSimulation();
 
     simulation->init(&argc, argv);
 
     EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, UNIQUE_TMP_PATH_PREFIX + "file.json"), std::invalid_argument);
-    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON((wrench::Workflow *)&argc, ""), std::invalid_argument);
 
     std::ifstream graph_json_file;
 
     // Generate a workflow with two independent tasks. Both tasks each have one input file and one output file.
-    std::unique_ptr<wrench::Workflow> independent_tasks_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    auto independent_tasks_workflow = wrench::Workflow::createWorkflow();
 
     t1 = independent_tasks_workflow->addTask("task1", 1.0, 1, 1, 0);
     t1->addInputFile(independent_tasks_workflow->addFile("task1_input", 1.0));
@@ -640,7 +639,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     t2->addInputFile(independent_tasks_workflow->addFile("task2_input", 1.0));
     t2->addOutputFile(independent_tasks_workflow->addFile("task2_output", 1.0));
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(independent_tasks_workflow.get(), workflow_graph_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(independent_tasks_workflow, workflow_graph_json_file_path));
 
     nlohmann::json result_json1;
     graph_json_file = std::ifstream(workflow_graph_json_file_path);
@@ -722,7 +721,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
 
     // Generate a workflow with two tasks, two input files, and four output files. Both tasks use both input files and produce two output files each.
-    std::unique_ptr<wrench::Workflow> two_tasks_use_all_files_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    auto two_tasks_use_all_files_workflow = wrench::Workflow::createWorkflow();
 
     t1 = two_tasks_use_all_files_workflow->addTask("task1", 1.0, 1, 1,  0);
     t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file1", 1));
@@ -738,7 +737,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     t2->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file3", 1));
     t2->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file4", 1));
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(two_tasks_use_all_files_workflow.get(), workflow_graph_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(two_tasks_use_all_files_workflow, workflow_graph_json_file_path));
 
     nlohmann::json result_json2;
     graph_json_file = std::ifstream(workflow_graph_json_file_path);
@@ -845,7 +844,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     EXPECT_TRUE(result_json2 == expected_json2);
 
     // Generate a workflow where one task1 forks into two tasks, then those two tasks join into one.
-    std::unique_ptr<wrench::Workflow> fork_join_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    auto fork_join_workflow = wrench::Workflow::createWorkflow();
 
     t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 0);
     t1->addInputFile(fork_join_workflow->addFile("task1_input", 1.0));
@@ -869,7 +868,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     fork_join_workflow->addControlDependency(t2, t4);
     fork_join_workflow->addControlDependency(t3, t4);
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(fork_join_workflow.get(), workflow_graph_json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(fork_join_workflow, workflow_graph_json_file_path));
 
     nlohmann::json result_json3;
     graph_json_file = std::ifstream(workflow_graph_json_file_path);
@@ -1060,7 +1059,7 @@ bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1081,7 +1080,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -1089,7 +1088,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
 
     ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
 
-//    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/energy_unified.json", false, true, false, true, false, false, false);
+//    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/energy_unified.json", false, true, false, true, false, false, false);
 
     nlohmann::json expected_json = R"(
     {
@@ -1216,7 +1215,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
 
     EXPECT_TRUE(expected_json == result_json);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1284,7 +1283,7 @@ bool compareLinkname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1307,7 +1306,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
     //std::shared_ptr<wrench::DataFile> file = new wrench::DataFile("test_file", 10*GB);
-    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::make_unique<wrench::Workflow>();
+    auto link_usage_workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
@@ -1323,7 +1322,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
 
 
-    EXPECT_NO_THROW(wms->addWorkflow(link_usage_workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(link_usage_workflow));
 
     simulation->add(new wrench::FileRegistryService("host1"));
     for (auto const &file : link_usage_workflow->getInputFiles()) {
@@ -1335,7 +1334,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
-    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
+    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
 
     nlohmann::json expected_json_link_usage = R"(
     {
@@ -1383,7 +1382,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     EXPECT_TRUE(expected_json_link_usage == result_json);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1445,7 +1444,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpDiskOperationsTest) {
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1471,7 +1470,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
             this, {}, {ss1,  ss2}, nullptr, host1
     )));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->getOutput().enableDiskTimestamps(true);
 
@@ -1480,7 +1479,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     EXPECT_THROW(simulation->getOutput().dumpDiskOperationsJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpDiskOperationsJSON(this->disk_operations_json_file_path));
-    simulation->getOutput().dumpUnifiedJSON(workflow.get(), "/tmp/disk_unified.json", false, true, true, false, false, true, false);
+    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/disk_unified.json", false, true, true, false, false, true, false);
 
     // Performing programmatic checks of the JSON output
     std::ifstream json_file(disk_operations_json_file_path);
@@ -1515,7 +1514,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
 
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1531,7 +1530,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpPlatformGraphJSONTest) {
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1719,7 +1718,7 @@ void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSON_test() {
 
     EXPECT_TRUE(result_json == expected_json);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1734,7 +1733,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpPlatformGraphJSONWithBrokenRoutingT
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpPlatformGraphJSONBrokenRouting_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1755,7 +1754,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpUnifiedJSONTest) {
 }
 
 void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1766,7 +1765,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     simulation->instantiatePlatform(platform_file_path);
 
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -1943,7 +1942,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     }
     )"_json;
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow.get(), unified_json_file_path, true, true, true, false, false));
+    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow, unified_json_file_path, true, true, true, false, false));
 
     std::ifstream json_file = std::ifstream(unified_json_file_path);
     nlohmann::json result_json;
@@ -1971,7 +1970,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
 
     /*
-    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    workflow = wrench::Workflow::createWorkflow();
 
 
     std::string host = wrench::Simulation::getHostnameList()[0];
@@ -1983,11 +1982,11 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 
-    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow.get(), unified_json_file_path, false, false, false, true, false));
+    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow, unified_json_file_path, false, false, false, true, false));
 
     nlohmann::json expected_json6 = R"(
     {
@@ -2115,7 +2114,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     EXPECT_TRUE(expected_json6 == result_json2);
     */
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

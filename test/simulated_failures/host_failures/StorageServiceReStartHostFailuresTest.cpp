@@ -23,8 +23,7 @@ WRENCH_LOG_CATEGORY(storage_service_start_restart_host_failures_test, "Log categ
 class StorageServiceReStartHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_StorageServiceRestartTest_test();
 
@@ -32,8 +31,8 @@ protected:
 
     StorageServiceReStartHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
         std::string trace_file_content = "PERIODICITY 100\n"
@@ -172,7 +171,7 @@ TEST_F(StorageServiceReStartHostFailuresTest, StorageServiceReStartTest) {
 void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -205,7 +204,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

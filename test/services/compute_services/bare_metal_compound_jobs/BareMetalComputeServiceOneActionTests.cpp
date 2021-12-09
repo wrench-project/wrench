@@ -43,8 +43,7 @@ protected:
     BareMetalComputeServiceOneActionTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
@@ -118,8 +117,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -150,7 +148,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, BadSetup) {
 
 void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 0;
     auto **argv = (char **) calloc(argc, sizeof(char *));
@@ -256,7 +254,7 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
     // Run a do nothing simulation, because why not
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -311,7 +309,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, Noop) {
 
 void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -358,7 +356,7 @@ void BareMetalComputeServiceOneActionTest::do_Noop_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -449,7 +447,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, OneSleepAction) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -505,7 +503,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -593,7 +591,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionNotEnoughResources)
 
 void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -650,7 +648,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -733,7 +731,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, OneComputeActionBogusServiceSpecifi
 
 void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificArgs_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -790,7 +788,7 @@ void BareMetalComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecif
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -889,7 +887,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, ServiceCrashed) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -947,7 +945,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test(
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1022,7 +1020,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, JobTermination) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1080,7 +1078,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1205,7 +1203,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, ServiceCrashedRestarted) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestarted_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1262,7 +1260,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1360,7 +1358,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, FileNotThere) {
 
 void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1408,7 +1406,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1477,7 +1475,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, ServiceDown) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1525,7 +1523,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1594,7 +1592,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, ServiceSuspended) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1642,7 +1640,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1698,7 +1696,7 @@ TEST_F(BareMetalComputeServiceOneActionTest, BadScratch) {
 
 void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -1745,7 +1743,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

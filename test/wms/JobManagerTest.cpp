@@ -26,7 +26,7 @@ class JobManagerTest : public ::testing::Test {
 
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_JobManagerConstructorTest_test();
 
@@ -43,7 +43,7 @@ protected:
     JobManagerTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -93,7 +93,7 @@ protected:
 
     }
 
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
@@ -153,7 +153,7 @@ TEST_F(JobManagerTest, ConstructorTest) {
 void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -172,11 +172,11 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
             new JobManagerConstructorTestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -331,7 +331,7 @@ TEST_F(JobManagerTest, CreateJobTest) {
 void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -350,11 +350,11 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
             new JobManagerCreateJobTestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -420,7 +420,7 @@ TEST_F(JobManagerTest, SubmitJobTest) {
 void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -439,12 +439,12 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
             new JobManagerSubmitJobTestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -541,7 +541,7 @@ TEST_F(JobManagerTest, ResubmitJobTest) {
 void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -578,12 +578,12 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     std::shared_ptr<wrench::WorkflowTask> task2 = workflow->addTask("task2", 10.0, 10, 10, 0.0);
     workflow->addControlDependency(task1, task2);
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -694,7 +694,7 @@ TEST_F(JobManagerTest, TerminateJobTest) {
 void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -718,11 +718,11 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
             new JobManagerTerminateJobTestWMS(
                     this, "Host1", {cs})));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);
