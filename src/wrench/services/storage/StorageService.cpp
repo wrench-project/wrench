@@ -108,7 +108,7 @@ namespace wrench {
      * @param mountpoint: a mount point
      * @param directory: a directory
      */
-    void StorageService::stageFile(std::shared_ptr<DataFile>file, std::string mountpoint, std::string directory) {
+    void StorageService::stageFile(std::shared_ptr<DataFile> file, std::string mountpoint, std::string directory) {
         auto fs = this->file_systems[mountpoint].get();
 
         try {

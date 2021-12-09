@@ -59,7 +59,7 @@ namespace wrench {
 
         friend class StorageService;
 
-        void stageFile(std::shared_ptr<DataFile>file, std::string absolute_path);
+        void stageFile(std::shared_ptr<DataFile> file, std::string absolute_path);
 
         static std::map<std::string, StorageService*> mount_points;
 
