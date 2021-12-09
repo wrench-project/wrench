@@ -50,17 +50,14 @@ namespace wrench {
 
         // Create and handle a bogus workflow
 
-        auto tmp = new Workflow();
-        std::cerr << "TMP = " << tmp << "\n";
-//        this->workflow = std::shared_ptr<Workflow>(tmp);
-        this->addWorkflow(tmp);
+        this->addWorkflow(new Workflow());
 
         // Create the dual WMS that will just receive workflow execution events so that I don't have to
         std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
                 new WorkloadTraceFileReplayerEventReceiver(this->hostname, job_manager));
 
         // Start the WorkloadTraceFileReplayerEventReceiver
-        event_receiver->addWorkflow(workflow.get(), S4U_Simulation::getClock());
+        event_receiver->addWorkflow(this->getWorkflow(), S4U_Simulation::getClock());
         event_receiver->setSimulation(this->simulation);
         event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
 
@@ -96,7 +93,7 @@ namespace wrench {
             for (int i = 0; i < num_nodes; i++) {
                 double time_fudge = 1; // 1 second seems to make it all work!
                 double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
-                auto task = workflow->addTask(
+                auto task = this->getWorkflow()->addTask(
                         this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
                         task_flops,
                         num_cores_per_node, num_cores_per_node,

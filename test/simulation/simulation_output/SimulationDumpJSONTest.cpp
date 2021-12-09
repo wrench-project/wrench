@@ -1306,7 +1306,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     storage_services_list.insert(server_storage_service);
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
-    //std::shared_ptr<wrench::DataFile> file = new wrench::WorkflowFile("test_file", 10*GB);
+    //std::shared_ptr<wrench::DataFile> file = new wrench::DataFile("test_file", 10*GB);
     std::unique_ptr<wrench::Workflow> link_usage_workflow = std::make_unique<wrench::Workflow>();
     std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);

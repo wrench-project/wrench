@@ -12,7 +12,7 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 
-TEST(WorkflowFileTest, FileStructure) {
+TEST(DataFileTest, FileStructure) {
   wrench::Workflow workflow;
   std::shared_ptr<wrench::DataFile> f1 = workflow.addFile("file-01", 100);
 
