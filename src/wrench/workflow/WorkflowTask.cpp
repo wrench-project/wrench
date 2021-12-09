@@ -70,10 +70,10 @@ namespace wrench {
         }
 
         // Add the file
-        std::cerr << "ADDING TO THE LOCAL DB";
+        std::cerr << "ADDING TO THE LOCAL DB\n";
         this->input_files[file->getID()] = file;
         this->workflow->task_input_files[file].insert(this->getSharedPtr());
-        std::cerr << "ADDED TO THE SIMULATION DB";
+        std::cerr << "ADDED TO THE SIMULATION DB\n";
 
         // Add control dependency
         if (this->workflow->task_output_files.find(file) != this->workflow->task_output_files.end()) {
