@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 
 TEST(WorkflowFileTest, FileStructure) {
