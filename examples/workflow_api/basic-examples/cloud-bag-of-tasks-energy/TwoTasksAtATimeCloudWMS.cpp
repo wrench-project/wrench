@@ -84,10 +84,10 @@ namespace wrench {
 
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const std::shared_ptr<WorkflowTask>t1, const WorkflowTask  *t2) -> bool {
+                      [](const std::shared_ptr<WorkflowTask>t1, const std::shared_ptr<WorkflowTask>  t2) -> bool {
 
                           if (t1->getFlops() == t2->getFlops()) {
-                              return ((uintptr_t) t1 > (uintptr_t) t2);
+                              return ((uintptr_t) t1.get() > (uintptr_t) t2.get());
                           } else {
                               return (t1->getFlops() < t2->getFlops());
                           }
