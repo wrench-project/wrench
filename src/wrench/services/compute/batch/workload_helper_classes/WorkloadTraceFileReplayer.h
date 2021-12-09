@@ -37,7 +37,7 @@ namespace wrench {
         );
 
     private:
-        std::shared_ptr<Workflow> workflow;
+//        std::shared_ptr<Workflow> workflow;
 
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace;
         std::shared_ptr<BatchComputeService> batch_service;
