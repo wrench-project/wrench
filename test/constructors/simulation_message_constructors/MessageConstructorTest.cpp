@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-\
+
 
 
 #include <gtest/gtest.h>
@@ -15,7 +15,7 @@
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
 #include <wrench/wms/WMS.h>
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 #include "services/file_registry/FileRegistryMessage.h"
 #include <wrench/services/compute/ComputeServiceMessage.h>
