@@ -269,9 +269,6 @@ namespace wrench {
      */
     void WMS::addWorkflow(Workflow *workflow, double start_time) {
 
-        if (workflow == nullptr) {
-            std::cerr << "WTF! WORKFLOW = NULL\n";
-        }
         if ((workflow == nullptr) || (start_time < 0.0)) {
             throw std::invalid_argument("WMS::addWorkflow(): Invalid arguments");
         }
