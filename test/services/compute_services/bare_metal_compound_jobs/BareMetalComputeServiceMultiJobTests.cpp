@@ -32,8 +32,7 @@ protected:
     BareMetalComputeServiceActionMultiJobTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
@@ -107,8 +106,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -196,7 +194,7 @@ TEST_F(BareMetalComputeServiceActionMultiJobTest, DAGOfJobs) {
 
 void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -252,7 +250,7 @@ void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

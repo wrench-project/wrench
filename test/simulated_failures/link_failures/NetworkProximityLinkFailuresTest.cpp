@@ -35,7 +35,7 @@ protected:
     NetworkProximityLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -74,7 +74,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -141,7 +141,7 @@ TEST_F(NetworkProximityLinkFailuresTest, RandomLinkFailuress) {
 void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -172,14 +172,14 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
                                                            (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
                                                            stable_hostname)));
 
-                wms->addWorkflow(this->workflow.get(), 0.0);
+                wms->addWorkflow(this->workflow, 0.0);
 
 
 
                 // Running a "run a single task1" simulation
                 ASSERT_NO_THROW(simulation->launch());
 
-                delete simulation;
+
 
                 for (int i=0; i < argc; i++)
      free(argv[i]);

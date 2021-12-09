@@ -267,7 +267,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void WMS::addWorkflow(Workflow *workflow, double start_time) {
+    void WMS::addWorkflow(std::shared_ptr<Workflow> workflow, double start_time) {
 
         if ((workflow == nullptr) || (start_time < 0.0)) {
             throw std::invalid_argument("WMS::addWorkflow(): Invalid arguments");
@@ -292,7 +292,7 @@ namespace wrench {
      *
      * @return a workflow
      */
-    Workflow *WMS::getWorkflow() {
+    std::shared_ptr<Workflow> WMS::getWorkflow() {
         return this->workflow;
     }
 

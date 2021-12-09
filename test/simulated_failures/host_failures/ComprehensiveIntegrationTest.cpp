@@ -32,8 +32,7 @@ WRENCH_LOG_CATEGORY(comprehensive_integration_host_failure_test, "Log category f
 class ComprehensiveIntegrationHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::map<std::string, bool> faulty_map;
 
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
@@ -58,8 +57,8 @@ protected:
 
     ComprehensiveIntegrationHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>\n"
@@ -409,7 +408,7 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
 void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -500,7 +499,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

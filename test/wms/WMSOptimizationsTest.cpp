@@ -60,8 +60,8 @@ protected:
       fclose(platform_file);
     }
 
-    wrench::Workflow *createWorkflow() {
-      wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> createWorkflow() {
+      std::shared_ptr<wrench::Workflow> workflow;
       std::shared_ptr<wrench::DataFile> input_file;
       std::shared_ptr<wrench::DataFile> output_file1;
       std::shared_ptr<wrench::DataFile> output_file2;
@@ -71,8 +71,8 @@ protected:
       std::shared_ptr<wrench::WorkflowTask> task3;
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
-      workflow_unique_ptrs.push_back(std::unique_ptr<wrench::Workflow>(workflow));
+      workflow = wrench::Workflow::createWorkflow();
+      workflows.push_back(workflow);
 
       // Create the tasks
       task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -85,7 +85,7 @@ protected:
       return workflow;
     }
 
-    std::vector<std::unique_ptr<wrench::Workflow>> workflow_unique_ptrs;
+    std::vector<std::shared_ptr<wrench::Workflow>> workflows;
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
@@ -96,7 +96,7 @@ protected:
 class TaskClustering : public wrench::StaticOptimization {
 
 public:
-    void process(wrench::Workflow *workflow) override {
+    void process(std::shared_ptr<wrench::Workflow> workflow) override {
       for (auto task : workflow->getTasks()) {
         if (task->getID() != "task_1_10s_1core") {
           task->setClusterID("CLUSTER_TASK_2_AND_3");
@@ -169,7 +169,7 @@ TEST_F(WMSOptimizationsTest, StaticOptimizationsTestWMS) {
 
 void WMSOptimizationsTest::do_staticOptimization_test() {
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -194,7 +194,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
                   {})));
 
   // Create a WMS
-  wrench::Workflow *workflow = this->createWorkflow();
+  std::shared_ptr<wrench::Workflow> workflow = this->createWorkflow();
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StaticOptimizationsTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -219,7 +219,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
     }
   }
 
-  delete simulation;
+
   for (int i=0; i < argc; i++)
      free(argv[i]);
   free(argv);
@@ -232,7 +232,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
 class TaskParallelization : public wrench::DynamicOptimization {
 
 public:
-    void process(wrench::Workflow *workflow) override {
+    void process(std::shared_ptr<wrench::Workflow> workflow) override {
       for (auto task : workflow->getTasks()) {
         if (task->getID() == "task_3_10s_1core") {
           task->setPriority(100);
@@ -307,7 +307,7 @@ TEST_F(WMSOptimizationsTest, DynamicOptimizationsTestWMS) {
 
 void WMSOptimizationsTest::do_dynamicOptimization_test() {
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -332,7 +332,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
                   {})));
 
   // Create a WMS
-  wrench::Workflow *workflow = this->createWorkflow();
+  std::shared_ptr<wrench::Workflow> workflow = this->createWorkflow();
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new DynamicOptimizationsTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -358,7 +358,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   ASSERT_EQ(trace[2]->getContent()->getTask()->getID(), "task_2_10s_1core");
   ASSERT_GT(trace[2]->getContent()->getTask()->getStartDate(), trace[1]->getContent()->getTask()->getStartDate());
 
-  delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
   free(argv);

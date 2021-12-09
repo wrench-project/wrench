@@ -70,8 +70,7 @@ protected:
     BareMetalComputeServiceTestStandardJobs() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -147,8 +146,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -203,7 +201,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, UnsupportedStandardJobs) {
 void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -245,7 +243,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -317,7 +315,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, BogusNumCores) {
 void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -359,7 +357,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -450,7 +448,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, TwoSingleCoreTasks) {
 void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -494,7 +492,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -583,7 +581,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, TwoDualCoreTasksCase1) {
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -624,7 +622,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -725,7 +723,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, TwoDualCoreTasksCase2) {
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -767,7 +765,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -948,7 +946,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, TwoDualCoreTasksCase3) {
 void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -990,7 +988,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1068,7 +1066,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, JobImmediateTermination) {
 void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1116,7 +1114,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     ASSERT_EQ(this->task1->getFailureCount(), 1);
     ASSERT_EQ(this->task2->getFailureCount(), 1);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1196,7 +1194,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, JobTermination) {
 void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1244,7 +1242,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     ASSERT_EQ(this->task1->getFailureCount(), 1);
     ASSERT_EQ(this->task2->getFailureCount(), 1);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1313,7 +1311,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, NonSubmittedJobTermination) {
 void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1361,7 +1359,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
     ASSERT_EQ(this->task1->getFailureCount(), 0);
     ASSERT_EQ(this->task2->getFailureCount(), 0);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1437,7 +1435,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, CompletedJobTermination) {
 void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1487,7 +1485,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     ASSERT_EQ(this->task1->getFailureCount(), 0);
     ASSERT_EQ(this->task2->getFailureCount(), 0);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1576,7 +1574,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, ShutdownComputeServiceWhileJobIs
 void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobIsRunning_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1625,7 +1623,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     ASSERT_EQ(this->task1->getFailureCount(), 1);
     ASSERT_EQ(this->task2->getFailureCount(), 1);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1704,7 +1702,7 @@ TEST_F(BareMetalComputeServiceTestStandardJobs, ShutdownStorageServiceBeforeJobI
 void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1752,7 +1750,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     ASSERT_EQ(this->task1->getFailureCount(), 1);
     ASSERT_EQ(this->task2->getFailureCount(), 1);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

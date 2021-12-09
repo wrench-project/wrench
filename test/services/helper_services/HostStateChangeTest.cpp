@@ -133,7 +133,7 @@ TEST_F(HostStateChangeDetectorServiceTest, StateChangeDetectionTest) {
 void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notify_when_speed_change) {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -149,12 +149,12 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this,"Host1", notify_when_speed_change));
 
     // Create a bogus workflow
-    auto workflow =  std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-    wms->addWorkflow(workflow.get());
+    auto workflow =  wrench::Workflow::createWorkflow();
+    wms->addWorkflow(workflow);
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

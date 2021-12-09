@@ -19,7 +19,7 @@ public:
 protected:
     SimpleStorageServiceChunkingTest() {
         // simple workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // create the files
         file_size_0 = workflow->addFile("file_size_0", 0);
@@ -55,7 +55,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 class SimpleStorageServiceChunkingTestWMS : public wrench::WMS {
@@ -124,7 +124,7 @@ TEST_F(SimpleStorageServiceChunkingTest, CopyingFile) {
 void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
@@ -166,7 +166,7 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

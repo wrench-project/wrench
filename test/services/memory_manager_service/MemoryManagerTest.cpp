@@ -34,8 +34,7 @@ protected:
     MemoryManagerTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a platform file
         std::string bad_xml = "<?xml version='1.0'?>"
@@ -100,8 +99,7 @@ protected:
 
     std::string bad_platform_file_path = UNIQUE_TMP_PATH_PREFIX + "bas_platform.xml";
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -116,7 +114,7 @@ TEST_F(MemoryManagerTest, BadSetup) {
 
 void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -127,8 +125,6 @@ void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
 
     // Setting up the platform
     ASSERT_THROW(simulation->instantiatePlatform(bad_platform_file_path), std::invalid_argument);
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -191,7 +187,7 @@ TEST_F(MemoryManagerTest, MemoryManagerChainOfTask) {
 
 void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc =2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -223,7 +219,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
                                                 "", {})));
 
     // Create a Workflow
-    auto workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
     auto previous_output_file = workflow->addFile("task0_input", FILE_SIZE * GB);
     int num_tasks = 10;
     for (int i=0; i < num_tasks; i++) {
@@ -251,7 +247,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

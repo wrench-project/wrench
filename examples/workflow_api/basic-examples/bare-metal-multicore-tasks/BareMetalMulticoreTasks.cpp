@@ -51,15 +51,15 @@
 int main(int argc, char **argv) {
 
     /*
-     * Declare a WRENCH simulation object
+     * Create a WRENCH simulation object
      */
-    wrench::Simulation simulation;
+    auto simulation = wrench::Simulation::createSimulation();;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
      * Two special command-line arguments are --help-wrench and --help-simgrid, which print
      * details about available command-line arguments. */
-    simulation.init(&argc, argv);
+    simulation->init(&argc, argv);
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 2) {
@@ -70,45 +70,45 @@ int main(int argc, char **argv) {
     /* Reading and parsing the platform description file, written in XML following the SimGrid-defined DTD,
      * to instantiate the simulated platform */
     std::cerr << "Instantiating simulated platform..." << std::endl;
-    simulation.instantiatePlatform(argv[1]);
+    simulation->instantiatePlatform(argv[1]);
 
     /* Declare a workflow */
-    wrench::Workflow workflow;
+    auto workflow = wrench::Workflow::createWorkflow();
 
     /* Add a task1 with the default parallel model behavior */
-    auto task_default = workflow.addTask("task_default", 10 * GFLOP, 1, 10, 0.0);
+    auto task_default = workflow->addTask("task_default", 10 * GFLOP, 1, 10, 0.0);
 
     /* Add a task1 with the "constant efficiency" parallel model behavior */
-    auto task_constant_efficiency = workflow.addTask("task_constant_efficiency", 10 * GFLOP, 1, 10, 0.0);
+    auto task_constant_efficiency = workflow->addTask("task_constant_efficiency", 10 * GFLOP, 1, 10, 0.0);
     task_constant_efficiency->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.8));
 
     /* Add a task1 with the "amdahl" parallel model behavior */
-    auto task_amdahl = workflow.addTask("task_amdahl", 10 * GFLOP, 1, 10, 0.0);
+    auto task_amdahl = workflow->addTask("task_amdahl", 10 * GFLOP, 1, 10, 0.0);
     task_amdahl->setParallelModel(wrench::ParallelModel::AMDAHL(0.8));
 
 
-    /* Instantiate a bare-metal compute service, and add it to the simulation.
+    /* Instantiate a bare-metal compute service, and add it to the simulation->
      * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
     std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;
-    auto baremetal_service = simulation.add(new wrench::BareMetalComputeService(
+    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
-     * for executing the workflow. */
+     * for executing the workflow-> */
 
-    auto wms = simulation.add(
+    auto wms = simulation->add(
             new wrench::OneTaskAtATimeWMS({baremetal_service}, "WMSHost"));
 
     /* Associate the workflow to the WMS */
-    wms->addWorkflow(&workflow);
+    wms->addWorkflow(workflow);
 
-    /* Launch the simulation. This call only returns when the simulation is complete. */
+    /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
-        simulation.launch();
+        simulation->launch();
     } catch (std::runtime_error &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
         return 1;

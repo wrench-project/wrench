@@ -39,7 +39,7 @@ protected:
     NetworkProximityTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
@@ -123,7 +123,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -202,7 +202,7 @@ TEST_F(NetworkProximityTest, NetworkProximity) {
 void NetworkProximityTest::do_NetworkProximity_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -301,13 +301,13 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                     {compute_service}, {storage_service1},
                     {network_proximity_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);
@@ -404,7 +404,7 @@ TEST_F(NetworkProximityTest, CompareNetworkProximity) {
 void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -459,14 +459,14 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
                                    (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
                                    hostname)));
 
-    wms->addWorkflow(this->workflow.get(), 0.0);
+    wms->addWorkflow(this->workflow, 0.0);
 
 
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);
@@ -580,7 +580,7 @@ TEST_F(NetworkProximityTest, VivaldiConvergeTest) {
 
 void NetworkProximityTest::do_VivaldiConverge_Test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -643,12 +643,12 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                     (std::set<std::shared_ptr<wrench::NetworkProximityService>>){alltoall_network_service, vivaldi_network_service},
                     hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);
@@ -686,7 +686,7 @@ TEST_F(NetworkProximityTest, NetworkProximityValidatePropertiesTest) {
 
 void NetworkProximityTest::do_ValidateProperties_Test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -820,13 +820,13 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                     (std::set<std::shared_ptr<wrench::NetworkProximityService>>){nps},
                     hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 //  // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

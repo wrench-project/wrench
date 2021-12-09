@@ -25,8 +25,7 @@ WRENCH_LOG_CATEGORY(cloud_compute_service_host_failures_test, "Log category for 
 class CloudServiceHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     std::shared_ptr<wrench::DataFile> input_file;
     std::shared_ptr<wrench::DataFile> output_file;
@@ -42,8 +41,8 @@ protected:
 
     CloudServiceHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
@@ -189,7 +188,7 @@ TEST_F(CloudServiceHostFailuresTest, FailureOfAVMWithRunningJob) {
 void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -231,7 +230,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -344,7 +343,7 @@ TEST_F(CloudServiceHostFailuresTest, FailureOfAVMAndRestartWithRunningJobAndRest
 void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFollowedByRestart_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -384,7 +383,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -508,7 +507,7 @@ TEST_F(CloudServiceHostFailuresTest, RandomFailures) {
 void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -549,7 +548,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

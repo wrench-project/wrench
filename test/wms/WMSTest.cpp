@@ -169,7 +169,7 @@ TEST_F(WMSTest, DefaultEventHandling) {
 
 void WMSTest::do_DefaultHandlerWMS_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -209,7 +209,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
 
     // Create a WMS
-    auto workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestDefaultHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
@@ -231,7 +231,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -378,7 +378,7 @@ TEST_F(WMSTest, CustomEventHandling) {
 
 void WMSTest::do_CustomHandlerWMS_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -414,7 +414,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
 
     // Create a WMS
-    auto *workflow = new wrench::Workflow();
+    auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestCustomHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
@@ -436,7 +436,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

@@ -25,7 +25,7 @@ namespace wrench {
     /**
      * Documentation in .h file
      */
-    Workflow *PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename,
+    std::shared_ptr<Workflow> PegasusWorkflowParser::createWorkflowFromJSON(const std::string &filename,
                                                             const std::string &reference_flop_rate,
                                                             bool redundant_dependencies,
                                                             unsigned long min_cores_per_task,
@@ -37,7 +37,7 @@ namespace wrench {
         std::set<std::string> ignored_auxiliary_jobs;
         std::set<std::string> ignored_transfer_jobs;
 
-        auto *workflow = new Workflow();
+        auto workflow = Workflow::createWorkflow();
 
         double flop_rate;
 
@@ -190,7 +190,7 @@ namespace wrench {
     /**
      * Documentation in .h file
      */
-    Workflow *PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+    std::shared_ptr<Workflow> PegasusWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                                       bool redundant_dependencies,
                                                                       unsigned long min_cores_per_task,
                                                                       unsigned long max_cores_per_task,
@@ -201,7 +201,7 @@ namespace wrench {
     /**
       * Documentation in .h file
       */
-    Workflow *PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
+    std::shared_ptr<Workflow> PegasusWorkflowParser::createWorkflowFromDAX(const std::string &filename, const std::string &reference_flop_rate,
                                                            bool redundant_dependencies,
                                                            unsigned long min_cores_per_task,
                                                            unsigned long max_cores_per_task,
@@ -209,7 +209,7 @@ namespace wrench {
 
         pugi::xml_document dax_tree;
 
-        auto *workflow = new Workflow();
+        auto workflow = Workflow::createWorkflow();
 
         double flop_rate;
 

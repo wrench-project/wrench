@@ -84,7 +84,7 @@ namespace wrench {
      *
      * @return
      */
-    double CriticalPathPilotJobScheduler::getFlops(Workflow *workflow, const std::vector<std::shared_ptr<WorkflowTask>> &tasks) {
+    double CriticalPathPilotJobScheduler::getFlops(std::shared_ptr<Workflow> workflow, const std::vector<std::shared_ptr<WorkflowTask>> &tasks) {
       double max_flops = 0;
 
       for (auto task : tasks) {
@@ -106,7 +106,7 @@ namespace wrench {
      * @return the maximal number of jobs that can run in parallel
      */
     unsigned long
-    CriticalPathPilotJobScheduler::getMaxParallelization(Workflow *workflow, const std::set<std::shared_ptr<WorkflowTask>> &tasks) {
+    CriticalPathPilotJobScheduler::getMaxParallelization(std::shared_ptr<Workflow> workflow, const std::set<std::shared_ptr<WorkflowTask>> &tasks) {
       unsigned long count = tasks.size();
       std::set<std::shared_ptr<WorkflowTask>> children;
 

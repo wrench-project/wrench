@@ -34,8 +34,7 @@ protected:
     VirtualizedClusterServiceResourceAllocationTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -109,8 +108,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -212,7 +210,7 @@ TEST_F(VirtualizedClusterServiceResourceAllocationTest, VMResourceAllocationAlgo
 void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlgorithm_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -256,7 +254,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

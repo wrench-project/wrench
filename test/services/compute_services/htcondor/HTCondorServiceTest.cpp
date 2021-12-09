@@ -54,12 +54,11 @@ protected:
     HTCondorServiceTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         //Creating separate workflow for grid universe
-        workflow_unique_ptr1 = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        grid_workflow = workflow_unique_ptr1.get();
+        grid_workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -217,10 +216,8 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::string platform_file_path1 = UNIQUE_TMP_PATH_PREFIX + "platform1.xml";
-    wrench::Workflow *workflow;
-    wrench::Workflow *grid_workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr1;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> grid_workflow;
 };
 
 /**********************************************************************/
@@ -298,7 +295,7 @@ TEST_F(HTCondorServiceTest, HTCondorStandardJobTest) {
 void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -354,7 +351,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -436,7 +433,7 @@ TEST_F(HTCondorServiceTest, HTCondorStandardJobAddComputeServiceTest) {
 void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -488,7 +485,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -578,7 +575,7 @@ TEST_F(HTCondorServiceTest, HTCondorPilotJobTest) {
 void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -636,7 +633,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -708,7 +705,7 @@ TEST_F(HTCondorServiceTest, HTCondorSimpleServiceTest) {
 void HTCondorServiceTest::do_SimpleServiceTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -742,7 +739,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
                      std::invalid_argument);
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -826,7 +823,7 @@ TEST_F(HTCondorServiceTest, HTCondorGridUniverseTest) {
 void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -889,7 +886,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     //simulation->getOutput().dumpUnifiedJSON(grid_workflow, "/tmp/workflow_data.json", false, true, false, false, false, false, false);
-    delete simulation;
+
     free(argv[0]);
     free(argv);
 }
@@ -956,7 +953,7 @@ TEST_F(HTCondorServiceTest, NoGridUniverseSupportTest) {
 void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1016,7 +1013,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
     //return 0 in this case and 1 if it successfully completes.
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     free(argv[0]);
     free(argv);
 }
@@ -1081,7 +1078,7 @@ TEST_F(HTCondorServiceTest, NoNonGridUniverseSupportTest) {
 void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1138,7 +1135,7 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
     //return 0 in this case and 1 if it successfully completes.
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     free(argv[0]);
     free(argv);
 }
@@ -1201,7 +1198,7 @@ TEST_F(HTCondorServiceTest, NoGridJobSupportTest) {
 void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1259,7 +1256,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
     //return 0 in this case and 1 if it successfully completes.
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     free(argv[0]);
     free(argv);
 }
@@ -1364,7 +1361,7 @@ TEST_F(HTCondorServiceTest, NotEnoughResourcesTest) {
 void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1427,7 +1424,7 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
     //return 0 in this case and 1 if it successfully completes.
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     free(argv[0]);
     free(argv);
 }

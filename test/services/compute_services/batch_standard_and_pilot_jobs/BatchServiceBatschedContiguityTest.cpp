@@ -28,7 +28,7 @@ public:
     std::shared_ptr<wrench::ComputeService> batch_service_conservative_bf_non_contiguous = nullptr;
     std::shared_ptr<wrench::ComputeService> batch_service_easy_bf_contiguous = nullptr;
     std::shared_ptr<wrench::ComputeService> batch_service_easy_bf_non_contiguous = nullptr;
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
 
     void do_BatchJobContiguousAllocationTest_test();
@@ -38,7 +38,7 @@ protected:
     BatchServiceBatschedContiguityTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -65,7 +65,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -215,7 +215,7 @@ TEST_F(BatchServiceBatschedContiguityTest, DISABLED_BatchJobContiguousAllocation
 void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -267,14 +267,14 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
             this, {}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

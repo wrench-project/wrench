@@ -51,10 +51,10 @@ namespace wrench {
             return non_generic_vector;
         }
 
-        void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path,
+        void dumpWorkflowExecutionJSON(std::shared_ptr<Workflow> workflow, std::string file_path,
                                        bool generate_host_utilization_layout = false, bool writing_file = true);
 
-        void dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path, bool writing_file = true);
+        void dumpWorkflowGraphJSON(std::shared_ptr<Workflow> workflow, std::string file_path, bool writing_file = true);
 
         void dumpHostEnergyConsumptionJSON(std::string file_path, bool writing_file = true);
 
@@ -64,7 +64,7 @@ namespace wrench {
 
         void dumpLinkUsageJSON(std::string file_path, bool writing_file = true);
 
-        void dumpUnifiedJSON(Workflow *workflow, std::string file_path,
+        void dumpUnifiedJSON(std::shared_ptr<Workflow> workflow, std::string file_path,
                              bool include_platform = false,
                              bool include_workflow_exec = true,
                              bool include_workflow_graph = false,

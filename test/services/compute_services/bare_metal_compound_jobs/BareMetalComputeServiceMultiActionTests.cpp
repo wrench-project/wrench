@@ -36,8 +36,7 @@ protected:
     BareMetalComputeServiceMultiActionTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
@@ -111,8 +110,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -231,7 +229,7 @@ TEST_F(BareMetalComputeServiceMultiActionTest, DAGOfSleeps) {
 
 void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -287,7 +285,7 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -348,7 +346,7 @@ TEST_F(BareMetalComputeServiceMultiActionTest, NonDAG) {
 
 void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -404,7 +402,7 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -492,7 +490,7 @@ TEST_F(BareMetalComputeServiceMultiActionTest, RAMConstraintsAndPriorities) {
 
 void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -548,7 +546,7 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -646,7 +644,7 @@ TEST_F(BareMetalComputeServiceMultiActionTest, PartialFailure) {
 
 void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -695,7 +693,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -782,7 +780,7 @@ TEST_F(BareMetalComputeServiceMultiActionTest, PartialTermination) {
 
 void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -831,7 +829,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

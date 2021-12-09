@@ -30,7 +30,7 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
-    wrench::Simulation *simulation = nullptr;
+    std::shared_ptr<wrench::Simulation> simulation = nullptr;
 
     void do_AccessEnergyApiExceptionTests_test();
 
@@ -44,10 +44,10 @@ public:
 
     void do_PluginNotActive_test();
 
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-    EnergyConsumptionTest():workflow(std::unique_ptr<wrench::Workflow>(new wrench::Workflow())) {
+    EnergyConsumptionTest():workflow(wrench::Workflow::createWorkflow()) {
 
         // Create a four-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"
@@ -249,7 +249,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -287,7 +287,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
             new EnergyApiAccessExceptionsTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -301,7 +301,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -418,7 +418,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -456,7 +456,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
             new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -470,7 +470,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -543,7 +543,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -580,7 +580,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
             new EnergyConsumptionTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -594,7 +594,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -696,7 +696,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -733,7 +733,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
             new EnergyAPICheckTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -747,7 +747,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -872,7 +872,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -910,7 +910,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
             new EnergyConsumptionPStateChangeTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
 
     // Create two workflow files
@@ -924,7 +924,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -986,7 +986,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1012,11 +1012,11 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
     EXPECT_NO_THROW(wms = simulation->add(
             new PluginNotActivatedTestWMS(this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

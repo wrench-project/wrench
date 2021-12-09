@@ -33,7 +33,7 @@ WRENCH_LOG_CATEGORY(compute_action_executor_test, "Log category for ComputeActio
 class ComputeActionExecutorTest : public ::testing::Test {
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
 
@@ -107,7 +107,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -200,7 +200,7 @@ TEST_F(ComputeActionExecutorTest, Success) {
 void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -212,7 +212,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    this->workflow = std::make_unique<wrench::Workflow>();
+    this->workflow = wrench::Workflow::createWorkflow();
 
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
@@ -227,11 +227,11 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new ComputeActionExecutorTestWMS(this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

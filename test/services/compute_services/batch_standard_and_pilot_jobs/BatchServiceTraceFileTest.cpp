@@ -29,7 +29,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_BatchTraceFileReplayTest_test();
 
@@ -46,7 +46,7 @@ protected:
     BatchServiceTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -81,7 +81,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -189,7 +189,7 @@ TEST_F(BatchServiceTest, BatchTraceFileReplayTest) {
 void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -214,14 +214,14 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
             new BatchTraceFileReplayTestWMS(
                     this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -265,7 +265,7 @@ TEST_F(BatchServiceTest, BatchTraceFileReplayTestWithFailedJob) {
 void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -302,7 +302,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
             new BatchTraceFileReplayTestWithFailedJobWMS(
                     this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -310,7 +310,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -361,7 +361,7 @@ TEST_F(BatchServiceTest, WorkloadTraceFileSWFBatchServiceShutdownTest) {
 void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -403,14 +403,14 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFBatchServiceShutdownTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -545,7 +545,7 @@ TEST_F(BatchServiceTest, WorkloadTraceFileSWFTest) {
 void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -767,7 +767,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -785,7 +785,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
         WRENCH_INFO("%s: %s %lu", task->getID().c_str(), host.c_str(), num_cores);
     }
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -904,7 +904,7 @@ TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFRequestedTimesTest) {
 void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -945,14 +945,14 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1067,7 +1067,7 @@ TEST_F(BatchServiceTest, DISABLED_WorkloadTraceFileSWFDifferentTimeOriginTest) {
 void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1110,14 +1110,14 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1280,7 +1280,7 @@ TEST_F(BatchServiceTest, WorkloadTraceFileJSONTest) {
 void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1688,14 +1688,14 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1798,7 +1798,7 @@ TEST_F(BatchServiceTest, GetQueueStateTest) {
 void BatchServiceTest::do_GetQueueState_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1839,11 +1839,11 @@ void BatchServiceTest::do_GetQueueState_test() {
     ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

@@ -66,8 +66,7 @@ public:
 protected:
     VirtualizedClusterServiceTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -148,8 +147,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 /**********************************************************************/
@@ -162,7 +160,7 @@ TEST_F(VirtualizedClusterServiceTest, ConstructorTest) {
 
 void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -188,7 +186,7 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
                     {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "bogus"}})),
                  std::invalid_argument);
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -384,7 +382,7 @@ TEST_F(VirtualizedClusterServiceTest, CloudStandardJobTest) {
 
 void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -425,7 +423,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -512,7 +510,7 @@ TEST_F(VirtualizedClusterServiceTest, CloudStandardJobWithCustomVMNameTestWMS) {
 
 void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -552,7 +550,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -667,7 +665,7 @@ TEST_F(VirtualizedClusterServiceTest, VirtualizedClusterVMMigrationTestWMS) {
 
 void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -714,7 +712,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -787,7 +785,7 @@ TEST_F(VirtualizedClusterServiceTest, CloudNumCoresTestWMS) {
 
 void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -827,7 +825,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -893,7 +891,7 @@ TEST_F(VirtualizedClusterServiceTest, StopAllVMsTestWMS) {
 
 void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -934,7 +932,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1134,7 +1132,7 @@ TEST_F(VirtualizedClusterServiceTest, ShutdownVMTestWMS) {
 
 void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1177,7 +1175,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1260,7 +1258,7 @@ TEST_F(VirtualizedClusterServiceTest, ShutdownVMAndThenShutdownServiceTestWMS) {
 
 void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1300,7 +1298,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1420,7 +1418,7 @@ TEST_F(VirtualizedClusterServiceTest, SubmitToVMTestWMS) {
 
 void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1459,7 +1457,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1522,7 +1520,7 @@ TEST_F(VirtualizedClusterServiceTest, VMStartShutdownStartShutdown) {
 
 void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1562,7 +1560,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1650,7 +1648,7 @@ TEST_F(VirtualizedClusterServiceTest, VMShutdownWhileJobIsRunning) {
 
 void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1691,7 +1689,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -1781,7 +1779,7 @@ TEST_F(VirtualizedClusterServiceTest, VMComputeServiceStopWhileJobIsRunning) {
 
 void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1822,7 +1820,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);

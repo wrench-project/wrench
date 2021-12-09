@@ -29,7 +29,7 @@ WRENCH_LOG_CATEGORY(file_write_action_executor_test, "Log category for FileWrite
 class FileWriteActionExecutorTest : public ::testing::Test {
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_FileWriteActionExecutorSuccessTest_test();
 
@@ -103,7 +103,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 public:
     std::shared_ptr<wrench::DataFile> file;
@@ -187,7 +187,7 @@ TEST_F(FileWriteActionExecutorTest, SuccessTest) {
 void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -202,7 +202,7 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
     this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a workflow
-    workflow = std::make_unique<wrench::Workflow>();
+    workflow = wrench::Workflow::createWorkflow();
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
@@ -211,11 +211,11 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     wms = simulation->add(new FileWriteActionExecutorSuccessTestWMS(this, "Host1"));
 
-    wms->addWorkflow(workflow.get());
+    wms->addWorkflow(workflow);
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

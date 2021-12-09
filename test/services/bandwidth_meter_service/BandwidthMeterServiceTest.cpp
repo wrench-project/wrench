@@ -160,7 +160,7 @@ TEST_F(BandwidthMeterServiceTest, BasicCreationDestruction) {
 }
 
 void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -184,7 +184,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     const double GB = 1000.0 * 1000.0 * 1000.0;
     //std::shared_ptr<wrench::DataFile> file = new wrench::DataFile("test_file", 10*GB);
-    std::unique_ptr<wrench::Workflow> link_usage_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    auto link_usage_workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WorkflowTask> single_task;
     single_task = link_usage_workflow->addTask("dummy_task",1,1,1,8*GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10*GB));
@@ -199,7 +199,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     ));
 
 
-    EXPECT_NO_THROW(wms->addWorkflow(link_usage_workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(link_usage_workflow));
 
     simulation->add(new wrench::FileRegistryService("host1"));
     for (auto const &file : link_usage_workflow->getInputFiles()) {
@@ -208,7 +208,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

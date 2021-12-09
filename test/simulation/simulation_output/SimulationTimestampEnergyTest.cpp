@@ -12,7 +12,7 @@ WRENCH_LOG_CATEGORY(test_energy, "Log category for SimulationTimestampEnergyTest
 
 class SimulationTimestampEnergyTest: public ::testing::Test {
 public:
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_SimulationTimestampPstateSet_test();
     void do_SimulationTimestampEnergyConsumption_test();
@@ -22,7 +22,7 @@ public:
 
 protected:
 
-    SimulationTimestampEnergyTest() : workflow(std::unique_ptr<wrench::Workflow>(new wrench::Workflow())) {
+    SimulationTimestampEnergyTest() : workflow(wrench::Workflow::createWorkflow()) {
         // Create a two-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -97,7 +97,7 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampPstateSetTest) {
 }
 
 void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -117,7 +117,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
                     )
             ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -146,7 +146,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     ASSERT_EQ(2, ts3->getContent()->getPstate());
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -192,7 +192,7 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampEnergyConsumptionTest) 
 }
 
 void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -212,7 +212,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -235,7 +235,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     ASSERT_EQ("host1", ts2->getContent()->getHostname());
     ASSERT_DOUBLE_EQ(400.0, ts2->getContent()->getConsumption());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -322,7 +322,7 @@ TEST_F(SimulationTimestampEnergyTest, EnergyMeterSingleMeasurementPeriodTest) {
 }
 
 void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -342,7 +342,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -416,7 +416,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
         ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].second, host2_timestamps[i]->getContent()->getConsumption());
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -464,7 +464,7 @@ TEST_F(SimulationTimestampEnergyTest, EnergyMeterMultipleMeasurmentPeriodTest) {
 }
 
 void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -484,7 +484,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -543,7 +543,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
         ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].second, host2_timestamps[i]->getContent()->getConsumption());
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

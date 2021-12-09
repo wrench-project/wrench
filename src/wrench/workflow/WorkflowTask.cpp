@@ -287,7 +287,7 @@ namespace wrench {
      * @brief Get the workflow that contains the task
      * @return a workflow
      */
-    Workflow *WorkflowTask::getWorkflow() const {
+    std::shared_ptr<Workflow> WorkflowTask::getWorkflow() const {
         return this->workflow;
     }
 

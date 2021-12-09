@@ -26,7 +26,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_BogusSetupTest_test();
 
@@ -73,7 +73,7 @@ public:
 protected:
     BatchServiceTest() {
         // Create the simplest workflow
-        workflow = std::make_unique<wrench::Workflow>();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 10-core platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -172,7 +172,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -205,7 +205,7 @@ TEST_F(BatchServiceTest, BogusSetupTest) {
 
 void BatchServiceTest::do_BogusSetupTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -249,7 +249,7 @@ void BatchServiceTest::do_BogusSetupTest_test() {
                                             {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}})),
                  std::invalid_argument);
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -439,7 +439,7 @@ TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 
 void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -475,7 +475,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
             new TerminateOneStandardJobSubmissionTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -489,7 +489,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -566,7 +566,7 @@ TEST_F(BatchServiceTest, TerminatePilotJobsTest)
 
 void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -601,7 +601,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
             new TerminateOneStandardJobSubmissionTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -615,7 +615,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -725,7 +725,7 @@ TEST_F(BatchServiceTest, OneStandardJobSubmissionTest) {
 
 void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -762,7 +762,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
             new OneStandardJobSubmissionTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -776,7 +776,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -870,7 +870,7 @@ TEST_F(BatchServiceTest, StandardJobFailureTest) {
 
 void BatchServiceTest::do_StandardJobFailureTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -906,7 +906,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
             new StandardJobFailureTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -920,7 +920,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1049,7 +1049,7 @@ TEST_F(BatchServiceTest, TwoStandardJobSubmissionTest) {
 
 void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1083,7 +1083,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
             new TwoStandardJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1097,7 +1097,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1196,7 +1196,7 @@ TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 
 void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1233,7 +1233,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
                     this,
                     {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1249,7 +1249,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1376,7 +1376,7 @@ TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
 
 void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1410,7 +1410,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
                     this,
                     {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1426,7 +1426,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1515,7 +1515,7 @@ TEST_F(BatchServiceTest, InsufficientCoresJobSubmissionTest) {
 
 void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1548,7 +1548,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
             new InsufficientCoresJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1564,7 +1564,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1639,7 +1639,7 @@ TEST_F(BatchServiceTest, NoArgumentsJobSubmissionTest) {
 
 void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1672,7 +1672,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
             new NoArgumentsJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1688,7 +1688,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1788,7 +1788,7 @@ TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
 
 void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1822,7 +1822,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
             new StandardJobTimeoutSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1838,7 +1838,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -1916,7 +1916,7 @@ TEST_F(BatchServiceTest, PilotJobTimeOutTaskTest) {
 
 void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1949,7 +1949,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
             new PilotJobTimeoutSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1965,7 +1965,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -2138,7 +2138,7 @@ TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest)
 
 void BatchServiceTest::do_BestFitTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2172,7 +2172,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
             new BestFitStandardJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2194,7 +2194,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -2296,7 +2296,7 @@ TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest)
 
 void BatchServiceTest::do_FirstFitTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2330,7 +2330,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
             new FirstFitStandardJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2352,7 +2352,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -2555,7 +2555,7 @@ TEST_F(BatchServiceTest, RoundRobinTaskTest)
 
 void BatchServiceTest::do_RoundRobinTask_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2590,7 +2590,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
             new RoundRobinStandardJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2612,7 +2612,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -2733,7 +2733,7 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobTimeOutTaskTest) {
 
 void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2766,7 +2766,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
             new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2782,7 +2782,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -2896,7 +2896,7 @@ TEST_F(BatchServiceTest, StandardJobInsidePilotJobSucessTaskTest) {
 
 void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -2929,7 +2929,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
             new StandardJobInsidePilotJobSucessSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2945,7 +2945,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -3049,7 +3049,7 @@ TEST_F(BatchServiceTest, InsufficientCoresInsidePilotJobTaskTest) {
 
 void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -3082,7 +3082,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
             new InsufficientCoresInsidePilotJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -3098,7 +3098,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -3183,7 +3183,7 @@ TEST_F(BatchServiceTest, MultipleStandardJobSubmissionTest) {
 
 void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -3216,7 +3216,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
             new MultipleStandardJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -3232,7 +3232,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -3327,7 +3327,7 @@ TEST_F(BatchServiceTest, DISABLED_DifferentBatchAlgorithmsSubmissionTest)
 
 void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -3363,7 +3363,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
             new DifferentBatchAlgorithmsSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow).get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -3379,7 +3379,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     // of course not be likely to do
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
@@ -3475,7 +3475,7 @@ TEST_F(BatchServiceTest, ShutdownWithPendingRunningJobsTest) {
 
 void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -3500,13 +3500,13 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
             new ShutdownWithPendingRunningJobsTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow).get()));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
