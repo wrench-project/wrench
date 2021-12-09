@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 #include "../include/UniqueTmpPathPrefix.h"
 #include <wrench/tools/pegasus/PegasusWorkflowParser.h>
