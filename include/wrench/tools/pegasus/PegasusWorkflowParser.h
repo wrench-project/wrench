@@ -11,6 +11,7 @@
 #define WRENCH_PEGASUSWORKFLOWPARSER_H
 
 #include <string>
+#include <memory>
 
 namespace wrench {
 
