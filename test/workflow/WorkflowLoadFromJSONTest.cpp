@@ -3196,7 +3196,7 @@ TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
     ASSERT_NO_THROW(
             workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
     ASSERT_EQ(workflow->getNumberOfTasks(), 71);
-    ASSERT_EQ(workflow->getFiles().size(), 69);
+    ASSERT_EQ(workflow->getFileMap().size(), 69);
 
     for (auto task : workflow->getTasks()) {
         if (task->getID() == "register_local_2_0") {

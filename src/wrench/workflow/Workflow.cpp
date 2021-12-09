@@ -12,7 +12,7 @@
 #include <wrench/util/UnitParser.h>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
-
+#include <wrench/simulation/Simulation.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
@@ -70,8 +70,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Remove a file from the workflow. WARNING: this method de-allocated
-     *        memory_manager_service for the file, making any pointer to the file invalid
+     * @brief Remove a file from the workflow.
      * @param file: a file
      *
      * @throw std::invalid_argument
@@ -93,6 +92,7 @@ namespace wrench {
 
         this->task_output_files.erase(file);
         this->task_input_files.erase(file);
+        this->simulation->removeFile(file);
     }
 
     /**
@@ -227,55 +227,6 @@ namespace wrench {
         }
     }
 
-    /**
-     * @brief Add a new file to the workflow
-     *
-     * @param id: a unique string id
-     * @param size: a file size in bytes
-     *
-     * @return the DataFile instance
-     *
-     * @throw std::invalid_argument
-     */
-    std::shared_ptr<DataFile> Workflow::addFile(const std::string id, double size) {
-
-        // TODO: This should be in class SIMULATION
-
-        if (size < 0) {
-            throw std::invalid_argument("Workflow::addFile(): Invalid arguments");
-        }
-
-        // Create the DataFile object
-        if (files.find(id) != files.end()) {
-            throw std::invalid_argument("Workflow::addFile(): DataFile with id '" +
-                                        id + "' already exists");
-        }
-
-        auto file = std::shared_ptr<DataFile>(new DataFile(id, size));
-//        file->workflow = this;
-
-        // Add if to the set of workflow files
-        files[file->id] = file;
-
-        return file;
-    }
-
-    /**
-     * @brief Find a DataFile based on its ID
-     *
-     * @param id: a string id
-     *
-     * @return the DataFile instance (or throws a std::invalid_argument if not found)
-     *
-     * @throw std::invalid_argument
-     */
-    std::shared_ptr<DataFile> Workflow::getFileByID(const std::string &id) {
-        if (files.find(id) == files.end()) {
-            throw std::invalid_argument("Workflow::getFileByID(): Unknown DataFile ID " + id);
-        } else {
-            return files[id];
-        }
-    }
 
     /**
      * @brief Output the workflow's dependency graph to EPS
@@ -407,29 +358,6 @@ namespace wrench {
         return all_tasks;
     }
 
-    /**
-     * @brief Get the list of all files in the workflow
-     *
-     * @return a copy of map of files, indexed by file ID
-     */
-     // TODO: Move to Simulation
-    std::map<std::string, std::shared_ptr<DataFile>> Workflow::getFileMap() const {
-        return this->files;
-    }
-
-    /**
-     * @brief Get the list of all files in the workflow
-     *
-     * @return a vector of files
-     */
-     // TODO: MOVE TO SIMULATION
-    std::vector<std::shared_ptr<DataFile>> Workflow::getFiles() const {
-        std::vector<std::shared_ptr<DataFile>> all_files;
-        for (auto const &f : this->files) {
-            all_files.push_back(f.second);
-        }
-        return all_files;
-    }
 
     /**
      * @brief Get the list of children for a task
@@ -517,7 +445,7 @@ namespace wrench {
      */
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getInputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> input_files;
-        for (auto const &f : this->files) {
+        for (auto const &f : this->simulation->getFileMap()) {
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
                 continue;
@@ -539,7 +467,7 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> Workflow::getInputFiles() const {
         std::vector<std::shared_ptr<DataFile>> input_files;
-        for (auto const &f : this->files) {
+        for (auto const &f : this->simulation->getFileMap()) {
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
                 continue;
@@ -561,7 +489,7 @@ namespace wrench {
     */
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getOutputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> output_files;
-        for (auto const &f : this->files) {
+        for (auto const &f : this->simulation->getFileMap()) {
             // If the file is not output to any task, then it can't be what we want
             if (this->task_output_files.find(f.second) == this->task_output_files.end()) {
                 continue;
@@ -583,7 +511,7 @@ namespace wrench {
    */
     std::vector<std::shared_ptr<DataFile>> Workflow::getOutputFiles() const {
         std::vector<std::shared_ptr<DataFile>> output_files;
-        for (auto const &f : this->files) {
+        for (auto const &f : this->simulation->getFileMap()) {
             // If the file is not output to any task, then it can't be what we want
             if (this->task_output_files.find(f.second) == this->task_output_files.end()) {
                 continue;
@@ -769,5 +697,35 @@ namespace wrench {
         }
         return to_return;
     }
+
+
+    /**
+     * @brief Add a file to the workflow
+     * @param id : file name
+     * @param size : file size in bytes
+     * @return a file
+     */
+    std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
+        return this->simulation->addFile(id, size);
+    }
+
+    /**
+      * @brief Get the list of all files in the workflow/simulation
+      *
+      * @return a reference to the map of files in the workflow/simulation, indexed by file ID
+      */
+    std::map<std::string, std::shared_ptr<DataFile>> &Workflow::getFileMap() {
+        return this->simulation->getFileMap();
+    }
+
+    /**
+     * @brief Get a file based on its ID
+     * @param id : file ID
+     * @return a file
+     */
+    std::shared_ptr<DataFile> Workflow::getFileByID(const std::string &id) {
+        return this->simulation->getFileByID(id);
+    }
+
 
 }

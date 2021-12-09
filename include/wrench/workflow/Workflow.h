@@ -44,12 +44,11 @@ namespace wrench {
         void removeTask(std::shared_ptr<WorkflowTask>task);
 
         void removeFile(std::shared_ptr<DataFile>file);
-
-        std::shared_ptr<WorkflowTask>getTaskByID(const std::string &id);
-
-        std::shared_ptr<DataFile> addFile(std::string, double);
-
+        std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
+        std::shared_ptr<DataFile> addFile(std::string id, double size);
         std::shared_ptr<DataFile> getFileByID(const std::string &id);
+        std::shared_ptr<WorkflowTask> getTaskByID(const std::string &id);
+
 
         static double getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> tasks);
 
@@ -64,8 +63,6 @@ namespace wrench {
 
         void exportToEPS(std::string);
 
-        std::vector<std::shared_ptr<DataFile>> getFiles() const;
-        std::map<std::string, std::shared_ptr<DataFile>> getFileMap() const;
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
         std::map<std::string, std::shared_ptr<DataFile>> getInputFileMap() const;
         std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
@@ -135,8 +132,6 @@ namespace wrench {
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<WorkflowTask>> task_output_files;
         std::map<std::shared_ptr<DataFile>, std::set<std::shared_ptr<WorkflowTask>>> task_input_files;
 
-        /* Map of files */  // TODO: Move to Simulation
-        std::map<std::string, std::shared_ptr<DataFile>> files;
 
         std::string callback_mailbox;
         ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any
