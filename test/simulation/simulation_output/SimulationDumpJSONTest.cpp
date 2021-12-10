@@ -45,7 +45,8 @@ public:
 protected:
 
     ~SimulationDumpJSONTest() {
-        workflow->clear();
+//        std::cerr << "WORKFLOW = " << workflow.get() << "\n";
+        if (workflow.get()) workflow->clear();
     }
 
     SimulationDumpJSONTest() {
@@ -301,6 +302,7 @@ bool compareLinks(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 /**********************************************************************/
 /**          SimulationDumpWorkflowExecutionJSONTest                 **/
 /**********************************************************************/
+
 void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -455,7 +457,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     std::ifstream json_file;
 
-    workflow->clear();
 
     workflow = wrench::Workflow::createWorkflow();
 
@@ -494,6 +495,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
 
     EXPECT_TRUE(compareObjects(result_json1,expected_json1));
+
+    std::cerr << "HER2E\n";
 
     workflow->clear();
 
@@ -536,6 +539,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     workflow->clear();
 
     workflow = wrench::Workflow::createWorkflow();
+
+    std::cerr << "HERE\n";
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -734,6 +739,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
     EXPECT_TRUE(result_json1 == expected_json1);
 
+    independent_tasks_workflow->clear();
 
     // Generate a workflow with two tasks, two input files, and four output files. Both tasks use both input files and produce two output files each.
     auto two_tasks_use_all_files_workflow = wrench::Workflow::createWorkflow();
@@ -856,11 +862,9 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json2["workflow_graph"]["edges"].begin(), expected_json2["workflow_graph"]["edges"].end(), compareLinks);
     std::sort(expected_json2["workflow_graph"]["vertices"].begin(), expected_json2["workflow_graph"]["vertices"].end(), compareNodes);
 
-    std::cerr << "RESULT\n" << result_json2 << "\n";
-    std::cerr << "EXPECTED\n" << expected_json2 << "\n";
     EXPECT_TRUE(result_json2 == expected_json2);
 
-    independent_tasks_workflow->clear();
+    two_tasks_use_all_files_workflow->clear();
 
     // Generate a workflow where one task1 forks into two tasks, then those two tasks join into one.
     auto fork_join_workflow = wrench::Workflow::createWorkflow();
@@ -1016,6 +1020,8 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json3["workflow_graph"]["edges"].begin(), expected_json3["workflow_graph"]["edges"].end(), compareLinks);
     std::sort(expected_json3["workflow_graph"]["vertices"].begin(), expected_json3["workflow_graph"]["vertices"].end(), compareNodes);
 
+    std::cerr << "RESULT: " << result_json3 << "\n";
+    std::cerr << "EXPECTED: " << expected_json3 << "\n";
     EXPECT_TRUE(result_json3 == expected_json3);
 
     fork_join_workflow->clear();
@@ -1086,6 +1092,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-energy-simulation");
 //    argv[2] = strdup("--wrench-full-log");
+
+    workflow = wrench::Workflow::createWorkflow();
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1355,7 +1363,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpLinkUsageJSON(""), std::invalid_argument);
 
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
-    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
+    simulation->getOutput().dumpUnifiedJSON(link_usage_workflow, "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
 
     nlohmann::json expected_json_link_usage = R"(
     {
@@ -1403,6 +1411,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     EXPECT_TRUE(expected_json_link_usage == result_json);
 
+    link_usage_workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1437,8 +1446,6 @@ private:
     SimulationDumpJSONTest *test;
 
     int main() {
-
-
 
         auto ss = this->getAvailableStorageServices();
         auto ss1 = *(ss.begin());
@@ -1491,6 +1498,8 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
             this, {}, {ss1,  ss2}, nullptr, host1
     )));
 
+    auto workflow = wrench::Workflow::createWorkflow();
+
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->getOutput().enableDiskTimestamps(true);
@@ -1535,6 +1544,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
 
     }
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

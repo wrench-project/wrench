@@ -25,10 +25,9 @@ namespace wrench {
      *         by these tasks
      */
     void Workflow::clear() {
-        std::cerr << " IN WORKFLOW CLEAR!: " << this->data_files.size() << "\n";
        this->tasks.clear();
         for (auto const &f : this->data_files) {
-            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
+//            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
             Simulation::removeFile(f);
         }
         this->data_files.clear();
@@ -87,7 +86,7 @@ namespace wrench {
      */
     void Workflow::removeFile(std::shared_ptr<DataFile> file) {
 
-        std::cerr << "REMOVING FILE " << file->getID() << "\n";
+//        std::cerr << "REMOVING FILE " << file->getID() << "\n";
 
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
@@ -722,9 +721,8 @@ namespace wrench {
      * @return a file
      */
     std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
-        std::cerr << "CREATING DATA FILE " << id << "\n";
+//        std::cerr << "CREATING DATA FILE " << id << "\n";
         auto data_file = Simulation::addFile(id, size);
-        std::cerr << "THIS =" << this << "\n";
         this->data_files.insert(data_file);
         return data_file;
     }
