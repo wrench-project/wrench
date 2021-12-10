@@ -496,8 +496,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     EXPECT_TRUE(compareObjects(result_json1,expected_json1));
 
-    std::cerr << "HER2E\n";
-
     workflow->clear();
 
     workflow = wrench::Workflow::createWorkflow();
@@ -539,8 +537,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     workflow->clear();
 
     workflow = wrench::Workflow::createWorkflow();
-
-    std::cerr << "HERE\n";
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 0);
@@ -1020,8 +1016,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json3["workflow_graph"]["edges"].begin(), expected_json3["workflow_graph"]["edges"].end(), compareLinks);
     std::sort(expected_json3["workflow_graph"]["vertices"].begin(), expected_json3["workflow_graph"]["vertices"].end(), compareNodes);
 
-    std::cerr << "RESULT: " << result_json3 << "\n";
-    std::cerr << "EXPECTED: " << expected_json3 << "\n";
     EXPECT_TRUE(result_json3 == expected_json3);
 
     fork_join_workflow->clear();

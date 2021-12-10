@@ -155,11 +155,6 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     workflow->removeTask(t1);
 
-    std::cerr << "FINISHING TEST: #FILES IN WORKFLOWS " << wrench::Simulation::data_files.size() << "\n";
-    for (const auto &f : wrench::Simulation::data_files) {
-        std::cerr << "  - " << f.second->getID() << "\n";
-    }
-
 }
 
 TEST_F(WorkflowTest, ControlDependency) {

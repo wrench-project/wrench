@@ -129,11 +129,7 @@ void ComputeThreadTest::do_Working_test() {
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-    std::cerr << "BEFORE LAUNCH: " << simulation->getFileMap().size() << "\n";
-
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
      free(argv[i]);
