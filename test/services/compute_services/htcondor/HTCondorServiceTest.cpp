@@ -51,11 +51,17 @@ public:
     void do_NotEnoughResourcesTest_test();
 
 protected:
+
+    ~HTCondorServiceTest() {
+        std::cerr << "CLEARING WWRKFL\n";
+      this->workflow->clear();
+      this->grid_workflow->clear();
+    }
+
     HTCondorServiceTest() {
 
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();
-
 
         //Creating separate workflow for grid universe
         grid_workflow = wrench::Workflow::createWorkflow();
