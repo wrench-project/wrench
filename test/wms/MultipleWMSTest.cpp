@@ -69,10 +69,8 @@ protected:
         std::shared_ptr<wrench::WorkflowTask> task2;
 
         // Create the simplest workflow
-        std::cerr << "IN TEST CREATE WORKFLOW\n";
         workflow = wrench::Workflow::createWorkflow();
         workflows.push_back(workflow);
-        std::cerr << "WORKFLOWS = " << workflows.size() << "\n";
 
         // Create the files
         input_file = workflow->addFile(prefix + "_input_file", 10.0);
@@ -90,7 +88,6 @@ protected:
         task1->addOutputFile(output_file1);
         task2->addOutputFile(output_file2);
 
-        std::cerr << "DONE WITH WF CREATION\n";
         return workflow;
     }
     std::vector<std::shared_ptr<wrench::Workflow>> workflows;

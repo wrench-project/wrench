@@ -53,7 +53,6 @@ public:
 protected:
 
     ~HTCondorServiceTest() {
-        std::cerr << "CLEARING WWRKFL\n";
       this->workflow->clear();
       this->grid_workflow->clear();
     }
