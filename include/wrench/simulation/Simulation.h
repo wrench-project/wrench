@@ -66,10 +66,10 @@ namespace wrench {
         static unsigned long getHostNumCores(std::string hostname);
         static double getHostFlopRate(std::string hostname);
 
-        std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
-        void removeFile(std::shared_ptr<DataFile>file);
-        std::shared_ptr<DataFile> getFileByID(const std::string &id);
-        std::shared_ptr<DataFile> addFile(std::string, double);
+        static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
+        static void removeFile(std::shared_ptr<DataFile>file);
+        static std::shared_ptr<DataFile> getFileByID(const std::string &id);
+        static std::shared_ptr<DataFile> addFile(std::string, double);
 
 
 

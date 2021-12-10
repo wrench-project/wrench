@@ -29,7 +29,7 @@ namespace wrench {
        this->tasks.clear();
         for (auto const &f : this->data_files) {
 //            std::cerr << "REMOVING FILE " << f->getID() << "\n";
-            this->simulation->removeFile(f);
+            Simulation::removeFile(f);
         }
         this->data_files.clear();
     }
@@ -102,7 +102,7 @@ namespace wrench {
 
         this->task_output_files.erase(file);
         this->task_input_files.erase(file);
-        this->simulation->removeFile(file);
+        Simulation::removeFile(file);
         this->data_files.erase(file);
     }
 
@@ -459,7 +459,7 @@ namespace wrench {
      */
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getInputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> input_files;
-        for (auto const &f : this->simulation->getFileMap()) {
+        for (auto const &f : Simulation::getFileMap()) {
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
                 continue;
@@ -481,7 +481,7 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> Workflow::getInputFiles() const {
         std::vector<std::shared_ptr<DataFile>> input_files;
-        for (auto const &f : this->simulation->getFileMap()) {
+        for (auto const &f : Simulation::getFileMap()) {
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
                 continue;
@@ -503,7 +503,7 @@ namespace wrench {
     */
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getOutputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> output_files;
-        for (auto const &f : this->simulation->getFileMap()) {
+        for (auto const &f : Simulation::getFileMap()) {
             // If the file is not output to any task, then it can't be what we want
             if (this->task_output_files.find(f.second) == this->task_output_files.end()) {
                 continue;
@@ -525,7 +525,7 @@ namespace wrench {
    */
     std::vector<std::shared_ptr<DataFile>> Workflow::getOutputFiles() const {
         std::vector<std::shared_ptr<DataFile>> output_files;
-        for (auto const &f : this->simulation->getFileMap()) {
+        for (auto const &f : Simulation::getFileMap()) {
             // If the file is not output to any task, then it can't be what we want
             if (this->task_output_files.find(f.second) == this->task_output_files.end()) {
                 continue;
@@ -721,7 +721,7 @@ namespace wrench {
      */
     std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
 //        std::cerr << "CREATING DATA FILE " << id << "\n";
-        auto data_file = this->simulation->addFile(id, size);
+        auto data_file = Simulation::addFile(id, size);
         this->data_files.insert(data_file);
         return data_file;
     }
@@ -732,7 +732,7 @@ namespace wrench {
       * @return a reference to the map of files in the workflow/simulation, indexed by file ID
       */
     std::map<std::string, std::shared_ptr<DataFile>> &Workflow::getFileMap() {
-        return this->simulation->getFileMap();
+        return Simulation::getFileMap();
     }
 
     /**
@@ -741,7 +741,7 @@ namespace wrench {
      * @return a file
      */
     std::shared_ptr<DataFile> Workflow::getFileByID(const std::string &id) {
-        return this->simulation->getFileByID(id);
+        return Simulation::getFileByID(id);
     }
 
     /**
