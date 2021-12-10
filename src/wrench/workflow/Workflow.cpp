@@ -25,10 +25,10 @@ namespace wrench {
      *         by these tasks
      */
     void Workflow::clear() {
-        std::cerr << " IN WORKFLOW CLEAR!\n";
+//        std::cerr << " IN WORKFLOW CLEAR!\n";
        this->tasks.clear();
         for (auto const &f : this->data_files) {
-            std::cerr << "REMOVING FILE " << f->getID() << "\n";
+//            std::cerr << "REMOVING FILE " << f->getID() << "\n";
             this->simulation->removeFile(f);
         }
         this->data_files.clear();
@@ -720,7 +720,7 @@ namespace wrench {
      * @return a file
      */
     std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
-        std::cerr << "CREATING DATA FILE " << id << "\n";
+//        std::cerr << "CREATING DATA FILE " << id << "\n";
         auto data_file = this->simulation->addFile(id, size);
         this->data_files.insert(data_file);
         return data_file;
