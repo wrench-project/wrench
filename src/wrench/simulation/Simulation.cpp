@@ -422,6 +422,9 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::launch() {
+
+        std::cerr << "***** IN LAUNCH: " << this->data_files.size() << "\n";
+
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();

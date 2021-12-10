@@ -16,6 +16,12 @@
 
 class WorkflowLoadFromDAXTest : public ::testing::Test {
 protected:
+
+    ~WorkflowLoadFromDAXTest() {
+        if (this->workflow)
+            this->workflow->clear();
+    }
+
     WorkflowLoadFromDAXTest() {
 
         std::string xml =
@@ -318,6 +324,9 @@ protected:
                 "</adag>"
         ;
 
+        std::shared_ptr<wrench::Workflow> workflow = nullptr;
+
+
         FILE *dax_file = fopen(dax_file_path.c_str(), "w");
         fprintf(dax_file, "%s", xml.c_str());
         fclose(dax_file);
@@ -351,11 +360,13 @@ protected:
     std::string dax_file_path = UNIQUE_TMP_PATH_PREFIX + "workflow.dax";
     std::string one_task_dax_file_path = UNIQUE_TMP_PATH_PREFIX + "one_task.dax";
     std::string one_task_bad_attribute_file_path = UNIQUE_TMP_PATH_PREFIX + "one_task_bad_attribute.dax";
+
+    std::shared_ptr<wrench::Workflow> workflow = nullptr;
+
 };
 
 TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
-    std::shared_ptr<wrench::Workflow> workflow = nullptr;
 
     ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX("bogus", "1f", false, 2, 10), std::invalid_argument);
     ASSERT_NO_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->dax_file_path, "1f", false, 2, 10));
@@ -391,6 +402,7 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
     std::shared_ptr<wrench::Workflow> one_task_bad_attribute_workflow = nullptr;
     ASSERT_THROW(one_task_bad_attribute_workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(this->one_task_bad_attribute_file_path, "1f", false), std::invalid_argument);
     one_task_bad_attribute_workflow = nullptr;
+
 }
 
 
