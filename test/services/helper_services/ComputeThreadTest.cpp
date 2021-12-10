@@ -28,6 +28,11 @@ public:
     void do_KillAfterDeath_test();
 
 protected:
+
+    ~ComputeThreadTest() {
+        workflow->clear();
+    }
+
     ComputeThreadTest() {
 
         // Create the simplest workflow

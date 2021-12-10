@@ -23,6 +23,11 @@ public:
     void do_noCleanup_Test();
 
 protected:
+
+    ~S4U_DaemonTest() {
+        workflow->clear();
+    }
+
     S4U_DaemonTest() {
 
         // Create the simplest workflow

@@ -30,6 +30,11 @@ public:
     void do_ResourceInformation_test();
 
 protected:
+
+    ~BareMetalComputeServiceTestResourceInformation() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceTestResourceInformation() {
 
         // Create the simplest workflow

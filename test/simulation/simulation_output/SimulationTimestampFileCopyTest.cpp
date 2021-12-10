@@ -27,6 +27,11 @@ public:
     void do_SimulationTimestampFileCopyBasic_test();
 
 protected:
+
+    ~SimulationTimestampFileCopyTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampFileCopyTest() {
 
         std::string xml = "<?xml version='1.0'?>"

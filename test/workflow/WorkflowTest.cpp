@@ -17,12 +17,10 @@
 class WorkflowTest : public ::testing::Test {
 protected:
     ~WorkflowTest() {
-        std::cerr << "CLEARING WORFKLOW\n";
         workflow->clear();
     }
 
     WorkflowTest() {
-        std::cerr << "CREATING WORKFLOW\n";
         workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
@@ -210,6 +208,8 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
     ASSERT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
 
+    bogus_workflow->clear();
+
 //  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
@@ -263,6 +263,11 @@ TEST_F(WorkflowTest, Export) {
 
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
+
+    ~AllDependenciesWorkflowTest() {
+        workflow->clear();
+    }
+
     AllDependenciesWorkflowTest() {
         workflow = wrench::Workflow::createWorkflow();
 

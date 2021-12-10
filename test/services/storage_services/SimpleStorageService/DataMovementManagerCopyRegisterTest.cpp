@@ -31,6 +31,11 @@ public:
     void do_CopyRegister_test();
 
 protected:
+
+    ~DataMovementManagerCopyRegisterTest() {
+        workflow->clear();
+    }
+
     DataMovementManagerCopyRegisterTest() {
 
         // Create the simplest workflow

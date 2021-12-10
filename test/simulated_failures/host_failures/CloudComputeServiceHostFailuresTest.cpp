@@ -39,6 +39,10 @@ public:
 
 protected:
 
+    ~CloudServiceHostFailuresTest() {
+        workflow->clear();
+    }
+
     CloudServiceHostFailuresTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

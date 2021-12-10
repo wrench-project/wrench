@@ -46,6 +46,11 @@ public:
     void do_JobForgettingAndScratchSpaceCleanup_test();
 
 protected:
+
+    ~ScratchSpaceTest() {
+        workflow->clear();
+    }
+
     ScratchSpaceTest() {
 
         // Create the simplest workflow

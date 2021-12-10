@@ -27,6 +27,11 @@ public:
 
 
 protected:
+
+    ~BatchServiceAvailabilityTimeLineTest() {
+        workflow->clear();
+    }
+
     BatchServiceAvailabilityTimeLineTest() {
 
         // Create the simplest workflow

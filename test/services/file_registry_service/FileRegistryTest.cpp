@@ -30,6 +30,10 @@ public:
     void do_lookupEntry_Test();
 
 protected:
+    ~FileRegistryTest() {
+        workflow->clear();
+    }
+
     FileRegistryTest() {
 
       // Create the simplest workflow

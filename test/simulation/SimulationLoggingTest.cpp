@@ -27,6 +27,10 @@ public:
 
 protected:
 
+    ~SimulationLoggingTest() {
+        workflow->clear();
+    }
+
     SimulationLoggingTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

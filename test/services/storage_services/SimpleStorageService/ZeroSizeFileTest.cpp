@@ -15,6 +15,11 @@ public:
     void do_ReadZeroSizeFileTest();
 
 protected:
+
+    ~SimpleStorageServiceZeroSizeFileTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceZeroSizeFileTest() {
         // simple workflow
         workflow = wrench::Workflow::createWorkflow();

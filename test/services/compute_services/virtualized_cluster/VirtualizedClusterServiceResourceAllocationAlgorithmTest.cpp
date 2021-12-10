@@ -31,6 +31,11 @@ public:
 
 
 protected:
+
+    ~VirtualizedClusterServiceResourceAllocationTest() {
+        workflow->clear();
+    }
+
     VirtualizedClusterServiceResourceAllocationTest() {
 
         // Create the simplest workflow

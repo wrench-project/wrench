@@ -35,6 +35,11 @@ public:
     void do_ActivateEnergyArgument_test();
 
 protected:
+
+    ~SimulationCommandLineArgumentsTest() {
+        workflow->clear();
+    }
+
     SimulationCommandLineArgumentsTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

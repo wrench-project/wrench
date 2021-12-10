@@ -29,6 +29,11 @@ public:
     void do_DAGOfJobs_test();
 
 protected:
+
+    ~BareMetalComputeServiceActionMultiJobTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceActionMultiJobTest() {
 
         // Create the simplest workflow
@@ -119,9 +124,9 @@ protected:
 class DAGOfJobsTestWMS : public wrench::WMS {
 public:
     DAGOfJobsTestWMS(BareMetalComputeServiceActionMultiJobTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                     std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }

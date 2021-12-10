@@ -25,6 +25,11 @@ public:
     void do_basicAPI_Test();
 
 protected:
+
+    ~S4U_SimulationTest() {
+        workflow->clear();
+    }
+
     S4U_SimulationTest() {
 
         // Create the simplest workflow

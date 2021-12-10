@@ -40,6 +40,11 @@ public:
 
 
 protected:
+
+    ~BatchServiceBatschedQueueWaitTimePredictionTest() {
+        workflow->clear();
+    }
+
     BatchServiceBatschedQueueWaitTimePredictionTest() {
 
         // Create the simplest workflow
