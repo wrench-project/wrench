@@ -190,9 +190,6 @@ private:
             throw std::runtime_error("Unexpected end time for task3: " + std::to_string(std::get<1>(times[tasks.at(2)])));
         }
 
-
-
-
         return 0;
     }
 
@@ -231,10 +228,10 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
             new RAMPressureTestWMS(
                     this, compute_services, {}, "Host1")));
 
+    workflow->clear();
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
-
 
 
     for (int i=0; i < argc; i++)
@@ -366,6 +363,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
             new LoadBalancing1TestWMS(
                     this, compute_services, {}, "Host1")));
 
+    workflow->clear();
     ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
