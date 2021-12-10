@@ -33,6 +33,11 @@ public:
     void do_BrokenQueueWaitTimePrediction_test();
 
 protected:
+
+    ~BatchServiceFCFSTest() {
+        workflow->clear();
+    }
+
     BatchServiceFCFSTest() {
 
         // Create the simplest workflow

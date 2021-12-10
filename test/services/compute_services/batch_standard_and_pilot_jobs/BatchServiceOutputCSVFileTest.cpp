@@ -36,6 +36,11 @@ public:
     void do_SimpleOutputCSVFile_test();
 
 protected:
+
+    ~BatchServiceOutputCSVFileTest() {
+        workflow->clear();
+    }
+
     BatchServiceOutputCSVFileTest() {
 
       // Create the simplest workflow

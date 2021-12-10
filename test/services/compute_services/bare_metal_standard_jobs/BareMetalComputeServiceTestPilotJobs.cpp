@@ -36,6 +36,11 @@ public:
     void do_UnsupportedPilotJobs_test();
 
 protected:
+
+    ~BareMetalComputeServiceTestPilotJobs() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceTestPilotJobs() {
 
         // Create the simplest workflow

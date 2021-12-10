@@ -235,6 +235,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -357,6 +358,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -527,6 +529,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -657,6 +660,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -791,6 +795,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -901,6 +906,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1069,6 +1075,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

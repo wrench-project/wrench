@@ -23,6 +23,11 @@ public:
     void do_downHost_Test();
 
 protected:
+
+    ~AlarmTest() {
+        workflow->clear();
+    }
+
     AlarmTest() {
 
         // Create the simplest workflow

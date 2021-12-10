@@ -15,24 +15,29 @@ namespace wrench {
     class CriticalPathSchedulerTest : public ::testing::Test {
 
     protected:
+
+        ~CriticalPathSchedulerTest() {
+            workflow->clear();
+        }
+
         CriticalPathSchedulerTest() {
-          workflow = wrench::Workflow::createWorkflow();
+            workflow = wrench::Workflow::createWorkflow();
 
 
-          // create simple diamond workflow
-          t1 = workflow->addTask("task1-test-01", 100, 1, 1, 0);
-          t2 = workflow->addTask("task1-test-02", 200, 1, 1, 0);
-          t3 = workflow->addTask("task1-test-03", 100, 1, 1, 0);
-          t4 = workflow->addTask("task1-test-04", 200, 1, 1, 0);
-          t5 = workflow->addTask("task1-test-05", 100, 1, 1, 0);
-          t6 = workflow->addTask("task1-test-06", 100, 1, 1, 0);
+            // create simple diamond workflow
+            t1 = workflow->addTask("task1-test-01", 100, 1, 1, 0);
+            t2 = workflow->addTask("task1-test-02", 200, 1, 1, 0);
+            t3 = workflow->addTask("task1-test-03", 100, 1, 1, 0);
+            t4 = workflow->addTask("task1-test-04", 200, 1, 1, 0);
+            t5 = workflow->addTask("task1-test-05", 100, 1, 1, 0);
+            t6 = workflow->addTask("task1-test-06", 100, 1, 1, 0);
 
-          workflow->addControlDependency(t1, t2);
-          workflow->addControlDependency(t1, t3);
-          workflow->addControlDependency(t2, t4);
-          workflow->addControlDependency(t3, t5);
-          workflow->addControlDependency(t4, t6);
-          workflow->addControlDependency(t5, t6);
+            workflow->addControlDependency(t1, t2);
+            workflow->addControlDependency(t1, t3);
+            workflow->addControlDependency(t2, t4);
+            workflow->addControlDependency(t3, t5);
+            workflow->addControlDependency(t4, t6);
+            workflow->addControlDependency(t5, t6);
         }
 
         // data members
@@ -41,44 +46,44 @@ namespace wrench {
     };
 
     TEST_F(CriticalPathSchedulerTest, GetTotalFlops) {
-      std::unique_ptr<CriticalPathPilotJobScheduler> scheduler(
-              new CriticalPathPilotJobScheduler(workflow));
+        std::unique_ptr<CriticalPathPilotJobScheduler> scheduler(
+                new CriticalPathPilotJobScheduler(workflow));
 
-      std::vector<std::shared_ptr<WorkflowTask>> tasks;
-      tasks.push_back(t1);
-      tasks.push_back(t2);
-      tasks.push_back(t3);
-      tasks.push_back(t4);
-      tasks.push_back(t5);
-      tasks.push_back(t6);
+        std::vector<std::shared_ptr<WorkflowTask>> tasks;
+        tasks.push_back(t1);
+        tasks.push_back(t2);
+        tasks.push_back(t3);
+        tasks.push_back(t4);
+        tasks.push_back(t5);
+        tasks.push_back(t6);
 
-      ASSERT_EQ(600, scheduler->getFlops(this->workflow, tasks));
+        ASSERT_EQ(600, scheduler->getFlops(this->workflow, tasks));
 
-      tasks.erase(std::remove(tasks.begin(), tasks.end(), t1), tasks.end());
-      ASSERT_EQ(500, scheduler->getFlops(this->workflow, tasks));
+        tasks.erase(std::remove(tasks.begin(), tasks.end(), t1), tasks.end());
+        ASSERT_EQ(500, scheduler->getFlops(this->workflow, tasks));
 
-      tasks.erase(std::remove(tasks.begin(), tasks.end(), t2), tasks.end());
-      ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
+        tasks.erase(std::remove(tasks.begin(), tasks.end(), t2), tasks.end());
+        ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
 
-      tasks.erase(std::remove(tasks.begin(), tasks.end(), t4), tasks.end());
-      ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
+        tasks.erase(std::remove(tasks.begin(), tasks.end(), t4), tasks.end());
+        ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
     }
 
     TEST_F(CriticalPathSchedulerTest, GetMaxParallelization) {
-      std::unique_ptr<CriticalPathPilotJobScheduler> scheduler(
-              new CriticalPathPilotJobScheduler(workflow));
+        std::unique_ptr<CriticalPathPilotJobScheduler> scheduler(
+                new CriticalPathPilotJobScheduler(workflow));
 
-      std::set<std::shared_ptr<WorkflowTask>> tasks = {t1};
+        std::set<std::shared_ptr<WorkflowTask>> tasks = {t1};
 
-      ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
+        ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 
-      tasks = {t2, t3};
-      ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
+        tasks = {t2, t3};
+        ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 
-      tasks = {t2};
-      ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
+        tasks = {t2};
+        ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
 
-      tasks = {t3};
-      ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
+        tasks = {t3};
+        ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
     }
 }

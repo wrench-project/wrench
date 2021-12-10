@@ -43,6 +43,11 @@ public:
     void do_SimulationDumpUnifiedJSON_test();
 
 protected:
+
+    ~SimulationDumpJSONTest() {
+        workflow->clear();
+    }
+
     SimulationDumpJSONTest() {
 
         // platform without energy consumption information
@@ -597,6 +602,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t2->setNumCoresAllocated(10);
 
     //EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true), std::runtime_error);
+
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

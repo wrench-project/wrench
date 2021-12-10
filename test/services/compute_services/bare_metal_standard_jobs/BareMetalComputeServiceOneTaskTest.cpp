@@ -58,6 +58,11 @@ public:
 
 
 protected:
+
+    ~BareMetalComputeServiceOneTaskTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceOneTaskTest() {
 
         // Create the simplest workflow
@@ -960,9 +965,9 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 class ExecutionWithLocationMapMultipleTestWMS : public wrench::WMS {
 public:
     ExecutionWithLocationMapMultipleTestWMS(BareMetalComputeServiceOneTaskTest *test,
-                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                    std::string &hostname) :
+                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                            std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -1500,7 +1505,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesNoTaskNoCl
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a WMS
@@ -1624,7 +1629,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPreNoPostCopiesNoTaskCl
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a WMS
@@ -1748,7 +1753,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a WMS
@@ -1870,7 +1875,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores_test() {
                                                 {std::make_pair("OneCoreHost",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a WMS
@@ -1987,7 +1992,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_test() {
                                                 {std::make_pair("RAMHost",
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a WMS
@@ -2095,7 +2100,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a Storage Service
@@ -2223,7 +2228,7 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithSuspendedService_test()
                                                 {std::make_pair(hostname,
                                                                 std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                 wrench::ComputeService::ALL_RAM))},
-                                                                                "/scratch",
+                                                "/scratch",
                                                 {})));
 
     // Create a Storage Service

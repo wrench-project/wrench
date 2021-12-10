@@ -17,6 +17,11 @@ public:
     void do_ChunkingTest(std::string mode);
 
 protected:
+
+    ~SimpleStorageServiceChunkingTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceChunkingTest() {
         // simple workflow
         workflow = wrench::Workflow::createWorkflow();

@@ -16,6 +16,10 @@
 
 class SimplePipelineClusteringTest : public ::testing::Test {
 protected:
+    ~SimplePipelineClusteringTest() {
+        workflow->clear();
+    }
+
     SimplePipelineClusteringTest() {
       workflow = wrench::Workflow::createWorkflow();
 

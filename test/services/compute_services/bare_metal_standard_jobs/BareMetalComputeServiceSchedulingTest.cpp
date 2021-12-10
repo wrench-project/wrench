@@ -49,6 +49,11 @@ public:
     }
 
 protected:
+
+    ~BareMetalComputeServiceTestScheduling() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceTestScheduling() {
 
         // Create the simplest workflow

@@ -30,6 +30,10 @@ public:
     void do_SimulationTimestampFileReadBasic_test();
 
 protected:
+    ~SimulationTimestampFileReadTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampFileReadTest() {
 
         std::string xml = "<?xml version='1.0'?>"

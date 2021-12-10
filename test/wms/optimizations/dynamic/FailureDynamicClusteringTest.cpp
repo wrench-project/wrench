@@ -15,6 +15,11 @@
 
 class FailureDynamicClusteringTest : public ::testing::Test {
 protected:
+
+    ~FailureDynamicClusteringTest() {
+        workflow->clear();
+    }
+
     FailureDynamicClusteringTest() {
       workflow = wrench::Workflow::createWorkflow();
 

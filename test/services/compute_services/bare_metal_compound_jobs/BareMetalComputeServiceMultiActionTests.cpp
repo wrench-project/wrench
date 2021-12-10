@@ -33,6 +33,10 @@ public:
     void do_PartialTermination_test();
 
 protected:
+    ~BareMetalComputeServiceMultiActionTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceMultiActionTest() {
 
         // Create the simplest workflow
@@ -123,9 +127,9 @@ protected:
 class DAGOfSleepsTestWMS : public wrench::WMS {
 public:
     DAGOfSleepsTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -300,9 +304,9 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
 class NonDAGsTestWMS : public wrench::WMS {
 public:
     NonDAGsTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                       std::string &hostname) :
+                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                   std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -417,9 +421,9 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
 class RAMConstraintsAndPrioritiesTestWMS : public wrench::WMS {
 public:
     RAMConstraintsAndPrioritiesTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                   std::string &hostname) :
+                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                       std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -561,9 +565,9 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
 class PartialFailureTestWMS : public wrench::WMS {
 public:
     PartialFailureTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                       std::string &hostname) :
+                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                          std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -708,9 +712,9 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
 class PartialTerminationTestWMS : public wrench::WMS {
 public:
     PartialTerminationTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                          std::string &hostname) :
+                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                              std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }

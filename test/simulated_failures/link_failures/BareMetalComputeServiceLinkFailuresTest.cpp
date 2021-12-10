@@ -30,6 +30,11 @@ public:
     void do_ResourceInformationLinkFailure_test();
 
 protected:
+
+    ~BareMetalComputeServiceLinkFailuresTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceLinkFailuresTest() {
 
         // Create the simplest workflow

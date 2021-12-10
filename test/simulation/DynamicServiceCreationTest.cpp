@@ -36,6 +36,10 @@ public:
 
 protected:
 
+    ~DynamicServiceCreationTest() {
+        workflow->clear();
+    }
+
     DynamicServiceCreationTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

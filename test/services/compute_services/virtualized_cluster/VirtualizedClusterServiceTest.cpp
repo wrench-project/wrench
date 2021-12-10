@@ -64,6 +64,11 @@ public:
     void do_VMComputeServiceStopWhileJobIsRunning_test();
 
 protected:
+
+    ~VirtualizedClusterServiceTest() {
+        workflow->clear();
+    }
+
     VirtualizedClusterServiceTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

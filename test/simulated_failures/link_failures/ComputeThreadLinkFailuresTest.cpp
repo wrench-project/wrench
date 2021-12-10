@@ -26,6 +26,10 @@ public:
     void do_LinkFailure_test();
 
 protected:
+    ~ComputeThreadLinkFailuresTest() {
+        workflow->clear();
+    }
+
     ComputeThreadLinkFailuresTest() {
 
         // Create the simplest workflow

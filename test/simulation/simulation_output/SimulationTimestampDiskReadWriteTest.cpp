@@ -23,6 +23,11 @@ public:
     void do_SimulationTimestampDiskReadWriteBasic_test();
 
 protected:
+
+    ~SimulationTimestampDiskReadWriteTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampDiskReadWriteTest() {
 
         std::string xml = "<?xml version='1.0'?>"

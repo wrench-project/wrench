@@ -32,6 +32,10 @@ public:
     void do_FileRegistryLinkFailureSimpleRandom_Test();
 
 protected:
+    ~FileRegistryLinkFailuresTest() {
+        workflow->clear();
+    }
+
     FileRegistryLinkFailuresTest() {
 
         // Create the simplest workflow
