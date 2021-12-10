@@ -282,7 +282,7 @@ namespace wrench {
              * Set the simulation pointer member variable of the workflow so that the
              * workflow tasks have access to it for creating SimulationTimestamps
              */
-            this->workflow->simulation = this->simulation;
+//            this->workflow->simulation = this->simulation;
         }
         this->start_time = start_time;
     }

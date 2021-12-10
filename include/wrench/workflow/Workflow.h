@@ -150,8 +150,8 @@ namespace wrench {
         std::set<std::shared_ptr<DataFile>> data_files;
 
         std::string callback_mailbox;
-        ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any
-        Simulation *simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
+
+//        Simulation *simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
     };
 };
 
