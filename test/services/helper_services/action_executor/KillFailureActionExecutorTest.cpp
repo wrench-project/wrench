@@ -367,6 +367,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

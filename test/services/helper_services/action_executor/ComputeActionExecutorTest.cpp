@@ -231,6 +231,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

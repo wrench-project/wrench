@@ -29,6 +29,11 @@ public:
     void do_AlarmLinkFailure_Test();
 
 protected:
+
+    ~AlarmLinkFailuresTest() {
+        workflow->clear();
+    }
+
     AlarmLinkFailuresTest() {
 
         // Create the simplest workflow

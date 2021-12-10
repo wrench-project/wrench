@@ -71,6 +71,11 @@ public:
     void do_ShutdownWithPendingRunningJobsTest_test();
 
 protected:
+
+    ~BatchServiceTest() {
+        workflow->clear();
+    }
+
     BatchServiceTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

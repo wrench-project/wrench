@@ -237,6 +237,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
+    this->workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

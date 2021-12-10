@@ -141,6 +141,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
         " instead of " + std::to_string(expected_makespan));
     }
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -208,6 +209,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
                                  " instead of " + std::to_string(expected_makespan));
     }
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -280,6 +282,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
                                  " instead of " + std::to_string(expected_makespan));
     }
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

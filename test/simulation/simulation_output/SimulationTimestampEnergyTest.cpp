@@ -22,6 +22,10 @@ public:
 
 protected:
 
+    ~SimulationTimestampEnergyTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampEnergyTest() : workflow(wrench::Workflow::createWorkflow()) {
         // Create a two-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"

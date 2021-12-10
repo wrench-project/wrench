@@ -32,6 +32,10 @@ public:
     void do_NetworkProximityLinkFailures_Test();
 
 protected:
+    ~NetworkProximityLinkFailuresTest() {
+        workflow->clear();
+    }
+
     NetworkProximityLinkFailuresTest() {
 
         // Create the simplest workflow

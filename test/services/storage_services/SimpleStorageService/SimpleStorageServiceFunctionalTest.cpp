@@ -46,6 +46,11 @@ public:
 
 
 protected:
+
+    ~SimpleStorageServiceFunctionalTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceFunctionalTest() {
 
         // Create the simplest workflow

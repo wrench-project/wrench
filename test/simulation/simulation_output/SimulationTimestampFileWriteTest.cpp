@@ -31,6 +31,10 @@ public:
     void do_SimulationTimestampFileWriteBasic_test();
 
 protected:
+    ~SimulationTimestampFileWriteTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampFileWriteTest() {
 
         std::string xml = "<?xml version='1.0'?>"

@@ -30,6 +30,10 @@ public:
 
 
 protected:
+    ~SimulationTimestampTaskTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampTaskTest() {
 
         std::string xml = "<?xml version='1.0'?>"

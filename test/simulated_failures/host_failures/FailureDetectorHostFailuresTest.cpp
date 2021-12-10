@@ -31,6 +31,10 @@ public:
 
 protected:
 
+    ~FailureDetectorHostFailuresTest() {
+        workflow->clear();
+    }
+
     FailureDetectorHostFailuresTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

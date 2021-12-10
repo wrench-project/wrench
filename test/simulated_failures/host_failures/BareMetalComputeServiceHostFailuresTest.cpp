@@ -39,6 +39,10 @@ public:
 
 protected:
 
+    ~BareMetalComputeServiceHostFailuresTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceHostFailuresTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

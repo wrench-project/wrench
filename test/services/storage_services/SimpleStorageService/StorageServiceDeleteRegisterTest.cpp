@@ -20,6 +20,11 @@ public:
     void do_DeleteRegisterTest();
 
 protected:
+
+    ~SimpleStorageServiceDeleteRegisterTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceDeleteRegisterTest() {
         // simple workflow
         workflow = wrench::Workflow::createWorkflow();

@@ -36,6 +36,11 @@ public:
     void do_ValidateProperties_Test();
 
 protected:
+
+    ~NetworkProximityTest() {
+        workflow->clear();
+    }
+
     NetworkProximityTest() {
 
         // Create the simplest workflow

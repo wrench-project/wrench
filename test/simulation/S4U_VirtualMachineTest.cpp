@@ -22,6 +22,11 @@ public:
     void do_basic_Test();
 
 protected:
+
+    ~S4U_VirtualMachineTest() {
+        workflow->clear();
+    }
+
     S4U_VirtualMachineTest() {
 
         // Create the simplest workflow

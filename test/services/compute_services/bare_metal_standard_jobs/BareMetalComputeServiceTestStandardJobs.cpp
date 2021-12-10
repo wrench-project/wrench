@@ -55,7 +55,7 @@ public:
     void do_TwoDualCoreTasksCase3_test();
 
     void do_JobImmediateTermination_test();
-    
+
     void do_JobTermination_test();
 
     void do_NonSubmittedJobTermination_test();
@@ -67,6 +67,11 @@ public:
     void do_ShutdownStorageServiceBeforeJobIsSubmitted_test();
 
 protected:
+
+    ~BareMetalComputeServiceTestStandardJobs() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceTestStandardJobs() {
 
         // Create the simplest workflow
@@ -1003,9 +1008,9 @@ class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::WMS
 
 public:
     BareMetalComputeServiceJobImmediateTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                                 std::string hostname) :
+                                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+                                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                                          std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }

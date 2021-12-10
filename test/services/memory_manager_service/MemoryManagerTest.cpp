@@ -31,6 +31,11 @@ public:
     void do_MemoryManagerChainOfTasksTest_test();
 
 protected:
+
+    ~MemoryManagerTest() {
+        workflow->clear();
+    }
+
     MemoryManagerTest() {
 
         // Create the simplest workflow
@@ -38,25 +43,25 @@ protected:
 
         // Create a platform file
         std::string bad_xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                          "<platform version=\"4.1\"> "
-                          "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"TwoCoreHost\" speed=\"100f\" core=\"2\"> "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"1.5GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"1.5GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "       </host> "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                          "   </zone> "
-                          "</platform>";
+                              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                              "<platform version=\"4.1\"> "
+                              "   <zone id=\"AS0\" routing=\"Full\"> "
+                              "       <host id=\"TwoCoreHost\" speed=\"100f\" core=\"2\"> "
+                              "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                              "             <prop id=\"size\" value=\"1.5GB\"/>"
+                              "             <prop id=\"mount\" value=\"/\"/>"
+                              "          </disk>"
+                              "       </host> "
+                              "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
+                              "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                              "             <prop id=\"size\" value=\"1.5GB\"/>"
+                              "             <prop id=\"mount\" value=\"/\"/>"
+                              "          </disk>"
+                              "       </host> "
+                              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                              "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                              "   </zone> "
+                              "</platform>";
         FILE *bad_platform_file = fopen(bad_platform_file_path.c_str(), "w");
         fprintf(bad_platform_file, "%s", bad_xml.c_str());
         fclose(bad_platform_file);
@@ -74,23 +79,23 @@ protected:
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
                           "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
-                          "             <prop id=\"mount\" value=\"/memory\"/>"
-                          "          </disk>"
-                          "       </host> "
-                          "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
-                          "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
-                          "             <prop id=\"mount\" value=\"/memory\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"30000GB\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "       </host> "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                          "   </zone> "
-                          "</platform>";
+                                                                                                            "             <prop id=\"mount\" value=\"/memory\"/>"
+                                                                                                            "          </disk>"
+                                                                                                            "       </host> "
+                                                                                                            "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
+                                                                                                            "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
+                                                                                                            "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
+                                                                                                                                                                                              "             <prop id=\"mount\" value=\"/memory\"/>"
+                                                                                                                                                                                              "          </disk>"
+                                                                                                                                                                                              "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                                                                                                                                              "             <prop id=\"size\" value=\"30000GB\"/>"
+                                                                                                                                                                                              "             <prop id=\"mount\" value=\"/\"/>"
+                                                                                                                                                                                              "          </disk>"
+                                                                                                                                                                                              "       </host> "
+                                                                                                                                                                                              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                                                                                                                                                                                              "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                                                                                                                                                                                              "   </zone> "
+                                                                                                                                                                                              "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -207,8 +212,8 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/"},
-                {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
-                {})));
+                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
+                                             {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -247,7 +252,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

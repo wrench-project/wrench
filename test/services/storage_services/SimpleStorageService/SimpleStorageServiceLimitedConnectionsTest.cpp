@@ -39,6 +39,11 @@ public:
 
 
 protected:
+
+    ~SimpleStorageServiceLimitedConnectionsTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceLimitedConnectionsTest() {
 
       // Create the simplest workflow

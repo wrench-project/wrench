@@ -38,6 +38,11 @@ public:
     int seed;
 
 protected:
+
+    ~BatchServiceCONSERVATIVE_BFTest() {
+        workflow->clear();
+    }
+
     BatchServiceCONSERVATIVE_BFTest() {
 
         // Create the simplest workflow

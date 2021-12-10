@@ -216,6 +216,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
 
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

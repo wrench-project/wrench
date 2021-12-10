@@ -75,6 +75,11 @@ public:
 
 
 protected:
+
+    ~SimpleStorageServicePerformanceTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServicePerformanceTest() {
 
         // Create the simplest workflow

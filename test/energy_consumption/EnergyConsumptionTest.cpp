@@ -47,7 +47,14 @@ public:
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-    EnergyConsumptionTest():workflow(wrench::Workflow::createWorkflow()) {
+
+    ~EnergyConsumptionTest() {
+        workflow->clear();
+    }
+
+    EnergyConsumptionTest() {
+
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"
@@ -125,7 +132,7 @@ protected:
 
     }
 
-    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+        std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
 

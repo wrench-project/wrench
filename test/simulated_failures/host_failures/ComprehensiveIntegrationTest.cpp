@@ -55,6 +55,10 @@ protected:
         return to_return;
     }
 
+    ~ComprehensiveIntegrationHostFailuresTest() {
+        workflow->clear();
+    }
+
     ComprehensiveIntegrationHostFailuresTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

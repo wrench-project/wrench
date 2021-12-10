@@ -220,6 +220,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -324,6 +325,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
 
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -440,6 +442,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
 
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -565,6 +568,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
 
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

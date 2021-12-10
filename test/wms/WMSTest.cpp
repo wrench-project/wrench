@@ -230,7 +230,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -435,7 +435,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-
+    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

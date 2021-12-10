@@ -99,6 +99,8 @@ void LogicalFileSystemTest::do_BasicTests() {
     auto file1 = workflow->addFile("file1", 10000);
     ASSERT_THROW(fs1->reserveSpace(file, "/files/"), std::invalid_argument);
 
+    workflow->clear();
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

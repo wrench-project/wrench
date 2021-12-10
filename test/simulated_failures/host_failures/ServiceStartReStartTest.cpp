@@ -29,6 +29,10 @@ public:
 
 protected:
 
+    ~ServiceReStartHostFailuresTest() {
+        workflow->clear();
+    }
+
     ServiceReStartHostFailuresTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();

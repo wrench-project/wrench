@@ -39,6 +39,11 @@ public:
     void do_OneSleepActionBadScratch_test();
 
 protected:
+
+    ~BatchComputeServiceOneActionTest() {
+        workflow->clear();
+    }
+
     BatchComputeServiceOneActionTest() {
 
         // Create the simplest workflow

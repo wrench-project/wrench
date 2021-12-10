@@ -208,6 +208,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     EXPECT_NO_THROW(simulation->launch());
 
+    link_usage_workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

@@ -40,6 +40,11 @@ public:
     void do_OneSleepActionBadScratch_test();
 
 protected:
+
+    ~BareMetalComputeServiceOneActionTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceOneActionTest() {
 
         // Create the simplest workflow
