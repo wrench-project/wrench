@@ -60,7 +60,7 @@ protected:
         fclose(platform_file);
     }
 
-    std::shared_ptr<wrench::Workflow> createWorkflow() {
+    std::shared_ptr<wrench::Workflow> createWorkflow(std::string prefix) {
         std::shared_ptr<wrench::Workflow> workflow;
         std::shared_ptr<wrench::DataFile> input_file;
         std::shared_ptr<wrench::DataFile> output_file1;
@@ -69,13 +69,15 @@ protected:
         std::shared_ptr<wrench::WorkflowTask> task2;
 
         // Create the simplest workflow
+        std::cerr << "IN TEST CREATE WORKFLOW\n";
         workflow = wrench::Workflow::createWorkflow();
         workflows.push_back(workflow);
+        std::cerr << "WORKFLOWS = " << workflows.size() << "\n";
 
         // Create the files
-        input_file = workflow->addFile("input_file", 10.0);
-        output_file1 = workflow->addFile("output_file1", 10.0);
-        output_file2 = workflow->addFile("output_file2", 10.0);
+        input_file = workflow->addFile(prefix + "_input_file", 10.0);
+        output_file1 = workflow->addFile(prefix + "output_file1", 10.0);
+        output_file2 = workflow->addFile(prefix + "output_file2", 10.0);
 
         // Create the tasks
         task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
@@ -88,6 +90,7 @@ protected:
         task1->addOutputFile(output_file1);
         task2->addOutputFile(output_file2);
 
+        std::cerr << "DONE WITH WF CREATION\n";
         return workflow;
     }
     std::vector<std::shared_ptr<wrench::Workflow>> workflows;
@@ -202,7 +205,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
             {})));
 
     // Create a WMS
-    auto workflow = this->createWorkflow();
+    auto workflow = this->createWorkflow("wf_");
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -256,7 +259,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
                                             {})));
 
     // Create a WMS
-    auto workflow = this->createWorkflow();
+    auto workflow = this->createWorkflow("wf1_");
     std::shared_ptr<wrench::WMS> wms1 = nullptr;
     ASSERT_NO_THROW(wms1 = simulation->add(
             new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
@@ -264,7 +267,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     ASSERT_NO_THROW(wms1->addWorkflow(workflow, 100));
 
     // Create a second WMS
-    auto workflow2 = this->createWorkflow();
+    auto workflow2 = this->createWorkflow("wf_2");
     std::shared_ptr<wrench::WMS> wms2 = nullptr;
     ASSERT_NO_THROW(wms2 = simulation->add(
             new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));

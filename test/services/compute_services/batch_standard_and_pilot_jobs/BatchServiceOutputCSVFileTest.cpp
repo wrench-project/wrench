@@ -226,7 +226,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
           new SimpleOutputCSVFileTestWMS(
                   this,  {compute_service}, hostname)));
 
-  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   ASSERT_NO_THROW(simulation->launch());
 

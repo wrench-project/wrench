@@ -480,7 +480,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
             new TerminateOneStandardJobSubmissionTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -606,7 +606,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
             new TerminateOneStandardJobSubmissionTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -767,7 +767,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
             new OneStandardJobSubmissionTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -911,7 +911,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
             new StandardJobFailureTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1088,7 +1088,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
             new TwoStandardJobSubmissionTestWMS(
                     this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);

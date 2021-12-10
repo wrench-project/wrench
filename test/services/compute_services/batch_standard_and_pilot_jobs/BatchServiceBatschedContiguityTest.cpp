@@ -267,7 +267,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
             this, {}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
