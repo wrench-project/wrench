@@ -214,7 +214,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
             new BatchTraceFileReplayTestWMS(
                     this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -302,7 +302,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
             new BatchTraceFileReplayTestWithFailedJobWMS(
                     this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -403,7 +403,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFBatchServiceShutdownTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -767,7 +767,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -945,7 +945,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1110,7 +1110,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1688,7 +1688,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1839,7 +1839,7 @@ void BatchServiceTest::do_GetQueueState_test() {
     ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(
             this, {compute_service}, {}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 

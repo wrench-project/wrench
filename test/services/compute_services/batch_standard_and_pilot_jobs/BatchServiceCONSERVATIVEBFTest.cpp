@@ -232,7 +232,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
             new SimpleCONSERVATIVE_BFTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -408,7 +408,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
             new LargeCONSERVATIVE_BFTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -581,7 +581,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
             new SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -751,7 +751,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
             new BatschedBrokenTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -926,7 +926,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test()
             new SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -1104,7 +1104,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_CORE_LEVEL_test(in
             new LargeCONSERVATIVE_BF_CORE_LEVELTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
