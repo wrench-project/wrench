@@ -261,7 +261,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
             new SimpleScratchSpaceTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -488,7 +488,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
             new SimpleScratchSpaceFailureTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -700,7 +700,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
             new PilotJobScratchSpaceTestWMS(
                     this, {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files

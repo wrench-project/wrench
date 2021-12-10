@@ -294,7 +294,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
             new EnergyApiAccessExceptionsTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -463,7 +463,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
             new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -587,7 +587,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
             new EnergyConsumptionTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -740,7 +740,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
             new EnergyAPICheckTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -917,7 +917,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
             new EnergyConsumptionPStateChangeTestWMS(
                     this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
 
     // Create two workflow files
@@ -1019,7 +1019,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
     EXPECT_NO_THROW(wms = simulation->add(
             new PluginNotActivatedTestWMS(this,  {compute_service}, hostname)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
     EXPECT_NO_THROW(simulation->launch());
 

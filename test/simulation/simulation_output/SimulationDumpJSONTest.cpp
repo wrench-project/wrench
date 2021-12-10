@@ -233,7 +233,7 @@ protected:
         fprintf(platform_file6, "%s", xml6.c_str());
         fclose(platform_file6);
 
-        workflow = wrench::Workflow::createWorkflow();
+//        workflow = wrench::Workflow::createWorkflow();
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -455,6 +455,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     std::ifstream json_file;
 
+    workflow->clear();
+
     workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
@@ -493,6 +495,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
     EXPECT_TRUE(compareObjects(result_json1,expected_json1));
 
+    workflow->clear();
+
     workflow = wrench::Workflow::createWorkflow();
 
     t1 = workflow->addTask("task1", 1, 1, 1, 0);
@@ -528,6 +532,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
 
     EXPECT_TRUE(compareObjects(result_json2,expected_json2));
+
+    workflow->clear();
 
     workflow = wrench::Workflow::createWorkflow();
 
@@ -582,6 +588,8 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
 
 
     EXPECT_TRUE(compareObjects(result_json3,expected_json3));
+
+    workflow->clear();
 
     workflow = wrench::Workflow::createWorkflow();
 
@@ -848,7 +856,11 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json2["workflow_graph"]["edges"].begin(), expected_json2["workflow_graph"]["edges"].end(), compareLinks);
     std::sort(expected_json2["workflow_graph"]["vertices"].begin(), expected_json2["workflow_graph"]["vertices"].end(), compareNodes);
 
+    std::cerr << "RESULT\n" << result_json2 << "\n";
+    std::cerr << "EXPECTED\n" << expected_json2 << "\n";
     EXPECT_TRUE(result_json2 == expected_json2);
+
+    independent_tasks_workflow->clear();
 
     // Generate a workflow where one task1 forks into two tasks, then those two tasks join into one.
     auto fork_join_workflow = wrench::Workflow::createWorkflow();
@@ -1005,6 +1017,8 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     std::sort(expected_json3["workflow_graph"]["vertices"].begin(), expected_json3["workflow_graph"]["vertices"].end(), compareNodes);
 
     EXPECT_TRUE(result_json3 == expected_json3);
+
+    fork_join_workflow->clear();
 
 }
 

@@ -234,7 +234,7 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
             new SimpleFCFSTestWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -421,7 +421,7 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
             new SimpleFCFSQueueWaitTimePredictionWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -530,7 +530,7 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
             new BrokenQueueWaitTimePredictionWMS(
                     this,  {compute_service}, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow)));
+    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 

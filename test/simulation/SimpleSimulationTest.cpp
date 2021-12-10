@@ -37,6 +37,10 @@ public:
 
 protected:
 
+    ~SimpleSimulationTest() {
+        workflow->clear();
+    }
+
     SimpleSimulationTest() {
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();
