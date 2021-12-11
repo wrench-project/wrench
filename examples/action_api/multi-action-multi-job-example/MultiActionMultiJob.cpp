@@ -75,18 +75,22 @@ int main(int argc, char **argv) {
      * in this storage service, and accessed remotely by the compute service. Note that the
      * storage service is configured to use a buffer size of 50M when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
-    std::cerr << "Instantiating a SimpleStorageService on StorageHost..." << std::endl;
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(
-            "StorageHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+    std::cerr << "Instantiating a SimpleStorageService on StorageHost1..." << std::endl;
+    auto storage_service_1 = simulation->add(new wrench::SimpleStorageService(
+            "StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+    std::cerr << "Instantiating a SimpleStorageService on StorageHost2..." << std::endl;
+    auto storage_service_2 = simulation->add(new wrench::SimpleStorageService(
+            "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+
 
     /* Instantiate a bare-metal compute service, and add it to the simulation->
-     * A wrench::bare_metal_standard_jobs is an abstraction of a compute service that corresponds
+     * A wrench::BareMetalCoputeService is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
-    std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;
+    std::cerr << "Instantiating a bare-metal compute service on ComputeHost1..." << std::endl;
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "ComputeHost", {"ComputeHost"}, "", {}, {}));
+            "ComputeHost1", {{"ComputeHost1"}, {"ComputeHost2"}}, "", {}, {}));
 
     /* Instantiate a cloud compute service, and add it to the simulation->
      * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
@@ -100,7 +104,7 @@ int main(int argc, char **argv) {
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation->add(
-            new wrench::MultiActionMultiJobController(baremetal_service, cloud_service, storage_service, "UserHost"));
+            new wrench::MultiActionMultiJobController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
 
     /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;

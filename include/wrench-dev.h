@@ -71,6 +71,7 @@
 #include "wrench/action/FileRegistryDeleteEntryAction.h"
 #include "wrench/action/FileWriteAction.h"
 #include "wrench/action/SleepAction.h"
+#include "wrench/services/helper_services/action_executor/ActionExecutor.h"
 
 
 // Job

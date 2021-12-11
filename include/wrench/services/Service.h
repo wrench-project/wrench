@@ -40,6 +40,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         void resume();
 
         std::string getHostname();
+        std::string getPhysicalHostname();
 
         bool isUp();
 
