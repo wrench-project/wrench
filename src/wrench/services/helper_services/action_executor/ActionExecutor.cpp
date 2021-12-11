@@ -111,6 +111,7 @@ namespace wrench {
         this->action->setState(Action::State::STARTED);
         try {
             this->action->execute(this->getSharedPtr<ActionExecutor>());
+            this->action->terminate(this->getSharedPtr<ActionExecutor>());
             this->action->setState(Action::State::COMPLETED);
         } catch (ExecutionException &e) {
             this->action->setState(Action::State::FAILED);

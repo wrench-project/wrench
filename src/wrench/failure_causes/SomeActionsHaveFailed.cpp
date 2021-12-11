@@ -28,9 +28,9 @@ namespace wrench {
      */
     std::string SomeActionsHaveFailed::toString() {
         if (this->message.empty()) {
-            return std::string("Internal implementation failure, likely a WRENCH bug");
+            return std::string("Some actions have failed");
         } else {
-            return std::string(this->message + " (internal implementation failure)");
+            return std::string(this->message + " (some actions have failed))");
         }
     }
 

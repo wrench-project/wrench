@@ -21,6 +21,7 @@
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/failure_causes/NetworkError.h>
 #include <wrench/failure_causes/NotAllowed.h>
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 
@@ -364,6 +365,18 @@ namespace wrench {
     */
     std::string Service::getHostname() {
         return this->hostname;
+    }
+
+    /**
+    * @brief Get the physical name of the host on which the service is / will be running
+    * @return the physical hostname
+    */
+    std::string Service::getPhysicalHostname() {
+        if (S4U_VirtualMachine::vm_to_pm_map.find(this->hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            return S4U_VirtualMachine::vm_to_pm_map[this->hostname];
+        } else {
+            return this->hostname;
+        }
     }
 
     /**
