@@ -1047,6 +1047,7 @@ namespace wrench {
         std::shared_ptr<FailureCause> job_failure_cause;
         job->processCompoundJobOutcome(state_changes, failure_count_increments, job_failure_cause, this->simulation);
 
+
         // Fix the failure cause in case it's a failure cause that refers to a job (in which case it is
         // right now referring to the compound job instead of the standard job
         if (auto actual_cause = std::dynamic_pointer_cast<JobKilled>(job_failure_cause)) {

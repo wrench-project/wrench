@@ -7,40 +7,59 @@
         <host id="UserHost" speed="10Gf" core="1">
         </host>
 
-        <!-- The host on which the bare_metal_standard_jobs will run -->
-        <host id="ComputeHost" speed="1Gf" core="10">
+        <!-- The host on which the bare-metal compute service will run and also run jobs-->
+        <host id="ComputeHost1" speed="35Gf" core="10">
             <prop id="ram" value="16GB" />
         </host>
 
-        <!-- The host on which the first StorageService will run -->
-        <host id="StorageHost" speed="1Gf" core="1">
+        <!-- Another host on which the bare-metal compute service will be able to run jobs -->
+        <host id="ComputeHost2" speed="35Gf" core="10">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- The host on which the first storage service will run -->
+        <host id="StorageHost1" speed="10Gf" core="1">
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
         </host>
 
-        <!-- The host on which the second StorageService will run -->
-        <host id="CloudHeadHost" speed="1Gf" core="1">
+        <!-- The host on which the second storage service will run -->
+        <host id="StorageHost2" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="200MBps" write_bw="200MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the cloud compute service will run -->
+        <host id="CloudHeadHost" speed="10Gf" core="1">
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/scratch/"/>
             </disk>
         </host>
 
-        <!-- The host on which the bare_metal_standard_jobs will run -->
-        <host id="CloudHost" speed="1Gf" core="10">
+        <!-- The host on which the cloud compute service will start VMs -->
+        <host id="CloudHost" speed="25Gf" core="8">
             <prop id="ram" value="16GB" />
         </host>
 
         <!-- A network link shared by EVERY ONE-->
-        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <link id="network_link" bandwidth="50MBps" latency="1ms"/>
 
         <!-- The same network link connects all hosts together -->
-        <route src="UserHost" dst="ComputeHost"> <link_ctn id="network_link"/> </route>
-        <route src="UserHost" dst="StorageHost"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="ComputeHost1"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="ComputeHost2"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="UserHost" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost1" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost2" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="CloudHeadHost" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost1" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost2" dst="CloudHost"> <link_ctn id="network_link"/> </route>
 
     </zone>
 </platform>

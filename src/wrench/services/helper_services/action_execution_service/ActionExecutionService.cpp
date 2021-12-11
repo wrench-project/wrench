@@ -793,6 +793,7 @@ namespace wrench {
     */
     void ActionExecutionService::processActionExecutorFailure(std::shared_ptr<ActionExecutor> executor) {
 
+
         auto action = executor->getAction();
         auto cause = action->getFailureCause();
 
