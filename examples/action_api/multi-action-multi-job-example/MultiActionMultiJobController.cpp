@@ -6,9 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-
+e
 /**
- ** A Controller that creates several multi-action jobs and runs them.
+ ** A Controller that creates a job with a powerful custom action
  *
  ** Example invocation of the simulator with only controller logging:
  **    ./wrench-example-multi-action-multi-job ./four_hosts.xml --log=custom_controller.threshold=info
@@ -69,7 +69,6 @@ namespace wrench {
         /* Creates an instance of input_file on both storage services. This takes zero simulation time. After
          * all, that file needs to be there somewhere initially if it's indeed some input file */
         ss_1->createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
-        ss_2->createFile(input_file, wrench::FileLocation::LOCATION(ss_2, "/data/"));
 
         /* Create a one-action job with one action that simply sleeps for 10 seconds */
         auto job1 = job_manager->createCompoundJob("job1");
@@ -83,15 +82,15 @@ namespace wrench {
         auto job2_file_write_action = job2->addFileWriteAction("", output_file, wrench::FileLocation::LOCATION(ss_1));
         job2->addActionDependency(job2_compute_action, job2_file_write_action);
 
-        /* Create a one-action job with a custom-defined action */
+        /* Create a one-action job with a file-copy action */
         auto job3 = job_manager->createCompoundJob("job3");
 
-        // A small data structure that, just for fun, specifies a number of cores to use for running
-        // a computation as part of the custom-defined action
-        std::map<std::string, std::shared_ptr<StorageService>> ss_to_use = {{"ComputeHost", ss_1}, {"CloudHost", ss_2}};
+        // A small data structure that, just for fun, specifies a target storage service
+        // to used based on the custom action is running
+        std::map<std::string, std::shared_ptr<StorageService>> ss_to_use = {{"ComputeHost1", ss_1}, {"ComputeHost2", ss_2}};
 
         // Create the custom action with two lambdas
-        job3->addCustomAction("custom",
+        job3->addCustomAction("file_copy",
                               [ss_to_use, input_file](std::shared_ptr<ActionExecutor> action_executor) {
                                   WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
 

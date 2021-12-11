@@ -42,19 +42,11 @@ namespace wrench {
      */
     class ExecutionController : public Service {
 
-    protected:
-
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        ExecutionController(
-                const std::string &hostname,
-                const std::string suffix);
-
-
-        void setTimer(double date, std::string message);
-
+    public:
         virtual std::shared_ptr<JobManager> createJobManager();
         virtual std::shared_ptr<DataMovementManager> createDataMovementManager();
         std::shared_ptr<EnergyMeterService> createEnergyMeter(const std::map<std::string, double> &measurement_periods);
@@ -65,6 +57,18 @@ namespace wrench {
 
         std::shared_ptr<ExecutionEvent>  waitForNextEvent();
         std::shared_ptr<ExecutionEvent>  waitForNextEvent(double timeout);
+
+    protected:
+
+
+
+        ExecutionController(
+                const std::string &hostname,
+                const std::string suffix);
+
+
+        void setTimer(double date, std::string message);
+
 
         /***********************/
         /** \endcond           */

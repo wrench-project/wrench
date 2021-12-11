@@ -93,18 +93,6 @@ namespace wrench {
                         num_cores_per_node, num_cores_per_node,
                         ParallelModel::CONSTANTEFFICIENCY(1.0));
             }
-//            // Create the set of tasks
-//            std::vector<std::shared_ptr<WorkflowTask>> to_submit;
-//            for (int i = 0; i < num_nodes; i++) {
-//                double time_fudge = 1; // 1 second seems to make it all work!
-//                double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
-//                auto task = this->getWorkflow()->addTask(
-//                        this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
-//                        task_flops,
-//                        num_cores_per_node, num_cores_per_node,
-//                        requested_ram);
-//                to_submit.push_back(task);
-//            }
 
             job_count++;
 
