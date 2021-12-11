@@ -25,7 +25,7 @@ namespace wrench {
      * @brief A service that goes through a job submission trace (as loaded
      * by a TraceFileLoader), and "replays" it on a given BatchComputeService.
      */
-    class WorkloadTraceFileReplayer : public WMS {
+    class WorkloadTraceFileReplayer : public ExecutionController {
 
     public:
 

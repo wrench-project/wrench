@@ -32,10 +32,8 @@ namespace wrench {
                                                          bool use_actual_runtimes_as_requested_runtimes,
                                                          std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace
     ) :
-            WMS(nullptr, nullptr,
-                {batch_service}, {},
-                {},
-                nullptr, hostname,
+            ExecutionController(
+                hostname,
                 "workload_tracefile_replayer"),
             workload_trace(workload_trace),
             batch_service(batch_service),
@@ -48,17 +46,11 @@ namespace wrench {
         // Create a Job Manager
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
-        // Create and handle a bogus workflow
-        auto workflow = Workflow::createWorkflow();
-
-        this->addWorkflow(workflow);
-
         // Create the dual WMS that will just receive workflow execution events so that I don't have to
         std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
                 new WorkloadTraceFileReplayerEventReceiver(this->hostname, job_manager));
 
         // Start the WorkloadTraceFileReplayerEventReceiver
-        event_receiver->addWorkflow(this->getWorkflow(), S4U_Simulation::getClock());
         event_receiver->setSimulation(this->simulation);
         event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
 
@@ -89,27 +81,31 @@ namespace wrench {
             double requested_ram = std::get<4>(job);
             int num_nodes = std::get<5>(job);
 
-            // Create the set of tasks
-            std::vector<std::shared_ptr<WorkflowTask>> to_submit;
-            for (int i = 0; i < num_nodes; i++) {
+            // Create a job
+            auto cjob = job_manager->createCompoundJob(this->getName() + "_job_" + std::to_string(job_count));
+            // Add its compute actions
+            for (int i=0; i < num_nodes; i++) {
                 double time_fudge = 1; // 1 second seems to make it all work!
                 double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
-                auto task = this->getWorkflow()->addTask(
+                cjob->addComputeAction(
                         this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
-                        task_flops,
+                        task_flops, requested_ram,
                         num_cores_per_node, num_cores_per_node,
-                        requested_ram);
-                to_submit.push_back(task);
+                        ParallelModel::CONSTANTEFFICIENCY(1.0));
             }
+//            // Create the set of tasks
+//            std::vector<std::shared_ptr<WorkflowTask>> to_submit;
+//            for (int i = 0; i < num_nodes; i++) {
+//                double time_fudge = 1; // 1 second seems to make it all work!
+//                double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
+//                auto task = this->getWorkflow()->addTask(
+//                        this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
+//                        task_flops,
+//                        num_cores_per_node, num_cores_per_node,
+//                        requested_ram);
+//                to_submit.push_back(task);
+//            }
 
-            // Create a Standard Job with only the tasks
-            std::shared_ptr<StandardJob> standard_job;
-            try {
-                standard_job = job_manager->createStandardJob(to_submit);
-            } catch (std::invalid_argument &e) {
-                WRENCH_INFO("Couldn't create a standard job: %s (ignoring)", e.what());
-                continue;
-            }
             job_count++;
 
             // Create the batch_standard_and_pilot_jobs-specific argument
@@ -128,7 +124,7 @@ namespace wrench {
                         batch_job_args["-c"].c_str(),
                         batch_job_args["-u"].c_str());
             try {
-                job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
+                job_manager->submitJob(cjob, this->batch_service, batch_job_args);
             } catch (ExecutionException &e) {
                 WRENCH_INFO("Couldn't submit a replayed job: %s (ignoring)", e.getCause()->toString().c_str());
             }

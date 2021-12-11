@@ -24,7 +24,7 @@ namespace wrench {
      * @brief A WMS that only submits a single job to a given batch_standard_and_pilot_jobs service, which is used
      *        to implement batch_standard_and_pilot_jobs workload replay
      */
-    class WorkloadTraceFileReplayerEventReceiver : public WMS {
+    class WorkloadTraceFileReplayerEventReceiver : public ExecutionController {
 
     public:
         /**
@@ -32,14 +32,11 @@ namespace wrench {
          * @param hostname: the name of the host on which the "one job" WMS will run
          * @param job_manager: A JobManager with which to interact
          */
-        WorkloadTraceFileReplayerEventReceiver(std::string hostname, std::shared_ptr<JobManager> job_manager) : WMS(
-                nullptr, nullptr,
-                {}, {},
-                {},
-                nullptr, hostname,
-                "workload_trace_file_replayer_event_receiver"),
-                                                                                                                job_manager(
-                                                                                                                        job_manager) {}
+        WorkloadTraceFileReplayerEventReceiver(std::string hostname, std::shared_ptr<JobManager> job_manager) :
+                ExecutionController(
+                        hostname,
+                        "workload_trace_file_replayer_event_receiver"),
+                job_manager(job_manager) {}
 
         int main() override;
 
