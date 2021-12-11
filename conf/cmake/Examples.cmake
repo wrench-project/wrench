@@ -16,6 +16,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/workflow_api/condor-grid-example/CMakeLists.txt
         examples/workflow_api/basic-examples/io-pagecache/CMakeLists.txt
         examples/action_api/multi-action-multi-job-example/CMakeLists.txt
+        examples/action_api/custom-action/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})

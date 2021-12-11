@@ -12,6 +12,7 @@
 
 #include <set>
 
+#include "wrench/execution_controller/ExecutionController.h"
 #include "wrench/services/Service.h"
 #include "wrench/action/Action.h"
 
@@ -28,7 +29,7 @@ namespace wrench {
     /**
      * @brief An service that performs an Action
      */
-    class ActionExecutor : public Service {
+    class ActionExecutor : public ExecutionController {
 
     public:
 

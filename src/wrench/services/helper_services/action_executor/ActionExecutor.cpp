@@ -39,7 +39,7 @@ namespace wrench {
             std::string callback_mailbox,
             std::shared_ptr <Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) :
-            Service(hostname, "action_executor", "action_executor") {
+            ExecutionController(hostname, "action_executor") {
 
         if (action == nullptr) {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");

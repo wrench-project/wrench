@@ -11,13 +11,14 @@
  ** This simulator simulates the execution of three multi-action jobs,
  ** where job3 depends on job 2
  **
- ** The compute platform comprises four hosts, UserHost, StorageHost, ComputeHost, CloudHeadHost, and CloudComputeHost.
- ** On UserHost runs a controller (defined in class MultiActionMultiJobController). On StorageHost
- ** runs a storage services. On ComputeHost runs a bare-metal
- ** compute service, that has access to the 10 cores of that host.  On CloudHeadHost runs
+ ** The compute platform comprises 6 hosts hosts, UserHost, StorageHost1, StorageHost2, ComputeHost1,
+ ** ComputeHost2, CloudHeadHost, and CloudComputeHost.
+ ** On UserHost runs a controller (defined in class MultiActionMultiJobController). On StorageHost1 and
+ ** StorageHost2 run two storage services.  On ComputeHost1 runs a bare-metal
+ ** compute service, that has access to the 10 cores of that host on on ComputeHost2.  On CloudHeadHost runs
  ** a cloud service, that has access to the 10 cores of host CloudComputeHost. This cloud-service
  ** has a scratch space (i.e., a local storage service "mounted" at /scratch/)
- ** Once the simulation is done, various action/job information are printed.
+ **
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-multi-action-multi-job ./four_hosts.xml
