@@ -253,7 +253,7 @@ namespace wrench {
                                     new ServiceStopDaemonMessage(
                                             ack_mailbox,
                                             false,
-                                            0,
+                                            ComputeService::TerminationCause::TERMINATION_NONE,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {

@@ -765,7 +765,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->setStateToDown();
-            this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause)); // TODO: this cast is ugly
+            this->terminate(msg->send_failure_notifications, msg->termination_cause);
 //            this->terminateRunningPilotJobs();
 
             // Send back a synchronous reply!
