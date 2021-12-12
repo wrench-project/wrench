@@ -30,7 +30,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox, bool send_failure_notifications,
-                                                       int termination_cause,
+                                                       ComputeService::TerminationCause termination_cause,
                                                        double payload)
             : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(std::move(ack_mailbox)), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}
 
