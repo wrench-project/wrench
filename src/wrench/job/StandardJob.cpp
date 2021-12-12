@@ -284,7 +284,11 @@ namespace wrench {
                             fixed_locations.push_back(loc);
                         }
                     }
-                    fwrite_action = cjob->addFileWriteAction("", f, fixed_locations.at(0));  // TODO: The at(0) here is ok? I mean, what does it mean to write to multiple locations....
+                    if (fixed_locations.size() > 1) {
+                        throw std::runtime_error("StandardJob::createUnderlyingCompoundJob(): Internal WRENCH error - "
+                                                 "there should be a single location for a file write action");
+                    }
+                    fwrite_action = cjob->addFileWriteAction("", f, fixed_locations.at(0));
                 } else {
                     fwrite_action = cjob->addFileWriteAction("", f, FileLocation::LOCATION(compute_service->getScratch()));
                 }
@@ -293,7 +297,7 @@ namespace wrench {
             }
         }
 
-        // TODO replace this horror with some sjob function perhaps?
+        // Determine whether the scratch space needs to be cleaned
         bool need_scratch_clean = false;
         for (auto const &task : this->tasks) {
             for (auto const &f : task->getInputFiles()) {

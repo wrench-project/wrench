@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-e
+
 /**
  ** A Controller that creates a job with a powerful custom action
  *

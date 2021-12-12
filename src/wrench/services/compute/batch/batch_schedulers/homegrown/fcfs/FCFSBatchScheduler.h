@@ -35,7 +35,6 @@ namespace wrench {
 
         void processQueuedJobs() override;
 
-        // TODO: is't the second arg just inside the first->id field?
         void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;
         void processJobFailure(std::shared_ptr<BatchJob> batch_job) override;
         void processJobCompletion(std::shared_ptr<BatchJob> batch_job) override;

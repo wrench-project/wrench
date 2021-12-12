@@ -29,7 +29,6 @@ namespace wrench {
 
         explicit CONSERVATIVEBFBatchSchedulerCoreLevel(BatchComputeService *cs);
 
-        // TODO: IMPLEMENT EVERYTHING
         void processQueuedJobs() override;
 
         void processJobSubmission(std::shared_ptr<BatchJob> batch_job) override;

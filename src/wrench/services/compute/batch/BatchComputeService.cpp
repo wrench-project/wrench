@@ -618,7 +618,6 @@ namespace wrench {
 
 
         while (not this->batch_queue.empty()) {
-            // TODO: Do in a simple while loop that removes as it goes
             auto batch_job = (*(this->batch_queue.begin()));
             auto compound_job = batch_job->getCompoundJob();
             WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM PENDING LIST", compound_job->getName().c_str());
@@ -797,14 +796,6 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<ComputeServiceTerminateCompoundJobRequestMessage *>(message.get())) {
             processCompoundJobTerminationRequest(msg->job, msg->answer_mailbox);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-            processPilotJobCompletion(msg->job);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
-            processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
             return true;
 
         } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
