@@ -260,17 +260,11 @@ namespace wrench {
         // Terminate
         void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        //Process the pilot job completion
-        void processPilotJobCompletion(std::shared_ptr<PilotJob> job) {}; // TODO: TO REMOVE
-
         //Process standard job timeout
         void processCompoundJobTimeout(std::shared_ptr<CompoundJob> job);
 
         //process standard job termination request
         void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, std::string answer_mailbox);
-
-        //process pilot job termination request
-        void processPilotJobTerminationRequest(std::shared_ptr<PilotJob> job, std::string answer_mailbox) {}; // TODO: TO REMOVE
 
         // process a batch_standard_and_pilot_jobs bach_job tiemout event
         void processAlarmJobTimeout(std::shared_ptr<BatchJob>bach_job);

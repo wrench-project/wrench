@@ -386,7 +386,8 @@ namespace wrench {
             throw std::invalid_argument("Workflow::getTaskChildren(): Invalid arguments");
         }
         auto raw_ptrs = this->dag.getChildren(task.get());
-        std::vector<std::shared_ptr<WorkflowTask>> shared_ptrs; // TODO: RESERVE SPACE!
+        std::vector<std::shared_ptr<WorkflowTask>> shared_ptrs;
+        shared_ptrs.reserve(raw_ptrs.size());
         for (const auto &raw_ptr : raw_ptrs) {
             shared_ptrs.push_back(raw_ptr->getSharedPtr());
         }
