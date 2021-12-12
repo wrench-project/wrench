@@ -28,54 +28,6 @@ WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
 
 namespace wrench {
 
-//    std::unordered_map<Service *, std::shared_ptr<Service>> Service::service_shared_ptr_map;
-//    unsigned long Service::num_terminated_services = 0;
-
-//    /**
-//     * @brief Increase the completed service count
-//     */
-//    void Service::increaseNumCompletedServicesCount() {
-//        Service::num_terminated_services++;
-//    }
-
-//    /**
-//     * @brief Forget all tracked services
-//     */
-//    void Service::clearTrackedServices() {
-//        Service::service_shared_ptr_map.clear();
-//    }
-//
-//    /**
-//     * @brief Go through the tracked services and remove all entries with a refcount of 1!
-//     */
-//    void Service::cleanupTrackedServices() {
-//#if 0
-//        std::set<Service *> to_cleanup;
-//
-//        // TODO: Perhaps do this as one step?
-//        for (auto const &x : Service::service_shared_ptr_map) {
-////            WRENCH_DEBUG("---> %s (%ld)", x.second->getName().c_str(), x.second.use_count());
-//            if (x.second.use_count() == 1) {
-//                to_cleanup.insert(x.first);
-//            }
-//        }
-//
-//        for (auto const &x : to_cleanup) {
-//            Service::service_shared_ptr_map.erase(x);
-//        }
-//#endif
-//
-//        auto it = Service::service_shared_ptr_map.begin();
-//        while (it != Service::service_shared_ptr_map.end()) {
-//            if (it->second.use_count() == 1) {
-//                it = Service::service_shared_ptr_map.erase(it);
-//            } else {
-//                it++;
-//            }
-//        }
-//
-//    }
-
     /**
      * @brief Destructor
      */
