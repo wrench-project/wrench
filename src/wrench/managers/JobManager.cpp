@@ -68,7 +68,8 @@ namespace wrench {
      */
     void JobManager::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", false, 0, 0.0));
+            S4U_Mailbox::putMessage(this->mailbox_name,
+                                    new ServiceStopDaemonMessage("", false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
