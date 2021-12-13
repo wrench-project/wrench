@@ -31,7 +31,9 @@ namespace wrench {
         friend class Simulation;
         DataFile(std::string id, double size);
 
+        /** @brief File id/name **/
         std::string id;
+        /** @brief File size in bytes **/
         double size; // in bytes
 
     };
