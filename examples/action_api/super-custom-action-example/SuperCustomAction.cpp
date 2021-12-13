@@ -24,7 +24,7 @@
  **    ./wrench-example-super-custom-action ./four_hosts.xml
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-super-custom-action ./four_hosts.xml --log=custom_wms.threshold=info
+ **    ./wrench-example-super-custom-action ./four_hosts.xml --log=custom_controller.threshold=info
  **
  ** Example invocation of the simulator with full logging:
  **    ./wrench-example-super-custom-action ./four_hosts.xml --wrench-full-log

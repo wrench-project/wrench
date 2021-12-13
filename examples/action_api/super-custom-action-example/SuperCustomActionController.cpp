@@ -9,12 +9,6 @@
 
 /**
  ** A Controller that creates a job with a powerful custom action
- *
- ** Example invocation of the simulator with only controller logging:
- **    ./wrench-example-multi-action-multi-job ./four_hosts.xml --log=custom_controller.threshold=info
- **
- ** Example invocation of the simulator with full logging:
- **    ./wrench-example-multi-action-multi-job ./four_hosts.xml --wrench-full-log
  **/
 
 #include <iostream>
@@ -31,8 +25,10 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param compute_services: a set of compute services available to run tasks
-     * @param storage_services: a set of storage services available to store files
+     * @param bm_cs: a bare-metal compute service
+     * @param cloud_cs: a cloud compute service
+     * @param ss_1: a storage service
+     * @param ss_2: a storage service
      * @param hostname: the name of the host on which to start the Controller
      */
     SuperCustomActionController::SuperCustomActionController(
