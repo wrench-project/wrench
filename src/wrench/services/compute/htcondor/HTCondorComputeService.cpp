@@ -380,8 +380,8 @@ namespace wrench {
 
     /**
      * @brief Determine whether compute service has scratch
+     *
      * @param service_specific_args: the service-specific arguments (useful for some services)
-     * @return
      */
     void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
 

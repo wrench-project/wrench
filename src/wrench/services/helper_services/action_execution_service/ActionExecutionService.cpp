@@ -884,7 +884,6 @@ namespace wrench {
      *        arguments) can run given available  resources
      *
      * @param action: the action
-     * @param service_specific_arguments: the service-specific arguments
      * @return true if the action can run
      */
     bool ActionExecutionService::actionCanRun(std::shared_ptr<Action> action) {
