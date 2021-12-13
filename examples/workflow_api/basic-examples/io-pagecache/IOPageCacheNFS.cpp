@@ -156,10 +156,8 @@ int main(int argc, char **argv) {
             "compute_host", {"compute_host"}, "", {}, {}));
 
     auto wms = simulation->add(
-            new wrench::NFSPipelineWMS({baremetal_service}, client_storage_service, server_storage_service,
+            new wrench::NFSPipelineWMS(workflow, {baremetal_service}, client_storage_service, server_storage_service,
                     "compute_host"));
-
-    wms->addWorkflow(workflow);
 
     std::cerr << "Instantiating a FileRegistryService on compute_host ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("compute_host");

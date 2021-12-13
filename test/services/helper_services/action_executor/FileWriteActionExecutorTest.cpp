@@ -120,8 +120,9 @@ class FileWriteActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
     FileWriteActionExecutorSuccessTestWMS(FileWriteActionExecutorTest *test,
-                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                          std::shared_ptr<wrench::Workflow> workflow,
+                                          std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -138,7 +139,7 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a file_write_action
         auto file_write_action = job->addFileWriteAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss1));
+                                                         wrench::FileLocation::LOCATION(this->test->ss1));
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_write_action, nullptr));
@@ -209,9 +210,7 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    wms = simulation->add(new FileWriteActionExecutorSuccessTestWMS(this, "Host1"));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new FileWriteActionExecutorSuccessTestWMS(this, workflow, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 

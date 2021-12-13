@@ -140,11 +140,12 @@ class ProxTestWMS : public wrench::WMS {
 
 public:
     ProxTestWMS(NetworkProximityTest *test,
+                std::shared_ptr<wrench::Workflow> workflow,
                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                 const std::set<std::shared_ptr<wrench::NetworkProximityService>> &network_proximity_services,
                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, network_proximity_services, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -303,11 +304,9 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new ProxTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {storage_service1},
                     {network_proximity_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -327,11 +326,12 @@ class CompareProxTestWMS : public wrench::WMS {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
+                       std::shared_ptr<wrench::Workflow> workflow,
                        std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                        std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                        std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -459,14 +459,12 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CompareProxTestWMS(this, (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
+            new CompareProxTestWMS(this,
+                                   this->workflow,
+                                   (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
                                    (std::set<std::shared_ptr<wrench::StorageService>>){storage_service1},
                                    (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
                                    hostname)));
-
-    wms->addWorkflow(this->workflow, 0.0);
-
-
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -485,11 +483,12 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 class VivaldiConvergeWMS : public wrench::WMS {
 public:
     VivaldiConvergeWMS(NetworkProximityTest *test,
+                       std::shared_ptr<wrench::Workflow> workflow,
                        std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                        std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                        std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -643,12 +642,11 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new VivaldiConvergeWMS(
                     this,
+                    workflow,
                     (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
                     (std::set<std::shared_ptr<wrench::StorageService>>){storage_service1},
                     (std::set<std::shared_ptr<wrench::NetworkProximityService>>){alltoall_network_service, vivaldi_network_service},
                     hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -667,11 +665,12 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 class ValidatePropertiesWMS : public wrench::WMS {
 public:
     ValidatePropertiesWMS(NetworkProximityTest *test,
+                          std::shared_ptr<wrench::Workflow> workflow,
                           std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                           std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                           std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -820,12 +819,11 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new ValidatePropertiesWMS(
                     this,
+                    workflow,
                     (std::set<std::shared_ptr<wrench::ComputeService>>){compute_service},
                     (std::set<std::shared_ptr<wrench::StorageService>>){storage_service1},
                     (std::set<std::shared_ptr<wrench::NetworkProximityService>>){nps},
                     hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 //  // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

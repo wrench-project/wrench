@@ -181,9 +181,7 @@ int main(int argc, char **argv) {
             "host01", {"host01"}, "", {}, {}));
 
     auto wms = simulation->add(
-            new wrench::ConcurrentPipelineWMS({baremetal_service}, {storage_service}, "host01"));
-
-    wms->addWorkflow(workflow);
+            new wrench::ConcurrentPipelineWMS(workflow, {baremetal_service}, {storage_service}, "host01"));
 
     std::cerr << "Instantiating a FileRegistryService on host01 ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("host01");

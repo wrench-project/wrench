@@ -113,8 +113,9 @@ class SleepActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
     SleepActionExecutorSuccessTestWMS(SleepActionExecutorTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -192,9 +193,7 @@ void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SleepActionExecutorSuccessTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(wrench::Workflow::createWorkflow()));
+            new SleepActionExecutorSuccessTestWMS(this, wrench::Workflow::createWorkflow(), "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

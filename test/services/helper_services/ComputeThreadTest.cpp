@@ -74,8 +74,9 @@ class ComputeThreadWorkingTestWMS : public wrench::WMS {
 
 public:
     ComputeThreadWorkingTestWMS(ComputeThreadTest *test,
-                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+                                std::shared_ptr<wrench::Workflow> workflow,
+                                std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -125,14 +126,12 @@ void ComputeThreadTest::do_Working_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadWorkingTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadWorkingTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -145,8 +144,9 @@ class ComputeThreadKillAfterDeathTestWMS : public wrench::WMS {
 
 public:
     ComputeThreadKillAfterDeathTestWMS(ComputeThreadTest *test,
-                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+                                       std::shared_ptr<wrench::Workflow> workflow,
+                                       std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -196,16 +196,11 @@ void ComputeThreadTest::do_KillAfterDeath_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadKillAfterDeathTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadKillAfterDeathTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-
-
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
-

@@ -81,10 +81,11 @@ class ResourceInformationTestWMS : public wrench::WMS {
 
 public:
     ResourceInformationTestWMS(BareMetalComputeServiceTestResourceInformation *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -273,9 +274,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ResourceInformationTestWMS(
-                    this, compute_services, {}, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, compute_services, {}, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

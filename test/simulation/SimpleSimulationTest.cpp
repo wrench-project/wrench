@@ -133,10 +133,11 @@ class SimpleSimulationReadyTasksTestWMS : public wrench::WMS {
 
 public:
     SimpleSimulationReadyTasksTestWMS(SimpleSimulationTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -402,8 +403,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleSimulationReadyTasksTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
+            new SimpleSimulationReadyTasksTestWMS(this, this->workflow, {compute_service}, {storage_service}, hostname)));
 
     // BOGUS ADDS
     ASSERT_THROW(simulation->add((wrench::WMS *) nullptr), std::invalid_argument);
@@ -411,11 +411,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
-
-    // Won't work without a workflow!
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Won't work due to missing file staging
     ASSERT_THROW(simulation->launch(), std::runtime_error);

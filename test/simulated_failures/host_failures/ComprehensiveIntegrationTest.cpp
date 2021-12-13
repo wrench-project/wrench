@@ -162,11 +162,12 @@ class IntegrationFailureTestTestWMS : public wrench::WMS {
 
 public:
     IntegrationFailureTestTestWMS(ComprehensiveIntegrationHostFailuresTest *test,
+                                  std::shared_ptr<wrench::Workflow> workflow,
                                   std::string &hostname,
                                   std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                   std::set<std::shared_ptr<wrench::StorageService>> storage_services
     ) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -492,13 +493,10 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     std::string wms_host = "WMSHost";
     auto wms = simulation->add(
             new IntegrationFailureTestTestWMS(
-                    this,
+                    this, workflow,
                     wms_host,
                     {this->baremetal_service, this->cloud_service},
                     {this->storage_service1, this->storage_service2}));
-
-    wms->addWorkflow(workflow);
-
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

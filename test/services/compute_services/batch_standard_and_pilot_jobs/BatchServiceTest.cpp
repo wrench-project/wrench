@@ -188,9 +188,10 @@ protected:
 class BogusSetupTestWMS : public wrench::WMS {
 public:
     BogusSetupTestWMS(BatchServiceTest *test,
+                      std::shared_ptr<wrench::Workflow> workflow,
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -269,9 +270,10 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 class TerminateOneStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     TerminateOneStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                             std::shared_ptr<wrench::Workflow> workflow,
                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -478,9 +480,7 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TerminateOneStandardJobSubmissionTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -509,9 +509,10 @@ void BatchServiceTest::do_TerminateStandardJobsTest_test() {
 class TerminateOnePilotJobSubmissionTestWMS : public wrench::WMS {
 public:
     TerminateOnePilotJobSubmissionTestWMS(BatchServiceTest *test,
+                                          std::shared_ptr<wrench::Workflow> workflow,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -604,9 +605,7 @@ void BatchServiceTest::do_TerminatePilotJobsTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TerminateOneStandardJobSubmissionTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -637,9 +636,10 @@ class
 OneStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     OneStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -765,9 +765,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OneStandardJobSubmissionTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -796,9 +794,10 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 class StandardJobFailureTestWMS : public wrench::WMS {
 public:
     StandardJobFailureTestWMS(BatchServiceTest *test,
+                              std::shared_ptr<wrench::Workflow> workflow,
                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -909,9 +908,7 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardJobFailureTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -939,10 +936,11 @@ void BatchServiceTest::do_StandardJobFailureTest_test() {
 class TwoStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     TwoStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -1086,9 +1084,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TwoStandardJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     // Create two workflow files
     auto input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1116,10 +1112,11 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 class OnePilotJobSubmissionTestWMS : public wrench::WMS {
 public:
     OnePilotJobSubmissionTestWMS(BatchServiceTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1235,10 +1232,8 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new OnePilotJobSubmissionTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1268,10 +1263,11 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 class StandardPlusPilotJobSubmissionTestWMS : public wrench::WMS {
 public:
     StandardPlusPilotJobSubmissionTestWMS(BatchServiceTest *test,
+                                          std::shared_ptr<wrench::Workflow> workflow,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1412,10 +1408,8 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardPlusPilotJobSubmissionTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1445,10 +1439,11 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 class InsufficientCoresJobSubmissionTestWMS : public wrench::WMS {
 public:
     InsufficientCoresJobSubmissionTestWMS(BatchServiceTest *test,
+                                          std::shared_ptr<wrench::Workflow> workflow,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1551,9 +1546,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new InsufficientCoresJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1583,10 +1576,11 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 class NoArgumentsJobSubmissionTestWMS : public wrench::WMS {
 public:
     NoArgumentsJobSubmissionTestWMS(BatchServiceTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1675,9 +1669,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new NoArgumentsJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1707,10 +1699,11 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 class StandardJobTimeoutSubmissionTestWMS : public wrench::WMS {
 public:
     StandardJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1825,9 +1818,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardJobTimeoutSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1857,10 +1848,11 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 class PilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
 public:
     PilotJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1952,9 +1944,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new PilotJobTimeoutSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1984,10 +1974,11 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 class BestFitStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     BestFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -2175,9 +2166,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BestFitStandardJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2213,10 +2202,11 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 class FirstFitStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     FirstFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                         std::shared_ptr<wrench::Workflow> workflow,
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -2333,9 +2323,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FirstFitStandardJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2371,10 +2359,11 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 class RoundRobinStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     RoundRobinStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                           std::shared_ptr<wrench::Workflow> workflow,
                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                            std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -2593,9 +2582,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new RoundRobinStandardJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2632,10 +2619,11 @@ class StandardJobInsidePilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
 public:
     StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
             BatchServiceTest *test,
+            std::shared_ptr<wrench::Workflow> workflow,
             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -2769,9 +2757,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2801,10 +2787,11 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 class StandardJobInsidePilotJobSucessSubmissionTestWMS : public wrench::WMS {
 public:
     StandardJobInsidePilotJobSucessSubmissionTestWMS(BatchServiceTest *test,
+                                                     std::shared_ptr<wrench::Workflow> workflow,
                                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -2932,9 +2919,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StandardJobInsidePilotJobSucessSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -2965,10 +2950,11 @@ class InsufficientCoresInsidePilotJobSubmissionTestWMS : public wrench::WMS {
 public:
     InsufficientCoresInsidePilotJobSubmissionTestWMS(
             BatchServiceTest *test,
+            std::shared_ptr<wrench::Workflow> workflow,
             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -3085,9 +3071,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new InsufficientCoresInsidePilotJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -3117,10 +3101,11 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 class MultipleStandardJobSubmissionTestWMS : public wrench::WMS {
 public:
     MultipleStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                         std::shared_ptr<wrench::Workflow> workflow,
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -3219,9 +3204,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new MultipleStandardJobSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -3251,10 +3234,11 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 class DifferentBatchAlgorithmsSubmissionTestWMS : public wrench::WMS {
 public:
     DifferentBatchAlgorithmsSubmissionTestWMS(BatchServiceTest *test,
+                                              std::shared_ptr<wrench::Workflow> workflow,
                                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -3366,9 +3350,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DifferentBatchAlgorithmsSubmissionTestWMS(
-                    this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -3398,9 +3380,10 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 class ShutdownWithPendingRunningJobsTestWMS : public wrench::WMS {
 public:
     ShutdownWithPendingRunningJobsTestWMS(BatchServiceTest *test,
+                                          std::shared_ptr<wrench::Workflow> workflow,
                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -3503,9 +3486,7 @@ void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ShutdownWithPendingRunningJobsTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

@@ -487,16 +487,6 @@ namespace wrench {
                     "An execution controller should have been instantiated and passed to Simulation.setWMS()");
         }
 
-        // Check that every WMS has a workflow
-        for (const auto &execution_controller : this->execution_controllers) {
-            if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {
-                if (wms->getWorkflow() == nullptr) {
-                    throw std::runtime_error(
-                            "A WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
-                }
-            }
-        }
-
         // Check that WMSs can do their work
         for (const auto &execution_controller : this->execution_controllers) {
             if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {

@@ -55,8 +55,8 @@ protected:
 
 class ParallelModelTestWMS : public wrench::WMS {
 public:
-    ParallelModelTestWMS(ParallelModelTest *test, std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+    ParallelModelTestWMS(ParallelModelTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -115,10 +115,9 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
             {})));
 
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, wms_host)));
-
     auto workflow = wrench::Workflow::createWorkflow();
+    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
+            this, workflow, wms_host)));
     double work = 100.0;
     double alpha = 0.3;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
@@ -128,8 +127,6 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::AmdahlParallelModel>(parallel_model);
     ASSERT_NE(real_parallel_model, nullptr);
     ASSERT_EQ(real_parallel_model->getAlpha(), 0.3);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -181,10 +178,10 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
             {})));
 
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, wms_host)));
-
     auto workflow = wrench::Workflow::createWorkflow();
+    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
+            this, workflow, wms_host)));
+
     double work = 100.0;
     double efficiency = 0.3;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
@@ -194,8 +191,6 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(parallel_model);
     ASSERT_NE(real_parallel_model, nullptr);
     ASSERT_EQ(real_parallel_model->getEfficiency(), 0.3);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -249,10 +244,10 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
             {})));
 
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, wms_host)));
-
     auto workflow = wrench::Workflow::createWorkflow();
+    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
+            this, workflow, wms_host)));
+
     double work = 100.0;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
@@ -269,8 +264,6 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     auto parallel_model = task->getParallelModel();
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::CustomParallelModel>(parallel_model);
     ASSERT_NE(real_parallel_model, nullptr);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 

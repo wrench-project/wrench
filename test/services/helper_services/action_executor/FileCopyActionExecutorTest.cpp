@@ -121,8 +121,9 @@ class FileCopyActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
     FileCopyActionExecutorSuccessTestWMS(FileCopyActionExecutorTest *test,
+                                         std::shared_ptr<wrench::Workflow> workflow,
                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -217,9 +218,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    wms = simulation->add(new FileCopyActionExecutorSuccessTestWMS(this, "Host1"));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new FileCopyActionExecutorSuccessTestWMS(this, workflow, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 

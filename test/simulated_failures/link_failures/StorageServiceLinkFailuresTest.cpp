@@ -98,8 +98,9 @@ class StorageServiceLinkFailuresTestWMS : public wrench::WMS {
 
 public:
     StorageServiceLinkFailuresTestWMS(StorageServiceLinkFailuresTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->rng.seed(666);
     }
@@ -407,13 +408,9 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     wms = simulation->add(
             new StorageServiceLinkFailuresTestWMS(
-                    this, "Host1"));
-
-    wms->addWorkflow(workflow);
+                    this, workflow, "Host1"));
 
     simulation->launch();
-
-
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

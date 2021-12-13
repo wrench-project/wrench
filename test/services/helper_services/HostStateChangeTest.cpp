@@ -54,8 +54,9 @@ class HostStateChangeDetectorTestWMS : public wrench::WMS {
 
 public:
     HostStateChangeDetectorTestWMS(HostStateChangeDetectorServiceTest *test,
+                                   std::shared_ptr<wrench::Workflow> workflow,
                                    std::string hostname, bool notify_when_speed_change) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->notify_when_speed_change = notify_when_speed_change;
     }
@@ -146,11 +147,7 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMS
-    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this,"Host1", notify_when_speed_change));
-
-    // Create a bogus workflow
-    auto workflow =  wrench::Workflow::createWorkflow();
-    wms->addWorkflow(workflow);
+    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this, wrench::Workflow::createWorkflow(), "Host1", notify_when_speed_change));
 
     simulation->launch();
 

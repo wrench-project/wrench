@@ -265,10 +265,11 @@ TEST_F(WorkflowTaskTest, StateToString) {
 class WorkflowTaskExecutionHistoryTestWMS : public wrench::WMS {
 public:
     WorkflowTaskExecutionHistoryTestWMS(WorkflowTaskTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -368,10 +369,8 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
-            this, {compute_service}, {storage_service, backup_storage_service}, wms_host
+            this, workflow, {compute_service}, {storage_service, backup_storage_service}, wms_host
     )));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 

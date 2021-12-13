@@ -121,10 +121,11 @@ class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : publi
 public:
     SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
             SimpleStorageServiceLimitedConnectionsTest *test,
+            std::shared_ptr<wrench::Workflow> workflow,
             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             const std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -263,10 +264,8 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   std::shared_ptr<wrench::WMS> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
-                  this, {compute_service}, {storage_service_wms_unlimited, storage_service_wms_limited, storage_service_unlimited, storage_service_limited},
+                  this, workflow, {compute_service}, {storage_service_wms_unlimited, storage_service_wms_limited, storage_service_unlimited, storage_service_limited},
                   "WMSHost")));
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService("WMSHost"));

@@ -24,7 +24,8 @@ namespace wrench {
 
     public:
         // Constructor
-        CondorWMS(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+        CondorWMS(std::shared_ptr<Workflow> workflow,
+                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                   std::string hostname);
 

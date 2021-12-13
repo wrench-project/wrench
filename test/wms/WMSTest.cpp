@@ -75,19 +75,25 @@ class TestDefaultHandlerWMS : public wrench::WMS {
 
 public:
     TestDefaultHandlerWMS(WMSTest *test,
+                          std::shared_ptr<wrench::Workflow> workflow,
+                          double sleep_time,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
         this->test = test;
+        this->sleep_time = sleep_time;
     }
 
 private:
 
     WMSTest *test;
+    double sleep_time;
 
     int main() {
+
+        wrench::Simulation::sleep(this->sleep_time);
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -212,9 +218,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestDefaultHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
+            new TestDefaultHandlerWMS(this,  workflow, 100, {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -247,21 +251,27 @@ class TestCustomHandlerWMS : public wrench::WMS {
 
 public:
     TestCustomHandlerWMS(WMSTest *test,
+                         std::shared_ptr<wrench::Workflow> workflow,
+                         double sleep_time,
                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
         this->test = test;
+        this->sleep_time = sleep_time;
     }
 
 private:
 
     WMSTest *test;
+    double sleep_time;
 
     int counter;
 
     int main() override {
+
+        wrench::Simulation::sleep(this->sleep_time);
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -417,9 +427,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestCustomHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
+            new TestCustomHandlerWMS(this,  workflow, 100, {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(

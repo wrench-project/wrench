@@ -124,8 +124,9 @@ protected:
 class VMResourceAllocationTestWMS : public wrench::WMS {
 
 public:
-    VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test, std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+    VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -253,9 +254,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new VMResourceAllocationTestWMS(this, hostname));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new VMResourceAllocationTestWMS(this, workflow, hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 

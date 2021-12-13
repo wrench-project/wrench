@@ -96,8 +96,9 @@ class S4U_DaemonTestWMS : public wrench::WMS {
 
 public:
     S4U_DaemonTestWMS(S4U_DaemonTest *test,
+                      std::shared_ptr<wrench::Workflow> workflow,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -189,10 +190,7 @@ void S4U_DaemonTest::do_basic_Test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new S4U_DaemonTestWMS(this, workflow, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -200,7 +198,7 @@ void S4U_DaemonTest::do_basic_Test() {
 
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -215,8 +213,9 @@ class S4U_DaemonNoCleanupTestWMS : public wrench::WMS {
 
 public:
     S4U_DaemonNoCleanupTestWMS(S4U_DaemonTest *test,
-                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+                               std::shared_ptr<wrench::Workflow> workflow,
+                               std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -266,9 +265,7 @@ void S4U_DaemonTest::do_noCleanup_Test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonNoCleanupTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new S4U_DaemonNoCleanupTestWMS(this, workflow, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -276,7 +273,7 @@ void S4U_DaemonTest::do_noCleanup_Test() {
 
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 

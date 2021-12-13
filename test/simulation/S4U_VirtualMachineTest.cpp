@@ -95,8 +95,9 @@ class S4U_VirtualMachineTestWMS : public wrench::WMS {
 
 public:
     S4U_VirtualMachineTestWMS(S4U_VirtualMachineTest *test,
+                              std::shared_ptr<wrench::Workflow> workflow,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -186,9 +187,7 @@ void S4U_VirtualMachineTest::do_basic_Test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new S4U_VirtualMachineTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, hostname)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());

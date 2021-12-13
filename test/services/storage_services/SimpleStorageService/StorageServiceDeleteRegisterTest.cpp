@@ -65,11 +65,12 @@ protected:
 class SimpleStorageServiceDeleteRegisterTestWMS : public wrench::WMS {
 public:
     SimpleStorageServiceDeleteRegisterTestWMS(SimpleStorageServiceDeleteRegisterTest *test,
+                                              std::shared_ptr<wrench::Workflow> workflow,
                                               const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                               std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
                         hostname, "test") {
         this->test = test;
     }
@@ -154,11 +155,7 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceDeleteRegisterTestWMS(
-            this, {compute_service}, {storage_service}, file_registry_service, "WMSHost")));
-
-    wms->addWorkflow(this->workflow);
-
-
+            this, this->workflow, {compute_service}, {storage_service}, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service));

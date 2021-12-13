@@ -137,10 +137,11 @@ class DynamicServiceCreationReadyTasksTestWMS : public wrench::WMS {
 
 public:
     DynamicServiceCreationReadyTasksTestWMS(DynamicServiceCreationTest *test,
+                                            std::shared_ptr<wrench::Workflow> workflow,
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -292,10 +293,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new DynamicServiceCreationReadyTasksTestWMS(this, {}, {storage_service}, hostname)));
-
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new DynamicServiceCreationReadyTasksTestWMS(this, workflow, {}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

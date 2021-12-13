@@ -95,11 +95,12 @@ protected:
 class SimulationTimestampFileReadBasicTestWMS : public wrench::WMS {
 public:
     SimulationTimestampFileReadBasicTestWMS(SimulationTimestampFileReadTest *test,
+                                            std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 
@@ -174,11 +175,9 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
-            this, {compute_service}, {storage_service}, file_registry_service, host1
+            this, workflow, {compute_service}, {storage_service}, file_registry_service, host1
     )));
 
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     //stage files
     std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1, file_2, file_3, xl_file};

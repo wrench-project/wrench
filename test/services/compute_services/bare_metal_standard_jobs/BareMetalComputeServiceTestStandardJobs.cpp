@@ -163,10 +163,11 @@ class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::WMS {
 
 public:
     MulticoreComputeServiceUnsupportedJobTypeTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                     std::shared_ptr<wrench::Workflow> workflow,
                                                      const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -234,9 +235,7 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceUnsupportedJobTypeTestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -262,10 +261,11 @@ class MulticoreComputeServiceBogusNumCoresTestWMS : public wrench::WMS {
 
 public:
     MulticoreComputeServiceBogusNumCoresTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                std::shared_ptr<wrench::Workflow> workflow,
                                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -348,9 +348,7 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceBogusNumCoresTestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -377,10 +375,11 @@ class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::WMS {
 
 public:
     MulticoreComputeServiceTwoSingleCoreTasksTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                     std::shared_ptr<wrench::Workflow> workflow,
                                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -483,13 +482,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
-
 
     // Staging the input file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
@@ -511,10 +507,11 @@ class MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS : public wrench::WMS {
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                        std::shared_ptr<wrench::Workflow> workflow,
                                                         const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -614,9 +611,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
     std::shared_ptr<wrench::WMS> wms;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -642,10 +637,11 @@ class MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS : public wrench::WMS {
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                        std::shared_ptr<wrench::Workflow> workflow,
                                                         const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -756,9 +752,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(
-                    this,  {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this,  workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -785,10 +779,11 @@ class BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::WMS {
 
 public:
     BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                        std::shared_ptr<wrench::Workflow> workflow,
                                                         const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -979,9 +974,7 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(
-                    this,  {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this,  workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1008,10 +1001,11 @@ class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::WMS
 
 public:
     BareMetalComputeServiceJobImmediateTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                          std::shared_ptr<wrench::Workflow> workflow,
                                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1099,9 +1093,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceJobImmediateTerminationTestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1133,10 +1125,11 @@ class BareMetalComputeServiceJobTerminationTestWMS : public wrench::WMS {
 
 public:
     BareMetalComputeServiceJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                 std::shared_ptr<wrench::Workflow> workflow,
                                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1227,9 +1220,7 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceJobTerminationTestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1262,10 +1253,11 @@ class BareMetalComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::
 
 public:
     BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                             std::shared_ptr<wrench::Workflow> workflow,
                                                              const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1343,9 +1335,7 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(
-                    this,  {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this,  workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1379,10 +1369,11 @@ class BareMetalComputeServiceCompletedJobTerminationTestWMS : public wrench::WMS
 
 public:
     BareMetalComputeServiceCompletedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
+                                                          std::shared_ptr<wrench::Workflow> workflow,
                                                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1469,9 +1460,7 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceCompletedJobTerminationTestWMS(
-                    this,  {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this,  workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1506,10 +1495,11 @@ class BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : pu
 public:
     BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
+            std::shared_ptr<wrench::Workflow> workflow,
             const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1607,9 +1597,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
-                    this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1644,10 +1632,11 @@ class BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS :
 public:
     BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
+            std::shared_ptr<wrench::Workflow> workflow,
             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1735,9 +1724,7 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
-                    this,  {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));

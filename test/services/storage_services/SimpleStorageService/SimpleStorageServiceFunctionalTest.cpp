@@ -102,11 +102,12 @@ class SimpleStorageServiceBasicFunctionalityTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceBasicFunctionalityTestWMS(SimpleStorageServiceFunctionalTest *test,
+                                                  std::shared_ptr<wrench::Workflow> workflow,
                                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                   std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                                   std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname,
                         "test") {
         this->test = test;
     }
@@ -631,14 +632,13 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceBasicFunctionalityTestWMS(this,
+                                                              workflow,
                                                               {compute_service},
                                                               {
                                                                       storage_service_100, storage_service_510,
                                                                       storage_service_1000
                                                               },
                                                               file_registry_service, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // A bogus staging
     ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
@@ -672,10 +672,11 @@ class SimpleStorageServiceSynchronousFileCopyTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceSynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
+                                                   std::shared_ptr<wrench::Workflow> workflow,
                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -802,10 +803,9 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceSynchronousFileCopyTestWMS(
                     this,
+                    workflow,
                     {compute_service},
                     {storage_service_1000, storage_service_510}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -834,10 +834,11 @@ class SimpleStorageServiceAsynchronousFileCopyTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceAsynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
+                                                    std::shared_ptr<wrench::Workflow> workflow,
                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -943,10 +944,8 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceAsynchronousFileCopyTestWMS(
-                    this, {compute_service}, {storage_service_1000, storage_service_510},
+                    this, workflow, {compute_service}, {storage_service_1000, storage_service_510},
                     hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -974,10 +973,11 @@ class SimpleStorageServiceSynchronousFileCopyFailuresTestWMS : public wrench::WM
 
 public:
     SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
+                                                           std::shared_ptr<wrench::Workflow> workflow,
                                                            const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                            std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1146,14 +1146,13 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(
-                    this, {
+                    this, workflow,
+                    {
                             compute_service
                     }, {
                             storage_service_100, storage_service_510,
                             storage_service_1000
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1180,10 +1179,11 @@ class SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS : public wrench::W
 
 public:
     SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
+                                                            std::shared_ptr<wrench::Workflow> workflow,
                                                             const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1358,14 +1358,13 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
-                    this, {
+                    this, workflow,
+                    {
                             compute_service
                     }, {
                             storage_service_100, storage_service_510,
                             storage_service_1000
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1392,9 +1391,10 @@ class PartitionsTestWMS : public wrench::WMS {
 
 public:
     PartitionsTestWMS(SimpleStorageServiceFunctionalTest *test,
+                      std::shared_ptr<wrench::Workflow> workflow,
                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1613,11 +1613,10 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new PartitionsTestWMS(
-                    this, {
+                    this, workflow,
+                    {
                             storage_service_1000, storage_service_510
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1648,9 +1647,10 @@ class FileWriteTestWMS : public wrench::WMS {
 
 public:
     FileWriteTestWMS(SimpleStorageServiceFunctionalTest *test,
+                     std::shared_ptr<wrench::Workflow> workflow,
                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1740,11 +1740,9 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FileWriteTestWMS(
-                    this, {
+                    this, workflow, {
                             storage_service_100
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
