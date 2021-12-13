@@ -127,10 +127,11 @@ protected:
 class DAGOfSleepsTestWMS : public wrench::WMS {
 public:
     DAGOfSleepsTestWMS(BareMetalComputeServiceMultiActionTest *test,
+                       std::shared_ptr<wrench::Workflow> workflow,
                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                        std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -271,11 +272,10 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new DAGOfSleepsTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -304,10 +304,11 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
 class NonDAGsTestWMS : public wrench::WMS {
 public:
     NonDAGsTestWMS(BareMetalComputeServiceMultiActionTest *test,
+                   std::shared_ptr<wrench::Workflow> workflow,
                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                    std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -388,11 +389,10 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new NonDAGsTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -421,10 +421,11 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
 class RAMConstraintsAndPrioritiesTestWMS : public wrench::WMS {
 public:
     RAMConstraintsAndPrioritiesTestWMS(BareMetalComputeServiceMultiActionTest *test,
+                                       std::shared_ptr<wrench::Workflow> workflow,
                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -532,11 +533,10 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
     ASSERT_NO_THROW(wms = simulation->add(
             new RAMConstraintsAndPrioritiesTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -565,10 +565,11 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
 class PartialFailureTestWMS : public wrench::WMS {
 public:
     PartialFailureTestWMS(BareMetalComputeServiceMultiActionTest *test,
+                          std::shared_ptr<wrench::Workflow> workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -686,11 +687,10 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new PartialFailureTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -712,10 +712,11 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
 class PartialTerminationTestWMS : public wrench::WMS {
 public:
     PartialTerminationTestWMS(BareMetalComputeServiceMultiActionTest *test,
+                              std::shared_ptr<wrench::Workflow> workflow,
                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                               std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -822,11 +823,10 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new PartialTerminationTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

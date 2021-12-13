@@ -128,11 +128,12 @@ class FileRegistryTestWMS : public wrench::WMS {
 
 public:
     FileRegistryTestWMS(FileRegistryTest *test,
+                        std::shared_ptr<wrench::Workflow> workflow,
                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -307,12 +308,8 @@ void FileRegistryTest::do_FileRegistry_Test() {
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new FileRegistryTestWMS(
-                  this,
+                  this, workflow,
                   {compute_service}, {storage_service1, storage_service2}, file_registry_service, hostname)));
-
-
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
@@ -331,12 +328,13 @@ class FileRegistryLookupEntryTestWMS : public wrench::WMS {
 
 public:
     FileRegistryLookupEntryTestWMS(FileRegistryTest *test,
+                                   std::shared_ptr<wrench::Workflow> workflow,
                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                    const std::set<std::shared_ptr<wrench::NetworkProximityService>> &network_proximity_services,
                                    std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, network_proximity_services, file_registry_service, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, network_proximity_services, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -483,10 +481,8 @@ void FileRegistryTest::do_lookupEntry_Test() {
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   wms = simulation->add(
           new FileRegistryLookupEntryTestWMS(
-                  this,
+                  this, workflow,
                   {}, {storage_service1, storage_service2, storage_service3}, {network_proximity_service}, file_registry_service, host1));
-
-  wms->addWorkflow(workflow);
 
   ASSERT_NO_THROW(simulation->launch());
 

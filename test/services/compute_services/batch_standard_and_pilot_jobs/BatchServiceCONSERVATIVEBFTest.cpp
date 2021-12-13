@@ -86,9 +86,10 @@ class SimpleCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
 public:
     SimpleCONSERVATIVE_BFTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -230,9 +231,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleCONSERVATIVE_BFTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -254,9 +253,10 @@ class LargeCONSERVATIVE_BFTestWMS : public wrench::WMS {
 
 public:
     LargeCONSERVATIVE_BFTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -406,13 +406,9 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_test(int seed) {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new LargeCONSERVATIVE_BFTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -430,9 +426,10 @@ class SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS : public wrench::WMS {
 
 public:
     SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                                                    std::shared_ptr<wrench::Workflow> workflow,
                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -579,9 +576,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BFQueueWaitTimePredi
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleCONSERVATIVE_BFQueueWaitTimePredictionWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -601,9 +596,10 @@ class BatschedBrokenTestWMS : public wrench::WMS {
 
 public:
     BatschedBrokenTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                          std::shared_ptr<wrench::Workflow> workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -749,9 +745,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_BatschedBroken_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BatschedBrokenTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this,  workflow, {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -770,9 +764,10 @@ class SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS : public wrench::WMS {
 
 public:
     SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                                            std::shared_ptr<wrench::Workflow> workflow,
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -924,13 +919,9 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test()
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -948,9 +939,10 @@ class LargeCONSERVATIVE_BF_CORE_LEVELTestWMS : public wrench::WMS {
 
 public:
     LargeCONSERVATIVE_BF_CORE_LEVELTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
+                                           std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -1102,9 +1094,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_LargeCONSERVATIVE_BF_CORE_LEVEL_test(in
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new LargeCONSERVATIVE_BF_CORE_LEVELTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

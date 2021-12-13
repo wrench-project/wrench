@@ -145,10 +145,11 @@ class MemoryManagerChainOfTasksTestWMS : public wrench::WMS {
 public:
     MemoryManagerChainOfTasksTestWMS(
             MemoryManagerTest *test,
+            std::shared_ptr<wrench::Workflow> workflow,
             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -238,11 +239,8 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MemoryManagerChainOfTasksTestWMS(this,
+            new MemoryManagerChainOfTasksTestWMS(this, workflow,
                                                  {compute_service}, {storage_service1}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 

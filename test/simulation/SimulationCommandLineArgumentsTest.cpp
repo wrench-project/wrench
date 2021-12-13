@@ -65,8 +65,9 @@ class SimulationCommandLineArgumentsWMS : public wrench::WMS {
 
 public:
     SimulationCommandLineArgumentsWMS(SimulationCommandLineArgumentsTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -318,9 +319,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     std::string hostname = "DualCoreHost";
-    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, workflow, hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -392,9 +391,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     std::string hostname = "DualCoreHost";
-    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, workflow, hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -449,12 +446,9 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     std::string hostname = "DualCoreHost";
-    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, workflow, hostname));
 
     simulation->launch();
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

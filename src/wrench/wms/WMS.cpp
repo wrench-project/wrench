@@ -27,6 +27,7 @@ namespace wrench {
     /**
      * @brief Constructor:  a WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
+     * @param workflow: a workflow to execute
      * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr then none is used)
      * @param pilot_job_scheduler: a pilot job scheduler implementation (if nullptr then none is used)
      * @param compute_services: a set of compute services available to run jobs (if {} then none is available)
@@ -38,7 +39,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    WMS::WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+    WMS::WMS(std::shared_ptr<Workflow> workflow,
+             std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
              std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
              const std::set<std::shared_ptr<ComputeService>> &compute_services,
              const std::set<std::shared_ptr<StorageService>> &storage_services,
@@ -53,7 +55,10 @@ namespace wrench {
             file_registry_service(file_registry_service),
             standard_job_scheduler(std::move(standard_job_scheduler)),
             pilot_job_scheduler(std::move(pilot_job_scheduler)) {
-        this->workflow = nullptr;
+        if (workflow == nullptr) {
+            throw std::invalid_argument("WMS::WMS(): the workflow argument cannot be nullptr");
+        }
+        this->workflow = workflow;
     }
 
     /**
@@ -74,39 +79,6 @@ namespace wrench {
      */
     void WMS::addStaticOptimization(std::unique_ptr<StaticOptimization> optimization) {
         this->static_optimizations.push_back(std::move(optimization));
-    }
-
-    /**
-     * @brief Check whether the WMS has a deferred start simulation time (likely the
-     *        first call in the main() routine of any WMS
-     *
-     * @throw std::runtime_error
-     */
-    void WMS::checkDeferredStart() {
-        if (S4U_Simulation::getClock() < this->start_time) {
-
-            Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
-                                       new AlarmWMSDeferredStartMessage(0), "wms_start");
-
-            // Wait for a message
-            std::unique_ptr<SimulationMessage> message = nullptr;
-
-            try {
-                message = S4U_Mailbox::getMessage(this->mailbox_name);
-            } catch (std::shared_ptr<NetworkError> &cause) {
-                throw std::runtime_error(cause->toString());
-            }
-
-            if (message == nullptr) {
-                std::runtime_error("Got a NULL message... Likely this means the WMS cannot be started. Aborting!");
-            }
-
-            if (auto msg = dynamic_cast<AlarmWMSDeferredStartMessage*>(message.get())) {
-                // The WMS can be started
-            } else {
-                throw std::runtime_error("WMS::checkDeferredStart(): Unexpected " + message->getName() + " message");
-            }
-        }
     }
 
     /**
@@ -261,43 +233,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Assign a workflow to the WMS
-     * @param workflow: a workflow to execute
-     * @param start_time: the simulated time when the WMS should start executed the workflow (0 if not specified)
-     *
-     * @throw std::invalid_argument
-     */
-    void WMS::addWorkflow(std::shared_ptr<Workflow> workflow, double start_time) {
-
-        if ((workflow == nullptr) || (start_time < 0.0)) {
-            throw std::invalid_argument("WMS::addWorkflow(): Invalid arguments");
-        }
-
-        if (this->workflow) {
-            throw std::invalid_argument("WMS::addWorkflow(): The WMS has already been given a workflow");
-        } else {
-            this->workflow = workflow;
-
-            /**
-             * Set the simulation pointer member variable of the workflow so that the
-             * workflow tasks have access to it for creating SimulationTimestamps
-             */
-//            this->workflow->simulation = this->simulation;
-        }
-        this->start_time = start_time;
-    }
-
-    /**
-     * @brief Get the workflow that was assigned to the WMS
-     *
-     * @return a workflow
-     */
-    std::shared_ptr<Workflow> WMS::getWorkflow() {
-        return this->workflow;
-    }
-
-
-    /**
      * @brief Get the WMS's pilot scheduler
      * 
      * @return the pilot scheduler, or nullptr if none
@@ -358,6 +293,14 @@ namespace wrench {
         }
 
         return data_movement_manager;
+    }
+
+    /**
+     * @brief Return the WMS's workflow
+     * @return a workflow
+     */
+    std::shared_ptr<Workflow> WMS::getWorkflow() {
+        return this->workflow;
     }
 
 };

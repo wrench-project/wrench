@@ -93,10 +93,11 @@ class BatchTraceFileReplayTestWMS : public wrench::WMS {
 
 public:
     BatchTraceFileReplayTestWMS(BatchServiceTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services,
                         {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -212,9 +213,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchTraceFileReplayTestWMS(
-                    this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -237,10 +236,11 @@ class BatchTraceFileReplayTestWithFailedJobWMS : public wrench::WMS {
 
 public:
     BatchTraceFileReplayTestWithFailedJobWMS(BatchServiceTest *test,
+                                             std::shared_ptr<wrench::Workflow> workflow,
                                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services,
                         {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -300,9 +300,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchTraceFileReplayTestWithFailedJobWMS(
-                    this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -325,10 +323,11 @@ class WorkloadTraceFileSWFBatchServiceShutdownTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFBatchServiceShutdownTestWMS(BatchServiceTest *test,
+                                                    std::shared_ptr<wrench::Workflow> workflow,
                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -401,9 +400,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWFBatchServiceShutdown_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFBatchServiceShutdownTestWMS(
-            this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -425,10 +422,11 @@ class WorkloadTraceFileSWFTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFTestWMS(BatchServiceTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -765,9 +763,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
-            this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -806,10 +802,11 @@ class WorkloadTraceFileSWFRequestedTimesTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFRequestedTimesTestWMS(BatchServiceTest *test,
+                                              std::shared_ptr<wrench::Workflow> workflow,
                                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -943,9 +940,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
-            this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -970,10 +965,11 @@ class WorkloadTraceFileSWFDifferentTimeOriginTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileSWFDifferentTimeOriginTestWMS(BatchServiceTest *test,
+                                                   std::shared_ptr<wrench::Workflow> workflow,
                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -1108,9 +1104,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
-            this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1158,10 +1152,11 @@ class WorkloadTraceFileJSONTestWMS : public wrench::WMS {
 
 public:
     WorkloadTraceFileJSONTestWMS(BatchServiceTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -1686,9 +1681,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
-            this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1711,10 +1704,11 @@ class GetQueueStateTestWMS : public wrench::WMS {
 
 public:
     GetQueueStateTestWMS(BatchServiceTest *test,
+                         std::shared_ptr<wrench::Workflow> workflow,
                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -1837,9 +1831,7 @@ void BatchServiceTest::do_GetQueueState_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(
-            this, {compute_service}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

@@ -147,11 +147,12 @@ class SimpleStorageServiceConcurrentFileCopiesTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceConcurrentFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
+                                                    std::shared_ptr<wrench::Workflow> workflow,
                                                     const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname,
                                                     double buffer_size) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
         this->buffer_size = buffer_size;
     }
@@ -286,10 +287,8 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceConcurrentFileCopiesTestWMS(
-                    this, {compute_service}, {storage_service_1, storage_service_2},
+                    this, this->workflow, {compute_service}, {storage_service_1, storage_service_2},
                     "WMSHost", buffer_size)));
-
-    wms->addWorkflow(this->workflow);
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService("WMSHost"));
@@ -318,9 +317,10 @@ class SimpleStorageServiceFileReadTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceFileReadTestWMS(SimpleStorageServicePerformanceTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname, double buffer_size) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
         this->buffer_size = buffer_size;
     }
@@ -398,10 +398,8 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceFileReadTestWMS(
-                    this, {storage_service_1},
+                    this, this->workflow, {storage_service_1},
                     "WMSHost", buffer_size)));
-
-    wms->addWorkflow(this->workflow);
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService("WMSHost"));

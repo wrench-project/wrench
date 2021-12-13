@@ -84,9 +84,10 @@ class SimpleOutputCSVFileTestWMS : public wrench::WMS {
 
 public:
     SimpleOutputCSVFileTestWMS(BatchServiceOutputCSVFileTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
     }
@@ -224,9 +225,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleOutputCSVFileTestWMS(
-                  this,  {compute_service}, hostname)));
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                  this, workflow,  {compute_service}, hostname)));
 
   ASSERT_NO_THROW(simulation->launch());
 

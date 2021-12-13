@@ -124,10 +124,11 @@ protected:
 class DAGOfJobsTestWMS : public wrench::WMS {
 public:
     DAGOfJobsTestWMS(BareMetalComputeServiceActionMultiJobTest *test,
+                     std::shared_ptr<wrench::Workflow> workflow,
                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                      std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -237,11 +238,10 @@ void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new DAGOfJobsTestWMS(
                     this,
+                    workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

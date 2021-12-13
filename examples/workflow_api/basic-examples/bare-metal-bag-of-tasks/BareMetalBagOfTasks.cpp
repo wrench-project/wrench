@@ -123,10 +123,7 @@ int main(int argc, char **argv) {
      * for executing the workflow-> */
 
     auto wms = simulation->add(
-            new wrench::TwoTasksAtATimeWMS({baremetal_service}, {storage_service}, "WMSHost"));
-
-    /* Associate the workflow to the WMS */
-    wms->addWorkflow(workflow);
+            new wrench::TwoTasksAtATimeWMS(workflow, {baremetal_service}, {storage_service}, "WMSHost"));
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
@@ -163,6 +160,9 @@ int main(int argc, char **argv) {
 
     /* Dump it all to a JSON file */
     simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/wrench.json");
+
+    /* Free up memory */
+    workflow->clear();
 
     return 0;
 }

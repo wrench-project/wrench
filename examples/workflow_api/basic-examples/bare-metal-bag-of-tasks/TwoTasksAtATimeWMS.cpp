@@ -29,13 +29,16 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
+     * @param workflow: the workflow
      * @param compute_services: a set of compute services available to run tasks
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
+    TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(std::shared_ptr<Workflow> workflow,
+                                           const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                            const std::set<std::shared_ptr<StorageService>> &storage_services,
                                            const std::string &hostname) : WMS(
+            workflow,
             nullptr, nullptr,
             compute_services,
             storage_services,
@@ -59,8 +62,8 @@ namespace wrench {
         WRENCH_INFO("WMS starting on host %s at time %lf",
                     Simulation::getHostName().c_str(),
                     Simulation::getCurrentSimulatedDate());
-        
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
@@ -163,7 +166,7 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         WRENCH_INFO("Notified that a standard job has failed (failure cause: %s)",
-                event->failure_cause->toString().c_str());
+                    event->failure_cause->toString().c_str());
         /* Retrieve the job's tasks */
         WRENCH_INFO("As a result, the following tasks have failed:");
         for (auto const &task : job->getTasks()) {

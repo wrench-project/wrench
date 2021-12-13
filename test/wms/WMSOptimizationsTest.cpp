@@ -109,10 +109,11 @@ class StaticOptimizationsTestWMS : public wrench::WMS {
 
 public:
     StaticOptimizationsTestWMS(WMSOptimizationsTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
       this->test = test;
     }
@@ -197,9 +198,8 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
   std::shared_ptr<wrench::Workflow> workflow = this->createWorkflow();
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
-          new StaticOptimizationsTestWMS(this, {compute_service}, {storage_service}, hostname)));
+          new StaticOptimizationsTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
   ASSERT_NO_THROW(wms->addStaticOptimization(std::unique_ptr<wrench::StaticOptimization>(new TaskClustering())));
 
   // Create a file registry
@@ -245,10 +245,11 @@ class DynamicOptimizationsTestWMS : public wrench::WMS {
 
 public:
     DynamicOptimizationsTestWMS(WMSOptimizationsTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -335,9 +336,8 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
   std::shared_ptr<wrench::Workflow> workflow = this->createWorkflow();
   std::shared_ptr<wrench::WMS> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
-          new DynamicOptimizationsTestWMS(this, {compute_service}, {storage_service}, hostname)));
+          new DynamicOptimizationsTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
   ASSERT_NO_THROW(wms->addDynamicOptimization(std::unique_ptr<wrench::DynamicOptimization>(new TaskParallelization())));
 
   // Create a file registry

@@ -91,9 +91,10 @@ class NetworkProxLinkFailuresTestWMS : public wrench::WMS {
 
 public:
     NetworkProxLinkFailuresTestWMS(NetworkProximityLinkFailuresTest *test,
+                                   std::shared_ptr<wrench::Workflow> workflow,
                                    std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {},
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {},
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -173,17 +174,12 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
                 std::shared_ptr<wrench::WMS> wms = nullptr;;
                 ASSERT_NO_THROW(wms = simulation->add(
                         new NetworkProxLinkFailuresTestWMS(this,
+                                                           workflow,
                                                            (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
                                                            stable_hostname)));
 
-                wms->addWorkflow(this->workflow, 0.0);
-
-
-
                 // Running a "run a single task1" simulation
                 ASSERT_NO_THROW(simulation->launch());
-
-
 
                 for (int i=0; i < argc; i++)
      free(argv[i]);

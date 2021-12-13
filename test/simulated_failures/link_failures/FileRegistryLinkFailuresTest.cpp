@@ -93,8 +93,9 @@ class FileRegistryLinkFailuresTestWMS : public wrench::WMS {
 
 public:
     FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -198,9 +199,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FileRegistryLinkFailuresTestWMS(
-                    this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

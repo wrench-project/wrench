@@ -156,9 +156,10 @@ class SimpleScratchSpaceTestWMS : public wrench::WMS {
 
 public:
     SimpleScratchSpaceTestWMS(ScratchSpaceTest *test,
+                              std::shared_ptr<wrench::Workflow> workflow,
                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -259,10 +260,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleScratchSpaceTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 1000.0);
@@ -292,9 +290,10 @@ class SimpleScratchSpaceFailureTestWMS : public wrench::WMS {
 
 public:
     SimpleScratchSpaceFailureTestWMS(ScratchSpaceTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -486,10 +485,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleScratchSpaceFailureTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file1 = this->workflow->addFile("input_file1", 10000.0);
@@ -520,9 +516,10 @@ class PilotJobScratchSpaceTestWMS : public wrench::WMS {
 
 public:
     PilotJobScratchSpaceTestWMS(ScratchSpaceTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -698,10 +695,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new PilotJobScratchSpaceTestWMS(
-                    this, {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
+                    this, workflow, {compute_service}, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file1 = this->workflow->addFile("input_file1", 1000.0);
@@ -735,10 +729,11 @@ class ScratchSpaceRaceConditionTestWMS : public wrench::WMS {
 
 public:
     ScratchSpaceRaceConditionTestWMS(ScratchSpaceTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                      std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -842,11 +837,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ScratchSpaceRaceConditionTestWMS(this, {compute_service}, {storage_service1}, hostname)));
-
-
-//  std::shared_ptr<wrench::Workflow> workflow = wrench::Workflow::createWorkflow()
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ScratchSpaceRaceConditionTestWMS(this, this->workflow, {compute_service}, {storage_service1}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -875,10 +866,11 @@ class ScratchNonScratchPartitionsTestWMS : public wrench::WMS {
 
 public:
     ScratchNonScratchPartitionsTestWMS(ScratchSpaceTest *test,
+                                       std::shared_ptr<wrench::Workflow> workflow,
                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1064,11 +1056,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ScratchNonScratchPartitionsTestWMS(this, {compute_service}, {storage_service1}, hostname)));
-
-
-//  auto workflow = wrench::Workflow::createWorkflow()
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new ScratchNonScratchPartitionsTestWMS(this, workflow, {compute_service}, {storage_service1}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

@@ -26,10 +26,11 @@ namespace wrench {
     public:
         // Constructor
         NFSPipelineWMS(
-                  const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                  const std::shared_ptr<StorageService> &client_storage_service,
-                  const std::shared_ptr<StorageService> &server_storage_service,
-                  const std::string &hostname);
+                std::shared_ptr<Workflow> workflow,
+                const std::set<std::shared_ptr<ComputeService>> &compute_services,
+                const std::shared_ptr<StorageService> &client_storage_service,
+                const std::shared_ptr<StorageService> &server_storage_service,
+                const std::string &hostname);
 
     protected:
 

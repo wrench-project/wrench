@@ -128,8 +128,9 @@ class ActionExecutionServiceOneActionSuccessTestWMS : public wrench::WMS {
 
 public:
     ActionExecutionServiceOneActionSuccessTestWMS(ActionExecutionServiceTest *test,
-                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                  std::shared_ptr<wrench::Workflow> workflow,
+                                                  std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -147,7 +148,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                             {}, {}));
+                                                   {}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
@@ -229,9 +230,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceOneActionSuccessTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -252,8 +251,9 @@ class ActionExecutionServiceOneActionTerminateTestWMS : public wrench::WMS {
 
 public:
     ActionExecutionServiceOneActionTerminateTestWMS(ActionExecutionServiceTest *test,
-                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                    std::shared_ptr<wrench::Workflow> workflow,
+                                                    std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -271,7 +271,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            {}, {}));
+                                                   {}, {}));
         action_execution_service->setParentService(this->getSharedPtr<Service>());
 
         // Start it
@@ -352,9 +352,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceOneActionTerminateTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -376,8 +374,9 @@ class ActionExecutionServiceOneActionCrashRestartTestWMS : public wrench::WMS {
 
 public:
     ActionExecutionServiceOneActionCrashRestartTestWMS(ActionExecutionServiceTest *test,
-                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                       std::shared_ptr<wrench::Workflow> workflow,
+                                                       std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -395,10 +394,10 @@ private:
         compute_resources["Host3"] = std::make_tuple(4, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, nullptr,
-                                            {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
+                                                   {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
-        
+
         // Start it
         action_execution_service->setSimulation(this->simulation);
         action_execution_service->start(action_execution_service, true, false);
@@ -437,7 +436,7 @@ private:
         if (!msg) {
             throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
-        
+
         // Is the start-date sensible?
         if (action->getStartDate() < 12.0 or action->getStartDate() > 12.0) {
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
@@ -523,9 +522,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -547,8 +544,9 @@ class ActionExecutionServiceOneActionCrashNoRestartTestWMS : public wrench::WMS 
 
 public:
     ActionExecutionServiceOneActionCrashNoRestartTestWMS(ActionExecutionServiceTest *test,
-                                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                         std::shared_ptr<wrench::Workflow> workflow,
+                                                         std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -566,10 +564,10 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources, this->getSharedPtr<Service>(),
-                                            {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
+                                                   {{wrench::ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}, {}));
 
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
-        
+
         // Start it
         action_execution_service->setSimulation(this->simulation);
         action_execution_service->start(action_execution_service, true, false);
@@ -654,9 +652,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -678,8 +674,9 @@ class ActionExecutionServiceOneActionFailureTestWMS : public wrench::WMS {
 
 public:
     ActionExecutionServiceOneActionFailureTestWMS(ActionExecutionServiceTest *test,
-                                                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                  std::shared_ptr<wrench::Workflow> workflow,
+                                                  std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -697,7 +694,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            {}, {}));
+                                                   {}, {}));
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
@@ -789,9 +786,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceOneActionFailureTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -813,8 +808,9 @@ class ActionExecutionServiceOneActionNotEnoughResourcesTestWMS : public wrench::
 
 public:
     ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(ActionExecutionServiceTest *test,
-                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                             std::shared_ptr<wrench::Workflow> workflow,
+                                                             std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -832,7 +828,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            {}, {}));
+                                                   {}, {}));
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
@@ -852,7 +848,7 @@ private:
             throw std::runtime_error("Should not have been able to submit action 1");
         } catch (wrench::ExecutionException &e) {
             if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
-               throw std::runtime_error("Unexpected failure cause");
+                throw std::runtime_error("Unexpected failure cause");
             }
         }
         try {
@@ -900,9 +896,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -923,8 +917,9 @@ class ActionExecutionServiceThreeActionsInSequenceTestWMS : public wrench::WMS {
 
 public:
     ActionExecutionServiceThreeActionsInSequenceTestWMS(ActionExecutionServiceTest *test,
-                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+                                                        std::shared_ptr<wrench::Workflow> workflow,
+                                                        std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -942,7 +937,7 @@ private:
         compute_resources["Host3"] = std::make_tuple(3, 100.0);
         auto action_execution_service = std::shared_ptr<wrench::ActionExecutionService>(
                 new wrench::ActionExecutionService("Host2", compute_resources,
-                                            {}, {}));
+                                                   {}, {}));
         action_execution_service->setParentService(this->getSharedPtr<wrench::Service>());
 
         // Start it
@@ -1069,9 +1064,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

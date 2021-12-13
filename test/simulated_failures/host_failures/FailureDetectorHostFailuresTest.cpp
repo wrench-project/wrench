@@ -87,8 +87,9 @@ class FailureDetectorForSleeperTestWMS : public wrench::WMS {
 
 public:
     FailureDetectorForSleeperTestWMS(FailureDetectorHostFailuresTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -191,9 +192,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorForSleeperTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new FailureDetectorForSleeperTestWMS(this, workflow, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -213,8 +212,9 @@ class FailureDetectorForComputerTestWMS : public wrench::WMS {
 
 public:
     FailureDetectorForComputerTestWMS(FailureDetectorHostFailuresTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                      std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -313,9 +313,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorForComputerTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new FailureDetectorForComputerTestWMS(this, workflow, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

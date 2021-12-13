@@ -102,21 +102,25 @@ class DeferredWMSStartTestWMS : public wrench::WMS {
 
 public:
     DeferredWMSStartTestWMS(MultipleWMSTest *test,
+                            std::shared_ptr<wrench::Workflow> workflow,
+                            double sleep_time,
                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
         this->test = test;
+        this->sleep_time = sleep_time;
     }
 
 private:
 
     MultipleWMSTest *test;
+    double sleep_time;
 
     int main() {
         // check for deferred start
-        checkDeferredStart();
+        wrench::Simulation::sleep(this->sleep_time);
 
 
         // Create a data movement manager
@@ -205,9 +209,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     auto workflow = this->createWorkflow("wf_");
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
+            new DeferredWMSStartTestWMS(this, workflow, 100, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -259,17 +261,13 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     auto workflow = this->createWorkflow("wf1_");
     std::shared_ptr<wrench::WMS> wms1 = nullptr;
     ASSERT_NO_THROW(wms1 = simulation->add(
-            new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms1->addWorkflow(workflow, 100));
+            new DeferredWMSStartTestWMS(this, workflow, 100, {compute_service}, {storage_service}, hostname)));
 
     // Create a second WMS
     auto workflow2 = this->createWorkflow("wf_2");
     std::shared_ptr<wrench::WMS> wms2 = nullptr;
     ASSERT_NO_THROW(wms2 = simulation->add(
-            new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms2->addWorkflow(workflow2, 10000));
+            new DeferredWMSStartTestWMS(this, workflow2, 10000, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(

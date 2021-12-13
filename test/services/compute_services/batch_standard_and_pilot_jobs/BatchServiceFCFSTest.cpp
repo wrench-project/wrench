@@ -81,9 +81,10 @@ class SimpleFCFSTestWMS : public wrench::WMS {
 
 public:
     SimpleFCFSTestWMS(BatchServiceFCFSTest *test,
+                      std::shared_ptr<wrench::Workflow> workflow,
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -232,9 +233,7 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleFCFSTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -256,9 +255,10 @@ class SimpleFCFSQueueWaitTimePredictionWMS : public wrench::WMS {
 
 public:
     SimpleFCFSQueueWaitTimePredictionWMS(BatchServiceFCFSTest *test,
+                                         std::shared_ptr<wrench::Workflow> workflow,
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -419,9 +419,7 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleFCFSQueueWaitTimePredictionWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -441,9 +439,10 @@ class BrokenQueueWaitTimePredictionWMS : public wrench::WMS {
 
 public:
     BrokenQueueWaitTimePredictionWMS(BatchServiceFCFSTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -528,9 +527,7 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BrokenQueueWaitTimePredictionWMS(
-                    this,  {compute_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow,  {compute_service}, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

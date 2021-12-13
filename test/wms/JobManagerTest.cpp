@@ -122,8 +122,9 @@ class JobManagerConstructorTestWMS : public wrench::WMS {
 
 public:
     JobManagerConstructorTestWMS(JobManagerTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname) :
-            wrench::WMS(std::unique_ptr<BogusStandardJobScheduler>(new BogusStandardJobScheduler()),
+            wrench::WMS(workflow, std::unique_ptr<BogusStandardJobScheduler>(new BogusStandardJobScheduler()),
                         std::unique_ptr<BogusPilotJobScheduler>(new BogusPilotJobScheduler()),
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -170,9 +171,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerConstructorTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -192,8 +191,9 @@ class JobManagerCreateJobTestWMS : public wrench::WMS {
 
 public:
     JobManagerCreateJobTestWMS(JobManagerTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -348,9 +348,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerCreateJobTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -370,8 +368,9 @@ class JobManagerSubmitJobTestWMS : public wrench::WMS {
 
 public:
     JobManagerSubmitJobTestWMS(JobManagerTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -437,14 +436,9 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerSubmitJobTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
+                    this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -460,9 +454,10 @@ class JobManagerResubmitJobTestWMS : public wrench::WMS {
 
 public:
     JobManagerResubmitJobTestWMS(JobManagerTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname,
                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         compute_services, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -571,19 +566,14 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerResubmitJobTestWMS(
-                    this, "Host1", {cs1, cs2})));
+                    this, workflow, "Host1", {cs1, cs2})));
 
     // Add tasks to the workflow
     std::shared_ptr<wrench::WorkflowTask> task1 = workflow->addTask("task1", 10.0, 10, 10, 0.0);
     std::shared_ptr<wrench::WorkflowTask> task2 = workflow->addTask("task2", 10.0, 10, 10, 0.0);
     workflow->addControlDependency(task1, task2);
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -600,9 +590,10 @@ class JobManagerTerminateJobTestWMS : public wrench::WMS {
 
 public:
     JobManagerTerminateJobTestWMS(JobManagerTest *test,
+                                  std::shared_ptr<wrench::Workflow> workflow,
                                   std::string hostname,
                                   std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         compute_services, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -716,9 +707,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerTerminateJobTestWMS(
-                    this, "Host1", {cs})));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, "Host1", {cs})));
 
     ASSERT_NO_THROW(simulation->launch());
 

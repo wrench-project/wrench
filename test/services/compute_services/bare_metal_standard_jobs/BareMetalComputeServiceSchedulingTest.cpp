@@ -89,11 +89,6 @@ protected:
     std::shared_ptr<wrench::Workflow> workflow;
 };
 
-
-
-
-
-
 /**********************************************************************/
 /**  RAM PRESSURE TEST                                               **/
 /**********************************************************************/
@@ -102,10 +97,11 @@ class RAMPressureTestWMS : public wrench::WMS {
 
 public:
     RAMPressureTestWMS(BareMetalComputeServiceTestScheduling *test,
+                       std::shared_ptr<wrench::Workflow> workflow,
                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -226,10 +222,9 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new RAMPressureTestWMS(
-                    this, compute_services, {}, "Host1")));
+                    this, workflow, compute_services, {}, "Host1")));
 
     workflow->clear();
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -250,10 +245,11 @@ class LoadBalancing1TestWMS : public wrench::WMS {
 
 public:
     LoadBalancing1TestWMS(BareMetalComputeServiceTestScheduling *test,
+                          std::shared_ptr<wrench::Workflow> workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -361,10 +357,9 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new LoadBalancing1TestWMS(
-                    this, compute_services, {}, "Host1")));
+                    this, workflow, compute_services, {}, "Host1")));
 
     workflow->clear();
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -386,10 +381,11 @@ class LoadBalancing2TestWMS : public wrench::WMS {
 
 public:
     LoadBalancing2TestWMS(BareMetalComputeServiceTestScheduling *test,
+                          std::shared_ptr<wrench::Workflow> workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -497,9 +493,7 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new LoadBalancing2TestWMS(
-                    this, compute_services, {}, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, compute_services, {}, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

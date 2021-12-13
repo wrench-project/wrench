@@ -33,10 +33,12 @@ namespace wrench {
      * @param server_storage_services: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    NFSPipelineWMS::NFSPipelineWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
+    NFSPipelineWMS::NFSPipelineWMS(std::shared_ptr<Workflow> workflow,
+                                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                    const std::shared_ptr<StorageService> &client_storage_service,
                                    const std::shared_ptr<StorageService> &server_storage_service,
                                    const std::string &hostname) : WMS(
+            workflow,
             nullptr, nullptr,
             compute_services,
             {client_storage_service, server_storage_service},

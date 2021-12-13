@@ -56,8 +56,9 @@ class SimulationLoggingWMS : public wrench::WMS {
 
 public:
     SimulationLoggingWMS(SimulationLoggingTest *test,
+                         std::shared_ptr<wrench::Workflow> workflow,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -107,8 +108,7 @@ void SimulationLoggingTest::do_logging_test() {
 
     std::string hostname = "DualCoreHost";
 
-    auto wms = simulation->add(new SimulationLoggingWMS(this, hostname));
-    wms->addWorkflow(wrench::Workflow::createWorkflow(), 0);
+    auto wms = simulation->add(new SimulationLoggingWMS(this, wrench::Workflow::createWorkflow(), hostname));
 
     simulation->launch();
 

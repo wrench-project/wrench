@@ -25,11 +25,13 @@ namespace wrench {
      * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to start the WMS
      */
-    SimpleWMS::SimpleWMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+    SimpleWMS::SimpleWMS(std::shared_ptr<Workflow> workflow,
+                         std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
                          std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
                          const std::set<std::shared_ptr<ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<StorageService>> &storage_services,
                          const std::string &hostname) : WMS(
+            workflow,
             std::move(standard_job_scheduler),
             std::move(pilot_job_scheduler),
             compute_services,
@@ -49,9 +51,6 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
       
-      // Check whether the WMS has a deferred start time
-      checkDeferredStart();
-
       WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
 

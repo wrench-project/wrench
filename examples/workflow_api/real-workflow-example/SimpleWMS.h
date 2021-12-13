@@ -22,7 +22,8 @@ namespace wrench {
     class SimpleWMS : public WMS {
 
     public:
-        SimpleWMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+        SimpleWMS(std::shared_ptr<Workflow> workflow,
+                  std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
                   std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                   const std::set<std::shared_ptr<StorageService>> &storage_services,

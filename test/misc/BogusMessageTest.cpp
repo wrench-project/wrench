@@ -126,8 +126,9 @@ class BogusMessageTestWMS : public wrench::WMS {
 
 public:
     BogusMessageTestWMS(BogusMessageTest *test,
+                        std::shared_ptr<wrench::Workflow> workflow,
                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -149,8 +150,8 @@ private:
 class NoopWMS : public wrench::WMS {
 
 public:
-    NoopWMS(BogusMessageTest *test, std::string hostname, bool create_data_movement_manager) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+    NoopWMS(BogusMessageTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string hostname, bool create_data_movement_manager) :
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->create_data_movement_manager = create_data_movement_manager;
     }
@@ -220,13 +221,11 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
         this->service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
         this->dst_mailbox = this->service->mailbox_name;
     } else if (service_type == "wms") {
-        auto wms = new NoopWMS(this, hostname, false);
-        wms->addWorkflow(workflow);
+        auto wms = new NoopWMS(this, workflow, hostname, false);
         this->service = simulation->add(wms);
         this->dst_mailbox = wms->mailbox_name;
     } else if (service_type == "data_movement_manager") {
-        auto wms = new NoopWMS(this, hostname, true);
-        wms->addWorkflow(workflow);
+        auto wms = new NoopWMS(this, workflow, hostname, true);
         this->service = simulation->add(wms);
         this->dst_mailbox = ""; // Will be set by the WMS on DMM is created
     }
@@ -234,9 +233,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     // Create the Bogus Message WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BogusMessageTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new BogusMessageTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

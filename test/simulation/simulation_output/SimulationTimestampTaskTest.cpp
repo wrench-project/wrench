@@ -113,10 +113,11 @@ protected:
 class SimulationTimestampTaskBasicTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskBasicTestWMS(SimulationTimestampTaskTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -196,10 +197,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskBasicTestWMS(
-            this, {compute_service}, {storage_service}, wms_host
+            this, workflow, {compute_service}, {storage_service}, wms_host
     )));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -305,10 +304,11 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 class SimulationTimestampTaskMultipleTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskMultipleTestWMS(SimulationTimestampTaskTest *test,
+                                           std::shared_ptr<wrench::Workflow> workflow,
                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                            std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -391,10 +391,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
-            this, {compute_service}, {storage_service, backup_storage_service}, wms_host
+            this, workflow, {compute_service}, {storage_service, backup_storage_service}, wms_host
     )));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -522,10 +520,11 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 class SimulationTimestampTaskTerminateAndFailTestWMS : public wrench::WMS {
 public:
     SimulationTimestampTaskTerminateAndFailTestWMS(SimulationTimestampTaskTest *test,
+                                                   std::shared_ptr<wrench::Workflow> workflow,
                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                    std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -585,10 +584,8 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
 
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskTerminateAndFailTestWMS(
-            this, {compute_service}, {storage_service}, wms_host
+            this, workflow, {compute_service}, {storage_service}, wms_host
     )));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 

@@ -26,6 +26,7 @@ namespace wrench {
     public:
         // Constructor
         OneTaskAtATimeWMS(
+                  std::shared_ptr<Workflow> workflow,
                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
                   const std::set<std::shared_ptr<StorageService>> &storage_services,
                   const std::string &hostname);

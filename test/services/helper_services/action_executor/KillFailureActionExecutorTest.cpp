@@ -138,11 +138,12 @@ class KillFailActionExecutorTestWMS : public wrench::WMS {
 
 public:
     KillFailActionExecutorTestWMS(KillFailActionExecutorTest *test,
+                                  std::shared_ptr<wrench::Workflow> workflow,
                                   std::string hostname,
                                   double sleep_time,
                                   bool kill,
                                   std::string action_type) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->sleep_time = sleep_time;
         this->kill =kill;
@@ -361,9 +362,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new KillFailActionExecutorTestWMS(this, "Host1", sleep_time, kill, action_type)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new KillFailActionExecutorTestWMS(this, this->workflow, "Host1", sleep_time, kill, action_type)));
 
     ASSERT_NO_THROW(simulation->launch());
 

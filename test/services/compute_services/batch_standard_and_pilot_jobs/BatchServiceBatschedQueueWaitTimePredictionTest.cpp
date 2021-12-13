@@ -140,11 +140,12 @@ class BatchJobBrokenEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobBrokenEstimateWaitingTimeTestWMS(BatchServiceBatschedQueueWaitTimePredictionTest *test,
-                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
-                        hostname, "test") {
+                                             std::shared_ptr<wrench::Workflow> workflow,
+    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+            std::string hostname) :
+    wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+    hostname, "test") {
         this->test = test;
     }
 
@@ -177,7 +178,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
@@ -287,12 +288,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
-            this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-//  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-//          new wrench::FileRegistryService(hostname));
+            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -324,10 +320,11 @@ class BatchJobBasicEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobBasicEstimateWaitingTimeTestWMS(BatchServiceBatschedQueueWaitTimePredictionTest *test,
+                                            std::shared_ptr<wrench::Workflow> workflow,
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -362,7 +359,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
@@ -464,9 +461,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobBasicEstimateWaitingTimeTestWMS(
-            this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -499,10 +494,11 @@ class BatchJobEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobEstimateWaitingTimeTestWMS(BatchServiceBatschedQueueWaitTimePredictionTest *test,
+                                       std::shared_ptr<wrench::Workflow> workflow,
                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -537,7 +533,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
@@ -602,7 +598,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = "4";
@@ -694,13 +690,11 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobEstimateWaitingTimeTestWMS(
-            this, {compute_service}, {storage_service1, storage_service2}, hostname)));
+            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
     std::shared_ptr<wrench::DataFile> output_file = this->workflow->addFile("output_file", 20000.0);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -726,10 +720,11 @@ class BatchJobLittleComplexEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobLittleComplexEstimateWaitingTimeTestWMS(BatchServiceBatschedQueueWaitTimePredictionTest *test,
+                                                    std::shared_ptr<wrench::Workflow> workflow,
                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -764,7 +759,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
 
             std::map<std::string, std::string> batch_job_args;
@@ -799,7 +794,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "2";
@@ -831,7 +826,7 @@ private:
                             wrench::FileLocation::LOCATION(this->test->storage_service2))},
                     {},
                     {std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>(this->getWorkflow()->getFileByID("input_file"),
-                                                                                                 wrench::FileLocation::LOCATION(this->test->storage_service2))});
+                                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service2))});
 
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "4";
@@ -965,9 +960,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobLittleComplexEstimateWaitingTimeTestWMS(
-            this, {compute_service}, {storage_service1, storage_service2}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

@@ -66,8 +66,9 @@ class NodeAvailabilityTimelineTestWMS : public wrench::WMS {
 
 public:
     NodeAvailabilityTimelineTestWMS(
+            std::shared_ptr<wrench::Workflow> workflow,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
     }
 
@@ -134,9 +135,7 @@ void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test(
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new NodeAvailabilityTimelineTestWMS(hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new NodeAvailabilityTimelineTestWMS(workflow, hostname)));
 
     simulation->launch();
 
@@ -156,8 +155,9 @@ class CoreAvailabilityTimelineTestWMS : public wrench::WMS {
 
 public:
     CoreAvailabilityTimelineTestWMS(
+            std::shared_ptr<wrench::Workflow> workflow,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
     }
 
@@ -222,9 +222,7 @@ void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test(
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CoreAvailabilityTimelineTestWMS(hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new CoreAvailabilityTimelineTestWMS(workflow, hostname)));
 
     simulation->launch();
 

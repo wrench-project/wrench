@@ -28,8 +28,9 @@ namespace wrench {
      * @param hostname string containing the name of the host on which this service runs
      */
     SimulationController::SimulationController(
+            std::shared_ptr<Workflow> workflow,
             const std::string &hostname, int sleep_us) :
-            WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "SimulationController"), sleep_us(sleep_us) {}
+            WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "SimulationController"), sleep_us(sleep_us) {}
 
     /**
      * @brief Simulation execution_controller's main method

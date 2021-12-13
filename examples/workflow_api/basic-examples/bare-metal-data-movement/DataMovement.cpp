@@ -106,12 +106,8 @@ int main(int argc, char **argv) {
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
      * for executing the workflow-> */
-
     auto wms = simulation->add(
-            new wrench::DataMovementWMS({baremetal_service}, {storage_service1, storage_service2}, "WMSHost"));
-
-    /* Associate the workflow to the WMS */
-    wms->addWorkflow(workflow);
+            new wrench::DataMovementWMS(workflow, {baremetal_service}, {storage_service1, storage_service2}, "WMSHost"));
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that
