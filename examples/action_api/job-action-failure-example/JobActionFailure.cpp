@@ -8,8 +8,8 @@
  */
 
 /**
- ** This simulator simulates the execution of three multi-action jobs,
- ** where job3 depends on job 2
+ ** This simulator simulates the execution of a multi-action job, where some of the
+ ** actions experience failures.
  **
  ** The compute platform comprises 6 hosts hosts, UserHost, StorageHost1, StorageHost2, ComputeHost1,
  ** ComputeHost2, CloudHeadHost, and CloudComputeHost.
@@ -21,19 +21,19 @@
  **
  **
  ** Example invocation of the simulator with no logging:
- **    ./wrench-example-multi-action-multi-job ./four_hosts.xml
+ **    ./wrench-example-job-action-failure ./four_hosts.xml
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-multi-action-multi-job ./four_hosts.xml --log=custom_controller.threshold=info
+ **    ./wrench-example-job-action-failure ./four_hosts.xml --log=custom_wms.threshold=info
  **
  ** Example invocation of the simulator with full logging:
- **    ./wrench-example-multi-action-multi-job ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-job-action-failure ./four_hosts.xml --wrench-full-log
  **/
 
 #include <iostream>
 #include <wrench.h>
 
-#include "MultiActionMultiJobController.h" // Controller implementation
+#include "JobActionFailureController.h" // Controller implementation
 
 /**
  * @brief The Simulator's main function
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation->add(
-            new wrench::MultiActionMultiJobController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
+            new wrench::JobActionFailureController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
 
     /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
