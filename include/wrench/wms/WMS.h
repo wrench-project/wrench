@@ -45,14 +45,14 @@ namespace wrench {
     class WMS : public ExecutionController {
 
     public:
-        void addWorkflow(std::shared_ptr<Workflow> workflow, double start_time = 0);
-        std::shared_ptr<Workflow> getWorkflow();
         PilotJobScheduler *getPilotJobScheduler();
         StandardJobScheduler *getStandardJobScheduler();
 
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
+
+        std::shared_ptr<Workflow> getWorkflow();
 
 
     protected:
@@ -61,7 +61,8 @@ namespace wrench {
         /** \cond DEVELOPER */
         /***********************/
 
-        WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+        WMS(std::shared_ptr<Workflow> workflow,
+            std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
             std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
             const std::set<std::shared_ptr<ComputeService>> &compute_services,
             const std::set<std::shared_ptr<StorageService>> &storage_services,
@@ -70,8 +71,6 @@ namespace wrench {
             const std::string &hostname,
             const std::string suffix);
 
-
-        void checkDeferredStart();
 
         void runDynamicOptimizations();
 
@@ -128,6 +127,9 @@ namespace wrench {
         std::shared_ptr<JobManager> createJobManager() override;
         std::shared_ptr<DataMovementManager> createDataMovementManager() override;
 
+        /** @brief The workflow to execute */
+        std::shared_ptr<Workflow> workflow;
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -141,8 +143,7 @@ namespace wrench {
         friend class DataMovementManager;
         friend class JobManager;
 
-        /** @brief The workflow to execute */
-        std::shared_ptr<Workflow> workflow;
+
         /** @brief the WMS simulated start time */
         double start_time;
         /** @brief List of available compute services */

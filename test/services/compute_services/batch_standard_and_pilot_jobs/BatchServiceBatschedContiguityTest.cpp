@@ -78,10 +78,11 @@ class BatchJobContiguousAllocationTestWMS : public wrench::WMS {
 
 public:
     BatchJobContiguousAllocationTestWMS(BatchServiceBatschedContiguityTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
         this->test = test;
     }
@@ -265,9 +266,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
-            this, {}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            this, workflow, {}, {}, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

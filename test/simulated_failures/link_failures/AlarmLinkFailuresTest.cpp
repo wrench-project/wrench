@@ -71,8 +71,9 @@ class AlarmLinkFailuresTestWMS : public wrench::WMS {
 
 public:
     AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
+                             std::shared_ptr<wrench::Workflow> workflow,
                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -129,9 +130,7 @@ void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new AlarmLinkFailuresTestWMS(
-                    this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                    this, workflow, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

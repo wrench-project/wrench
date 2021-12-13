@@ -71,8 +71,9 @@ class ComputeThreadLinkFailuresTestWMS : public wrench::WMS {
 
 public:
     ComputeThreadLinkFailuresTestWMS(ComputeThreadLinkFailuresTest *test,
-                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+                                     std::shared_ptr<wrench::Workflow> workflow,
+                                     std::string hostname) :
+            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -152,9 +153,7 @@ void ComputeThreadLinkFailuresTest::do_LinkFailure_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

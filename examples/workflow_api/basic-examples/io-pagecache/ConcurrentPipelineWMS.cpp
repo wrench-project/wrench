@@ -32,9 +32,11 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    ConcurrentPipelineWMS::ConcurrentPipelineWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
+    ConcurrentPipelineWMS::ConcurrentPipelineWMS(std::shared_ptr<Workflow> workflow,
+                                                 const std::set<std::shared_ptr<ComputeService>> &compute_services,
                                          const std::set<std::shared_ptr<StorageService>> &storage_services,
                                          const std::string &hostname) : WMS(
+            workflow,
             nullptr, nullptr,
             compute_services,
             storage_services,

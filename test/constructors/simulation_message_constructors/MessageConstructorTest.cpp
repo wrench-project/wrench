@@ -102,8 +102,9 @@ class MessageConstructorTestWMS : public wrench::WMS {
 
 public:
     MessageConstructorTestWMS(MessageConstructorTest *test,
+                              std::shared_ptr<wrench::Workflow> workflow,
                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
+            wrench::WMS(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -413,13 +414,9 @@ void MessageConstructorTest::do_MessageConstruction_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    CUSTOM_NO_THROW(wms = simulation->add(new MessageConstructorTestWMS(this, hostname)));
-
-    CUSTOM_NO_THROW(wms->addWorkflow(workflow));
+    CUSTOM_NO_THROW(wms = simulation->add(new MessageConstructorTestWMS(this, workflow, hostname)));
 
     simulation->launch();
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

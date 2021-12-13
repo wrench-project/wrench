@@ -137,11 +137,9 @@ int main(int argc, char **argv) {
      * The WMS implementation is in SimpleWMS.[cpp|h].
      */
     auto wms = simulation->add(
-            new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
+            new wrench::SimpleWMS(workflow, std::unique_ptr<wrench::CloudStandardJobScheduler>(
                     new wrench::CloudStandardJobScheduler(storage_service)),
                                   nullptr, compute_services, storage_services, wms_host));
-
-    wms->addWorkflow(workflow);
 
     /* Instantiate a file registry service to be started on some host. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that

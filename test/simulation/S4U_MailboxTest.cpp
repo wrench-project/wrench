@@ -56,8 +56,9 @@ class AsynchronousCommunicationTestWMS : public wrench::WMS {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -248,17 +249,11 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMSs
-    this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this,"Host1"));
-    this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this,"Host2"));
-
-    // Create a bogus workflow
     auto workflow =  wrench::Workflow::createWorkflow();
-    this->wms1->addWorkflow(workflow);
-    this->wms2->addWorkflow(workflow);
+    this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this, workflow, "Host1"));
+    this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this, workflow, "Host2"));
 
     simulation->launch();
-
-
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

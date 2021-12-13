@@ -75,9 +75,10 @@ protected:
 class BasicCreationDestructionTestWMS : public wrench::WMS {
 public:
     BasicCreationDestructionTestWMS(BandwidthMeterServiceTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     std::string &hostname,
                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -192,14 +193,11 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
 
     EXPECT_NO_THROW(wms = simulation->add(
             new BasicCreationDestructionTestWMS(
-                    this,
+                    this, link_usage_workflow,
                     host,
                     storage_services_list
             )
     ));
-
-
-    EXPECT_NO_THROW(wms->addWorkflow(link_usage_workflow));
 
     simulation->add(new wrench::FileRegistryService("host1"));
     for (auto const &file : link_usage_workflow->getInputFiles()) {

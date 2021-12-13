@@ -233,10 +233,11 @@ class HTCondorStandardJobTestWMS : public wrench::WMS {
 
 public:
     HTCondorStandardJobTestWMS(HTCondorServiceTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -343,9 +344,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorStandardJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new HTCondorStandardJobTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -373,10 +372,11 @@ class HTCondorStandardJobAddComputeServiceTestWMS : public wrench::WMS {
 
 public:
     HTCondorStandardJobAddComputeServiceTestWMS(HTCondorServiceTest *test,
+                                                std::shared_ptr<wrench::Workflow> workflow,
                                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                 std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -477,9 +477,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorStandardJobAddComputeServiceTestWMS(this, {compute_service, baremetal_compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new HTCondorStandardJobAddComputeServiceTestWMS(this, workflow, {compute_service, baremetal_compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -504,10 +502,11 @@ class HTCondorPilotJobTestWMS : public wrench::WMS {
 
 public:
     HTCondorPilotJobTestWMS(HTCondorServiceTest *test,
+                            std::shared_ptr<wrench::Workflow> workflow,
                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -625,9 +624,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorPilotJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new HTCondorPilotJobTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -652,10 +649,11 @@ class HTCondorSimpleServiceTestWMS : public wrench::WMS {
 
 public:
     HTCondorSimpleServiceTestWMS(HTCondorServiceTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -759,10 +757,11 @@ class HTCondorGridUniverseTestWMS : public wrench::WMS {
 
 public:
     HTCondorGridUniverseTestWMS(HTCondorServiceTest *test,
+                                std::shared_ptr<wrench::Workflow> workflow,
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -876,9 +875,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorGridUniverseTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
+            new HTCondorGridUniverseTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -905,10 +902,11 @@ class HTCondorNoGridUniverseJobTestWMS : public wrench::WMS {
 
 public:
     HTCondorNoGridUniverseJobTestWMS(HTCondorServiceTest *test,
+                                     std::shared_ptr<wrench::Workflow> workflow,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                      std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -996,16 +994,12 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
                     {},
                     {})));
 
-
-
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNoGridUniverseJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
+            new HTCondorNoGridUniverseJobTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1033,10 +1027,11 @@ class HTCondorNoNonGridUniverseJobTestWMS : public wrench::WMS {
 
 public:
     HTCondorNoNonGridUniverseJobTestWMS(HTCondorServiceTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1125,9 +1120,7 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNoNonGridUniverseJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
+            new HTCondorNoNonGridUniverseJobTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1156,10 +1149,11 @@ class HTCondorNoGridJobTestWMS : public wrench::WMS {
 
 public:
     HTCondorNoGridJobTestWMS(HTCondorServiceTest *test,
+                             std::shared_ptr<wrench::Workflow> workflow,
                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                              std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1246,9 +1240,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNoGridJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
+            new HTCondorNoGridJobTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1277,10 +1269,11 @@ class HTCondorNotEnoughResourcesTestWMS : public wrench::WMS {
 
 public:
     HTCondorNotEnoughResourcesTestWMS(HTCondorServiceTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1414,9 +1407,7 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNotEnoughResourcesTestWMS(this, {compute_service}, {storage_service}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(grid_workflow));
+            new HTCondorNotEnoughResourcesTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

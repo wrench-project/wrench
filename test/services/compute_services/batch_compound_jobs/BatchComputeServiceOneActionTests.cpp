@@ -132,10 +132,11 @@ protected:
 class BatchBadSetupTestWMS : public wrench::WMS {
 public:
     BatchBadSetupTestWMS(BatchComputeServiceOneActionTest *test,
+                         std::shared_ptr<wrench::Workflow> workflow,
                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -212,7 +213,7 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
                                             {})), std::invalid_argument);
 
     // Create a WMS
-    auto wms = simulation->add(new BatchBadSetupTestWMS(this, {}, {}, hostname));
+    auto wms = simulation->add(new BatchBadSetupTestWMS(this, wrench::Workflow::createWorkflow(), {}, {}, hostname));
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -228,10 +229,11 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
 class BatchOneSleepActionTestWMS : public wrench::WMS {
 public:
     BatchOneSleepActionTestWMS(BatchComputeServiceOneActionTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -360,12 +362,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchOneSleepActionTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -394,10 +394,11 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
 class BatchOneComputeActionNotEnoughResourcesTestWMS : public wrench::WMS {
 public:
     BatchOneComputeActionNotEnoughResourcesTestWMS(BatchComputeServiceOneActionTest *test,
+                                                   std::shared_ptr<wrench::Workflow> workflow,
                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                    std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -529,12 +530,10 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchOneComputeActionNotEnoughResourcesTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -565,10 +564,11 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
 class BatchOneComputeActionBogusServiceSpecificArgsTestWMS : public wrench::WMS {
 public:
     BatchOneComputeActionBogusServiceSpecificArgsTestWMS(BatchComputeServiceOneActionTest *test,
+                                                         std::shared_ptr<wrench::Workflow> workflow,
                                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -667,12 +667,10 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchOneComputeActionBogusServiceSpecificArgsTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -703,10 +701,11 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
 class BatchServiceCrashedTestWMS : public wrench::WMS {
 public:
     BatchServiceCrashedTestWMS(BatchComputeServiceOneActionTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -827,12 +826,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchServiceCrashedTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -862,10 +859,11 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
 class BatchJobTerminationTestWMS : public wrench::WMS {
 public:
     BatchJobTerminationTestWMS(BatchComputeServiceOneActionTest *test,
+                               std::shared_ptr<wrench::Workflow> workflow,
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -964,12 +962,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchJobTerminationTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -999,10 +995,11 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
 class BatchJobExpirationTestWMS : public wrench::WMS {
 public:
     BatchJobExpirationTestWMS(BatchComputeServiceOneActionTest *test,
+                              std::shared_ptr<wrench::Workflow> workflow,
                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                               std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1110,13 +1107,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchJobExpirationTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1144,10 +1138,11 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
 class BatchServiceFileNotThereTestWMS : public wrench::WMS {
 public:
     BatchServiceFileNotThereTestWMS(BatchComputeServiceOneActionTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                     std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1269,12 +1264,10 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchServiceFileNotThereTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1294,10 +1287,11 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
 class BatchServiceServiceDownTestWMS : public wrench::WMS {
 public:
     BatchServiceServiceDownTestWMS(BatchComputeServiceOneActionTest *test,
+                                   std::shared_ptr<wrench::Workflow> workflow,
                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                    std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1384,12 +1378,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchServiceServiceDownTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1409,10 +1401,11 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
 class BatchServiceServiceSuspendedTestWMS : public wrench::WMS {
 public:
     BatchServiceServiceSuspendedTestWMS(BatchComputeServiceOneActionTest *test,
+                                        std::shared_ptr<wrench::Workflow> workflow,
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1499,12 +1492,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchServiceServiceSuspendedTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1524,10 +1515,11 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
 class BatchServiceBadScratchTestWMS : public wrench::WMS {
 public:
     BatchServiceBadScratchTestWMS(BatchComputeServiceOneActionTest *test,
+                                  std::shared_ptr<wrench::Workflow> workflow,
                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                   std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1600,12 +1592,10 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BatchServiceBadScratchTestWMS(
-                    this,
+                    this, workflow,
                     {compute_service}, {
                             storage_service1
                     }, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());

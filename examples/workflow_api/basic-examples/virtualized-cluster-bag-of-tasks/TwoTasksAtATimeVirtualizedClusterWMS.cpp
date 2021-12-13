@@ -37,9 +37,12 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    TwoTasksAtATimeVirtualizedClusterWMS::TwoTasksAtATimeVirtualizedClusterWMS(const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                     const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                                     const std::string &hostname) : WMS(
+    TwoTasksAtATimeVirtualizedClusterWMS::TwoTasksAtATimeVirtualizedClusterWMS(
+            std::shared_ptr<Workflow> workflow,
+            const std::set<std::shared_ptr<ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<StorageService>> &storage_services,
+            const std::string &hostname) : WMS(
+            workflow,
             nullptr, nullptr,
             compute_services,
             storage_services,
@@ -110,7 +113,7 @@ namespace wrench {
 
             /* Create the job  */
             WRENCH_INFO("Creating a job to run task1 %s (%.2lf)",
-                    cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
+                        cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
 
             auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
 

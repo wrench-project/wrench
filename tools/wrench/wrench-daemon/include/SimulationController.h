@@ -34,7 +34,7 @@ namespace wrench {
     class SimulationController : public WMS {
 
     public:
-        explicit SimulationController(const std::string &hostname, int sleep_us);
+        SimulationController(std::shared_ptr<Workflow> workflow, const std::string &hostname, int sleep_us);
 
         void stopSimulation();
 

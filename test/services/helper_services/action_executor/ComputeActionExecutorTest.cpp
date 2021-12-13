@@ -121,8 +121,9 @@ class ComputeActionExecutorTestWMS : public wrench::WMS {
 
 public:
     ComputeActionExecutorTestWMS(ComputeActionExecutorTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -225,9 +226,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ComputeActionExecutorTestWMS(this, "Host1")));
-
-    ASSERT_NO_THROW(wms->addWorkflow(this->workflow));
+            new ComputeActionExecutorTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

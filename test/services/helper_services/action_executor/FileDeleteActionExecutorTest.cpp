@@ -119,8 +119,9 @@ class FileDeleteActionExecutorSuccessTestWMS : public wrench::WMS {
 
 public:
     FileDeleteActionExecutorSuccessTestWMS(FileDeleteActionExecutorTest *test,
+                                           std::shared_ptr<wrench::Workflow> workflow,
                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -210,9 +211,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
-    wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, "Host1"));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, workflow, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 

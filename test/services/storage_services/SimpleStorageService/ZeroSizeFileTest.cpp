@@ -59,10 +59,11 @@ protected:
 class SimpleStorageServiceZeroSizeFileTestWMS : public wrench::WMS {
 public:
     SimpleStorageServiceZeroSizeFileTestWMS(SimpleStorageServiceZeroSizeFileTest *test,
+                                            std::shared_ptr<wrench::Workflow> workflow,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, file_registry_service,
+            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, file_registry_service,
                         hostname, "test") {
         this->test = test;
     }
@@ -115,9 +116,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceZeroSizeFileTestWMS(
-            this, {storage_service}, file_registry_service, "WMSHost")));
-
-    wms->addWorkflow(this->workflow);
+            this, this->workflow, {storage_service}, file_registry_service, "WMSHost")));
 
     // Stage the file on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file, storage_service));

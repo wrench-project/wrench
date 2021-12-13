@@ -23,16 +23,19 @@ WRENCH_LOG_CATEGORY(custom_wms, "Log category for Custom WMS");
 
 namespace wrench {
 
-    CondorWMS::CondorWMS(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                         std::string hostname) : WMS(
-                    nullptr, nullptr,
-                    compute_services,
-                    storage_services,
-                    {},
-                    nullptr,
-                    hostname,
-                    "condor-grid"){}
+    CondorWMS::CondorWMS(
+            std::shared_ptr<Workflow> workflow,
+            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
+            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+            std::string hostname) : WMS(
+            workflow,
+            nullptr, nullptr,
+            compute_services,
+            storage_services,
+            {},
+            nullptr,
+            hostname,
+            "condor-grid"){}
 
     /**
      * Main method of the WMS

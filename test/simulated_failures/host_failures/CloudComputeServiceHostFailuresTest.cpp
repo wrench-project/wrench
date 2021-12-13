@@ -122,9 +122,10 @@ class CloudServiceFailureOfAVMTestWMS : public wrench::WMS {
 
 public:
     CloudServiceFailureOfAVMTestWMS(CloudServiceHostFailuresTest *test,
+                                    std::shared_ptr<wrench::Workflow> workflow,
                                     std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                     std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -222,9 +223,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
@@ -253,8 +252,9 @@ class CloudServiceFailureOfAVMAndRestartTestWMS : public wrench::WMS {
 
 public:
     CloudServiceFailureOfAVMAndRestartTestWMS(CloudServiceHostFailuresTest *test,
+                                              std::shared_ptr<wrench::Workflow> workflow,
                                               std::string &hostname, std::shared_ptr<wrench::ComputeService> cs, std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -375,9 +375,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
@@ -406,9 +404,10 @@ class CloudServiceRandomFailuresTestWMS : public wrench::WMS {
 
 public:
     CloudServiceRandomFailuresTestWMS(CloudServiceHostFailuresTest *test,
+                                      std::shared_ptr<wrench::Workflow> workflow,
                                       std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                       std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -540,9 +539,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
