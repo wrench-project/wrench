@@ -388,7 +388,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param execution_hosts: the hosts available for running virtual machines
      * @param answer: true/false
      * @param payload: the message size in bytes
      */

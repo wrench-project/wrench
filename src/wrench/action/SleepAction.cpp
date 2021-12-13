@@ -37,8 +37,6 @@ namespace wrench {
     /**
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
-     * @param num_threads: number of threads to use
-     * @param ram_footprint: ram footprint necessary
      */
     void SleepAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread creation overhead

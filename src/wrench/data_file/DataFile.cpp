@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param string: the file id
+     * @param name: the file id
      * @param s: the file size
      */
     DataFile::DataFile(const std::string name, double s) :
