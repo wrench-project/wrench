@@ -17,6 +17,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/workflow_api/basic-examples/io-pagecache/CMakeLists.txt
         examples/action_api/multi-action-multi-job-example/CMakeLists.txt
         examples/action_api/super-custom-action-example/CMakeLists.txt
+        examples/action_api/job-action-failure-example/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})
