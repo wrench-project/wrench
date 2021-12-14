@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
      * Parsing of the command-line arguments for this WRENCH simulation
      */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <xml platform file> <workflow file>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <xml platform file> <workflow file> [--log=simple_wms.threshold=info]" << std::endl;
         exit(1);
     }
 

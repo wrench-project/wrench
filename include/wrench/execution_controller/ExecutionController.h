@@ -10,16 +10,10 @@
 #ifndef WRENCH_EXECUTIONCONTROLLER_H
 #define WRENCH_EXECUTIONCONTROLLER_H
 
-
-
-
 #include "wrench/services/metering/EnergyMeterService.h"
 #include "wrench/services/metering/BandwidthMeterService.h"
 #include "wrench/services/Service.h"
-#include "wrench/wms/DynamicOptimization.h"
-#include "wrench/wms/StaticOptimization.h"
-#include "wrench/wms/scheduler/PilotJobScheduler.h"
-#include "wrench/wms/scheduler/StandardJobScheduler.h"
+#include "wrench/managers/DataMovementManager.h"
 #include "wrench/services/compute/cloud/CloudComputeService.h"
 #include "wrench/execution_events/CompoundJobFailedEvent.h"
 #include "wrench/execution_events/CompoundJobCompletedEvent.h"

@@ -90,7 +90,7 @@ namespace wrench {
      * @param add: true if we're adding, false otherwise
      * @param start: the start date
      * @param end: the end date
-     * @param job: the batch_standard_and_pilot_jobs job
+     * @param job: the BatchComputeService job
      */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSet();
@@ -145,8 +145,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the batch_standard_and_pilot_jobs jobs in the first slot in the node availability timeline
-     * @return a set of batch_standard_and_pilot_jobs jobs
+     * @brief Get the BatchComputeService jobs in the first slot in the node availability timeline
+     * @return a set of BatchComputeService jobs
      */
     std::set<std::shared_ptr<BatchJob>> NodeAvailabilityTimeLine::getJobsInFirstSlot() {
         std::set<std::shared_ptr<BatchJob>> to_return;

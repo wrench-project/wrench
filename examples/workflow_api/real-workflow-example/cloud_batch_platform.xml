@@ -29,6 +29,11 @@
         <route src="WMSHost" dst="CloudHeadNode"> <link_ctn id="wide_area_backbone"/></route>
         <route src="WMSHost" dst="CloudNode1"> <link_ctn id="wide_area_backbone"/></route>
         <route src="WMSHost" dst="CloudNode2"> <link_ctn id="wide_area_backbone"/></route>
+        <route src="CloudHeadNode" dst="CloudNode1"> <link_ctn id="wide_area_backbone"/></route>
+        <route src="CloudHeadNode" dst="CloudNode2"> <link_ctn id="wide_area_backbone"/></route>
+        <route src="BatchHeadNode" dst="BatchNode1"> <link_ctn id="wide_area_backbone"/></route>
+        <route src="BatchHeadNode" dst="BatchNode2"> <link_ctn id="wide_area_backbone"/></route>
+        <route src="BatchNode1" dst="BatchNode2"> <link_ctn id="wide_area_backbone"/></route>
 
     </zone>
 </platform>

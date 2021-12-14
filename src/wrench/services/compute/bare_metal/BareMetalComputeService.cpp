@@ -254,8 +254,8 @@ namespace wrench {
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
-                       "bare_metal_compound_jobs",
-                       "bare_metal_compound_jobs",
+                       "bare_metal",
+                       "bare_metal",
                        scratch_space_mount_point) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -278,8 +278,8 @@ namespace wrench {
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
-                       "bare_metal_standard_jobs",
-                       "bare_metal_standard_jobs",
+                       "bare_metal",
+                       "bare_metal",
                        scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (auto h : compute_hosts) {
@@ -316,8 +316,8 @@ namespace wrench {
             std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space
     ) : ComputeService(hostname,
-                       "bare_metal_standard_jobs" + suffix,
-                       "bare_metal_standard_jobs" + suffix,
+                       "bare_metal" + suffix,
+                       "bare_metal" + suffix,
                        scratch_space) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -344,8 +344,8 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list,
             std::shared_ptr<StorageService> scratch_space) :
             ComputeService(hostname,
-                           "bare_metal_standard_jobs",
-                           "bare_metal_standard_jobs",
+                           "bare_metal",
+                           "bare_metal",
                            scratch_space) {
         initiateInstance(hostname,
                          compute_resources,
@@ -374,7 +374,7 @@ namespace wrench {
             std::shared_ptr<PilotJob> pj) {
         if (ttl < 0) {
             throw std::invalid_argument(
-                    "bare_metal_standard_jobs::initiateInstance(): invalid TTL value (must be >0)");
+                    "BareMetalComputeService::initiateInstance(): invalid TTL value (must be >0)");
         }
 
         // Set default and specified properties
@@ -565,7 +565,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "bare_metal_standard_jobs::terminateCompoundJob(): Received an unexpected [" +
+                    "BareMetalComputeService::terminateCompoundJob(): Received an unexpected [" +
                     message->getName() + "] message!");
         }
     }

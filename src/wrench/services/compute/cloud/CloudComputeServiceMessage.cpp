@@ -63,8 +63,8 @@ namespace wrench {
      * @param ram_memory: the VM's RAM memory_manager_service capacity (use ComputeService::ALL_RAM to use all RAM available on the
      *                    host, this can be lead to an out of memory_manager_service issue)
      * @param desired_vm_name: the desired VM name ("" means "pick a name for me")
-     * @param property_list: a property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
-     * @param messagepayload_list: a message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults")
+     * @param property_list: a property list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list for the BareMetalComputeService that will run on the VM ({} means "use all defaults")
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -175,7 +175,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param success: whether the VM start succeeded
-     * @param cs: the bare_metal_standard_jobs exposed by the started VM (or nullptr if not success)
+     * @param cs: the BareMetalComputeService exposed by the started VM (or nullptr if not success)
      * @param failure_cause: the cause of the failure (or nullptr if success)
      * @param payload: the message size in bytes
      */
