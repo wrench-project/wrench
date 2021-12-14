@@ -77,7 +77,7 @@ namespace wrench {
         /* Add a file-write action that will fail */
         auto file_write_action = job->addFileWriteAction("file_write", output_file, wrench::FileLocation::LOCATION(ss_2));
 
-        /* Add a long compute action that will fail will kill the compute service! */
+        /* Add a long compute action that will fail when we kill the compute service! */
         auto compute_long = job->addComputeAction("compute_long", 10000 * GFLOP, 100, 1, 20, wrench::ParallelModel::AMDAHL(0.57));
 
         /* Add a sleep action */
@@ -102,6 +102,7 @@ namespace wrench {
         if (auto job_completion_event = std::dynamic_pointer_cast<wrench::CompoundJobFailedEvent>(event)) {
             auto completed_job = job_completion_event->job;
             WRENCH_INFO("Job %s has failed!", completed_job->getName().c_str());
+            WRENCH_INFO("Job failure cause: %s", job_completion_event->failure_cause->toString().c_str());
             WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
             for (auto const &action : completed_job->getActions()) {
                 WRENCH_INFO("  * Action %s: in state %s", action->getName().c_str(), action->getStateAsString().c_str());

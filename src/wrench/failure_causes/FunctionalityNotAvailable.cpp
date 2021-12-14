@@ -11,6 +11,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/Service.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_functionality_not_available, "Log category for FunctionalityNotAvailable");
 
 namespace wrench {
@@ -23,7 +25,7 @@ namespace wrench {
      */
     FunctionalityNotAvailable::FunctionalityNotAvailable(std::shared_ptr<Service> service,
                                                          std::string functionality_name) {
-        this->service = service;
+        this->service = std::move(service);
         this->functionality_name = std::move(functionality_name);
     }
 

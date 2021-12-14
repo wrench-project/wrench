@@ -492,10 +492,6 @@ namespace wrench {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
 
-//        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-//            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-//            return true;
-
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
             processGetResourceInformation(msg->answer_mailbox);
             return true;
@@ -707,34 +703,6 @@ namespace wrench {
     }
 
 
-///**
-// * @brief Process a submit pilot job request
-// *
-// * @param answer_mailbox: the mailbox to which the answer message should be sent
-// * @param job: the job
-// *
-// * @throw std::runtime_error
-// */
-//    void BareMetalComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-//                                                        std::shared_ptr<PilotJob> job,
-//                                                        std::map<std::string, std::string> service_specific_args) {
-//        WRENCH_INFO("Asked to run a pilot job");
-//
-//        if (not this->supportsPilotJobs()) {
-//            S4U_Mailbox::dputMessage(
-//                    answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-//                            job, this->getSharedPtr<BareMetalComputeService>(), false,
-//                            std::shared_ptr<FailureCause>(
-//                                    new JobTypeNotSupported(job, this->getSharedPtr<BareMetalComputeService>())),
-//                            this->getMessagePayloadValue(
-//                                    BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-//            return;
-//        }
-//
-//        throw std::runtime_error(
-//                "bare_metal_standard_jobs::processSubmitPilotJob(): We shouldn't be here! (fatal)");
-//    }
-
 /**
  * @brief Process a host available resource request
  * @param answer_mailbox: the answer mailbox
@@ -814,17 +782,6 @@ namespace wrench {
         }
 
     }
-
-///**
-// * @brief Not implement implemented. Will throw.
-// * @param job: a pilot job to (supposedly) terminate
-// *
-// * @throw std::runtime_error
-// */
-//    void BareMetalComputeService::terminatePilotJob(std::shared_ptr<PilotJob> job) {
-//        throw std::runtime_error(
-//                "bare_metal_standard_jobs::terminatePilotJob(): not implemented because bare_metal_standard_jobs never supports pilot jobs");
-//    }
 
 
 /**
