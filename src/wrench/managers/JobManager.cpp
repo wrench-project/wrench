@@ -655,7 +655,7 @@ namespace wrench {
                                                   {},
                                                   DBL_MAX,
                                                   nullptr,
-                                                  "one_shot_bm",
+                                                  "_one_shot_bm",
                                                   std::dynamic_pointer_cast<ComputeService>(execution_service->getParentService())->getScratch()
                                           ));
 

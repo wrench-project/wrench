@@ -148,8 +148,10 @@ namespace wrench {
     * @param event: a workflow execution event
     */
     void SimpleWMS::processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) {
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("The pilot job has started (it exposes bare-metal compute service %s)",
                     event->pilot_job->getComputeService()->getName().c_str());
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         this->pilot_job_is_running = true;
         this->core_utilization_map[this->pilot_job->getComputeService()] = event->pilot_job->getComputeService()->getTotalNumIdleCores();
 
@@ -206,13 +208,17 @@ namespace wrench {
                     for (auto const &f : task->getOutputFiles()) {
                         file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service);
                     }
-                    auto job = job_manager->createStandardJob(task, file_locations);WRENCH_INFO(
-                            "Submitting task %s to compute service %s", task->getID().c_str(), cs->getName().c_str());
-                    job_manager->submitJob(job, cs);
-
-                    this->core_utilization_map[cs]--;
-                    num_tasks_scheduled++;
-                    scheduled = true;
+                    try {
+                        auto job = job_manager->createStandardJob(task, file_locations);WRENCH_INFO(
+                                "Submitting task %s to compute service %s", task->getID().c_str(),
+                                cs->getName().c_str());
+                        job_manager->submitJob(job, cs);
+                        this->core_utilization_map[cs]--;
+                        num_tasks_scheduled++;
+                        scheduled = true;
+                    } catch (ExecutionException &e) {
+                        WRENCH_INFO("WARNING: Was not able to submit task %s, likely due to the pilot job having expired (I should get a notification of its expiration soon)");
+                    }
                     break;
                 }
             }
