@@ -1023,11 +1023,6 @@ namespace wrench {
                 "Creating a BareMetalComputeServiceOneShot for a compound job on %ld nodes with %ld cores per node",
                 num_nodes_allocated, cores_per_node_asked_for);
 
-        /* Set the number of cores per node to what was asked for */
-        for (auto const &r : resources) {
-            resources[r.first] = std::make_tuple(cores_per_node_asked_for, std::get<1>(r.second));
-        }
-
         compound_job->pushCallbackMailbox(this->mailbox_name);
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(new
                                                                                 BareMetalComputeServiceOneShot(
@@ -1041,7 +1036,7 @@ namespace wrench {
                 {},
                 DBL_MAX,
                 nullptr,
-                "one_shot_bm_",
+                "_one_shot_bm_",
                 this->getScratch()
         ));
 

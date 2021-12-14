@@ -100,9 +100,12 @@ int main(int argc, char **argv) {
      * batch_standard_and_pilot_jobs-scheduled platforms in which jobs are submitted to a queue and dispatched
      * to compute nodes according to various scheduling algorithms.
      * In this example, this particular batch_standard_and_pilot_jobs service has no scratch storage space (mount point = "").
-     * The last argument to the constructor
+     * The next argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
-     * list. In this example, one specifies that the message that will be send to the service to
+     * list. In this case, we use the  conservative_bf_core_level scheduling algorithm which implements
+     * conservative backfilling at the core level (i.e., two jobs can shared a compute node by using different cores on it).
+     * The last argument to the constructor makes it possible to specify various control message sizes.
+     * In this example, one specifies that the message that will be send to the service to
      * terminate it will be 2048 bytes. See the documentation to find out all available
      * configurable properties for each kind of service.
      */
@@ -110,7 +113,7 @@ int main(int argc, char **argv) {
     try {
         batch_compute_service = simulation->add(new wrench::BatchComputeService(
         {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
-                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}},
+                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf_core_level"}},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
     } catch (std::invalid_argument &e) {
         std::cerr << "Error: " << e.what() << std::endl;
@@ -136,10 +139,8 @@ int main(int argc, char **argv) {
         std::exit(1);
     }
 
-    /* Instantiate a WMS, to be started on some host (wms_host), which is responsible
-     * for executing the workflow, and uses a scheduler (BatchStandardJobScheduler). That scheduler
-     * is instantiated with the batch_standard_and_pilot_jobs service, the list of hosts available for running
-     * tasks, and also provided a pointer to the simulation object.
+    /* Instantiate a WMS (which is an ExecutionController really), to be started on some host (wms_host), which is responsible
+     * for executing the workflow.
      *
      * The WMS implementation is in SimpleWMS.[cpp|h].
      */
@@ -183,13 +184,27 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     /* Simulation results can be examined via simulation->output, which provides access to traces
-     * of events. In the code below, we retrieve the trace of all task1 completion events, print how
-     * many such events there are, and print some information for the first such event.
+     * of events. In the code below, go through some time-stamps and compute some statistics.
      */
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
     trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
-    std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getID() << std::endl;
+    unsigned long num_failed_tasks = 0;
+    double computation_communication_ratio_average = 0.0;
+    for (const auto &item : trace) {
+        auto task = item->getContent()->getTask();
+        if (task->getExecutionHistory().size() > 1) {
+            num_failed_tasks++;
+        }
+        double io_time = task->getExecutionHistory().top().read_input_end - task->getExecutionHistory().top().read_input_start;
+        io_time += task->getExecutionHistory().top().write_output_end - task->getExecutionHistory().top().write_output_start;
+        double compute_time = task->getExecutionHistory().top().computation_end - task->getExecutionHistory().top().computation_start;
+        computation_communication_ratio_average += compute_time / io_time;
+    }
+    computation_communication_ratio_average /= (double)(trace.size());
+
+    std::cerr << "Number of tasks that failed at least once: " << num_failed_tasks << "\n";
+    std::cerr << "Average computation time / communication+IO time ratio over all tasks: " << computation_communication_ratio_average << "\n";
 
     return 0;
 }
