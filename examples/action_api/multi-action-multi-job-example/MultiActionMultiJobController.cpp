@@ -36,8 +36,8 @@ namespace wrench {
             std::shared_ptr<CloudComputeService> cloud_cs,
             std::shared_ptr<StorageService> ss_1,
             std::shared_ptr<StorageService> ss_2,
-            const std::string &hostname) : ExecutionController(
-            hostname,"mamj"), bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
+            const std::string &hostname) : ExecutionController(hostname,"mamj"),
+            bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
 
     /**
      * @brief main method of the MultiActionMultiJobController daemon

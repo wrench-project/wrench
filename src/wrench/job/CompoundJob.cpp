@@ -259,7 +259,7 @@ namespace wrench {
      * @brief Helper method to add an action to the job
      * @param action: an action
      */
-    void CompoundJob::addAction(std::shared_ptr<Action> action) {
+    void CompoundJob::addAction(const std::shared_ptr<Action>& action) {
         assertJobNotSubmitted();
         assertActionNameDoesNotAlreadyExist(action->getName());
         action->setState(Action::State::READY);
@@ -296,7 +296,7 @@ namespace wrench {
      * @brief Add a parent job to this job (be careful not to add circular dependencies, which may lead to deadlocks)
      * @param parent: the parent job
      */
-    void CompoundJob::addParentJob(std::shared_ptr<CompoundJob> parent) {
+    void CompoundJob::addParentJob(const std::shared_ptr<CompoundJob>& parent) {
         assertJobNotSubmitted();
         if (parent == nullptr) {
             throw std::invalid_argument("CompoundJob::addParentJob: Cannot add a nullptr parent");
@@ -312,7 +312,7 @@ namespace wrench {
      * @brief Add a child job to this job (be careful not to add circular dependencies, which may lead to deadlocks)
      * @param child: the child job
      */
-    void CompoundJob::addChildJob(std::shared_ptr<CompoundJob> child) {
+    void CompoundJob::addChildJob(const std::shared_ptr<CompoundJob>& child) {
         assertJobNotSubmitted();
         if (child == nullptr) {
             throw std::invalid_argument("CompoundJob::addChildJob: Cannot add a nullptr child");
@@ -360,7 +360,7 @@ namespace wrench {
      * @param old_state: the action's old state
      * @param new_state: the action's new state
      */
-    void CompoundJob::updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state) {
+    void CompoundJob::updateStateActionMap(const std::shared_ptr<Action>& action, Action::State old_state, Action::State new_state) {
         if (old_state != new_state) {
             this->state_task_map[old_state].erase(action);
             this->state_task_map[new_state].insert(action);
@@ -429,7 +429,7 @@ namespace wrench {
      * @brief Set all actions to FAILED for the same failure cause (e.g., a job-level failure)
      * @param cause: a failure cause
      */
-    void CompoundJob::setAllActionsFailed(std::shared_ptr<FailureCause> cause) {
+    void CompoundJob::setAllActionsFailed(const std::shared_ptr<FailureCause>& cause) {
         for (auto const &action : this->actions) {
             action->setState(Action::State::FAILED);
             action->setFailureCause(cause);
@@ -444,12 +444,12 @@ namespace wrench {
      * @return
      */
     bool CompoundJob::pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b) {
-        auto children = a->getChildren();
-        if (children.find(b) != children.end()) {
+        auto current_children = a->getChildren();
+        if (current_children.find(b) != current_children.end()) {
             return true;
         }
         bool path_exists = false;
-        for (auto const &c : children) {
+        for (auto const &c : current_children) {
             path_exists = path_exists || this->pathExists(c, b);
         }
         return path_exists;
@@ -462,12 +462,12 @@ namespace wrench {
      * @return
      */
     bool CompoundJob::pathExists(const std::shared_ptr<CompoundJob>& a, const std::shared_ptr<CompoundJob> &b) {
-        auto children = a->getChildren();
-        if (children.find(b) != children.end()) {
+        auto current_children = a->getChildren();
+        if (current_children.find(b) != current_children.end()) {
             return true;
         }
         bool path_exists = false;
-        for (auto const &c : children) {
+        for (auto const &c : current_children) {
             path_exists = path_exists || this->pathExists(c, b);
         }
         return path_exists;

@@ -60,15 +60,12 @@ namespace wrench {
 
     protected:
 
-
-
         ExecutionController(
                 const std::string &hostname,
                 const std::string suffix);
 
 
         void setTimer(double date, std::string message);
-
 
         /***********************/
         /** \endcond           */

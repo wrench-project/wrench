@@ -24,7 +24,7 @@
  **    ./wrench-example-job-action-failure ./four_hosts.xml
  **
  ** Example invocation of the simulator with only WMS logging:
- **    ./wrench-example-job-action-failure ./four_hosts.xml --log=custom_wms.threshold=info
+ **    ./wrench-example-job-action-failure ./four_hosts.xml --log=custom_controller.threshold=info
  **
  ** Example invocation of the simulator with full logging:
  **    ./wrench-example-job-action-failure ./four_hosts.xml --wrench-full-log

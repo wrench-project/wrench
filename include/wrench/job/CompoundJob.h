@@ -118,8 +118,8 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
 
         void addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child);
 
-        void addParentJob(std::shared_ptr<CompoundJob> parent);
-        void addChildJob(std::shared_ptr<CompoundJob> child);
+        void addParentJob(const std::shared_ptr<CompoundJob>& parent);
+        void addChildJob(const std::shared_ptr<CompoundJob>& child);
 
         std::set<std::shared_ptr<CompoundJob>> getParentJobs();
         std::set<std::shared_ptr<CompoundJob>> getChildrenJobs();
@@ -165,9 +165,9 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         State state;
         unsigned long priority;
 
-        void updateStateActionMap(std::shared_ptr<Action> action, Action::State old_state, Action::State new_state);
+        void updateStateActionMap(const std::shared_ptr<Action>& action, Action::State old_state, Action::State new_state);
 
-        void setAllActionsFailed(std::shared_ptr<FailureCause> cause);
+        void setAllActionsFailed(const std::shared_ptr<FailureCause>& cause);
 
         bool hasAction(const std::string &name);
 
@@ -182,7 +182,7 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         void assertJobNotSubmitted();
         void assertActionNameDoesNotAlreadyExist(const std::string &name);
 
-        void addAction(std::shared_ptr<Action> action);
+        void addAction(const std::shared_ptr<Action>& action);
 
         bool pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b);
         bool pathExists(const std::shared_ptr<CompoundJob>& a, const std::shared_ptr<CompoundJob> &b);
