@@ -24,9 +24,11 @@ namespace wrench {
 
     public:
         // Constructor
-        CondorWMS(std::shared_ptr<Workflow> workflow,
-                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+        CondorWMS(const std::shared_ptr<Workflow> &workflow,
+                  const std::shared_ptr<wrench::HTCondorComputeService> &htcondor_compute_service,
+                  const std::shared_ptr<wrench::BatchComputeService> &batch_compute_service,
+                  const std::shared_ptr<wrench::CloudComputeService> &cloud_compute_service,
+                  const std::shared_ptr<wrench::StorageService> &storage_service,
                   std::string hostname);
 
     protected:
@@ -40,7 +42,13 @@ namespace wrench {
         // main() method of the WMS
         int main() override;
 
+        std::shared_ptr<Workflow> workflow;
+        std::shared_ptr<wrench::HTCondorComputeService> htcondor_compute_service;
+        std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
+        std::shared_ptr<wrench::CloudComputeService> cloud_compute_service;
+        std::shared_ptr<wrench::StorageService> storage_service;
     };
+
 }
 
 #endif //WRENCH_CONDORWMS_H

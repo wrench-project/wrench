@@ -24,18 +24,17 @@ WRENCH_LOG_CATEGORY(custom_wms, "Log category for Custom WMS");
 namespace wrench {
 
     CondorWMS::CondorWMS(
-            std::shared_ptr<Workflow> workflow,
-            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-            std::string hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {},
-            nullptr,
-            hostname,
-            "condor-grid"){}
+            const std::shared_ptr<Workflow> &workflow,
+            const std::shared_ptr<wrench::HTCondorComputeService> &htcondor_compute_service,
+            const std::shared_ptr<wrench::BatchComputeService> &batch_compute_service,
+            const std::shared_ptr<wrench::CloudComputeService> &cloud_compute_service,
+            const std::shared_ptr<wrench::StorageService> &storage_service,
+            std::string hostname) : ExecutionController(hostname,"condor-grid"),
+            workflow(workflow),
+            htcondor_compute_service(htcondor_compute_service),
+            batch_compute_service(batch_compute_service),
+            cloud_compute_service(cloud_compute_service),
+            storage_service(storage_service){}
 
     /**
      * Main method of the WMS
@@ -51,34 +50,26 @@ namespace wrench {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get reference to the storage service
-        auto ss = *(this->getAvailableStorageServices().begin());
-
-        // Get references to all compute services (note that all jobs will be submitted to the htcondor_cs)
-        auto htcondor_cs = *(this->getAvailableComputeServices<wrench::HTCondorComputeService>().begin());
-        auto batch_cs = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
-        auto cloud_cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
-
         // Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
         WRENCH_INFO("Creating a 5-core VM instance on the cloud service");
-        cloud_cs->createVM(5, 32.0*1000*1000*1000, "my_vm", {}, {});
+        cloud_compute_service->createVM(5, 32.0*1000*1000*1000, "my_vm", {}, {});
         WRENCH_INFO("Starting the VM instance, which exposes a usable bare-metal compute service");
-        auto vm_cs = cloud_cs->startVM("my_vm");
+        auto vm_cs = cloud_compute_service->startVM("my_vm");
 
         /* Add the VM's BareMetalComputeService to the HTCondor compute service */
         WRENCH_INFO("Adding the VM's bare-metal compute service to HTCondor");
-        htcondor_cs->addComputeService(vm_cs);
+        htcondor_compute_service->addComputeService(vm_cs);
 
         WRENCH_INFO("At this point, HTCondor has access to one batch_standard_and_pilot_jobs compute service and one bare-metal service (which runs on a VM)");
 
         // Create a map of files, which are all supposed to be on the local SS
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-        for (auto const &t : this->getWorkflow()->getTasks()) {
+        for (auto const &t : this->workflow->getTasks()) {
             for (auto const &f : t->getInputFiles()) {
-                file_locations[f] = wrench::FileLocation::LOCATION(ss);
+                file_locations[f] = wrench::FileLocation::LOCATION(storage_service);
             }
             for (auto const &f : t->getOutputFiles()) {
-                file_locations[f] = wrench::FileLocation::LOCATION(ss);
+                file_locations[f] = wrench::FileLocation::LOCATION(storage_service);
             }
         }
 
@@ -86,8 +77,8 @@ namespace wrench {
         std::vector<std::shared_ptr<wrench::WorkflowTask>> first_tasks;
         std::vector<std::shared_ptr<wrench::WorkflowTask>> last_tasks;
         unsigned long task_count = 0;
-        unsigned long num_tasks = this->getWorkflow()->getTasks().size();
-        for (auto const &t : this->getWorkflow()->getTasks()) {
+        unsigned long num_tasks = this->workflow->getTasks().size();
+        for (auto const &t : this->workflow->getTasks()) {
             if (task_count < num_tasks / 2) {
                 first_tasks.push_back(t);
             } else {
@@ -106,8 +97,8 @@ namespace wrench {
         htcondor_service_specific_arguments["-c"] = "5";
         htcondor_service_specific_arguments["-t"] = "3600";
         // This argument below is not required, as there is a single batch_standard_and_pilot_jobs service in this example
-        htcondor_service_specific_arguments["-service"] = batch_cs->getName();
-        job_manager->submitJob(grid_universe_job, htcondor_cs, htcondor_service_specific_arguments);
+        htcondor_service_specific_arguments["-service"] = batch_compute_service->getName();
+        job_manager->submitJob(grid_universe_job, htcondor_compute_service, htcondor_service_specific_arguments);
         WRENCH_INFO("Job submitted!");
 
         /* Submit the last tasks as individual non "grid universe" jobs to HTCondor */
@@ -115,16 +106,16 @@ namespace wrench {
             WRENCH_INFO("Creating and submitting a single-task job (for task %s) as a non-grid-universe job to HTCondor (will run on the VM)",
                         task->getID().c_str());
             auto job = job_manager->createStandardJob(task, file_locations);
-            job_manager->submitJob(job, htcondor_cs);
+            job_manager->submitJob(job, htcondor_compute_service);
         }
 
         WRENCH_INFO("Waiting for Workflow Execution Events until the workflow execution is finished...");
         /* Wait for all execution events */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
             this->waitForAndProcessNextEvent();
         }
 
-        htcondor_cs->stop();
+        htcondor_compute_service->stop();
         return 0;
     }
 
