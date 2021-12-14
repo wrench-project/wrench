@@ -12,6 +12,7 @@
 #define WRENCH_WORKLOADTRACEFILEREPLAYER_H
 
 #include "wrench/services/Service.h"
+#include "wrench/execution_controller/ExecutionController.h"
 
 /***********************/
 /** \cond INTERNAL    **/

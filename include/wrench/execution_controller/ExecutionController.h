@@ -58,6 +58,24 @@ namespace wrench {
         std::shared_ptr<ExecutionEvent>  waitForNextEvent();
         std::shared_ptr<ExecutionEvent>  waitForNextEvent(double timeout);
 
+        void waitForAndProcessNextEvent();
+        bool waitForAndProcessNextEvent(double timeout);
+
+        virtual void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>);
+        virtual void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>);
+
+        virtual void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>);
+        virtual void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>);
+
+
+        virtual void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>);
+        virtual void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>);
+
+        virtual void processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent>);
+        virtual void processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent>);
+
+        virtual void processEventTimer(std::shared_ptr<TimerEvent>);
+
     protected:
 
         ExecutionController(

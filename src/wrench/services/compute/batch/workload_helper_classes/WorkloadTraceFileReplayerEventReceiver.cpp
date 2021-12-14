@@ -12,12 +12,12 @@
 #include <wrench-dev.h>
 #include "WorkloadTraceFileReplayerEventReceiver.h"
 
-WRENCH_LOG_CATEGORY(wrench_core_one_job_wms, "Log category for One Job WMS");
+WRENCH_LOG_CATEGORY(wrench_core_one_job_wms, "Log category for WorkloadTraceFileReplayerEventReceiver");
 
 namespace wrench {
 
     /**
-     * @brief main method of the OneJobWMS daemon
+     * @brief main method of the WorkloadTraceFileReplayerEventReceiver daemon
      * @return 0 on success
      */
     int WorkloadTraceFileReplayerEventReceiver::main() {

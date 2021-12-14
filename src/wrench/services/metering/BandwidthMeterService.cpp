@@ -8,7 +8,6 @@
  */
 
 #include <wrench/services/metering/BandwidthMeterService.h>
-#include <wrench/wms/WMS.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench-dev.h>
 

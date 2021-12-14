@@ -19,26 +19,18 @@ namespace wrench {
      * @brief Constructor that creates a Simple WMS with
      *        a scheduler implementation, and a list of compute services
      *
-     * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr none is used)
-     * @param pilot_job_scheduler: a pilot job scheduler implementation if nullptr none is used)
-     * @param compute_services: a set of compute services available to run jobs
-     * @param storage_services: a set of storage services available to the WMS
+     * @param workflow: a workflow to execute
+     * @param batch_compute_service: a batch compute service available to run jobs
+     * @param cloud_compute_service: a cloud compute service available to run jobs
+     * @param storage_service: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    SimpleWMS::SimpleWMS(std::shared_ptr<Workflow> workflow,
-                         std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
-                         std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
-                         const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                         const std::set<std::shared_ptr<StorageService>> &storage_services,
-                         const std::string &hostname) : WMS(
-            workflow,
-            std::move(standard_job_scheduler),
-            std::move(pilot_job_scheduler),
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "simple") {}
+    SimpleWMS::SimpleWMS(const std::shared_ptr<Workflow> &workflow,
+                         const std::shared_ptr<BatchComputeService> &batch_compute_service,
+                         const std::shared_ptr<CloudComputeService> &cloud_compute_service,
+                         const std::shared_ptr<StorageService> &storage_service,
+                         const std::string &hostname) :
+            ExecutionController(hostname,"simple") {}
 
     /**
      * @brief main method of the SimpleWMS daemon
@@ -49,73 +41,78 @@ namespace wrench {
      */
     int SimpleWMS::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
-      
-      WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
-      WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-      // Create a job manager
-      this->job_manager = this->createJobManager();
+        WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
-      // Create a data movement manager
-      std::shared_ptr<DataMovementManager> data_movement_manager = this->createDataMovementManager();
+        // Create a job manager
+        auto job_manager = this->createJobManager();
 
-      // Perform static optimizations
-      runStaticOptimizations();
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
 
-      while (true) {
+        // Create and start two VMs on the cloud service to use for the whole execution
+        auto vm1 = this->cloud_compute_service->createVM(2, 0.0); // 2 cores, 0 RAM (RAM isn't used in this simulation)
+        auto vm1_cs = this->cloud_compute_service->startVM(vm1);
 
-        // Get the ready tasks
-        std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
+        auto vm2 = this->cloud_compute_service->createVM(4, 0.0); // 4 cores, 0 RAM (RAM isn't used in this simulation)
+        auto vm2_cs = this->cloud_compute_service->startVM(vm1);
 
-        // Get the available compute services
-        auto compute_services = this->getAvailableComputeServices<ComputeService>();
+        // A pilot job to be submitted to the batch compute service
+        std::shared_ptr<PilotJob> pilot_job = nullptr;
+        bool pilot_job_running = false;
 
-        if (compute_services.empty()) {
-          WRENCH_INFO("Aborting - No compute services available!");
-          break;
+        while (true) {
+
+            // If a pilot job is not running on the batch service, let's submit one that asks
+            // for 3 cores on 2 compute nodes for 1 hour
+            if (not pilot_job) {
+                pilot_job = job_manager->createPilotJob();
+                job_manager->submitJob(pilot_job, this->batch_compute_service,
+                                       {{"-N","2"}, {"-c","3"}, {"-t", "60"}});
+            }
+
+            // Construct the list of currently available bare-metal services (on VMs and perhaps within pilot job as well)
+            std::set<std::shared_ptr<BareMetalComputeService>> available_compute_service = {vm1_cs, vm2_cs};
+            if (pilot_job_running) {
+                available_compute_service.insert(pilot_job->getComputeService());
+            }
+
+            // Schedule ready tasks
+            for (auto const &task : this->workflow->getReadyTasks()) {
+                // If the task cannot be scheduled, then we're out of resources
+                // and break out of this loop
+                if (not scheduleTask(job_manager, task, available_compute_service)) {
+                    break;
+                }
+            }
+
+            // Wait for a workflow execution event, and process it
+            try {
+                this->waitForAndProcessNextEvent();
+            } catch (ExecutionException &e) {
+                WRENCH_INFO("Error while getting next execution event (%s)... ignoring and trying again",
+                            (e.getCause()->toString().c_str()));
+                continue;
+            }
+            if (this->abort || this->workflow->isDone()) {
+                break;
+            }
         }
 
-        // Submit pilot jobs
-        if (this->getPilotJobScheduler()) {
-          WRENCH_INFO("Scheduling pilot jobs...");
-          this->getPilotJobScheduler()->schedulePilotJobs(this->getAvailableComputeServices<ComputeService>());
+        S4U_Simulation::sleep(10);
+
+        WRENCH_INFO("--------------------------------------------------------");
+        if (this->workflow->isDone()) {
+            WRENCH_INFO("Workflow execution is complete!");
+        } else {
+            WRENCH_INFO("Workflow execution is incomplete!");
         }
 
-        // Perform dynamic optimizations
-        runDynamicOptimizations();
+        WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 
-        // Run ready tasks with defined scheduler implementation
-        WRENCH_INFO("Scheduling tasks...");
-        this->getStandardJobScheduler()->scheduleTasks(this->getAvailableComputeServices<ComputeService>(), ready_tasks);
-
-        // Wait for a workflow execution event, and process it
-        try {
-          this->waitForAndProcessNextEvent();
-        } catch (ExecutionException &e) {
-          WRENCH_INFO("Error while getting next execution event (%s)... ignoring and trying again",
-                      (e.getCause()->toString().c_str()));
-          continue;
-        }
-        if (this->abort || this->getWorkflow()->isDone()) {
-          break;
-        }
-      }
-
-      S4U_Simulation::sleep(10);
-
-      WRENCH_INFO("--------------------------------------------------------");
-      if (this->getWorkflow()->isDone()) {
-        WRENCH_INFO("Workflow execution is complete!");
-      } else {
-        WRENCH_INFO("Workflow execution is incomplete!");
-      }
-
-      WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
-
-      this->job_manager.reset();
-
-      return 0;
+        return 0;
     }
 
     /**
@@ -124,11 +121,36 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void SimpleWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
-      auto job = event->standard_job;
-      WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
-      WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
-      WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
-      this->abort = true;
+        auto job = event->standard_job;
+        WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
+        WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
+        WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
+        this->abort = true;
+    }
+
+    /**
+     * @brief Helper method to schedule a task one available compute services. This is a very, very
+     *        simple/naive scheduling approach, that greedily runs tasks on idle cores of whatever
+     *        compute services are available right now, using 1 core per task. Obviously, much more
+     *        sophisticated approaches/algorithms are possible. But this is sufficient for the sake
+     *        of an example.
+     *
+     * @param job_manager: a job manager
+     * @param task: the task to schedule
+     * @param compute_services: available compute services
+     * @return
+     */
+    bool SimpleWMS::scheduleTask(std::shared_ptr<JobManager> job_manager,
+                                 std::shared_ptr<WorkflowTask> task,
+                                 std::set<std::shared_ptr<BareMetalComputeService>> compute_services) {
+        for (auto const &cs : compute_services) {
+            if (cs->getTotalNumIdleCores() > 0) {
+                auto job = job_manager->createStandardJob(task);
+                job_manager->submitJob(job, cs);
+                return true;
+            }
+        }
+        return false;
     }
 
 }

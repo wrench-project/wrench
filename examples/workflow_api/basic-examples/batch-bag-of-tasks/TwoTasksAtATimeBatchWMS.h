@@ -19,21 +19,25 @@ namespace wrench {
     class Simulation;
 
     /**
-     *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
+     *  @brief A Workflow Management System (WMS) implementation
      */
-    class TwoTasksAtATimeBatchWMS : public WMS {
+    class TwoTasksAtATimeBatchWMS : public ExecutionController {
 
     public:
         // Constructor
         TwoTasksAtATimeBatchWMS(
                 std::shared_ptr<Workflow> workflow,
-                const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                const std::set<std::shared_ptr<StorageService>> &storage_services,
+                const std::shared_ptr<BatchComputeService> &batch_compute_service,
+                const std::shared_ptr<StorageService> &storage_service,
                 const std::string &hostname);
 
     private:
         // main() method of the WMS
         int main() override;
+
+        std::shared_ptr<Workflow> workflow;
+        const std::shared_ptr<BatchComputeService> batch_compute_service;
+        const std::shared_ptr<StorageService> storage_service;
 
     };
 }

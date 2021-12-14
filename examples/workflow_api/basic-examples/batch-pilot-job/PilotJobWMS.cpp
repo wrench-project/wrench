@@ -34,16 +34,11 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     PilotJobWMS::PilotJobWMS(std::shared_ptr<Workflow> workflow,
-                             const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                             const std::set<std::shared_ptr<StorageService>> &storage_services,
-                             const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "two-tasks-at-a-time-batch_standard_and_pilot_jobs") {}
+                             const std::shared_ptr<BatchComputeService> &batch_compute_service,
+                             const std::shared_ptr<StorageService> &storage_service,
+                             const std::string &hostname) :
+                             ExecutionController(hostname,"two-tasks-at-a-time-batch_standard_and_pilot_jobs"),
+                             workflow(workflow), batch_compute_service(batch_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the PilotJobWMS daemon
@@ -58,28 +53,25 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());WRENCH_INFO(
-                "About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+                "About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage service  */
-        auto batch_service = *(this->getAvailableComputeServices<BatchComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
 
         /* Record the batch_standard_and_pilot_jobs node's core flop rate */
-        double core_flop_rate = (*(batch_service->getCoreFlopRate().begin())).second;
+        double core_flop_rate = (*(batch_compute_service->getCoreFlopRate().begin())).second;
 
         /*  Get references to tasks and files */
-        auto task_0 = this->getWorkflow()->getTaskByID("task_0");
-        auto task_1 = this->getWorkflow()->getTaskByID("task_1");
-        auto file_0 = this->getWorkflow()->getFileByID("file_0");
-        auto file_1 = this->getWorkflow()->getFileByID("file_1");
-        auto file_2 = this->getWorkflow()->getFileByID("file_2");
+        auto task_0 = this->workflow->getTaskByID("task_0");
+        auto task_1 = this->workflow->getTaskByID("task_1");
+        auto file_0 = this->workflow->getFileByID("file_0");
+        auto file_1 = this->workflow->getFileByID("file_1");
+        auto file_2 = this->workflow->getFileByID("file_2");
 
         /* For each task, estimate its execution time in minutes */
         std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_minutes;
-        for (auto  const &t : this->getWorkflow()->getTasks())  {
+        for (auto  const &t : this->workflow->getTasks())  {
             double parallel_efficiency =
                     std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
             double in_seconds = (t->getFlops() / core_flop_rate) /  (10 * parallel_efficiency);
@@ -106,7 +98,7 @@ namespace wrench {
                     service_specific_arguments["-c"].c_str(),
                     service_specific_arguments["-t"].c_str());
 
-        job_manager->submitJob(pilot_job, batch_service, service_specific_arguments);
+        job_manager->submitJob(pilot_job, batch_compute_service, service_specific_arguments);
 
         /*  Waiting for the pilot job to start */
         WRENCH_INFO("Waiting and event");

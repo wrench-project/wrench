@@ -30,21 +30,15 @@ namespace wrench {
      * @brief Constructor, which calls the super constructor
      *
      * @param workflow: the workflow
-     * @param compute_services: a set of compute services available to run tasks
-     * @param storage_services: a set of storage services available to store files
+     * @param bare_metal_compute_service: a bare-metal compute service for running tasks
+     * @param storage_service: a storage service for storing files
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(std::shared_ptr<Workflow> workflow,
-                                           const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                           const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                           const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "two-tasks-at-a-time") {
+                                           std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                                           std::shared_ptr<SimpleStorageService> &storage_service,
+                                           const std::string &hostname) : ExecutionController (hostname, "two-tasks-at-a-time"),
+                                           workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {
     }
 
     /**
@@ -63,20 +57,16 @@ namespace wrench {
                     Simulation::getHostName().c_str(),
                     Simulation::getCurrentSimulatedDate());
 
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage service  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             /* Get the ready tasks */
-            std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
             /* Sort them by increasing flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
@@ -129,7 +119,7 @@ namespace wrench {
                         expensive_ready_task->getID().c_str());
 
             /* Submit the job to the compute service */
-            job_manager->submitJob(standard_job, compute_service, service_specific_args);
+            job_manager->submitJob(standard_job, this->bare_metal_compute_service, service_specific_args);
 
             /* Wait for a workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method

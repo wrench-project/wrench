@@ -19,27 +19,31 @@ namespace wrench {
     class Simulation;
 
     /**
-     *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
+     *  @brief A Workflow Management System (WMS) implementation
      */
-    class WorkflowAsAsingleJobWMS : public WMS {
+    class WorkflowAsAsingleJobWMS : public ExecutionController {
 
     public:
         // Constructor
         WorkflowAsAsingleJobWMS(
-                std::shared_ptr<Workflow> workflow,
-                const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                const std::set<std::shared_ptr<StorageService>> &storage_services,
+                const std::shared_ptr<Workflow> &workflow,
+                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                const std::shared_ptr<SimpleStorageService> &storage_service,
                 const std::string &hostname);
 
     protected:
 
-        // Overriden methods
+        // Overridden methods
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
         void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
 
     private:
         // main() method of the WMS
         int main() override;
+
+        std::shared_ptr<Workflow> workflow;
+        std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
+        std::shared_ptr<SimpleStorageService> storage_service;
 
     };
 }

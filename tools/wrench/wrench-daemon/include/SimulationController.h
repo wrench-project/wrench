@@ -31,7 +31,7 @@ namespace wrench {
      * Simulation Daemon (which itself was spawned by wrench-daemon, and which handles
      * all interaction with the simulation client).
      */
-    class SimulationController : public WMS {
+    class SimulationController : public ExecutionController {
 
     public:
         SimulationController(std::shared_ptr<Workflow> workflow, const std::string &hostname, int sleep_us);
@@ -103,6 +103,9 @@ namespace wrench {
         // The two managers
         std::shared_ptr<JobManager> job_manager;
         std::shared_ptr<DataMovementManager> data_movement_manager;
+
+        // The workflow
+        std::shared_ptr<Workflow> workflow;
 
         bool keep_going = true;
         double time_horizon_to_reach = 0;

@@ -33,20 +33,14 @@ namespace wrench {
      * @param server_storage_services: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    NFSPipelineWMS::NFSPipelineWMS(std::shared_ptr<Workflow> workflow,
-                                   const std::set<std::shared_ptr<ComputeService>> &compute_services,
+    NFSPipelineWMS::NFSPipelineWMS(const std::shared_ptr<Workflow> &workflow,
+                                   const std::shared_ptr<ComputeService> &bare_metal_compute_service,
                                    const std::shared_ptr<StorageService> &client_storage_service,
                                    const std::shared_ptr<StorageService> &server_storage_service,
-                                   const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            {client_storage_service, server_storage_service},
-            {}, nullptr,
-            hostname,
-            "nfs-pipeline-wms") {
-        this->client_storage_service = client_storage_service;
-        this->server_storage_service = server_storage_service;
+                                   const std::string &hostname) :
+                                   ExecutionController (hostname,"nfs-pipeline-wms"),
+                                   workflow(workflow), bare_metal_compute_service(bare_metal_compute_service),
+                                   client_storage_service(client_storage_service), server_storage_service(server_storage_service) {
     }
 
     /**
@@ -62,20 +56,17 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());WRENCH_INFO(
-                "About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+                "About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage servic  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
-            std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
-            for (auto ready_task : ready_tasks) {
+            for (const auto &ready_task : ready_tasks) {
 
                 /* Create a standard job for the task1 */
                 WRENCH_INFO("Creating a job for task1 %s", ready_task->getID().c_str());
@@ -86,7 +77,7 @@ namespace wrench {
                 std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
                 std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
 
-                for (auto input_file : ready_task->getInputFiles()) {
+                for (const auto &input_file : ready_task->getInputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {
                         file_locations[input_file] = FileLocation::LOCATION(this->client_storage_service, this->server_storage_service);
                     } else {
@@ -94,7 +85,7 @@ namespace wrench {
                     }
 
                 }
-                for (auto output_file : ready_task->getOutputFiles()) {
+                for (const auto &output_file : ready_task->getOutputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {
                         file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, this->server_storage_service);
                     } else {
@@ -124,7 +115,7 @@ namespace wrench {
 
                 /* Submit the job to the compute service */
                 WRENCH_INFO("Submitting the job to the compute service");
-                job_manager->submitJob(standard_job, compute_service, compute_args);
+                job_manager->submitJob(standard_job, bare_metal_compute_service, compute_args);
             }
 
             /* Wait for a workflow execution event and process it. In this case we know that
