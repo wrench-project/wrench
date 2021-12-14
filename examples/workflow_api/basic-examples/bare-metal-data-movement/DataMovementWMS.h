@@ -28,8 +28,8 @@ namespace wrench {
         DataMovementWMS(
                 const std::shared_ptr<Workflow> &workflow,
                 const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                const std::shared_ptr<StorageService> &storage_service2,
                 const std::shared_ptr<StorageService> &storage_service1,
+                const std::shared_ptr<StorageService> &storage_service2,
                 const std::string &hostname);
 
     protected:
@@ -44,8 +44,8 @@ namespace wrench {
 
         std::shared_ptr<Workflow> workflow;
         std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
-        std::shared_ptr<StorageService> storage_service2;
         std::shared_ptr<StorageService> storage_service1;
+        std::shared_ptr<StorageService> storage_service2;
 
     };
 }

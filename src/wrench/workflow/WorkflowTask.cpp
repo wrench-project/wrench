@@ -215,6 +215,7 @@ namespace wrench {
             case WorkflowTask::State::COMPLETED:
                 return "COMPLETED";
             case WorkflowTask::State::UNKNOWN:
+            default:
                 return "UNKNOWN";
         }
     }
