@@ -11,14 +11,17 @@
 #ifndef WRENCH_DATAMOVEMENTMANAGER_H
 #define WRENCH_DATAMOVEMENTMANAGER_H
 
+#include <list>
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
 
     class Workflow;
     class DataFile;
     class StorageService;
+    class FileRegistryService;
     class ExecutionController;
     class WMS;
 

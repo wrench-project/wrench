@@ -134,7 +134,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the parent compute service of the job
+     * @brief Get the compute service that is running /ran the job
      *
      * @return a compute service
      */

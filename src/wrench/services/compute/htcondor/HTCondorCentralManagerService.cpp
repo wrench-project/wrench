@@ -147,7 +147,7 @@ namespace wrench {
                 // dispatching standard or pilot jobs
                 if (not this->pending_jobs.empty()) {
                     this->dispatching_jobs = true;
-                    //WRENCH_INFO("adding batch_standard_and_pilot_jobs service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
+                    //WRENCH_INFO("adding BatchComputeService service to new negotiator---> %p", this->grid_universe_batch_service_shared_ptr.get());
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                             new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead,
                                                           this->compute_services,

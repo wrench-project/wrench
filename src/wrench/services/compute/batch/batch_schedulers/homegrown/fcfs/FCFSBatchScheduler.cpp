@@ -19,7 +19,7 @@ namespace wrench {
     /**
     * @brief Overriden Method to pick the next job to schedule
     *
-    * @return A batch_standard_and_pilot_jobs job, or nullptr is none is found
+    * @return A BatchComputeService job, or nullptr is none is found
     */
     std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() {
         if (this->cs->batch_queue.empty()) {
@@ -345,7 +345,7 @@ namespace wrench {
                 break;
             }
 
-            // Get the compound job associated to the picked batch_standard_and_pilot_jobs job
+            // Get the compound job associated to the picked BatchComputeService job
             std::shared_ptr<CompoundJob> compound_job = batch_job->getCompoundJob();
 
             // Find on which resources to actually run the job
@@ -366,7 +366,7 @@ namespace wrench {
 
             WRENCH_INFO("Starting compound job %s", compound_job->getName().c_str());
 
-            // Remove the job from the batch_standard_and_pilot_jobs queue
+            // Remove the job from the BatchComputeService queue
             this->cs->removeJobFromBatchQueue(batch_job);
 
             // Add it to the running list
@@ -382,7 +382,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch_standard_and_pilot_jobs job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
@@ -390,7 +390,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch_standard_and_pilot_jobs job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
@@ -398,7 +398,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch_standard_and_pilot_jobs job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
@@ -406,7 +406,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param job_id: a batch_standard_and_pilot_jobs job id
+     * @param job_id: a BatchComputeService job id
      */
     void processUnknownJobTermination(std::string job_id) {
         // Do nothing
@@ -414,7 +414,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch_standard_and_pilot_jobs job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing

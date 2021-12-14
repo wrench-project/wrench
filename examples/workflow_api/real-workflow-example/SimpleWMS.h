@@ -30,7 +30,10 @@ namespace wrench {
 
     protected:
 
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
+        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) override;
+        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) override;
+        void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) override;
+        void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent> event) override;
 
     private:
         int main() override;
@@ -38,14 +41,21 @@ namespace wrench {
         /** @brief Whether the workflow execution should be aborted */
         bool abort = false;
 
-        bool scheduleTask(std::shared_ptr<JobManager> job_manager,
-                          std::shared_ptr<WorkflowTask> task,
-                          std::set<std::shared_ptr<BareMetalComputeService>> compute_services);
+        /** @brief A pilot job that is submitted to the batch compute service */
+        std::shared_ptr<PilotJob> pilot_job = nullptr;
+        /** @brief A boolean to indicate whether the pilot job is running */
+        bool pilot_job_is_running = false;
+
+        void scheduleReadyTasks(std::vector<std::shared_ptr<WorkflowTask>> ready_tasks,
+                                std::shared_ptr<JobManager> job_manager,
+                                std::set<std::shared_ptr<BareMetalComputeService>> compute_services);
 
         std::shared_ptr<Workflow> workflow;
-        std::shared_ptr<CloudComputeService> cloud_compute_service;
         std::shared_ptr<BatchComputeService> batch_compute_service;
+        std::shared_ptr<CloudComputeService> cloud_compute_service;
         std::shared_ptr<StorageService> storage_service;
+
+        std::map<std::shared_ptr<ComputeService>, unsigned long> core_utilization_map;
 
     };
 }

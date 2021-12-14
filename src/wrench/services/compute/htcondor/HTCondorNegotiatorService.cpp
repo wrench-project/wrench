@@ -153,7 +153,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
 
-        // Figure out which batch_standard_and_pilot_jobs compute services are available
+        // Figure out which BatchComputeService compute services are available
         for (auto const &cs : this->compute_services) {
             if (auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs)) {
                 available_batch_compute_services.insert(batch_cs);
@@ -185,7 +185,7 @@ namespace wrench {
             }
         }
 
-        // Find the target batch_standard_and_pilot_jobs compute service
+        // Find the target BatchComputeService compute service
         std::shared_ptr<BatchComputeService> target_batch_cs = nullptr;
         for (auto const &batch_cs : available_batch_compute_services) {
             if (batch_cs->getName() == service_specific_arguments["-service"]) {
@@ -195,7 +195,7 @@ namespace wrench {
         }
         if (target_batch_cs == nullptr) {
             throw std::invalid_argument("HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(): "
-                                        "-service service-specific argument specifies a batch_standard_and_pilot_jobs compute service named '" +
+                                        "-service service-specific argument specifies a BatchComputeService compute service named '" +
                                         service_specific_arguments["-service"] +
                                         "', but no such service is known to the HTCondorComputeService");
         }
@@ -216,7 +216,7 @@ namespace wrench {
 
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
-        // Figure out which batch_standard_and_pilot_jobs compute services are available
+        // Figure out which BatchComputeService compute services are available
         for (auto const &cs : this->compute_services) {
             // Only BareMetalComputeServices can be used
             if (not std::dynamic_pointer_cast<BareMetalComputeService>(cs)) {

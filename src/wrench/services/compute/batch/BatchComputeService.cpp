@@ -49,8 +49,8 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param compute_hosts: the list of names of the available compute hosts
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
-     *                 - all cores are usable by the batch_standard_and_pilot_jobs service on each host
-     *                 - all RAM is usable by the batch_standard_and_pilot_jobs service on each host
+     *                 - all cores are usable by the BatchComputeService service on each host
+     *                 - all RAM is usable by the BatchComputeService service on each host
      * @param scratch_space_mount_point: the mount point of the scratch storage space for the service ("" means "no scratch space")
      * @param property_list: a property list that specifies BatchComputeServiceProperty values ({} means "use all defaults")
      * @param messagepayload_list: a message payload list that specifies BatchComputeServiceMessagePayload values ({} means "use all defaults")
@@ -89,8 +89,8 @@ namespace wrench {
                                              std::map<std::string, double> messagepayload_list,
                                              std::string suffix) :
             ComputeService(hostname,
-                           "batch_standard_and_pilot_jobs" + suffix,
-                           "batch_standard_and_pilot_jobs" + suffix,
+                           "BatchComputeService" + suffix,
+                           "BatchComputeService" + suffix,
                            scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -113,19 +113,19 @@ namespace wrench {
             // Compute speed
             if (std::abs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
                 throw std::invalid_argument(
-                        "BatchComputeService::BatchComputeService(): Compute hosts for a batch_standard_and_pilot_jobs service need "
+                        "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different flop rates detected)");
             }
             // RAM
             if (std::abs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
                 throw std::invalid_argument(
-                        "BatchComputeService::BatchComputeService(): Compute hosts for a batch_standard_and_pilot_jobs service need "
+                        "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
             }
             // Num cores
             if (Simulation::getHostNumCores(h) != num_cores_available) {
                 throw std::invalid_argument(
-                        "BatchComputeService::BatchComputeService(): Compute hosts for a batch_standard_and_pilot_jobs service need "
+                        "BatchComputeService::BatchComputeService(): Compute hosts for a BatchComputeService service need "
                         "to be homogeneous (different RAM capacities detected)");
             }
         }
@@ -230,7 +230,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Gets the state of the batch_standard_and_pilot_jobs queue
+    * @brief Gets the state of the BatchComputeService queue
     * @return A vector of tuples:
     *              - std::string: username
     *              - string: job name
@@ -371,7 +371,7 @@ namespace wrench {
             batch_job->csv_metadata = "color:" + (*it).second;
         }
 
-        // Send a "run a batch_standard_and_pilot_jobs job" message to the daemon's mailbox_name
+        // Send a "run a BatchComputeService job" message to the daemon's mailbox_name
         auto answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
         try {
             S4U_Mailbox::dputMessage(
@@ -819,11 +819,11 @@ namespace wrench {
     /**
      * @brief Process a job submission
      *
-     * @param job: the batch_standard_and_pilot_jobs job object
+     * @param job: the BatchComputeService job object
      * @param answer_mailbox: the mailbox to which answer messages should be sent
      */
     void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, std::string answer_mailbox) {
-        WRENCH_INFO("Asked to run a batch_standard_and_pilot_jobs job with id %ld", job->getJobID());
+        WRENCH_INFO("Asked to run a BatchComputeService job with id %ld", job->getJobID());
 
 
         // Check that the job can be admitted in terms of resources:
@@ -904,7 +904,7 @@ namespace wrench {
         this->compound_job_alarms[job]->kill();
         this->compound_job_alarms.erase(job);
 
-        // Look for the corresponding batch_standard_and_pilot_jobs job
+        // Look for the corresponding BatchComputeService job
         if (this->running_jobs.find(job) == this->running_jobs.end()) {
             throw std::runtime_error(
                     "BatchComputeService::processCompoundJobCompletion(): Received a compound job completion, "
@@ -938,7 +938,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Helper function to remove a job from the batch_standard_and_pilot_jobs queue
+     * @brief Helper function to remove a job from the BatchComputeService queue
      * @param job: the job to remove
      */
     void BatchComputeService::removeJobFromBatchQueue(std::shared_ptr<BatchJob> job) {
@@ -1023,6 +1023,10 @@ namespace wrench {
                 "Creating a BareMetalComputeServiceOneShot for a compound job on %ld nodes with %ld cores per node",
                 num_nodes_allocated, cores_per_node_asked_for);
 
+        /* Set the number of cores per node to what was asked for */
+        for (auto const &r : resources) {
+            resources[r.first] = std::make_tuple(cores_per_node_asked_for, std::get<1>(r.second));
+        }
 
         compound_job->pushCallbackMailbox(this->mailbox_name);
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(new
@@ -1252,7 +1256,7 @@ namespace wrench {
 
     /**
      * @brief Process a Batch bach_job timeout
-     * @param bach_job: the batch_standard_and_pilot_jobs bach_job
+     * @param bach_job: the BatchComputeService bach_job
      */
     void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> batch_job) {
 
@@ -1268,7 +1272,7 @@ namespace wrench {
             // time out
             WRENCH_INFO(
                     "BatchComputeService::processAlarmJobTimeout(): Received a time out message for an unknown "
-                    "batch_standard_and_pilot_jobs bach_job (%ld)... ignoring",
+                    "BatchComputeService bach_job (%ld)... ignoring",
                     (unsigned long) batch_job.get());
             return;
         }
@@ -1358,7 +1362,7 @@ namespace wrench {
     void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox,
                                                                                  unsigned long num_cores, double ram) {
         throw std::runtime_error(
-                "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A batch_standard_and_pilot_jobs compute service does not support this operation");
+                "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A BatchComputeService compute service does not support this operation");
     }
 
 
