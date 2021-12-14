@@ -217,7 +217,8 @@ namespace wrench {
                         num_tasks_scheduled++;
                         scheduled = true;
                     } catch (ExecutionException &e) {
-                        WRENCH_INFO("WARNING: Was not able to submit task %s, likely due to the pilot job having expired (I should get a notification of its expiration soon)");
+                        WRENCH_INFO("WARNING: Was not able to submit task %s, likely due to the pilot job having expired "
+                                    "(I should get a notification of its expiration soon)", task->getID().c_str());
                     }
                     break;
                 }
