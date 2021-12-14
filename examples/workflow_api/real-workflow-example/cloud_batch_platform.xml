@@ -4,12 +4,12 @@
     <zone id="AS0" routing="Full">
 
         <host id="BatchHeadNode" speed="10Gf" core="1"/>
-        <host id="BatchNode1" speed="100Gf" core="10"/>
-        <host id="BatchNode2" speed="100Gf" core="10"/>
+        <host id="BatchNode1" speed="50Gf" core="10"/>
+        <host id="BatchNode2" speed="50Gf" core="10"/>
 
         <host id="CloudHeadNode" speed="10Gf" core="2"/>
-        <host id="CloudNode1" speed="100Gf" core="4"/>
-        <host id="CloudNode2" speed="100Gf" core="4"/>
+        <host id="CloudNode1" speed="60Gf" core="4"/>
+        <host id="CloudNode2" speed="60Gf" core="4"/>
         
         <host id="WMSHost" speed="10Gf" core="1">
             <disk id="large_disk" read_bw="50MBps" write_bw="50MBps">
@@ -20,7 +20,7 @@
 
         <!-- A since network links that connects all hosts together, which 
              of course a crazy over-simplification -->
-        <link id="wide_area_backbone" bandwidth="500GBps" latency="1ms"/>
+        <link id="wide_area_backbone" bandwidth="30MBps" latency="1ms"/>
 
         <!-- The network link connects all hosts together -->
         <route src="WMSHost" dst="BatchHeadNode"> <link_ctn id="wide_area_backbone"/></route>

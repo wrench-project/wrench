@@ -20,7 +20,7 @@ namespace wrench {
     /**
      *  @brief A Workflow Management System (WMS) implementation
      */
-    class CondorWMS : public WMS {
+    class CondorWMS : public ExecutionController {
 
     public:
         // Constructor
