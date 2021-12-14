@@ -196,14 +196,14 @@ int main(int argc, char **argv) {
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */
     std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;
-    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
+    auto baremetal_compute_service = simulation->add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
      * for executing the workflow-> */
 
     auto wms = simulation->add(
-            new wrench::TwoTasksAtATimeWMS(workflow, {baremetal_service}, {storage_service}, "WMSHost"));
+            new wrench::TwoTasksAtATimeWMS(workflow, baremetal_compute_service, storage_service, "WMSHost"));
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that

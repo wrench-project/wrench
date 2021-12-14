@@ -36,22 +36,6 @@ namespace wrench {
             Service(hostname, "controller_" + suffix, "controller_" + suffix) {
     }
 
-    /**
-     * @brief  Wait for an execution event
-     * @param timeout: a timeout value in seconds
-     * @return the event
-     */
-    std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent(double timeout) {
-        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name, timeout);
-    }
-
-    /**
-     * @brief  Wait for an execution event
-     * @return the event
-     */
-    std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent() {
-        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name, -1.0);
-    }
 
     /**
      * @brief Instantiate and start a job manager
@@ -152,4 +136,148 @@ namespace wrench {
                                    new ExecutionControllerAlarmTimerMessage(message, 0), "wms_timer");
     }
 
+    /**
+     * @brief  Wait for an execution event
+     * @param timeout: a timeout value in seconds
+     * @return the event
+     */
+    std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent(double timeout) {
+        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name, timeout);
+    }
+
+    /**
+     * @brief  Wait for an execution event
+     * @return the event
+     */
+    std::shared_ptr<ExecutionEvent> ExecutionController::waitForNextEvent() {
+        return ExecutionEvent::waitForNextExecutionEvent(this->mailbox_name, -1.0);
+    }
+
+    /**
+  * @brief Wait for an execution event and then call the associated function to process that event
+  */
+    void ExecutionController::waitForAndProcessNextEvent() {
+        this->waitForAndProcessNextEvent(-1.0);
+    }
+
+    /**
+     * @brief Wait for an execution event and then call the associated function to process that event
+     * @param timeout: a timeout value in seconds
+     *
+     * @return false if a timeout occurred (in which case no event was received/processed)
+     * @throw wrench::ExecutionException
+     */
+    bool ExecutionController::waitForAndProcessNextEvent(double timeout) {
+
+        std::shared_ptr<ExecutionEvent> event = this->waitForNextEvent(timeout);
+        if (event == nullptr) {
+            return false;
+        }
+
+        if (auto real_event = std::dynamic_pointer_cast<CompoundJobCompletedEvent>(event)) {
+            processEventCompoundJobCompletion(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<CompoundJobFailedEvent>(event)) {
+            processEventCompoundJobFailure(real_event);
+        } else  if (auto real_event = std::dynamic_pointer_cast<StandardJobCompletedEvent>(event)) {
+            processEventStandardJobCompletion(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<StandardJobFailedEvent>(event)) {
+            processEventStandardJobFailure(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<PilotJobStartedEvent>(event)) {
+            processEventPilotJobStart(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<PilotJobExpiredEvent>(event)) {
+            processEventPilotJobExpiration(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<FileCopyCompletedEvent>(event)) {
+            processEventFileCopyCompletion(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<FileCopyFailedEvent>(event)) {
+            processEventFileCopyFailure(real_event);
+        } else if (auto real_event = std::dynamic_pointer_cast<TimerEvent>(event)) {
+            processEventTimer(real_event);
+        } else {
+            throw std::runtime_error("SimpleExecutionController::main(): Unknown workflow execution event: " + event->toString());
+        }
+
+        return true;
+    }
+
+    /**
+     * @brief Process a standard job completion event
+     *
+     * @param event: a StandardJobCompletedEvent
+     */
+    void ExecutionController::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
+        auto standard_job = event->standard_job;
+        WRENCH_INFO("In default event-handler: Notified that a %ld-task job has completed", standard_job->getNumTasks());
+    }
+
+    /**
+     * @brief Process a standard job failure event
+     *
+     * @param event: a StandardJobFailedEvent
+     */
+    void ExecutionController::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a standard job has failed (all its tasks are back in the ready state)");
+    }
+
+    /**
+     * @brief Process a pilot job start event
+     *
+     * @param event: a PilotJobStartedEvent
+     */
+    void ExecutionController::processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a pilot job has started!");
+    }
+
+    /**
+     * @brief Process a pilot job expiration event
+     *
+     * @param event: a PilotJobExpiredEvent
+     */
+    void ExecutionController::processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a pilot job has expired!");
+    }
+
+    /**
+     * @brief Process a file copy completion event
+     *
+     * @param event: a FileCopyCompletedEvent
+     */
+    void ExecutionController::processEventFileCopyCompletion(std::shared_ptr<FileCopyCompletedEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a file copy is completed!");
+    }
+
+    /**
+     * @brief Process a file copy failure event
+     *
+     * @param event: a FileCopyFailedEvent
+     */
+    void ExecutionController::processEventFileCopyFailure(std::shared_ptr<FileCopyFailedEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a file copy has failed!");
+    }
+
+    /**
+     * @brief Process a timer event
+     *
+     * @param event: a TimerEvent
+     */
+    void ExecutionController::processEventTimer(std::shared_ptr<TimerEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a time has gone off!");
+    }
+
+    /**
+   * @brief Process a standard job completion event
+   *
+   * @param event: a CompoundJobCompletedEvent
+   */
+    void ExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a %ld-action job has completed", event->job->getActions().size());
+    }
+
+    /**
+     * @brief Process a standard job failure event
+     *
+     * @param event: a CompoundJobFailedEvent
+     */
+    void ExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
+        WRENCH_INFO("In default event-handler: Notified that a standard job has failed (all its tasks are back in the ready state)");
+    }
 };

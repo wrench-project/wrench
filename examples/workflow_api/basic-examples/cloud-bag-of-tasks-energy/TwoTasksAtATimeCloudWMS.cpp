@@ -34,17 +34,12 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(std::shared_ptr<Workflow> workflow,
-                                                     const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                     const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                                     const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "two-tasks-at-a-time-cloud") {}
+    TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(std::shared_ptr<Workflow> &workflow,
+                                                     const std::shared_ptr<CloudComputeService> &cloud_compute_service,
+                                                     const std::shared_ptr<StorageService> &storage_service,
+                                                     const std::string &hostname) :
+                                                     ExecutionController (hostname,"two-tasks-at-a-time-cloud"),
+                                                     workflow(workflow), cloud_compute_service(cloud_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the TwoTasksAtATimeCloudWMS daemon
@@ -59,30 +54,26 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage service  */
-        auto cloud_service = *(this->getAvailableComputeServices<CloudComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* Create a VM instance with 5 cores and one with 2 cores (and 500M of RAM) */
         WRENCH_INFO("Creating a 'large' VM with 5 cores  and a 'small' VM with 2 cores");
-        auto large_vm = cloud_service->createVM(5, 500000);
-        auto small_vm = cloud_service->createVM(2, 500000);
+        auto large_vm = cloud_compute_service->createVM(5, 500000);
+        auto small_vm = cloud_compute_service->createVM(2, 500000);
 
         /* Start the VMs */
         WRENCH_INFO("Starting both VMs");
-        auto large_vm_compute_service = cloud_service->startVM(large_vm);
-        auto small_vm_compute_service = cloud_service->startVM(small_vm);
+        auto large_vm_compute_service = cloud_compute_service->startVM(large_vm);
+        auto small_vm_compute_service = cloud_compute_service->startVM(small_vm);
 
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             /* Get the ready tasks */
-            auto ready_tasks = this->getWorkflow()->getReadyTasks();
+            auto ready_tasks = this->workflow->getReadyTasks();
 
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
@@ -108,7 +99,7 @@ namespace wrench {
 
             /* Create the job  */
             WRENCH_INFO("Creating a job to run task1 %s (%.2lf)",
-                    cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
+                        cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
 
             auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
 

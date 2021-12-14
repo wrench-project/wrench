@@ -11,7 +11,6 @@
 #include <wrench.h>
 
 #include "SimpleWMS.h"
-#include "scheduler/BatchStandardJobScheduler.h"
 #include <wrench/tools/pegasus/PegasusWorkflowParser.h>
 
 static bool ends_with(const std::string& str, const std::string& suffix) {
@@ -82,22 +81,21 @@ int main(int argc, char **argv) {
     /* Instantiate a storage service, to be started on some host in the simulated platform,
      * and adding it to the simulation->  A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
-     * of wrench::SimpleStorageService, is started on Host3 in the
+     * of wrench::SimpleStorageService, is started on WMSHost in the
      * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
      * is a barebone storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service.
      */
-    std::string storage_host = "Host3";
-    std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(storage_host, {"/"}));
+    std::cerr << "Instantiating a SimpleStorageService on WMSHost " << std::endl;
+    auto storage_service = simulation->add(new wrench::SimpleStorageService({"WMSHost"}, {"/"}));
     storage_services.insert(storage_service);
 
 
     /* Create a list of compute services that will be used by the WMS */
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
 
-    /* Instantiate a batch_standard_and_pilot_jobs service, to be started on some host in the simulation platform.
+    /* Instantiate and add to the simulation a batch_standard_and_pilot_jobs service, to be started on some host in the simulation platform.
      * A batch_standard_and_pilot_jobs service is an abstraction of a compute service that corresponds to
      * batch_standard_and_pilot_jobs-scheduled platforms in which jobs are submitted to a queue and dispatched
      * to compute nodes according to various scheduling algorithms.
@@ -108,19 +106,35 @@ int main(int argc, char **argv) {
      * terminate it will be 2048 bytes. See the documentation to find out all available
      * configurable properties for each kind of service.
      */
-    std::string batch_front_end_host = "Host2";
-
-    /* Add the batch_standard_and_pilot_jobs service to the simulation, catching a possible exception */
+    std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
     try {
-        auto batch_service = simulation->add(new wrench::BatchComputeService(
-                batch_front_end_host, hostname_list, "",
+        batch_compute_service = simulation->add(new wrench::BatchComputeService(
+        {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
                 {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
-        compute_services.insert(batch_service);
     } catch (std::invalid_argument &e) {
         std::cerr << "Error: " << e.what() << std::endl;
         std::exit(1);}
 
+    /* Instantiate and add to the simulation a cloud service, to be started on some host in the simulation platform.
+     * A cloud service is an abstraction of a compute service that corresponds to a
+     * Cloud platform that provides access to virtualized compute resources.
+     * In this example, this particular cloud service has no scratch storage space (mount point = "").
+     * The last argument to the constructor
+     * shows how to configure particular simulated behaviors of the compute service via a property
+     * list. In this example, one specified that the message that will be send to the service to
+     * terminate it will by 1024 bytes. See the documentation to find out all available
+     * configurable properties for each kind of service.
+     */
+    std::shared_ptr<wrench::CloudComputeService> cloud_compute_service;
+    try {
+        cloud_compute_service = simulation->add(new wrench::CloudComputeService(
+                {"CloudHeadNode"}, {{"CloudNode1"}, {"CloudNode2"}}, "", {},
+                {{wrench::CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}}));
+    } catch (std::invalid_argument &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        std::exit(1);
+    }
 
     /* Instantiate a WMS, to be started on some host (wms_host), which is responsible
      * for executing the workflow, and uses a scheduler (BatchStandardJobScheduler). That scheduler
@@ -129,13 +143,10 @@ int main(int argc, char **argv) {
      *
      * The WMS implementation is in SimpleWMS.[cpp|h].
      */
-    std::string wms_host = "Host1";
-    std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
+    std::cerr << "Instantiating a WMS on WMSHost..." << std::endl;
     auto wms = simulation->add(
-            new wrench::SimpleWMS(workflow,
-                                  std::unique_ptr<wrench::BatchStandardJobScheduler>(
-                                          new wrench::BatchStandardJobScheduler(storage_service)),
-                                  nullptr, compute_services, storage_services, wms_host));
+            new wrench::SimpleWMS(workflow, batch_compute_service,
+                                  cloud_compute_service, storage_service, {"WMSHost"}));
 
     /* Instantiate a file registry service to be started on some host. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that

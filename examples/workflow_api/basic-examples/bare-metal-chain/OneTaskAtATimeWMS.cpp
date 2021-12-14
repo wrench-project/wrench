@@ -28,21 +28,16 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param compute_services: a set of compute services available to run tasks
+     * @param bare_metalcompute_service: a set of compute services available to run tasks
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
     OneTaskAtATimeWMS::OneTaskAtATimeWMS(std::shared_ptr<Workflow> workflow,
-                                         const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                         const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                         const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "one-task1-at-a-time") {}
+                                         const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                                         const std::shared_ptr<SimpleStorageService> &storage_service,
+                                         const std::string &hostname) :
+                                         ExecutionController(hostname,"one-task1-at-a-time"),
+                                         workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the OneTaskAtATimeWMS daemon
@@ -57,20 +52,16 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage servic  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             /* Get one ready task1 */
-            auto ready_task = this->getWorkflow()->getReadyTasks().at(0);
+            auto ready_task = this->workflow->getReadyTasks().at(0);
 
             /* Create a standard job for the task1 */
             WRENCH_INFO("Creating a job for task1 %s", ready_task->getID().c_str());
@@ -86,7 +77,7 @@ namespace wrench {
 
             /* Submit the job to the compute service */
             WRENCH_INFO("Submitting the job to the compute service");
-            job_manager->submitJob(standard_job, compute_service);
+            job_manager->submitJob(standard_job, bare_metal_compute_service);
 
             /* Wait for a workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method

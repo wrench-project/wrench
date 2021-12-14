@@ -35,16 +35,10 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(std::shared_ptr<Workflow> workflow,
-                                           const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                           const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                           const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "two-tasks-at-a-time") {
+                                           const std::shared_ptr<BareMetalComputeService> &compute_service,
+                                           const std::shared_ptr<SimpleStorageService> &storage_service,
+                                           const std::string &hostname) : ExecutionController(hostname, "two-tasks-at-a-time"),
+                                           workflow(workflow), compute_service(compute_service), storage_service(storage_service) {
     }
 
     /**
@@ -68,19 +62,15 @@ namespace wrench {
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage service  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             /* Get the ready tasks */
-            std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<std::shared_ptr<WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
             /* Sort them by increasing flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const std::shared_ptr<WorkflowTask>t1, const std::shared_ptr<WorkflowTask> t2) -> bool {
+                      [](const std::shared_ptr<WorkflowTask>&t1, const std::shared_ptr<WorkflowTask>& t2) -> bool {
 
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1.get() > (uintptr_t) t2.get());

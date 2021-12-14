@@ -34,17 +34,12 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(std::shared_ptr<Workflow> workflow,
-                                                     const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                     const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                                     const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "two-tasks-at-a-time-cloud") {}
+    TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(std::shared_ptr<Workflow> &workflow,
+                                                     const std::shared_ptr<CloudComputeService> &cloud_compute_service,
+                                                     const std::shared_ptr<StorageService> &storage_service,
+                                                     const std::string &hostname) :
+                                                     ExecutionController(hostname,"two-tasks-at-a-time-cloud"),
+                                                     workflow(workflow), cloud_compute_service(cloud_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the TwoTasksAtATimeCloudWMS daemon
@@ -59,34 +54,30 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage service  */
-        auto cloud_service = *(this->getAvailableComputeServices<CloudComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* Create a VM instance with 10 cores and one with 4 cores (and 500M of RAM) */
         WRENCH_INFO("Creating a 'large' VM with 10 cores  and a 'small' VM with 4 cores");
-        auto large_vm = cloud_service->createVM(10, 500000);
-        auto small_vm = cloud_service->createVM(4, 500000);
+        auto large_vm = cloud_compute_service->createVM(10, 500000);
+        auto small_vm = cloud_compute_service->createVM(4, 500000);
 
         /* Start the VMs */
         WRENCH_INFO("Starting both VMs");
-        auto large_vm_compute_service = cloud_service->startVM(large_vm);
-        auto small_vm_compute_service = cloud_service->startVM(small_vm);
+        auto large_vm_compute_service = cloud_compute_service->startVM(large_vm);
+        auto small_vm_compute_service = cloud_compute_service->startVM(small_vm);
 
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             /* Get the ready tasks */
-            auto ready_tasks = this->getWorkflow()->getReadyTasks();
+            auto ready_tasks = this->workflow->getReadyTasks();
 
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const std::shared_ptr<WorkflowTask>t1, const std::shared_ptr<WorkflowTask>  t2) -> bool {
+                      [](const std::shared_ptr<WorkflowTask> &t1, const std::shared_ptr<WorkflowTask>  &t2) -> bool {
 
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1.get() > (uintptr_t) t2.get());

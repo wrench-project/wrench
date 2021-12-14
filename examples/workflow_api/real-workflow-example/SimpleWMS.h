@@ -19,14 +19,13 @@ namespace wrench {
     /**
      *  @brief A simple WMS implementation
      */
-    class SimpleWMS : public WMS {
+    class SimpleWMS : public ExecutionController {
 
     public:
-        SimpleWMS(std::shared_ptr<Workflow> workflow,
-                  std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
-                  std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
-                  const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                  const std::set<std::shared_ptr<StorageService>> &storage_services,
+        SimpleWMS(const std::shared_ptr<Workflow> &workflow,
+                  const std::shared_ptr<BatchComputeService> &batch_compute_service,
+                  const std::shared_ptr<CloudComputeService> &cloud_compute_service,
+                  const std::shared_ptr<StorageService> &storage_service,
                   const std::string &hostname);
 
     protected:
@@ -36,10 +35,18 @@ namespace wrench {
     private:
         int main() override;
 
-        /** @brief The job manager */
-        std::shared_ptr<JobManager> job_manager;
         /** @brief Whether the workflow execution should be aborted */
         bool abort = false;
+
+        bool scheduleTask(std::shared_ptr<JobManager> job_manager,
+                          std::shared_ptr<WorkflowTask> task,
+                          std::set<std::shared_ptr<BareMetalComputeService>> compute_services);
+
+        std::shared_ptr<Workflow> workflow;
+        std::shared_ptr<CloudComputeService> cloud_compute_service;
+        std::shared_ptr<BatchComputeService> batch_compute_service;
+        std::shared_ptr<StorageService> storage_service;
+
     };
 }
 #endif //WRENCH_EXAMPLE_SIMPLEWMS_H

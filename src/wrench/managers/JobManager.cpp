@@ -12,7 +12,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <utility>
 
-#include <wrench/wms/WMS.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/managers/JobManager.h>

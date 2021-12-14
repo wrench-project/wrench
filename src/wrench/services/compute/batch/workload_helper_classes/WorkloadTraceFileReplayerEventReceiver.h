@@ -10,7 +10,7 @@
 #ifndef WRENCH_ONEJOBWMS_H
 #define WRENCH_ONEJOBWMS_H
 
-#include "wrench/wms/WMS.h"
+#include "wrench/execution_controller/ExecutionController.h"
 
 /***********************/
 /** \cond INTERNAL    **/

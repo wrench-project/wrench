@@ -737,7 +737,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
+     * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the execution controller)
      * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
      */
     double WorkflowTask::getTerminationDate() const {

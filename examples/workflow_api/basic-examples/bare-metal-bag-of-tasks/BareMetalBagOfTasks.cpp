@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
      * for executing the workflow-> */
 
     auto wms = simulation->add(
-            new wrench::TwoTasksAtATimeWMS(workflow, {baremetal_service}, {storage_service}, "WMSHost"));
+            new wrench::TwoTasksAtATimeWMS(workflow, baremetal_service, storage_service, "WMSHost"));
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that

@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 
     // Create a WMS
     auto wms = simulation->add(
-            new wrench::CondorWMS(workflow, {htcondor_cs, batch_cs, cloud_cs}, {local_ss}, "HTCondorHost"));
+            new wrench::CondorWMS(workflow, htcondor_cs, batch_cs, cloud_cs, local_ss, "HTCondorHost"));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService("WMSHost"));
