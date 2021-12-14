@@ -54,7 +54,6 @@ namespace wrench {
 
         std::shared_ptr<Workflow> getWorkflow();
 
-
     protected:
 
         /***********************/

@@ -171,7 +171,7 @@ namespace wrench {
      * @param args: a map of argument name/values
      */
      void Job::setServiceSpecificArguments(std::map<std::string, std::string> args) {
-        this->service_specific_args = args;
+        this->service_specific_args = std::move(args);
     }
 
     /**

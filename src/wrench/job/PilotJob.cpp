@@ -19,7 +19,7 @@ namespace wrench {
      * @param workflow: a workflow
      */
     PilotJob::PilotJob(std::shared_ptr<JobManager> job_manager) :
-            Job("", job_manager), state(PilotJob::State::NOT_SUBMITTED) {
+            Job("", std::move(job_manager)), state(PilotJob::State::NOT_SUBMITTED) {
 
       this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
     }
