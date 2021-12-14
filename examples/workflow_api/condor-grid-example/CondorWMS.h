@@ -18,7 +18,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     *  @brief A Workflow Management System (WMS) implementation (inherits from WMS)
+     *  @brief A Workflow Management System (WMS) implementation
      */
     class CondorWMS : public WMS {
 

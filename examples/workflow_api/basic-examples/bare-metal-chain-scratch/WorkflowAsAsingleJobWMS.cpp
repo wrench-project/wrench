@@ -28,22 +28,16 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param compute_services: a set of compute services available to run tasks
-     * @param storage_services: a set of storage services available to store files
+     * @param compute_service: a compute service available to run tasks
+     * @param storage_services: a storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    WorkflowAsAsingleJobWMS::WorkflowAsAsingleJobWMS(std::shared_ptr<Workflow> workflow,
-                                                     const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                                     const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                                     const std::string &hostname) : WMS(
-
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "one-task1-at-a-time") {}
+    WorkflowAsAsingleJobWMS::WorkflowAsAsingleJobWMS(const std::shared_ptr<Workflow> &workflow,
+                                                     const std::shared_ptr<BareMetalComputeService> &compute_service,
+                                                     const std::shared_ptr<SimpleStorageService> &storage_service,
+                                                     const std::string &hostname) :
+            ExecutionController(hostname, "one-task1-at-a-time"),
+            workflow(workflow), bare_metal_compute_service(compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the OneTaskAtATimeWMS daemon
@@ -58,14 +52,10 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
-
-        /* Get the first available bare-metal compute service and storage service  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
 
         /* We want to execute the workflow tasks so that intermediate files are
          * kept in the compute service's scratch place, and only the final output
@@ -78,25 +68,25 @@ namespace wrench {
          * where is should be read/written */
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         // Set each file's location to the compute service's scratch space
-        for (auto const &file : this->getWorkflow()->getFileMap()) {
+        for (auto const &file : this->workflow->getFileMap()) {
             file_locations[file.second] = FileLocation::SCRATCH;
         }
         // For the workflow input files, in fact, set the location to the storage service
-        for (auto const &f  : this->getWorkflow()->getInputFiles()) {
+        for (auto const &f  : this->workflow->getInputFiles()) {
             file_locations[f] = FileLocation::LOCATION(storage_service);
         }
         // For the workflow output files, in fact, set the location to the storage service
-        for (auto const &f  : this->getWorkflow()->getOutputFiles()) {
+        for (auto const &f  : this->workflow->getOutputFiles()) {
             file_locations[f] = FileLocation::LOCATION(storage_service);
         }
 
         /* Second, we create a job */
         WRENCH_INFO("Creating a job for the entire workflow");
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), file_locations);
+        auto job = job_manager->createStandardJob(this->workflow->getTasks(), file_locations);
 
         /* Submit the job to the compute service */
-        WRENCH_INFO("Submitting the job to the compute sercvice");
-        job_manager->submitJob(job, compute_service);
+        WRENCH_INFO("Submitting the job to the compute service");
+        job_manager->submitJob(job, bare_metal_compute_service);
 
         /* Wait for a workflow execution event and process it. In this case we know that
          * the event will be a StandardJobCompletionEvent, which is processed by the method

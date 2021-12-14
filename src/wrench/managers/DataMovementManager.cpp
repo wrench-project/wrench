@@ -16,7 +16,6 @@
 #include <wrench/exceptions/ExecutionException.h>
 #include <services/storage/StorageServiceMessage.h>
 #include <wrench/data_file/DataFile.h>
-#include <wrench/wms/WMS.h>
 #include <wrench/managers/DataMovementManager.h>
 #include  <wrench/failure_causes/FileAlreadyBeingCopied.h>
 #include  <wrench/failure_causes/NetworkError.h>

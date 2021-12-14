@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
      * for executing the workflow->  */
     auto wms = simulation->add(
-            new wrench::PilotJobWMS(workflow, {batch_service}, {storage_service}, "WMSHost"));
+            new wrench::PilotJobWMS(workflow, batch_service, storage_service, "WMSHost"));
 
     /* Instantiate a file registry service to be started on WMSHost. This service is
      * essentially a replica catalog that stores <file , storage service> pairs so that

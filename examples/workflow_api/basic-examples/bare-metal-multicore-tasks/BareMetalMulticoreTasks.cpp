@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
     /* Instantiate a WMS, to be stated on WMSHost, which is responsible
      * for executing the workflow-> */
     auto wms = simulation->add(
-            new wrench::OneTaskAtATimeWMS(workflow, {baremetal_service}, "WMSHost"));
+            new wrench::OneTaskAtATimeWMS(workflow, baremetal_service, "WMSHost"));
 
     /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;

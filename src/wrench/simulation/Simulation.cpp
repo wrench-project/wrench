@@ -12,7 +12,7 @@
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 
-#include <wrench/wms/WMS.h>
+#include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/logging/TerminalOutput.h>
@@ -484,49 +484,9 @@ namespace wrench {
         // Check that there is at least one execution controller
         if (this->execution_controllers.empty()) {
             throw std::runtime_error(
-                    "An execution controller should have been instantiated and passed to Simulation.setWMS()");
+                    "An execution controller should have been instantiated and passed to Simulation.add()");
         }
 
-        // Check that WMSs can do their work
-        for (const auto &execution_controller : this->execution_controllers) {
-            if (auto wms = std::dynamic_pointer_cast<WMS>(execution_controller)) {
-                // Check that at least one StorageService is running (only needed if there are files in the workflow),
-                if (not Simulation::data_files.empty()) {
-                    bool one_storage_service_running = false;
-                    for (const auto &storage_service : this->storage_services) {
-                        if (storage_service->state == Service::UP) {
-                            one_storage_service_running = true;
-                            break;
-                        }
-                    }
-                    if (not one_storage_service_running) {
-                        throw std::runtime_error(
-                                "At least one StorageService should have been instantiated add passed to Simulation.add() because "
-                                "the simulation has files and they need to be stored somewhere!!");
-                    }
-                }
-
-                // Check that a FileRegistryService is running if needed
-                if (not wms->workflow->getInputFiles().empty()) {
-                    if (this->file_registry_services.empty()) {
-                        throw std::runtime_error(
-                                "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
-                                "because there are workflow input files to be staged.");
-                    }
-                }
-
-                // Check that each input file is staged on the file registry services
-                for (auto file : wms->workflow->getInputFiles()) {
-                    for (auto frs : this->file_registry_services) {
-                        if (frs->entries.find(file) == frs->entries.end()) {
-                            throw std::runtime_error(
-                                    "Workflow input file " + file->getID() +
-                                    " is not staged on any storage service!");
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**

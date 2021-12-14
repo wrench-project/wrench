@@ -30,7 +30,7 @@ namespace wrench {
     SimulationController::SimulationController(
             std::shared_ptr<Workflow> workflow,
             const std::string &hostname, int sleep_us) :
-            WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "SimulationController"), sleep_us(sleep_us) {}
+            ExecutionController(hostname, "SimulationController"), workflow(workflow), sleep_us(sleep_us)  {}
 
     /**
      * @brief Simulation execution_controller's main method
@@ -443,7 +443,7 @@ namespace wrench {
 
         std::shared_ptr<DataFile> file;
         try {
-            file = this->getWorkflow()->getFileByID(filename);
+            file = this->workflow->getFileByID(filename);
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Unknown file " + filename);
         }
@@ -514,7 +514,7 @@ namespace wrench {
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
 
         for (auto const &name : data["tasks"]) {
-            tasks.push_back(this->getWorkflow()->getTaskByID(name));
+            tasks.push_back(this->workflow->getTaskByID(name));
         }
 
         auto job = this->job_manager->createStandardJob(tasks);
@@ -587,7 +587,7 @@ namespace wrench {
      */
     json SimulationController::createTask(json data) {
 
-        this->getWorkflow()->addTask(data["name"],
+        this->workflow->addTask(data["name"],
                                      data["flops"],
                                      data["min_num_cores"],
                                      data["max_num_cores"],
@@ -617,7 +617,7 @@ namespace wrench {
      */
     json SimulationController::getTaskFlops(json data) {
         json answer;
-        answer["flops"] = this->getWorkflow()->getTaskByID(data["name"])->getFlops();
+        answer["flops"] = this->workflow->getTaskByID(data["name"])->getFlops();
         return answer;
     }
 
@@ -643,7 +643,7 @@ namespace wrench {
      */
     json SimulationController::getTaskMinNumCores(json data) {
         json answer;
-        answer["min_num_cores"] = this->getWorkflow()->getTaskByID(data["name"])->getMinNumCores();
+        answer["min_num_cores"] = this->workflow->getTaskByID(data["name"])->getMinNumCores();
         return answer;
     }
 
@@ -669,7 +669,7 @@ namespace wrench {
      */
     json SimulationController::getTaskMaxNumCores(json data) {
         json answer;
-        answer["max_num_cores"] = this->getWorkflow()->getTaskByID(data["name"])->getMaxNumCores();
+        answer["max_num_cores"] = this->workflow->getTaskByID(data["name"])->getMaxNumCores();
         return answer;
     }
 
@@ -695,7 +695,7 @@ namespace wrench {
      */
     json SimulationController::getTaskMemory(json data) {
         json answer;
-        answer["memory"] = this->getWorkflow()->getTaskByID(data["name"])->getMemoryRequirement();
+        answer["memory"] = this->workflow->getTaskByID(data["name"])->getMemoryRequirement();
         return answer;
     }
 
@@ -720,7 +720,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addFile(json data) {
-        auto file = this->getWorkflow()->addFile(data["name"], data["size"]);
+        auto file = this->workflow->addFile(data["name"], data["size"]);
         return {};
     }
 
@@ -745,7 +745,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getFileSize(json data) {
-        auto file = this->getWorkflow()->getFileByID(data["name"]);
+        auto file = this->workflow->getFileByID(data["name"]);
         json answer;
         answer["size"] = file->getSize();
         return answer;
@@ -772,8 +772,8 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addInputFile(json data) {
-        auto task = this->getWorkflow()->getTaskByID(data["task"]);
-        auto file = this->getWorkflow()->getFileByID(data["file"]);
+        auto task = this->workflow->getTaskByID(data["task"]);
+        auto file = this->workflow->getFileByID(data["file"]);
         task->addInputFile(file);
         return {};
     }
@@ -799,8 +799,8 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::addOutputFile(json data) {
-        auto task = this->getWorkflow()->getTaskByID(data["task"]);
-        auto file = this->getWorkflow()->getFileByID(data["file"]);
+        auto task = this->workflow->getTaskByID(data["task"]);
+        auto file = this->workflow->getFileByID(data["file"]);
         task->addOutputFile(file);
         return {};
     }
@@ -826,7 +826,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getTaskInputFiles(json data) {
-        auto task = this->getWorkflow()->getTaskByID(data["task"]);
+        auto task = this->workflow->getTaskByID(data["task"]);
         auto files = task->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
@@ -857,7 +857,7 @@ namespace wrench {
      * END_REST_API_DOCUMENTATION
      */
     json SimulationController::getInputFiles(json data) {
-        auto files = this->getWorkflow()->getInputFiles();
+        auto files = this->workflow->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
         for (const auto &f : files) {
@@ -893,7 +893,7 @@ namespace wrench {
             throw std::runtime_error("Unknown storage service " + service_name);
         }
 
-        for (auto const &f : this->getWorkflow()->getInputFiles()) {
+        for (auto const &f : this->workflow->getInputFiles()) {
             this->simulation->stageFile(f, storage_service);
         }
         return {};

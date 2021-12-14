@@ -38,17 +38,12 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoTasksAtATimeVirtualizedClusterWMS::TwoTasksAtATimeVirtualizedClusterWMS(
-            std::shared_ptr<Workflow> workflow,
-            const std::set<std::shared_ptr<ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<StorageService>> &storage_services,
-            const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "two-tasks-at-a-time-virtualized-cluster") {}
+            const std::shared_ptr<Workflow> &workflow,
+            const std::shared_ptr<VirtualizedClusterComputeService> &virtualized_cluster_compute_service,
+            const std::shared_ptr<StorageService> &storage_service,
+            const std::string &hostname) :
+            ExecutionController(hostname,"two-tasks-at-a-time-virtualized-cluster"),
+            workflow(workflow), virtualized_cluster_compute_service(virtualized_cluster_compute_service), storage_service(storage_service){}
 
     /**
      * @brief main method of the TwoTasksAtATimeVirtualizedClusterWMS daemon
@@ -63,35 +58,31 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage service  */
-        auto virtualized_cluster_service = *(this->getAvailableComputeServices<VirtualizedClusterComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* Create a VM instance with 5 cores and one with 2 cores (and 500M of RAM) */
         WRENCH_INFO("Creating a 'large' VM with 5 cores  and a 'small' VM with 2 cores, both of them with 5GB RAM");
-        auto large_vm = virtualized_cluster_service->createVM(5, 5 * GB);
-        auto small_vm = virtualized_cluster_service->createVM(2, 5 * GB);
+        auto large_vm = virtualized_cluster_compute_service->createVM(5, 5 * GB);
+        auto small_vm = virtualized_cluster_compute_service->createVM(2, 5 * GB);
 
         /* Start the VMs */
         WRENCH_INFO("Start the large VM on host VirtualizedClusterHost1");
-        auto large_vm_compute_service = virtualized_cluster_service->startVM(large_vm, "VirtualizedClusterHost1");
+        auto large_vm_compute_service = virtualized_cluster_compute_service->startVM(large_vm, "VirtualizedClusterHost1");
         WRENCH_INFO("Start the small VM on host VirtualizedClusterHost2");
-        auto small_vm_compute_service = virtualized_cluster_service->startVM(small_vm, "VirtualizedClusterHost2");
+        auto small_vm_compute_service = virtualized_cluster_compute_service->startVM(small_vm, "VirtualizedClusterHost2");
 
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             /* Get the ready tasks */
-            auto ready_tasks = this->getWorkflow()->getReadyTasks();
+            auto ready_tasks = this->workflow->getReadyTasks();
 
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const std::shared_ptr<WorkflowTask>t1, const std::shared_ptr<WorkflowTask>  t2) -> bool {
+                      [](const std::shared_ptr<WorkflowTask> &t1, const std::shared_ptr<WorkflowTask>  &t2) -> bool {
 
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1.get() > (uintptr_t) t2.get());
@@ -143,7 +134,7 @@ namespace wrench {
 
             /* Migrate the VM */
             WRENCH_INFO("Migrating the small VM from VirtualizedClusterHost1 to VirtualizedClusterHost2");
-            virtualized_cluster_service->migrateVM(small_vm, "VirtualizedClusterHost2");
+            virtualized_cluster_compute_service->migrateVM(small_vm, "VirtualizedClusterHost2");
             WRENCH_INFO("VM Migrated!");
 
             /* Wait for  workflow execution event and process it. In this case we know that

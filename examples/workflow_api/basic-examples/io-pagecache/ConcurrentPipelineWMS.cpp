@@ -32,17 +32,12 @@ namespace wrench {
      * @param storage_services: a set of storage services available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
-    ConcurrentPipelineWMS::ConcurrentPipelineWMS(std::shared_ptr<Workflow> workflow,
-                                                 const std::set<std::shared_ptr<ComputeService>> &compute_services,
-                                         const std::set<std::shared_ptr<StorageService>> &storage_services,
-                                         const std::string &hostname) : WMS(
-            workflow,
-            nullptr, nullptr,
-            compute_services,
-            storage_services,
-            {}, nullptr,
-            hostname,
-            "concurrent-pipeline-wms") {}
+    ConcurrentPipelineWMS::ConcurrentPipelineWMS(const std::shared_ptr<Workflow> &workflow,
+                                                 const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                                                 const std::shared_ptr<StorageService> &storage_service,
+                                                 const std::string &hostname) :
+            ExecutionController (hostname,"concurrent-pipeline-wms"),
+            workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the ConcurrentPipelineWMS daemon
@@ -57,19 +52,15 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
-        WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
+        WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
-        /* Get the first available bare-metal compute service and storage servic  */
-        auto compute_service = *(this->getAvailableComputeServices<BareMetalComputeService>().begin());
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         /* While the workflow isn't done, repeat the main loop */
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
-            std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->getWorkflow()->getReadyTasks();
+            std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
             for (auto ready_task : ready_tasks) {
 
@@ -92,7 +83,7 @@ namespace wrench {
 
                 /* Submit the job to the compute service */
                 WRENCH_INFO("Submitting the job to the compute service");
-                job_manager->submitJob(standard_job, compute_service);
+                job_manager->submitJob(standard_job, bare_metal_compute_service);
             }
 
             /* Wait for a workflow execution event and process it. In this case we know that

@@ -129,11 +129,6 @@ set(HEADER_FILES
         include/wrench/util/PointerUtil.h
         include/wrench/util/TraceFileLoader.h
         include/wrench/util/UnitParser.h
-        include/wrench/wms/DynamicOptimization.h
-        include/wrench/wms/StaticOptimization.h
-        include/wrench/wms/WMS.h
-        include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowTask.h
         include/wrench/execution_events/ExecutionEvent.h
@@ -310,9 +305,6 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/util/UnitParser.cpp
-        src/wrench/wms/WMS.cpp
-        src/wrench/wms/WMSMessage.cpp
-        src/wrench/wms/WMSMessage.h
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/DagOfTasks.cpp
         src/wrench/workflow/WorkflowTask.cpp
@@ -436,7 +428,6 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         test/misc/BogusMessageTest.cpp
-        examples/workflow_api/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp

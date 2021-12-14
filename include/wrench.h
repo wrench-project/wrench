@@ -31,17 +31,6 @@
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 
-// WMS Implementations
-#include "wrench/wms/WMS.h"
-
-// Scheduler
-#include "wrench/wms/scheduler/StandardJobScheduler.h"
-#include "wrench/wms/scheduler/PilotJobScheduler.h"
-
-// Scheduling Optimizations
-#include "wrench/wms/StaticOptimization.h"
-#include "wrench/wms/DynamicOptimization.h"
-
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
