@@ -49,9 +49,6 @@ protected:
 
     BareMetalComputeServiceOneActionTest() {
 
-        std::shared_ptr<wrench::Workflow> workflow;
-
-
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();
 
@@ -262,7 +259,6 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
 
     // Run a do nothing simulation, because why not
     ASSERT_NO_THROW(simulation->launch());
-
 
 
     for (int i=0; i < argc; i++)
