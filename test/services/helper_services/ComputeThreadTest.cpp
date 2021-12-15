@@ -70,16 +70,13 @@ protected:
 /**  DO WORKING TEST                                                **/
 /**********************************************************************/
 
-class ComputeThreadWorkingTestWMS : public wrench::WMS {
+class ComputeThreadWorkingTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadWorkingTestWMS(ComputeThreadTest *test,
-                                std::shared_ptr<wrench::Workflow> workflow,
                                 std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
-
 
 private:
 
@@ -125,8 +122,8 @@ void ComputeThreadTest::do_Working_test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadWorkingTestWMS(this, workflow, hostname)));
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadWorkingTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -140,13 +137,13 @@ void ComputeThreadTest::do_Working_test() {
 /**  DO KILL AFTER DEATH TEST                                        **/
 /**********************************************************************/
 
-class ComputeThreadKillAfterDeathTestWMS : public wrench::WMS {
+class ComputeThreadKillAfterDeathTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadKillAfterDeathTestWMS(ComputeThreadTest *test,
                                        std::shared_ptr<wrench::Workflow> workflow,
                                        std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test"), test(test) {
         this->test = test;
     }
 
@@ -195,7 +192,7 @@ void ComputeThreadTest::do_KillAfterDeath_test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadKillAfterDeathTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());

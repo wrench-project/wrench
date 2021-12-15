@@ -115,14 +115,12 @@ public:
 /**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
 
-class FileDeleteActionExecutorSuccessTestWMS : public wrench::WMS {
+class FileDeleteActionExecutorSuccessTestWMS : public wrench::ExecutionController {
 
 public:
     FileDeleteActionExecutorSuccessTestWMS(FileDeleteActionExecutorTest *test,
-                                           std::shared_ptr<wrench::Workflow> workflow,
                                          std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -201,17 +199,14 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     // Create a Storage Service
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
-    // Create a workflow
-    workflow = wrench::Workflow::createWorkflow();
-
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
 
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, workflow, "Host1"));
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 

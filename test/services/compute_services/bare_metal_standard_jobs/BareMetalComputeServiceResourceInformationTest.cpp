@@ -27,6 +27,8 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service3 = nullptr;
 
+    std::shared_ptr<wrench::Workflow> workflow;
+
     void do_ResourceInformation_test();
 
 protected:
@@ -69,7 +71,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -77,15 +78,12 @@ protected:
 /**  RESOURCE INFORMATION SIMULATION TEST                            **/
 /**********************************************************************/
 
-class ResourceInformationTestWMS : public wrench::WMS {
+class ResourceInformationTestWMS : public wrench::ExecutionController {
 
 public:
     ResourceInformationTestWMS(BareMetalComputeServiceTestResourceInformation *test,
-                               std::shared_ptr<wrench::Workflow> workflow,
-                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -182,8 +180,8 @@ private:
         }
 
         // Create a job that will use cores on compute service #1
-        std::shared_ptr<wrench::WorkflowTask> t1 = this->getWorkflow()->addTask("task1", 60.0000, 3, 3, 0);
-        std::shared_ptr<wrench::WorkflowTask> t2 = this->getWorkflow()->addTask("task2", 60000000000.0001, 2, 2, 0);
+        std::shared_ptr<wrench::WorkflowTask> t1 = this->test->workflow->addTask("task1", 60.0000, 3, 3, 0);
+        std::shared_ptr<wrench::WorkflowTask> t2 = this->test->workflow->addTask("task2", 60000000000.0001, 2, 2, 0);
 
         std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
         tasks.push_back(t1);
@@ -222,8 +220,8 @@ private:
         }
 
 
-        this->getWorkflow()->removeTask(t1);
-        this->getWorkflow()->removeTask(t2);
+        this->test->workflow->removeTask(t1);
+        this->test->workflow->removeTask(t2);
 
         return 0;
     }
@@ -271,10 +269,10 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
     compute_services.insert(compute_service2);
 
     // Create the WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ResourceInformationTestWMS(
-                    this, workflow, compute_services, {}, "Host1")));
+                    this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

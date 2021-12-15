@@ -117,14 +117,12 @@ protected:
 /**********************************************************************/
 
 
-class CustomActionExecutorTestWMS : public wrench::WMS {
+class CustomActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     CustomActionExecutorTestWMS(CustomActionExecutorTest *test,
-                                std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -230,9 +228,9 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CustomActionExecutorTestWMS(this, this->workflow, "Host1")));
+            new CustomActionExecutorTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

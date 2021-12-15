@@ -42,6 +42,8 @@ public:
 
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
+    std::shared_ptr<wrench::Workflow> workflow;
+
     void do_UnsupportedStandardJobs_test();
 
     void do_BogusNumCores_test();
@@ -151,7 +153,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -159,16 +160,12 @@ protected:
 /**  UNSUPPORTED JOB TYPE TEST                                       **/
 /**********************************************************************/
 
-class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::WMS {
+class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::ExecutionController {
 
 public:
     MulticoreComputeServiceUnsupportedJobTypeTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                     std::shared_ptr<wrench::Workflow> workflow,
-                                                     const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -182,8 +179,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a pilot job
         auto pilot = job_manager->createPilotJob();
@@ -232,10 +227,9 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
                                                 {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MulticoreComputeServiceUnsupportedJobTypeTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+            new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -257,16 +251,12 @@ void BareMetalComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 /**  TWO BOGUS NUM CORES TEST                                        **/
 /**********************************************************************/
 
-class MulticoreComputeServiceBogusNumCoresTestWMS : public wrench::WMS {
+class MulticoreComputeServiceBogusNumCoresTestWMS : public wrench::ExecutionController {
 
 public:
     MulticoreComputeServiceBogusNumCoresTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                std::shared_ptr<wrench::Workflow> workflow,
-                                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                 std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -345,10 +335,10 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
                                                 {"/scratch"}, {}))); //scratch space of size 101
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceBogusNumCoresTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -371,16 +361,12 @@ void BareMetalComputeServiceTestStandardJobs::do_BogusNumCores_test() {
 /**  TWO SINGLE CORE TASKS TEST                                      **/
 /**********************************************************************/
 
-class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::WMS {
+class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::ExecutionController {
 
 public:
     MulticoreComputeServiceTwoSingleCoreTasksTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                     std::shared_ptr<wrench::Workflow> workflow,
-                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -394,8 +380,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
@@ -479,10 +463,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
                     {}))); //scratch space of size 101
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -503,16 +487,12 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 /**  TWO DUAL-CORE TASKS TEST #1                                     **/
 /**********************************************************************/
 
-class MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS : public wrench::WMS {
+class MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS : public wrench::ExecutionController {
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        std::shared_ptr<wrench::Workflow> workflow,
-                                                        const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -526,8 +506,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
@@ -608,10 +586,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
                                                 {"/scratch"}, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms;
+    std::shared_ptr<wrench::ExecutionController> wms;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -633,15 +611,12 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 /**  TWO DUAL-CORE TASKS TEST #2                                     **/
 /**********************************************************************/
 
-class MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS : public wrench::WMS {
+class MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS : public wrench::ExecutionController {
 
 public:
     MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        std::shared_ptr<wrench::Workflow> workflow,
-                                                        const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -656,8 +631,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
         // Create a 2-task1 job
@@ -749,10 +722,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
                                                 {"/scratch"}, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(
-                    this,  workflow, {compute_service}, {storage_service}, hostname)));
+                    this,  hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -775,16 +748,12 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 /**  TWO DUAL-CORE TASKS TEST #3                                     **/
 /**********************************************************************/
 
-class BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::WMS {
+class BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                        std::shared_ptr<wrench::Workflow> workflow,
-                                                        const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -798,8 +767,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job_1 = job_manager->createStandardJob({this->test->task5, this->test->task6},
@@ -971,10 +938,10 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
                                                 "/scratch", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceTwoDualCoreTasksCase3TestWMS(
-                    this,  workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -997,16 +964,12 @@ void BareMetalComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase3_test() {
 /**  IMMEDIATE JOB TERMINATION TEST                                  **/
 /**********************************************************************/
 
-class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceJobImmediateTerminationTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceJobImmediateTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                          std::shared_ptr<wrench::Workflow> workflow,
-                                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                           std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1020,8 +983,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
@@ -1090,10 +1051,10 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
                                                 "/scratch", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceJobImmediateTerminationTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1121,16 +1082,12 @@ void BareMetalComputeServiceTestStandardJobs::do_JobImmediateTermination_test() 
 /**  JOB TERMINATION TEST                                            **/
 /**********************************************************************/
 
-class BareMetalComputeServiceJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceJobTerminationTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                 std::shared_ptr<wrench::Workflow> workflow,
-                                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                  std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1144,8 +1101,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
@@ -1217,10 +1172,10 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
                                                 "/scratch", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceJobTerminationTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1249,16 +1204,12 @@ void BareMetalComputeServiceTestStandardJobs::do_JobTermination_test() {
 /**  NOT SUBMITTED JOB TERMINATION TEST                              **/
 /**********************************************************************/
 
-class BareMetalComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                             std::shared_ptr<wrench::Workflow> workflow,
-                                                             const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                              std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1272,8 +1223,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
@@ -1332,10 +1281,10 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
                                                 "", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceNonSubmittedJobTerminationTestWMS(
-                    this,  workflow, {compute_service}, {storage_service}, hostname)));
+                    this,  hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1365,16 +1314,12 @@ void BareMetalComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 /**  COMPLETED JOB TERMINATION TEST                                  **/
 /**********************************************************************/
 
-class BareMetalComputeServiceCompletedJobTerminationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceCompletedJobTerminationTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceCompletedJobTerminationTestWMS(BareMetalComputeServiceTestStandardJobs *test,
-                                                          std::shared_ptr<wrench::Workflow> workflow,
-                                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                           std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1388,8 +1333,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
@@ -1457,10 +1400,10 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
                                                 "/scratch", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceCompletedJobTerminationTestWMS(
-                    this,  workflow, {compute_service}, {storage_service}, hostname)));
+                    this,  hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1490,17 +1433,13 @@ void BareMetalComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 /**  COMPUTE SERVICE SHUTDOWN WHILE JOB IS RUNNING TEST              **/
 /**********************************************************************/
 
-class BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : public wrench::WMS {
+class BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
-            std::shared_ptr<wrench::Workflow> workflow,
-            const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1514,8 +1453,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2},
@@ -1594,10 +1531,10 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
                                                 "/scratch", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1627,17 +1564,13 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
 /**  STORAGE SERVICE SHUTDOWN BEFORE JOB IS SUBMITTED TEST           **/
 /**********************************************************************/
 
-class BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS : public wrench::WMS {
+class BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
             BareMetalComputeServiceTestStandardJobs *test,
-            std::shared_ptr<wrench::Workflow> workflow,
-            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1651,8 +1584,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a 2-task1 job
         auto two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2});
@@ -1721,10 +1652,10 @@ void BareMetalComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
                                                 "/scratch", {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
-                    this, workflow, {compute_service}, {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));

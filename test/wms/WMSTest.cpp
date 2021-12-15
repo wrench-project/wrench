@@ -71,7 +71,7 @@ protected:
 /**  WMS REACTING TO EVENTS : DEFAULT HANDLERS                       **/
 /**********************************************************************/
 
-class TestDefaultHandlerWMS : public wrench::WMS {
+class TestDefaultHandlerWMS : public wrench::ExecutionController {
 
 public:
     TestDefaultHandlerWMS(WMSTest *test,
@@ -80,7 +80,7 @@ public:
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
         this->test = test;
         this->sleep_time = sleep_time;
@@ -110,7 +110,7 @@ private:
         auto vm_cs = cloud->startVM(vm_name);
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        auto task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        auto task1 = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -129,7 +129,7 @@ private:
         // Get the list of pending pilot jobs
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask("task2", 100.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -216,7 +216,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
     // Create a WMS
     auto workflow = wrench::Workflow::createWorkflow();
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestDefaultHandlerWMS(this,  workflow, 100, {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 
@@ -247,7 +247,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 /**  WMS REACTING TO EVENTS : CUSTOM HANDLERS                       **/
 /**********************************************************************/
 
-class TestCustomHandlerWMS : public wrench::WMS {
+class TestCustomHandlerWMS : public wrench::ExecutionController {
 
 public:
     TestCustomHandlerWMS(WMSTest *test,
@@ -256,7 +256,7 @@ public:
                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
         this->test = test;
         this->sleep_time = sleep_time;
@@ -287,7 +287,7 @@ private:
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
-        std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -305,7 +305,7 @@ private:
         }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask("task2", 200.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -425,7 +425,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
     // Create a WMS
     auto workflow = wrench::Workflow::createWorkflow();
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestCustomHandlerWMS(this,  workflow, 100, {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
 

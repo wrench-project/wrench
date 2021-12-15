@@ -25,6 +25,9 @@ class BareMetalComputeServiceTestScheduling : public ::testing::Test {
 
 
 public:
+
+    std::shared_ptr<wrench::Workflow> workflow;
+
     // Default
     std::shared_ptr<wrench::ComputeService> cs = nullptr;
 
@@ -86,23 +89,18 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 /**********************************************************************/
 /**  RAM PRESSURE TEST                                               **/
 /**********************************************************************/
 
-class RAMPressureTestWMS : public wrench::WMS {
+class RAMPressureTestWMS : public wrench::ExecutionController {
 
 public:
     RAMPressureTestWMS(BareMetalComputeServiceTestScheduling *test,
-                       std::shared_ptr<wrench::Workflow> workflow,
-                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                        std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -116,10 +114,10 @@ private:
 
         // Create a few tasks
         std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
-        tasks.push_back(this->getWorkflow()->addTask("task1", 60, 1, 1, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task2", 60, 1, 1, 600));
-        tasks.push_back(this->getWorkflow()->addTask("task3", 60, 1, 1, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task4", 60, 1, 1, 000));
+        tasks.push_back(this->test->workflow->addTask("task1", 60, 1, 1, 500));
+        tasks.push_back(this->test->workflow->addTask("task2", 60, 1, 1, 600));
+        tasks.push_back(this->test->workflow->addTask("task3", 60, 1, 1, 500));
+        tasks.push_back(this->test->workflow->addTask("task4", 60, 1, 1, 000));
 
         // Submit them in order
         for (auto const & t : tasks) {
@@ -219,10 +217,9 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     compute_services.insert(cs);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new RAMPressureTestWMS(
-                    this, workflow, compute_services, {}, "Host1")));
+            new RAMPressureTestWMS(this, "Host1")));
 
     workflow->clear();
 
@@ -241,16 +238,12 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
 /**  LOAD-BALANCING  TEST  #1                                        **/
 /**********************************************************************/
 
-class LoadBalancing1TestWMS : public wrench::WMS {
+class LoadBalancing1TestWMS : public wrench::ExecutionController {
 
 public:
     LoadBalancing1TestWMS(BareMetalComputeServiceTestScheduling *test,
-                          std::shared_ptr<wrench::Workflow> workflow,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -265,10 +258,10 @@ private:
 
         // Create a few tasks
         std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
-        tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 500));
-        tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 500));
+        tasks.push_back(this->test->workflow->addTask("task1", 100, 4, 4, 500));
+        tasks.push_back(this->test->workflow->addTask("task2", 100, 4, 4, 500));
+        tasks.push_back(this->test->workflow->addTask("task3", 100, 4, 4, 500));
+        tasks.push_back(this->test->workflow->addTask("task4", 100, 4, 4, 500));
 
         // Submit them in order
         for (auto const & t : tasks) {
@@ -354,10 +347,10 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
     compute_services.insert(cs);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new LoadBalancing1TestWMS(
-                    this, workflow, compute_services, {}, "Host1")));
+                    this, "Host1")));
 
     workflow->clear();
 
@@ -377,15 +370,12 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
 /**  LOAD-BALANCING  TEST  #2 (HETEROGENEOUS: 1 1x host, 1 3x host)  **/
 /**********************************************************************/
 
-class LoadBalancing2TestWMS : public wrench::WMS {
+class LoadBalancing2TestWMS : public wrench::ExecutionController {
 
 public:
     LoadBalancing2TestWMS(BareMetalComputeServiceTestScheduling *test,
-                          std::shared_ptr<wrench::Workflow> workflow,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -401,10 +391,10 @@ private:
 
         // Create a few tasks
         std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
-        tasks.push_back(this->getWorkflow()->addTask("task1", 100, 4, 4, 100));
-        tasks.push_back(this->getWorkflow()->addTask("task2", 100, 4, 4, 100));
-        tasks.push_back(this->getWorkflow()->addTask("task3", 100, 4, 4, 100));
-        tasks.push_back(this->getWorkflow()->addTask("task4", 100, 4, 4, 100));
+        tasks.push_back(this->test->workflow->addTask("task1", 100, 4, 4, 100));
+        tasks.push_back(this->test->workflow->addTask("task2", 100, 4, 4, 100));
+        tasks.push_back(this->test->workflow->addTask("task3", 100, 4, 4, 100));
+        tasks.push_back(this->test->workflow->addTask("task4", 100, 4, 4, 100));
 
         // Submit them in order
         for (auto const & t : tasks) {
@@ -490,10 +480,10 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
     compute_services.insert(cs);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new LoadBalancing2TestWMS(
-                    this, workflow, compute_services, {}, "Host1")));
+                    this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

@@ -141,29 +141,28 @@ void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
 /** EXECUTION WITH PRE/POST COPIES AND CLEANUP SIMULATION TEST       **/
 /**********************************************************************/
 
-class MemoryManagerChainOfTasksTestWMS : public wrench::WMS {
+class MemoryManagerChainOfTasksTestWMS : public wrench::ExecutionController {
 public:
     MemoryManagerChainOfTasksTestWMS(
             MemoryManagerTest *test,
             std::shared_ptr<wrench::Workflow> workflow,
-            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"),
+            test(test), workflow(workflow){
     }
 
 private:
     MemoryManagerTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow->isDone()) {
 
             // Create job
-            auto task = *(this->getWorkflow()->getReadyTasks().begin());
+            auto task = *(this->workflow->getReadyTasks().begin());
             auto job = job_manager->createStandardJob(
                     task,
                     {{*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION((test->storage_service1))},
@@ -237,10 +236,9 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     }
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MemoryManagerChainOfTasksTestWMS(this, workflow,
-                                                 {compute_service}, {storage_service1}, hostname)));
+            new MemoryManagerChainOfTasksTestWMS(this, workflow, hostname)));
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 

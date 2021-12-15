@@ -53,20 +53,20 @@ protected:
 };
 
 
-class ParallelModelTestWMS : public wrench::WMS {
+class ParallelModelTestWMS : public wrench::ExecutionController {
 public:
     ParallelModelTestWMS(ParallelModelTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
     ParallelModelTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
         auto job_manager = this->createJobManager();
 
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTaskByID("task1"));
+        auto job = job_manager->createStandardJob(this->workflow->getTaskByID("task1"));
         job_manager->submitJob(job, this->test->compute_service);
 
         std::shared_ptr<wrench::ExecutionEvent> event;
@@ -114,7 +114,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
                             wrench::ComputeService::ALL_RAM))}, "",
             {})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
             this, workflow, wms_host)));
@@ -177,10 +177,9 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
                             wrench::ComputeService::ALL_RAM))}, "",
             {})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     auto workflow = wrench::Workflow::createWorkflow();
-    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, workflow, wms_host)));
+    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(this, workflow, wms_host)));
 
     double work = 100.0;
     double efficiency = 0.3;
@@ -243,7 +242,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
                             wrench::ComputeService::ALL_RAM))}, "",
             {})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
             this, workflow, wms_host)));

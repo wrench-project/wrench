@@ -61,13 +61,13 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
-class SimulationCommandLineArgumentsWMS : public wrench::WMS {
+class SimulationCommandLineArgumentsWMS : public wrench::ExecutionController {
 
 public:
     SimulationCommandLineArgumentsWMS(SimulationCommandLineArgumentsTest *test,
                                       std::shared_ptr<wrench::Workflow> workflow,
                                       std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -317,7 +317,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, workflow, hostname));
 
@@ -389,7 +389,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, workflow, hostname));
 
@@ -444,7 +444,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, workflow, hostname));
 

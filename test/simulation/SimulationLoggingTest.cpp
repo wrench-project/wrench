@@ -52,13 +52,13 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
-class SimulationLoggingWMS : public wrench::WMS {
+class SimulationLoggingWMS : public wrench::ExecutionController {
 
 public:
     SimulationLoggingWMS(SimulationLoggingTest *test,
                          std::shared_ptr<wrench::Workflow> workflow,
                          std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 

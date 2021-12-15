@@ -116,13 +116,12 @@ public:
 /**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
 
-class FileWriteActionExecutorSuccessTestWMS : public wrench::WMS {
+class FileWriteActionExecutorSuccessTestWMS : public wrench::ExecutionController {
 
 public:
     FileWriteActionExecutorSuccessTestWMS(FileWriteActionExecutorTest *test,
-                                          std::shared_ptr<wrench::Workflow> workflow,
                                           std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -209,8 +208,8 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
     this->file = workflow->addFile("some_file", 1000000.0);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    wms = simulation->add(new FileWriteActionExecutorSuccessTestWMS(this, workflow, "Host1"));
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    wms = simulation->add(new FileWriteActionExecutorSuccessTestWMS(this, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 

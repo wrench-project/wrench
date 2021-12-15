@@ -119,19 +119,19 @@ public:
 /**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST                       **/
 /**********************************************************************/
 
-class FileReadActionExecutorSuccessTestWMS : public wrench::WMS {
+class FileReadActionExecutorSuccessTestWMS : public wrench::ExecutionController {
 
 public:
     FileReadActionExecutorSuccessTestWMS(FileReadActionExecutorTest *test,
                                          std::shared_ptr<wrench::Workflow> workflow,
                                          std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
 
     FileReadActionExecutorTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
 
@@ -214,7 +214,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     wms = simulation->add(new FileReadActionExecutorSuccessTestWMS(this, workflow, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
@@ -232,19 +232,19 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 /**  DO FILE_READ ACTION EXECUTOR MULTIPLE ATTEMPT SUCCESS TEST      **/
 /**********************************************************************/
 
-class FileReadActionExecutorMultipleAttemptsSuccessTestWMS : public wrench::WMS {
+class FileReadActionExecutorMultipleAttemptsSuccessTestWMS : public wrench::ExecutionController {
 
 public:
     FileReadActionExecutorMultipleAttemptsSuccessTestWMS(FileReadActionExecutorTest *test,
                                                          std::shared_ptr<wrench::Workflow> workflow,
                                                          std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
 
     FileReadActionExecutorTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
 
@@ -318,7 +318,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     wms = simulation->add(new FileReadActionExecutorMultipleAttemptsSuccessTestWMS(this, workflow, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
@@ -337,14 +337,12 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
 /**********************************************************************/
 
 
-class FileReadActionExecutorMissingFileTestWMS : public wrench::WMS {
+class FileReadActionExecutorMissingFileTestWMS : public wrench::ExecutionController {
 
 public:
     FileReadActionExecutorMissingFileTestWMS(FileReadActionExecutorTest *test,
-                                             std::shared_ptr<wrench::Workflow> workflow,
                                              std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -433,9 +431,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     this->file = workflow->addFile("some_file", 1000000.0);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileReadActionExecutorMissingFileTestWMS(this, wrench::Workflow::createWorkflow(), "Host1")));
+            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -454,14 +452,12 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
 /**********************************************************************/
 
 
-class FileReadActionExecutorKillingStorageServiceTestWMS : public wrench::WMS {
+class FileReadActionExecutorKillingStorageServiceTestWMS : public wrench::ExecutionController {
 
 public:
     FileReadActionExecutorKillingStorageServiceTestWMS(FileReadActionExecutorTest *test,
-                                                       std::shared_ptr<wrench::Workflow> workflow,
                                                        std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -558,9 +554,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileReadActionExecutorKillingStorageServiceTestWMS(this, wrench::Workflow::createWorkflow(), "Host1")));
+            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 

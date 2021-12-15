@@ -121,12 +121,12 @@ protected:
 /**   VM RESOURCE ALLOCATION ALGORITHMS TEST                         **/
 /**********************************************************************/
 
-class VMResourceAllocationTestWMS : public wrench::WMS {
+class VMResourceAllocationTestWMS : public wrench::ExecutionController {
 
 public:
     VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test,
                                 std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -253,7 +253,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-cores-first"}}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new VMResourceAllocationTestWMS(this, workflow, hostname));
 
     ASSERT_NO_THROW(simulation->launch());

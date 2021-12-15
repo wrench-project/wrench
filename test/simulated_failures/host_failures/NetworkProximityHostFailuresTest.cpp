@@ -82,14 +82,14 @@ protected:
 /**  FAILURE TEST                                                    **/
 /**********************************************************************/
 
-class NetworkProxFailuresTestWMS : public wrench::WMS {
+class NetworkProxFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     NetworkProxFailuresTestWMS(NetworkProximityHostFailuresTest *test,
                                std::shared_ptr<wrench::Workflow> workflow,
                                std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                                std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {},
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {},
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -206,7 +206,7 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
                                                                                                                                         {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"0"}})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new NetworkProxFailuresTestWMS(this, workflow,
                                            (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},

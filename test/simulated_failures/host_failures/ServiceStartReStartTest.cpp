@@ -81,13 +81,13 @@ protected:
 /**          START SERVICE ON DOWN HOST TEST                         **/
 /**********************************************************************/
 
-class StartServiceOnDownHostTestWMS : public wrench::WMS {
+class StartServiceOnDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     StartServiceOnDownHostTestWMS(ServiceReStartHostFailuresTest *test,
                                   std::shared_ptr<wrench::Workflow> workflow,
                                   std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -139,7 +139,7 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StartServiceOnDownHostTestWMS(this, workflow, hostname)));
 
@@ -158,13 +158,13 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
 /**                    SERVICE RESTART TEST                          **/
 /**********************************************************************/
 
-class ServiceRestartTestWMS : public wrench::WMS {
+class ServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     ServiceRestartTestWMS(ServiceReStartHostFailuresTest *test,
                           std::shared_ptr<wrench::Workflow> workflow,
                           std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -229,7 +229,7 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ServiceRestartTestWMS(this, workflow, hostname)));
 

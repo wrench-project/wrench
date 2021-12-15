@@ -262,14 +262,11 @@ TEST_F(WorkflowTaskTest, StateToString) {
 /**            WorkflowTaskExecutionHistoryTest                      **/
 /**********************************************************************/
 
-class WorkflowTaskExecutionHistoryTestWMS : public wrench::WMS {
+class WorkflowTaskExecutionHistoryTestWMS : public wrench::ExecutionController {
 public:
     WorkflowTaskExecutionHistoryTestWMS(WorkflowTaskTest *test,
-                                        std::shared_ptr<wrench::Workflow> workflow,
-                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -290,7 +287,7 @@ private:
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
+        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
 
@@ -367,9 +364,9 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_NO_THROW(
             backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
-            this, workflow, {compute_service}, {storage_service, backup_storage_service}, wms_host
+            this, wms_host
     )));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));

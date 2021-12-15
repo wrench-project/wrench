@@ -26,6 +26,8 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
 
+    std::shared_ptr<wrench::Workflow> workflow;
+
     void do_DAGOfSleeps_test();
     void do_NonDAG_test();
     void do_RAMConstraintsAndPriorities_test();
@@ -114,7 +116,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -124,19 +125,17 @@ protected:
 /**  DAG OF SLEEPS TEST                                              **/
 /**********************************************************************/
 
-class DAGOfSleepsTestWMS : public wrench::WMS {
+class DAGOfSleepsTestWMS : public wrench::ExecutionController {
 public:
     DAGOfSleepsTestWMS(BareMetalComputeServiceMultiActionTest *test,
                        std::shared_ptr<wrench::Workflow> workflow,
-                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                        std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
     BareMetalComputeServiceMultiActionTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
 
@@ -267,15 +266,10 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new DAGOfSleepsTestWMS(
-                    this,
-                    workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+            new DAGOfSleepsTestWMS(this, workflow, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -301,15 +295,11 @@ void BareMetalComputeServiceMultiActionTest::do_DAGOfSleeps_test() {
 /**  NON-DAG OF SLEEPS TEST                                          **/
 /**********************************************************************/
 
-class NonDAGsTestWMS : public wrench::WMS {
+class NonDAGsTestWMS : public wrench::ExecutionController {
 public:
     NonDAGsTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                   std::shared_ptr<wrench::Workflow> workflow,
-                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                    std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -384,15 +374,10 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new NonDAGsTestWMS(
-                    this,
-                    workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+            new NonDAGsTestWMS(this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -418,14 +403,11 @@ void BareMetalComputeServiceMultiActionTest::do_NonDAG_test() {
 /**  RAM CONSTRAINTS AND PRIORITIES TEST                             **/
 /**********************************************************************/
 
-class RAMConstraintsAndPrioritiesTestWMS : public wrench::WMS {
+class RAMConstraintsAndPrioritiesTestWMS : public wrench::ExecutionController {
 public:
     RAMConstraintsAndPrioritiesTestWMS(BareMetalComputeServiceMultiActionTest *test,
-                                       std::shared_ptr<wrench::Workflow> workflow,
-                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -528,15 +510,11 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new RAMConstraintsAndPrioritiesTestWMS(
-                    this,
-                    workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -562,15 +540,14 @@ void BareMetalComputeServiceMultiActionTest::do_RAMConstraintsAndPriorities_test
 /**  PARTIAL FAILURE TEST                                            **/
 /**********************************************************************/
 
-class PartialFailureTestWMS : public wrench::WMS {
+class PartialFailureTestWMS : public wrench::ExecutionController {
 public:
     PartialFailureTestWMS(BareMetalComputeServiceMultiActionTest *test,
                           std::shared_ptr<wrench::Workflow> workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -682,7 +659,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new PartialFailureTestWMS(
@@ -709,15 +686,14 @@ void BareMetalComputeServiceMultiActionTest::do_PartialFailure_test() {
 /**  PARTIAL TERMINATION TEST                                        **/
 /**********************************************************************/
 
-class PartialTerminationTestWMS : public wrench::WMS {
+class PartialTerminationTestWMS : public wrench::ExecutionController {
 public:
     PartialTerminationTestWMS(BareMetalComputeServiceMultiActionTest *test,
                               std::shared_ptr<wrench::Workflow> workflow,
                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                               std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -818,7 +794,7 @@ void BareMetalComputeServiceMultiActionTest::do_PartialTermination_test() {
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new PartialTerminationTestWMS(

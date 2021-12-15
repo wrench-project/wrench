@@ -87,16 +87,12 @@ protected:
 /**  UNSUPPORTED PILOT JOB                                           **/
 /**********************************************************************/
 
-class BareMetalComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
+class BareMetalComputeServiceUnsupportedPilotJobsTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceUnsupportedPilotJobsTestWMS(BareMetalComputeServiceTestPilotJobs *test,
-                                                       std::shared_ptr<wrench::Workflow> workflow,
-                                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                        std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -110,8 +106,6 @@ private:
 
         // Create a job  manager
         auto job_manager = this->createJobManager();
-
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Create a pilot job
         auto pilot_job = job_manager->createPilotJob();
@@ -160,12 +154,10 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
                                                 {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms;
+    std::shared_ptr<wrench::ExecutionController> wms;
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalComputeServiceUnsupportedPilotJobsTestWMS(
-                    this,  workflow,
-                    {compute_service},
-                    {storage_service}, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));

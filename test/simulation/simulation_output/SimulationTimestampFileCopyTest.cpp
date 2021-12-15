@@ -84,14 +84,14 @@ protected:
 /**            SimulationTimestampFileCopyTestBasic                  **/
 /**********************************************************************/
 
-class SimulationTimestampFileCopyBasicTestWMS : public wrench::WMS {
+class SimulationTimestampFileCopyBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampFileCopyBasicTestWMS(SimulationTimestampFileCopyTest *test,
                                             std::shared_ptr<wrench::Workflow> workflow,
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                            std::string &hostname) : wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+                                            std::string &hostname) : wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 protected:
@@ -187,7 +187,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileCopyBasicTestWMS(
             this, workflow, {compute_service}, {source_storage_service, destination_storage_service, }, file_registry_service, host1
     )));

@@ -94,13 +94,13 @@ protected:
 /**  LINK FAILURE TEST                                               **/
 /**********************************************************************/
 
-class StorageServiceLinkFailuresTestWMS : public wrench::WMS {
+class StorageServiceLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceLinkFailuresTestWMS(StorageServiceLinkFailuresTest *test,
                                       std::shared_ptr<wrench::Workflow> workflow,
                                       std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->rng.seed(666);
     }
@@ -221,7 +221,7 @@ private:
                 0, this->test->storage_services.size()-1);
 
         auto dest = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
-        auto file = this->getWorkflow()->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
+        auto file = this->workflow()->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
         wrench::StorageService::writeFile(file, dest);
         wrench::StorageService::deleteFile(file, dest);
     }
@@ -405,7 +405,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
         }
     }
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(
             new StorageServiceLinkFailuresTestWMS(
                     this, workflow, "Host1"));

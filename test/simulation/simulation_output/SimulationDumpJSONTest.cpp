@@ -1029,12 +1029,12 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowGraphJSONTest) {
 /**********************************************************************/
 /**         SimulationDumpHostEnergyConsumptionJSONTest              **/
 /**********************************************************************/
-class SimulationOutputDumpEnergyConsumptionTestWMS : public wrench::WMS {
+class SimulationOutputDumpEnergyConsumptionTestWMS : public wrench::ExecutionController {
 public:
     SimulationOutputDumpEnergyConsumptionTestWMS(SimulationDumpJSONTest *test,
                                                  std::shared_ptr<wrench::Workflow> workflow,
                                                  std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1097,7 +1097,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpEnergyConsumptionTestWMS(
                     this, workflow, host
@@ -1257,13 +1257,13 @@ bool compareRoutes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 /**********************************************************************/
 /**               SimulationDumpLinkUsageJSONTest                    **/
 /**********************************************************************/
-class SimulationOutputDumpLinkUsageTestWMS : public wrench::WMS {
+class SimulationOutputDumpLinkUsageTestWMS : public wrench::ExecutionController {
 public:
     SimulationOutputDumpLinkUsageTestWMS(SimulationDumpJSONTest *test,
                                          std::shared_ptr<wrench::Workflow> workflow,
                                          std::string &hostname,
                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1289,7 +1289,7 @@ private:
             }
         }
         //copying file to force link usage.
-        auto file = *(this->getWorkflow()->getFileMap().begin());
+        auto file = *(this->workflow()->getFileMap().begin());
         data_manager->doSynchronousFileCopy(file.second,
                                             wrench::FileLocation::LOCATION(client_storage_service),
                                             wrench::FileLocation::LOCATION(server_storage_service));
@@ -1318,7 +1318,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
     std::set<std::shared_ptr<wrench::StorageService>> storage_services_list;
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
 
     std::shared_ptr<wrench::StorageService> client_storage_service;
     client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
@@ -1420,7 +1420,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
  * and SimulationTimestampDiskReadWriteCompletion objects are added to their respective simulation
  * traces at the appropriate times.
  */
-class SimulationDumpDiskOperationsTestWMS : public wrench::WMS {
+class SimulationDumpDiskOperationsTestWMS : public wrench::ExecutionController {
 public:
     SimulationDumpDiskOperationsTestWMS(SimulationDumpJSONTest *test,
                                         std::shared_ptr<wrench::Workflow> workflow,
@@ -1428,7 +1428,7 @@ public:
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 
@@ -1447,7 +1447,7 @@ private:
             ss2 = tmp;
         }
 
-        auto file_1 = this->getWorkflow()->addFile("file_1", 1.00*1000*1000);
+        auto file_1 = this->workflow()->addFile("file_1", 1.00*1000*1000);
 
         wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(ss1));
         wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(ss2));
@@ -1483,7 +1483,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     ASSERT_NO_THROW(ss2 = simulation->add(new wrench::SimpleStorageService(host2, {"/"},
                                                                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new SimulationDumpDiskOperationsTestWMS(
             this, workflow, {}, {ss1,  ss2}, nullptr, host1
@@ -1993,7 +1993,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpEnergyConsumptionTestWMS(
                     this, workflow, host

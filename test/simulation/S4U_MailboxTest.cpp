@@ -19,7 +19,7 @@ class S4U_MailboxTest : public ::testing::Test {
 
 public:
 
-    std::shared_ptr<wrench::WMS> wms1, wms2;
+    std::shared_ptr<wrench::ExecutionController> wms1, wms2;
 
     void do_AsynchronousCommunication_test();
 
@@ -52,13 +52,13 @@ protected:
 /**  ASYNCHRONOUS COMMUNICATION TEST                                 **/
 /**********************************************************************/
 
-class AsynchronousCommunicationTestWMS : public wrench::WMS {
+class AsynchronousCommunicationTestWMS : public wrench::ExecutionController {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
                                      std::shared_ptr<wrench::Workflow> workflow,
                                      std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
