@@ -118,13 +118,13 @@ class BogusPilotJobScheduler : public wrench::PilotJobScheduler {
 
 void BogusPilotJobScheduler::schedulePilotJobs(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services) {}
 
-class JobManagerConstructorTestWMS : public wrench::WMS {
+class JobManagerConstructorTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerConstructorTestWMS(JobManagerTest *test,
                                  std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname) :
-            wrench::WMS(workflow, std::unique_ptr<BogusStandardJobScheduler>(new BogusStandardJobScheduler()),
+            wrench::ExecutionController(workflow, std::unique_ptr<BogusStandardJobScheduler>(new BogusStandardJobScheduler()),
                         std::unique_ptr<BogusPilotJobScheduler>(new BogusPilotJobScheduler()),
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
@@ -168,7 +168,7 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerConstructorTestWMS(
                     this, workflow, hostname)));
@@ -187,13 +187,13 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 /**  DO CREATE JOB TEST                                             **/
 /**********************************************************************/
 
-class JobManagerCreateJobTestWMS : public wrench::WMS {
+class JobManagerCreateJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerCreateJobTestWMS(JobManagerTest *test,
                                std::shared_ptr<wrench::Workflow> workflow,
                                std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,
+            wrench::ExecutionController(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -232,9 +232,9 @@ private:
         }
 
 
-        std::shared_ptr<wrench::WorkflowTask> t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 0.0);
-        std::shared_ptr<wrench::WorkflowTask> t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 0.0);
-        std::shared_ptr<wrench::DataFile> f = this->getWorkflow()->addFile("f", 100);
+        std::shared_ptr<wrench::WorkflowTask> t1 = this->workflow()->addTask("t1", 1.0, 1, 1, 0.0);
+        std::shared_ptr<wrench::WorkflowTask> t2 = this->workflow()->addTask("t2", 1.0, 1, 1, 0.0);
+        std::shared_ptr<wrench::DataFile> f = this->workflow()->addFile("f", 100);
         t1->addOutputFile(f);
         t2->addInputFile(f);
 
@@ -345,7 +345,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerCreateJobTestWMS(
                     this, workflow, hostname)));
@@ -364,13 +364,13 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 /**  DO SUBMIT JOB TEST                                              **/
 /**********************************************************************/
 
-class JobManagerSubmitJobTestWMS : public wrench::WMS {
+class JobManagerSubmitJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerSubmitJobTestWMS(JobManagerTest *test,
                                std::shared_ptr<wrench::Workflow> workflow,
                                std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,
+            wrench::ExecutionController(workflow, nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -433,7 +433,7 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerSubmitJobTestWMS(
                     this, workflow, hostname)));
@@ -450,14 +450,14 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 /**  DO SUBMIT JOB TEST                                              **/
 /**********************************************************************/
 
-class JobManagerResubmitJobTestWMS : public wrench::WMS {
+class JobManagerResubmitJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerResubmitJobTestWMS(JobManagerTest *test,
                                  std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname,
                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
-            wrench::WMS(workflow, nullptr, nullptr,
+            wrench::ExecutionController(workflow, nullptr, nullptr,
                         compute_services, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -484,7 +484,7 @@ private:
         }
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks());
+        auto job = job_manager->createStandardJob(this->workflow()->getTasks());
 
         // Try to submit a standard job to the wrong service
         try {
@@ -494,8 +494,8 @@ private:
         }
 
         // Check task1 states
-        std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->getTaskByID("task1");
-        std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->getTaskByID("task2");
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->workflow()->getTaskByID("task1");
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->getTaskByID("task2");
         if (task1->getState() != wrench::WorkflowTask::State::READY) {
             throw std::runtime_error("Unexpected task1 state (should be READY but is " +
                                      wrench::WorkflowTask::stateToString(task1->getState()));
@@ -563,7 +563,7 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
                                                 {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerResubmitJobTestWMS(
                     this, workflow, "Host1", {cs1, cs2})));
@@ -586,14 +586,14 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 /**  DO TERMINATE JOB TEST                                           **/
 /**********************************************************************/
 
-class JobManagerTerminateJobTestWMS : public wrench::WMS {
+class JobManagerTerminateJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerTerminateJobTestWMS(JobManagerTest *test,
                                   std::shared_ptr<wrench::Workflow> workflow,
                                   std::string hostname,
                                   std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
-            wrench::WMS(workflow, nullptr, nullptr,
+            wrench::ExecutionController(workflow, nullptr, nullptr,
                         compute_services, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -612,16 +612,16 @@ private:
         auto cs = *(this->getAvailableComputeServices<wrench::ComputeService>().begin());
 
         // Add tasks to the workflow
-        std::shared_ptr<wrench::WorkflowTask> t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 80);
-        std::shared_ptr<wrench::WorkflowTask> t2 = this->getWorkflow()->addTask("task2", 600, 9, 10, 80);
-        std::shared_ptr<wrench::WorkflowTask> t3 = this->getWorkflow()->addTask("task3", 600, 8, 10, 0);
-        std::shared_ptr<wrench::WorkflowTask> t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 0);
+        std::shared_ptr<wrench::WorkflowTask> t1 = this->workflow()->addTask("task1", 600, 10, 10, 80);
+        std::shared_ptr<wrench::WorkflowTask> t2 = this->workflow()->addTask("task2", 600, 9, 10, 80);
+        std::shared_ptr<wrench::WorkflowTask> t3 = this->workflow()->addTask("task3", 600, 8, 10, 0);
+        std::shared_ptr<wrench::WorkflowTask> t4 = this->workflow()->addTask("task4", 600, 10, 10, 0);
 
         /* t1 and t2 can't run at the same time in this example, due to RAM */
 
-        this->getWorkflow()->addControlDependency(t1, t3);
-        this->getWorkflow()->addControlDependency(t2, t3);
-        this->getWorkflow()->addControlDependency(t3, t4);
+        this->workflow()->addControlDependency(t1, t3);
+        this->workflow()->addControlDependency(t2, t3);
+        this->workflow()->addControlDependency(t3, t4);
 
         // Setting priorities for coverage
         t1->setPriority(12);
@@ -629,7 +629,7 @@ private:
         t3->setPriority(42);
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks());
+        auto job = job_manager->createStandardJob(this->workflow()->getTasks());
         job->getMinimumRequiredNumCores(); // coverage
         job->getPriority(); // coverage
 
@@ -704,7 +704,7 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
                                                 {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerTerminateJobTestWMS(
                     this, workflow, "Host1", {cs})));

@@ -21,6 +21,7 @@ class AlarmTest : public ::testing::Test {
 public:
 
     void do_downHost_Test();
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
 
@@ -70,7 +71,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -80,14 +80,12 @@ protected:
 /**********************************************************************/
 
 
-class AlarmDownHostTestWMS : public wrench::WMS {
+class AlarmDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmDownHostTestWMS(AlarmTest *test,
-                         std::shared_ptr<wrench::Workflow> workflow,
                       std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -134,7 +132,7 @@ void AlarmTest::do_downHost_Test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new AlarmDownHostTestWMS(this, workflow, hostname)));
 

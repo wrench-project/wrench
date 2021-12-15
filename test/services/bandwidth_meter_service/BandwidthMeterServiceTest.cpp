@@ -72,13 +72,13 @@ protected:
 /**********************************************************************/
 /**   BASIC CREATION/DESTRUCTION TEST                                **/
 /**********************************************************************/
-class BasicCreationDestructionTestWMS : public wrench::WMS {
+class BasicCreationDestructionTestWMS : public wrench::ExecutionController {
 public:
     BasicCreationDestructionTestWMS(BandwidthMeterServiceTest *test,
                                     std::shared_ptr<wrench::Workflow> workflow,
                                     std::string &hostname,
                                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -143,7 +143,7 @@ private:
             }
         }
         //copying file to force link usage.
-        auto file = *(this->getWorkflow()->getFileMap().begin());
+        auto file = *(this->workflow()->getFileMap().begin());
         data_manager->doSynchronousFileCopy(file.second,
                                             wrench::FileLocation::LOCATION(client_storage_service),
                                             wrench::FileLocation::LOCATION(server_storage_service));
@@ -174,7 +174,7 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
     std::set<std::shared_ptr<wrench::StorageService>> storage_services_list;
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
 
     std::shared_ptr<wrench::StorageService> client_storage_service;
     client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));

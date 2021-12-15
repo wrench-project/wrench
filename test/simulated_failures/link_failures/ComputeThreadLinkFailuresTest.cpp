@@ -67,13 +67,13 @@ protected:
 /**  DO LINK FAILURE TEST                                            **/
 /**********************************************************************/
 
-class ComputeThreadLinkFailuresTestWMS : public wrench::WMS {
+class ComputeThreadLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadLinkFailuresTestWMS(ComputeThreadLinkFailuresTest *test,
                                      std::shared_ptr<wrench::Workflow> workflow,
                                      std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -152,7 +152,7 @@ void ComputeThreadLinkFailuresTest::do_LinkFailure_test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());

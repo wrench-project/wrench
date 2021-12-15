@@ -89,13 +89,13 @@ protected:
 /**  LINK FAILURE  TEST                                              **/
 /**********************************************************************/
 
-class FileRegistryLinkFailuresTestWMS : public wrench::WMS {
+class FileRegistryLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
                                     std::shared_ptr<wrench::Workflow> workflow,
                                     std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -108,7 +108,7 @@ private:
         // Create a bunch of files
         std::vector<std::shared_ptr<wrench::DataFile> > files;
         for (unsigned int i=0; i < NUM_FILES; i++) {
-            files.push_back(this->getWorkflow()->addFile("file_" + std::to_string(i) , 100.0));
+            files.push_back(this->workflow()->addFile("file_" + std::to_string(i) , 100.0));
         }
 
         // Create a link switcher on/off er
@@ -196,7 +196,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
                                             payloads));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FileRegistryLinkFailuresTestWMS(
                     this, workflow, "Host1")));

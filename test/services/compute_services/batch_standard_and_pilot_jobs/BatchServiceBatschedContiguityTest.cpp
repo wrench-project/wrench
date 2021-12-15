@@ -74,17 +74,12 @@ protected:
 /**  CONTIGUOUS ALLOCATION TEST                                      **/
 /**********************************************************************/
 
-class BatchJobContiguousAllocationTestWMS : public wrench::WMS {
+class BatchJobContiguousAllocationTestWMS : public wrench::ExecutionController {
 
 public:
     BatchJobContiguousAllocationTestWMS(BatchServiceBatschedContiguityTest *test,
-                                        std::shared_ptr<wrench::Workflow> workflow,
-                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
-                        hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -104,10 +99,10 @@ private:
 
         for (auto const &cs : compute_services) {
 
-            std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask(cs->getName() + "task1", 59, 1, 1, 0);
-            std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask(cs->getName() + "task2", 118, 1, 1, 0);
-            std::shared_ptr<wrench::WorkflowTask> task3 = this->getWorkflow()->addTask(cs->getName() + "task3", 59, 1, 1, 0);
-            std::shared_ptr<wrench::WorkflowTask> task4 = this->getWorkflow()->addTask(cs->getName() + "task4", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->workflow()->addTask(cs->getName() + "task1", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask(cs->getName() + "task2", 118, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task3 = this->workflow()->addTask(cs->getName() + "task3", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task4 = this->workflow()->addTask(cs->getName() + "task4", 59, 1, 1, 0);
             std::shared_ptr<wrench::StandardJob> job;
 
             double start_time = wrench::Simulation::getCurrentSimulatedDate();
@@ -264,9 +259,9 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
 
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
-            this, workflow, {}, {}, hostname)));
+            this, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would

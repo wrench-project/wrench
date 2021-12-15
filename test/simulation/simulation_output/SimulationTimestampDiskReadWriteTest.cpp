@@ -83,7 +83,7 @@ protected:
  * and SimulationTimestampDiskReadWriteCompletion objects are added to their respective simulation
  * traces at the appropriate times.
  */
-class SimulationTimestampDiskReadWriteBasicTestWMS : public wrench::WMS {
+class SimulationTimestampDiskReadWriteBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampDiskReadWriteBasicTestWMS(SimulationTimestampDiskReadWriteTest *test,
                                                  std::shared_ptr<wrench::Workflow> workflow,
@@ -91,7 +91,7 @@ public:
                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                              std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                              std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 
@@ -141,7 +141,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampDiskReadWriteBasicTestWMS(
             this, workflow, {}, {storage_service_1,  storage_service_2}, file_registry_service, host1
     )));

@@ -129,7 +129,7 @@ protected:
 /**            GET READY TASKS SIMULATION TEST ON ONE HOST           **/
 /**********************************************************************/
 
-class SimpleSimulationReadyTasksTestWMS : public wrench::WMS {
+class SimpleSimulationReadyTasksTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleSimulationReadyTasksTestWMS(SimpleSimulationTest *test,
@@ -137,7 +137,7 @@ public:
                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -401,12 +401,12 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleSimulationReadyTasksTestWMS(this, this->workflow, {compute_service}, {storage_service}, hostname)));
 
     // BOGUS ADDS
-    ASSERT_THROW(simulation->add((wrench::WMS *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::StorageService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);

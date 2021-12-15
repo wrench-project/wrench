@@ -56,28 +56,23 @@ protected:
     std::shared_ptr<wrench::Workflow> workflow;
 };
 
-class SimpleStorageServiceZeroSizeFileTestWMS : public wrench::WMS {
+class SimpleStorageServiceZeroSizeFileTestWMS : public wrench::ExecutionController {
 public:
     SimpleStorageServiceZeroSizeFileTestWMS(SimpleStorageServiceZeroSizeFileTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                            std::shared_ptr<wrench::StorageService> &storage_service,
                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                             std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, storage_services, {}, file_registry_service,
-                        hostname, "test") {
+            wrench::ExecutionController(hostname, "test"),
+            storage_service(storage_service), file_registry_service(file_registry_service) {
         this->test = test;
     }
 
 private:
     SimpleStorageServiceZeroSizeFileTest *test;
+    std::shared_ptr<wrench::StorageService> storage_service;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
     int main() {
-
-        // get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
-
-        // get the single storage service
-        auto storage_service = *(this->getAvailableStorageServices().begin());
 
         // read the file
         wrench::StorageService::readFile(this->test->file,
@@ -114,9 +109,9 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceZeroSizeFileTestWMS(
-            this, this->workflow, {storage_service}, file_registry_service, "WMSHost")));
+            this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the file on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file, storage_service));

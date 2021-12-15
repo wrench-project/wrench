@@ -95,7 +95,7 @@ protected:
 /**          START SERVICE ON DOWN HOST TEST                         **/
 /**********************************************************************/
 
-class StorageServiceRestartTestWMS : public wrench::WMS {
+class StorageServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceRestartTestWMS(StorageServiceReStartHostFailuresTest *test,
@@ -103,7 +103,7 @@ public:
                                  std::string &hostname,
                                  std::shared_ptr<wrench::StorageService> storage_service
     ) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {storage_service}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {storage_service}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -125,7 +125,7 @@ private:
         resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
-        auto file = this->getWorkflow()->getFileByID("file");
+        auto file = this->workflow()->getFileByID("file");
         auto storage_service = *(this->getAvailableStorageServices().begin());
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
@@ -194,7 +194,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Create a WMS
     std::string stable_host = "StableHost";
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StorageServiceRestartTestWMS(this, workflow, stable_host, storage_service)));
 

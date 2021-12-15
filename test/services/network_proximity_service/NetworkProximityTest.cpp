@@ -136,7 +136,7 @@ protected:
 /**  SIMPLE PROXIMITY TEST                                           **/
 /**********************************************************************/
 
-class ProxTestWMS : public wrench::WMS {
+class ProxTestWMS : public wrench::ExecutionController {
 
 public:
     ProxTestWMS(NetworkProximityTest *test,
@@ -145,7 +145,7 @@ public:
                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                 const std::set<std::shared_ptr<wrench::NetworkProximityService>> &network_proximity_services,
                 std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, network_proximity_services, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -300,7 +300,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                 {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}}, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new ProxTestWMS(
                     this,
@@ -322,7 +322,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
 /**  COMPARE PROXIMITY TEST                                          **/
 /**********************************************************************/
 
-class CompareProxTestWMS : public wrench::WMS {
+class CompareProxTestWMS : public wrench::ExecutionController {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
@@ -331,7 +331,7 @@ public:
                        std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                        std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                        std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -457,7 +457,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     ASSERT_NO_THROW(network_proximity_service = simulation->add(new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new CompareProxTestWMS(this,
                                    this->workflow,
@@ -480,7 +480,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 /**  VIVALDI CONVERGE TEST                                           **/
 /**********************************************************************/
 
-class VivaldiConvergeWMS : public wrench::WMS {
+class VivaldiConvergeWMS : public wrench::ExecutionController {
 public:
     VivaldiConvergeWMS(NetworkProximityTest *test,
                        std::shared_ptr<wrench::Workflow> workflow,
@@ -488,7 +488,7 @@ public:
                        std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                        std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                        std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services,
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -638,7 +638,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
                                                 {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
                                                  {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}})));
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new VivaldiConvergeWMS(
                     this,
@@ -662,7 +662,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 /**  VALIDATE PROPERTIES TEST                                        **/
 /**********************************************************************/
 
-class ValidatePropertiesWMS : public wrench::WMS {
+class ValidatePropertiesWMS : public wrench::ExecutionController {
 public:
     ValidatePropertiesWMS(NetworkProximityTest *test,
                           std::shared_ptr<wrench::Workflow> workflow,
@@ -670,7 +670,7 @@ public:
                           std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                           std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                           std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services,
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
         this->test = test;
     }
@@ -815,7 +815,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
             )));
 
     //Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ValidatePropertiesWMS(
                     this,

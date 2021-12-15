@@ -80,16 +80,12 @@ protected:
 /**  SIMPLE TEST                                                **/
 /**********************************************************************/
 
-class SimpleOutputCSVFileTestWMS : public wrench::WMS {
+class SimpleOutputCSVFileTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleOutputCSVFileTestWMS(BatchServiceOutputCSVFileTest *test,
-                               std::shared_ptr<wrench::Workflow> workflow,
-                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
-                        "test") {
-      this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -104,7 +100,7 @@ private:
       std::shared_ptr<wrench::WorkflowTask> tasks[8];
       std::shared_ptr<wrench::StandardJob> jobs[8];
       for (int i=0; i < 8; i++) {
-        tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
+        tasks[i] = this->test->workflow->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i]);
       }
 
@@ -222,7 +218,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
                                     {wrench::BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}})));
 
   // Create a WMS
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleOutputCSVFileTestWMS(
                   this, workflow,  {compute_service}, hostname)));

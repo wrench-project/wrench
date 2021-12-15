@@ -118,14 +118,14 @@ protected:
 /**                    FAILURE WITH RUNNING JOB                      **/
 /**********************************************************************/
 
-class CloudServiceFailureOfAVMTestWMS : public wrench::WMS {
+class CloudServiceFailureOfAVMTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceFailureOfAVMTestWMS(CloudServiceHostFailuresTest *test,
                                     std::shared_ptr<wrench::Workflow> workflow,
                                     std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                     std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -222,7 +222,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
@@ -248,13 +248,13 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
 /**    FAILURE WITH RUNNING JOB FOLLOWED BY RESTART                  **/
 /**********************************************************************/
 
-class CloudServiceFailureOfAVMAndRestartTestWMS : public wrench::WMS {
+class CloudServiceFailureOfAVMAndRestartTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceFailureOfAVMAndRestartTestWMS(CloudServiceHostFailuresTest *test,
                                               std::shared_ptr<wrench::Workflow> workflow,
                                               std::string &hostname, std::shared_ptr<wrench::ComputeService> cs, std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -374,7 +374,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
@@ -400,14 +400,14 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
 /**                    RANDOM FAILURES                               **/
 /**********************************************************************/
 
-class CloudServiceRandomFailuresTestWMS : public wrench::WMS {
+class CloudServiceRandomFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceRandomFailuresTestWMS(CloudServiceHostFailuresTest *test,
                                       std::shared_ptr<wrench::Workflow> workflow,
                                       std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                       std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -538,7 +538,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service

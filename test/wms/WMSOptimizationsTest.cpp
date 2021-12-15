@@ -105,7 +105,7 @@ public:
     }
 };
 
-class StaticOptimizationsTestWMS : public wrench::WMS {
+class StaticOptimizationsTestWMS : public wrench::ExecutionController {
 
 public:
     StaticOptimizationsTestWMS(WMSOptimizationsTest *test,
@@ -113,7 +113,7 @@ public:
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
       this->test = test;
     }
@@ -132,7 +132,7 @@ private:
 
       while (true) {
         // Get the ready clustered tasks
-        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> ready_clustered_tasks = this->getWorkflow()->getReadyClusters();
+        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> ready_clustered_tasks = this->workflow()->getReadyClusters();
 
         // Get the available compute services
         auto compute_services = this->getAvailableComputeServices<wrench::ComputeService>();
@@ -155,7 +155,7 @@ private:
         }
 
         // Are we done?
-        if (this->getWorkflow()->isDone()) {
+        if (this->workflow()->isDone()) {
           break;
         }
       }
@@ -196,7 +196,7 @@ void WMSOptimizationsTest::do_staticOptimization_test() {
 
   // Create a WMS
   std::shared_ptr<wrench::Workflow> workflow = this->createWorkflow();
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new StaticOptimizationsTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -241,7 +241,7 @@ public:
     }
 };
 
-class DynamicOptimizationsTestWMS : public wrench::WMS {
+class DynamicOptimizationsTestWMS : public wrench::ExecutionController {
 
 public:
     DynamicOptimizationsTestWMS(WMSOptimizationsTest *test,
@@ -249,7 +249,7 @@ public:
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -270,7 +270,7 @@ private:
 
       while (true) {
         // Get the ready tasks
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > ready_tasks = this->getWorkflow()->getReadyTasks();
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > ready_tasks = this->workflow()->getReadyTasks();
 
         // Get the available compute services
         auto compute_services = this->getAvailableComputeServices<wrench::ComputeService>();
@@ -293,7 +293,7 @@ private:
         } catch (wrench::ExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
-        if (this->getWorkflow()->isDone()) {
+        if (this->workflow()->isDone()) {
           break;
         }
       }
@@ -334,7 +334,7 @@ void WMSOptimizationsTest::do_dynamicOptimization_test() {
 
   // Create a WMS
   std::shared_ptr<wrench::Workflow> workflow = this->createWorkflow();
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new DynamicOptimizationsTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 

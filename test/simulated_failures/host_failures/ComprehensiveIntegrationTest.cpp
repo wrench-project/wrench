@@ -158,7 +158,7 @@ protected:
 /**          INTEGRATION TEST                                        **/
 /**********************************************************************/
 
-class IntegrationFailureTestTestWMS : public wrench::WMS {
+class IntegrationFailureTestTestWMS : public wrench::ExecutionController {
 
 public:
     IntegrationFailureTestTestWMS(ComprehensiveIntegrationHostFailuresTest *test,
@@ -167,7 +167,7 @@ public:
                                   std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
                                   std::set<std::shared_ptr<wrench::StorageService>> storage_services
     ) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -230,7 +230,7 @@ private:
         }
 
 
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->workflow()->isDone()) {
 
             // Try to restart down VMs
             for (auto const &vm : this->vms) {
@@ -263,7 +263,7 @@ private:
 
         // Find a ready task1
         std::shared_ptr<wrench::WorkflowTask> task = nullptr;
-        for (auto const &t : this->getWorkflow()->getTasks()) {
+        for (auto const &t : this->workflow()->getTasks()) {
             if (t->getState() == wrench::WorkflowTask::READY) {
                 task = t;
                 break;

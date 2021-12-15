@@ -92,7 +92,7 @@ protected:
  * and SimulationTimestampFileReadCompletion objects are added to their respective simulation
  * traces at the appropriate times.
  */
-class SimulationTimestampFileReadBasicTestWMS : public wrench::WMS {
+class SimulationTimestampFileReadBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampFileReadBasicTestWMS(SimulationTimestampFileReadTest *test,
                                             std::shared_ptr<wrench::Workflow> workflow,
@@ -100,7 +100,7 @@ public:
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
         this->test = test;
     }
 
@@ -111,7 +111,7 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        this->test->task1 = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
         this->test->task1->addInputFile(this->test->file_1);
         this->test->task1->addInputFile(this->test->file_2);
         this->test->task1->addInputFile(this->test->file_3);
@@ -173,7 +173,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
             this, workflow, {compute_service}, {storage_service}, file_registry_service, host1
     )));

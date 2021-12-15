@@ -133,7 +133,7 @@ protected:
 /**            GET READY TASKS SIMULATION TEST ON ONE HOST           **/
 /**********************************************************************/
 
-class DynamicServiceCreationReadyTasksTestWMS : public wrench::WMS {
+class DynamicServiceCreationReadyTasksTestWMS : public wrench::ExecutionController {
 
 public:
     DynamicServiceCreationReadyTasksTestWMS(DynamicServiceCreationTest *test,
@@ -141,7 +141,7 @@ public:
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -291,7 +291,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DynamicServiceCreationReadyTasksTestWMS(this, workflow, {}, {storage_service}, hostname)));
 

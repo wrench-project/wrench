@@ -117,14 +117,14 @@ protected:
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
 /**********************************************************************/
 
-class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
                                                                                 std::shared_ptr<wrench::Workflow> workflow,
                                                                                 std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                                                                 std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -213,7 +213,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
@@ -236,7 +236,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
 /**                    RESTART ON SAME HOST                          **/
 /**********************************************************************/
 
-class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
@@ -244,7 +244,7 @@ public:
                                                                              std::string &hostname,
                                                                              std::shared_ptr<wrench::ComputeService> cs,
                                                                              std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -332,7 +332,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
@@ -354,7 +354,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
 /**                    RANDOM FAILURES                               **/
 /**********************************************************************/
 
-class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::WMS {
+class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceHostFailuresTest *test,
@@ -362,7 +362,7 @@ public:
                                                  std::string &hostname,
                                                  std::shared_ptr<wrench::ComputeService> cs,
                                                  std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -469,7 +469,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service
@@ -492,14 +492,14 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
 /**    FALURE ON SERVICE THAT DIES WHEN ALL RESOURCES ARE DOWN       **/
 /**********************************************************************/
 
-class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS : public wrench::WMS {
+class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceHostFailuresTest *test,
                                                                                            std::shared_ptr<wrench::Workflow> workflow,
                                                                                            std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                                                                            std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -576,7 +576,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(this, workflow, stable_host, compute_service, storage_service));
 
     // Staging the input_file on the storage service

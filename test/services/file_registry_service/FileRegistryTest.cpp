@@ -124,7 +124,7 @@ protected:
 /**  SIMPLE FILE REGISTRY TEST                                       **/
 /**********************************************************************/
 
-class FileRegistryTestWMS : public wrench::WMS {
+class FileRegistryTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryTestWMS(FileRegistryTest *test,
@@ -133,7 +133,7 @@ public:
                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                         std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -143,8 +143,8 @@ private:
 
     int main() {
 
-      auto file1 = this->getWorkflow()->addFile("file1", 100.0);
-      auto file2 = this->getWorkflow()->addFile("file2", 100.0);
+      auto file1 = this->workflow()->addFile("file1", 100.0);
+      auto file2 = this->workflow()->addFile("file2", 100.0);
       auto frs = this->getAvailableFileRegistryService();
 
       std::set<std::shared_ptr<wrench::FileLocation>> locations;
@@ -305,7 +305,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
   ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new FileRegistryTestWMS(
                   this, workflow,
@@ -324,7 +324,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
 /**   LOOKUP ENTRY BY PROXIMITY TEST                                 **/
 /**********************************************************************/
 
-class FileRegistryLookupEntryTestWMS : public wrench::WMS {
+class FileRegistryLookupEntryTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryLookupEntryTestWMS(FileRegistryTest *test,
@@ -334,7 +334,7 @@ public:
                                    const std::set<std::shared_ptr<wrench::NetworkProximityService>> &network_proximity_services,
                                    std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                    std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, storage_services, network_proximity_services, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, network_proximity_services, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -344,7 +344,7 @@ private:
 
     int main() {
 
-      std::shared_ptr<wrench::DataFile> file1 = this->getWorkflow()->addFile("file1", 100.0);
+      std::shared_ptr<wrench::DataFile> file1 = this->workflow()->addFile("file1", 100.0);
       std::shared_ptr<wrench::DataFile>  nullptr_file = nullptr;
       auto frs = this->getAvailableFileRegistryService();
       auto nps = *(this->getAvailableNetworkProximityServices().begin());
@@ -478,7 +478,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   auto file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
 
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   wms = simulation->add(
           new FileRegistryLookupEntryTestWMS(
                   this, workflow,
