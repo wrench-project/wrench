@@ -30,6 +30,8 @@ WRENCH_LOG_CATEGORY(batch_service_output_csv_file_test, "Log category for BatchS
 class BatchServiceOutputCSVFileTest : public ::testing::Test {
 
 public:
+    std::shared_ptr<wrench::Workflow> workflow;
+
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::Simulation> simulation;
 
@@ -72,7 +74,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -221,7 +222,7 @@ void BatchServiceOutputCSVFileTest::do_SimpleOutputCSVFile_test() {
   std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleOutputCSVFileTestWMS(
-                  this, workflow,  {compute_service}, hostname)));
+                  this, hostname)));
 
   ASSERT_NO_THROW(simulation->launch());
 

@@ -30,7 +30,7 @@ public:
     std::shared_ptr<wrench::WorkflowTask> task4;
     std::shared_ptr<wrench::WorkflowTask> task5;
     std::shared_ptr<wrench::WorkflowTask> task6;
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::CloudComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_getReadyTasksTest_test();
@@ -133,12 +133,8 @@ class SimpleSimulationReadyTasksTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleSimulationReadyTasksTestWMS(SimpleSimulationTest *test,
-                                      std::shared_ptr<wrench::Workflow> workflow,
-                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -151,18 +147,6 @@ private:
 
         // Create a job manager
         auto job_manager = this->createJobManager();
-
-        // Get the scheduler pointers just for coverage
-        // Get the scheduler pointers just for coverage
-        if (this->getPilotJobScheduler() != nullptr) {
-            throw std::runtime_error("getPilotJobScheduler() should return nullptr");
-        }
-        if (this->getStandardJobScheduler() != nullptr) {
-            throw std::runtime_error("getStandardJobScheduler() should return nullptr");
-        }
-
-        // Get a file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks = this->test->workflow->getReadyTasks();
         if (tasks.size() != 5) {
@@ -183,7 +167,7 @@ private:
         }
 
         // Get pointer to cloud service
-        auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+        auto cs = this->test->compute_service;
 
         // Create a bogus VM
         try {
@@ -403,7 +387,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleSimulationReadyTasksTestWMS(this, this->workflow, {compute_service}, {storage_service}, hostname)));
+            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
     ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);

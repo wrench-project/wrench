@@ -1139,12 +1139,8 @@ class SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS : public wrench::E
 
 public:
     SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                            std::shared_ptr<wrench::Workflow> workflow,
-                                                            const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                             std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1316,13 +1312,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
-                    this, workflow,
-                    {
-                            compute_service
-                    }, {
-                            storage_service_100, storage_service_510,
-                            storage_service_1000
-                    }, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1600,11 +1590,8 @@ class FileWriteTestWMS : public wrench::ExecutionController {
 
 public:
     FileWriteTestWMS(SimpleStorageServiceFunctionalTest *test,
-                     std::shared_ptr<wrench::Workflow> workflow,
-                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                      std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1616,7 +1603,6 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         try {
             wrench::StorageService::writeFile(nullptr, wrench::FileLocation::LOCATION(this->test->storage_service_100, "/disk100"));
@@ -1693,9 +1679,7 @@ void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FileWriteTestWMS(
-                    this, workflow, {
-                            storage_service_100
-                    }, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
