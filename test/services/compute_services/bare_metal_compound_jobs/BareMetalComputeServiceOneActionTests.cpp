@@ -170,7 +170,6 @@ void BareMetalComputeServiceOneActionTest::do_BadSetup_test() {
 
     ASSERT_THROW(simulation->launch(), std::runtime_error);
 
-
     argc = 1;
     argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
