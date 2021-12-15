@@ -67,13 +67,13 @@ protected:
 /**  LINK FAILURE  TEST                                              **/
 /**********************************************************************/
 
-class AlarmLinkFailuresTestWMS : public wrench::WMS {
+class AlarmLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
                              std::shared_ptr<wrench::Workflow> workflow,
                             std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -84,7 +84,7 @@ private:
     int main() {
 
         // Create an Alarm service that will go of in 10 seconds
-        std::string mailbox = this->getWorkflow()->getCallbackMailbox();
+        std::string mailbox = this->workflow()->getCallbackMailbox();
         wrench::Alarm::createAndStartAlarm(this->simulation, 10,"Host2", mailbox,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
@@ -127,7 +127,7 @@ void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new AlarmLinkFailuresTestWMS(
                     this, workflow, "Host1")));

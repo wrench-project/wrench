@@ -25,12 +25,14 @@ WRENCH_LOG_CATEGORY(batch_service_fcfs_test, "Log category for BatchServiceFCFST
 class BatchServiceFCFSTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::BatchComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::Simulation> simulation;
 
     void do_SimpleFCFS_test();
     void do_SimpleFCFSQueueWaitTimePrediction_test();
     void do_BrokenQueueWaitTimePrediction_test();
+
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
 
@@ -69,7 +71,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -77,16 +78,12 @@ protected:
 /**  SIMPLE FCFS TEST                                                **/
 /**********************************************************************/
 
-class SimpleFCFSTestWMS : public wrench::WMS {
+class SimpleFCFSTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleFCFSTestWMS(BatchServiceFCFSTest *test,
-                      std::shared_ptr<wrench::Workflow> workflow,
-                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
-                        "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname,"test"), test(test) {
     }
 
 private:
@@ -102,7 +99,7 @@ private:
         std::shared_ptr<wrench::WorkflowTask> tasks[8];
         std::shared_ptr<wrench::StandardJob> jobs[8];
         for (int i=0; i < 8; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
+            tasks[i] = this->test->workflow->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
@@ -230,10 +227,10 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleFCFSTestWMS(
-                    this, workflow,  {compute_service}, hostname)));
+                    this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -251,14 +248,12 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
 /**  SIMPLE FCFS TEST WITH QUEUE PREDICTION                          **/
 /**********************************************************************/
 
-class SimpleFCFSQueueWaitTimePredictionWMS : public wrench::WMS {
+class SimpleFCFSQueueWaitTimePredictionWMS : public wrench::ExecutionController {
 
 public:
     SimpleFCFSQueueWaitTimePredictionWMS(BatchServiceFCFSTest *test,
-                                         std::shared_ptr<wrench::Workflow> workflow,
-                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(hostname,
                         "test") {
         this->test = test;
     }
@@ -266,6 +261,7 @@ public:
 private:
 
     BatchServiceFCFSTest *test;
+    std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
 
     int main() {
         // Create a job manager
@@ -276,7 +272,7 @@ private:
         std::shared_ptr<wrench::WorkflowTask> tasks[9];
         std::shared_ptr<wrench::StandardJob> jobs[9];
         for (int i=0; i < 9; i++) {
-            tasks[i] = this->getWorkflow()->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
+            tasks[i] = this->test->workflow->addTask("task1" + std::to_string(i), 60, 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 
@@ -362,7 +358,7 @@ private:
         expectations.insert(std::make_pair("job10", 480));
 
         std::map<std::string,double> jobs_estimated_start_times =
-                (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->getStartTimeEstimates(set_of_jobs);
+                this->batch_compute_service->getStartTimeEstimates(set_of_jobs);
 
         for (auto job : set_of_jobs) {
             std::string id = std::get<0>(job);
@@ -416,10 +412,9 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleFCFSQueueWaitTimePredictionWMS(
-                    this, workflow,  {compute_service}, hostname)));
+            new SimpleFCFSQueueWaitTimePredictionWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -435,16 +430,12 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
 /**  BROKEN TEST WITH QUEUE PREDICTION                               **/
 /**********************************************************************/
 
-class BrokenQueueWaitTimePredictionWMS : public wrench::WMS {
+class BrokenQueueWaitTimePredictionWMS : public wrench::ExecutionController {
 
 public:
     BrokenQueueWaitTimePredictionWMS(BatchServiceFCFSTest *test,
-                                     std::shared_ptr<wrench::Workflow> workflow,
-                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
-                        "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -464,7 +455,7 @@ private:
 
         try {
             std::map<std::string,double> jobs_estimated_start_times =
-                    (*(this->getAvailableComputeServices<wrench::BatchComputeService>().begin()))->getStartTimeEstimates(set_of_jobs);
+                    this->test->compute_service->getStartTimeEstimates(set_of_jobs);
             throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::FunctionalityNotAvailable>(e.getCause());
@@ -524,10 +515,10 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BrokenQueueWaitTimePredictionWMS(
-                    this, workflow,  {compute_service}, hostname)));
+                    this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

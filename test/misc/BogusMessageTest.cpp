@@ -115,7 +115,7 @@ protected:
 /**  BOGUS MESSAGE TEST                                              **/
 /**********************************************************************/
 
-class BogusMessageTestWMS : public wrench::WMS {
+class BogusMessageTestWMS : public wrench::ExecutionController {
 
     class BogusMessage : public wrench::SimulationMessage {
 
@@ -128,7 +128,7 @@ public:
     BogusMessageTestWMS(BogusMessageTest *test,
                         std::shared_ptr<wrench::Workflow> workflow,
                         std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -147,11 +147,11 @@ private:
 };
 
 
-class NoopWMS : public wrench::WMS {
+class NoopWMS : public wrench::ExecutionController {
 
 public:
     NoopWMS(BogusMessageTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string hostname, bool create_data_movement_manager) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
         this->create_data_movement_manager = create_data_movement_manager;
     }
@@ -231,7 +231,7 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     }
 
     // Create the Bogus Message WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new BogusMessageTestWMS(this, workflow, hostname)));
 

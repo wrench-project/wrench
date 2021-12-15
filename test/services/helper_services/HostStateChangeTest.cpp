@@ -50,15 +50,12 @@ protected:
 /**  HOST STATE CHANGE DETECTOR SERVICE TEST                         **/
 /**********************************************************************/
 
-class HostStateChangeDetectorTestWMS : public wrench::WMS {
+class HostStateChangeDetectorTestWMS : public wrench::ExecutionController {
 
 public:
     HostStateChangeDetectorTestWMS(HostStateChangeDetectorServiceTest *test,
-                                   std::shared_ptr<wrench::Workflow> workflow,
                                    std::string hostname, bool notify_when_speed_change) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
-        this->notify_when_speed_change = notify_when_speed_change;
+            wrench::ExecutionController(hostname, "test"),test(test), notify_when_speed_change(notify_when_speed_change) {
     }
 
 
@@ -74,7 +71,7 @@ private:
         hosts.push_back("Host2");
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
-                                                    this->getSharedPtr<wrench::WMS>(), this->mailbox_name, {}));
+                                                    this->getSharedPtr<wrench::ExecutionController>(), this->mailbox_name, {}));
         ssd->setSimulation(this->simulation);
         ssd->start(ssd, true, false);
 
@@ -147,7 +144,7 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMS
-    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this, wrench::Workflow::createWorkflow(), "Host1", notify_when_speed_change));
+    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this, "Host1", notify_when_speed_change));
 
     simulation->launch();
 

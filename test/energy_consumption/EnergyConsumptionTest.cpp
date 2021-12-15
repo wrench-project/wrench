@@ -141,14 +141,14 @@ protected:
 /**         ENERGY API TEST WITH BOGUS HOST NAMES                    **/
 /**********************************************************************/
 
-class EnergyApiAccessExceptionsTestWMS : public wrench::WMS {
+class EnergyApiAccessExceptionsTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyApiAccessExceptionsTestWMS(EnergyConsumptionTest *test,
                                      std::shared_ptr<wrench::Workflow> workflow,
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      std::string& hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -166,7 +166,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->workflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -290,7 +290,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyApiAccessExceptionsTestWMS(
                     this,  workflow, {compute_service}, hostname)));
@@ -318,14 +318,14 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 /**         ENERGY API TEST WITHOUT ENABLING ENERGY PLUGIN           **/
 /**********************************************************************/
 
-class EnergyApiAccessExceptionsPluginNotActiveTestWMS : public wrench::WMS {
+class EnergyApiAccessExceptionsPluginNotActiveTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyApiAccessExceptionsPluginNotActiveTestWMS(EnergyConsumptionTest *test,
                                                     std::shared_ptr<wrench::Workflow> workflow,
                                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                     std::string& hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -343,7 +343,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->workflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -457,7 +457,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
                     this,  workflow, {compute_service}, hostname)));
@@ -485,14 +485,14 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 /**                    ENERGY CONSUMPTION TEST                       **/
 /**********************************************************************/
 
-class EnergyConsumptionTestWMS : public wrench::WMS {
+class EnergyConsumptionTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyConsumptionTestWMS(EnergyConsumptionTest *test,
                              std::shared_ptr<wrench::Workflow> workflow,
                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              std::string& hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -508,7 +508,7 @@ private:
         {
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            std::shared_ptr<wrench::WorkflowTask> task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->workflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -580,7 +580,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyConsumptionTestWMS(
                     this, workflow, {compute_service}, hostname)));
@@ -608,14 +608,14 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 /**                 SIMPLE ENERGY API CHECK TEST                     **/
 /**********************************************************************/
 
-class EnergyAPICheckTestWMS : public wrench::WMS {
+class EnergyAPICheckTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyAPICheckTestWMS(EnergyConsumptionTest *test,
                           std::shared_ptr<wrench::Workflow> workflow,
                           const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           std::string& hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -731,7 +731,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyAPICheckTestWMS(
                     this,  workflow, {compute_service}, hostname)));
@@ -759,14 +759,14 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 /**          ENERGY CONSUMPTION TEST WITH CHANGE IN PSTSATES         **/
 /**********************************************************************/
 
-class EnergyConsumptionPStateChangeTestWMS : public wrench::WMS {
+class EnergyConsumptionPStateChangeTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyConsumptionPStateChangeTestWMS(EnergyConsumptionTest *test,
                                          std::shared_ptr<wrench::Workflow> workflow,
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          std::string& hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -785,13 +785,13 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            std::shared_ptr<wrench::WorkflowTask> task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->workflow()->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job1 = job_manager->createStandardJob(task1);
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            std::shared_ptr<wrench::WorkflowTask> task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask("task2", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job2 = job_manager->createStandardJob(task2);
@@ -906,7 +906,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyConsumptionPStateChangeTestWMS(
                     this, workflow, {compute_service}, hostname)));
@@ -935,14 +935,14 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 /**                     PLUGIN NOT ACTIVATED TEST                    **/
 /**********************************************************************/
 
-class PluginNotActivatedTestWMS : public wrench::WMS {
+class PluginNotActivatedTestWMS : public wrench::ExecutionController {
 
 public:
     PluginNotActivatedTestWMS(EnergyConsumptionTest *test,
                               std::shared_ptr<wrench::Workflow> workflow,
                               const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               std::string& hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
         this->test = test;
     }
@@ -1007,7 +1007,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new PluginNotActivatedTestWMS(this, workflow, {compute_service}, hostname)));
 

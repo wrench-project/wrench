@@ -66,12 +66,12 @@ protected:
  * setPstate() is called, a timestamp is recorded and added to the simulation
  * output.
  */
-class SimulationTimestampPstateSetTestWMS : public wrench::WMS {
+class SimulationTimestampPstateSetTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampPstateSetTestWMS(SimulationTimestampEnergyTest *test,
                                         std::shared_ptr<wrench::Workflow> workflow,
                                         std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -115,7 +115,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationTimestampPstateSetTestWMS(
                     this, workflow, host
@@ -164,12 +164,12 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
  * This test assures that the timestamps are added to simulation output when
  * getEnergyTimestamp("hostname", true) is called.
  */
-class SimulationTimestampEnergyConsumptionTestWMS : public wrench::WMS {
+class SimulationTimestampEnergyConsumptionTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampEnergyConsumptionTestWMS(SimulationTimestampEnergyTest *test,
                                                 std::shared_ptr<wrench::Workflow> workflow,
                                                 std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -209,7 +209,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationTimestampEnergyConsumptionTestWMS(
                     this, workflow, host
@@ -252,12 +252,12 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
  * SimulationTimestampEnergyConsumption timestamps are created for a vector
  * of hosts, all with the same measurement period.
  */
-class EnergyMeterTestWMS : public wrench::WMS {
+class EnergyMeterTestWMS : public wrench::ExecutionController {
 public:
     EnergyMeterTestWMS(SimulationTimestampEnergyTest *test,
                        std::shared_ptr<wrench::Workflow> workflow,
                        std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -338,7 +338,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyMeterTestWMS(
                     this, workflow, host
@@ -433,12 +433,12 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
  * a map of (hostname, measurement_period) pairs.
  */
 
-class EnergyMeterMultipleMeasurementPeriodTestWMS : public wrench::WMS {
+class EnergyMeterMultipleMeasurementPeriodTestWMS : public wrench::ExecutionController {
 public:
     EnergyMeterMultipleMeasurementPeriodTestWMS(SimulationTimestampEnergyTest *test,
                                                 std::shared_ptr<wrench::Workflow> workflow,
                                                 std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -479,7 +479,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyMeterMultipleMeasurementPeriodTestWMS(
                     this, workflow, host

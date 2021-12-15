@@ -201,7 +201,7 @@ void VirtualizedClusterServiceTest::do_ConstructorTest_test() {
 /**  STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
 /**********************************************************************/
 
-class CloudStandardJobTestWMS : public wrench::WMS {
+class CloudStandardJobTestWMS : public wrench::ExecutionController {
 
 public:
     CloudStandardJobTestWMS(VirtualizedClusterServiceTest *test,
@@ -209,7 +209,7 @@ public:
                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -414,7 +414,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
                     {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new CloudStandardJobTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -438,7 +438,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
 /**  STANDARD JOB SUBMISSION TASK SIMULATION TEST WITH CUSTOM VM NAME ON ONE HOST **/
 /***********************************************************************************/
 
-class CloudStandardJobWithCustomVMNameTestWMS : public wrench::WMS {
+class CloudStandardJobWithCustomVMNameTestWMS : public wrench::ExecutionController {
 
 public:
     CloudStandardJobWithCustomVMNameTestWMS(VirtualizedClusterServiceTest *test,
@@ -446,7 +446,7 @@ public:
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -540,7 +540,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
                     {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new CloudStandardJobWithCustomVMNameTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -563,7 +563,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
 /**                   VM MIGRATION SIMULATION TEST                   **/
 /**********************************************************************/
 
-class VirtualizedClusterVMMigrationTestWMS : public wrench::WMS {
+class VirtualizedClusterVMMigrationTestWMS : public wrench::ExecutionController {
 
 public:
     VirtualizedClusterVMMigrationTestWMS(VirtualizedClusterServiceTest *test,
@@ -571,7 +571,7 @@ public:
                                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                          std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -700,7 +700,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
                                                          {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new VirtualizedClusterVMMigrationTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -724,7 +724,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
 /**  NUM CORES TEST                                                  **/
 /**********************************************************************/
 
-class CloudNumCoresTestWMS : public wrench::WMS {
+class CloudNumCoresTestWMS : public wrench::ExecutionController {
 
 public:
     CloudNumCoresTestWMS(VirtualizedClusterServiceTest *test,
@@ -732,7 +732,7 @@ public:
                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -812,7 +812,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
                                             {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new CloudNumCoresTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -836,7 +836,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 /**  STOP ALL VMS TEST                                               **/
 /**********************************************************************/
 
-class StopAllVMsTestWMS : public wrench::WMS {
+class StopAllVMsTestWMS : public wrench::ExecutionController {
 
 public:
     std::map<std::string, double> default_messagepayload_values = {
@@ -848,7 +848,7 @@ public:
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                       std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
 
         this->test = test;
         this->setMessagePayloads(this->default_messagepayload_values, {});
@@ -918,7 +918,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
                     {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StopAllVMsTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -942,7 +942,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
 /**  VM SHUTDOWN, START, SUSPEND, RESUME TEST                        **/
 /**********************************************************************/
 
-class ShutdownVMTestWMS : public wrench::WMS {
+class ShutdownVMTestWMS : public wrench::ExecutionController {
 
 public:
     std::map<std::string, double> default_messagepayload_values = {
@@ -955,7 +955,7 @@ public:
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                       std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
 
         this->test = test;
         this->setMessagePayloads(this->default_messagepayload_values, {});
@@ -1160,7 +1160,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
                     {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ShutdownVMTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -1184,7 +1184,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 /**  VM START-SHUTDOWN, and then SERVICE SHUTDOWN                    **/
 /**********************************************************************/
 
-class ShutdownVMAndThenShutdownServiceTestWMS : public wrench::WMS {
+class ShutdownVMAndThenShutdownServiceTestWMS : public wrench::ExecutionController {
 
 public:
     std::map<std::string, double> default_messagepayload_values = {
@@ -1197,7 +1197,7 @@ public:
                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
 
         this->test = test;
         this->setMessagePayloads(this->default_messagepayload_values, {});
@@ -1282,7 +1282,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
                                                          {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ShutdownVMAndThenShutdownServiceTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -1306,7 +1306,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
 /**  SUBMIT TO VM TEST                                               **/
 /**********************************************************************/
 
-class SubmitToVMTestWMS : public wrench::WMS {
+class SubmitToVMTestWMS : public wrench::ExecutionController {
 
 public:
     std::map<std::string, double> default_messagepayload_values = {
@@ -1319,7 +1319,7 @@ public:
                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                       std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
 
         this->test = test;
         this->setMessagePayloads(this->default_messagepayload_values, {});
@@ -1441,7 +1441,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
             new wrench::VirtualizedClusterComputeService(hostname, execution_hosts, "/scratch")));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SubmitToVMTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -1464,14 +1464,14 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
 /**                VM START-SHUTDOWN-START-SHUTDOWN                  **/
 /**********************************************************************/
 
-class CloudServiceVMStartShutdownStartShutdownTestWMS : public wrench::WMS {
+class CloudServiceVMStartShutdownStartShutdownTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceVMStartShutdownStartShutdownTestWMS(VirtualizedClusterServiceTest *test,
                                                     std::shared_ptr<wrench::Workflow> workflow,
                                                     std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                                     std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1544,7 +1544,7 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
     storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(
             new CloudServiceVMStartShutdownStartShutdownTestWMS(this, workflow, hostname, compute_service, storage_service));
 
@@ -1566,14 +1566,14 @@ void VirtualizedClusterServiceTest::do_VMStartShutdownStartShutdown_test() {
 /**                VM SHUTDOWN WHILE JOB IS RUNNING                  **/
 /**********************************************************************/
 
-class CloudServiceVMShutdownWhileJobIsRunningTestWMS : public wrench::WMS {
+class CloudServiceVMShutdownWhileJobIsRunningTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceVMShutdownWhileJobIsRunningTestWMS(VirtualizedClusterServiceTest *test,
                                                    std::shared_ptr<wrench::Workflow> workflow,
                                                    std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
                                                    std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1672,7 +1672,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
     storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(
             new CloudServiceVMShutdownWhileJobIsRunningTestWMS(this, workflow, hostname, compute_service, storage_service));
 
@@ -1694,7 +1694,7 @@ void VirtualizedClusterServiceTest::do_VMShutdownWhileJobIsRunning_test() {
 /**   VM COMPUTE SERVICE STOP SHUTDOWN WHILE JOB IS RUNNING          **/
 /**********************************************************************/
 
-class CloudServiceVMComputeServiceStopWhileJobIsRunningTestWMS : public wrench::WMS {
+class CloudServiceVMComputeServiceStopWhileJobIsRunningTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceVMComputeServiceStopWhileJobIsRunningTestWMS(VirtualizedClusterServiceTest *test,
@@ -1702,7 +1702,7 @@ public:
                                                              std::string &hostname,
                                                              std::shared_ptr<wrench::ComputeService> cs,
                                                              std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1802,7 +1802,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     storage_service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new CloudServiceVMComputeServiceStopWhileJobIsRunningTestWMS(
             this, workflow, hostname, compute_service, storage_service));
 

@@ -121,18 +121,16 @@ protected:
 /**  DAG OF JOBS TEST                                               **/
 /**********************************************************************/
 
-class DAGOfJobsTestWMS : public wrench::WMS {
+class DAGOfJobsTestWMS : public wrench::ExecutionController {
 public:
-    DAGOfJobsTestWMS(BareMetalComputeServiceActionMultiJobTest *test,
-                     std::shared_ptr<wrench::Workflow> workflow,
-                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                     const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                     std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
-    }
+    DAGOfJobsTestWMS(
+            BareMetalComputeServiceActionMultiJobTest *test,
+            std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test)
+            { }
 
 private:
+
     BareMetalComputeServiceActionMultiJobTest *test;
 
     int main() {
@@ -233,15 +231,10 @@ void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new DAGOfJobsTestWMS(
-                    this,
-                    workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+            new DAGOfJobsTestWMS(this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

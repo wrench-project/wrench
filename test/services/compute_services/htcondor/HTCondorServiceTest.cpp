@@ -229,7 +229,7 @@ protected:
 /**  STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
 /**********************************************************************/
 
-class HTCondorStandardJobTestWMS : public wrench::WMS {
+class HTCondorStandardJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorStandardJobTestWMS(HTCondorServiceTest *test,
@@ -237,7 +237,7 @@ public:
                                const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -342,7 +342,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
                     {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorStandardJobTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -368,7 +368,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 /**  ADDING A COMPUTE SERVICE ON THE FLY                             **/
 /**********************************************************************/
 
-class HTCondorStandardJobAddComputeServiceTestWMS : public wrench::WMS {
+class HTCondorStandardJobAddComputeServiceTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorStandardJobAddComputeServiceTestWMS(HTCondorServiceTest *test,
@@ -376,7 +376,7 @@ public:
                                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                 std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -475,7 +475,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
                     })));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorStandardJobAddComputeServiceTestWMS(this, workflow, {compute_service, baremetal_compute_service}, {storage_service}, hostname)));
 
@@ -498,7 +498,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
 /**  PILOT JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
 /**********************************************************************/
 
-class HTCondorPilotJobTestWMS : public wrench::WMS {
+class HTCondorPilotJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorPilotJobTestWMS(HTCondorServiceTest *test,
@@ -506,7 +506,7 @@ public:
                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -607,7 +607,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
                                     wrench::Simulation::getHostMemoryCapacity(execution_host)))},
             "/scratch"));
 
-    // Create a batch_standard_and_pilot_jobs compute service
+    // Create a BatchComputeService compute service
     auto batch_compute_service = simulation->add(new wrench::BatchComputeService(execution_host,
                                                                                  {execution_host},
                                                                                  "/scratch2"));
@@ -622,7 +622,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
                                                {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorPilotJobTestWMS(this, workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -645,7 +645,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 /**  SIMPLE SERVICE TESTS                                            **/
 /**********************************************************************/
 
-class HTCondorSimpleServiceTestWMS : public wrench::WMS {
+class HTCondorSimpleServiceTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorSimpleServiceTestWMS(HTCondorServiceTest *test,
@@ -653,7 +653,7 @@ public:
                                  const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -753,7 +753,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
 /**          STANDARD JOB SUBMISSION TEST FOR GRID UNIVERSE          **/
 /**********************************************************************/
 
-class HTCondorGridUniverseTestWMS : public wrench::WMS {
+class HTCondorGridUniverseTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorGridUniverseTestWMS(HTCondorServiceTest *test,
@@ -761,7 +761,7 @@ public:
                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                 std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -862,7 +862,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(batch_service);
 
-    // Create a HTCondor Service with batch_standard_and_pilot_jobs service
+    // Create a HTCondor Service with BatchComputeService service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::HTCondorComputeService(
                     hostname,  std::move(compute_services),
@@ -873,7 +873,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorGridUniverseTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -898,7 +898,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 /**          GRID UNIVERSE JOB SUBMISSION TEST WHERE GRID UNIVERSE JOBS NOT SUPPORTED          **/
 /************************************************************************************************/
 
-class HTCondorNoGridUniverseJobTestWMS : public wrench::WMS {
+class HTCondorNoGridUniverseJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNoGridUniverseJobTestWMS(HTCondorServiceTest *test,
@@ -906,7 +906,7 @@ public:
                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                      std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -997,7 +997,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorNoGridUniverseJobTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -1023,7 +1023,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
 /**          GRID UNIVERSE JOB SUBMISSION TEST WHERE NON-GRID UNIVERSE JOBS NOT SUPPORTED          **/
 /************************************************************************************************/
 
-class HTCondorNoNonGridUniverseJobTestWMS : public wrench::WMS {
+class HTCondorNoNonGridUniverseJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNoNonGridUniverseJobTestWMS(HTCondorServiceTest *test,
@@ -1031,7 +1031,7 @@ public:
                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1118,7 +1118,7 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorNoNonGridUniverseJobTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -1145,7 +1145,7 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
 /**          PILOT JOB SUBMISSION TEST WHERE GRID  JOBS NOT SUPPORTED                          **/
 /************************************************************************************************/
 
-class HTCondorNoGridJobTestWMS : public wrench::WMS {
+class HTCondorNoGridJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNoGridJobTestWMS(HTCondorServiceTest *test,
@@ -1153,7 +1153,7 @@ public:
                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                              std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1238,7 +1238,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorNoGridJobTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 
@@ -1265,7 +1265,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
 /**          STANDARD JOB SUBMISSION TEST WHERE NOT ENOUGH RESOURCES                          **/
 /************************************************************************************************/
 
-class HTCondorNotEnoughResourcesTestWMS : public wrench::WMS {
+class HTCondorNotEnoughResourcesTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNotEnoughResourcesTestWMS(HTCondorServiceTest *test,
@@ -1273,7 +1273,7 @@ public:
                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 
@@ -1320,7 +1320,7 @@ private:
         }
 
         {
-            auto big_task = this->getWorkflow()->addTask("big_task", 1000.0, 100, 100, 0);
+            auto big_task = this->workflow()->addTask("big_task", 1000.0, 100, 100, 0);
             auto ngrid_job = job_manager->createStandardJob(big_task);
             // Submit the job for execution
             try {
@@ -1405,7 +1405,7 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
     std::dynamic_pointer_cast<wrench::HTCondorComputeService>(compute_service)->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new HTCondorNotEnoughResourcesTestWMS(this, grid_workflow, {compute_service}, {storage_service}, hostname)));
 

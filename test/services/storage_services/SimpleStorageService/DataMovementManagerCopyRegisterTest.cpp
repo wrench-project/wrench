@@ -99,28 +99,23 @@ protected:
 /**  FILE COPY AND REGISTER TEST                                     **/
 /**********************************************************************/
 
-class DataMovementManagerCopyRegisterTestWMS : public wrench::WMS {
+class DataMovementManagerCopyRegisterTestWMS : public wrench::ExecutionController {
 
 public:
     DataMovementManagerCopyRegisterTestWMS(DataMovementManagerCopyRegisterTest *test,
-                                           std::shared_ptr<wrench::Workflow> workflow,
-                                           const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                           const std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                                            std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                            std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
-                        hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service)  {
     }
 
 private:
     DataMovementManagerCopyRegisterTest *test;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
     int main() {
 
 
         auto data_movement_manager = this->createDataMovementManager();
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // try synchronous copy and register
 
@@ -370,9 +365,9 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
-            this, this->workflow, {compute_service}, {src_storage_service, src2_storage_service, dst_storage_service}, file_registry_service, "WMSHost")));
+            this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));

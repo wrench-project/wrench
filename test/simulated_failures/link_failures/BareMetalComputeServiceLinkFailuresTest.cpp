@@ -100,13 +100,13 @@ protected:
 /**  LINK FAILURE TEST DURING RESOURCE INFORMATION                   **/
 /**********************************************************************/
 
-class BareMetalComputeServiceResourceInformationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceResourceInformationTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
                                                       std::shared_ptr<wrench::Workflow> workflow,
                                                       std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
         this->test = test;
     }
 

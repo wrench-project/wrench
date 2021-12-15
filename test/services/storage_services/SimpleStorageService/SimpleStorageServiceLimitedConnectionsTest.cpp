@@ -116,17 +116,14 @@ protected:
 /**  CONCURRENT FILE COPIES TEST                                     **/
 /**********************************************************************/
 
-class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : public wrench::WMS {
+class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
             SimpleStorageServiceLimitedConnectionsTest *test,
-            std::shared_ptr<wrench::Workflow> workflow,
-            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             const std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-      this->test = test;
+            wrench::ExecutionController(hostname, "test"),
+            test(test) {
     }
 
 private:
@@ -138,9 +135,6 @@ private:
 
       // Create a data movement manager
       auto data_movement_manager = this->createDataMovementManager();
-
-      // Get a file registry
-      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Reading
       for (auto dst_storage_service : {this->test->storage_service_unlimited, this->test->storage_service_limited}) {
@@ -261,11 +255,10 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
                                            {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
   // Create a WMS
-  std::shared_ptr<wrench::WMS> wms = nullptr;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
-                  this, workflow, {compute_service}, {storage_service_wms_unlimited, storage_service_wms_limited, storage_service_unlimited, storage_service_limited},
-                  "WMSHost")));
+                  this, "WMSHost")));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService("WMSHost"));

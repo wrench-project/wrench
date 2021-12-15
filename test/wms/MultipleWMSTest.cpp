@@ -98,7 +98,7 @@ protected:
 /**  DEFERRED WMS START TIME WITH ONE WMS ON ONE HOST                **/
 /**********************************************************************/
 
-class DeferredWMSStartTestWMS : public wrench::WMS {
+class DeferredWMSStartTestWMS : public wrench::ExecutionController {
 
 public:
     DeferredWMSStartTestWMS(MultipleWMSTest *test,
@@ -107,7 +107,7 @@ public:
                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
+            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
             ) {
         this->test = test;
         this->sleep_time = sleep_time;
@@ -136,7 +136,7 @@ private:
         auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
 
         std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
-        for (auto it : this->getWorkflow()->getInputFileMap()) {
+        for (auto it : this->workflow()->getInputFileMap()) {
             std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
                     std::make_tuple(it.second,
                                     wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -145,7 +145,7 @@ private:
         }
 
         // Create a 2-task1 job
-        auto two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(),
+        auto two_task_job = job_manager->createStandardJob(this->workflow()->getTasks(),
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                                                            pre_copies,
                                                            {}, {});
@@ -207,7 +207,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
 
     // Create a WMS
     auto workflow = this->createWorkflow("wf_");
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new DeferredWMSStartTestWMS(this, workflow, 100, {compute_service}, {storage_service}, hostname)));
 
@@ -259,13 +259,13 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
 
     // Create a WMS
     auto workflow = this->createWorkflow("wf1_");
-    std::shared_ptr<wrench::WMS> wms1 = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms1 = nullptr;
     ASSERT_NO_THROW(wms1 = simulation->add(
             new DeferredWMSStartTestWMS(this, workflow, 100, {compute_service}, {storage_service}, hostname)));
 
     // Create a second WMS
     auto workflow2 = this->createWorkflow("wf_2");
-    std::shared_ptr<wrench::WMS> wms2 = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms2 = nullptr;
     ASSERT_NO_THROW(wms2 = simulation->add(
             new DeferredWMSStartTestWMS(this, workflow2, 10000, {compute_service}, {storage_service}, hostname)));
 

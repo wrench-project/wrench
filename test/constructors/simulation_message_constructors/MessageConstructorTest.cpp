@@ -14,7 +14,7 @@
 #include <map>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 
-#include <wrench/wms/WMS.h>
+#include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 #include "services/file_registry/FileRegistryMessage.h"
@@ -98,21 +98,20 @@ public:
 
 };
 
-class MessageConstructorTestWMS : public wrench::WMS {
+class MessageConstructorTestWMS : public wrench::ExecutionController {
 
 public:
     MessageConstructorTestWMS(MessageConstructorTest *test,
                               std::shared_ptr<wrench::Workflow> workflow,
                               std::string hostname) :
-            wrench::WMS(workflow, nullptr, nullptr,
-                        {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 
 private:
 
     MessageConstructorTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
 
@@ -413,7 +412,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
     this->compute_service = simulation->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, ""));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     CUSTOM_NO_THROW(wms = simulation->add(new MessageConstructorTestWMS(this, workflow, hostname)));
 
     simulation->launch();
