@@ -107,12 +107,8 @@ class EmptySimulationOutputWMS : public wrench::ExecutionController {
 
 public:
     EmptySimulationOutputWMS(SimulationOutputTest *test,
-                             std::shared_ptr<wrench::Workflow> workflow,
-                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                              std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -161,7 +157,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new EmptySimulationOutputWMS(this, workflow, {}, {}, hostname)));
+            new EmptySimulationOutputWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

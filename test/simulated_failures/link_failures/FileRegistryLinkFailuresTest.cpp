@@ -29,6 +29,9 @@ public:
     std::vector<std::shared_ptr<wrench::StorageService>> storage_services;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
+    std::shared_ptr<wrench::Workflow> workflow;
+
+
     void do_FileRegistryLinkFailureSimpleRandom_Test();
 
 protected:
@@ -81,7 +84,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -93,9 +95,8 @@ class FileRegistryLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
-                                    std::shared_ptr<wrench::Workflow> workflow,
                                     std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -108,7 +109,7 @@ private:
         // Create a bunch of files
         std::vector<std::shared_ptr<wrench::DataFile> > files;
         for (unsigned int i=0; i < NUM_FILES; i++) {
-            files.push_back(this->workflow()->addFile("file_" + std::to_string(i) , 100.0));
+            files.push_back(this->test->workflow->addFile("file_" + std::to_string(i) , 100.0));
         }
 
         // Create a link switcher on/off er
@@ -199,7 +200,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FileRegistryLinkFailuresTestWMS(
-                    this, workflow, "Host1")));
+                    this, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

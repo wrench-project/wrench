@@ -1038,11 +1038,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalJobTerminationTestWMS(
-                    this,
-                    workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1071,12 +1067,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
 class BareMetalServiceCrashedRestartedTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceCrashedRestartedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1170,7 +1162,7 @@ private:
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        this->test->compute_service->stop();
 
         return 0;
     }
@@ -1220,10 +1212,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalServiceCrashedRestartedTestWMS(
-                    this, workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1251,12 +1240,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceCrashedRestar
 class BareMetalServiceFileNotThereTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceFileNotThereTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                        std::shared_ptr<wrench::Workflow> workflow,
-                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1324,7 +1309,7 @@ private:
         wrench::Simulation::sleep(1);
 
         // Stop the Compute service manually, for coverage
-        (*(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin()))->stop();
+        this->test->compute_service->stop();
 
         return 0;
     }
@@ -1374,10 +1359,7 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalServiceFileNotThereTestWMS(
-                    this, workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this,  hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1397,12 +1379,8 @@ void BareMetalComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test
 class BareMetalServiceServiceDownTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceServiceDownTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                       std::shared_ptr<wrench::Workflow> workflow,
-                                       const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                       const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                        std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1490,10 +1468,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalServiceServiceDownTestWMS(
-                    this, workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1513,12 +1488,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
 class BareMetalServiceServiceSuspendedTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceServiceSuspendedTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1606,10 +1577,7 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalServiceServiceSuspendedTestWMS(
-                    this, workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1629,11 +1597,8 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_tes
 class BareMetalServiceBadScratchTestWMS : public wrench::ExecutionController {
 public:
     BareMetalServiceBadScratchTestWMS(BareMetalComputeServiceOneActionTest *test,
-                                      std::shared_ptr<wrench::Workflow> workflow,
-                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -1708,15 +1673,10 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
             new BareMetalServiceBadScratchTestWMS(
-                    this, workflow,
-                    {compute_service}, {
-                            storage_service1
-                    }, hostname)));
+                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

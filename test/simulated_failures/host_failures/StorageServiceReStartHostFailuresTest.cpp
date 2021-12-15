@@ -24,6 +24,7 @@ class StorageServiceReStartHostFailuresTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::StorageService> storage_service;
 
     void do_StorageServiceRestartTest_test();
 
@@ -99,11 +100,8 @@ class StorageServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceRestartTestWMS(StorageServiceReStartHostFailuresTest *test,
-                                 std::shared_ptr<wrench::Workflow> workflow,
-                                 std::string &hostname,
-                                 std::shared_ptr<wrench::StorageService> storage_service
-    ) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {storage_service}, {}, nullptr, hostname, "test") {
+                                 std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -125,8 +123,8 @@ private:
         resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
-        auto file = this->workflow()->getFileByID("file");
-        auto storage_service = *(this->getAvailableStorageServices().begin());
+        auto file = this->test->workflow->getFileByID("file");
+        auto storage_service = this->test->storage_service;
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
@@ -190,13 +188,13 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Get a hostname
     std::string failed_host = "FailedHost";
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, {"/"}));
+    storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, {"/"}));
 
     // Create a WMS
     std::string stable_host = "StableHost";
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new StorageServiceRestartTestWMS(this, workflow, stable_host, storage_service)));
+            new StorageServiceRestartTestWMS(this, stable_host)));
 
     auto file = workflow->addFile("file", 10000000);
 

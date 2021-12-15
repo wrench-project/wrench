@@ -29,6 +29,8 @@ WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for Storag
 class StorageServiceLinkFailuresTest : public ::testing::Test {
 
 public:
+    std::shared_ptr<wrench::Workflow> workflow;
+
     std::vector<std::shared_ptr<wrench::DataFile> > files;
     std::vector<std::shared_ptr<wrench::StorageService>> storage_services;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -86,7 +88,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -98,9 +99,8 @@ class StorageServiceLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceLinkFailuresTestWMS(StorageServiceLinkFailuresTest *test,
-                                      std::shared_ptr<wrench::Workflow> workflow,
                                       std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->rng.seed(666);
     }
@@ -221,7 +221,7 @@ private:
                 0, this->test->storage_services.size()-1);
 
         auto dest = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
-        auto file = this->workflow()->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
+        auto file = this->test->workflow->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
         wrench::StorageService::writeFile(file, dest);
         wrench::StorageService::deleteFile(file, dest);
     }
@@ -408,7 +408,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(
             new StorageServiceLinkFailuresTestWMS(
-                    this, workflow, "Host1"));
+                    this, "Host1"));
 
     simulation->launch();
 

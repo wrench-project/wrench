@@ -95,9 +95,8 @@ class S4U_VirtualMachineTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_VirtualMachineTestWMS(S4U_VirtualMachineTest *test,
-                              std::shared_ptr<wrench::Workflow> workflow,
                       std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -187,12 +186,10 @@ void S4U_VirtualMachineTest::do_basic_Test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new S4U_VirtualMachineTestWMS(
-                    this, workflow, hostname)));
+                    this, hostname)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

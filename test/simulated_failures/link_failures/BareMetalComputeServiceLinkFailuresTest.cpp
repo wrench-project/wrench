@@ -104,9 +104,8 @@ class BareMetalComputeServiceResourceInformationTestWMS : public wrench::Executi
 
 public:
     BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
-                                                      std::shared_ptr<wrench::Workflow> workflow,
                                                       std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -206,7 +205,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
             }));
 
     auto wms = simulation->add(
-            new BareMetalComputeServiceResourceInformationTestWMS(this, workflow, "Host1"));
+            new BareMetalComputeServiceResourceInformationTestWMS(this, "Host1"));
 
     simulation->launch();
 

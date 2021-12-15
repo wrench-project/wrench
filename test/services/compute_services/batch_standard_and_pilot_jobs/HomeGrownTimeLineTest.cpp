@@ -154,10 +154,8 @@ class CoreAvailabilityTimelineTestWMS : public wrench::ExecutionController {
 
 public:
     CoreAvailabilityTimelineTestWMS(
-            std::shared_ptr<wrench::Workflow> workflow,
             std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,
-                                        {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
     }
 
 
@@ -221,11 +219,9 @@ void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test(
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CoreAvailabilityTimelineTestWMS(workflow, hostname)));
+            new CoreAvailabilityTimelineTestWMS(hostname)));
 
     simulation->launch();
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

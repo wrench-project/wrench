@@ -85,9 +85,8 @@ class StartServiceOnDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     StartServiceOnDownHostTestWMS(ServiceReStartHostFailuresTest *test,
-                                  std::shared_ptr<wrench::Workflow> workflow,
                                   std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -141,7 +140,7 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new StartServiceOnDownHostTestWMS(this, workflow, hostname)));
+            new StartServiceOnDownHostTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -162,9 +161,8 @@ class ServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     ServiceRestartTestWMS(ServiceReStartHostFailuresTest *test,
-                          std::shared_ptr<wrench::Workflow> workflow,
                           std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -231,7 +229,7 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ServiceRestartTestWMS(this, workflow, hostname)));
+            new ServiceRestartTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
