@@ -244,8 +244,6 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     std::string network_daemon4 = wrench::Simulation::getHostnameList()[3];
     std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
-    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
-
     // A few bogus constructor calls
     ASSERT_THROW(
             new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
