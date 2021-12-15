@@ -23,6 +23,9 @@ WRENCH_LOG_CATEGORY(virtualized_cluster_service_resource_allocation_test, "Log c
 class VirtualizedClusterServiceResourceAllocationTest : public ::testing::Test {
 
 public:
+    std::shared_ptr<wrench::Workflow> workflow;
+
+
     std::shared_ptr<wrench::CloudComputeService> cloud_service_first_fit = nullptr;
     std::shared_ptr<wrench::CloudComputeService> cloud_service_best_fit_ram_first = nullptr;
     std::shared_ptr<wrench::CloudComputeService> cloud_service_best_fit_cores_first = nullptr;
@@ -113,7 +116,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -125,9 +127,8 @@ class VMResourceAllocationTestWMS : public wrench::ExecutionController {
 
 public:
     VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test,
-                                std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+                                std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -254,7 +255,7 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
-    wms = simulation->add(new VMResourceAllocationTestWMS(this, workflow, hostname));
+    wms = simulation->add(new VMResourceAllocationTestWMS(this, hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 

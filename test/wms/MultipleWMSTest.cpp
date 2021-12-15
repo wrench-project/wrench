@@ -17,7 +17,7 @@
 class MultipleWMSTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::CloudComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
     void do_deferredWMSStartOneWMS_test();
@@ -70,7 +70,7 @@ protected:
 
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();
-        workflows.push_back(workflow);
+//        workflows.push_back(workflow);
 
         // Create the files
         input_file = workflow->addFile(prefix + "_input_file", 10.0);
@@ -90,7 +90,7 @@ protected:
 
         return workflow;
     }
-    std::vector<std::shared_ptr<wrench::Workflow>> workflows;
+//    std::vector<std::shared_ptr<wrench::Workflow>> workflows;
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
@@ -104,19 +104,16 @@ public:
     DeferredWMSStartTestWMS(MultipleWMSTest *test,
                             std::shared_ptr<wrench::Workflow> workflow,
                             double sleep_time,
-                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                             std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
-            ) {
-        this->test = test;
-        this->sleep_time = sleep_time;
+            wrench::ExecutionController(hostname, "test"), test(test), sleep_time(sleep_time) {
     }
 
 private:
 
     MultipleWMSTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
     double sleep_time;
+
 
     int main() {
         // check for deferred start
@@ -129,14 +126,12 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Get the cloud service
-        auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
+        auto cs = this->test->compute_service;
 
         std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>>> pre_copies = {};
-        for (auto it : this->workflow()->getInputFileMap()) {
+        for (auto it : this->workflow->getInputFileMap()) {
             std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> each_copy =
                     std::make_tuple(it.second,
                                     wrench::FileLocation::LOCATION(this->test->storage_service),
@@ -145,14 +140,14 @@ private:
         }
 
         // Create a 2-task1 job
-        auto two_task_job = job_manager->createStandardJob(this->workflow()->getTasks(),
+        auto two_task_job = job_manager->createStandardJob(this->workflow->getTasks(),
                                                            (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                                                            pre_copies,
                                                            {}, {});
 
         // Submit the 2-task1 job for execution
         try {
-            auto cs = *this->getAvailableComputeServices<wrench::CloudComputeService>().begin();
+            auto cs = this->test->compute_service;
             auto vm_name = cs->createVM(2, 100);
             auto vm_cs = cs->startVM(vm_name);
             job_manager->submitJob(two_task_job, vm_cs);
@@ -209,7 +204,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
     auto workflow = this->createWorkflow("wf_");
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new DeferredWMSStartTestWMS(this, workflow, 100, {compute_service}, {storage_service}, hostname)));
+            new DeferredWMSStartTestWMS(this, workflow, 100, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -261,13 +256,13 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
     auto workflow = this->createWorkflow("wf1_");
     std::shared_ptr<wrench::ExecutionController> wms1 = nullptr;
     ASSERT_NO_THROW(wms1 = simulation->add(
-            new DeferredWMSStartTestWMS(this, workflow, 100, {compute_service}, {storage_service}, hostname)));
+            new DeferredWMSStartTestWMS(this, workflow, 100, hostname)));
 
     // Create a second WMS
     auto workflow2 = this->createWorkflow("wf_2");
     std::shared_ptr<wrench::ExecutionController> wms2 = nullptr;
     ASSERT_NO_THROW(wms2 = simulation->add(
-            new DeferredWMSStartTestWMS(this, workflow2, 10000, {compute_service}, {storage_service}, hostname)));
+            new DeferredWMSStartTestWMS(this, workflow2, 10000, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(

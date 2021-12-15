@@ -284,7 +284,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBrokenEstimateW
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
-            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
+            this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -365,7 +365,7 @@ private:
             }
             auto first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
-            auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+            auto batch_service = this->test->compute_service;
             std::string job_id = "my_tentative_job";
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
@@ -822,7 +822,7 @@ private:
                 );
             }
 
-            auto batch_service = this->test->compute_host;
+            auto batch_service = this->test->compute_service;
 
             /** Note that below we have extra seconds since when submitting
              *  Jobs to batsched we always ask for one extra second

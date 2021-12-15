@@ -412,7 +412,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
     auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestCustomHandlerWMS(this,  workflow, 100, {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
+            new TestCustomHandlerWMS(this, 100, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
