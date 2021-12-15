@@ -24,6 +24,9 @@ WRENCH_LOG_CATEGORY(batch_service_contiguity_test, "Log category for BatchServic
 class BatchServiceBatschedContiguityTest : public ::testing::Test {
 
 public:
+
+    std::shared_ptr<wrench::Workflow> workflow;
+
     std::shared_ptr<wrench::ComputeService> batch_service_conservative_bf_contiguous = nullptr;
     std::shared_ptr<wrench::ComputeService> batch_service_conservative_bf_non_contiguous = nullptr;
     std::shared_ptr<wrench::ComputeService> batch_service_easy_bf_contiguous = nullptr;
@@ -65,7 +68,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -99,10 +101,10 @@ private:
 
         for (auto const &cs : compute_services) {
 
-            std::shared_ptr<wrench::WorkflowTask> task1 = this->workflow()->addTask(cs->getName() + "task1", 59, 1, 1, 0);
-            std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask(cs->getName() + "task2", 118, 1, 1, 0);
-            std::shared_ptr<wrench::WorkflowTask> task3 = this->workflow()->addTask(cs->getName() + "task3", 59, 1, 1, 0);
-            std::shared_ptr<wrench::WorkflowTask> task4 = this->workflow()->addTask(cs->getName() + "task4", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask(cs->getName() + "task1", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask(cs->getName() + "task2", 118, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task3 = this->test->workflow->addTask(cs->getName() + "task3", 59, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task4 = this->test->workflow->addTask(cs->getName() + "task4", 59, 1, 1, 0);
             std::shared_ptr<wrench::StandardJob> job;
 
             double start_time = wrench::Simulation::getCurrentSimulatedDate();

@@ -28,7 +28,7 @@ class BatchServiceBatschedQueueWaitTimePredictionTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::BatchComputeService> compute_service = nullptr;
 
     void do_BatchJobBrokenEstimateWaitingTimeTest_test();
 
@@ -37,6 +37,8 @@ public:
     void do_BatchJobEstimateWaitingTimeTest_test();
 
     void do_BatchJobLittleComplexEstimateWaitingTimeTest_test();
+
+    std::shared_ptr<wrench::Workflow> workflow;
 
 
 protected:
@@ -127,7 +129,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -188,7 +189,7 @@ private:
             }
             double first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
-            auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+            auto batch_service = this->test->compute_service;
             std::string job_id = "my_tentative_job";
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
@@ -535,7 +536,7 @@ private:
             double first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
 
-            auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+            auto batch_service = this->test->compute_service;
             std::string job_id = "my_job1";
             unsigned int nodes = 2;
             double walltime_seconds = 1000;
@@ -598,7 +599,7 @@ private:
                 );
             }
 
-            auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+            auto batch_service = this->test->compute_service;
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {};
             for (int i=0; i<10; i++) {
                 std::string job_id = "new_job"+std::to_string(i);
@@ -676,7 +677,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobEstimateWaiting
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobEstimateWaitingTimeTestWMS(
-            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
+            this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -706,13 +707,8 @@ class BatchJobLittleComplexEstimateWaitingTimeTestWMS : public wrench::Execution
 
 public:
     BatchJobLittleComplexEstimateWaitingTimeTestWMS(BatchServiceBatschedQueueWaitTimePredictionTest *test,
-                                                    std::shared_ptr<wrench::Workflow> workflow,
-                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
-                                        hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -826,7 +822,7 @@ private:
                 );
             }
 
-            auto batch_service = (*this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+            auto batch_service = this->test->compute_host;
 
             /** Note that below we have extra seconds since when submitting
              *  Jobs to batsched we always ask for one extra second
@@ -946,7 +942,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobLittleComplexEs
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobLittleComplexEstimateWaitingTimeTestWMS(
-            this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
+            this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
