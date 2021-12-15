@@ -96,9 +96,8 @@ class S4U_DaemonTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_DaemonTestWMS(S4U_DaemonTest *test,
-                      std::shared_ptr<wrench::Workflow> workflow,
                       std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -186,11 +185,10 @@ void S4U_DaemonTest::do_basic_Test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonTestWMS(this, workflow, hostname)));
+            new S4U_DaemonTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -213,10 +211,8 @@ class S4U_DaemonNoCleanupTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_DaemonNoCleanupTestWMS(S4U_DaemonTest *test,
-                               std::shared_ptr<wrench::Workflow> workflow,
                                std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -265,7 +261,7 @@ void S4U_DaemonTest::do_noCleanup_Test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonNoCleanupTestWMS(this, workflow, hostname)));
+            new S4U_DaemonNoCleanupTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

@@ -289,7 +289,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new DynamicServiceCreationReadyTasksTestWMS(this, workflow, {}, {storage_service}, hostname)));
+            new DynamicServiceCreationReadyTasksTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

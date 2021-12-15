@@ -71,9 +71,8 @@ class ComputeThreadLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadLinkFailuresTestWMS(ComputeThreadLinkFailuresTest *test,
-                                     std::shared_ptr<wrench::Workflow> workflow,
                                      std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -153,7 +152,7 @@ void ComputeThreadLinkFailuresTest::do_LinkFailure_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, workflow, hostname)));
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

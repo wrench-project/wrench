@@ -1556,10 +1556,7 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new PartitionsTestWMS(
-                    this, workflow,
-                    {
-                            storage_service_1000, storage_service_510
-                    }, hostname)));
+                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));

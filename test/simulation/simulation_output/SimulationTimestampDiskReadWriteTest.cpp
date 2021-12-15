@@ -86,12 +86,8 @@ protected:
 class SimulationTimestampDiskReadWriteBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampDiskReadWriteBasicTestWMS(SimulationTimestampDiskReadWriteTest *test,
-                                                 std::shared_ptr<wrench::Workflow> workflow,
-                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                              std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -143,8 +139,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampDiskReadWriteBasicTestWMS(
-            this, workflow, {}, {storage_service_1,  storage_service_2}, file_registry_service, host1
-    )));
+            this, host1)));
 
     //stage files
     std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1};
@@ -177,8 +172,6 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     diskwrite_timestamps.front()->getContent()->getEndpoint();
     diskwrite_timestamps.front()->getContent()->getHostname();
     diskwrite_timestamps.front()->getContent()->getMount();
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

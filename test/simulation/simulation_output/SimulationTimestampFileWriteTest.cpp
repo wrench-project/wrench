@@ -26,6 +26,7 @@ public:
     std::shared_ptr<wrench::DataFile> xl_file;
 
     std::shared_ptr<wrench::WorkflowTask> task = nullptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 
     void do_SimulationTimestampFileWriteBasic_test();
@@ -80,7 +81,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -97,12 +97,8 @@ protected:
 class SimulationTimestampFileWriteBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampFileWriteBasicTestWMS(SimulationTimestampFileWriteTest *test,
-                                             std::shared_ptr<wrench::Workflow> workflow,
-                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                              std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -114,7 +110,7 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
+        this->test->task = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
         this->test->task->addOutputFile(this->test->file_1);
         this->test->task->addOutputFile(this->test->file_2);
         this->test->task->addOutputFile(this->test->file_3);
@@ -180,8 +176,7 @@ void SimulationTimestampFileWriteTest::do_SimulationTimestampFileWriteBasic_test
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileWriteBasicTestWMS(
-            this, workflow, {compute_service}, {storage_service}, file_registry_service, host1
-    )));
+            this, host1)));
 
     //stage files
     std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1, file_2, file_3, xl_file};

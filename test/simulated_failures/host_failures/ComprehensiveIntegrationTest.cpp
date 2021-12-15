@@ -162,12 +162,9 @@ class IntegrationFailureTestTestWMS : public wrench::ExecutionController {
 
 public:
     IntegrationFailureTestTestWMS(ComprehensiveIntegrationHostFailuresTest *test,
-                                  std::shared_ptr<wrench::Workflow> workflow,
-                                  std::string &hostname,
-                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                  std::set<std::shared_ptr<wrench::StorageService>> storage_services
+                                  std::string &hostname
     ) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -230,7 +227,7 @@ private:
         }
 
 
-        while (not this->workflow()->isDone()) {
+        while (not this->test->workflow->isDone()) {
 
             // Try to restart down VMs
             for (auto const &vm : this->vms) {
@@ -263,7 +260,7 @@ private:
 
         // Find a ready task1
         std::shared_ptr<wrench::WorkflowTask> task = nullptr;
-        for (auto const &t : this->workflow()->getTasks()) {
+        for (auto const &t : this->test->workflow->getTasks()) {
             if (t->getState() == wrench::WorkflowTask::READY) {
                 task = t;
                 break;
@@ -493,10 +490,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     std::string wms_host = "WMSHost";
     auto wms = simulation->add(
             new IntegrationFailureTestTestWMS(
-                    this, workflow,
-                    wms_host,
-                    {this->baremetal_service, this->cloud_service},
-                    {this->storage_service1, this->storage_service2}));
+                    this,
+                    wms_host));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

@@ -134,7 +134,7 @@ void AlarmTest::do_downHost_Test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new AlarmDownHostTestWMS(this, workflow, hostname)));
+            new AlarmDownHostTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
