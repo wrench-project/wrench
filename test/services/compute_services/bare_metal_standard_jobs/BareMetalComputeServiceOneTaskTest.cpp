@@ -281,7 +281,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
     ASSERT_NO_THROW(wms = simulation->add(new BadSetupTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->launch());
 
 
 
