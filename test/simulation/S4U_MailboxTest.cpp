@@ -56,9 +56,8 @@ class AsynchronousCommunicationTestWMS : public wrench::ExecutionController {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
-                                     std::shared_ptr<wrench::Workflow> workflow,
                                      std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -250,8 +249,8 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
 
     // Create the WMSs
     auto workflow =  wrench::Workflow::createWorkflow();
-    this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this, workflow, "Host1"));
-    this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this, workflow, "Host2"));
+    this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host1"));
+    this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host2"));
 
     simulation->launch();
 

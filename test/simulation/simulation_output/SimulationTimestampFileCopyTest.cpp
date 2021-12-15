@@ -87,12 +87,8 @@ protected:
 class SimulationTimestampFileCopyBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampFileCopyBasicTestWMS(SimulationTimestampFileCopyTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                            std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                            std::string &hostname) : wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
-        this->test = test;
+                                            std::string &hostname):
+                                            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 protected:
     SimulationTimestampFileCopyTest *test;
@@ -189,8 +185,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileCopyBasicTestWMS(
-            this, workflow, {compute_service}, {source_storage_service, destination_storage_service, }, file_registry_service, host1
-    )));
+            this, host1)));
 
     //stage files
     std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1, file_2, file_3, xl_file, too_large_file};
@@ -315,10 +310,6 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
                          this->file_1,
                                  wrench::FileLocation::LOCATION(this->source_storage_service),
                                  nullptr), std::invalid_argument);
-
-
-
-
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

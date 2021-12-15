@@ -3000,7 +3000,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new InsufficientCoresInsidePilotJobSubmissionTestWMS(
-                    this, workflow, {compute_service}, {storage_service1, storage_service2}, hostname)));
+                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 

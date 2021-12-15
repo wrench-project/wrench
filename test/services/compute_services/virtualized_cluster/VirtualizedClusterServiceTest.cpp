@@ -528,7 +528,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskWithCustomVMNameTest_test(
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {wrench::Simulation::getHostnameList()[1]};
-    ASSERT_NO_THROW(compute_service = simulation->add(
+    ASSERT_NO_THROW(cloud_compute_service = simulation->add(
             new wrench::CloudComputeService(
                     hostname, execution_hosts, "/scratch",
                     {})));
@@ -1752,7 +1752,7 @@ void VirtualizedClusterServiceTest::do_VMComputeServiceStopWhileJobIsRunning_tes
     compute_hosts.push_back("QuadCoreHost");
 
     // Create a Compute Service that has access to two hosts
-    compute_service = simulation->add(
+    cloud_compute_service = simulation->add(
             new wrench::CloudComputeService(hostname,
                                             compute_hosts,
                                             "/scratch",

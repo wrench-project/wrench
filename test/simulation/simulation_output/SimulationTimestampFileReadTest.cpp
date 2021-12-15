@@ -15,6 +15,9 @@ WRENCH_LOG_CATEGORY(simulation_timestamp_file_read_test, "Log category for Simul
 class SimulationTimestampFileReadTest : public ::testing::Test {
 
 public:
+
+    std::shared_ptr<wrench::Workflow> workflow;
+
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -78,7 +81,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -95,12 +97,8 @@ protected:
 class SimulationTimestampFileReadBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampFileReadBasicTestWMS(SimulationTimestampFileReadTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -111,7 +109,7 @@ private:
 
         auto job_manager = this->createJobManager();
 
-        this->test->task1 = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
+        this->test->task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
         this->test->task1->addInputFile(this->test->file_1);
         this->test->task1->addInputFile(this->test->file_2);
         this->test->task1->addInputFile(this->test->file_3);
@@ -175,8 +173,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampFileReadBasicTestWMS(
-            this, workflow, {compute_service}, {storage_service}, file_registry_service, host1
-    )));
+            this, host1)));
 
 
     //stage files
@@ -309,7 +306,6 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                                                         wrench::FileLocation::LOCATION(this->storage_service).get(),
                                                                         nullptr,
                                                                         task1), std::invalid_argument);
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

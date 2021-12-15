@@ -752,11 +752,8 @@ class SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS : public wrench::ExecutionControll
 
 public:
     SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(BatchServiceCONSERVATIVE_BFTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                  std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
-                        "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -907,7 +904,7 @@ void BatchServiceCONSERVATIVE_BFTest::do_SimpleCONSERVATIVE_BF_CORE_LEVEL_test()
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleCONSERVATIVE_BF_CORE_LEVELTestWMS(
-                    this, workflow,  {compute_service}, hostname)));
+                    this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -946,7 +943,7 @@ private:
         // Create 4 1-min tasks and submit them as various shaped jobs
         for (int i=0; i < NUM_JOBS_CORE_LEVEL; i++) {
             random = random  * 17 + 4123451;
-            tasks[i] = this->workflow()->addTask("task1" + std::to_string(i), 60 + 60*(random % 30), 1, 1, 0);
+            tasks[i] = this->test->workflow->addTask("task1" + std::to_string(i), 60 + 60*(random % 30), 1, 1, 0);
             jobs[i] = job_manager->createStandardJob(tasks[i]);
         }
 

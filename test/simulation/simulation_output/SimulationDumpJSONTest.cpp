@@ -27,6 +27,12 @@
 class SimulationDumpJSONTest : public ::testing::Test {
 
 public:
+
+    std::shared_ptr<wrench::Workflow> workflow;
+
+    std::shared_ptr<wrench::StorageService> ss1;
+    std::shared_ptr<wrench::StorageService> ss2;
+
     std::shared_ptr<wrench::WorkflowTask> t1 = nullptr;
     std::shared_ptr<wrench::WorkflowTask> t2 = nullptr;
     std::shared_ptr<wrench::WorkflowTask> t3 = nullptr;
@@ -251,7 +257,6 @@ protected:
     std::string link_usage_json_file_path = UNIQUE_TMP_PATH_PREFIX + "link_usage.json";
     std::string disk_operations_json_file_path = UNIQUE_TMP_PATH_PREFIX + "disk_operations.json";
     std::string unified_json_file_path = UNIQUE_TMP_PATH_PREFIX + "unified_output.json";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -1032,9 +1037,8 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowGraphJSONTest) {
 class SimulationOutputDumpEnergyConsumptionTestWMS : public wrench::ExecutionController {
 public:
     SimulationOutputDumpEnergyConsumptionTestWMS(SimulationDumpJSONTest *test,
-                                                 std::shared_ptr<wrench::Workflow> workflow,
                                                  std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -1100,7 +1104,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpEnergyConsumptionTestWMS(
-                    this, workflow, host
+                    this, host
             )
     ));
 
@@ -1260,10 +1264,8 @@ bool compareRoutes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
 class SimulationOutputDumpLinkUsageTestWMS : public wrench::ExecutionController {
 public:
     SimulationOutputDumpLinkUsageTestWMS(SimulationDumpJSONTest *test,
-                                         std::shared_ptr<wrench::Workflow> workflow,
-                                         std::string &hostname,
-                                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+                                         std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -1281,15 +1283,8 @@ private:
         //Setting up storage services to accommodate data transfer.
         auto data_manager = this->createDataMovementManager();
         std::shared_ptr<wrench::StorageService> client_storage_service, server_storage_service;
-        for (const auto &ss : this->getAvailableStorageServices()) {
-            if (ss->getHostname() == "host1") {
-                client_storage_service = ss;
-            } else {
-                server_storage_service = ss;
-            }
-        }
         //copying file to force link usage.
-        auto file = *(this->workflow()->getFileMap().begin());
+        auto file = *(this->test->workflow->getFileMap().begin());
         data_manager->doSynchronousFileCopy(file.second,
                                             wrench::FileLocation::LOCATION(client_storage_service),
                                             wrench::FileLocation::LOCATION(server_storage_service));
@@ -1336,10 +1331,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationOutputDumpLinkUsageTestWMS(
-                    this, link_usage_workflow,
-                    host,
-                    storage_services_list
-            )
+                    this,
+                    host)
     ));
 
     simulation->add(new wrench::FileRegistryService("host1"));
@@ -1423,12 +1416,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
 class SimulationDumpDiskOperationsTestWMS : public wrench::ExecutionController {
 public:
     SimulationDumpDiskOperationsTestWMS(SimulationDumpJSONTest *test,
-                                        std::shared_ptr<wrench::Workflow> workflow,
-                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -1437,21 +1426,12 @@ private:
 
     int main() {
 
-        auto ss = this->getAvailableStorageServices();
-        auto ss1 = *(ss.begin());
-        auto ss2 = *(++ss.begin());
 
-        if (ss1->getHostname() == "host2") {
-            auto tmp = ss1;
-            ss1 = ss2;
-            ss2 = tmp;
-        }
+        auto file_1 = this->test->workflow->addFile("file_1", 1.00*1000*1000);
 
-        auto file_1 = this->workflow()->addFile("file_1", 1.00*1000*1000);
-
-        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(ss1));
-        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(ss2));
-        wrench::StorageService::readFile(file_1, wrench::FileLocation::LOCATION(ss1));
+        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(this->test->ss1));
+        wrench::StorageService::writeFile(file_1, wrench::FileLocation::LOCATION(this->test->ss2));
+        wrench::StorageService::readFile(file_1, wrench::FileLocation::LOCATION(this->test->ss1));
         return 0;
 
     }
@@ -1474,9 +1454,6 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     std::string host1 = "host1";
     std::string host2 = "host2";
 
-    std::shared_ptr<wrench::StorageService> ss1;
-    std::shared_ptr<wrench::StorageService> ss2;
-
     ASSERT_NO_THROW(ss1 = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
                                                                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "400000"}})));
 
@@ -1486,7 +1463,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new SimulationDumpDiskOperationsTestWMS(
-            this, workflow, {}, {ss1,  ss2}, nullptr, host1
+            this, host1
     )));
 
     simulation->getOutput().enableDiskTimestamps(true);

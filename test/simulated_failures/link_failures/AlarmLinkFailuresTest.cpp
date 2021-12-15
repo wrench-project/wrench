@@ -16,7 +16,6 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include <wms/WMSMessage.h>
 #include <wrench/execution_controller/ExecutionControllerMessage.h>
 
 WRENCH_LOG_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailuresTest");
@@ -27,6 +26,7 @@ class AlarmLinkFailuresTest : public ::testing::Test {
 public:
 
     void do_AlarmLinkFailure_Test();
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
 
@@ -59,7 +59,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -71,9 +70,8 @@ class AlarmLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
-                             std::shared_ptr<wrench::Workflow> workflow,
                             std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -84,7 +82,7 @@ private:
     int main() {
 
         // Create an Alarm service that will go of in 10 seconds
-        std::string mailbox = this->workflow()->getCallbackMailbox();
+        std::string mailbox = this->test->workflow->getCallbackMailbox();
         wrench::Alarm::createAndStartAlarm(this->simulation, 10,"Host2", mailbox,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
@@ -130,7 +128,7 @@ void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new AlarmLinkFailuresTestWMS(
-                    this, workflow, "Host1")));
+                    this, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

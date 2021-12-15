@@ -87,9 +87,8 @@ class FailureDetectorForSleeperTestWMS : public wrench::ExecutionController {
 
 public:
     FailureDetectorForSleeperTestWMS(FailureDetectorHostFailuresTest *test,
-                                     std::shared_ptr<wrench::Workflow> workflow,
                                       std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -192,7 +191,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorForSleeperTestWMS(this, workflow, hostname)));
+            new FailureDetectorForSleeperTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -212,9 +211,8 @@ class FailureDetectorForComputerTestWMS : public wrench::ExecutionController {
 
 public:
     FailureDetectorForComputerTestWMS(FailureDetectorHostFailuresTest *test,
-                                      std::shared_ptr<wrench::Workflow> workflow,
                                      std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -313,7 +311,7 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorForComputerTestWMS(this, workflow, hostname)));
+            new FailureDetectorForComputerTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());

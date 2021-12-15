@@ -424,7 +424,6 @@ set(TEST_FILES
         test/simulation/S4U_DaemonTest.cpp
         test/simulation/S4U_VirtualMachineTest.cpp
         test/simulation/S4U_SimulationTest.cpp
-        test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         test/misc/BogusMessageTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
