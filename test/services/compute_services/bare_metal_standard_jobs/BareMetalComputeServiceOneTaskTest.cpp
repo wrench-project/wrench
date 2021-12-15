@@ -372,8 +372,6 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
     ASSERT_NO_THROW(wms = simulation->add(
             new NoopTestWMS(this, hostname)));
 
-    // Without a file registry service this should fail
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_THROW(simulation->stageFile(input_file, storage_service1), std::runtime_error);
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -387,8 +385,6 @@ void BareMetalComputeServiceOneTaskTest::do_Noop_test() {
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
-
-
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
