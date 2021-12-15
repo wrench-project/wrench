@@ -208,7 +208,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
 
     // Create a WMS
-    auto workflow = wrench::Workflow::createWorkflow();
+    workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestDefaultHandlerWMS(this, 100, hostname1)));
@@ -409,7 +409,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
 
     // Create a WMS
-    auto workflow = wrench::Workflow::createWorkflow();
+    workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new TestCustomHandlerWMS(this, 100, hostname1)));
