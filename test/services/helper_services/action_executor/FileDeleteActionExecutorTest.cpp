@@ -102,7 +102,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::shared_ptr<wrench::Workflow> workflow;
 
 public:
     std::shared_ptr<wrench::DataFile> file;
@@ -200,7 +199,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a file
-    this->file = workflow->addFile("some_file", 1000000.0);
+    this->file =wrench::Simulation::addFile("some_file", 1000000.0);
 
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
@@ -209,8 +208,6 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     wms = simulation->add(new FileDeleteActionExecutorSuccessTestWMS(this, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
-
-    workflow->clear();
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
