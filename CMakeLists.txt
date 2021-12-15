@@ -402,7 +402,6 @@ set(TEST_FILES
         test/services/helper_services/AlarmTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
-        test/wms/WMSOptimizationsTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceResourceAllocationAlgorithmTest.cpp
         test/services/network_proximity_service/NetworkProximityTest.cpp

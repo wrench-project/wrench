@@ -918,7 +918,7 @@ void BatchServiceTest::do_WorkloadTraceFileRequestedTimesSWF_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFRequestedTimesTestWMS(
-            this, workflow, {compute_service}, {}, hostname)));
+            this, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -943,13 +943,8 @@ class WorkloadTraceFileSWFDifferentTimeOriginTestWMS : public wrench::ExecutionC
 
 public:
     WorkloadTraceFileSWFDifferentTimeOriginTestWMS(BatchServiceTest *test,
-                                                   std::shared_ptr<wrench::Workflow> workflow,
-                                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                    std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
-                        hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -972,7 +967,7 @@ private:
             double task_flops = 10 * (1 * (600 - time_fudge));
             int num_cores = 10;
             double ram = 0.0;
-            tasks.push_back(this->workflow()->addTask("test_job_1_task_" + std::to_string(i),
+            tasks.push_back(this->test->workflow->addTask("test_job_1_task_" + std::to_string(i),
                                                          task_flops,
                                                          num_cores, num_cores, ram));
         }
@@ -986,7 +981,7 @@ private:
         batch_job_args["-c"] = std::to_string(10);  //number of cores per task1
 
         // Submit this job to the BatchComputeService service
-        job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
+        job_manager->submitJob(standard_job_2_nodes, this->test->compute_service, batch_job_args);
 
 
         // Wait for the two execution events
@@ -1082,7 +1077,7 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFDifferentTimeOriginTestWMS(
-            this, workflow, {compute_service}, {}, hostname)));
+            this, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1101,27 +1096,6 @@ void BatchServiceTest::do_WorkloadTraceFileDifferentTimeOriginSWF_test() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**********************************************************************/
 /**  WORKLOAD TRACE FILE TEST JSON                                    **/
 /**********************************************************************/
@@ -1130,13 +1104,8 @@ class WorkloadTraceFileJSONTestWMS : public wrench::ExecutionController {
 
 public:
     WorkloadTraceFileJSONTestWMS(BatchServiceTest *test,
-                                 std::shared_ptr<wrench::Workflow> workflow,
-                                 const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                 const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                  std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
-                        hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
@@ -1161,7 +1130,7 @@ private:
             double task_flops = 10 * (1 * (1800 - time_fudge));
             int num_cores = 10;
             double ram = 0.0;
-            tasks.push_back(this->workflow()->addTask("test_job_1_task_" + std::to_string(i),
+            tasks.push_back(this->test->workflow->addTask("test_job_1_task_" + std::to_string(i),
                                                          task_flops,
                                                          num_cores, num_cores, ram));
         }
@@ -1175,7 +1144,7 @@ private:
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the BatchComputeService service
-        job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
+        job_manager->submitJob(standard_job_2_nodes, this->test->compute_service, batch_job_args);
 
 
         // Create and submit a job that needs 2 nodes and 30 minutes
@@ -1185,7 +1154,7 @@ private:
             double task_flops = 10 * (1 * (1800 - time_fudge));
             int num_cores = 10;
             double ram = 0.0;
-            tasks.push_back(this->workflow()->addTask("test_job_2_task_" + std::to_string(i),
+            tasks.push_back(this->test->workflow->addTask("test_job_2_task_" + std::to_string(i),
                                                          task_flops,
                                                          num_cores, num_cores, ram));
         }
@@ -1201,7 +1170,7 @@ private:
         batch_job_args["-c"] = std::to_string(10); //number of cores per task1
 
         // Submit this job to the BatchComputeService service
-        job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices<wrench::ComputeService>().begin()), batch_job_args);
+        job_manager->submitJob(standard_job_4_nodes, this->test->compute_service, batch_job_args);
 
 
         // Wait for the two execution events
@@ -1659,7 +1628,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
-            this, workflow, {compute_service}, {}, hostname)));
+            this, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -1682,12 +1651,8 @@ class GetQueueStateTestWMS : public wrench::ExecutionController {
 
 public:
     GetQueueStateTestWMS(BatchServiceTest *test,
-                         std::shared_ptr<wrench::Workflow> workflow,
-                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
-                        hostname, "test") {
+            wrench::ExecutionController(hostname, "test"), test(test) {
         this->test = test;
     }
 
@@ -1697,7 +1662,7 @@ private:
 
     int main() {
 
-        auto cs = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+        auto cs = this->test->compute_service;
 
         {
             wrench::Simulation::sleep(10);
@@ -1808,8 +1773,7 @@ void BatchServiceTest::do_GetQueueState_test() {
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
-    ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(
-            this, workflow, {compute_service}, {}, hostname)));
+    ASSERT_NO_THROW(wms = simulation->add(new GetQueueStateTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 

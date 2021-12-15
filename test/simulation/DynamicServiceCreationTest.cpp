@@ -137,12 +137,8 @@ class DynamicServiceCreationReadyTasksTestWMS : public wrench::ExecutionControll
 
 public:
     DynamicServiceCreationReadyTasksTestWMS(DynamicServiceCreationTest *test,
-                                            std::shared_ptr<wrench::Workflow> workflow,
-                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
