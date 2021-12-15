@@ -17,12 +17,14 @@
 class WMSTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::ComputeService> cs_cloud = nullptr;
-    std::shared_ptr<wrench::ComputeService> cs_batch = nullptr;
+    std::shared_ptr<wrench::CloudComputeService> cs_cloud = nullptr;
+    std::shared_ptr<wrench::BatchComputeService> cs_batch = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::DataFile> small_file = nullptr;
     std::shared_ptr<wrench::DataFile> big_file = nullptr;
+
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_DefaultHandlerWMS_test();
     void do_CustomHandlerWMS_test();
@@ -75,15 +77,9 @@ class TestDefaultHandlerWMS : public wrench::ExecutionController {
 
 public:
     TestDefaultHandlerWMS(WMSTest *test,
-                          std::shared_ptr<wrench::Workflow> workflow,
                           double sleep_time,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                           std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
-            ) {
-        this->test = test;
-        this->sleep_time = sleep_time;
+            wrench::ExecutionController(hostname, "test"), test(test), sleep_time(sleep_time) {
     }
 
 private:
@@ -101,16 +97,13 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
-
         // Create and start a VM on the cloud service
-        auto cloud = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+        auto cloud = this->test->cs_cloud;
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        auto task1 = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
+        auto task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -129,7 +122,7 @@ private:
         // Get the list of pending pilot jobs
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask("task2", 100.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 100.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -218,7 +211,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     auto workflow = wrench::Workflow::createWorkflow();
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestDefaultHandlerWMS(this,  workflow, 100, {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
+            new TestDefaultHandlerWMS(this, 100, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -251,15 +244,9 @@ class TestCustomHandlerWMS : public wrench::ExecutionController {
 
 public:
     TestCustomHandlerWMS(WMSTest *test,
-                         std::shared_ptr<wrench::Workflow> workflow,
                          double sleep_time,
-                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                          std::string &hostname) :
-            wrench::ExecutionController(workflow, nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
-            ) {
-        this->test = test;
-        this->sleep_time = sleep_time;
+            wrench::ExecutionController(hostname, "test"), test(test), sleep_time(sleep_time) {
     }
 
 private:
@@ -279,15 +266,13 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        auto cloud = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+        auto cloud = this->test->cs_cloud;
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
-        std::shared_ptr<wrench::WorkflowTask> task1 = this->workflow()->addTask("task1", 10.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -305,7 +290,7 @@ private:
         }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        std::shared_ptr<wrench::WorkflowTask> task2 = this->workflow()->addTask("task2", 200.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 200.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
