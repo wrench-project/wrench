@@ -136,12 +136,11 @@ private:
 
         //Setting up storage services to accommodate data transfer.
         auto data_manager = this->createDataMovementManager();
-        std::shared_ptr<wrench::StorageService> client_storage_service, server_storage_service;
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
         data_manager->doSynchronousFileCopy(file.second,
-                                            wrench::FileLocation::LOCATION(client_storage_service),
-                                            wrench::FileLocation::LOCATION(server_storage_service));
+                                            wrench::FileLocation::LOCATION(this->test->client_storage_service),
+                                            wrench::FileLocation::LOCATION(this->test->server_storage_service));
 
         // Terminating the Bandwidth Meter Services
         bm1->stop();
