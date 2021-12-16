@@ -22,8 +22,6 @@ WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Netwo
 
 namespace wrench {
 
-    std::default_random_engine NetworkProximityDaemon::rng(0);
-
 
     /**
      * @brief Constructor
@@ -43,6 +41,7 @@ namespace wrench {
                                                    std::map<std::string, double> messagepayload_list) :
             NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
                                    message_size, measurement_period, noise, messagepayload_list, "") {
+        this->rng.seed(0);
     }
 
 
