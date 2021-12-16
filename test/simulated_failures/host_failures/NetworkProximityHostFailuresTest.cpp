@@ -129,7 +129,7 @@ private:
         wrench::Simulation::sleep(221);
         auto result2 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
-//        WRENCH_INFO("################ prox=%lf timestamp=%lf",result2.first, result2.second);
+        WRENCH_INFO("################ prox=%lf timestamp=%lf",result2.first, result2.second);
         // Check that timestamp is more than 120 seconds past
         if (wrench::Simulation::getCurrentSimulatedDate() - result2.second < 120) {
             throw std::runtime_error("Network proximity timestamp shouldn't be less than 120 seconds old");
@@ -138,10 +138,10 @@ private:
         wrench::Simulation::sleep(1003);
         auto result3 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
-//        WRENCH_INFO("################ prox=%lf timestamp=%lf",result3.first, result3.second);
+        WRENCH_INFO("################ prox=%lf timestamp=%lf",result3.first, result3.second);
         // Check that timestamp isn't more than 10 seconds past
         if (wrench::Simulation::getCurrentSimulatedDate() - result3.second > 20) {
-            throw std::runtime_error("Network proximity timestamp shouldn't be more than 10 seconds old");
+            throw std::runtime_error("Network proximity timestamp shouldn't be more than 20 seconds old");
         }
 
 #ifdef COMMENTED_OUT_FOR_NOW
