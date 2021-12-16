@@ -119,9 +119,11 @@ private:
         auto result1 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
         // Check that timestamp isn't more than 10 seconds past
-//        WRENCH_INFO("################ prox=%lf timestamp=%lf",result1.first, result1.second);
+        std::cerr << "HERE2\n";
+        WRENCH_INFO("################ prox=%lf timestamp=%lf",result1.first, result1.second);
+        std::cerr << "HERE3\n";
         if (wrench::Simulation::getCurrentSimulatedDate() - result1.second > 20) {
-            throw std::runtime_error("Network proximity timestamp shouldn't be more than 10 seconds old");
+            throw std::runtime_error("Network proximity timestamp shouldn't be more than 20 seconds old");
         }
 
         wrench::Simulation::sleep(221);
@@ -183,12 +185,15 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 2;
+    int argc = 3;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
+
+    std::cerr << "HERE\n";
 
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
