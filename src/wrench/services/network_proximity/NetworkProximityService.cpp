@@ -389,7 +389,7 @@ namespace wrench {
         auto pool_size = (unsigned long) (std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
-        std::default_random_engine sender_rng;
+        std::default_random_engine sender_rng(0);
         // uniform distribution to be used by the sending daemon's rng
         std::uniform_int_distribution<unsigned long> s_udist;
 
