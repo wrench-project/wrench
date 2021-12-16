@@ -325,10 +325,9 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[2] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
