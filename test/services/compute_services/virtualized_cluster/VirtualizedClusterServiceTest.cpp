@@ -1445,7 +1445,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() override {
-        auto cloud_service = this->test->compute_service;
+        auto cloud_service = this->test->cloud_compute_service;
 
         // Create a VM on the Cloud Service
         auto vm_name = cloud_service->createVM(2, 1024);
@@ -1544,7 +1544,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() override {
-        auto cloud_service = this->test->compute_service;
+        auto cloud_service = this->test->cloud_compute_service;
 
         // Create a job manager
         auto job_manager = this->createJobManager();
@@ -1670,7 +1670,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() override {
-        auto cloud_service = this->test->compute_service;
+        auto cloud_service = this->test->cloud_compute_service;
 
         // Create a job manager
         auto job_manager = this->createJobManager();
