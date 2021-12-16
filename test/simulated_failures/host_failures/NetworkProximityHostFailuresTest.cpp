@@ -118,7 +118,7 @@ private:
         wrench::Simulation::sleep(80);
         auto result1 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
-        // Check that timestamp isn't more than 10 seconds past
+        // Check that timestamp isn't more than 20 seconds past
         std::cerr << "HERE2\n";
         WRENCH_INFO("################ prox=%lf timestamp=%lf",result1.first, result1.second);
         std::cerr << "HERE3\n";
