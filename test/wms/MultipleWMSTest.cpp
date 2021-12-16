@@ -105,7 +105,7 @@ public:
                             std::shared_ptr<wrench::Workflow> workflow,
                             double sleep_time,
                             std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), sleep_time(sleep_time), workflow(workflow) {
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow), sleep_time(sleep_time) {
     }
 
 private:
