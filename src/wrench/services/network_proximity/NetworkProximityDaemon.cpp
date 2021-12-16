@@ -112,6 +112,7 @@ namespace wrench {
         WRENCH_INFO("Network Daemon Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
         double time_for_next_measurement = this->getTimeUntilNextMeasurement();
+        std::cerr << "TIME FOR NEXT MEASUREMENT = " << time_for_next_measurement << "\n";
 
         try {
             S4U_Mailbox::putMessage(this->network_proximity_service_mailbox,
@@ -131,6 +132,7 @@ namespace wrench {
             S4U_Simulation::computeZeroFlop();
 
             double countdown = time_for_next_measurement - S4U_Simulation::getClock();
+            std::cerr << "COUNTDOWN = " << countdown << "\n";
             if (countdown > 0) {
                 life = this->processNextMessage(countdown);
             } else {
