@@ -728,9 +728,9 @@ private:
     int main() {
         try {
             // no VMs
-            unsigned long sum_num_cores = this->test->compute_service->getTotalNumCores();
+            unsigned long sum_num_cores = this->test->cloud_compute_service->getTotalNumCores();
 
-            unsigned long sum_num_idle_cores = this->test->compute_service->getTotalNumIdleCores();
+            unsigned long sum_num_idle_cores = this->test->cloud_compute_service->getTotalNumIdleCores();
 
             if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
                 throw std::runtime_error("getTotalNumCores() and getTotalNumIdleCores() should be 6 (they report " +
@@ -739,7 +739,7 @@ private:
             }
 
             // create and start VM with the 2  cores and 10 bytes of RAM
-            auto cs = this->test->compute_service;
+            auto cs = this->test->cloud_compute_service;
             cs->startVM(cs->createVM(2, 10));
 
             sum_num_idle_cores = cs->getTotalNumIdleCores();
