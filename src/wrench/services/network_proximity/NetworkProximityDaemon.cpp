@@ -101,6 +101,7 @@ namespace wrench {
         static std::default_random_engine rng(0);
         static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
         double noise = noise_dist(rng);
+        std::cerr << "NOISE = " << noise << "\n";
         return S4U_Simulation::getClock() + measurement_period + noise;
     }
 
