@@ -468,7 +468,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
     // Create a HTCondor Service
     ASSERT_NO_THROW(htcondor_service = simulation->add(
             new wrench::HTCondorComputeService(
-                    hostname, {},
+                    hostname, {baremetal_compute_service},
                     {
                     })));
 

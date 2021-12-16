@@ -243,7 +243,7 @@ protected:
         fprintf(platform_file6, "%s", xml6.c_str());
         fclose(platform_file6);
 
-//        workflow = wrench::Workflow::createWorkflow();
+        workflow = wrench::Workflow::createWorkflow();
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -1460,7 +1460,6 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test(){
                                                                            {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "infinity"}})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
-    auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new SimulationDumpDiskOperationsTestWMS(
             this, host1
     )));
