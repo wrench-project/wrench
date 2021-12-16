@@ -389,7 +389,7 @@ namespace wrench {
         auto pool_size = (unsigned long) (std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
-        std::default_random_engine sender_rng(0);
+        std::default_random_engine sender_rng;
         // uniform distribution to be used by the sending daemon's rng
         std::uniform_int_distribution<unsigned long> s_udist;
 
@@ -406,7 +406,8 @@ namespace wrench {
         }
 
         // set the seed unique to the sending daemon
-        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
+//        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
+        sender_rng.seed(0);
 
         std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);
 
