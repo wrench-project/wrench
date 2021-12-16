@@ -215,7 +215,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() {
-        auto cs = this->test->compute_service;
+        auto cs = this->test->cloud_compute_service;
 
         cs->getCoreFlopRate(); // coverage
 
