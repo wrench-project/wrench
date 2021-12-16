@@ -261,7 +261,6 @@ public:
 private:
 
     BatchServiceFCFSTest *test;
-    std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
 
     int main() {
         // Create a job manager
@@ -358,7 +357,7 @@ private:
         expectations.insert(std::make_pair("job10", 480));
 
         std::map<std::string,double> jobs_estimated_start_times =
-                this->batch_compute_service->getStartTimeEstimates(set_of_jobs);
+                this->test->compute_service->getStartTimeEstimates(set_of_jobs);
 
         for (auto job : set_of_jobs) {
             std::string id = std::get<0>(job);
