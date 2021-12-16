@@ -33,6 +33,9 @@ public:
     std::shared_ptr<wrench::StorageService> ss1;
     std::shared_ptr<wrench::StorageService> ss2;
 
+    std::shared_ptr<wrench::StorageService> client_storage_service;
+    std::shared_ptr<wrench::StorageService> server_storage_service;
+
     std::shared_ptr<wrench::WorkflowTask> t1 = nullptr;
     std::shared_ptr<wrench::WorkflowTask> t2 = nullptr;
     std::shared_ptr<wrench::WorkflowTask> t3 = nullptr;
@@ -1271,7 +1274,6 @@ public:
 
 private:
     SimulationDumpJSONTest *test;
-    std::shared_ptr<wrench::DataFile> file;
 
     int main() {
         //creating the bandwidth meter service
@@ -1282,12 +1284,11 @@ private:
 
         //Setting up storage services to accommodate data transfer.
         auto data_manager = this->createDataMovementManager();
-        std::shared_ptr<wrench::StorageService> client_storage_service, server_storage_service;
         //copying file to force link usage.
         auto file = *(this->test->workflow->getFileMap().begin());
         data_manager->doSynchronousFileCopy(file.second,
-                                            wrench::FileLocation::LOCATION(client_storage_service),
-                                            wrench::FileLocation::LOCATION(server_storage_service));
+                                            wrench::FileLocation::LOCATION(this->test->client_storage_service),
+                                            wrench::FileLocation::LOCATION(this->test->server_storage_service));
         return 0;
     }
 };
@@ -1315,9 +1316,7 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     std::set<std::shared_ptr<wrench::StorageService>> storage_services_list;
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
 
-    std::shared_ptr<wrench::StorageService> client_storage_service;
     client_storage_service = simulation->add(new wrench::SimpleStorageService("host1", {"/"}, {}));
-    std::shared_ptr<wrench::StorageService> server_storage_service;
     server_storage_service = simulation->add(new wrench::SimpleStorageService("host2", {"/"}, {}));
     storage_services_list.insert(client_storage_service);
     storage_services_list.insert(server_storage_service);
