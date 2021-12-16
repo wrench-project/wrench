@@ -111,7 +111,6 @@ namespace wrench {
      * @param mailbox: the mailbox name
      */
     void Job::pushCallbackMailbox(std::string mailbox) {
-        WRENCH_INFO("PUSHING %s", mailbox.c_str());
         this->callback_mailbox_stack.push(mailbox);
     }
 

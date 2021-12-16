@@ -200,7 +200,7 @@ private:
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
-        for (auto task : tasks) {
+        for (const auto &task : tasks) {
             try {
                 one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file,
                                                                                     wrench::FileLocation::LOCATION(this->test->storage_service)}},
@@ -251,7 +251,6 @@ private:
             throw std::runtime_error("Invalid route between hosts returned");
         }
 
-
         // Wait for workflow execution events
         for (auto const & task : tasks) {
             std::shared_ptr<wrench::ExecutionEvent> event;
@@ -264,7 +263,6 @@ private:
                 throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
             }
         }
-
 
         // Coverage
         one_task_jobs[0]->getEndDate();
@@ -330,7 +328,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
+    argv[2] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -370,6 +368,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
             wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
 
+
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -384,6 +383,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
+
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
@@ -395,10 +395,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
-
-    // Won't work due to missing file staging
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-
 
     // Try to stage a file without a file registry
     ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
@@ -416,7 +412,6 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
-
 
     for (int i=0; i < argc; i++)
      free(argv[i]);
