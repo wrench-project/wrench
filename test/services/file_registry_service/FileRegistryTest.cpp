@@ -300,7 +300,6 @@ void FileRegistryTest::do_FileRegistry_Test() {
           new wrench::SimpleStorageService(hostname, {"/otherdisk"})));
 
   // Create a file registry service
-  std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
   ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
