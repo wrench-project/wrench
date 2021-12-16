@@ -22,6 +22,9 @@ WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Netwo
 
 namespace wrench {
 
+    std::default_random_engine NetworkProximityDaemon::rng(0);
+
+
     /**
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
@@ -98,7 +101,6 @@ namespace wrench {
      */
     double NetworkProximityDaemon::getTimeUntilNextMeasurement() {
 
-        static std::default_random_engine rng(0);
         static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
         double noise = noise_dist(rng);
         std::cerr << "NOISE = " << noise << "\n";

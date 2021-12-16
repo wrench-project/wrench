@@ -38,6 +38,8 @@ namespace wrench {
 
         friend class Simulation;
 
+        static std::default_random_engine rng;
+
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                std::string network_proximity_service_mailbox,
                                double message_size,double measurement_period,
