@@ -448,7 +448,7 @@ private:
     VirtualizedClusterServiceTest *test;
 
     int main() {
-        auto cs = this->test->compute_service;
+        auto cs = this->test->cloud_compute_service;
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
