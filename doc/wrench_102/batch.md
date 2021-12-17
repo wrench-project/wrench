@@ -18,8 +18,7 @@ provided to the [Slurm](https://slurm.schedmd.com/) batch scheduler.
 Here is an example job submission to the batch service:
 
 ~~~~~~~~~~~~~{.cpp}
-// Get the first batch compute service (assuming there's at least one)
-auto batch_service = *(this->getAvailableComputeServices<wrench::BatchComputeService>().begin());
+std::shared_ptr<wrench::BatchComputeService> some_batch_service;
 
 // Create a job manager
 auto job_manager = this->createJobManager();
@@ -40,7 +39,7 @@ service_specific_args["-N"] = "2";
 service_specific_args["-c"] = "4";
 
 // Submit the job
-job_manager->submitJob(job, batch_cs, service_specific_args);
+job_manager->submitJob(job, some_batch_service, service_specific_args);
 
 //  Wait for and process the next event
 this->waitForAndProcessNextEvent();
@@ -50,7 +49,7 @@ If the service-specific arguments are invalid (e.g., number of nodes too
 large), `wrench::JobManager::submitJob()` method throws a
 `wrench::ExecutionException`.
 
-See the WMS implementation in `examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp` for a more complete example.
+See the execution controller implementation in `examples/basic-examples/batch-bag-of-tasks/TwoTasksAtATimeBatchWMS.cpp` for a more complete example.
 
 
 A batch compute service also supports pilot jobs. Once started, a pilot job exposes a temporary  (only running until its containing pilot job expires) bare-metal compute service. Here is a simple code excerpt:
@@ -62,7 +61,7 @@ auto pilot_job = job_manager->createPilotJob();
 // submit it to the batch compute service, asking for 2 10-core nodes for 20 minutes
 std::map<std::string, std::string> service_specific_arguments = 
             {{"-N","2"},{"-c","10"},{"-t","20"}};
-job_manager->submitJob(pilot_job, batch_service, service_specific_arguments);
+job_manager->submitJob(pilot_job, some_batch_service, service_specific_arguments);
 
 // Waiting for the next event (which will be a pilot job start event)
 this->waitForAndProcessNextEvent();
@@ -78,5 +77,5 @@ auto cs = pilot_job->getComputeService();
 While the pilot job is running,  [standard jobs can be submitted to its bare-metal service](@ref guide-102-baremetal).
 
 
-See the WMS implementation in `examples/basic-examples/basic-examples/batch-pilot-job/PilotJobWMS.cpp` for a more complete example.
+See the execution controller implementation in `examples/basic-examples/basic-examples/batch-pilot-job/PilotJobWMS.cpp` for a more complete example.
 
