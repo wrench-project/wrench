@@ -19,31 +19,32 @@ namespace wrench {
     class Simulation;
 
     /**
-     *  @brief A Workflow Management System (WMS) implementation
+     *  @brief An execution controller implementation
      */
-    class TwoTasksAtATimeWMS : public ExecutionController {
+    class TwoTasksAtATimeExecutionController : public ExecutionController {
 
     public:
         // Constructor
-        TwoTasksAtATimeWMS(
-                std::shared_ptr<Workflow> workflow,
-                const std::shared_ptr<BareMetalComputeService> &compute_service,
-                const std::shared_ptr<SimpleStorageService> &storage_service,
+        TwoTasksAtATimeExecutionController(
+                int num_tasks,
+                const std::shared_ptr<BareMetalComputeService> compute_service,
+                const std::shared_ptr<SimpleStorageService> storage_service,
                 const std::string &hostname);
 
     protected:
 
         // Overridden method
-        void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
+        void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>) override;
+        void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>) override;
 
     private:
         // main() method of the WMS
         int main() override;
 
-        std::shared_ptr<Workflow> workflow;
         const std::shared_ptr<BareMetalComputeService> compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
+
+        int num_tasks;
 
     };
 }

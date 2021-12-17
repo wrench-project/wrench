@@ -35,7 +35,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoTasksAtATimeWMS.h" // WMS implementation
+#include "TwoTasksAtATimeExecutionController.h" // WMS implementation
 
 #define MBPS (1000 * 1000)
 
