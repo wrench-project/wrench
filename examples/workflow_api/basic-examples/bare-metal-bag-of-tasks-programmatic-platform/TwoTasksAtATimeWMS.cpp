@@ -20,7 +20,7 @@
 
 #include <iostream>
 
-#include "TwoTasksAtATimeWMS.h"
+#include "TwoTasksAtATimeExecutionController.h"
 
 WRENCH_LOG_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeWMS");
 
