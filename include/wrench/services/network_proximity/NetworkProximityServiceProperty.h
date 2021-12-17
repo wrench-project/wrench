@@ -40,6 +40,9 @@ namespace wrench {
          * to avoid idiosyncratic effects of perfect synchrony) (default: 20) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
 
+        /** @brief The seed for the noise random number generator **/
+        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
+
         /** @brief The percentage of other network proximity daemons that each network proximity daemon will conduct RTT measurements with (default: 1.0)**/
         DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 

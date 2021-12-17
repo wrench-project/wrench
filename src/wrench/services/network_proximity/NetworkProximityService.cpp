@@ -209,6 +209,8 @@ namespace wrench {
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
                             this->getPropertyValueAsDouble(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
+                            this->getPropertyValueAsDouble(
+                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
                             this->messagepayload_list));
             this->network_daemons.push_back(np_daemon);
 
