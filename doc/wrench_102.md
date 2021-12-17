@@ -94,7 +94,7 @@ have (public) member functions for submitting jobs for execution!**
 
 The rationale for the above is that many member functions need to be asynchronous so
 that the execution controller can use services concurrently. For instance, an execution controller could
-submit a compute job to two distinct compute services asynchronously, and
+submit a job to two distinct compute services asynchronously, and
 then wait for the service which completes its job first and cancel the job
 on the other service.  Exposing this asynchronicity to the execution controller would
 require that the WRENCH developer use data structures to perform the
@@ -159,7 +159,10 @@ of an execution controller  while affording flexibility.
 A **Compound Job** is simply  set of actions to be performed, with possible control dependencies
 between actions. It is the most generic, flexible, and expressive kind of job. See the API documentation
 for the `wrench::CompoundJob` class and the examples in the `examples/action_api` directory. The other types of
-jobs below are actually implemented internally as compound jobs. 
+jobs below are actually implemented internally as compound jobs.  The Compound Job abstraction is the most recent
+addition to the WRENCH API, and vastly expands the list of possible things that an execution controller can do.  But because
+it is more recent, the reader will find that there are more examples in these documents and in the `examples` directory
+that use standard jobs (described below). But all these examples could be easily rewritten using the more generic compound job abstraction. 
 
 A **Standard Job** is a specific kind of job designed for **workflow** applications. 
 In its most complete form, a standard job specifies:
