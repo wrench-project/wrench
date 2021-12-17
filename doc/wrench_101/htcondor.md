@@ -6,7 +6,7 @@ Creating a HTCondor compute service                        {#guide-101-htcondor}
 # Overview #            {#guide-htcondor-overview}
 
 [HTCondor](http://htcondor.org) is a workload management framework that supervises 
-task1 executions on various sets of resources.
+task executions on various sets of resources.
 HTCondor is composed of six main service daemons (`startd`, `starter`, 
 `schedd`, `shadow`, `negotiator`, and `collector`). In addition, 
 each host on which one or more of these daemons is spawned must also 
