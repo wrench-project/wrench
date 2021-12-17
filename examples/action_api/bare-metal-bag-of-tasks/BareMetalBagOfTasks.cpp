@@ -104,7 +104,6 @@ int main(int argc, char **argv) {
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
-
     auto wms = simulation->add(
             new wrench::TwoTasksAtATimeExecutionController(num_tasks, baremetal_service, storage_service, "UserHost"));
 
