@@ -2,7 +2,6 @@
 set(EXAMPLES_CMAKEFILES_TXT
         examples/workflow_api/basic-examples/bare-metal-chain/CMakeLists.txt
         examples/workflow_api/basic-examples/bare-metal-chain-scratch/CMakeLists.txt
-        examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/CMakeLists.txt
         examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeLists.txt
         examples/workflow_api/basic-examples/bare-metal-multicore-tasks/CMakeLists.txt
         examples/workflow_api/basic-examples/bare-metal-complex-job/CMakeLists.txt
@@ -15,9 +14,10 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/workflow_api/real-workflow-example/CMakeLists.txt
         examples/workflow_api/condor-grid-example/CMakeLists.txt
         examples/workflow_api/basic-examples/io-pagecache/CMakeLists.txt
-        examples/action_api/multi-action-multi-job-example/CMakeLists.txt
-        examples/action_api/super-custom-action-example/CMakeLists.txt
-        examples/action_api/job-action-failure-example/CMakeLists.txt
+        examples/action_api/multi-action-multi-job/CMakeLists.txt
+        examples/action_api/super-custom-action/CMakeLists.txt
+        examples/action_api/job-action-failure/CMakeLists.txt
+        examples/action_api/bare-metal-bag-of-tasks/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})

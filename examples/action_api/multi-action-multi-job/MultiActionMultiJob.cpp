@@ -66,10 +66,10 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating simulated platform..." << std::endl;
     simulation->instantiatePlatform(argv[1]);
 
-    /* Instantiate a storage service, and add it to the simulation->
+    /* Instantiate a storage services, and add it to the simulation.
      * A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
-     * of wrench::SimpleStorageService, is started on StorageHost in the
+     * of wrench::SimpleStorageService, is started on StorageHost1 in the
      * platform , which has an attached disk mounted at "/". The SimpleStorageService
      * is a basic storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
@@ -79,6 +79,7 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating a SimpleStorageService on StorageHost1..." << std::endl;
     auto storage_service_1 = simulation->add(new wrench::SimpleStorageService(
             "StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+    /* Start another storage service on StorageHost2 */
     std::cerr << "Instantiating a SimpleStorageService on StorageHost2..." << std::endl;
     auto storage_service_2 = simulation->add(new wrench::SimpleStorageService(
             "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));

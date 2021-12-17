@@ -8,26 +8,25 @@
  */
 
 /**
- ** This simulator simulates the execution of a bag-of-tasks workflow, that is, of a workflow
- ** in which each task has its own input file and its own output file, and tasks can be
- ** executed completely independently
+ ** This simulator simulates the execution of a bag-of-tasks application, that is, a bunch
+ ** of independent tasks, each with its own input file and its own output file. Tasks can be
+ ** executed completely independently:
  **
  **   InputFile #0 -> Task #0 -> OutputFile #1
  **   ...
  **   InputFile #n -> Task #n -> OutputFile #n
  **
- ** The compute platform comprises two hosts, WMSHost and ComputeHost. On WMSHost runs a simple storage
- ** service and a WMS (defined in class TwoTasksAtATimeWMS). On ComputeHost runs a bare metal
- ** compute service, that has access to the 10 cores of that host. Once the simulation is done,
- ** the completion time of each workflow task is printed.
+ ** The compute platform comprises two hosts, ControllerHost and ComputeHost. On ControllerHost runs a simple storage
+ ** service and an execution controller (defined in class TwoTasksAtATimeExecutionController). On ComputeHost runs a bare metal
+ ** compute service, that has access to the 10 cores of that host.
  **
- ** Example invocation of the simulator for a 10-task workflow, with no logging:
+ ** Example invocation of the simulator for a 10-task workload, with no logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml
  **
- ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
- **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml --log=custom_wms.threshold=info
+ ** Example invocation of the simulator for a 10-task workload, with only execution controller logging:
+ **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml --log=custom_execution_controller.threshold=info
  **
- ** Example invocation of the simulator for a 6-task1 workflow with full logging:
+ ** Example invocation of the simulator for a 6-task1 workload with full logging:
  **    ./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --wrench-full-log
  **/
 
@@ -35,7 +34,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoTasksAtATimeWMS.h" // WMS implementation
+#include "TwoTasksAtATimeExecutionController.h"
 
 /**
  * @brief The Simulator's main function
@@ -80,35 +79,19 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    /* Declare a workflow */
-    auto workflow = wrench::Workflow::createWorkflow();
-
-    /* Initialize and seed a RNG */
-    std::uniform_real_distribution<double> dist(100000000.0,10000000000.0);
-    std::mt19937 rng(42);
-
-    /* Add workflow tasks and files */
-    for (int i=0; i < num_tasks; i++) {
-        /* Create a task1: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
-        auto task = workflow->addTask("task_" + std::to_string(i), dist(rng), 1, 10, 10000000);
-        task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
-        task->addInputFile(workflow->addFile("input_" + std::to_string(i), 10000000));
-        task->addOutputFile(workflow->addFile("output_" + std::to_string(i), 10000000));
-    }
-
     /* Instantiate a storage service, and add it to the simulation->
      * A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
-     * of wrench::SimpleStorageService, is started on WMSHost in the
+     * of wrench::SimpleStorageService, is started on UserHost in the
      * platform , which has an attached disk mounted at "/". The SimpleStorageService
      * is a basic storage service implementation provided by WRENCH.
      * Throughout the simulation execution, input/output files of workflow tasks will be located
      * in this storage service, and accessed remotely by the compute service. Note that the
      * storage service is configured to use a buffer size of 50M when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
-    std::cerr << "Instantiating a SimpleStorageService on WMSHost..." << std::endl;
+    std::cerr << "Instantiating a SimpleStorageService on UserHost..." << std::endl;
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
-            "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+            "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
     /* Instantiate a bare-metal compute service, and add it to the simulation->
      * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
@@ -119,26 +102,11 @@ int main(int argc, char **argv) {
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
-    /* Instantiate a WMS, to be stated on WMSHost, which is responsible
+    /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
 
     auto wms = simulation->add(
-            new wrench::TwoTasksAtATimeWMS(workflow, baremetal_service, storage_service, "WMSHost"));
-
-    /* Instantiate a file registry service to be started on WMSHost. This service is
-     * essentially a replica catalog that stores <file , storage service> pairs so that
-     * any service, in particular a WMS, can discover where workflow files are stored. */
-    std::cerr << "Instantiating a FileRegistryService on WMSHost ..." << std::endl;
-    auto file_registry_service = new wrench::FileRegistryService("WMSHost");
-    simulation->add(file_registry_service);
-
-    /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
-     * method of the Workflow class returns the set of all workflow files that are not generated
-     * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
-    std::cerr << "Staging task1 input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
-        simulation->stageFile(f, storage_service);
-    }
+            new wrench::TwoTasksAtATimeExecutionController(num_tasks, baremetal_service, storage_service, "UserHost"));
 
     /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
@@ -149,20 +117,6 @@ int main(int argc, char **argv) {
         return 1;
     }
     std::cerr << "Simulation done!" << std::endl;
-
-    /* Simulation results can be examined via simulation->output, which provides access to traces
-     * of events. In the code below, we print the  retrieve the trace of all task1 completion events, print how
-     * many such events there are, and print some information for the first such event. */
-    auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
-    for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
-    }
-
-    /* Dump it all to a JSON file */
-    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/wrench.json");
-
-    /* Free up memory */
-    workflow->clear();
 
     return 0;
 }

@@ -19,34 +19,28 @@ correspond to software that knows how to store data, perform computation,
 and many other useful things that real-world cyberinfrastructure services
 can do.
 
-The simulator then creates a workflow to be executed, which consists of 
-a set of compute tasks each with input and output files, with control and/or
-data dependencies between tasks.
-
-A special service is then created, called a Workflow Management System
-(WMS),  that will be in charge of executing the workflow on the platform using
-available hardware resources  and software services.  The WMS
-is implemented using the [WRENCH Developer API](./developer/annotated.html), as
+The simulator then creates a special (simulated) process called an *execution controller*. An 
+execution controller interacts with the services running on the platform to execute some application
+workload of interest, whatever that workflow is. The execution controller is implemented using
+the [WRENCH Developer API](./developer/annotated.html), as
 discussed in the [WRENCH 102](@ref wrench-102) page. 
 
 The simulation is then launched via a single call
-(`wrench::Simulation::launch()`), and returns only once the WMS has terminated 
-(after completing or failing to complete the execution of the workflow).
-Simulation output can be analyzed programmatically and/or dumped to a JSON file. 
-This JSON file can be loaded into the *WRENCH dashboard* tool (just run the 
-`wrench-dashboard` executable, which should have been installed on your system).
+(`wrench::Simulation::launch()`), and returns only once the execution controller has terminated 
+(after completing or failing to complete whatever it wanted to accomplish).  
+
 
 # 1,000-ft view of a WRENCH simulator #         {#wrench-101-simulator-1000ft}
 
 In this section, we dive deeper into what it takes to implement a WRENCH 
 simulator. _To provide context, we refer to the example simulator in the_
-`examples/basic-examples/bare-metal-chain` _directory of the WRENCH 
-distribution_. This simulator simulates the execution of a chain workflow
-on a two-host platform that runs one compute service and one storage
-service. Although other examples are available (see `examples/README.md`), 
+`examples/basic-examples/action_api/multi-action-multi-job` _directory of the WRENCH 
+distribution_. This simulator simulates the execution of a few jobs, each of which consists of
+one or more actions, on a 4-host platform that runs a couple of compute services and storage
+services. Although other examples are available (see `examples/README.md`), 
 this simple example is sufficient to showcase most of what a WRENCH simulator 
-does, which consists in going through the steps below. Note that the simulator's 
-code contains extensive comments as well. 
+does, which consists in going through the steps below. Note that all simulator
+codes in the `examples` directory contain extensive comments. 
 
 ## Step 0: Include wrench.h #                   {#wrench-101-simulator-1000ft-step-0}
 
@@ -61,14 +55,16 @@ header file:
 ## Step 1: Create and initialize a simulation #   {#wrench-101-simulator-1000ft-step-1}
 
 The state of a WRENCH simulation is defined by the `wrench::Simulation` 
-class. A simulator must create an instance of this class and initialize it
-with the `wrench::Simulation::init()` member function.  The bare-metal-chain
+class. A simulator must create an instance of this class by calling 
+`wrench::Simulation::createSimulation()` and initialize it
+with the `wrench::Simulation::init()` member function.  The `multi-action-multi-job`
 simulator does this as follows:
 
 ~~~~~~~~~~~~~{.cpp}
-wrench::Simulation simulation;
-simulation.init(&argc, argv);
+auto simulation = wrench::Simulation::createSimulation();
+    simulation->init(&argc, argv);
 ~~~~~~~~~~~~~
+
 
 Note that this member function takes in the command-line arguments passed to the main
 function of the simulator. This is so that it can parse WRENCH-specific and
@@ -76,7 +72,7 @@ function of the simulator. This is so that it can parse WRENCH-specific and
 command-line arguments. (Recall that WRENCH is based on
 [SimGrid](https://simgrid.org).) Two useful such arguments are `--wrench-help`,
 which displays a WRENCH help message, and `--help-simgrid`, which displays
-an extensive SimGrid help message.
+an extensive SimGrid help message. Another one is `--wrench-full-log`, which displays full simulation logs (see below for more details).
 
 ## Step 2: Instantiate a simulated platform #     {#wrench-101-simulator-1000ft-step-2}
 
@@ -86,7 +82,7 @@ file](https://simgrid.org/doc/latest/platform.html), we defines all the
 simulated hardware (compute hosts, clusters 
 of hosts, storage resources, network links, routers, routes between 
 hosts, etc.). The bare-metal-chain simulator comes with a platform 
-description file, `examples/basic-examples/bare-metal-bag-of-tasks/two_hosts.xml`, 
+description file, `examples/action_api/multi-action-multi-job/four_hosts.xml`, 
 which we include here:
 
 ~~~~~~~~~~~~~{.xml}
@@ -95,80 +91,92 @@ which we include here:
 <platform version="4.1">
     <zone id="AS0" routing="Full">
 
-        <!-- The host on which the WMS will run -->
-        <host id="WMSHost" speed="10Gf" core="1">
+        <!-- The host on which the Controller will run -->
+        <host id="UserHost" speed="10Gf" core="1">
+        </host>
+
+        <!-- The host on which the bare-metal compute service will run and also run jobs-->
+        <host id="ComputeHost1" speed="35Gf" core="10">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- Another host on which the bare-metal compute service will be able to run jobs -->
+        <host id="ComputeHost2" speed="35Gf" core="10">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- The host on which the first storage service will run -->
+        <host id="StorageHost1" speed="10Gf" core="1">
             <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
                 <prop id="size" value="5000GiB"/>
                 <prop id="mount" value="/"/>
             </disk>
         </host>
 
-        <!-- The host on which the BareMetalComputeService will run -->
-        <host id="ComputeHost" speed="1Gf" core="10">
+        <!-- The host on which the second storage service will run -->
+        <host id="StorageHost2" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="200MBps" write_bw="200MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the cloud compute service will run -->
+        <host id="CloudHeadHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/scratch/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the cloud compute service will start VMs -->
+        <host id="CloudHost" speed="25Gf" core="8">
             <prop id="ram" value="16GB" />
-       </host>
+        </host>
 
-        <!-- A network link that connects both hosts -->
-        <link id="network_link" bandwidth="50MBps" latency="20us"/>
-        <!-- WMSHost's local "loopback" link -->
-        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
-        <!--ComputeHost's local "loopback" link -->
-        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
+        <!-- A network link shared by EVERY ONE-->
+        <link id="network_link" bandwidth="50MBps" latency="1ms"/>
 
-        <!-- Network routes -->
-        <route src="WMSHost" dst="ComputeHost">
-            <link_ctn id="network_link"/>
-        </route>
-
-        <!-- Each loopback link connects each host to itself -->
-        <route src="WMSHost" dst="WMSHost">
-            <link_ctn id="loopback_WMSHost"/>
-        </route>
-        <route src="ComputeHost" dst="ComputeHost">
-            <link_ctn id="loopback_ComputeHost"/>
-        </route>
+        <!-- The same network link connects all hosts together -->
+        <route src="UserHost" dst="ComputeHost1"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="ComputeHost2"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost1" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost2" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+        <route src="CloudHeadHost" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost1" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost2" dst="CloudHost"> <link_ctn id="network_link"/> </route>
 
     </zone>
 </platform>
 ~~~~~~~~~~~~~
 
-This file defines a platform with two hosts,  `WMSHost` and `ComputeHost`. 
-The former is a 1-core host with compute speed 10 Gflop/sec, with a 5000-GiB 
-disk with 100 MB/sec read and write bandwidth, which is mounted at `/`. 
-The latter is a 10-core host where each core computes at speed 1Gflop/sec and 
-with a total RAM capacity of 16 GB.  The platform also declares three network links.
-The first one, called `network_link` is an actual network link to interconnect the two
-hosts, with 50 MB/sec bandwidth and 20 microsecond latency.
-The other two links (`loopback_WMSHost` and `loopback_ComputeHost`) are used to model
-inter-process communication (IPC) performance within each host.   Last, network routes are declared.
-The route from host `WMSHost` and `ComputeHost` is through `network_link`. Then, there
-is a route from each host to itself using each loopback link. Note that these loopback routes
-are optional. By default, SimGrid includes a loopback route for each host, with bandwidths and
-latencies based on measurements obtained on actual computers. The above XML file  does not
-use these defaults, and instead declare loop routes through much faster loopback links (zero latency
-and extremely high bandwidth). This is because, for this simulation, we want to model a platform
-in  which IPC on a host is essentially free. 
-
+This file defines a platform with several hosts, each with some number of cores and a core speed. Some hosts have
+a disk attached to them, some declare a RAM capacity.  The platform also declares a single network link with a particular
+latency and bandwidth, and routes between some of the hosts (over that one link).
 We refer the reader 
 to platform description files in other examples in the  `examples` directory 
 and to the [SimGrid documentation](https://simgrid.org/doc/latest/platform.html) 
-for more information on how to create platform description files. 
-
+for more information on how to create platform description files.  There are many possibilities
+for defining complex platforms at will. 
 The bare-metal-chain simulator takes the path to the platform description as 
-its 2nd command-line argument and thus instantiates the simulated platform as:
+its 1st (and only) command-line argument and thus instantiates the simulated platform as:
 
 ~~~~~~~~~~~~~{.cpp}
-simulation.instantiatePlatform(argv[2]);
+simulation.instantiatePlatform(argv[1]);
 ~~~~~~~~~~~~~
 
 The **second version** of the `wrench::Simulation::instantiatePlatform()` method takes as input 
 a function that creates the platform description programmatically using the 
 [SimGrid platform description API](https://simgrid.org/doc/latest/Platform_cpp.html). The 
-example in `examples/basic-examples/bare-metal-bag-of-tasks-programmatic-platform` shows how
-the XML platform description in `examples/basic-examples/bare-metal-bag-of-tasks/two_hosts.xml` can
+example in `examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform` shows how
+the XML platform description in `examples/workflow_api/basic-examples/bare-metal-bag-of-tasks/two_hosts.xml` can
 be implemented programmatically. (Note that this example passes a functor to `wrench::Simulation::instantiatePlatform()`
-rather than a plain method.)
+rather than a plain lambda.)
 
+XXX BARF XXX
 
 ## Step 3: Instantiate services on the platform #    {#wrench-101-simulator-1000ft-step-3}
 
@@ -181,57 +189,81 @@ is to be started. Typical kinds of services include compute services,
 storage services, and file registry services  (see 
 [below](@ref wrench-101-simulator-services) for more details).
 
-The bare-metal-chain simulator instantiates three services. The first one
+The bare-metal-chain simulator instantiates four services. The first one
 is a compute service:
 
 ~~~~~~~~~~~~~{.cpp}
-auto bare_metal_service = simulation.add(new wrench::BareMetalComputeService("ComputeHost", {"ComputeHost"}, "", {}, {}));
-~~~~~~~~~~~~~
+ auto baremetal_service = simulation->add(new wrench::BareMetalComputeService("ComputeHost1", {{"ComputeHost1"}, {"ComputeHost2"}}, "", {}, {}));
+ ~~~~~~~~~~~~~
 
 The `wrench::BareMetalComputeService` class implements a simulation of a
 compute service that greedily runs jobs submitted to it. You can think of
 it as a compute server that simply fork-execs (possibly multi-threaded)
 processes upon  request, only ensuring that physical RAM capacity is not
 exceeded. In this particular case, the compute service is started on host 
-`ComputeHost`. It has access to the compute resources of that same 
-host (2nd argument). The third argument corresponds to the path of some 
+`ComputeHost1`. It has access to the compute resources of that same 
+host  as well as that of a second host `ComputeHost2` (2nd argument is a list of available
+compute hosts). The third argument corresponds to the path of some 
 scratch storage, i.e., storage in which data can be stored temporarily while 
 a job runs. 
-In this case, the scratch storage specification is empty as host `ComputeHost` 
+In this case, the scratch storage specification is empty as host `ComputeHost1` 
 has no disk attached to it.
-(See the `examples/basic-examples/bare-metal-chain-scratch` example
-simulator, in which scratch storage is used). The last two
+The last two
 arguments are `std::map` objects (in this case both empty), that are used 
-to configure properties of the compute service (see details in 
+to configure properties of the service (see details in 
 [this section below](@ref wrench-101-customizing-services)).
 
-The second service is a storage service:
+The second service is a cloud compute service:
 
 ~~~~~~~~~~~~~{.cpp}
-auto storage_service = simulation.add(new wrench::SimpleStorageService( "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
+auto cloud_service = simulation->add(new wrench::CloudComputeService("CloudHeadHost", {"CloudHost"}, "/scratch/", {}, {}));
+~~~~~~~~~~~~~
+
+The `wrench::CloudComputeService` implements a simulation of a cloud platform on which virtual machine (VM) instances
+can be created, started, used, and shutdown. The service runs on host `CloudHeadHost` and has access to the 
+compute resources on host `CloudHost`. Unlike the previous service, this service has scratch space,
+at path `/data` on the disk attached to host `CloudHost` (as seen in the XML platfom description).
+Here again, the last two arguments are used
+to configure properties of the service.
+
+The third service is a storage service:
+
+~~~~~~~~~~~~~{.cpp}
+auto storage_service_1 = simulation->add(new wrench::SimpleStorageService("StorageHost1", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 ~~~~~~~~~~~~~
 
 The `wrench::SimpleStorageService` class implements a  simulation of a
 remotely-accessible storage service on which files can be stored, copied,
 deleted, read, and written. In this particular case, the storage service
-is  started on host `WMSHost`. It uses storage mounted at `/`.  The
-last two arguments, as for the compute service, are used to configure
+is  started on host `StorageHost1`. It uses storage mounted at `/` on that host (which corresponds to the mount path of a disk, as
+seen in the XML platform description).  The
+last two arguments, as for the compute services, are used to configure
 particular properties of the service. In this case, the service is
 configured to use a 50-MB buffer size to pipeline network and disk accesses
 (see details in [this section below](@ref wrench-101-customizing-services)).
 
-The third service is a file registry service:
+The fourth service is a another storage service that runs on host `StorageHost2`.
 
-~~~~~~~~~~~~~{.cpp}
-auto file_registry_service = new wrench::FileRegistryService("WMSHost"); 
-simulation.add(file_registry_service); 
-~~~~~~~~~~~~~
+[comment]: <> (~~~~~~~~~~~~~{.cpp})
 
-The `wrench::FileRegistryService`  class implements a simulation of a
-key-values pair  service that stores for each file (the key)  the locations
-where  the file is  available for read/write access (the values). This service
-can be used by a WMS to find out where  workflow files
-are located (and is often required - see Step #4 hereafter). 
+[comment]: <> (auto file_registry_service = new wrench::FileRegistryService&#40;"WMSHost"&#41;; )
+
+[comment]: <> (simulation.add&#40;file_registry_service&#41;; )
+
+[comment]: <> (~~~~~~~~~~~~~)
+
+[comment]: <> (The `wrench::FileRegistryService`  class implements a simulation of a)
+
+[comment]: <> (key-values pair  service that stores for each file &#40;the key&#41;  the locations)
+
+[comment]: <> (where  the file is  available for read/write access &#40;the values&#41;. This service)
+
+[comment]: <> (can be used by a WMS to find out where  workflow files)
+
+[comment]: <> (are located &#40;and is often required - see Step #4 hereafter&#41;. )
+
+
+XXX BARF XXXX
 
 ## Step 4: Create at least one workflow #     {#wrench-101-simulator-1000ft-step-4}
 

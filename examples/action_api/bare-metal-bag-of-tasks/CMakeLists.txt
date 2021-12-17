@@ -1,7 +1,7 @@
 
 set(SOURCE_FILES
-        TwoTasksAtATimeWMS.h
-        TwoTasksAtATimeWMS.cpp
+        TwoTasksAtATimeExecutionController.h
+        TwoTasksAtATimeExecutionController.cpp
         BareMetalBagOfTasks.cpp
         )
 
