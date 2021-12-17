@@ -28,7 +28,13 @@ to analyze action failures.
     
   - `action_api/super-custom-action`: An example that showcases how a custom action within a job can do powerful things (and essentially act itself
     as an execution controller).
-    
+
+  - `action_api/bare-metal-bag-of-tasks`: A simulation of the execution of a
+  bag-of-tasks workload on a bare-metal compute
+  service, with all data being read/written from/to a single
+  storage service. Two  tasks are executed concurrently on
+  the compute service until the workload is complete. 
+  
 ### Workflow-API simulator examples
 
 #### Simulators that showcase fundamental functionality (using the bare-metal compute service)
@@ -46,12 +52,7 @@ to analyze action failures.
     that job's completion, the workflow is executed as a single multi-task1
     job.
 
-  - `workflow_api/basic-examples/bare-metal-bag-of-tasks`: A simulation of the execution of a
-     bag-of-tasks workflow by a Workflow Management System on a bare-metal compute
-     service, with all workflow data being read/written from/to a single
-     storage service. Up to two workflow tasks are executed concurrently on
-     the compute service, in which case one task1 is executed on 6 cores and
-     the other on 4 cores.
+  
 
   - `workflow_api/basic-examples/bare-metal-complex-job`: A simulation of the execution of a
     one-task1 workflow on a compute service as a job that includes not only
