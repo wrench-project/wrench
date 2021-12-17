@@ -31,6 +31,7 @@ namespace wrench {
      * @param message_size the size of the message to be sent between network daemons to compute proximity
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
+     * @param noise_seed seed for the noise RNG
      * @param messagepayload_list: a message payload list
      */
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
@@ -38,10 +39,10 @@ namespace wrench {
                                                    std::string network_proximity_service_mailbox,
                                                    double message_size, double measurement_period,
                                                    double noise,
+                                                   int noise_seed,
                                                    std::map<std::string, double> messagepayload_list) :
             NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
-                                   message_size, measurement_period, noise, messagepayload_list, "") {
-        this->rng.seed(10);
+                                   message_size, measurement_period, noise, noise_seed,messagepayload_list, "") {
     }
 
 
@@ -54,6 +55,7 @@ namespace wrench {
      * @param measurement_period: the time-difference between two message transfer to compute proximity
      * @param noise: the maximum magnitude of random noises added to the measurement_period at each iteration,
      *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
+     * @param noise_seed seed for the noise RNG
      * @param messagepayload_list: a message payload list
      * @param suffix: suffix to append to the service name and mailbox
      */
@@ -64,6 +66,7 @@ namespace wrench {
             std::string network_proximity_service_mailbox,
             double message_size, double measurement_period,
             double noise,
+            int noise_seed,
             std::map<std::string, double> messagepayload_list,
             std::string suffix = "") :
             Service(std::move(hostname), "network_daemon" + suffix, "network_daemon" + suffix) {
@@ -75,6 +78,7 @@ namespace wrench {
         this->message_size = message_size;
         this->measurement_period = measurement_period;
         this->max_noise = noise;
+        this->rng.seed(noise_seed);
 
         this->next_mailbox_to_send = "";
         this->next_daemon_to_send = nullptr;
@@ -102,7 +106,6 @@ namespace wrench {
 
         static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
         double noise = noise_dist(rng);
-        std::cerr << "NOISE = " << noise << "\n";
         return S4U_Simulation::getClock() + measurement_period + noise;
     }
 
@@ -114,7 +117,6 @@ namespace wrench {
         WRENCH_INFO("Network Daemon Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
         double time_for_next_measurement = this->getTimeUntilNextMeasurement();
-        std::cerr << "TIME FOR NEXT MEASUREMENT = " << time_for_next_measurement << "\n";
 
         try {
             S4U_Mailbox::putMessage(this->network_proximity_service_mailbox,
@@ -134,7 +136,6 @@ namespace wrench {
             S4U_Simulation::computeZeroFlop();
 
             double countdown = time_for_next_measurement - S4U_Simulation::getClock();
-            std::cerr << "COUNTDOWN = " << countdown << "\n";
             if (countdown > 0) {
                 life = this->processNextMessage(countdown);
             } else {

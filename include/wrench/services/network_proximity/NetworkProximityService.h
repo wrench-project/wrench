@@ -32,6 +32,7 @@ namespace wrench {
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE,                 "1024"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,           "60"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"},
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED,"0"},
                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,          "1.0"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED,             "1"}
         };
