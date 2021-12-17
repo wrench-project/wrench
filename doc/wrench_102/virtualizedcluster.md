@@ -14,8 +14,7 @@ Here is an example interaction with a virtualized cluster service,  in which
 VM instances are created and (live) migrated:
 
 ~~~~~~~~~~~~~{.cpp}
-// Get the first virtualized cluster compute service (assuming there's at least one)
-auto virtualized_cluster_cs = *(this->getAvailableComputeServices<wrench::VirtualizedClusterComputeService>().begin());
+std::shared_ptr<wrench::VirtualizedClusterComputeService> virtualized_cluster_cs;
 
 
 // Create a VM with 2 cores and 1 GiB of RAM
@@ -52,5 +51,5 @@ In the code above the VM instances are not used for anything. See the
 [interacting with a cloud service page](@ref guide-102-cloud)
 for an example in which jobs are submitted to the VM instances. 
 
-See the WMS implementation in `examples/basic-examples/virtualized-cluster-bag-of-tasks/TwoTasksAtATimeVirtualizedClusterWMS.cpp` for a more complete example.
+See the execution controller implementation in `examples/basic-examples/virtualized-cluster-bag-of-tasks/TwoTasksAtATimeVirtualizedClusterWMS.cpp` for a more complete example.
 
