@@ -126,7 +126,7 @@ private:
                 new wrench::NetworkProximityDaemon(this->simulation, "Host1",
                                                    "mailbox",
                                                    10.0, 1.0,
-                                                   1.0, {}));
+                                                   1.0, 0, {}));
         auto batch_job = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(compound_job, 1, 10, 1,
                                                                                 1, "me", 10.0, 0.0));
 

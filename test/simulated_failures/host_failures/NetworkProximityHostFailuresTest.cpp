@@ -119,9 +119,7 @@ private:
         auto result1 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
         // Check that timestamp isn't more than 20 seconds past
-        std::cerr << "HERE2\n";
         WRENCH_INFO("################ prox=%lf timestamp=%lf",result1.first, result1.second);
-        std::cerr << "HERE3\n";
         if (wrench::Simulation::getCurrentSimulatedDate() - result1.second > 20) {
             throw std::runtime_error("Network proximity timestamp shouldn't be more than 20 seconds old");
         }
@@ -135,7 +133,7 @@ private:
             throw std::runtime_error("Network proximity timestamp shouldn't be less than 120 seconds old");
         }
 
-        wrench::Simulation::sleep(1003);
+        wrench::Simulation::sleep(2000);
         auto result3 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
         WRENCH_INFO("################ prox=%lf timestamp=%lf",result3.first, result3.second);
@@ -185,15 +183,13 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 3;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-    argv[2] = strdup("--wrench-full-log");
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
-
-    std::cerr << "HERE\n";
 
     // Setting up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
@@ -206,7 +202,10 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
 
     ASSERT_NO_THROW(network_proximity_service = simulation->add(
             new wrench::NetworkProximityService(
-                    stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"}})));
+                    stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"},
+                                                        {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "0"},
+                                                        {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED, "0"}
+                                                        })));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
