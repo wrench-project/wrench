@@ -12,7 +12,7 @@ multi-threaded processes can be started using something like Ssh. The
 service does not perform any space-sharing among the jobs. In other words,
 jobs submitted to the service execute concurrently in a time-shared manner.
 It is the responsibility of the job submitter to pick hosts and/or numbers
-of cores for each task1, e.g., to enforce space-sharing of cores. But by default
+of cores for each task, e.g., to enforce space-sharing of cores. But by default
 the compute service operates as a "jungle" in which tasks share cores at will.  The only
 resource allocation performed by the service is that it ensures that the
 RAM capacity of a hosts are not exceeded. Tasks that have non-zero
