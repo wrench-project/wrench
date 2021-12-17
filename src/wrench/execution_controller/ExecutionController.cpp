@@ -26,7 +26,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which to run the controller
-     * @param suffix: a string to append to the controller process name (useful for debug output)
+     * @param suffix: a string to append to the controller process name (which will show up in logs)
      *
      * @throw std::invalid_argument
      */
