@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H
-#define WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H
+#ifndef WRENCH_EXAMPLE_TWO_ACTIONS_AT_A_TIME_H
+#define WRENCH_EXAMPLE_TWO_ACTIONS_AT_A_TIME_H
 
 #include <wrench-dev.h>
 
@@ -21,12 +21,12 @@ namespace wrench {
     /**
      *  @brief An execution controller implementation
      */
-    class TwoTasksAtATimeExecutionController : public ExecutionController {
+    class TwoActionsAtATimeExecutionController : public ExecutionController {
 
     public:
         // Constructor
-        TwoTasksAtATimeExecutionController(
-                int num_tasks,
+        TwoActionsAtATimeExecutionController(
+                int num_actions,
                 const std::shared_ptr<BareMetalComputeService> compute_service,
                 const std::shared_ptr<SimpleStorageService> storage_service,
                 const std::string &hostname);
@@ -44,8 +44,8 @@ namespace wrench {
         const std::shared_ptr<BareMetalComputeService> compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
 
-        int num_tasks;
+        int num_actions;
 
     };
 }
-#endif //WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_H
+#endif //WRENCH_EXAMPLE_TWO_ACTIONS_AT_A_TIME_H

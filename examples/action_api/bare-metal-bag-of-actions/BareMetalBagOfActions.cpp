@@ -8,33 +8,33 @@
  */
 
 /**
- ** This simulator simulates the execution of a bag-of-tasks application, that is, a bunch
- ** of independent tasks, each with its own input file and its own output file. Tasks can be
+ ** This simulator simulates the execution of a bag-of-actions application, that is, a bunch
+ ** of independent compute actions, each with its own input file and its own output file. Actions can be
  ** executed completely independently:
  **
- **   InputFile #0 -> Task #0 -> OutputFile #1
+ **   InputFile #0 -> Action #0 -> OutputFile #1
  **   ...
- **   InputFile #n -> Task #n -> OutputFile #n
+ **   InputFile #n -> Action #n -> OutputFile #n
  **
  ** The compute platform comprises two hosts, ControllerHost and ComputeHost. On ControllerHost runs a simple storage
- ** service and an execution controller (defined in class TwoTasksAtATimeExecutionController). On ComputeHost runs a bare metal
+ ** service and an execution controller (defined in class TwoActionsAtATimeExecutionController). On ComputeHost runs a bare metal
  ** compute service, that has access to the 10 cores of that host.
  **
- ** Example invocation of the simulator for a 10-task workload, with no logging:
- **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml
+ ** Example invocation of the simulator for a 10-compute-action workload, with no logging:
+ **    ./wrench-example-bare-metal-bag-of-actions 10 ./two_hosts.xml
  **
- ** Example invocation of the simulator for a 10-task workload, with only execution controller logging:
- **    ./wrench-example-bare-metal-bag-of-tasks 10 ./two_hosts.xml --log=custom_execution_controller.threshold=info
+ ** Example invocation of the simulator for a 10-compute-action workload, with only execution controller logging:
+ **    ./wrench-example-bare-metal-bag-of-actions 10 ./two_hosts.xml --log=custom_execution_controller.threshold=info
  **
- ** Example invocation of the simulator for a 6-task1 workload with full logging:
- **    ./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --wrench-full-log
+ ** Example invocation of the simulator for a 6-compute-action workload with full logging:
+ **    ./wrench-example-bare-metal-bag-of-actions 6 ./two_hosts.xml --wrench-full-log
  **/
 
 
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoTasksAtATimeExecutionController.h"
+#include "TwoActionsAtATimeExecutionController.h"
 
 /**
  * @brief The Simulator's main function
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 
     /* Parsing of the command-line arguments for this WRENCH simulation */
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <an EVEN number of tasks> <xml platform file> [--log=custom_wms.threshold=info]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <an EVEN number of compute actions> <xml platform file> [--log=custom_wms.threshold=info]" << std::endl;
         exit(1);
     }
 
@@ -67,15 +67,15 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating simulated platform..." << std::endl;
     simulation->instantiatePlatform(argv[2]);
 
-    /* Parse the first command-line argument (number of tasks) */
-    int num_tasks = 0;
+    /* Parse the first command-line argument (number of actions) */
+    int num_actions = 0;
     try {
-        num_tasks = std::atoi(argv[1]);
-        if (num_tasks  %  2)  {
-            throw std::invalid_argument("Number of tasks should be even");
+        num_actions = std::atoi(argv[1]);
+        if (num_actions  %  2)  {
+            throw std::invalid_argument("Number of actions should be even");
         }
     } catch (std::invalid_argument &e) {
-        std::cerr << "Invalid number of tasks ("  << e.what() << ")\n";
+        std::cerr << "Invalid number of actions ("  << e.what() << ")\n";
         exit(1);
     }
 
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
      * of wrench::SimpleStorageService, is started on UserHost in the
      * platform , which has an attached disk mounted at "/". The SimpleStorageService
      * is a basic storage service implementation provided by WRENCH.
-     * Throughout the simulation execution, input/output files of workflow tasks will be located
+     * Throughout the simulation execution, data files will be located
      * in this storage service, and accessed remotely by the compute service. Note that the
      * storage service is configured to use a buffer size of 50M when transferring data over
      * the network (i.e., to pipeline disk reads/writes and network revs/sends). */
@@ -95,9 +95,9 @@ int main(int argc, char **argv) {
 
     /* Instantiate a bare-metal compute service, and add it to the simulation->
      * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
-     * to a software infrastructure that can execute tasks on hardware resources.
+     * to a software infrastructure that can execute actions on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
-     * This means that tasks running on this service will access data only from remote storage services. */
+     * This means that actions running on this service will access data files only from remote storage services. */
     std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
     auto wms = simulation->add(
-            new wrench::TwoTasksAtATimeExecutionController(num_tasks, baremetal_service, storage_service, "UserHost"));
+            new wrench::TwoActionsAtATimeExecutionController(num_actions, baremetal_service, storage_service, "UserHost"));
 
     /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;

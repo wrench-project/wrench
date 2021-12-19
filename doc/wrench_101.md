@@ -268,7 +268,7 @@ service that is in charge of executing an application workload on the platform. 
 class that derives from `wrench::ExecutionController` and override its constructor as well as its `main()` method. This method
 is implementing using the [WRENCH Developer API](./developer/annotated.html). 
 
-The example in `examples/action_api/bare-metal-bag-of-tasks` does this as follows:
+The example in `examples/action_api/bare-metal-bag-of-actions` does this as follows:
 ~~~~~~~~~~~~~{.cpp}
 auto wms = simulation->add(new wrench::TwoTasksAtATimeExecutionController(num_tasks, baremetal_service, storage_service, "UserHost"));
 ~~~~~~~~~~~~~
@@ -419,7 +419,7 @@ is a thin layer on top of SimGrid's logging system, and as such is controlled
 via command-line arguments. 
 
 The `bare-metal-chain` example simulator can be executed as follows in the
-`examples/action_api/bare-metal-bag-of-tasks` directory:
+`examples/action_api/bare-metal-bag-of-actions` directory:
 
 ~~~~~~~~~~~~~{.sh}
 ./wrench-example-bare-metal-bag-of-tasks 10 ./four_hosts.xml
@@ -429,7 +429,7 @@ The above generates almost no output to the terminal whatsoever.
 It is possible to enable some logging to the terminal. 
 It turns out the execution controller class in that example (`TwoTasksAtATimeExecutionController.cpp`) defines a logging
 category named  `custom_execution_controller`
-(see one of the first lines of `examples/action_api/bare-metal-bag-of-tasks/TwoTasksAtATimeExecutionController.cpp`),
+(see one of the first lines of `examples/action_api/bare-metal-bag-of-actions/TwoActionsAtATimeExecutionController.cpp`),
 which can be enabled as:
 
 ~~~~~~~~~~~~~{.cpp}

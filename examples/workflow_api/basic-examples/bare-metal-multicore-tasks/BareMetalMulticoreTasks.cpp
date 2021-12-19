@@ -9,19 +9,19 @@
 
 /**
  ** This simulator simulates the execution of a bag-of-tasks workflow, that is, of a workflow
- ** in which each task1 has its own input file and its own output file, and tasks can be
+ ** in which each task has its own input file and its own output file, and tasks can be
  ** executed completely independently
  **
  ** There are four tasks in this workflow, none of which has input/output files, and each of which
  ** uses a different parallel model:
  **   - task_default: the default (ideal) parallel model
- **   - task_constant_efficiency: a model where the task1 has a specified constant efficiency
- **   - task_amdahl: a model that specifies the fraction of the task1's work that can be parallelized perfectly
+ **   - task_constant_efficiency: a model where the task has a specified constant efficiency
+ **   - task_amdahl: a model that specifies the fraction of the task's work that can be parallelized perfectly
  **
  ** The compute platform comprises two hosts, WMSHost and ComputeHost. On WMSHost runs a  a WMS
  ** (defined in class OneTaskAtATimeWMS). On ComputeHost runs a bare metal
  ** compute service, that has access to the 10 cores of that host. Once the simulation is done,
- ** the execution time of each workflow task1 is printed.
+ ** the execution time of each workflow task is printed.
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-bare-metal-multicore-tasks./two_hosts.xml
@@ -75,14 +75,14 @@ int main(int argc, char **argv) {
     /* Declare a workflow */
     auto workflow = wrench::Workflow::createWorkflow();
 
-    /* Add a task1 with the default parallel model behavior */
+    /* Add a task with the default parallel model behavior */
     auto task_default = workflow->addTask("task_default", 10 * GFLOP, 1, 10, 0.0);
 
-    /* Add a task1 with the "constant efficiency" parallel model behavior */
+    /* Add a task with the "constant efficiency" parallel model behavior */
     auto task_constant_efficiency = workflow->addTask("task_constant_efficiency", 10 * GFLOP, 1, 10, 0.0);
     task_constant_efficiency->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.8));
 
-    /* Add a task1 with the "amdahl" parallel model behavior */
+    /* Add a task with the "amdahl" parallel model behavior */
     auto task_amdahl = workflow->addTask("task_amdahl", 10 * GFLOP, 1, 10, 0.0);
     task_amdahl->setParallelModel(wrench::ParallelModel::AMDAHL(0.8));
 
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    /* Print all task1 execution information */
+    /* Print all task execution information */
     std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = {task_default, task_constant_efficiency, task_amdahl};
     for (auto const &task : tasks) {
         std::cerr << "Task " + task->getID() + ": ";

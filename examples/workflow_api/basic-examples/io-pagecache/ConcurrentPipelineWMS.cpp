@@ -64,8 +64,8 @@ namespace wrench {
 
             for (auto ready_task : ready_tasks) {
 
-                /* Create a standard job for the task1 */
-                WRENCH_INFO("Creating a job for task1 %s", ready_task->getID().c_str());
+                /* Create a standard job for the task */
+                WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
                 /* First, we need to create a map of file locations, stating for each file
                  * where is should be read/written */
@@ -106,9 +106,9 @@ namespace wrench {
     void ConcurrentPipelineWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task1 %s", task->getID().c_str());
+        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
     }
 
     /**
@@ -119,10 +119,10 @@ namespace wrench {
     void ConcurrentPipelineWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");
