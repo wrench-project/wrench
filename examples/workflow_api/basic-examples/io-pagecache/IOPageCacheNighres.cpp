@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
     auto file_registry_service = new wrench::FileRegistryService("host01");
     simulation->add(file_registry_service);
 
-    std::cerr << "Staging task1 input files..." << std::endl;
+    std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }

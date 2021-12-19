@@ -8,7 +8,7 @@
  */
 
 /**
- ** This simulator simulates the execution of a 2-task1 workflow:
+ ** This simulator simulates the execution of a 2-task workflow:
  **
  **   File #0 -> Task #0 -> File #1 -> Task #1 -> File #2
  **
@@ -16,7 +16,7 @@
  **  BatchNode2. On WMSHost runs a simple storage
  ** service and a WMS (defined in class PilotJobWMS). On BatchHeadNode runs a batch_standard_and_pilot_jobs
  ** service, that has access to two hosts: BatchNode1 and BatchNode2. Once the simulation is done,
- ** the completion time of each workflow task1 is printed.
+ ** the completion time of each workflow task is printed.
  **
  ** Example invocation of the simulator with no logging:
  **    ./wrench-example-batch_standard_and_pilot_jobs-pilot-job ./four_hosts_scratch.xml
@@ -71,15 +71,15 @@ int main(int argc, char **argv) {
     /* Add workflow tasks and files */
     auto task0 = workflow->addTask("task_0", 100 * TFLOP,  1, 10, 1000);
     task0->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
-    auto task1 = workflow->addTask("task_1", 300 * TFLOP,  1, 5, 1000);
-    task1->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
+    auto task = workflow->addTask("task_1", 300 * TFLOP,  1, 5, 1000);
+    task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     auto file0 = workflow->addFile("file_0", 10000000);
     auto file1 = workflow->addFile("file_1", 20000000);
     auto file2 = workflow->addFile("file_2", 15000000);
     task0->addInputFile(file0);
     task0->addOutputFile(file1);
-    task1->addInputFile(file1);
-    task1->addOutputFile(file2);
+    task->addInputFile(file1);
+    task->addOutputFile(file2);
 
     /* Instantiate a storage service, and add it to the simulation->
      * A wrench::StorageService is an abstraction of a service on
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
-    std::cerr << "Staging task1 input files..." << std::endl;
+    std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
@@ -137,8 +137,8 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    /* Print task1 statistics */
-    for (auto const &task :  {task0,  task1})  {
+    /* Print task statistics */
+    for (auto const &task :  {task0,  task})  {
         if (task->getState() == wrench::WorkflowTask::COMPLETED) {
             std::cerr << "Task " << task->getID() << " completed\n";
         } else {

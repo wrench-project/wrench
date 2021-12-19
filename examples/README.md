@@ -42,21 +42,21 @@ to analyze action failures.
   - `workflow_api/basic-examples/bare-metal-chain`: A simulation of the execution of a
     chain workflow by a Workflow Management System on a bare-metal compute service,
     with all workflow data being read/written from/to a single storage
-    service. The compute  service runs on a 10-core host, and each task1 is
+    service. The compute  service runs on a 10-core host, and each task is
     executed as a single job  that uses 10 cores
 
   - `workflow_api/basic-examples/bare-metal-chain-scratch`: Similar to the previous
     simulator, but the compute service now
     has scratch space to hold intermediate workflow files. Since files
     created in the scratch space during a job's execution are erased after
-    that job's completion, the workflow is executed as a single multi-task1
+    that job's completion, the workflow is executed as a single multi-task
     job.
 
   
 
   - `workflow_api/basic-examples/bare-metal-complex-job`: A simulation of the execution of a
-    one-task1 workflow on a compute service as a job that includes not only
-    the task1 computation but also data movements.
+    one-task workflow on a compute service as a job that includes not only
+    the task computation but also data movements.
     
   - `workflow_api/basic-examples/bare-metal-data-movement`: A simulation that is similar
     to the previous one, but instead  of using a complex job to do data movements
@@ -69,7 +69,7 @@ to analyze action failures.
        bag-of-tasks workflow by a Workflow Management System on a cloud compute
        service, with all workflow data being read/written from/to a single
        storage service. Up to two workflow tasks are executed concurrently on
-       the compute service, in which case one task1 is executed on 6 cores and
+       the compute service, in which case one task is executed on 6 cores and
        the other on 4 cores.
        
   - `workflow_api/workflow_api/basic-examples/cloud-bag-of-tasks-energy`: A simulation identical to the previous one, 

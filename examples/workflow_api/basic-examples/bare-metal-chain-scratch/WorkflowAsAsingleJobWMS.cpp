@@ -10,7 +10,7 @@
 /**
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
- **    - Pick a ready task1 if any
+ **    - Pick a ready task if any
  **    - Submit it to the first available bare-metal compute service as a job in a way that
  **       - Uses 5 cores
  **       - Reads the input file from the StorageService
@@ -36,7 +36,7 @@ namespace wrench {
                                                      const std::shared_ptr<BareMetalComputeService> &compute_service,
                                                      const std::shared_ptr<SimpleStorageService> &storage_service,
                                                      const std::string &hostname) :
-            ExecutionController(hostname, "one-task1-at-a-time"),
+            ExecutionController(hostname, "one-task-at-a-time"),
             workflow(workflow), bare_metal_compute_service(compute_service), storage_service(storage_service) {}
 
     /**
@@ -62,7 +62,7 @@ namespace wrench {
          * file is written back to the storage service at host WMSHost. However,
          * files stored in the compute service's scratch space are erased
          * after the job that created them has completed. So we have to run
-         * the entire workflow as a single multi-task1 job! */
+         * the entire workflow as a single multi-task job! */
 
         /* First, we need to create a map of file locations, stating for each file
          * where is should be read/written */
@@ -106,9 +106,9 @@ namespace wrench {
     void WorkflowAsAsingleJobWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         for (auto const &task : job->getTasks()) {
-            WRENCH_INFO("Notified that a standard job has completed task1 %s", task->getID().c_str());
+            WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
         }
     }
 
@@ -120,10 +120,10 @@ namespace wrench {
     void WorkflowAsAsingleJobWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");

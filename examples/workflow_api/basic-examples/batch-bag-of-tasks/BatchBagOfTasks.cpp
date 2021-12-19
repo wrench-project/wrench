@@ -9,7 +9,7 @@
 
 /**
  ** This simulator simulates the execution of a bag-of-tasks workflow, that is, of a workflow
- ** in which each task1 has its own input file and its own output file, and tasks can be
+ ** in which each task has its own input file and its own output file, and tasks can be
  ** executed completely independently
  **
  **   InputFile #0 -> Task #0 -> OutputFile #1
@@ -20,15 +20,15 @@
  **  BatchNode2. On WMSHost runs a simple storage
  ** service and a WMS (defined in class TwoTasksAtATimeBatchWMS). On BatchHeadNode runs a batch_standard_and_pilot_jobs
  ** service, that has access to two hosts: BatchNode1 and BatchNode2. Once the simulation is done,
- ** the completion time of each workflow task1 is printed.
+ ** the completion time of each workflow task is printed.
  **
- ** Example invocation of the simulator for a 10-task1 workflow, with no logging:
+ ** Example invocation of the simulator for a 10-task workflow, with no logging:
  **    ./wrench-example-batch_standard_and_pilot_jobs-bag-of-tasks 10 ./four_hosts.xml
  **
- ** Example invocation of the simulator for a 10-task1 workflow, with only WMS logging:
+ ** Example invocation of the simulator for a 10-task workflow, with only WMS logging:
  **    ./wrench-example-batch_standard_and_pilot_jobs-bag-of-tasks 10 ./four_hosts.xml --log=custom_wms.threshold=info
  **
- ** Example invocation of the simulator for a 6-task1 workflow with full logging:
+ ** Example invocation of the simulator for a 6-task workflow with full logging:
  **    ./wrench-example-batch_standard_and_pilot_jobs-bag-of-tasks 6 ./four_hosts.xml --wrench-full-log
  **/
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
 
     /* Add workflow tasks  and files */
     for (int i=0; i < num_tasks; i++) {
-        /* Create a task1: increasing GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
+        /* Create a task: increasing GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow->addTask("task_" + std::to_string(i), (100 + i * 500) * TFLOP,
                 1, 10, 1000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
-    std::cerr << "Staging task1 input files..." << std::endl;
+    std::cerr << "Staging task input files..." << std::endl;
     for (auto const &f : workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
@@ -148,9 +148,9 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     /* Simulation results can be examined via simulation->output, which provides access to traces
-     * of events. In the code below, we print the  retrieve the trace of all task1 completion events, print how
+     * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event.  Also print
-     * out how many failures each task1 has experienced */
+     * out how many failures each task has experienced */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     for (auto const &item : trace) {
         std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at hour " << (item->getDate()/3600);

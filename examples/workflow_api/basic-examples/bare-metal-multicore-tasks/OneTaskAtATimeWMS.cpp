@@ -10,10 +10,10 @@
 /**
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
- **    - Pick one ready task1
+ **    - Pick one ready task
  **    - Submit it as part of a single job to the one available bare-metal compute service so that:
- **       - The task1 uses 10 cores
- **    - Wait for the task1's completion
+ **       - The task uses 10 cores
+ **    - Wait for the task's completion
  **/
 
 #include <iostream>
@@ -34,7 +34,7 @@ namespace wrench {
     OneTaskAtATimeWMS::OneTaskAtATimeWMS(const std::shared_ptr<Workflow>& workflow,
                                          const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                                          const std::string &hostname) :
-                                         ExecutionController(hostname,"one-task1-at-a-time"),
+                                         ExecutionController(hostname,"one-task-at-a-time"),
                                          workflow(workflow), bare_metal_compute_service(bare_metal_compute_service) {}
 
     /**
@@ -58,16 +58,16 @@ namespace wrench {
         /* While the workflow isn't done, repeat the main loop */
         while (not this->workflow->isDone()) {
 
-            /* Get the next ready task1 */
+            /* Get the next ready task */
             auto ready_task = *(this->workflow->getReadyTasks().begin());
 
-            WRENCH_INFO("Creating a job for task1 %s", ready_task->getID().c_str());
+            WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
             /* Create the job  */
             auto standard_job = job_manager->createStandardJob(ready_task);
 
-            /* No need to use service specific arguments to specify a number of cores for the task1.
-             * By default, the compute service will run the task1 with the largest possible number of
+            /* No need to use service specific arguments to specify a number of cores for the task.
+             * By default, the compute service will run the task with the largest possible number of
              * cores. */
 
             WRENCH_INFO("Submitting the job to the compute service");
@@ -96,7 +96,7 @@ namespace wrench {
         auto job = event->standard_job;
         /* Retrieve the job's tasks */
         for (auto const &task : job->getTasks()) {
-            WRENCH_INFO("Notified that a standard job has completed task1 %s",
+            WRENCH_INFO("Notified that a standard job has completed task %s",
                         task->getID().c_str());
         }
     }

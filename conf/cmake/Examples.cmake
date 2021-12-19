@@ -14,10 +14,12 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/workflow_api/real-workflow-example/CMakeLists.txt
         examples/workflow_api/condor-grid-example/CMakeLists.txt
         examples/workflow_api/basic-examples/io-pagecache/CMakeLists.txt
+
         examples/action_api/multi-action-multi-job/CMakeLists.txt
         examples/action_api/super-custom-action/CMakeLists.txt
         examples/action_api/job-action-failure/CMakeLists.txt
-        examples/action_api/bare-metal-bag-of-tasks/CMakeLists.txt
+        examples/action_api/bare-metal-bag-of-actions/CMakeLists.txt
+        examples/action_api/batch-bag-of-actions/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})

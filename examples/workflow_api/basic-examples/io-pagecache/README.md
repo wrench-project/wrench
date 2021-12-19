@@ -1,6 +1,6 @@
-The example simulators in this directory are similar to the simulators in the bare-metal-bag-of-task1 directory, but just modified to enable the use of writeback page cache devices.
+The example simulators in this directory are similar to the simulators in the bare-metal-bag-of-task directory, but just modified to enable the use of writeback page cache devices.
 
-There are 3 experimental scenarios implemented. In every experiment, we run a number of pipelines, each pipeline consists of 3 sequential tasks, which read an input file, do some computations, then write the output to a file. The output of a task1 is the input of the following task1.
+There are 3 experimental scenarios implemented. In every experiment, we run a number of pipelines, each pipeline consists of 3 sequential tasks, which read an input file, do some computations, then write the output to a file. The output of a task is the input of the following task.
 
 ## 1. Single-threaded
  - How to run: run `./wrench-example-io-pagecache-single 1 <input_size_in_gb> <cpu_time_in_sec> single_host.xml --single`. Run with `--wrench-pagecache-simulation` to enable a writeback page cache.
