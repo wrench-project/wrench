@@ -86,29 +86,29 @@ namespace wrench {
 
             /*  Pick a random index and tasks */
             int index = dist(rng) % ready_tasks.size();
-            auto ready_task1 = ready_tasks.at(index);
+            auto ready_task = ready_tasks.at(index);
             auto ready_task2 = (ready_tasks.size() > 1 ? ready_tasks.at((index + 1) % ready_tasks.size()) : nullptr);
 
             /* Swap the tasks if ready_task2 is cheaper than ready_task 1, for the  sake of the example */
-            if (ready_task2 and (ready_task2->getFlops() < ready_task1->getFlops())) {
-                auto tmp = ready_task1;
-                ready_task1 = ready_task2;
+            if (ready_task2 and (ready_task2->getFlops() < ready_task->getFlops())) {
+                auto tmp = ready_task;
+                ready_task = ready_task2;
                 ready_task2 = tmp;
             }
 
             if (ready_task2) { WRENCH_INFO(
                         "Creating a job to execute tasks %s (%.1lf Gflops) and task %s (%.1lf Gflops)",
-                        ready_task1->getID().c_str(), ready_task1->getFlops() / 1000000000.0,
+                        ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0,
                         ready_task2->getID().c_str(), ready_task2->getFlops() / 1000000000.0);
             } else { WRENCH_INFO("Creating a job to execute task %s (%.1lf Gflops)",
-                                 ready_task1->getID().c_str(), ready_task1->getFlops() / 1000000000.0);
+                                 ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0);
             }
 
             /* Create a map of file locations, stating for each file
              * where is should be read/written */
             std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-            file_locations[ready_task1->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
-            file_locations[ready_task1->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations[ready_task->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
+            file_locations[ready_task->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
             if (ready_task2) {
                 file_locations[ready_task2->getInputFiles().at(0)] = FileLocation::LOCATION(storage_service);
                 file_locations[ready_task2->getOutputFiles().at(0)] = FileLocation::LOCATION(storage_service);
@@ -117,9 +117,9 @@ namespace wrench {
             /* Create the job  */
             std::shared_ptr<StandardJob> standard_job;
             if (ready_task2) {
-                standard_job = job_manager->createStandardJob({ready_task1, ready_task2}, file_locations);
+                standard_job = job_manager->createStandardJob({ready_task, ready_task2}, file_locations);
             } else {
-                standard_job = job_manager->createStandardJob(ready_task1, file_locations);
+                standard_job = job_manager->createStandardJob(ready_task, file_locations);
             }
 
             /* Construct the required (Slurm-like) service-specific arguments */
@@ -130,17 +130,17 @@ namespace wrench {
             service_specific_arguments["-c"] = "10";
             // time
             WRENCH_INFO("Task %s should run in under %ld minutes",
-                        ready_task1->getID().c_str(), execution_times_in_minutes[ready_task1]);
+                        ready_task->getID().c_str(), execution_times_in_minutes[ready_task]);
             if (ready_task2) {
                 WRENCH_INFO("Task %s should run in under %ld minutes",
                             ready_task2->getID().c_str(), execution_times_in_minutes[ready_task2]);
             }
 
             // But let's submit the job so that it requests time sufficient only
-            // for the cheaper task1, which will lead to the
-            // expensive task1, if any, to be terminated prematurely (i.e., it will fail and thus still be ready).
+            // for the cheaper task, which will lead to the
+            // expensive task, if any, to be terminated prematurely (i.e., it will fail and thus still be ready).
 
-            service_specific_arguments["-t"] = std::to_string(execution_times_in_minutes[ready_task1]);
+            service_specific_arguments["-t"] = std::to_string(execution_times_in_minutes[ready_task]);
 
             WRENCH_INFO("Submitting the job, asking for %s %s-core nodes for %s minutes",
                         service_specific_arguments["-N"].c_str(),
@@ -172,11 +172,11 @@ namespace wrench {
                                          std::string(e.what()) + ")");
             }
 
-            /* At this point, the cheap task1 should have completed, and the expensive one,
+            /* At this point, the cheap task should have completed, and the expensive one,
              * if any, should have failed. Let's check and print some logging info */
-            if (ready_task1->getState() != WorkflowTask::COMPLETED) {
-                throw std::runtime_error("Task " + ready_task1->getID() + "should have completed successfully!");
-            } else { WRENCH_INFO("Task %s has completed successfully :)", ready_task1->getID().c_str());
+            if (ready_task->getState() != WorkflowTask::COMPLETED) {
+                throw std::runtime_error("Task " + ready_task->getID() + "should have completed successfully!");
+            } else { WRENCH_INFO("Task %s has completed successfully :)", ready_task->getID().c_str());
             }
             if (ready_task2) {
                 if (ready_task2->getState() != WorkflowTask::READY) {

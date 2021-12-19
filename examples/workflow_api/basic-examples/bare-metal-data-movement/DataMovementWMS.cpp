@@ -87,7 +87,7 @@ namespace wrench {
         file_locations[outfile_2] = FileLocation::LOCATION(storage_service2);
 
         /* Create the standard job */
-        WRENCH_INFO("Creating a  job to execute task1 %s", task->getID().c_str());
+        WRENCH_INFO("Creating a  job to execute task %s", task->getID().c_str());
         auto job = job_manager->createStandardJob(task, file_locations);
 
         /* Submit the job to the compute service */
@@ -142,9 +142,9 @@ namespace wrench {
     void DataMovementWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task1 %s", task->getID().c_str());
+        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
     }
 
     /**
@@ -155,10 +155,10 @@ namespace wrench {
     void DataMovementWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");

@@ -10,7 +10,7 @@
 /**
  ** A Workflow Management System (WMS) implementation that operates as follows:
  **  - While the workflow is not done, repeat:
- **    - Pick a ready task1 if any
+ **    - Pick a ready task if any
  **    - Submit it to the first available bare-metal compute service as a job in a way that
  **       - Uses 10 cores
  **       - Reads the input file from the StorageService
@@ -36,7 +36,7 @@ namespace wrench {
                                          const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                                          const std::shared_ptr<SimpleStorageService> &storage_service,
                                          const std::string &hostname) :
-                                         ExecutionController(hostname,"one-task1-at-a-time"),
+                                         ExecutionController(hostname,"one-task-at-a-time"),
                                          workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
@@ -60,11 +60,11 @@ namespace wrench {
         /* While the workflow isn't done, repeat the main loop */
         while (not this->workflow->isDone()) {
 
-            /* Get one ready task1 */
+            /* Get one ready task */
             auto ready_task = this->workflow->getReadyTasks().at(0);
 
-            /* Create a standard job for the task1 */
-            WRENCH_INFO("Creating a job for task1 %s", ready_task->getID().c_str());
+            /* Create a standard job for the task */
+            WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
             /* First, we need to create a map of file locations, stating for each file
              * where is should be read/written */
@@ -97,9 +97,9 @@ namespace wrench {
     void OneTaskAtATimeWMS::processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
-        WRENCH_INFO("Notified that a standard job has completed task1 %s", task->getID().c_str());
+        WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
     }
 
     /**
@@ -110,10 +110,10 @@ namespace wrench {
     void OneTaskAtATimeWMS::processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
-        /* Retrieve the job's first (and in our case only) task1 */
+        /* Retrieve the job's first (and in our case only) task */
         auto task = job->getTasks().at(0);
         /* Print some error message */
-        WRENCH_INFO("Notified that a standard job has failed for task1 %s with error %s",
+        WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
         throw std::runtime_error("ABORTING DUE TO JOB FAILURE");
