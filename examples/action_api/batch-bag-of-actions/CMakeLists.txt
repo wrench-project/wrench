@@ -1,7 +1,7 @@
 
 set(SOURCE_FILES
-        TwoActionsAtATimeExecutionController.h
-        TwoActionsAtATimeExecutionController.cpp
+        GreedyExecutionController.h
+        GreedyExecutionController.cpp
         BatchBagOfActions.cpp
         )
 

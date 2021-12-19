@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
             "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a bare-metal compute service, and add it to the simulation->
+    /* Instantiate a bare-metal compute service, and add it to the simulation
      * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute actions on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").

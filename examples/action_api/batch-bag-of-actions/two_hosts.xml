@@ -11,29 +11,23 @@
             </disk>
         </host>
 
-        <!-- The host on which the bare-metal compute service will run -->
-        <host id="ComputeHost" speed="1Gf" core="10">
+        <!-- The host on which the batch compute service will run -->
+        <host id="CloudHeadNode" speed="10Gf" core="1">
             <prop id="ram" value="16GB" />
        </host>
+        <host id="CloudComputeNode1" speed="5Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+        <host id="CloudComputeNode2" speed="5Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
 
         <!-- A network link that connects both hosts -->
         <link id="network_link" bandwidth="10MBps" latency="20us"/>
-        <!-- UserHost's local "loopback" link -->
-        <link id="loopback_UserHost" bandwidth="1000EBps" latency="0us"/>
-        <!--ComputeHost's local "loopback" link -->
-        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
 
         <!-- Network routes -->
-        <route src="UserHost" dst="ComputeHost">
+        <route src="UserHost" dst="CloudHeadNode">
             <link_ctn id="network_link"/>
-        </route>
-
-        <!-- Each loopback link connects each host to itself -->
-        <route src="UserHost" dst="UserHost">
-            <link_ctn id="loopback_UserHost"/>
-        </route>
-        <route src="ComputeHost" dst="ComputeHost">
-            <link_ctn id="loopback_ComputeHost"/>
         </route>
 
     </zone>

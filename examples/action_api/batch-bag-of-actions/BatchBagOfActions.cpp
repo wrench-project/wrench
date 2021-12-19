@@ -16,9 +16,9 @@
  **   ...
  **   InputFile #n -> Action #n -> OutputFile #n
  **
- ** The compute platform comprises two hosts, ControllerHost and ComputeHost. On ControllerHost runs a simple storage
- ** service and an execution controller (defined in class TwoActionsAtATimeExecutionController). On ComputeHost runs a bare metal
- ** compute service, that has access to the 10 cores of that host.
+ ** The compute platform comprises four hosts, UserHost, BatchHeadNode, BatchComputeNode1,and BatchComputeNode2. On UserHost runs a simple storage
+ ** service and an execution controller (defined in class GreedyExecutionController). On BatchHeadNode runs a batch
+ ** compute service, that has access to the 10 cores of hosts BatchComputeNode1 and BatchComputeNode2.
  **
  ** Example invocation of the simulator for a 10-compute-action workload, with no logging:
  **    ./wrench-example-bare-metal-bag-of-actions 10 ./two_hosts.xml
@@ -34,7 +34,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoActionsAtATimeExecutionController.h"
+#include "GreedyExecutionController.h"
 
 /**
  * @brief The Simulator's main function
@@ -93,19 +93,20 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
             "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a bare-metal compute service, and add it to the simulation->
-     * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
-     * to a software infrastructure that can execute actions on hardware resources.
-     * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
+    /* Instantiate a batch compute service, and add it to the simulation.
+     * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
+     * to a batch-scheduled compute platform, i.e., managed by a batch scheduler that has jobs
+     * in a queue waiting for gaining access to compute resources.
+     * This particular service is started on BatchHeadNode and has no scratch storage space (mount point argument = "").
      * This means that actions running on this service will access data files only from remote storage services. */
-    std::cerr << "Instantiating a bare-metal compute service on ComputeHost..." << std::endl;
-    auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
-            "ComputeHost", {"ComputeHost"}, "", {}, {}));
+    std::cerr << "Instantiating a batch compute service on ComputeHost..." << std::endl;
+    auto batch_service = simulation->add(new wrench::BatchComputeService(
+            "BatchHeadNode", {"BatchComputeNode1", "BatchComputeNode2"}, "", {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
     auto wms = simulation->add(
-            new wrench::TwoActionsAtATimeExecutionController(num_actions, baremetal_service, storage_service, "UserHost"));
+            new wrench::GreedyExecutionController(num_actions, batch_service, storage_service, "UserHost"));
 
     /* Launch the simulation-> This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
