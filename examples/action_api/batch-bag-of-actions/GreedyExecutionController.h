@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_EXAMPLE_TWO_ACTIONS_AT_A_TIME_H
-#define WRENCH_EXAMPLE_TWO_ACTIONS_AT_A_TIME_H
+#ifndef WRENCH_EXAMPLE_GREEDY_EXECUTION_CONTROLLER_H
+#define WRENCH_EXAMPLE_GREEDY_EXECUTION_CONTROLLER_H
 
 #include <wrench-dev.h>
 
@@ -21,31 +21,27 @@ namespace wrench {
     /**
      *  @brief An execution controller implementation
      */
-    class TwoActionsAtATimeExecutionController : public ExecutionController {
+    class GreedyExecutionController : public ExecutionController {
 
     public:
         // Constructor
-        TwoActionsAtATimeExecutionController(
+        GreedyExecutionController(
                 int num_actions,
-                std::shared_ptr<BareMetalComputeService> compute_service,
+                std::shared_ptr<BatchComputeService> compute_service,
                 std::shared_ptr<SimpleStorageService> storage_service,
                 const std::string &hostname);
-
-    protected:
-
-        // Overridden method
-        void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>) override;
-        void processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent>) override;
 
     private:
         // main() method of the WMS
         int main() override;
 
-        const std::shared_ptr<BareMetalComputeService> compute_service;
+        const std::shared_ptr<BatchComputeService> compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
+
+        std::shared_ptr<PilotJob> pilot_job;
 
         int num_actions;
 
     };
 }
-#endif //WRENCH_EXAMPLE_TWO_ACTIONS_AT_A_TIME_H
+#endif //WRENCH_EXAMPLE_GREEDY_EXECUTION_CONTROLLER_H

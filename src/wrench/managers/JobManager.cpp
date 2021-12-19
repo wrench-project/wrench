@@ -1253,6 +1253,7 @@ namespace wrench {
     void JobManager::processCompoundJobCompletion(const std::shared_ptr<CompoundJob>& job,
                                                   std::shared_ptr<ComputeService> compute_service) {
         job->state = CompoundJob::State::COMPLETED;
+        job->end_date = Simulation::getCurrentSimulatedDate();
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
 
@@ -1273,6 +1274,8 @@ namespace wrench {
     void JobManager::processCompoundJobFailure(const std::shared_ptr<CompoundJob>& job,
                                                std::shared_ptr<ComputeService> compute_service) {
         job->state = CompoundJob::State::DISCONTINUED;
+        job->end_date = Simulation::getCurrentSimulatedDate();
+
         // remove the job from the "dispatched" list
         this->jobs_dispatched.erase(job);
 
