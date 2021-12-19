@@ -12,13 +12,13 @@
         </host>
 
         <!-- The host on which the batch compute service will run -->
-        <host id="CloudHeadNode" speed="10Gf" core="1">
+        <host id="BatchHeadNode" speed="10Gf" core="1">
             <prop id="ram" value="16GB" />
        </host>
-        <host id="CloudComputeNode1" speed="5Gf" core="10">
+        <host id="BatchComputeNode1" speed="50Gf" core="10">
             <prop id="ram" value="64GB" />
         </host>
-        <host id="CloudComputeNode2" speed="5Gf" core="10">
+        <host id="BatchComputeNode2" speed="50Gf" core="10">
             <prop id="ram" value="64GB" />
         </host>
 
@@ -26,9 +26,11 @@
         <link id="network_link" bandwidth="10MBps" latency="20us"/>
 
         <!-- Network routes -->
-        <route src="UserHost" dst="CloudHeadNode">
-            <link_ctn id="network_link"/>
-        </route>
+        <route src="UserHost" dst="BatchHeadNode"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="BatchComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="BatchComputeNode2"> <link_ctn id="network_link"/></route>
+        <route src="BatchHeadNode" dst="BatchComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="BatchHeadNode" dst="BatchComputeNode2"> <link_ctn id="network_link"/></route>
 
     </zone>
 </platform>
