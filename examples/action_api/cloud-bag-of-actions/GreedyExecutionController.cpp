@@ -39,6 +39,8 @@ namespace wrench {
             compute_service(compute_service), storage_service(storage_service), num_actions(num_actions) {
     }
 
+
+
     /**
      * @brief main method of the GreedyExecutionController daemon
      *
@@ -78,6 +80,12 @@ namespace wrench {
             action_specs.push_back(std::make_tuple(work, input_file, output_file));
         }
 
+        /* Create two VMs on the cloud service and start them */
+        auto vm1_name = this->compute_service->createVM(7, 100 * MB);
+        auto vm1_cs = this->compute_service->startVM(vm1_name);
+        auto vm2_name = this->compute_service->createVM(8, 100 * MB);
+        auto vm2_cs = this->compute_service->startVM(vm2_name);
+
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
@@ -85,57 +93,39 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("Submitting jobs to the batch compute service");
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
-        std::uniform_int_distribution<int> node_dist(1, 2);
-        std::uniform_int_distribution<int> core_dist(1, 10);
-        std::uniform_int_distribution<int> minute_dist(5, 15);
 
         std::vector<std::shared_ptr<ComputeAction>> compute_actions;
         for (int i=0; i < this->num_actions; i += 2) {
-            // Create a compound job
-            auto job = job_manager->createCompoundJob("job_" + std::to_string(i/2));
-            // Add action_specs to the job
-            auto file_read_1 = job->addFileReadAction("file_read_" + std::to_string(i), std::get<1>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
-            auto compute_1 = job->addComputeAction("computation_" + std::to_string(i), std::get<0>(action_specs.at(i + 1)), 0.0, 1, 10, wrench::ParallelModel::AMDAHL(0.9));
-            auto file_write_1 = job->addFileWriteAction("file_write_" + std::to_string(i), std::get<2>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
-            job->addActionDependency(file_read_1, compute_1);
-            job->addActionDependency(compute_1, file_write_1);
+            // Create a compound job and submit it to the first VM
+            auto job1 = job_manager->createCompoundJob("job_" + std::to_string(i));
+            auto file_read_1 = job1->addFileReadAction("file_read_" + std::to_string(i), std::get<1>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto compute_1 = job1->addComputeAction("computation_" + std::to_string(i), std::get<0>(action_specs.at(i + 1)), 0.0, 1, 10, wrench::ParallelModel::AMDAHL(0.9));
+            auto file_write_1 = job1->addFileWriteAction("file_write_" + std::to_string(i), std::get<2>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            job1->addActionDependency(file_read_1, compute_1);
+            job1->addActionDependency(compute_1, file_write_1);
             compute_actions.push_back(compute_1);
-            auto file_read_2 = job->addFileReadAction("file_read_" + std::to_string(i+1), std::get<1>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
-            auto compute_2 = job->addComputeAction("computation_" + std::to_string(i+1), std::get<0>(action_specs.at(i + 1)), 0.0, 1, 10, wrench::ParallelModel::AMDAHL(0.9));
-            auto file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
-            job->addActionDependency(file_read_2, compute_2);
-            job->addActionDependency(compute_2, file_write_2);
+            WRENCH_INFO("Submitting job %s for executing action %s on VM %s",
+                        job1->getName().c_str(),compute_1->getName().c_str(), vm1_name.c_str());
+            job_manager->submitJob(job1, vm1_cs);
+
+            // Create a compound job and submit it to the second VM
+            auto job2 = job_manager->createCompoundJob("job_" + std::to_string(i+1));
+            auto file_read_2 = job2->addFileReadAction("file_read_" + std::to_string(i+1), std::get<1>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto compute_2 = job2->addComputeAction("computation_" + std::to_string(i+1), std::get<0>(action_specs.at(i + 1)), 0.0, 1, 10, wrench::ParallelModel::AMDAHL(0.9));
+            auto file_write_2 = job2->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(action_specs.at(i + 1)), wrench::FileLocation::LOCATION(this->storage_service));
+            job2->addActionDependency(file_read_2, compute_2);
+            job2->addActionDependency(compute_2, file_write_2);
             compute_actions.push_back(compute_2);
+            WRENCH_INFO("Submitting job %s for executing action %s on VM %s",
+                        job2->getName().c_str(),compute_2->getName().c_str(), vm2_name.c_str());
+            job_manager->submitJob(job2, vm2_cs);
 
-            // Pick job configuration parameters
-            int num_nodes = node_dist(rng);
-            int num_cores_per_nodes = core_dist(rng);
-            int num_minutes= minute_dist(rng);
-            std::map<std::string, std::string> service_specific_args =
-                    {{"-N", std::to_string(num_nodes)},
-                     {"-c", std::to_string(num_cores_per_nodes)},
-                     {"-t", std::to_string(num_minutes)}};
+            TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
+            WRENCH_INFO("Waiting for execution events");
+            TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-            // Submit the job!
-            WRENCH_INFO("Submitting job %s (%d nodes, %d cores per node, %d minutes) for executing actions %s and %s",
-                        job->getName().c_str(),
-                        num_nodes, num_cores_per_nodes, num_minutes,
-                        compute_1->getName().c_str(), compute_2->getName().c_str());
-            job_manager->submitJob(job, this->compute_service, service_specific_args);
-
-
-        }
-
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
-        WRENCH_INFO("Waiting for execution events");
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
-
-        /* Wait for execution events, one per job. Some job will likely fail! The code below doe "manual"
-         * processing of the event, rather than using registered callback functions */
-        for (int i=0; i < this->num_actions/2; i++) {
-            WRENCH_INFO("Number of queued jobs at the batch service: %lu", this->compute_service->getQueue().size());
-            auto event = this->waitForNextEvent();
-            WRENCH_INFO("Received an execution event: %s", event->toString().c_str());
+            this->waitForAndProcessNextEvent();
+            this->waitForAndProcessNextEvent();
         }
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
@@ -151,7 +141,10 @@ namespace wrench {
             WRENCH_INFO("  - ran as part of job %s, which was submitted at time %.2lf and finished at time %.2lf",
                         action->getJob()->getName().c_str(),
                         action->getJob()->getSubmitDate(), action->getJob()->getEndDate());
-            if (action->getState() == Action::State::KILLED) {
+            WRENCH_INFO("     ran on host %s (physical host: %s)",
+                        action->getExecutionHistory().top().execution_host.c_str(),
+                        action->getExecutionHistory().top().physical_execution_host.c_str());
+            if (action->getState() != Action::State::COMPLETED) {
                 WRENCH_INFO("  - action failure cause: %s", action->getFailureCause()->toString().c_str());
             }
             TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
@@ -159,5 +152,22 @@ namespace wrench {
         }
         return 0;
     }
+
+    /**
+     * @brief Method to handle a compound job failure
+     * @param event: the event
+     */
+    void GreedyExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
+        WRENCH_INFO("Job %s failed!", event->job->getName().c_str());
+    }
+
+    /**
+     * @brief Method to handle a compound job completion
+     * @param event: the event
+     */
+    void GreedyExecutionController::processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent> event) {
+        WRENCH_INFO("Job %s completed sucessfully!", event->job->getName().c_str());
+    }
+
 
 }
