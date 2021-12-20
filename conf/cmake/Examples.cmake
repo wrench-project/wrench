@@ -20,6 +20,7 @@ set(EXAMPLES_CMAKEFILES_TXT
         examples/action_api/job-action-failure/CMakeLists.txt
         examples/action_api/bare-metal-bag-of-actions/CMakeLists.txt
         examples/action_api/batch-bag-of-actions/CMakeLists.txt
+        examples/action_api/cloud-bag-of-actions/CMakeLists.txt
         )
 
 foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})
