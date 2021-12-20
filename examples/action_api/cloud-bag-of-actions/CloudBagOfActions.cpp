@@ -16,18 +16,18 @@
  **   ...
  **   InputFile #n -> Action #n -> OutputFile #n
  **
- ** The compute platform comprises four hosts, UserHost, BatchHeadNode, BatchComputeNode1,and BatchComputeNode2. On UserHost runs a simple storage
- ** service and an execution controller (defined in class GreedyExecutionController). On BatchHeadNode runs a batch
- ** compute service, that has access to the 10 cores of hosts BatchComputeNode1 and BatchComputeNode2.
+ ** The compute platform comprises four hosts, UserHost, CloudHeadNode, CloudComputeNode1,and CloudComputeNode2. On UserHost runs a simple storage
+ ** service and an execution controller (defined in class GreedyExecutionController). On CloudHeadNode runs a cloud
+ ** compute service, that has access to the 10 cores of hosts CloudComputeNode1 and CloudComputeNode2, on which it can start VMs.
  **
  ** Example invocation of the simulator for a 10-compute-action workload, with no logging:
- **    ./wrench-example-batch-bag-of-actions 10 ./four_hosts.xml
+ **    ./wrench-example-cloud-bag-of-actions 10 ./four_hosts.xml
  **
  ** Example invocation of the simulator for a 10-compute-action workload, with only execution controller logging:
- **    ./wrench-example-batch-bag-of-actions 10 ./four_hosts.xml --log=custom_execution_controller.threshold=info
+ **    ./wrench-example-cloud-bag-of-actions 10 ./four_hosts.xml --log=custom_execution_controller.threshold=info
  **
  ** Example invocation of the simulator for a 6-compute-action workload with full logging:
- **    ./wrench-example-batch-bag-of-actions 6 ./four_hosts.xml --wrench-full-log
+ **    ./wrench-example-cloud-bag-of-actions 6 ./four_hosts.xml --wrench-full-log
  **/
 
 
@@ -93,15 +93,14 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
             "UserHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a batch compute service, and add it to the simulation.
-     * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
-     * to a batch-scheduled compute platform, i.e., managed by a batch scheduler that has jobs
-     * in a queue waiting for gaining access to compute resources.
-     * This particular service is started on BatchHeadNode and has no scratch storage space (mount point argument = "").
+    /* Instantiate a cloud compute service, and add it to the simulation.
+     * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
+     * to a cloud on which the user can create VMs and use them as compute services.
+     * This particular service is started on CloudHeadNode and has no scratch storage space (mount point argument = "").
      * This means that actions running on this service will access data files only from remote storage services. */
     std::cerr << "Instantiating a batch compute service on ComputeHost..." << std::endl;
-    auto batch_service = simulation->add(new wrench::BatchComputeService(
-            "BatchHeadNode", {"BatchComputeNode1", "BatchComputeNode2"}, "", {}, {}));
+    auto batch_service = simulation->add(new wrench::CloudComputeService(
+            "CloudHeadNode", {"CloudComputeNode1", "CloudComputeNode2"}, "", {}, {}));
 
     /* Instantiate an Execution controller, to be stated on UserHost, which is responsible
      * for executing the workflow-> */
