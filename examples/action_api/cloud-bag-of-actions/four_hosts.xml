@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run -->
+        <host id="UserHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the batch compute service will run -->
+        <host id="BatchHeadNode" speed="10Gf" core="1">
+            <prop id="ram" value="16GB" />
+       </host>
+        <host id="BatchComputeNode1" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+        <host id="BatchComputeNode2" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+
+        <!-- A network link that connects both hosts -->
+        <link id="network_link" bandwidth="10MBps" latency="20us"/>
+
+        <!-- Network routes -->
+        <route src="UserHost" dst="BatchHeadNode"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="BatchComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="UserHost" dst="BatchComputeNode2"> <link_ctn id="network_link"/></route>
+        <route src="BatchHeadNode" dst="BatchComputeNode1"> <link_ctn id="network_link"/></route>
+        <route src="BatchHeadNode" dst="BatchComputeNode2"> <link_ctn id="network_link"/></route>
+
+    </zone>
+</platform>
