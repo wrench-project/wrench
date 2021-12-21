@@ -230,6 +230,9 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+        if ((file == nullptr) or (location == nullptr)) {
+            throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
+        }
         readFile(file, location, file->getSize());
     }
 
