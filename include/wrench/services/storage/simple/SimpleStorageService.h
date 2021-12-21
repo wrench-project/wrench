@@ -108,7 +108,8 @@ namespace wrench {
                                      unsigned long buffer_size);
 
         bool
-        processFileReadRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location, std::string answer_mailbox,
+        processFileReadRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
+                               double num_bytes_to_read, std::string answer_mailbox,
                                std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
         bool processFileCopyRequest(std::shared_ptr<DataFile>file,

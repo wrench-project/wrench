@@ -235,6 +235,7 @@ namespace wrench {
                                              std::string mailbox_to_receive_the_file_content,
                                              std::shared_ptr<DataFile>file,
                                              std::shared_ptr<FileLocation> location,
+                                             double num_bytes_to_read,
                                              unsigned long buffer_size,
                                              double payload);
 
@@ -245,7 +246,9 @@ namespace wrench {
         /** @brief The file to read */
         std::shared_ptr<DataFile>file;
         /** @brief The location from which to  read the file */
-       std::shared_ptr<FileLocation> location;
+        std::shared_ptr<FileLocation> location;
+        /** @brief The number of bytes to read */
+        double num_bytes_to_read;
         /** @brief The requested buffer size */
         unsigned long buffer_size;
     };

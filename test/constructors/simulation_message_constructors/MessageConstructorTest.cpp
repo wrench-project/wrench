@@ -326,11 +326,12 @@ private:
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, location, true, failure_cause, "mailbox", 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, location, false, nullptr, "mailbox", 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, location, 10, 666));
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", file, location, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "", file, location, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", nullptr, location, 10, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, nullptr, 10, 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, location, 10, 10, 666));
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", file, location, 10, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "", file, location, 10, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", nullptr, location, 10, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, nullptr, 10, 10, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, location, -1.0, 10, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, location, true, nullptr, 666));
         CUSTOM_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, location, false, failure_cause, 666));

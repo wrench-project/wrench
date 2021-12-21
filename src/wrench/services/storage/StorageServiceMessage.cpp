@@ -308,6 +308,7 @@ namespace wrench {
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
    * @param location: the location where the file is stored
+   * @param num_bytes_to_read: the number of bytes to read
    * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
@@ -317,12 +318,13 @@ namespace wrench {
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> location,
+                                                                               double num_bytes_to_read,
                                                                                unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload) {
         if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") ||
-            (file == nullptr) || (location == nullptr)) {
+            (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
             throw std::invalid_argument(
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
@@ -330,6 +332,7 @@ namespace wrench {
         this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
         this->file = file;
         this->location = location;
+        this->num_bytes_to_read = num_bytes_to_read;
         this->buffer_size = buffer_size;
     }
 
