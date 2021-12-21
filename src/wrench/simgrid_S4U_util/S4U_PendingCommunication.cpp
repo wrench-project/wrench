@@ -109,8 +109,8 @@ namespace wrench {
         }
 
         if (one_comm_failed) {
-            for (index = 0; index < pending_s4u_comms.size(); index++) {
-                if (pending_s4u_comms[index]->get_state() == simgrid::s4u::Activity::State::FAILED) {
+            for (auto & pending_s4u_comm : pending_s4u_comms) {
+                if (pending_s4u_comm->get_state() == simgrid::s4u::Activity::State::FAILED) {
                     break;
                 }
             }
