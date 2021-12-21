@@ -27,6 +27,7 @@ namespace wrench {
      * @param hostname: host on which to run
      * @param parent: the parent storage service
      * @param file: the file corresponding to the connection
+     * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_mailbox: the a source mailbox to receive data from
      * @param dst_location: a location to write data to
      * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
@@ -40,6 +41,7 @@ namespace wrench {
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile>file,
+                                           double num_bytes_to_transfer,
                                            std::string src_mailbox,
                                            std::shared_ptr<FileLocation> dst_location,
                                            std::string answer_mailbox_if_read,
@@ -49,6 +51,7 @@ namespace wrench {
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
+            num_bytes_to_transfer(num_bytes_to_transfer),
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
@@ -77,6 +80,7 @@ namespace wrench {
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile>file,
+                                           double num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::string dst_mailbox,
                                            std::string answer_mailbox_if_read,
@@ -86,6 +90,7 @@ namespace wrench {
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
+            num_bytes_to_transfer(num_bytes_to_transfer),
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
@@ -114,6 +119,7 @@ namespace wrench {
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
                                            std::shared_ptr<DataFile>file,
+                                           double num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::shared_ptr<FileLocation> dst_location,
                                            std::string answer_mailbox_if_read,
@@ -123,6 +129,7 @@ namespace wrench {
             Service(hostname, "file_transfer_thread", "file_transfer_thread"),
             parent(parent),
             file(file),
+            num_bytes_to_transfer(num_bytes_to_transfer),
             answer_mailbox_if_read(answer_mailbox_if_read),
             answer_mailbox_if_write(answer_mailbox_if_write),
             answer_mailbox_if_copy(answer_mailbox_if_copy),
@@ -154,9 +161,10 @@ namespace wrench {
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
         WRENCH_INFO(
-                "New FileTransferThread (file=%s, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
+                "New FileTransferThread (file=%s, bytes_to_transfer=%.2lf, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
                 "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%lu",
                 file->getID().c_str(),
+                this->num_bytes_to_transfer,
                 (src_mailbox.empty() ? "none" : src_mailbox.c_str()),
                 (src_location == nullptr ? "none" : src_location->toString().c_str()),
                 (dst_mailbox.empty() ? "none" : dst_mailbox.c_str()),
@@ -184,7 +192,7 @@ namespace wrench {
             (not dst_mailbox.empty())) {
             /** Sending a local file to the network **/
             try {
-                sendLocalFileToNetwork(this->file, this->src_location, this->dst_mailbox);
+                sendLocalFileToNetwork(this->file, this->src_location, num_bytes_to_transfer, this->dst_mailbox);
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
 
                 WRENCH_INFO(
@@ -337,12 +345,14 @@ namespace wrench {
      * @brief Method to send a file from the local disk to the network
      * @param file: the file
      * @param location: the source location
+     * @param num_bytes_to_transfer: number of bytes to transfer
      * @param mailbox: the destination mailbox
      *
      * @throw shared_ptr<FailureCause>
      */
     void FileTransferThread::sendLocalFileToNetwork(std::shared_ptr<DataFile>file,
                                                     std::shared_ptr<FileLocation> location,
+                                                    double num_bytes_to_transfer,
                                                     std::string mailbox) {
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
@@ -354,7 +364,7 @@ namespace wrench {
                 /** Non-zero buffer size */
                 std::shared_ptr<S4U_PendingCommunication> req = nullptr;
                 // Sending a zero-byte file is really sending a 1-byte file
-                double remaining = std::max<double>(1, file->getSize());
+                double remaining = std::max<double>(1, num_bytes_to_transfer);
 
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
@@ -478,6 +488,7 @@ namespace wrench {
                             mailbox_that_should_receive_file_content,
                             file,
                             src_location,
+                            file->getSize(),
                             std::min<unsigned long>(this->buffer_size,
                                                     this->buffer_size),
                             src_location->getStorageService()->getMessagePayloadValue(

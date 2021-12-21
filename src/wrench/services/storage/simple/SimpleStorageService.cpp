@@ -221,7 +221,7 @@ namespace wrench {
             return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage*>(message.get())) {
-            return processFileReadRequest(msg->file, msg->location, msg->answer_mailbox,
+            return processFileReadRequest(msg->file, msg->location, msg->num_bytes_to_read, msg->answer_mailbox,
                                           msg->mailbox_to_receive_the_file_content, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
@@ -318,6 +318,7 @@ namespace wrench {
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
                                            file,
+                                           file->getSize(),
                                            file_reception_mailbox,
                                            location,
                                            "",
@@ -349,7 +350,8 @@ namespace wrench {
     /**
      * @brief Handle a file read request
      * @param file: the file
-     * @param src_partition: the file partition to read the file from
+     * @param location: the file's location
+     * @param num_bytes_to_read: the number of bytes to read
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
      * @param buffer_size: the buffer_size to use
@@ -357,6 +359,7 @@ namespace wrench {
      */
     bool SimpleStorageService::processFileReadRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> location,
+                                                      double num_bytes_to_read,
                                                       std::string answer_mailbox,
                                                       std::string mailbox_to_receive_the_file_content,
                                                       unsigned long buffer_size) {
@@ -403,6 +406,7 @@ namespace wrench {
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
                                            file,
+                                           num_bytes_to_read,
                                            location,
                                            mailbox_to_receive_the_file_content,
                                            answer_mailbox,
@@ -501,6 +505,7 @@ namespace wrench {
                 new FileTransferThread(this->hostname,
                                        this->getSharedPtr<StorageService>(),
                                        file,
+                                       file->getSize(),
                                        src_location,
                                        dst_location,
                                        "",
@@ -623,7 +628,7 @@ namespace wrench {
     /**
      * @brief Process a file deletion request
      * @param file: the file to delete
-     * @param dst_partition: the partition in which it is
+     * @param location: the file location
      * @param answer_mailbox: the mailbox to which the notification should be sent
      * @return false if the daemon should terminate
      */

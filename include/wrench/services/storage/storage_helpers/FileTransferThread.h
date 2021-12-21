@@ -36,6 +36,7 @@ namespace wrench {
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile>file,
+                           double num_bytes_to_transfer,
                            std::string src_mailbox,
                            std::shared_ptr<FileLocation> dst_location,
                            std::string answer_mailbox_if_read,
@@ -46,6 +47,7 @@ namespace wrench {
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile>file,
+                           double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
                            std::string dst_mailbox,
                            std::string answer_mailbox_if_read,
@@ -56,6 +58,7 @@ namespace wrench {
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
                            std::shared_ptr<DataFile>file,
+                           double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
                            std::shared_ptr<FileLocation> dsg_location,
                            std::string answer_mailbox_if_read,
@@ -80,13 +83,15 @@ namespace wrench {
         std::string dst_mailbox;
         std::shared_ptr<FileLocation> dst_location;
 
+        double num_bytes_to_transfer;
+
         std::string answer_mailbox_if_read;
         std::string answer_mailbox_if_write;
         std::string answer_mailbox_if_copy;
         unsigned long buffer_size;
 
         void receiveFileFromNetwork(std::shared_ptr<DataFile>file, std::string mailbox, std::shared_ptr<FileLocation> location);
-        void sendLocalFileToNetwork(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location, std::string mailbox);
+        void sendLocalFileToNetwork(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location, double num_bytes_to_transfer, std::string mailbox);
         void downloadFileFromStorageService(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
         void copyFileLocally(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
 
