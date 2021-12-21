@@ -230,7 +230,21 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
-        if ((file == nullptr) or (location == nullptr)) {
+        readFile(file, location, file->getSize());
+    }
+
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param location: the location to read the file from
+     * @param num_bytes_to_read: number of bytes to read from the file
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location, double num_bytes_to_read) {
+        if ((file == nullptr) or (location == nullptr) or (num_bytes_to_read < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
 
@@ -249,6 +263,7 @@ namespace wrench {
                                             answer_mailbox,
                                             file,
                                             location,
+                                            num_bytes_to_read,
                                             storage_service->buffer_size,
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
