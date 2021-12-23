@@ -246,10 +246,12 @@ namespace wrench {
     * @return a custom action
     */
     std::shared_ptr<CustomAction> CompoundJob::addCustomAction(std::string name,
+                                                               double ram,
+                                                               unsigned long num_cores,
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
                                                                const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) {
         auto new_action = std::shared_ptr<CustomAction>(
-                new CustomAction(name, this->getSharedPtr(), lambda_execute, lambda_terminate));
+                new CustomAction(name, this->getSharedPtr(), ram, num_cores, lambda_execute, lambda_terminate));
         this->addAction(new_action);
         return new_action;
     }

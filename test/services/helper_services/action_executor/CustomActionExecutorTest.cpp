@@ -151,7 +151,7 @@ private:
         };
         auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor>& action_executor) { };
 
-        action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", lambda_execute, lambda_terminate));
+        action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
         action->setThreadCreationOverhead(0.0);
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
