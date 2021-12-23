@@ -216,7 +216,7 @@ private:
                 wrench::Simulation::sleep(10.0); };
             auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) { };
 
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", lambda_execute, lambda_terminate));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
             action->setThreadCreationOverhead(0.0);
             thread_overhead = 0.0;
             expected_completion_date = 20.84743174020618639020;

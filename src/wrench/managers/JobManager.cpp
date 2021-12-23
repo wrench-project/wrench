@@ -642,6 +642,7 @@ namespace wrench {
         std::string callback_mailbox = this->mailbox_name;
         std::shared_ptr<CompoundJob> cjob = this->createCompoundJob("cjob_for_" + this->getName());
         cjob->addCustomAction("pilot_job_",
+                              0, 0, 
                               [callback_mailbox, job, compute_service](std::shared_ptr<ActionExecutor> executor) {
                                   // Create a bare-metal compute service and start it
                                   auto execution_service = executor->getActionExecutionService();

@@ -111,6 +111,8 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
                                                         std::shared_ptr<ParallelModel> parallel_model);
 
         std::shared_ptr<CustomAction> addCustomAction(std::string name,
+                                                      double ram,
+                                                      unsigned long num_cores,
                                                       const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                                                       const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
 

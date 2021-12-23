@@ -348,7 +348,7 @@ namespace wrench {
                 }
             };
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
-            scratch_cleanup = cjob->addCustomAction("", lambda_execute, lambda_terminate);
+            scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
 
         }
 
