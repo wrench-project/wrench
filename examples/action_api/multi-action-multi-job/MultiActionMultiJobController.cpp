@@ -87,6 +87,7 @@ namespace wrench {
 
         // Create the custom action with two lambdas
         job3->addCustomAction("file_copy",
+                              0, 0,
                               [ss_to_use, input_file](std::shared_ptr<ActionExecutor> action_executor) {
                                   WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
 
