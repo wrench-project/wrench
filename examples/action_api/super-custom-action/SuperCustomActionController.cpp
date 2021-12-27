@@ -72,6 +72,7 @@ namespace wrench {
         std::map<std::string, unsigned long> num_cores_to_use_for_vm = {{"ComputeHost1", 2}, {"ComputeHost2", 4}};
         auto cloud_service = this->cloud_cs;
         job->addCustomAction("powerful",
+                             0, 0,
                              [num_cores_to_use_for_vm, cloud_service](std::shared_ptr<ActionExecutor> action_executor) {
 
                                  TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
