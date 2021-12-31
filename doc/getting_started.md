@@ -20,24 +20,21 @@ project-folder/
 ├── CMakeModules
 │   └── FindSimGrid.cmake
 ├── src/
-│   ├── SimpleSimulator.cpp
-│   ├── SimpleStandardJobScheduler.cpp
-│   ├── SimpleStandardJobScheduler.h
-│   ├── SimpleWMS.cpp
-│   └── SimpleWMS.h 
-├── test/
-├── doc/
+│   ├── Simulator.cpp
+│   ├── Controller.cpp
+├── include/
+│   └── Controller.h 
 ├── build/
 └── data/
-    └── platform-files/
-        └── hosts.xml
+    └── platform.xml
 ~~~~~~~~~~~~~
 
-The `simplesimulator.cpp` source file contains the class representing the simulator 
-(either cloud or batch). `simplestandardjobscheduler.h` and `simplestandardjobscheduler.cpp`
-contain a simple implementation for a `wrench::StandardJobScheduler`; `simplewms.h`
-and `simplewms.cpp` denote the implementation of a simple workflow management system.
-Example platform and workflow files are also generated into the `data` folder. These
+The `Simulator.cpp` source file contains the `main()` function of the simulator, which
+initializes a simulated platform and services running on this platform;
+`Controller.h` and `Controller.cpp` contain the implementation of an execution
+controller, which executes a workflow on the available services. The simulator
+takes as command-line argument a path to a platform description file in XML, 
+which is available in `data/platform.xml`. These
 files provide the minimum necessary implementation for a WRENCH-enabled simulator.
 
 The `wrench-init` tool only requires a single argument, the name of the folder where
@@ -107,24 +104,21 @@ target_link_libraries(unit_tests
 # Example WRENCH simulators  #         {#getting-started-example}
 
 The examples in the `examples` directory provide good starting points
-for developing your own simulators.  Typing `make` in the top-level
-directory compiles the examples in the `examples` directory (note
-that examples are already installed as executables programs in the
-container, so there is no need to compile them).
+for developing your own simulators.  Examples are provided for the generic
+"action" API as well as for the "workflow" API, and are built along with the
+WRENCH library and tools. 
 
-Let us run the `examples/basic-examples/bare-metal-bag-of-tasks` by 
-navigating to that directory and typing:
+For instance, the `examples/action_api/basic-examples/bare-metal-bag-of-actions` example can be executed 
+as: 
 
 ~~~~~~~~~~~~~{.sh}
-$ ./wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --log=custom_wms.threshold=info
-
-# or if in the container just call the executable directly:
-$ wrench-example-bare-metal-bag-of-tasks 6 ./two_hosts.xml --log=custom_wms.threshold=info
+$ wrench-example-bare-metal-bag-of-actions 6 two_hosts.xml --log=custom_wms.threshold=info
 ~~~~~~~~~~~~~
 
+(File `two_hosts.xml` is in the `examples/action_api/basic-examples/bare-metal-bag-of-actions` directory.)
 You should see some output in the terminal. The output in white is
-produced by the simulator implemented with the WRENCH user API. The output
-in green is produced by the workflow management system implemented with
+produced by the simulator's main function. The output
+in green is produced by the execution controller implemented with
 the WRENCH developer API.
 
 Although you can inspect the codes of the examples on your own, we highly
