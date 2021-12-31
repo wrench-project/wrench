@@ -13,7 +13,7 @@ find_package(SimGrid REQUIRED)
 find_package(Boost REQUIRED)
 
 # include directories for dependencies and WRENCH libraries
-include_directories(src/ ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench ${Boost_INCLUDE_DIR})
+include_directories(include/ ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench ${Boost_INCLUDE_DIR})
 
 # source files
 set(SOURCE_FILES
