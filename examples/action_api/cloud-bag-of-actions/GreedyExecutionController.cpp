@@ -19,7 +19,7 @@
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000.0 * 1000.0)
 
-WRENCH_LOG_CATEGORY(custom_execution_controller, "Log category for GreedyExecutionController");
+WRENCH_LOG_CATEGORY(custom_controller, "Log category for GreedyExecutionController");
 
 namespace wrench {
 
