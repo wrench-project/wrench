@@ -28,8 +28,9 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param bare_metalcompute_service: a set of compute services available to run tasks
-     * @param storage_services: a set of storage services available to store files
+     * @param workflow: the workflow to execute
+     * @param bare_metal_compute_service: a bare-metal compute service available to run tasks
+     * @param storage_service: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
     OneTaskAtATimeWMS::OneTaskAtATimeWMS(std::shared_ptr<Workflow> workflow,

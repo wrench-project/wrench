@@ -33,8 +33,9 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param compute_services: a set of compute services available to run tasks
-     * @param storage_services: a set of storage services available to store files
+     * @param workflow: the workflow to execute
+     * @param virtualized_cluster_compute_service: a virtualized cluster compute service available to run tasks
+     * @param storage_service: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoTasksAtATimeVirtualizedClusterWMS::TwoTasksAtATimeVirtualizedClusterWMS(

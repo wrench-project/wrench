@@ -28,9 +28,10 @@ namespace wrench {
     /**
      * @brief Constructor, which calls the super constructor
      *
-     * @param compute_services: a set of compute services available to run tasks
-     * @param client_storage_service: a set of storage service running on compute host
-     * @param server_storage_services: a storage service available to store files
+     * @param workflow: the workflow to execute
+     * @param bare_metal_compute_service: a bare-metal compute service available to run tasks
+     * @param client_storage_service: a storage service available to store files
+     * @param server_storage_service: a storage service available to store files
      * @param hostname: the name of the host on which to start the WMS
      */
     NFSPipelineWMS::NFSPipelineWMS(const std::shared_ptr<Workflow> &workflow,

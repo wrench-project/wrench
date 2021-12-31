@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run -->
+        <host id="WMSHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the bare-metal compute service will run -->
+        <host id="ComputeHost" speed="1Gf" core="10">
+            <prop id="ram" value="16GB" />
+       </host>
+
+        <!-- A network link that connects both hosts -->
+        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <!-- WMSHost's local "loopback" link -->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!--ComputeHost's local "loopback" link -->
+        <link id="loopback_ComputeHost" bandwidth="1000EBps" latency="0us"/>
+
+        <!-- Network routes -->
+        <route src="WMSHost" dst="ComputeHost">
+            <link_ctn id="network_link"/>
+        </route>
+
+        <!-- Each loopback link connects each host to itself -->
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+        <route src="ComputeHost" dst="ComputeHost">
+            <link_ctn id="loopback_ComputeHost"/>
+        </route>
+
+    </zone>
+</platform>
