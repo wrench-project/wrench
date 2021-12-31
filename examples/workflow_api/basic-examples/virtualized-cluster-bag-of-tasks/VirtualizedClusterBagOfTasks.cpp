@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
         task->addOutputFile(workflow->addFile("output_" + std::to_string(i), 10000000));
     }
 
-    /* Instantiate a storage service, and add it to the simulation->
+    /* Instantiate a storage service, and add it to the simulation.
      * A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on WMSHost in the
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a virtualized cluster compute service, and add it to the simulation->
+    /* Instantiate a virtualized cluster compute service, and add it to the simulation.
      * A wrench::VirtualizedClusterComputeService is an abstraction of a compute service that corresponds
      * to a virtualized_cluster that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
      * This particular service is started on VirtualizedClusterProviderHost, uses VirtualizedClusterHost1 and VirtualizedClusterHost2
@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
         simulation->stageFile(f, storage_service);
     }
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    /* Simulation results can be examined via simulation->output, which provides access to traces
+    /* Simulation results can be examined via simulation->getOutput(), which provides access to traces
      * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();

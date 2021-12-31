@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
         simulation->stageFile(f, storage_service);
     }
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();

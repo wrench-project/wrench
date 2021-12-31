@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     task->addInputFile(file1);
     task->addOutputFile(file2);
 
-    /* Instantiate a storage service, and add it to the simulation->
+    /* Instantiate a storage service, and add it to the simulation.
      * A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on WMSHost in the
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
             "WMSHost", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
-    /* Instantiate a batch_standard_and_pilot_jobs compute service, and add it to the simulation->
+    /* Instantiate a batch_standard_and_pilot_jobs compute service, and add it to the simulation.
      * A wrench::BatchComputeService is an abstraction of a compute service that corresponds
      * to a batch_standard_and_pilot_jobs scheduled cluster, which responds to job submission requests by placing them
      * in a batch_standard_and_pilot_jobs queue, and granting them exclusive access to compute resources.
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
         simulation->stageFile(f, storage_service);
     }
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();
