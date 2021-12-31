@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
     task_amdahl->setParallelModel(wrench::ParallelModel::AMDAHL(0.8));
 
 
-    /* Instantiate a bare-metal compute service, and add it to the simulation->
+    /* Instantiate a bare-metal compute service, and add it to the simulation.
      * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     auto wms = simulation->add(
             new wrench::OneTaskAtATimeWMS(workflow, baremetal_service, "WMSHost"));
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();
