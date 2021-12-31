@@ -32,7 +32,6 @@ namespace wrench {
 
         // Overridden method
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
-        void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
 
     private:
         // main() method of the WMS

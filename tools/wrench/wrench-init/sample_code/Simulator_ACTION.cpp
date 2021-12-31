@@ -20,9 +20,9 @@
 #define GBYTE (1000.0 * 1000.0 * 1000.0)
 
 #include <iostream>
-#include <wrench.h>
+#include <wrench-dev.h>
 
-#include "ExecutionController.h"
+#include "Controller.h"
 
 /**
  * @brief The Simulator's main function
@@ -53,10 +53,10 @@ int main(int argc, char **argv) {
 
     /* Add a workflow task. See examples in the examples/workflow_api/
      * directory for examples of how to create various workflows */
-    auto task1 = workflow->addTask("task1", 10 * GFLOPS, 2, 10, 2 * GBYTE);
-    auto task2 = workflow->addTask("task2", 40 * GFLOPS, 2, 10, 4 * GBYTE);
-    auto task3 = workflow->addTask("task3", 30 * GFLOPS, 2, 10, 4 * GBYTE);
-    auto task4 = workflow->addTask("task4", 20 * GFLOPS, 2, 10, 2 * GBYTE);
+    auto task1 = workflow->addTask("task1", 10 * GFLOP, 2, 10, 2 * GBYTE);
+    auto task2 = workflow->addTask("task2", 40 * GFLOP, 2, 10, 4 * GBYTE);
+    auto task3 = workflow->addTask("task3", 30 * GFLOP, 2, 10, 4 * GBYTE);
+    auto task4 = workflow->addTask("task4", 20 * GFLOP, 2, 10, 2 * GBYTE);
 
     /* Set a custom parallel efficiency behavior for task 2 */
     task2->setParallelModel(wrench::ParallelModel::AMDAHL(0.8));
@@ -107,9 +107,9 @@ int main(int argc, char **argv) {
     simulation->launch();
 
     /* Print task execution timelines */
-    std::vector<std::shared_ptr<WorkflowTask>> tasks = {task1, task2, task3, task4};
+    std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = {task1, task2, task3, task4};
     for (auto const &t : tasks) {
-        std::cerr << "Task " << t->getID() << ": " << t->getStartDate() << "-" << t->getEndDate() << "\n";
+        printf("Task %s: %.2fs - %.2fs\n", t->getID().c_str(), t->getStartDate(), t->getEndDate());
     }
 
     return 0;
