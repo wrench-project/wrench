@@ -4,6 +4,14 @@ add_custom_command(
         COMMAND /bin/sh generate.sh ${CMAKE_CURRENT_SOURCE_DIR}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init.in
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/generate.sh
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/CMakeLists.txt
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/platform.xml
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/Simulator_ACTION.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/Controller_ACTION.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/Controller_ACTION.h
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/Simulator_WORKFLOW.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/Controller_WORKFLOW.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/sample_code/Controller_WORKFLOW.h
         COMMENT "Generating wrench-init script"
         VERBATIM
 )
