@@ -11,7 +11,6 @@
 #define WRENCH_WRENCH_H
 
 #include "wrench/simulation/Simulation.h"
-#include "wrench/workflow/Workflow.h"
 
 // Services and Service Properties
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
@@ -34,6 +33,10 @@
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
+
+// Workflow
+#include "wrench/workflow/Workflow.h"
+#include "wrench/workflow/WorkflowTask.h"
 
 // Tools
 #include "wrench/tools/pegasus/PegasusWorkflowParser.h"
