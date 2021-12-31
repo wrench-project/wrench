@@ -14,8 +14,6 @@
 
 namespace wrench {
 
-    class Simulation;
-
     /**
      *  @brief A simple WMS implementation
      */

@@ -8,43 +8,40 @@
  */
 
 
-#ifndef WRENCH_EXAMPLE_PILOT_JOB_H
-#define WRENCH_EXAMPLE_PILOT_JOB_H
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
 #include <wrench-dev.h>
-
 
 namespace wrench {
 
     /**
      *  @brief A Workflow Management System (WMS) implementation
      */
-    class PilotJobWMS : public ExecutionController {
+    class Controller : public ExecutionController {
 
     public:
         // Constructor
-        PilotJobWMS(
-                std::shared_ptr<Workflow> workflow,
-                const std::shared_ptr<BatchComputeService> &batch_compute_service,
-                const std::shared_ptr<StorageService> &storage_service,
-                const std::string &hostname);
+        Controller(
+                  std::shared_ptr<Workflow> workflow,
+                  const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                  const std::shared_ptr<SimpleStorageService> &storage_service,
+                  const std::string &hostname);
 
     protected:
 
         // Overridden method
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
         void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
-        void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent>) override;
-        void processEventPilotJobExpiration(std::shared_ptr<PilotJobExpiredEvent>) override;
 
     private:
         // main() method of the WMS
         int main() override;
 
         std::shared_ptr<Workflow> workflow;
-        const std::shared_ptr<BatchComputeService> batch_compute_service;
-        const std::shared_ptr<StorageService> storage_service;
+        const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
+        const std::shared_ptr<SimpleStorageService> storage_service;
 
     };
 }
-#endif //WRENCH_EXAMPLE_PILOT_JOB_H
+#endif //CONTROLLER_H
