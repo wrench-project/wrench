@@ -165,7 +165,7 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         std::map<std::string, std::shared_ptr<Action>> name_map;
 
         State state;
-        unsigned long priority;
+        double priority;
 
         void updateStateActionMap(const std::shared_ptr<Action>& action, Action::State old_state, Action::State new_state);
 
