@@ -487,7 +487,7 @@ function processData(data, tt, populateLegend) {
 
 /*
     data: data to generate graph in json array
-    populateLegend: pass in true, this is for initial dashboard
+    populateLegend: pass in true, this is for initial wrench-dashboard
     needToInitialse: whether you want to reset all of the parameters for the 3d graph
 */
 function generate3dGraph(data, populateLegend, needToInitialise) {
