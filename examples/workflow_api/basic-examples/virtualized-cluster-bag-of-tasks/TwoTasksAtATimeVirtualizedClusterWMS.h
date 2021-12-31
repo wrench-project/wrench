@@ -16,8 +16,6 @@
 
 namespace wrench {
 
-    class Simulation;
-
     /**
      *  @brief A Workflow Management System (WMS) implementation
      */

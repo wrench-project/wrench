@@ -1,13 +1,3 @@
-# generate and install wrench-init.in tool
-add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/
-        COMMAND /bin/sh generate.sh ${CMAKE_CURRENT_SOURCE_DIR}/conf/cmake/FindSimGrid.cmake
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init.in
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/generate.sh
-        COMMENT "Generating wrench-init script"
-        VERBATIM
-        )
 
 add_custom_target(wrench_init DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init)
 add_dependencies(wrench wrench_init)
