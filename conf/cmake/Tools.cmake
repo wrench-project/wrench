@@ -25,18 +25,18 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
-# install dashboard
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/dashboard
+# install wrench-dashboard
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard
         DESTINATION wrench
         PATTERN "*"
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
 configure_file (
-        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard.in"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard/wrench-dashboard.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard/wrench-dashboard"
 )
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard/wrench-dashboard
         DESTINATION bin
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
