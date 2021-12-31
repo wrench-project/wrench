@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
         simulation->stageFile(f, server_storage_service);
     }
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     try {

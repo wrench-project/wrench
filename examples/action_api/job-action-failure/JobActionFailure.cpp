@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating simulated platform..." << std::endl;
     simulation->instantiatePlatform(argv[1]);
 
-    /* Instantiate a storage service, and add it to the simulation->
+    /* Instantiate a storage service, and add it to the simulation.
      * A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on StorageHost in the
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
             "StorageHost2", {"/"}, {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "50000000"}}, {}));
 
 
-    /* Instantiate a bare-metal compute service, and add it to the simulation->
+    /* Instantiate a bare-metal compute service, and add it to the simulation.
      * A wrench::BareMetalCoputeService is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "ComputeHost1", {{"ComputeHost1"}, {"ComputeHost2"}}, "", {}, {}));
 
-    /* Instantiate a cloud compute service, and add it to the simulation->
+    /* Instantiate a cloud compute service, and add it to the simulation.
      * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
      * to a cloud that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
      * This particular service is started on CloudProviderHost, uses CloudHost1 and CloudHost2
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     auto wms = simulation->add(
             new wrench::JobActionFailureController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();

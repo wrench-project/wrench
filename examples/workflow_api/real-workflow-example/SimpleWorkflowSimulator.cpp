@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
     std::set<std::shared_ptr<wrench::StorageService>> storage_services;
 
     /* Instantiate a storage service, to be started on some host in the simulated platform,
-     * and adding it to the simulation->  A wrench::StorageService is an abstraction of a service on
+     * and adding it to the simulation.  A wrench::StorageService is an abstraction of a service on
      * which files can be written and read.  This particular storage service, which is an instance
      * of wrench::SimpleStorageService, is started on WMSHost in the
      * platform (platform/batch_platform.xml), which has an attached disk called large_disk. The SimpleStorageService
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();
@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
     }
     std::cerr << "Simulation done!" << std::endl;
 
-    /* Simulation results can be examined via simulation->output, which provides access to traces
+    /* Simulation results can be examined via simulation->getOutput(), which provides access to traces
      * of events. In the code below, go through some time-stamps and compute some statistics.
      */
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;

@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
 
     double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-    /* Launch the simulation-> This call only returns when the simulation is complete. */
+    /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
         simulation->launch();
