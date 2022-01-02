@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 
 
     /* Instantiate a bare-metal compute service, and add it to the simulation-
-     * A wrench::BareMetalCoputeService is an abstraction of a compute service that corresponds
+     * A wrench::BareMetalComputeService is an abstraction of a compute service that corresponds
      * to a software infrastructure that can execute tasks on hardware resources.
      * This particular service is started on ComputeHost and has no scratch storage space (mount point argument = "").
      * This means that tasks running on this service will access data only from remote storage services. */

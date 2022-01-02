@@ -419,7 +419,8 @@ is a thin layer on top of SimGrid's logging system, and as such is controlled
 via command-line arguments. 
 
 The `bare-metal-chain` example simulator can be executed as follows in the
-`examples/action_api/bare-metal-bag-of-actions` directory:
+`examples/action_api/bare-metal-bag-of-actions` subdirectory of the build directory (after
+typing `make examples` in the build directory):
 
 ~~~~~~~~~~~~~{.sh}
 ./wrench-example-bare-metal-bag-of-tasks 10 ./four_hosts.xml
