@@ -1,7 +1,12 @@
 ## WRENCH Examples
 
 The `examples` directory in the WRENCH distribution contains several
-example simulators that showcase the use of the WRENCH APIs.  Examples are in two
+example simulators that showcase the use of the WRENCH APIs.  
+
+To build the examples just type `make examples` in the build directory. 
+
+
+Examples are in two
 categories and sub-directories:
 
   - `action_api`: example simulators that simulate the execution of arbitrary jobs that each consist of one or more arbitrary actions.

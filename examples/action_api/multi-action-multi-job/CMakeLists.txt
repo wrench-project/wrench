@@ -1,17 +1,34 @@
-set(SOURCE_FILES
-        MultiActionMultiJobController.h
-        MultiActionMultiJobController.cpp
-        MultiActionMultiJob.cpp
-        )
 
-add_executable(wrench-example-multi-action-multi-job ${SOURCE_FILES})
+set(CMAKE_CXX_STANDARD 14)
+
+# Add source to this project's executable.
+add_executable(wrench-example-multi-action-multi-job
+        ./MultiActionMultiJobController.h
+        ./MultiActionMultiJobController.cpp
+        ./MultiActionMultiJob.cpp)
+
+add_custom_target(
+        wrench-example-multi-action-multi-job-platform-file
+        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/four_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/four_hosts.xml
+        VERBATIM
+)
+
+add_dependencies(examples wrench-example-multi-action-multi-job)
+add_dependencies(wrench-example-multi-action-multi-job wrench-example-multi-action-multi-job-platform-file)
 
 if (ENABLE_BATSCHED)
-    find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-multi-action-multi-job wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-multi-action-multi-job
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            ${ZMQ_LIBRARY}
+            )
 else()
-    target_link_libraries(wrench-example-multi-action-multi-job wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-multi-action-multi-job
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            )
 endif()
-
-install(TARGETS wrench-example-multi-action-multi-job DESTINATION bin)
-
