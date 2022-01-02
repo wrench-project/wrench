@@ -1,4 +1,6 @@
-# source files
+
+set(CMAKE_CXX_STANDARD 14)
+
 set(SOURCE_FILES
         CondorTimestamp.h
         CondorWMS.h
@@ -10,8 +12,34 @@ set(SOURCE_FILES
 
 # condor grid
 set(CONDOR_GRID CondorGridSimulator.cpp)
-add_executable(wrench-example-condor-grid-universe ${SOURCE_FILES} ${CONDOR_GRID})
-target_link_libraries(wrench-example-condor-grid-universe wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY} )
 
-install(TARGETS wrench-example-condor-grid-universe DESTINATION bin)
+# Add source to this project's executable.
+add_executable(wrench-example-condor-grid-universe ${SOURCE_FILES} ${CONDOR_GRID})
+
+add_custom_target(
+        wrench-example-condor-grid-universe-file
+        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/condor-grid-hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/condor-grid-hosts.xml
+        VERBATIM
+)
+
+add_dependencies(examples wrench-example-condor-grid-universe)
+add_dependencies(wrench-example-condor-grid-universe wrench-example-condor-grid-universe-file)
+
+if (ENABLE_BATSCHED)
+    target_link_libraries(wrench-example-condor-grid-universe
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            ${ZMQ_LIBRARY}
+            )
+else()
+    target_link_libraries(wrench-example-condor-grid-universe
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            )
+endif()
+
 

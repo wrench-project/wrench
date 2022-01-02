@@ -1,19 +1,34 @@
 
-set(SOURCE_FILES
-        OneTaskAtATimeWMS.h
-        OneTaskAtATimeWMS.cpp
-        BareMetalChain.cpp
-        )
+set(CMAKE_CXX_STANDARD 14)
 
-add_executable(wrench-example-bare-metal-chain ${SOURCE_FILES})
+# Add source to this project's executable.
+add_executable(wrench-example-bare-metal-chain
+        ./OneTaskAtATimeWMS.h
+        ./OneTaskAtATimeWMS.cpp
+        ./BareMetalChain.cpp)
+
+add_custom_target(
+        wrench-example-bare-metal-chain-platform-file
+        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts.xml
+        VERBATIM
+)
+
+add_dependencies(examples wrench-example-bare-metal-chain)
+add_dependencies(wrench-example-bare-metal-chain wrench-example-bare-metal-chain-platform-file)
 
 if (ENABLE_BATSCHED)
-    find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-bare-metal-chain wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-bare-metal-chain
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            ${ZMQ_LIBRARY}
+            )
 else()
-    target_link_libraries(wrench-example-bare-metal-chain wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-bare-metal-chain
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            )
 endif()
-
-
-install(TARGETS wrench-example-bare-metal-chain DESTINATION bin)
-

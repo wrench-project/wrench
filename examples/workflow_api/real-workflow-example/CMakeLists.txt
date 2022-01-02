@@ -1,17 +1,40 @@
-# source files
-set(SOURCE_FILES
-        SimpleWMS.h
-        SimpleWMS.cpp
-        SimpleWorkflowSimulator.cpp
-        )
 
-add_executable(wrench-example-real-workflow ${SOURCE_FILES} ${APP_BATCH_FILES})
+set(CMAKE_CXX_STANDARD 14)
+
+# Add source to this project's executable.
+add_executable(wrench-example-real-workflow
+        ./SimpleWMS.h
+        ./SimpleWMS.cpp
+        ./SimpleWorkflowSimulator.cpp)
+
+find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY NAMES wrenchpegasusworkflowparser)
+
+add_custom_target(
+        wrench-example-real-workflow-files
+        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/cloud_batch_platform.xml ${CMAKE_CURRENT_BINARY_DIR}/cloud_batch_platform.xml
+        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/genome.json ${CMAKE_CURRENT_BINARY_DIR}/genome.json
+        VERBATIM
+)
+
+add_dependencies(examples wrench-example-real-workflow)
+add_dependencies(wrench-example-real-workflow wrench-example-real-workflow-files)
+add_dependencies(wrench-example-real-workflow wrenchpegasusworkflowparser)
 
 if (ENABLE_BATSCHED)
-    find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-real-workflow wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-real-workflow
+            wrench
+            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            ${ZMQ_LIBRARY}
+            )
 else()
-    target_link_libraries(wrench-example-real-workflow wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-real-workflow
+            wrench
+            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            )
 endif()
-
-install(TARGETS wrench-example-real-workflow DESTINATION bin)

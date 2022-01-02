@@ -1,17 +1,34 @@
-set(SOURCE_FILES
-        JobActionFailureController.h
-        JobActionFailureController.cpp
-        JobActionFailure.cpp
-        )
 
-add_executable(wrench-example-job-action-failure ${SOURCE_FILES})
+set(CMAKE_CXX_STANDARD 14)
+
+# Add source to this project's executable.
+add_executable(wrench-example-job-action-failure
+        ./JobActionFailureController.h
+        ./JobActionFailureController.cpp
+        ./JobActionFailure.cpp)
+
+add_custom_target(
+        wrench-example-job-action-failure-platform-file
+        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/four_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/four_hosts.xml
+        VERBATIM
+)
+
+add_dependencies(examples wrench-example-job-action-failure)
+add_dependencies(wrench-example-job-action-failure wrench-example-job-action-failure-platform-file)
 
 if (ENABLE_BATSCHED)
-    find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-job-action-failure wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-job-action-failure
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            ${ZMQ_LIBRARY}
+            )
 else()
-    target_link_libraries(wrench-example-job-action-failure wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-job-action-failure
+            wrench
+            ${SimGrid_LIBRARY}
+            ${PUGIXML_LIBRARY}
+            ${Boost_LIBRARIES}
+            )
 endif()
-
-install(TARGETS wrench-example-job-action-failure DESTINATION bin)
-
