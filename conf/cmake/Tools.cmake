@@ -18,7 +18,7 @@ add_custom_command(
 
 
 add_custom_target(wrench_init DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init)
-add_dependencies(wrench wrench_init)
+add_dependencies(wrench_init wrench)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init
         DESTINATION bin

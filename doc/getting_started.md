@@ -106,7 +106,8 @@ target_link_libraries(unit_tests
 The examples in the `examples` directory provide good starting points
 for developing your own simulators.  Examples are provided for the generic
 "action" API as well as for the "workflow" API, and are built along with the
-WRENCH library and tools. 
+WRENCH library and tools. See the `examples/README.md` file for a brief description
+of all examples. Examples can be built by typing `make examples` in the build directory.
 
 For instance, the `examples/action_api/basic-examples/bare-metal-bag-of-actions` example can be executed 
 as: 
