@@ -39,7 +39,7 @@ protected:
 
         // Create a platform file
         std::string bad_xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"TwoCoreHost\" speed=\"100f\" core=\"2\"> "
@@ -65,7 +65,7 @@ protected:
 
         // Create a VALID platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"TwoCoreHost\" speed=\"1000f\" core=\"2\"> "
