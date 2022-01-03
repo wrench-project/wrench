@@ -9,7 +9,7 @@ add_executable(wrench-example-bare-metal-bag-of-tasks-programmatic-platform
 
 add_custom_target(
         wrench-example-bare-metal-bag-of-tasks-programmatic-platform-platform-file
-        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}/' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts.xml ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts.xml ; fi ;"
         VERBATIM
 )
 
