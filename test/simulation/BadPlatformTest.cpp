@@ -27,7 +27,7 @@ protected:
 
 
     std::string bad_format_xml = "<?xml version='1.0'?>"
-                               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                               "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                "<platform version=\"4.1\"> "
                                " < "
                                "   <zone id=\"AS0\" routing=\"Full\"> "
@@ -36,7 +36,7 @@ protected:
                                "</platform>";
 
     std::string bad_ram1_xml = "<?xml version='1.0'?>"
-                               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                               "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                "<platform version=\"4.1\"> "
                                "   <zone id=\"AS0\" routing=\"Full\"> "
                                "       <host id=\"Host\" speed=\"1f\" core=\"2\" > "
@@ -46,7 +46,7 @@ protected:
                                "</platform>";
 
     std::string bad_ram2_xml = "<?xml version='1.0'?>"
-                               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                               "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                "<platform version=\"4.1\"> "
                                "   <zone id=\"AS01\" routing=\"Full\"> "
                                "       <host id=\"Host\" speed=\"1f\" core=\"2\" > "
@@ -57,7 +57,7 @@ protected:
 
 
     std::string bad_disk1_xml = "<?xml version='1.0'?>"
-                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                 "<platform version=\"4.1\"> "
                                 "   <zone id=\"AS01\" routing=\"Full\"> "
                                 "       <host id=\"Host\" speed=\"1f\" core=\"2\" > "
@@ -70,7 +70,7 @@ protected:
                                 "</platform>";
 
     std::string bad_disk2_xml = "<?xml version='1.0'?>"
-                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                 "<platform version=\"4.1\"> "
                                 "   <zone id=\"AS01\" routing=\"Full\"> "
                                 "       <host id=\"Host\" speed=\"1f\" core=\"2\" > "
@@ -87,7 +87,7 @@ protected:
                                 "</platform>";
 
     std::string bad_disk3_xml = "<?xml version='1.0'?>"
-                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                 "<platform version=\"4.1\"> "
                                 "   <zone id=\"AS01\" routing=\"Full\"> "
                                 "       <host id=\"Host\" speed=\"1f\" core=\"2\" > "
@@ -104,7 +104,7 @@ protected:
                                 "</platform>";
 
     std::string zero_bandwidth_link = "<?xml version='1.0'?>"
-                                  "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                  "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                   "<platform version=\"4.1\"> "
                                   "   <zone id=\"AS01\" routing=\"Full\"> "
                                   "       <link id=\"link\" bandwidth=\"0Mbps\" latency=\"0us\" > "
@@ -113,7 +113,7 @@ protected:
                                   "</platform>";
 
     std::string zero_speed_host = "<?xml version='1.0'?>"
-                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                 "<platform version=\"4.1\"> "
                                 "   <zone id=\"AS01\" routing=\"Full\"> "
                                 "       <host id=\"Host\" speed=\"0f\" core=\"2\" > "

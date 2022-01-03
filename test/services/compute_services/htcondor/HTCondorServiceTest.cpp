@@ -104,7 +104,7 @@ protected:
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
@@ -145,7 +145,7 @@ protected:
 
         //Grid Universe Platform file.
         std::string xml1 = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                            "<platform version=\"4.1\"> "
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
