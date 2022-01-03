@@ -1,15 +1,14 @@
 
 add_custom_target(
         wrench-example-io-pagecache-files
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/single_host.xml ${CMAKE_CURRENT_BINARY_DIR}/single_host.xml
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts.xml
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/simple_workflow.dax ${CMAKE_CURRENT_BINARY_DIR}/simple_workflow.dax
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/nighres_workflow.dax ${CMAKE_CURRENT_BINARY_DIR}/nighres_workflow.dax
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/run_multi.sh ${CMAKE_CURRENT_BINARY_DIR}/run_multi.sh
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/run_nfs.sh ${CMAKE_CURRENT_BINARY_DIR}/run_nfs.sh
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/run_nighres.sh ${CMAKE_CURRENT_BINARY_DIR}/run_nighres.sh
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/run_single.sh ${CMAKE_CURRENT_BINARY_DIR}/run_single.sh
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/run_single.sh ${CMAKE_CURRENT_BINARY_DIR}/run_single.sh
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/single_host.xml ${CMAKE_CURRENT_BINARY_DIR}/single_host.xml ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts.xml ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/simple_workflow.dax ${CMAKE_CURRENT_BINARY_DIR}/simple_workflow.dax ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/nighres_workflow.dax ${CMAKE_CURRENT_BINARY_DIR}/nighres_workflow.dax ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_multi.sh ${CMAKE_CURRENT_BINARY_DIR}/run_multi.sh ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_nfs.sh ${CMAKE_CURRENT_BINARY_DIR}/run_nfs.sh ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_nighres.sh ${CMAKE_CURRENT_BINARY_DIR}/run_nighres.sh ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_single.sh ${CMAKE_CURRENT_BINARY_DIR}/run_single.sh ; fi ;"
         VERBATIM
 )
 
