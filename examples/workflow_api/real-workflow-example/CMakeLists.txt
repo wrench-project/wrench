@@ -7,8 +7,6 @@ add_executable(wrench-example-real-workflow
         ./SimpleWMS.cpp
         ./SimpleWorkflowSimulator.cpp)
 
-#find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY NAMES wrenchpegasusworkflowparser)
-
 add_custom_target(
         wrench-example-real-workflow-files
         COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/cloud_batch_platform.xml ${CMAKE_CURRENT_BINARY_DIR}/cloud_batch_platform.xml
@@ -32,7 +30,7 @@ if (ENABLE_BATSCHED)
 else()
     target_link_libraries(wrench-example-real-workflow
             wrench
-            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
+            wrenchpegasusworkflowparser
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
