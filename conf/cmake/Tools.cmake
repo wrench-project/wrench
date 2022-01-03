@@ -25,8 +25,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/dashboard
         )
 
 configure_file (
-        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard.in"
-        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/dashboard/wrench-dashboard.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/dashboard/wrench-dashboard"
 )
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-dashboard
         DESTINATION bin
