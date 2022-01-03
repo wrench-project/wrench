@@ -7,7 +7,7 @@ add_executable(wrench-example-real-workflow
         ./SimpleWMS.cpp
         ./SimpleWorkflowSimulator.cpp)
 
-find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY NAMES wrenchpegasusworkflowparser)
+#find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY NAMES wrenchpegasusworkflowparser)
 
 add_custom_target(
         wrench-example-real-workflow-files
@@ -23,7 +23,7 @@ add_dependencies(wrench-example-real-workflow wrenchpegasusworkflowparser)
 if (ENABLE_BATSCHED)
     target_link_libraries(wrench-example-real-workflow
             wrench
-            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
+            wrenchpegasusworkflowparser
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
