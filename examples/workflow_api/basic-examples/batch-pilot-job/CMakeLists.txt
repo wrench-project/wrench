@@ -9,7 +9,7 @@ add_executable(wrench-example-batch-pilot-job
 
 add_custom_target(
         wrench-example-batch-pilot-job-platform-file
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/four_hosts_scratch.xml ${CMAKE_CURRENT_BINARY_DIR}/four_hosts_scratch.xml
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/four_hosts_scratch.xml ${CMAKE_CURRENT_BINARY_DIR}/four_hosts_scratch.xml ; fi ;"
         VERBATIM
 )
 

@@ -9,7 +9,7 @@ add_executable(wrench-example-cloud-bag-of-tasks-energy
 
 add_custom_target(
         wrench-example-cloud-bag-of-tasks-energy-platform-file
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/four_hosts_energy.xml ${CMAKE_CURRENT_BINARY_DIR}/four_hosts_energy.xml
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/four_hosts_energy.xml ${CMAKE_CURRENT_BINARY_DIR}/four_hosts_energy.xml ; fi ;"
         VERBATIM
 )
 

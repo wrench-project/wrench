@@ -9,8 +9,8 @@ add_executable(wrench-example-real-workflow
 
 add_custom_target(
         wrench-example-real-workflow-files
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/cloud_batch_platform.xml ${CMAKE_CURRENT_BINARY_DIR}/cloud_batch_platform.xml
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/genome.json ${CMAKE_CURRENT_BINARY_DIR}/genome.json
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/cloud_batch_platform.xml ${CMAKE_CURRENT_BINARY_DIR}/cloud_batch_platform.xml ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/genome.json ${CMAKE_CURRENT_BINARY_DIR}/genome.json ; fi ;"
         VERBATIM
 )
 
