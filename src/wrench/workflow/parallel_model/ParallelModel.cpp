@@ -50,7 +50,6 @@ namespace wrench {
      * @return a model instance
      **/
     std::shared_ptr<ParallelModel> ParallelModel::CUSTOM(std::function<std::vector<double>(double, long)> lambda) {
-        return std::shared_ptr<ParallelModel>(new CustomParallelModel(lambda));
     }
 
 };

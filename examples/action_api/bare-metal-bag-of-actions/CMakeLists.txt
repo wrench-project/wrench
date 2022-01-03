@@ -19,7 +19,6 @@ add_dependencies(wrench-example-bare-metal-bag-of-actions wrench-example-bare-me
 if (ENABLE_BATSCHED)
     target_link_libraries(wrench-example-bare-metal-bag-of-actions
             wrench
-            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
@@ -28,7 +27,6 @@ if (ENABLE_BATSCHED)
 else()
     target_link_libraries(wrench-example-bare-metal-bag-of-actions
             wrench
-            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
