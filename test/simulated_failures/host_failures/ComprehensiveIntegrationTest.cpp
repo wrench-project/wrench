@@ -66,7 +66,7 @@ protected:
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>\n"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">\n"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">\n"
                           "<platform version=\"4.1\">\n"
                           "   <zone id=\"AS0\" routing=\"Full\">\n";
 
