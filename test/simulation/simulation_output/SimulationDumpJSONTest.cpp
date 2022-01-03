@@ -47,7 +47,7 @@ protected:
 
         // platform without energy consumption information
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
@@ -66,7 +66,7 @@ protected:
 
         // platform with energy consumption information
         std::string xml2 = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                            "<platform version=\"4.1\">"
                            "<zone id=\"AS0\" routing=\"Full\">"
 
@@ -89,7 +89,7 @@ protected:
 
         // 3 host platform with an asymmetrical route between host1 and host3
         std::string xml3 = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                            "<platform version=\"4.1\"> "
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
@@ -116,7 +116,7 @@ protected:
 
         // 3 host platform with full routing but not all connections specified
         std::string xml3_broken = "<?xml version='1.0'?>"
-                                  "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                  "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                   "<platform version=\"4.1\"> "
                                   "   <zone id=\"AS0\" routing=\"Full\"> "
                                   "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
@@ -142,7 +142,7 @@ protected:
 
         // platform with cluster
         std::string xml4 = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                            "<platform version=\"4.1\">"
                            "   <zone id=\"AS0\" routing=\"Full\">"
                            "     <!-- effective bandwidth = 1250 MBps -->"
@@ -176,7 +176,7 @@ protected:
 
         // platform for Link Usage
         std::string xml5 = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                            "<platform version=\"4.1\"> "
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
@@ -203,7 +203,7 @@ protected:
 
         // platform for Disk Operations
         std::string xml6 = "<?xml version='1.0'?>"
-                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                            "<platform version=\"4.1\"> "
                            "   <zone id=\"AS0\" routing=\"Full\"> "
                            "       <host id=\"host1\" speed=\"1f\" core=\"1\"> "
