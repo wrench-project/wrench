@@ -18,7 +18,7 @@ add_executable(wrench-example-condor-grid-universe ${SOURCE_FILES} ${CONDOR_GRID
 
 add_custom_target(
         wrench-example-condor-grid-universe-file
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/condor-grid-hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/condor-grid-hosts.xml
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/condor-grid-hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/condor-grid-hosts.xml ; fi ;"
         VERBATIM
 )
 

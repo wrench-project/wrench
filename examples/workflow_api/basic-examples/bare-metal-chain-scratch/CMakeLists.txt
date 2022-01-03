@@ -9,7 +9,7 @@ add_executable(wrench-example-bare-metal-chain-scratch
 
 add_custom_target(
         wrench-example-bare-metal-chain-scratch-platform-file
-        COMMAND /bin/cp ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts_scratch.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts_scratch.xml
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts_scratch.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts_scratch.xml ; fi ;"
         VERBATIM
 )
 
