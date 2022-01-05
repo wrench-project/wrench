@@ -17,9 +17,8 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 
 include_directories(src/ include/ ${Boost_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR}/include /usr/local/include /opt/local/include /usr/local/include/wrench)
 
-
 # Add source to this project's executable.
-add_executable (wrench-daemon
+add_executable(wrench-daemon
         include/httplib.h
         src/main.cpp
         src/WRENCHDaemon.cpp
