@@ -16,8 +16,7 @@ add_custom_command(
         VERBATIM
 )
 
-
-add_custom_target(wrench_init DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init)
+add_custom_target(wrench_init ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init)
 add_dependencies(wrench_init wrench)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tools/wrench/wrench-init/wrench-init
