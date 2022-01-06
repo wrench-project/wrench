@@ -610,8 +610,7 @@ namespace wrench {
         this->current_jobs.insert(job);
 
         // Add all action to the list of actions to run
-        for (auto const &item : job->name_map) {
-            auto action = item.second;
+        for (auto const &action : job->getActions()) {
             if (action->getState() == Action::State::READY) {
                 this->ready_actions.push_back(action);
             } else {
