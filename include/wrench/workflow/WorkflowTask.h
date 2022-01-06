@@ -180,9 +180,9 @@ namespace wrench {
 
         void setState(WorkflowTask::State);
 
-        void setUpcomingState(WorkflowTask::State);
-
-        WorkflowTask::State getUpcomingState() const;
+//        void setUpcomingState(WorkflowTask::State);
+//
+//        WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
 

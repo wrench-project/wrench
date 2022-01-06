@@ -220,14 +220,14 @@ namespace wrench {
         }
     }
 
-    /**
-    * @brief Get the state of the task
-    *
-    * @return a task state
-    */
-    WorkflowTask::State WorkflowTask::getUpcomingState() const {
-        return this->upcoming_visible_state;
-    }
+//    /**
+//    * @brief Get the state of the task
+//    *
+//    * @return a task state
+//    */
+//    WorkflowTask::State WorkflowTask::getUpcomingState() const {
+//        return this->upcoming_visible_state;
+//    }
 
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
@@ -308,58 +308,23 @@ namespace wrench {
      * @param state: the task state
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
-
-//      WRENCH_INFO("WorkflowTask::setState(): SETTING %s's VISIBLE STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
-
-        // Sanity check
-        bool sane = true;
-//        switch (state) {
-//            case NOT_READY:
-//                if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-//                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-//                    sane = false;
-//                }
-//                break;
-//            case READY:
-//                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-//                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-//                    sane = false;
-//                }
-//                break;
-//            case PENDING:
-//                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-//                    (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-//                    (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
-//                    sane = false;
-//                }
-//                break;
-//            case COMPLETED:
-//                if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
-//                    sane = false;
-//                }
-//                break;
-//            case UNKNOWN:
-//                sane = false;
-//                break;
-//        }
-//
-//        if (not sane) {
-//            throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-//                                     this->getID() + "'s visible state to " +
-//                                     stateToString(state) + " when its internal " +
-//                                     "state is " + stateToString(this->internal_state));
-//        }
+        if (this->visible_state == WorkflowTask::State::READY) {
+            this->workflow->ready_tasks.erase(this->getSharedPtr());
+        }
         this->visible_state = state;
+        if (state == WorkflowTask::State::READY) {
+            this->workflow->ready_tasks.insert(this->getSharedPtr());
+        }
     }
 
-    /**
-     * @brief Set the upcoming visible state of the task
-     *
-     * @param state: the task state
-     */
-    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
-        this->upcoming_visible_state = state;
-    }
+//    /**
+//     * @brief Set the upcoming visible state of the task
+//     *
+//     * @param state: the task state
+//     */
+//    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
+//        this->upcoming_visible_state = state;
+//    }
 
     /**
      * @brief Set the task's containing job
