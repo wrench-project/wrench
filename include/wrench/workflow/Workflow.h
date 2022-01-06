@@ -104,7 +104,7 @@ namespace wrench {
 
         std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 
-        std::set<std::shared_ptr<WorkflowTask>> &getReadyTasks();
+        std::vector<std::shared_ptr<WorkflowTask>> getReadyTasks();
 
         std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> getReadyClusters();
 
