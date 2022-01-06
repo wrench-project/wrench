@@ -65,6 +65,7 @@ namespace wrench {
         // Create the WorkflowTask object
         auto task = std::shared_ptr<WorkflowTask>(new WorkflowTask(id, flops, min_num_cores, max_num_cores,
                                      memory_requirement));
+        this->ready_tasks.insert(task);
         // Associate the workflow to the task
         task->workflow = this->getSharedPtr();
 
@@ -287,18 +288,8 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getReadyTasks() {
-
-        std::vector<std::shared_ptr<WorkflowTask>> tasks_list;
-
-        for (auto &it : this->tasks) {
-            auto task = it.second;
-
-            if (task->getState() == WorkflowTask::State::READY) {
-                tasks_list.push_back(task);
-            }
-        }
-        return tasks_list;
+    std::set<std::shared_ptr<WorkflowTask>> &Workflow::getReadyTasks() {
+        return this->ready_tasks;
     }
 
     /**
