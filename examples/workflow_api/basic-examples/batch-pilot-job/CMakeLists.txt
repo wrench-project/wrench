@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-batch-pilot-job
+        EXCLUDE_FROM_ALL
         ./PilotJobWMS.h
         ./PilotJobWMS.cpp
         ./BatchPilotJob.cpp)

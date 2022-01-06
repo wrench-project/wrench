@@ -19,7 +19,9 @@ set(SOURCE_FILES
         IOPageCacheSingle.cpp
         )
 
-add_executable(wrench-example-io-pagecache-single ${SOURCE_FILES})
+add_executable(wrench-example-io-pagecache-single
+        EXCLUDE_FROM_ALL
+        ${SOURCE_FILES})
 
 add_dependencies(examples wrench-example-io-pagecache-single)
 add_dependencies(wrench-example-io-pagecache-single wrench-example-io-pagecache-files)
@@ -40,7 +42,9 @@ set(SOURCE_FILES
         IOPageCacheMulti.cpp
         )
 
-add_executable(wrench-example-io-pagecache-multi ${SOURCE_FILES})
+add_executable(wrench-example-io-pagecache-multi
+        EXCLUDE_FROM_ALL
+        ${SOURCE_FILES})
 
 
 add_dependencies(examples wrench-example-io-pagecache-multi)
@@ -62,7 +66,9 @@ set(SOURCE_FILES
         IOPageCacheNFS.cpp
         )
 
-add_executable(wrench-example-io-pagecache-nfs ${SOURCE_FILES})
+add_executable(wrench-example-io-pagecache-nfs
+        EXCLUDE_FROM_ALL
+        ${SOURCE_FILES})
 
 
 add_dependencies(examples wrench-example-io-pagecache-nfs)
@@ -84,7 +90,9 @@ set(SOURCE_FILES
         IOPageCacheNighres.cpp
         )
 
-add_executable(wrench-example-io-pagecache-nighres ${SOURCE_FILES})
+add_executable(wrench-example-io-pagecache-nighres
+        EXCLUDE_FROM_ALL
+        ${SOURCE_FILES})
 
 
 add_dependencies(examples wrench-example-io-pagecache-nighres)
