@@ -1018,7 +1018,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a "get resource description message"
+     * @brief Return resource information
      * @param answer_mailbox: the mailbox to which the description message should be sent
      * @return resource information map
      */
