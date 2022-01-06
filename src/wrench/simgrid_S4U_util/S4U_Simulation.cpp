@@ -558,6 +558,12 @@ namespace wrench {
  * @return a memory_manager_service capacity in bytes
  */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
+        static std::map<simgrid::s4u::Host *, double> memoized;
+
+        if (memoized.find(host) != memoized.end()) {
+            return memoized[host];
+        }
+
         std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory_manager_service", "Memory", "MEMORY"};
         double capacity_value = S4U_Simulation::DEFAULT_RAM;
 
@@ -579,6 +585,7 @@ namespace wrench {
                 }
             }
         }
+        memoized[host] = capacity_value;
         return capacity_value;
     }
 
