@@ -288,8 +288,9 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::set<std::shared_ptr<WorkflowTask>> &Workflow::getReadyTasks() {
-        return this->ready_tasks;
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getReadyTasks() {
+        std::vector<std::shared_ptr<WorkflowTask>> vector_of_ready_tasks(this->ready_tasks.begin(), this->ready_tasks.end());
+        return vector_of_ready_tasks;
     }
 
     /**
