@@ -610,13 +610,15 @@ namespace wrench {
         this->current_jobs.insert(job);
 
         // Add all action to the list of actions to run
-        for (auto const &action : job->getActions()) {
+        for (auto const &item : job->name_map) {
+            auto action = item.second;
             if (action->getState() == Action::State::READY) {
                 this->ready_actions.push_back(action);
             } else {
                 this->not_ready_actions.insert(action);
             }
         }
+
 
         // And send a reply!
         S4U_Mailbox::dputMessage(
@@ -791,13 +793,23 @@ namespace wrench {
 
 //        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
-        // Sort all the actions in the ready queue by (job.priority, action.priority)
+
+        // Sort all the actions in the ready queue by (job.priority, action.priority, action.name)
+        // TODO: This may be a performance bottleneck... may have to remedy
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
                   [](const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b) -> bool {
                       if (a->getJob() != b->getJob()) {
                           if (a->getJob()->getPriority() > b->getJob()->getPriority()) {
                               return true;
                           } else if (a->getJob()->getPriority() < b->getJob()->getPriority()) {
+                              return false;
+                          } else if (a->getPriority() > b->getPriority()) {
+                              return true;
+                          } else if (a->getPriority() < b->getPriority()) {
+                              return false;
+                          } else if (a->getName() < b->getName()) {
+                              return true;
+                          } else if (a->getName() < b->getName()) {
                               return false;
                           } else {
                               return (unsigned long)(a->getJob().get()) > (unsigned long)(b->getJob().get());
@@ -806,6 +818,10 @@ namespace wrench {
                           if (a->getPriority() > b->getPriority()) {
                               return true;
                           } else if (a->getPriority() < b->getPriority()) {
+                              return false;
+                          } else if (a->getName() < b->getName()) {
+                              return true;
+                          } else if (a->getName() > b->getName()) {
                               return false;
                           } else {
                               return (unsigned long)(a.get()) > (unsigned long)(b.get());
