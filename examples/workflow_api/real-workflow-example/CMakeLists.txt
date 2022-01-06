@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-real-workflow
+        EXCLUDE_FROM_ALL
         ./SimpleWMS.h
         ./SimpleWMS.cpp
         ./SimpleWorkflowSimulator.cpp)

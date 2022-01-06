@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-virtualized-cluster-bag-of-tasks
+        EXCLUDE_FROM_ALL
         ./TwoTasksAtATimeVirtualizedClusterWMS.h
         ./TwoTasksAtATimeVirtualizedClusterWMS.cpp
         ./VirtualizedClusterBagOfTasks.cpp)

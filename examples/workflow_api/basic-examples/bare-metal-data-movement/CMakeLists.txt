@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-bare-metal-data-movement
+        EXCLUDE_FROM_ALL
         ./DataMovementWMS.h
         ./DataMovementWMS.cpp
         ./DataMovement.cpp)

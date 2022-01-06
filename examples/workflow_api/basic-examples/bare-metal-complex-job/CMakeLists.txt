@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-bare-metal-complex-job
+        EXCLUDE_FROM_ALL
         ./ComplexJobWMS.h
         ./ComplexJobWMS.cpp
         ./ComplexJob.cpp)

@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-bare-metal-bag-of-tasks-programmatic-platform
+        EXCLUDE_FROM_ALL
         ./TwoTasksAtATimeWMS.h
         ./TwoTasksAtATimeWMS.cpp
         ./BareMetalBagOfTasksProgrammaticPlatform.cpp)

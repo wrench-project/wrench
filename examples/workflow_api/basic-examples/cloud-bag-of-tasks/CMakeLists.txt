@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-cloud-bag-of-tasks
+        EXCLUDE_FROM_ALL
         ./TwoTasksAtATimeCloudWMS.h
         ./TwoTasksAtATimeCloudWMS.cpp
         ./CloudBagOfTasks.cpp)

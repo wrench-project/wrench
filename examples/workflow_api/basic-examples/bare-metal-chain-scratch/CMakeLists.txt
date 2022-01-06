@@ -3,6 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Add source to this project's executable.
 add_executable(wrench-example-bare-metal-chain-scratch
+        EXCLUDE_FROM_ALL
         ./WorkflowAsAsingleJobWMS.h
         ./WorkflowAsAsingleJobWMS.cpp
         ./BareMetalChainScratch.cpp)

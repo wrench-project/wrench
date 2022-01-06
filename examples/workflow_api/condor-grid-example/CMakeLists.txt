@@ -14,7 +14,9 @@ set(SOURCE_FILES
 set(CONDOR_GRID CondorGridSimulator.cpp)
 
 # Add source to this project's executable.
-add_executable(wrench-example-condor-grid-universe ${SOURCE_FILES} ${CONDOR_GRID})
+add_executable(wrench-example-condor-grid-universe
+        EXCLUDE_FROM_ALL
+        ${SOURCE_FILES} ${CONDOR_GRID})
 
 add_custom_target(
         wrench-example-condor-grid-universe-file
