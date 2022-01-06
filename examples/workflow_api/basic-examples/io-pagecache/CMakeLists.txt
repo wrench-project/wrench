@@ -31,7 +31,7 @@ else()
     target_link_libraries(wrench-example-io-pagecache-single wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
-install(TARGETS wrench-example-io-pagecache-single DESTINATION bin)
+#install(TARGETS wrench-example-io-pagecache-single DESTINATION bin)
 
 #============================================================
 set(SOURCE_FILES
@@ -53,7 +53,7 @@ else()
     target_link_libraries(wrench-example-io-pagecache-multi wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
-install(TARGETS wrench-example-io-pagecache-multi DESTINATION bin)
+#install(TARGETS wrench-example-io-pagecache-multi DESTINATION bin)
 
 #============================================================
 set(SOURCE_FILES
@@ -75,7 +75,7 @@ else()
     target_link_libraries(wrench-example-io-pagecache-nfs wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
-install(TARGETS wrench-example-io-pagecache-nfs DESTINATION bin)
+#install(TARGETS wrench-example-io-pagecache-nfs DESTINATION bin)
 
 #============================================================
 set(SOURCE_FILES
@@ -97,4 +97,4 @@ else()
     target_link_libraries(wrench-example-io-pagecache-nighres wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
-install(TARGETS wrench-example-io-pagecache-nighres DESTINATION bin)
+#install(TARGETS wrench-example-io-pagecache-nighres DESTINATION bin)
