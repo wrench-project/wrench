@@ -36,14 +36,13 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(std::string answer_mailbox,
+    StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(const std::string &answer_mailbox,
                                                                                  double payload)
-            : StorageServiceMessage("FREE_SPACE_REQUEST", payload) {
+            : StorageServiceMessage("FREE_SPACE_REQUEST", payload), answer_mailbox(answer_mailbox) {
         if ((answer_mailbox == "")) {
             throw std::invalid_argument(
                     "StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -75,19 +74,16 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
+    StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(const std::string &answer_mailbox,
                                                                                    std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
             : StorageServiceMessage("FILE_LOOKUP_REQUEST",
-                                    payload) {
+                                    payload), answer_mailbox(answer_mailbox), file(file), location(location) {
         if ((file == nullptr) || (location == nullptr) || (answer_mailbox.empty())) {
             throw std::invalid_argument(
                     "StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->location = location;
     }
 
     /**
@@ -121,20 +117,17 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
+    StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(const std::string &answer_mailbox,
                                                                                    std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
             : StorageServiceMessage("FILE_DELETE_REQUEST",
-                                    payload) {
+                                    payload), answer_mailbox(answer_mailbox), file(file), location(location) {
 
         if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
         }
-        this->file = file;
-        this->answer_mailbox = answer_mailbox;
-        this->location = location;
     }
 
     /**
@@ -177,28 +170,18 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
+    StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(const std::string &answer_mailbox,
                                                                                std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
                                                                                double payload) : StorageServiceMessage(
-            "FILE_COPY_REQUEST", payload) {
+            "FILE_COPY_REQUEST", payload), answer_mailbox(answer_mailbox), file(file), src(src), dst(dst), file_registry_service(file_registry_service) {
         if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)
             || (dst == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->src = src;
-        this->dst = dst;
-        this->file_registry_service = file_registry_service;
-
-
-        /**
-         *
-         */
     }
 
     /**
@@ -250,23 +233,18 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
+    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(const std::string &answer_mailbox,
                                                                                  std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  unsigned long buffer_size,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
-                                    payload) {
+                                    payload), answer_mailbox(answer_mailbox), file(file), location(location), buffer_size(buffer_size) {
 
         if ((answer_mailbox.empty()) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
-        this->payload = payload;
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->location = location;
-        this->buffer_size = buffer_size;
     }
 
     /**
@@ -314,7 +292,7 @@ namespace wrench {
    *
    * @throw std::invalid_argument
    */
-    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(const std::string &answer_mailbox,
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> location,
@@ -322,18 +300,12 @@ namespace wrench {
                                                                                unsigned long buffer_size,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
-            payload) {
+            payload), answer_mailbox(answer_mailbox), mailbox_to_receive_the_file_content(mailbox_to_receive_the_file_content), file(file), location(location), num_bytes_to_read(num_bytes_to_read), buffer_size(buffer_size) {
         if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") ||
             (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
             throw std::invalid_argument(
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
-        this->file = file;
-        this->location = location;
-        this->num_bytes_to_read = num_bytes_to_read;
-        this->buffer_size = buffer_size;
     }
 
     /**

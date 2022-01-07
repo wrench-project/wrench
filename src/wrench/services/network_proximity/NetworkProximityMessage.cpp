@@ -26,17 +26,15 @@ namespace wrench {
      * @param hosts: the pair of hosts to look up
      * @param payload: the message size in bytes
      */
-    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(std::string answer_mailbox,
+    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(const std::string &answer_mailbox,
                                                                                std::pair<std::string, std::string> hosts,
                                                                                double payload) :
-            NetworkProximityMessage("PROXIMITY_LOOKUP_REQUEST", payload) {
+            NetworkProximityMessage("PROXIMITY_LOOKUP_REQUEST", payload), answer_mailbox(answer_mailbox), hosts(hosts) {
 
         if ((answer_mailbox == "") || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
             throw std::invalid_argument(
                     "NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->hosts = hosts;
     }
 
 
@@ -124,15 +122,13 @@ namespace wrench {
      * @param requested_host: the naje of the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
-    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox,
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(const std::string &answer_mailbox,
                                                                    std::string requested_host, double payload) :
-            NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
+            NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload), answer_mailbox(answer_mailbox), requested_host(requested_host) {
         if (answer_mailbox == "" || requested_host == "") {
             throw std::invalid_argument(
                     "CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->requested_host = requested_host;
     }
 
     /**

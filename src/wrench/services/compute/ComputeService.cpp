@@ -203,18 +203,14 @@ namespace wrench {
      */
     unsigned long ComputeService::getNumHosts() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("num_hosts");
         } catch (ExecutionException &e) {
             throw;
         }
 
-        unsigned long count = 0;
-        if (dict.find("num_hosts") != dict.end()) {
-            count += (unsigned long) (*(dict["num_hosts"].begin())).second;
-        }
-        return count;
+        return (unsigned long) (*(dict.begin())).second;;
     }
 
     /**
@@ -226,19 +222,17 @@ namespace wrench {
       */
     std::vector<std::string> ComputeService::getHosts() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("num_cores");
         } catch (ExecutionException &e) {
             throw;
         }
 
         std::vector<std::string> to_return;
 
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_cores"]) {
-                to_return.emplace_back(x.first);
-            }
+        for (auto const &x : dict) {
+            to_return.emplace_back(x.first);
         }
 
         return to_return;
@@ -255,19 +249,17 @@ namespace wrench {
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("num_cores");
         } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, unsigned long> to_return;
 
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_cores"]) {
-                to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
 
         return to_return;
@@ -282,18 +274,16 @@ namespace wrench {
       */
     unsigned long ComputeService::getTotalNumCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("num_cores");
         } catch (ExecutionException &e) {
             throw;
         }
 
         unsigned long count = 0;
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_cores"]) {
-                count += (unsigned long) x.second;
-            }
+        for (auto const &x : dict) {
+            count += (unsigned long) x.second;
         }
         return count;
     }
@@ -308,19 +298,17 @@ namespace wrench {
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("num_idle_cores");
         } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, unsigned long> to_return;
 
-        if (dict.find("num_idle_cores") != dict.end()) {
-            for (auto x : dict["num_idle_cores"]) {
-                to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
 
         return to_return;
@@ -335,19 +323,17 @@ namespace wrench {
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("ram_availabilities");
         } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, double> to_return;
 
-        if (dict.find("ram_availabilities") != dict.end()) {
-            for (auto x : dict["ram_availabilities"]) {
-                to_return.insert(std::make_pair(x.first, (double) x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, (double) x.second));
         }
 
         return to_return;
@@ -362,19 +348,17 @@ namespace wrench {
      */
     unsigned long ComputeService::getTotalNumIdleCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("num_idle_cores");
         } catch (ExecutionException &e) {
             throw;
         }
 
 
         unsigned long count = 0;
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_idle_cores"]) {
-                count += (unsigned long) x.second;
-            }
+        for (auto const &x : dict) {
+            count += (unsigned long) x.second;
         }
         return count;
     }
@@ -429,18 +413,16 @@ namespace wrench {
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("flop_rates");
         } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, double> to_return;
-        if (dict.find("flop_rates") != dict.end()) {
-            for (auto x : dict["flop_rates"]) {
-                to_return.insert(std::make_pair(x.first, x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, x.second));
         }
 
         return to_return;
@@ -454,19 +436,17 @@ namespace wrench {
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("ram_capacities");
         } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, double> to_return;
 
-        if (dict.find("ram_capacities") != dict.end()) {
-            for (auto x : dict["ram_capacities"]) {
-                to_return.insert(std::make_pair(x.first, x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, x.second));
         }
 
         return to_return;
@@ -480,24 +460,25 @@ namespace wrench {
      */
     double ComputeService::getTTL() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
+            dict = this->getServiceResourceInformation("ttl");
         } catch (ExecutionException &e) {
             throw;
         }
 
-        return (*(dict["ttl"].begin())).second;
+        return (*(dict.begin())).second;
     }
 
     /**
      * @brief Get information about the compute service as a dictionary of vectors
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @return service information
      *
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
+    std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key) {
 
         assertServiceIsUp();
 
@@ -507,6 +488,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
                     answer_mailbox,
+                    key,
                     this->getMessagePayloadValue(
                             ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {

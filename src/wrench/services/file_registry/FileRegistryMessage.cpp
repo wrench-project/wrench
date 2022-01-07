@@ -28,16 +28,14 @@ namespace wrench {
      * @param file: the file to look up
      * @param payload: the message size in bytes
      */
-    FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(std::string answer_mailbox,
+    FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(const std::string &answer_mailbox,
                                                                                std::shared_ptr<DataFile>file, double payload) :
-            FileRegistryMessage("FILE_LOOKUP_REQUEST", payload) {
+            FileRegistryMessage("FILE_LOOKUP_REQUEST", payload), answer_mailbox(answer_mailbox), file(file) {
 
         if ((answer_mailbox == "") || file == nullptr) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
     }
 
     /**
@@ -109,18 +107,15 @@ namespace wrench {
      * @param location: the file location of that entry
      * @param payload: the message size in bytes
      */
-    FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox,
+    FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(const std::string &answer_mailbox,
                                                                                  std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  double payload) :
-            FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload) {
+            FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload), answer_mailbox(answer_mailbox), file(file), location(location) {
         if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->location = location;
     }
 
 
@@ -142,19 +137,15 @@ namespace wrench {
      * @param location: the location for the new entry
      * @param payload: the message size in bytes
      */
-    FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(std::string answer_mailbox,
+    FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(const std::string &answer_mailbox,
                                                                            std::shared_ptr<DataFile>file,
                                                                            std::shared_ptr<FileLocation> location,
                                                                            double payload) :
-            FileRegistryMessage("ADD_ENTRY_REQUEST", payload) {
+            FileRegistryMessage("ADD_ENTRY_REQUEST", payload), answer_mailbox(answer_mailbox), file(file), location(location) {
         if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->location = location;
-
     }
 
     /**

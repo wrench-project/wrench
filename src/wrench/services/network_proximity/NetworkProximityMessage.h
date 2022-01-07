@@ -34,11 +34,11 @@ namespace wrench {
      */
     class NetworkProximityLookupRequestMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityLookupRequestMessage(std::string answer_mailbox, std::pair<std::string, std::string> hosts,
+        NetworkProximityLookupRequestMessage(const std::string &answer_mailbox, std::pair<std::string, std::string> hosts,
                                              double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The hosts between which to calculate a proximity value */
         std::pair<std::string, std::string> hosts;
     };
@@ -119,10 +119,10 @@ namespace wrench {
      */
     class CoordinateLookupRequestMessage : public NetworkProximityMessage {
     public:
-        CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload);
+        CoordinateLookupRequestMessage(const std::string &answer_mailbox, std::string requested_host, double payload);
 
         /** @brief The mailbox to which the answer should be sent back */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
 
         /** @brief The name of the host whose coordinates are being requested */
         std::string requested_host;

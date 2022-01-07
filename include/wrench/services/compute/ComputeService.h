@@ -200,7 +200,7 @@ namespace wrench {
 
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
-        std::map<std::string, std::map<std::string, double>> getServiceResourceInformation();
+        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries);
 
     };
 

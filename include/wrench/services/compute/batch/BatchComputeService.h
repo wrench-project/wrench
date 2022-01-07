@@ -243,7 +243,7 @@ namespace wrench {
 
         void startBackgroundWorkloadProcess();
 
-        void processGetResourceInformation(const std::string &answer_mailbox);
+        void processGetResourceInformation(const std::string &answer_mailbox, const std::string &key);
 
         void processCompoundJobCompletion(std::shared_ptr<BareMetalComputeServiceOneShot> executor, std::shared_ptr<CompoundJob> job);
 
