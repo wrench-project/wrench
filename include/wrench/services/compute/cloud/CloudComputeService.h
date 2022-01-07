@@ -152,7 +152,8 @@ namespace wrench {
 
         virtual bool processNextMessage();
 
-        virtual void processGetResourceInformation(const std::string &answer_mailbox);
+        virtual void processGetResourceInformation(const std::string &answer_mailbox,
+                                                   const std::string &key);
 
         virtual void processGetExecutionHosts(const std::string &answer_mailbox);
 

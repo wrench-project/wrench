@@ -75,7 +75,7 @@ namespace wrench {
 
         std::map<std::string, std::tuple<unsigned long, double>> &getComputeResources();
 
-        std::map<std::string, std::map<std::string, double>> getResourceInformation();
+        std::map<std::string, double> getResourceInformation(const std::string &key);
 
         ~ActionExecutionService();
 

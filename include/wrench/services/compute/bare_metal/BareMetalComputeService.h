@@ -194,7 +194,7 @@ namespace wrench {
 
         void terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
 
-        void processGetResourceInformation(const std::string &answer_mailbox);
+        void processGetResourceInformation(const std::string &answer_mailbox, const std::string &key);
 
 //        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 

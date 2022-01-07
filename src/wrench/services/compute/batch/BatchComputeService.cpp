@@ -778,7 +778,7 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-            processGetResourceInformation(msg->answer_mailbox);
+            processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
         } else if (auto msg = dynamic_cast<BatchComputeServiceJobRequestMessage *>(message.get())) {
@@ -1065,58 +1065,64 @@ namespace wrench {
     /**
     * @brief Process a "get resource description message"
     * @param answer_mailbox: the mailbox to which the description message should be sent
+    * @param key: the desired resource information (i.e., dictionary key) that's needed)
     */
-    void BatchComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
+    void BatchComputeService::processGetResourceInformation(const std::string &answer_mailbox, const std::string &key) {
         // Build a dictionary
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
 
-        // Num hosts
-        std::map<std::string, double> num_hosts;
-        num_hosts.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
-        dict.insert(std::make_pair("num_hosts", num_hosts));
+        if (key == "num_hosts") {
 
-        // Num cores per hosts
-        std::map<std::string, double> num_cores;
-        for (auto h : this->nodes_to_cores_map) {
-            num_cores.insert(std::make_pair(h.first, (double) (h.second)));
-        }
-        dict.insert(std::make_pair("num_cores", num_cores));
+            // Num hosts
+            dict.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
 
-        // Num idle cores per hosts
-        std::map<std::string, double> num_idle_cores;
-        for (auto h : this->available_nodes_to_cores) {
-            num_idle_cores.insert(std::make_pair(h.first, (double) (h.second)));
-        }
-        dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
+        } else if (key == "num_cores") {
 
-        // Flop rate per host
-        std::map<std::string, double> flop_rates;
-        for (auto h : this->nodes_to_cores_map) {
-            flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
-        }
-        dict.insert(std::make_pair("flop_rates", flop_rates));
-
-        // RAM capacity per host
-        std::map<std::string, double> ram_capacities;
-        for (auto h : this->nodes_to_cores_map) {
-            ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
-        }
-        dict.insert(std::make_pair("ram_capacities", ram_capacities));
-
-        // RAM availability per host  (0 if something is running, full otherwise)
-        std::map<std::string, double> ram_availabilities;
-        for (auto h : this->available_nodes_to_cores) {
-            if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
-                ram_availabilities.insert(std::make_pair(h.first, 0.0));
-            } else {
-                ram_availabilities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
+            for (auto h : this->nodes_to_cores_map) {
+                dict.insert(std::make_pair(h.first, (double) (h.second)));
             }
-        }
-        dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
-        std::map<std::string, double> ttl;
-        ttl.insert(std::make_pair(this->getName(), DBL_MAX));
-        dict.insert(std::make_pair("ttl", ttl));
+        } else if (key == "num_idle_cores") {
+
+            // Num idle cores per hosts
+            for (auto h : this->available_nodes_to_cores) {
+                dict.insert(std::make_pair(h.first, (double) (h.second)));
+            }
+
+        } else if (key == "flop_rates") {
+
+            // Flop rate per host
+            for (auto h : this->nodes_to_cores_map) {
+                dict.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
+            }
+
+        } else if (key == "ram_capacities") {
+
+            // RAM capacity per host
+            for (auto h : this->nodes_to_cores_map) {
+                dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
+            }
+
+        } else if (key == "ram_availabilities") {
+
+            // RAM availability per host  (0 if something is running, full otherwise)
+            for (auto h : this->available_nodes_to_cores) {
+                if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
+                    dict.insert(std::make_pair(h.first, 0.0));
+                } else {
+                    dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
+                }
+            }
+
+        } else if (key == "ttl") {
+
+            dict.insert(std::make_pair(this->getName(), DBL_MAX));
+
+        } else {
+
+            throw std::runtime_error("BatchComputeService::processGetResourceInformation(): unknown key");
+
+        }
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(

@@ -9,6 +9,7 @@
 
 
 #include <iostream>
+#include <utility>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 
 namespace wrench {
@@ -32,18 +33,16 @@ namespace wrench {
    * @throw std::invalid_arguments
    */
     ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(
-            const std::string answer_mailbox,
+            const std::string &answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             const std::map<std::string, std::string> service_specific_args,
             double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload),
-            service_specific_args(service_specific_args) {
+            answer_mailbox(answer_mailbox), job(job), service_specific_args(service_specific_args) {
         if ((answer_mailbox.empty()) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->job = job;
     }
 
     /**
@@ -123,16 +122,14 @@ namespace wrench {
     * @throw std::invalid_arguments
     */
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
-            std::string answer_mailbox,
+            const std::string &answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             double payload) :
-            ComputeServiceMessage("TERMINATE_COMPOUND_JOB_REQUEST", payload) {
+            ComputeServiceMessage("TERMINATE_COMPOUND_JOB_REQUEST", payload), answer_mailbox(answer_mailbox), job(job) {
         if ((answer_mailbox == "") || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->job = job;
     }
 
     /**
@@ -332,19 +329,20 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer should be sent
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
-            std::string answer_mailbox,
+            const std::string& answer_mailbox,
+            const std::string &key,
             double payload)
-            : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload) {
-        if (answer_mailbox.empty()) {
+            : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload), answer_mailbox(answer_mailbox), key(key) {
+        if (answer_mailbox.empty() or key.empty()) {
             throw std::invalid_argument(
                     "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
     }
 
 
@@ -356,8 +354,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
-            std::map<std::string, std::map<std::string, double>> info, double payload)
-            : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
+            std::map<std::string, double> info, double payload)
+            : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(std::move(info)) {}
 
 
     /**

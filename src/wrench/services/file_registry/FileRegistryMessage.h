@@ -38,10 +38,10 @@ namespace wrench {
      */
     class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupRequestMessage(std::string answer_mailbox, std::shared_ptr<DataFile>file, double payload);
+        FileRegistryFileLookupRequestMessage(const std::string &answer_mailbox, std::shared_ptr<DataFile>file, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The file to lookup */
         std::shared_ptr<DataFile>file;
     };
@@ -123,11 +123,11 @@ namespace wrench {
      */
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, std::shared_ptr<DataFile>file,
+        FileRegistryRemoveEntryRequestMessage(const std::string &answer_mailbox, std::shared_ptr<DataFile>file,
                                               std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The file for which one entry should be removed */
         std::shared_ptr<DataFile>file;
         /** @brief The location to remove */
@@ -150,11 +150,11 @@ namespace wrench {
      */
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryAddEntryRequestMessage(std::string answer_mailbox, std::shared_ptr<DataFile>file,
+        FileRegistryAddEntryRequestMessage(const std::string &answer_mailbox, std::shared_ptr<DataFile>file,
                                            std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The file for which to add an entry */
         std::shared_ptr<DataFile>file;
         /** @brief The location in that entry */

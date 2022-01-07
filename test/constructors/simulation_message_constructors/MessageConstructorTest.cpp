@@ -211,10 +211,11 @@ private:
         CUSTOM_THROW(new wrench::ComputeServiceTerminateCompoundJobAnswerMessage(compound_job, compute_service, false, nullptr, 666), std::invalid_argument);
 
 
-        CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox", 666));
-        CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("", 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox", "stuff", 666));
+        CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("", "stuff", 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox", "", 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::map<std::string, double>({{"aa", 2.3}, {"bb", 4.5}}))}, 666));
+        CUSTOM_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::map<std::string, double>({{"aa", 2.3}, {"bb", 4.5}})}, 666));
 
 
         CUSTOM_NO_THROW(new wrench::CloudComputeServiceGetExecutionHostsRequestMessage("mailbox", 600));

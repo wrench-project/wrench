@@ -493,7 +493,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-            processGetResourceInformation(msg->answer_mailbox);
+            processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
         } else if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage *>(message.get())) {
@@ -725,12 +725,18 @@ namespace wrench {
 /**
  * @brief Process a "get resource description message"
  * @param answer_mailbox: the mailbox to which the description message should be sent
+ * @param key: the desired resource information (i.e., dictionary key) that's needed)
  */
-    void BareMetalComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
-        auto dict = this->action_execution_service->getResourceInformation();
+    void BareMetalComputeService::processGetResourceInformation(const std::string &answer_mailbox,
+                                                                const std::string &key) {
 
-        // Add the ttl
-        dict["ttl"] = {{"ttl", this->ttl}};
+        std::map<std::string, double> dict;
+
+        if (key == "ttl") {
+            dict["ttl"] = this->ttl;
+        } else {
+            dict = this->action_execution_service->getResourceInformation(key);
+        }
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(
