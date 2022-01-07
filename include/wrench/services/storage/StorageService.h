@@ -73,7 +73,7 @@ namespace wrench {
                                      std::shared_ptr<FileLocation> dst_location);
 
 
-        static void initiateFileCopy(std::string answer_mailbox,
+        static void initiateFileCopy(std::string &answer_mailbox,
                                       std::shared_ptr<DataFile>file,
                                       std::shared_ptr<FileLocation> src_location,
                                       std::shared_ptr<FileLocation> dst_location);
