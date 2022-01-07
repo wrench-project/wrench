@@ -624,7 +624,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(std::string answer_mailbox, std::shared_ptr<DataFile>file,
+    void StorageService::initiateFileCopy(std::string &answer_mailbox, std::shared_ptr<DataFile>file,
                                           std::shared_ptr<FileLocation> src_location,
                                           std::shared_ptr<FileLocation> dst_location) {
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
