@@ -225,6 +225,11 @@ namespace wrench {
                                           msg->mailbox_to_receive_the_file_content, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
+            std::cerr << msg->file.get() << "\n";
+            std::cerr << msg->src.get() << "\n";
+            std::cerr << msg->dst.get() << "\n";
+            std::cerr << msg->answer_mailbox << "\n";
+
             return processFileCopyRequest(msg->file, msg->src, msg->dst, msg->answer_mailbox);
 
         } else if (auto msg = dynamic_cast<FileTransferThreadNotificationMessage*>(message.get())) {
