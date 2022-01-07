@@ -136,12 +136,13 @@ namespace wrench {
      */
     class ComputeServiceSubmitCompoundJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitCompoundJobRequestMessage(const std::string answer_mailbox, std::shared_ptr<CompoundJob> ,
+        ComputeServiceSubmitCompoundJobRequestMessage(const std::string &answer_mailbox,
+                                                      std::shared_ptr<CompoundJob> job,
                                                       const std::map<std::string, std::string> service_specific_args,
                                                       double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The submitted job */
         std::shared_ptr<CompoundJob> job;
         /** @brief Service specific arguments */
@@ -198,10 +199,10 @@ namespace wrench {
     */
     class ComputeServiceTerminateCompoundJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceTerminateCompoundJobRequestMessage(std::string answer_mailbox, std::shared_ptr<CompoundJob> , double payload);
+        ComputeServiceTerminateCompoundJobRequestMessage(const std::string &answer_mailbox, std::shared_ptr<CompoundJob> , double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The job to terminate*/
         std::shared_ptr<CompoundJob> job;
     };
@@ -343,10 +344,12 @@ namespace wrench {
     */
     class ComputeServiceResourceInformationRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceInformationRequestMessage(std::string answer_mailbox, double payload);
+        ComputeServiceResourceInformationRequestMessage(const std::string& answer_mailbox, const std::string &key, double payload);
 
         /** @brief The mailbox to which the answer should be sent */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
+        /** @brief The key (i.e., resource information name) desired */
+        const std::string &key;
     };
 
     /**
@@ -354,11 +357,11 @@ namespace wrench {
      */
     class ComputeServiceResourceInformationAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::map<std::string, double>> info,
+        ComputeServiceResourceInformationAnswerMessage(std::map<std::string, double> info,
                                                        double payload);
 
         /** @brief The resource information map */
-        std::map<std::string, std::map<std::string, double>> info;
+        std::map<std::string, double> info;
     };
 
     /**

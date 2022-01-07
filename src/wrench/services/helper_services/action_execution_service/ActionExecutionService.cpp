@@ -1020,56 +1020,70 @@ namespace wrench {
     /**
      * @brief Return resource information
      * @param answer_mailbox: the mailbox to which the description message should be sent
-     * @return resource information map
+     * @return resource information
      */
-    std::map<std::string, std::map<std::string, double>> ActionExecutionService::getResourceInformation() {
+    std::map<std::string, double> ActionExecutionService::getResourceInformation(const std::string &key) {
         // Build a dictionary
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> information;
 
-        // Num hosts
-        std::map<std::string, double> num_hosts;
-        num_hosts.insert(std::make_pair(this->getName(), this->compute_resources.size()));
-        dict.insert(std::make_pair("num_hosts", num_hosts));
+        if (key == "num_hosts") {
 
-        // Num cores per hosts
-        std::map<std::string, double> num_cores;
-        for (auto r : this->compute_resources) {
-            num_cores.insert(std::make_pair(r.first, (double) (std::get<0>(r.second))));
+            // Num hosts
+            std::map<std::string, double> num_hosts;
+            num_hosts.insert(std::make_pair(this->getName(), this->compute_resources.size()));
+            return num_hosts;
+
+        }  else if (key == "num_cores") {
+
+            // Num cores per hosts
+            std::map<std::string, double> num_cores;
+            for (auto r : this->compute_resources) {
+                num_cores.insert(std::make_pair(r.first, (double) (std::get<0>(r.second))));
+            }
+            return num_cores;
+
+        } else if (key == "num_idle_cores") {
+
+            // Num idle cores per hosts
+            std::map<std::string, double> num_idle_cores;
+            for (auto r : this->running_thread_counts) {
+                unsigned long cores = std::get<0>(this->compute_resources[r.first]);
+                unsigned long running_threads = r.second;
+                num_idle_cores.insert(
+                        std::make_pair(r.first, (double) (std::max<unsigned long>(cores - running_threads, 0))));
+            }
+            return num_idle_cores;
+
+        } else if (key == "flop_rates") {
+
+            // Flop rate per host
+            std::map<std::string, double> flop_rates;
+            for (auto h : this->compute_resources) {
+                flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(std::get<0>(h))));
+            }
+            return flop_rates;
+
+        } else if (key == "ram_capacities") {
+
+            // RAM capacity per host
+            std::map<std::string, double> ram_capacities;
+            for (auto h : this->compute_resources) {
+                ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(std::get<0>(h))));
+            }
+            return ram_capacities;
+
+        } else if (key == "ram_availabilities") {
+
+            // RAM availability per host
+            std::map<std::string, double> ram_availabilities_to_return;
+            for (auto r : this->ram_availabilities) {
+                ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
+            }
+            return ram_availabilities_to_return;
+
+        } else {
+            throw std::runtime_error("ActionExecutionService::getResourceInformation(): unknown key");
         }
-        dict.insert(std::make_pair("num_cores", num_cores));
-
-        // Num idle cores per hosts
-        std::map<std::string, double> num_idle_cores;
-        for (auto r : this->running_thread_counts) {
-            unsigned long cores = std::get<0>(this->compute_resources[r.first]);
-            unsigned long running_threads = r.second;
-            num_idle_cores.insert(
-                    std::make_pair(r.first, (double) (std::max<unsigned long>(cores - running_threads, 0))));
-        }
-        dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
-
-        // Flop rate per host
-        std::map<std::string, double> flop_rates;
-        for (auto h : this->compute_resources) {
-            flop_rates.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(std::get<0>(h))));
-        }
-        dict.insert(std::make_pair("flop_rates", flop_rates));
-
-        // RAM capacity per host
-        std::map<std::string, double> ram_capacities;
-        for (auto h : this->compute_resources) {
-            ram_capacities.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(std::get<0>(h))));
-        }
-        dict.insert(std::make_pair("ram_capacities", ram_capacities));
-
-        // RAM availability per host
-        std::map<std::string, double> ram_availabilities_to_return;
-        for (auto r : this->ram_availabilities) {
-            ram_availabilities_to_return.insert(std::make_pair(r.first, r.second));
-        }
-        dict.insert(std::make_pair("ram_availabilities", ram_availabilities_to_return));
-
-        return dict;
     }
 
 /**

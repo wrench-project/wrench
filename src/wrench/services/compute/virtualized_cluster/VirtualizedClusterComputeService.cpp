@@ -192,7 +192,7 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-            processGetResourceInformation(msg->answer_mailbox);
+            processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {

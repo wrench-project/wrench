@@ -551,7 +551,7 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-            processGetResourceInformation(msg->answer_mailbox);
+            processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {
@@ -1087,64 +1087,79 @@ namespace wrench {
     /**
      * @brief Process a "get resource information message"
      * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
      */
-    void CloudComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
+    void CloudComputeService::processGetResourceInformation(const std::string &answer_mailbox,
+                                                            const std::string &key) {
         // Build a dictionary
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
 
-        // Num hosts
-        std::map<std::string, double> num_hosts;
-        num_hosts.insert(std::make_pair(this->getName(), (double) (this->vm_list.size())));
-        dict.insert(std::make_pair("num_hosts", num_hosts));
+        if (key == "num_hosts") {
 
-        std::map<std::string, double> num_cores;
-        std::map<std::string, double> num_idle_cores;
-        std::map<std::string, double> flop_rates;
-        std::map<std::string, double> ram_capacities;
-        std::map<std::string, double> ram_availabilities;
+            // Num hosts
+            dict.insert(std::make_pair(this->getName(), (double) (this->vm_list.size())));
 
-        for (auto &host : this->execution_hosts) {
+        } else if (key == "num_cores") {
+
             // Total num cores
-            unsigned long total_num_cores = Simulation::getHostNumCores(host);
-            num_cores.insert(std::make_pair(host, (double) total_num_cores));
-            // Idle cores
-            unsigned long num_cores_allocated_to_vms = 0;
-            for (auto &vm_pair : this->vm_list) {
-                auto actual_vm = vm_pair.second.first;
-                if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and
-                    (actual_vm->getPhysicalHostname() == host)) {
-                    num_cores_allocated_to_vms += actual_vm->getNumCores();
-                }
+            for (auto &host : this->execution_hosts) {
+                unsigned long total_num_cores = Simulation::getHostNumCores(host);
+                dict.insert(std::make_pair(host, (double) total_num_cores));
             }
-            num_idle_cores.insert(std::make_pair(host, (double) (total_num_cores - num_cores_allocated_to_vms)));
-            // Total RAM
-            double total_ram = Simulation::getHostMemoryCapacity(host);
-            ram_capacities.insert(std::make_pair(host, total_ram));
-            // Available RAM
-            double ram_allocated_to_vms = 0;
-            for (auto &vm_pair : this->vm_list) {
-                auto actual_vm = vm_pair.second.first;
-                if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and
-                    (actual_vm->getPhysicalHostname() == host)) {
-                    ram_allocated_to_vms += actual_vm->getMemory();
-                }
-            }
-            ram_availabilities.insert(std::make_pair(host, total_ram - ram_allocated_to_vms));
 
-            // Flop rate
-            double flop_rate = Simulation::getHostFlopRate(host);
-            flop_rates.insert(std::make_pair(host, flop_rate));
+        } else if (key == "num_idle_cores") {
+
+            for (auto &host : this->execution_hosts) {
+                // Total num cores
+                unsigned long total_num_cores = Simulation::getHostNumCores(host);
+                // Idle cores
+                unsigned long num_cores_allocated_to_vms = 0;
+                for (auto &vm_pair : this->vm_list) {
+                    auto actual_vm = vm_pair.second.first;
+                    if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and
+                        (actual_vm->getPhysicalHostname() == host)) {
+                        num_cores_allocated_to_vms += actual_vm->getNumCores();
+                    }
+                }
+                dict.insert(std::make_pair(host, (double) (total_num_cores - num_cores_allocated_to_vms)));
+            }
+        } else if (key == "flop_rates") {
+
+            for (auto &host : this->execution_hosts) {
+                double flop_rate = Simulation::getHostFlopRate(host);
+                dict.insert(std::make_pair(host, flop_rate));
+            }
+
+        } else if (key == "ram_capacities") {
+
+            for (auto &host : this->execution_hosts) {
+                double total_ram = Simulation::getHostMemoryCapacity(host);
+                dict.insert(std::make_pair(host, total_ram));
+            }
+
+        } else if (key == "ram_availabilities") {
+
+            for (auto &host : this->execution_hosts) {
+                double total_ram = Simulation::getHostMemoryCapacity(host);
+                // Available RAM
+                double ram_allocated_to_vms = 0;
+                for (auto &vm_pair : this->vm_list) {
+                    auto actual_vm = vm_pair.second.first;
+                    if ((actual_vm->getState() != S4U_VirtualMachine::DOWN) and
+                        (actual_vm->getPhysicalHostname() == host)) {
+                        ram_allocated_to_vms += actual_vm->getMemory();
+                    }
+                }
+                dict.insert(std::make_pair(host, total_ram - ram_allocated_to_vms));
+            }
+
+        } else if (key == "ttl") {
+
+            dict.insert(std::make_pair(this->getName(), DBL_MAX));
+
+        } else {
+            throw std::runtime_error("CloudComputeService::processGetResourceInformation(): unknown key");
         }
-
-        dict.insert(std::make_pair("num_cores", num_cores));
-        dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
-        dict.insert(std::make_pair("flop_rates", flop_rates));
-        dict.insert(std::make_pair("ram_capacities", ram_capacities));
-        dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
-
-        std::map<std::string, double> ttl;
-        ttl.insert(std::make_pair(this->getName(), DBL_MAX));
-        dict.insert(std::make_pair("ttl", ttl));
 
         // Send the reply
         auto *answer_message = new ComputeServiceResourceInformationAnswerMessage(

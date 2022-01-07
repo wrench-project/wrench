@@ -32,10 +32,10 @@ namespace wrench{
      */
     class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
-        BatchComputeServiceJobRequestMessage(std::string answer_mailbox, std::shared_ptr<BatchJob> job , double payload);
+        BatchComputeServiceJobRequestMessage(const std::string &answer_mailbox, std::shared_ptr<BatchJob> job , double payload);
 
         /** @brief The mailbox to answer to */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
         /** @brief The batch_standard_and_pilot_jobs job */
         std::shared_ptr<BatchJob> job;
     };
@@ -99,10 +99,10 @@ namespace wrench{
      */
     class BatchExecuteJobFromBatSchedMessage : public BatchComputeServiceMessage {
     public:
-        BatchExecuteJobFromBatSchedMessage(std::string answer_mailbox, std::string batsched_decision_reply, double payload);
+        BatchExecuteJobFromBatSchedMessage(const std::string &answer_mailbox, std::string batsched_decision_reply, double payload);
 
         /** @brief The mailbox to answer to */
-        std::string answer_mailbox;
+        const std::string &answer_mailbox;
 
         /** @brief The decision reply from Batsched */
         std::string batsched_decision_reply;
