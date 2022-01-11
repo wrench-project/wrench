@@ -400,7 +400,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): unexpected [" + msg->getName() +
+                    "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): unexpected [" + message->getName() +
                     "] message");
         }
     }
@@ -508,7 +508,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + message->getName() +
                     "] message");
         }
     }

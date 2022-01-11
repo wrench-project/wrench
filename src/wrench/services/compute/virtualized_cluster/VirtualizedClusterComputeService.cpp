@@ -127,7 +127,7 @@ namespace wrench {
             }
         } else {
             throw std::runtime_error(
-                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + msg->getName() + "] message");
+                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + answer_message->getName() + "] message");
         }
     }
 
