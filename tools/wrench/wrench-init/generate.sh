@@ -1,12 +1,14 @@
 # script to generate wrench-init script. Takes one command-line argument, which is
 # the CMAKE_CURRENT_SOURCE_DIR
-if [ -z $1 ]; then
-        echo "Missing command-line argument to specify file path"
+if [ $# -ne 2 ]; then
+        echo "Usage: $0 <src dir> <build dir>"
         exit 0
 fi
 
+mkdir $2"/tools/wrench/wrench-init/" || true
+
 # Redirect output
-exec 1> $1"/tools/wrench/wrench-init/wrench-init"
+exec 1> $2"/tools/wrench/wrench-init/wrench-init"
 
 echo "#!/usr/bin/env python3
 #
