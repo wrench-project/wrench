@@ -349,7 +349,7 @@ namespace wrench {
         } else if (std::dynamic_pointer_cast<FileRegistryDeleteEntryAction>(action)) {
             return "FILEREGISTRY_DELETE-";
         } else {
-            return "????-";
+            return R"(???-)";
         }
     }
 
