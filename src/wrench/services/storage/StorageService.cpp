@@ -165,7 +165,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
             return msg->free_space;
         } else {
-            throw std::runtime_error("StorageService::getFreeSpace(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("StorageService::getFreeSpace(): Unexpected [" + message->getName() + "] message");
         }
     }
 
@@ -216,7 +216,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
             return msg->file_is_available;
         } else {
-            throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + msg->getName() + "] message");
+            throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + message->getName() + "] message");
         }
     }
 
