@@ -40,11 +40,11 @@ namespace wrench {
         void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
-        std::function<void (std::shared_ptr<ActionExecutor> action_executor)> lambda_execute;
-        std::function<void (std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate;
-
         double ram;
         unsigned long num_cores;
+
+        std::function<void (std::shared_ptr<ActionExecutor> action_executor)> lambda_execute;
+        std::function<void (std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate;
     };
 }
 
