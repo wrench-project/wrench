@@ -1006,8 +1006,10 @@ namespace wrench {
             for (auto const &r : this->running_thread_counts) {
                 unsigned long cores = std::get<0>(this->compute_resources[r.first]);
                 unsigned long running_threads = r.second;
-                auto num_idle_cores = std::max<unsigned long>(cores - running_threads, 0);
-                if (num_idle_cores >= num_cores) {
+                if (running_threads > cores) {
+                    throw std::runtime_error("TOO MANY THREADS!");
+                }
+                if (running_threads < cores and (cores - running_threads >= num_cores)) {
                     enough_cores = true;
                     break;
                 }
