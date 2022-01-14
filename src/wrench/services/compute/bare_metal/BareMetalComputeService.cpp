@@ -714,7 +714,6 @@ namespace wrench {
                                                                                      unsigned long num_cores,
                                                                                      double ram) {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
-
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
                         answer,
