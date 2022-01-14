@@ -291,7 +291,10 @@ namespace wrench {
 
     /**
      * @brief Get idle core counts for each of the compute service's host
-     * @return the idle core counts (could be empty)
+     * @return the idle core counts (could be empty). Note that this doesn't
+     *        mean that asking for these cores right will mean immediate execution (since
+     *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
+     *        actions that are not using all available resources).
      *
      * @throw ExecutionException
      * @throw std::runtime_error
@@ -340,8 +343,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the total idle core count for all hosts of the compute service
-     * @return total idle core count
+     * @brief Get the total idle core count for all hosts of the compute service. Note that this doesn't
+     *        mean that asking for these cores right will mean immediate execution (since
+     *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
+     *        actions that are not using all available resources).
+     * @return total idle core count.
      *
      * @throw ExecutionException
      * @throw std::runtime_error
