@@ -365,7 +365,10 @@ namespace wrench {
 
     /**
      * @brief Method to find out if, right now, the compute service has at least one host
-     *        with some idle number of cores and some available RAM
+     *        with some idle number of cores and some available RAM. Note that this doesn't
+     *        mean that asking for these resources right will mean immediate execution (since
+     *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
+     *        actions that are not using all available resources).
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      * @return true if idle resources are available, false otherwise
