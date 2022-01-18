@@ -193,6 +193,7 @@ namespace wrench {
 
         *argc = 0;
         for (auto a : cleanedup_args) {
+            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }

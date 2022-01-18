@@ -747,6 +747,7 @@ namespace wrench {
 //            throw std::runtime_error("Cannot create a workflow before the simulation is initialized");
 //        }
         return std::shared_ptr<Workflow>(new Workflow());
+
     }
 
 
