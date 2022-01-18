@@ -1538,9 +1538,9 @@ namespace wrench {
      * @brief Destructor
      */
     SimulationOutput::~SimulationOutput() {
-//        for (auto t : this->traces) {
-//            delete t.second;
-//        }
+    for (auto t : this->traces) {
+            delete t.second;
+        }
         this->traces.clear();
     }
 
@@ -1684,6 +1684,7 @@ namespace wrench {
                                                      StorageService *service,
                                                      std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
+
             this->addTimestamp<SimulationTimestampFileReadCompletion>(
                     new SimulationTimestampFileReadCompletion(date, file, src, service, task));
         }
