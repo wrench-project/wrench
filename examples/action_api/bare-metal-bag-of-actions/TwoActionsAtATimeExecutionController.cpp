@@ -62,6 +62,7 @@ namespace wrench {
 
         WRENCH_INFO("About to execute a workload with %d compute actions", this->num_actions);
 
+
         /* Create random amounts of work in GFlop, input sizes in bytes, and output sizes in bytes */
         std::vector<std::tuple<double, std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::DataFile>>> actions;
         actions.reserve(num_actions);
@@ -72,8 +73,9 @@ namespace wrench {
             auto input_file = wrench::Simulation::addFile("input_file_" + std::to_string(i), mb_dist(rng));
             // Create a copy of the input file on the storage service
             this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+            // Create output file
             auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(i), mb_dist(rng));
-            actions.push_back(std::make_tuple(work, input_file, output_file));
+            actions.emplace_back(work, input_file, output_file);
         }
         
         /* Create a job manager so that we can create/submit jobs */

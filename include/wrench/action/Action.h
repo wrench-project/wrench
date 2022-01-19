@@ -14,6 +14,7 @@
 #include <string>
 #include <set>
 #include <stack>
+#include <iostream>
 
 namespace wrench {
 
@@ -120,7 +121,6 @@ namespace wrench {
         void setRAMAllocated(double ram);
         void setFailureCause(std::shared_ptr<FailureCause> failure_cause);
 
-//        virtual ~Action() = default;
         virtual ~Action() = default;
 
         Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
@@ -144,7 +144,6 @@ namespace wrench {
         bool simulate_computation_as_sleep;
 
     private:
-
 
         std::set<Action*> parents;
         std::set<Action*> children;
