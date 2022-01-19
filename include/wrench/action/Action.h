@@ -54,9 +54,9 @@ namespace wrench {
         double getEndDate() const;
         std::shared_ptr<FailureCause> getFailureCause() const;
 
-        std::set<std::shared_ptr<Action>> &getChildren();
+        std::set<std::shared_ptr<Action>> getChildren();
 
-        std::set<std::shared_ptr<Action>> &getParents();
+        std::set<std::shared_ptr<Action>> getParents();
 
         virtual unsigned long getMinNumCores() const;
         virtual unsigned long getMaxNumCores() const;
@@ -120,7 +120,9 @@ namespace wrench {
         void setRAMAllocated(double ram);
         void setFailureCause(std::shared_ptr<FailureCause> failure_cause);
 
+//        virtual ~Action() = default;
         virtual ~Action() = default;
+
         Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
 
         /**
@@ -144,13 +146,13 @@ namespace wrench {
     private:
 
 
-        std::set<std::shared_ptr<Action>> parents;
-        std::set<std::shared_ptr<Action>> children;
+        std::set<Action*> parents;
+        std::set<Action*> children;
 
         double priority;
 
         std::string name;
-        std::shared_ptr<CompoundJob> job;
+        std::weak_ptr<CompoundJob> job;
 
         std::map<std::string, std::string> service_specific_arguments;
 

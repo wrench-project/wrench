@@ -166,7 +166,7 @@ namespace wrench {
 
         unsigned long num_running_pilot_jobs = 0;
 
-        std::map<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> cjob_args;
+//        std::map<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> cjob_args;
 
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<StandardJob>> cjob_to_sjob_map;
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<PilotJob>> cjob_to_pjob_map;

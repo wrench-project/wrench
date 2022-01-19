@@ -763,6 +763,7 @@ namespace wrench {
         this->acquireDaemonLock();
         auto it = std::find(this->jobs_to_dispatch.begin(), this->jobs_to_dispatch.end(), job->compound_job);
         if (it != this->jobs_to_dispatch.end()) {
+            this->cjob_to_sjob_map.erase(*it);
             this->jobs_to_dispatch.erase(it);
             this->releaseDaemonLock();
             return;
@@ -1253,6 +1254,7 @@ namespace wrench {
      */
     void JobManager::processCompoundJobCompletion(const std::shared_ptr<CompoundJob>& job,
                                                   std::shared_ptr<ComputeService> compute_service) {
+
         job->state = CompoundJob::State::COMPLETED;
         job->end_date = Simulation::getCurrentSimulatedDate();
         // remove the job from the "dispatched" list

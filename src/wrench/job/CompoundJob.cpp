@@ -289,8 +289,8 @@ namespace wrench {
             throw std::invalid_argument("CompoundJob::addDependency(): Adding this dependency would create a cycle");
         }
 
-        child->parents.insert(parent);
-        parent->children.insert(child);
+        child->parents.insert(parent.get());
+        parent->children.insert(child.get());
         child->updateState();
     }
 
@@ -446,13 +446,13 @@ namespace wrench {
      * @return
      */
     bool CompoundJob::pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b) {
-        auto current_children = a->getChildren();
-        if (current_children.find(b) != current_children.end()) {
+        auto current_children = a->children;
+        if (current_children.find(b.get()) != current_children.end()) {
             return true;
         }
         bool path_exists = false;
         for (auto const &c : current_children) {
-            path_exists = path_exists || this->pathExists(c, b);
+            path_exists = path_exists || this->pathExists(c->getSharedPtr(), b);
         }
         return path_exists;
     }
@@ -499,10 +499,10 @@ namespace wrench {
         assertJobNotSubmitted();
         this->state_task_map[action->getState()].erase(action);
         for (auto const &parent : action->parents) {
-            parent->children.erase(action);
+            parent->children.erase(action.get());
         }
         for (auto const &child : action->children) {
-            child->parents.erase(action);
+            child->parents.erase(action.get());
             child->updateState();
         }
         this->actions.erase(action);
@@ -515,16 +515,16 @@ namespace wrench {
     void CompoundJob::printActionDependencies() {
         for (auto const &action : this->actions) {
             std::cerr << "* " << Action::getActionTypeAsString(action) << "-" << action->getName() << " ("  << action->getStateAsString() << ")\n";
-            if (not action->getChildren().empty()) {
+            if (not action->children.empty()) {
                 std::cerr << "  CHILDREN:\n";
-                for (auto const &child: action->getChildren()) {
-                    std::cerr << "    - " << Action::getActionTypeAsString(child) << "-" << child->getName() << "\n";
+                for (auto const &child: action->children) {
+                    std::cerr << "    - " << Action::getActionTypeAsString(child->getSharedPtr()) << "-" << child->getName() << "\n";
                 }
             }
-            if (not action->getParents().empty()) {
+            if (not action->parents.empty()) {
                 std::cerr << "  PARENTS:\n";
-                for (auto const &parent: action->getParents()) {
-                    std::cerr << "    - " << Action::getActionTypeAsString(parent) << "-" << parent->getName() << "\n";
+                for (auto const &parent: action->parents) {
+                    std::cerr << "    - " << Action::getActionTypeAsString(parent->getSharedPtr()) << "-" << parent->getName() << "\n";
                 }
             }
         }

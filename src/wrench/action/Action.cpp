@@ -110,7 +110,7 @@ namespace wrench {
      * @return the job
      */
     std::shared_ptr<CompoundJob> Action::getJob() const {
-        return this->job;
+        return this->job.lock();
     }
 
     /**
@@ -119,7 +119,7 @@ namespace wrench {
      */
     void Action::setState(Action::State new_state) {
         auto old_state = this->execution_history.top().state;
-        this->job->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
+        this->job.lock()->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
 //        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
         this->execution_history.top().state = new_state;
     }
@@ -296,16 +296,24 @@ namespace wrench {
      * @brief Get the action's children
      * @return a set of children
      */
-    std::set<std::shared_ptr<Action>> &Action::getChildren() {
-        return this->children;
+    std::set<std::shared_ptr<Action>> Action::getChildren() {
+        std::set<std::shared_ptr<Action>> to_return;
+        for (auto const &c : this->children) {
+            to_return.insert(c->getSharedPtr());
+        }
+        return to_return;
     }
 
     /**
      * @brief Get the action's parents
      * @return a set of parents
      */
-    std::set<std::shared_ptr<Action>> &Action::getParents() {
-        return this->parents;
+    std::set<std::shared_ptr<Action>> Action::getParents() {
+        std::set<std::shared_ptr<Action>> to_return;
+        for (auto const &p : this->parents) {
+            to_return.insert(p->getSharedPtr());
+        }
+        return to_return;
     }
 
     /**

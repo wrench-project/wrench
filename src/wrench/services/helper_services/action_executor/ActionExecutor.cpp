@@ -117,7 +117,7 @@ namespace wrench {
             this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
         }
-        for (auto const &child : this->action->children) {
+        for (auto const &child : this->action->getChildren()) {
             child->updateState();
         }
         this->action->setEndDate(S4U_Simulation::getClock());
