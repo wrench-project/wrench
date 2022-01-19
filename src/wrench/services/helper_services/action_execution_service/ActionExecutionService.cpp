@@ -668,6 +668,7 @@ namespace wrench {
 
         // Remove the action from the set of known actions
         this->all_actions.erase(action);
+        this->action_run_specs.erase(action);
 
         // Set the action's state
         action->setState(Action::State::KILLED);
@@ -780,6 +781,7 @@ namespace wrench {
         // Forget the action executor
         this->action_executors.erase(executor->getAction());
         this->all_actions.erase(executor->getAction());
+        this->action_run_specs.erase(executor->getAction());
 
         // Send the notification to the originator
         S4U_Mailbox::dputMessage(

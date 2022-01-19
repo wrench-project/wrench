@@ -798,6 +798,7 @@ namespace wrench {
 //        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
 
+
         // Sort all the actions in the ready queue by (job.priority, action.priority, action.name)
         // TODO: This may be a performance bottleneck... may have to remedy
         std::sort(this->ready_actions.begin(), this->ready_actions.end(),
@@ -874,6 +875,7 @@ namespace wrench {
         try {
             if (job->hasSuccessfullyCompleted() and (this->num_dispatched_actions_for_cjob[job] == 0)) {
                 this->current_jobs.erase(job);
+                this->num_dispatched_actions_for_cjob.erase(job);
                 S4U_Mailbox::dputMessage(
                         job->popCallbackMailbox(),
                         new ComputeServiceCompoundJobDoneMessage(
@@ -883,6 +885,7 @@ namespace wrench {
 
             } else if (job->hasFailed() and ((this->num_dispatched_actions_for_cjob[job] == 0))) {
                 this->current_jobs.erase(job);
+                this->num_dispatched_actions_for_cjob.erase(job);
                 S4U_Mailbox::putMessage(
                         job->popCallbackMailbox(),
                         new ComputeServiceCompoundJobFailedMessage(
