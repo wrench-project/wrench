@@ -94,7 +94,7 @@ namespace wrench {
             // Action i+1 with 4 cores
             auto file_read_2 = job->addFileReadAction("file_read_" + std::to_string(i+1), std::get<1>(actions.at(i+1)), wrench::FileLocation::LOCATION(this->storage_service));
             auto compute_2 = job->addComputeAction("computation_" + std::to_string(i+1), std::get<0>(actions.at(i+1)), 0.0, 4, 4, wrench::ParallelModel::AMDAHL(0.9));
-            auto file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(actions.at(i+1)), wrench::FileLocation::LOCATION(this->storage_service));
+            std::shared_ptr<Action> file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(actions.at(i+1)), wrench::FileLocation::LOCATION(this->storage_service));
             job->addActionDependency(file_read_2, compute_2);
             job->addActionDependency(compute_2, file_write_2);
 
