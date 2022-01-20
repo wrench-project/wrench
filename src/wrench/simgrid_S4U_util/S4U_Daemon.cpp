@@ -237,6 +237,8 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
+        std::cerr << "PID: " << this->s4u_actor->get_pid() << "\n";
+
         S4U_Daemon::map_actor_to_recv_mailbox[this->s4u_actor->get_pid()] = this->recv_mailbox;
         this->num_starts++;
         // Compute zero flop so that nothing happens
