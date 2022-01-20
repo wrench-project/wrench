@@ -73,7 +73,7 @@ namespace wrench {
                                      std::shared_ptr<FileLocation> dst_location);
 
 
-        static void initiateFileCopy(std::string &answer_mailbox,
+        static void initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox,
                                       std::shared_ptr<DataFile>file,
                                       std::shared_ptr<FileLocation> src_location,
                                       std::shared_ptr<FileLocation> dst_location);
@@ -85,8 +85,7 @@ namespace wrench {
 
         StorageService(const std::string &hostname,
                        const std::set<std::string> mount_points,
-                       const std::string &service_name,
-                       const std::string &data_mailbox_name_prefix);
+                       const std::string &service_name);
 
     protected:
 

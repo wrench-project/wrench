@@ -37,7 +37,7 @@ namespace wrench {
                 std::string hostname,
                 unsigned long num_cores,
                 double ram_footprint,
-                std::string callback_mailbox,
+                simgrid::s4u::Mailbox *callback_mailbox,
                 std::shared_ptr<Action> action,
                 std::shared_ptr<ActionExecutionService> action_execution_service);
 
@@ -55,7 +55,7 @@ namespace wrench {
 
         std::shared_ptr<Action> action;
         std::shared_ptr<ActionExecutionService> action_execution_service;
-        std::string callback_mailbox;
+        simgrid::s4u::Mailbox *callback_mailbox;
         bool killed_on_purpose;
 
         unsigned long num_cores;

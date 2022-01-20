@@ -75,7 +75,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -111,7 +111,7 @@ namespace wrench {
         }
 
         // send a "migrate vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("migrate_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -141,7 +141,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);WRENCH_INFO(
                 "Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
                 this->hostname.c_str(),
-                this->mailbox_name.c_str());
+                this->mailbox->get_cname());
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -168,7 +168,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -249,7 +249,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void
-    VirtualizedClusterComputeService::processMigrateVM(const std::string &answer_mailbox, const std::string &vm_name,
+    VirtualizedClusterComputeService::processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name,
                                                        const std::string &dest_pm_hostname) {
 
 

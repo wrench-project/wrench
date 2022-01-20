@@ -65,13 +65,13 @@ namespace wrench {
          */
         FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
                                               std::shared_ptr<DataFile>file,
-                                              std::string src_mailbox,
+                                              simgrid::s4u::Mailbox *src_mailbox,
                                               std::shared_ptr<FileLocation> src_location,
-                                              std::string dst_mailbox,
+                                              simgrid::s4u::Mailbox *dst_mailbox,
                                               std::shared_ptr<FileLocation> dst_location,
-                                              std::string answer_mailbox_if_read,
-                                              std::string answer_mailbox_if_write,
-                                              std::string answer_mailbox_if_copy,
+                                              simgrid::s4u::Mailbox *answer_mailbox_if_read,
+                                              simgrid::s4u::Mailbox *answer_mailbox_if_write,
+                                              simgrid::s4u::Mailbox *answer_mailbox_if_copy,
                                               bool success, std::shared_ptr<FailureCause> failure_cause) :
                 FileTransferThreadMessage("FileTransferThreadNotificationMessage", 0),
                 file_transfer_thread(file_transfer_thread),
@@ -90,21 +90,21 @@ namespace wrench {
         std::shared_ptr<DataFile>file;
 
         /** @brief Source mailbox (or "" if source wasn't a mailbox) */
-        std::string src_mailbox;
+        simgrid::s4u::Mailbox *src_mailbox;
         /** @brief Source location (or nullptr if source wasn't a location) */
         std::shared_ptr<FileLocation> src_location;
 
         /** @brief Destination mailbox (or "" if destination wasn't a mailbox) */
-        std::string dst_mailbox;
+        simgrid::s4u::Mailbox *dst_mailbox;
         /** @brief Destination location (or nullptr if source wasn't a location) */
         std::shared_ptr<FileLocation> dst_location;
 
         /** @brief If this was a file read, the mailbox to which an answer should be send */
-        std::string answer_mailbox_if_read;
+        simgrid::s4u::Mailbox *answer_mailbox_if_read;
         /** @brief If this was a file write, the mailbox to which an answer should be send */
-        std::string answer_mailbox_if_write;
+        simgrid::s4u::Mailbox *answer_mailbox_if_write;
         /** @brief If this was a file copy, the mailbox to which an answer should be send */
-        std::string answer_mailbox_if_copy;
+        simgrid::s4u::Mailbox *answer_mailbox_if_copy;
         /** @brief Whether the transfer succeeded or not */
         bool success;
         /** @brief The failure cause is case of a failure */

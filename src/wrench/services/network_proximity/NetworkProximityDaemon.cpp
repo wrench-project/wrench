@@ -36,12 +36,12 @@ namespace wrench {
      */
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
                                                    std::string hostname,
-                                                   std::string network_proximity_service_mailbox,
+                                                   simgrid::s4u::Mailbox *network_proximity_service_mailbox,
                                                    double message_size, double measurement_period,
                                                    double noise,
                                                    int noise_seed,
                                                    std::map<std::string, double> messagepayload_list) :
-            NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
+            NetworkProximityDaemon(simulation, std::move(hostname), network_proximity_service_mailbox,
                                    message_size, measurement_period, noise, noise_seed,messagepayload_list, "") {
     }
 
@@ -63,13 +63,13 @@ namespace wrench {
     NetworkProximityDaemon::NetworkProximityDaemon(
             Simulation *simulation,
             std::string hostname,
-            std::string network_proximity_service_mailbox,
+            simgrid::s4u::Mailbox *network_proximity_service_mailbox,
             double message_size, double measurement_period,
             double noise,
             int noise_seed,
             std::map<std::string, double> messagepayload_list,
             std::string suffix = "") :
-            Service(std::move(hostname), "network_daemon" + suffix, "network_daemon" + suffix) {
+            Service(std::move(hostname), "network_daemon" + suffix) {
 
         // Set the message payloads
         setMessagePayloads(messagepayload_list, {});
@@ -80,10 +80,10 @@ namespace wrench {
         this->max_noise = noise;
         this->rng.seed(noise_seed);
 
-        this->next_mailbox_to_send = "";
+        this->next_mailbox_to_send = nullptr;
         this->next_daemon_to_send = nullptr;
         this->next_host_to_send = "";
-        this->network_proximity_service_mailbox = std::move(network_proximity_service_mailbox);
+        this->network_proximity_service_mailbox = network_proximity_service_mailbox;
 
     }
 
@@ -139,13 +139,14 @@ namespace wrench {
             if (countdown > 0) {
                 life = this->processNextMessage(countdown);
             } else {
-                if ((not this->next_mailbox_to_send.empty()) &&
+                if ((this->next_mailbox_to_send) &&
                     (S4U_Simulation::isHostOn(this->next_host_to_send)) &&
                     (this->next_daemon_to_send->isUp())) {
 
                     double start_time = S4U_Simulation::getClock();
 
-                    WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",this->message_size, this->next_mailbox_to_send.c_str());
+                    WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",
+                                this->message_size, this->next_mailbox_to_send->get_cname());
                     try {
                         S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                                 new NetworkProximityTransferMessage(
@@ -170,7 +171,7 @@ namespace wrench {
                                                                                               NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
 
                     next_host_to_send = "";
-                    next_mailbox_to_send = "";
+                    next_mailbox_to_send = nullptr;
 
                     time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
@@ -204,7 +205,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             if (not cause->isTimeout()) {
                 WRENCH_INFO("Got a network error... oh well (%s)",

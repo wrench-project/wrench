@@ -100,7 +100,7 @@ private:
 
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
@@ -111,17 +111,17 @@ private:
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox, true, false));
         failure_detector1->setSimulation(this->simulation);
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox, true, false));
         failure_detector2->setSimulation(this->simulation);
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
@@ -131,7 +131,7 @@ private:
 
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
@@ -148,7 +148,7 @@ private:
         // And again...
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
@@ -223,7 +223,7 @@ private:
     int main() override {
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
@@ -234,17 +234,17 @@ private:
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox, true, false));
         failure_detector1->setSimulation(this->simulation);
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox, true, false));
         failure_detector2->setSimulation(this->simulation);
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
@@ -252,7 +252,7 @@ private:
         std::shared_ptr<wrench::SimulationMessage> message;
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message! " + cause->toString());
         }
@@ -268,7 +268,7 @@ private:
 
         // And again...
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }

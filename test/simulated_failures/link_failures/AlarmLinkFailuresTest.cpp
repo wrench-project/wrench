@@ -82,7 +82,7 @@ private:
     int main() {
 
         // Create an Alarm service that will go of in 10 seconds
-        std::string mailbox = this->test->workflow->getCallbackMailbox();
+        auto mailbox = this->test->workflow->getCallbackMailbox();
         wrench::Alarm::createAndStartAlarm(this->simulation, 10,"Host2", mailbox,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 

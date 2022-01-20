@@ -161,7 +161,7 @@ namespace wrench {
                 // Nobody kills me while I am starting a compute threads!
                 action_executor->acquireDaemonLock();
                 compute_thread = std::shared_ptr<ComputeThread>(
-                        new ComputeThread(S4U_Simulation::getHostName(), work, ""));
+                        new ComputeThread(S4U_Simulation::getHostName(), work, nullptr));
                 compute_thread->setSimulation(action_executor->getSimulation());
                 compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
                 action_executor->releaseDaemonLock();

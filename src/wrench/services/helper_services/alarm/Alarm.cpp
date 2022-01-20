@@ -25,20 +25,19 @@ namespace wrench {
      * @param date: the date at which the message should be sent. If date is in the past
      *              message will be sent immediately.
      * @param hostname: the name of the host on which the Alarm daemon should run
-     * @param reply_mailbox_name: the mailbox to which the message should be sent
+     * @param reply_mailbox: the mailbox to which the message should be sent
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name
      */
-    Alarm::Alarm(double date, std::string hostname, std::string &reply_mailbox_name,
-                 SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix,
-                                                                       "alarm_service_" + suffix) {
+    Alarm::Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
+                 SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
 
         this->date = date;
 //      if (this->date <= S4U_Simulation::getClock()) {
 //        WRENCH_INFO(
 //                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
 //      }
-        this->reply_mailbox_name = reply_mailbox_name;
+        this->reply_mailbox = reply_mailbox;
         this->msg = msg;
     }
 
@@ -57,9 +56,9 @@ namespace wrench {
             S4U_Simulation::sleep(time_to_sleep);
         }
 
-        WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
+        WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox->get_cname());
         try {
-            S4U_Mailbox::putMessage(this->reply_mailbox_name, msg);
+            S4U_Mailbox::putMessage(this->reply_mailbox, msg);
         } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_WARN("AlarmService was not able to send its message");
         }
@@ -84,10 +83,10 @@ namespace wrench {
      */
     std::shared_ptr<Alarm>
     Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
-                               std::string &reply_mailbox_name,
+                               simgrid::s4u::Mailbox *reply_mailbox,
                                SimulationMessage *msg, std::string suffix) {
         std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
-                new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
+                new Alarm(date, hostname, reply_mailbox, msg, suffix));
         alarm_ptr->simulation = simulation;
         try {
             alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart

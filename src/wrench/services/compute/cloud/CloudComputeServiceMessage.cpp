@@ -32,11 +32,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
-            const std::string &answer_mailbox, double payload) : CloudComputeServiceMessage(
+            simgrid::s4u::Mailbox *answer_mailbox, double payload) : CloudComputeServiceMessage(
             "GET_EXECUTION_HOSTS_REQUEST",
             payload) {
 
-        if (answer_mailbox.empty()) {
+        if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(): "
                     "Invalid arguments");
@@ -70,7 +70,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             unsigned long num_cores,
             double ram_memory,
             std::string desired_vm_name,
@@ -81,7 +81,7 @@ namespace wrench {
             num_cores(num_cores), ram_memory(ram_memory), desired_vm_name(desired_vm_name), property_list(property_list),
             messagepayload_list(messagepayload_list) {
 
-        if (answer_mailbox.empty() || (ram_memory < 0.0)) {
+        if ((answer_mailbox == nullptr) || (ram_memory < 0.0)) {
 //        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_name << std::endl;
             throw std::invalid_argument(
                     "CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(): Invalid arguments");
@@ -116,14 +116,14 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             bool send_failure_notifications,
             ComputeService::TerminationCause termination_cause,
             double payload) :
             CloudComputeServiceMessage("SHUTDOWN_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || vm_name.empty()) {
+        if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceShutdownVMRequestMessage::CloudComputeServiceShutdownVMRequestMessage(): Invalid arguments");
         }
@@ -156,13 +156,13 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             const std::string &pm_name,
             double payload) :
             CloudComputeServiceMessage("START_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || vm_name.empty()) {
+        if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceStartVMRequestMessage::CloudComputeServiceStartVMRequestMessage(): Invalid arguments");
         }
@@ -196,12 +196,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) :
             CloudComputeServiceMessage("SUSPEND_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || vm_name.empty()) {
+        if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(): Invalid arguments");
         }
@@ -231,12 +231,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) :
             CloudComputeServiceMessage("RESUME_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || vm_name.empty()) {
+        if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(): Invalid arguments");
         }
@@ -267,12 +267,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             double payload) :
             CloudComputeServiceMessage("DESTROY_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || vm_name.empty()) {
+        if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
                     "CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(): Invalid arguments");
         }

@@ -243,7 +243,7 @@ namespace wrench {
 
         void startBackgroundWorkloadProcess();
 
-        void processGetResourceInformation(const std::string &answer_mailbox, const std::string &key);
+        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
         void processCompoundJobCompletion(std::shared_ptr<BareMetalComputeServiceOneShot> executor, std::shared_ptr<CompoundJob> job);
 
@@ -264,7 +264,7 @@ namespace wrench {
         void processCompoundJobTimeout(std::shared_ptr<CompoundJob> job);
 
         //process standard job termination request
-        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, std::string answer_mailbox);
+        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, simgrid::s4u::Mailbox *answer_mailbox);
 
         // process a batch_standard_and_pilot_jobs bach_job tiemout event
         void processAlarmJobTimeout(std::shared_ptr<BatchJob>bach_job);
@@ -279,7 +279,7 @@ namespace wrench {
         void sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // process a job submission
-        void processJobSubmission(std::shared_ptr<BatchJob>job, std::string answer_mailbox);
+        void processJobSubmission(std::shared_ptr<BatchJob>job, simgrid::s4u::Mailbox *answer_mailbox);
 
         //start a job
         void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<CompoundJob> ,
@@ -288,7 +288,7 @@ namespace wrench {
 
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
-        void processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram);
+        void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
     };
 }

@@ -20,14 +20,14 @@ namespace wrench {
 
     public:
 
-        explicit SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, std::string mailbox_to_notify);
+        explicit SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
     private:
         double seconds_of_life;
         SimulationMessage *msg;
-        std::string mailbox_to_notify;
+        simgrid::s4u::Mailbox *mailbox_to_notify;
         int main() override;
 
     };

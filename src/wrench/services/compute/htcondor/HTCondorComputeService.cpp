@@ -43,7 +43,7 @@ namespace wrench {
                                                    std::set<std::shared_ptr<ComputeService>> compute_services,
                                                    std::map<std::string, std::string> property_list,
                                                    std::map<std::string, double> messagepayload_list) :
-            ComputeService(hostname, "htcondor_service", "htcondor_service", "") {
+            ComputeService(hostname, "htcondor_service", "") {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -132,12 +132,12 @@ namespace wrench {
 
         serviceSanityCheck();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new ComputeServiceSubmitCompoundJobRequestMessage(
                             answer_mailbox, job, service_specific_args,
                             this->getMessagePayloadValue(
@@ -192,7 +192,7 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
                 "HTCondor Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
-                this->mailbox_name.c_str());
+                this->mailbox->get_cname());
 
         // start the central manager service
         this->central_manager->setSimulation(this->simulation);
@@ -220,7 +220,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -262,7 +262,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void HTCondorComputeService::processSubmitCompoundJob(const std::string &answer_mailbox,
+    void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
                                                           std::shared_ptr<CompoundJob> job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
 
@@ -363,7 +363,7 @@ namespace wrench {
       * @param num_cores: the desired number of cores
       * @param ram: the desired RAM
       */
-    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox, unsigned long num_cores, double ram) {
+    void HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
         throw std::runtime_error("HTCondorComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A HTCondor service does not support this operation");
     }
 

@@ -44,7 +44,7 @@ namespace wrench {
             std::set <shared_ptr<ComputeService>> compute_services,
             std::map <std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list)
-            : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", "") {
+            : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
         this->compute_services = compute_services;
 
@@ -74,7 +74,7 @@ namespace wrench {
         //  send a "wake up" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new CentralManagerWakeUpMessage(0));
         } catch (std::shared_ptr <NetworkError> &cause) {
             throw ExecutionException(cause);
@@ -95,12 +95,12 @@ namespace wrench {
             const std::map <std::string, std::string> &service_specific_args) {
         serviceSanityCheck();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_compound_job");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new ComputeServiceSubmitCompoundJobRequestMessage(
                             answer_mailbox, job, service_specific_args,
                             this->getMessagePayloadValue(
@@ -139,7 +139,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
         WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s",
-                    this->hostname.c_str(), this->mailbox_name.c_str());
+                    this->hostname.c_str(), this->mailbox->get_cname());
 
         // main loop
         while (this->processNextMessage()) {
@@ -151,7 +151,7 @@ namespace wrench {
                     auto negotiator = std::shared_ptr<HTCondorNegotiatorService>(
                             new HTCondorNegotiatorService(this->hostname, this->negotiator_startup_overhead,
                                                           this->compute_services,
-                                                          this->running_jobs, this->pending_jobs, this->mailbox_name));
+                                                          this->running_jobs, this->pending_jobs, this->mailbox));
                     negotiator->setSimulation(this->simulation);
                     negotiator->start(negotiator, true, false); // Daemonized, no auto-restart
                 }
@@ -175,7 +175,7 @@ namespace wrench {
         std::shared_ptr <SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr <NetworkError> &cause) {
             return true;
         }
@@ -244,7 +244,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void HTCondorCentralManagerService::processSubmitCompoundJob(
-            const std::string &answer_mailbox, std::shared_ptr <CompoundJob> job,
+            simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr <CompoundJob> job,
             std::map <std::string, std::string> &service_specific_args) {
         this->pending_jobs.emplace_back(std::make_tuple(job, service_specific_args));
         this->resources_unavailable = false;
@@ -323,7 +323,7 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::processCompoundJobCompletion(std::shared_ptr <CompoundJob> job) {
         WRENCH_INFO("A compound job has completed: %s", job->getName().c_str());
-        std::string callback_mailbox = job->popCallbackMailbox();
+        auto callback_mailbox = job->popCallbackMailbox();
 
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(

@@ -39,10 +39,9 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the name of the host on which the service will run
      * @param process_name_prefix: the prefix for the process name
-     * @param mailbox_name_prefix: the prefix for the mailbox name
      */
-    Service::Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix) :
-            S4U_Daemon(hostname, process_name_prefix, mailbox_name_prefix) {
+    Service::Service(std::string hostname, std::string process_name_prefix) :
+            S4U_Daemon(hostname, process_name_prefix) {
         this->name = process_name_prefix;
     }
 
@@ -244,12 +243,12 @@ namespace wrench {
         }
         this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
 
-        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
 
         // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
-        std::string ack_mailbox = S4U_Mailbox::generateUniqueMailboxName("stop");
+        auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::putMessage(this->mailbox,
                                     new ServiceStopDaemonMessage(
                                             ack_mailbox,
                                             false,
