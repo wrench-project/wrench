@@ -98,7 +98,7 @@ private:
        wrench::Simulation::turnOffHost("Host2");
 
        // Start an alarm
-       std::string mailbox = "mailbox";
+       auto mailbox = simgrid::s4u::Mailbox::by_name("mailbox");
        try {
            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
                                               new wrench::SimulationMessage("whatever", 1), "bogus");

@@ -151,7 +151,7 @@ private:
                 new wrench::ActionExecutor("Host2",
                                            num_cores,
                                            ram,
-                                           this->mailbox_name,
+                                           this->mailbox,
                                            action,
                                            nullptr));
 
@@ -162,7 +162,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }

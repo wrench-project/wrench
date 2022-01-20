@@ -136,13 +136,13 @@ namespace wrench {
      */
     class ComputeServiceSubmitCompoundJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitCompoundJobRequestMessage(const std::string &answer_mailbox,
+        ComputeServiceSubmitCompoundJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                       std::shared_ptr<CompoundJob> job,
                                                       const std::map<std::string, std::string> service_specific_args,
                                                       double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        const std::string &answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The submitted job */
         std::shared_ptr<CompoundJob> job;
         /** @brief Service specific arguments */
@@ -199,10 +199,10 @@ namespace wrench {
     */
     class ComputeServiceTerminateCompoundJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceTerminateCompoundJobRequestMessage(const std::string &answer_mailbox, std::shared_ptr<CompoundJob> , double payload);
+        ComputeServiceTerminateCompoundJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> , double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        const std::string &answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The job to terminate*/
         std::shared_ptr<CompoundJob> job;
     };
@@ -311,10 +311,10 @@ namespace wrench {
     */
     class ComputeServiceTerminatePilotJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceTerminatePilotJobRequestMessage(std::string answer_mailbox, std::shared_ptr<PilotJob> , double payload);
+        ComputeServiceTerminatePilotJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<PilotJob> , double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The job to terminate*/
         std::shared_ptr<PilotJob> job;
     };
@@ -344,10 +344,10 @@ namespace wrench {
     */
     class ComputeServiceResourceInformationRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceInformationRequestMessage(const std::string& answer_mailbox, const std::string &key, double payload);
+        ComputeServiceResourceInformationRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key, double payload);
 
         /** @brief The mailbox to which the answer should be sent */
-        const std::string &answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The key (i.e., resource information name) desired */
         const std::string &key;
     };
@@ -369,12 +369,12 @@ namespace wrench {
      */
     class ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(const std::string &answer_mailbox,
+        ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                          unsigned long num_cores,
                                                                                          double ram, double payload);
 
         /** @brief The mailbox to which a reply should be sent */
-        std::string answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The number of cores desired */
         unsigned long num_cores;
         /** @brief The RAM desired */

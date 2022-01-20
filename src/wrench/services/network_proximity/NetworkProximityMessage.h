@@ -34,11 +34,11 @@ namespace wrench {
      */
     class NetworkProximityLookupRequestMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityLookupRequestMessage(const std::string &answer_mailbox, std::pair<std::string, std::string> hosts,
+        NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::pair<std::string, std::string> hosts,
                                              double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
-        const std::string &answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The hosts between which to calculate a proximity value */
         std::pair<std::string, std::string> hosts;
     };
@@ -102,7 +102,7 @@ namespace wrench {
     public:
         NextContactDaemonAnswerMessage(std::string next_host_to_send,
                                        std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
-                                       std::string next_mailbox_to_send, double payload);
+                                       simgrid::s4u::Mailbox *next_mailbox_to_send, double payload);
 
         /** @brief The next host for the NetworkProximityDaemon to contact */
         std::string next_host_to_send;
@@ -111,7 +111,7 @@ namespace wrench {
         std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send;
 
         /** @brief The next mailbox for the network daemon to contact */
-        std::string next_mailbox_to_send;
+        simgrid::s4u::Mailbox *next_mailbox_to_send;
     };
 
     /**
@@ -119,10 +119,10 @@ namespace wrench {
      */
     class CoordinateLookupRequestMessage : public NetworkProximityMessage {
     public:
-        CoordinateLookupRequestMessage(const std::string &answer_mailbox, std::string requested_host, double payload);
+        CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::string requested_host, double payload);
 
         /** @brief The mailbox to which the answer should be sent back */
-        const std::string &answer_mailbox;
+        simgrid::s4u::Mailbox *answer_mailbox;
 
         /** @brief The name of the host whose coordinates are being requested */
         std::string requested_host;

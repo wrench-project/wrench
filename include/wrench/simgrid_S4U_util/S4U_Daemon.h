@@ -41,18 +41,27 @@ namespace wrench {
 
 
     public:
+
+        static std::map<aid_t , simgrid::s4u::Mailbox*> map_actor_to_recv_mailbox;
+
         /** @brief The name of the daemon */
         std::string process_name;
-        /** @brief The initial name of the daemon's mailbox */
-        std::string initial_mailbox_name;
-        /** @brief The current name of the daemon's mailbox */
-        std::string mailbox_name;
+//        /** @brief The initial name of the daemon's mailbox */
+//        std::string initial_mailbox_name;
+//        /** @brief The current name of the daemon's mailbox */
+//        std::string mailbox_name;
+
+        /** @brief The daemon's mailbox **/
+        simgrid::s4u::Mailbox *mailbox;
+        /** @brief The daemon's receive mailbox (to send to another daemon so that that daemon can reply) **/
+        simgrid::s4u::Mailbox *recv_mailbox;
+
         /** @brief The name of the host on which the daemon is running */
         std::string hostname;
 
+        static simgrid::s4u::Mailbox *getRunningActorRecvMailbox();
 
-
-        S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix);
+        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         // Daemon without a mailbox (not needed?)
 //        S4U_Daemon(std::string hostname, std::string process_name_prefix);

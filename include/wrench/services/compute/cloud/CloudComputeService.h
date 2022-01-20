@@ -148,16 +148,16 @@ namespace wrench {
 
         int main() override;
 
-        std::shared_ptr<SimulationMessage> sendRequest(std::string &answer_mailbox, ComputeServiceMessage *message);
+        std::shared_ptr<SimulationMessage> sendRequest(simgrid::s4u::Mailbox *answer_mailbox, ComputeServiceMessage *message);
 
         virtual bool processNextMessage();
 
-        virtual void processGetResourceInformation(const std::string &answer_mailbox,
+        virtual void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                    const std::string &key);
 
-        virtual void processGetExecutionHosts(const std::string &answer_mailbox);
+        virtual void processGetExecutionHosts(simgrid::s4u::Mailbox *answer_mailbox);
 
-        virtual void processCreateVM(const std::string &answer_mailbox,
+        virtual void processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
                                      std::string desired_vm_name,
@@ -166,18 +166,18 @@ namespace wrench {
         );
 
         virtual void
-        processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
+        processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name, const std::string &pm_name);
 
-        virtual void processShutdownVM(const std::string &answer_mailbox,
+        virtual void processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
                                        const std::string &vm_name,
                                        bool send_failure_notifications,
                                        ComputeService::TerminationCause termination_cause);
 
-        virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processSuspendVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
-        virtual void processResumeVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processResumeVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
-        virtual void processDestroyVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processDestroyVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
 //        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
 //                                              std::map<std::string, std::string> &service_specific_args);
@@ -189,7 +189,7 @@ namespace wrench {
         processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
 
         virtual void processIsThereAtLeastOneHostWithAvailableResources(
-                const std::string &answer_mailbox, unsigned long num_cores, double ram);
+                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
 
         void stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);

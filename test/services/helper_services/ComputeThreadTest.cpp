@@ -85,12 +85,12 @@ private:
     int main() {
 
         // Create a compute thread on Host 3 that should report to me
-        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox_name));
+        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox));
         thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Get the message
-        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox);
 
         if (not dynamic_cast<wrench::ComputeThreadDoneMessage*>(message.get())) {
             throw std::runtime_error("Didn't receive the expected ComputeThreadDoneMessage message");
@@ -155,12 +155,12 @@ private:
     int main() {
 
         // Create a compute thread on Host 3 that should report to me
-        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox_name));
+        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox));
         thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Get the message
-        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox);
 
         // Sleep and kill
         wrench::Simulation::sleep(1000);

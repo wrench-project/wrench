@@ -33,49 +33,49 @@ namespace wrench {
     /**
      * @brief Synchronously receive a message from a mailbox
      *
-     * @param mailbox_name: the mailbox name
+     * @param mailbox: the mailbox
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
      *
      */
-    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
-        WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox_name.c_str());
-        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox) {
+        WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
+//        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg;
         try {
 //            msg = static_cast<SimulationMessage *>(mailbox->get());
             msg = mailbox->get<SimulationMessage>();
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox->get_cname()));
         }
 
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(mailbox_name, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox_name.c_str());
+        WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox->get_cname());
         return std::unique_ptr<SimulationMessage>(msg);
     }
 
     /**
      * @brief Synchronously receive a message from a mailbox, with a timeout
      *
-     * @param mailbox_name: the mailbox name
+     * @param mailbox: the mailbox
      * @param timeout:  a timeout value in seconds (<0 means never timeout)
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name, double timeout) {
+    std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout) {
 
         if (timeout < 0) {
-            return S4U_Mailbox::getMessage(mailbox_name);
+            return S4U_Mailbox::getMessage(mailbox);
         }
 
-        WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
-        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+        WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox->get_cname(), timeout);
+//        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 //        void *data = nullptr;
         wrench::SimulationMessage *msg;
 
@@ -84,10 +84,10 @@ namespace wrench {
             msg = mailbox->get<SimulationMessage>(timeout);
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
         } catch (simgrid::TimeoutException &e) {
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
+                    new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox->get_name()));
         }
 
 //        auto msg = static_cast<SimulationMessage *>(data);
@@ -97,7 +97,7 @@ namespace wrench {
         MessageManager::removeReceivedMessage(mailbox_name, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
+        WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox->get_cname());
 
         return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -105,47 +105,47 @@ namespace wrench {
     /**
      * @brief Synchronously send a message to a mailbox
      *
-     * @param mailbox_name: the mailbox name
+     * @param mailbox: the mailbox
      * @param msg: the SimulationMessage
      *
      * @throw std::shared_ptr<NetworkError>
      */
-    void S4U_Mailbox::putMessage(std::string mailbox_name, SimulationMessage *msg) {
-        WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox_name '%s'",
+    void S4U_Mailbox::putMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
+        WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox '%s'",
                      msg->getName().c_str(), msg->payload,
-                     mailbox_name.c_str());
-        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+                     mailbox->get_cname());
+//        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         try {
 #ifdef MESSAGE_MANAGER
-            MessageManager::manageMessage(mailbox_name, msg);
+            MessageManager::manageMessage(mailbox->get_name(), msg);
 #endif
             mailbox->put(msg, (uint64_t) msg->payload);
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox->get_name()));
         } catch (simgrid::TimeoutException &e) {
             // Can happen if the other side is doing a timeout.... I think
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
+                    new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox->get_name()));
         }
     }
 
     /**
      * @brief Asynchronously send a message to a mailbox in a "fire and forget" fashion
      *
-     * @param mailbox_name: the mailbox name
+     * @param mailbox: the mailbox
      * @param msg: the SimulationMessage
      *
      */
-    void S4U_Mailbox::dputMessage(std::string mailbox_name, SimulationMessage *msg) {
+    void S4U_Mailbox::dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
 
         WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
-                     mailbox_name.c_str());
+                     mailbox->get_cname());
 
         simgrid::s4u::CommPtr comm = nullptr;
 
-        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+//        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
 //        try {
 #ifdef MESSAGE_MANAGER
@@ -164,7 +164,7 @@ namespace wrench {
     /**
     * @brief Asynchronously send a message to a mailbox
     *
-    * @param mailbox_name: the mailbox name
+    * @param mailbox: the mailbox
     * @param msg: the SimulationMessage
     *
     * @return a pending communication handle
@@ -172,15 +172,15 @@ namespace wrench {
     * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication>
-    S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
+    S4U_Mailbox::iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
 
         WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
-                     mailbox_name.c_str());
+                     mailbox->get_cname());
 
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+//        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
         try {
 #ifdef MESSAGE_MANAGER
@@ -189,11 +189,11 @@ namespace wrench {
             comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+                    new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox->get_name()));
         }
 
         auto pending_communication = std::shared_ptr<S4U_PendingCommunication>(
-                new S4U_PendingCommunication(mailbox_name, S4U_PendingCommunication::OperationType::SENDING));
+                new S4U_PendingCommunication(mailbox, S4U_PendingCommunication::OperationType::SENDING));
         pending_communication->comm_ptr = comm_ptr;
         return pending_communication;
     }
@@ -201,28 +201,28 @@ namespace wrench {
     /**
     * @brief Asynchronously receive a message from a mailbox
     *
-    * @param mailbox_name: the mailbox name
+    * @param mailbox: the mailbox
     *
     * @return a pending communication handle
     *
      * @throw std::shared_ptr<NetworkError>
     */
-    std::shared_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(std::string mailbox_name) {
+    std::shared_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(simgrid::s4u::Mailbox *mailbox) {
 
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-        WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox_name.c_str());
+        WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox->get_cname());
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::shared_ptr<S4U_PendingCommunication>(
-                new S4U_PendingCommunication(mailbox_name, S4U_PendingCommunication::OperationType::RECEIVING));
+                new S4U_PendingCommunication(mailbox, S4U_PendingCommunication::OperationType::RECEIVING));
 
-        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
+//        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         try {
 //            comm_ptr = mailbox->get_async((void **) (&(pending_communication->simulation_message)));
             comm_ptr = mailbox->get_async<void>((void **) (&(pending_communication->simulation_message)));
         } catch (simgrid::NetworkFailureException &e) {
             throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+                    new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
         }
         pending_communication->comm_ptr = comm_ptr;
         return pending_communication;

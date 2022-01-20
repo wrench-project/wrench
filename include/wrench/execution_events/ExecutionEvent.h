@@ -30,8 +30,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(std::string);
-        static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(std::string, double timeout);
+        static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox);
+        static std::shared_ptr<ExecutionEvent> waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox, double timeout);
 
         /**
          * @brief Get a textual description of the event

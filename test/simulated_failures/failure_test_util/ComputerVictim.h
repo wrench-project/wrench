@@ -21,14 +21,14 @@ namespace wrench {
 
     public:
 
-        explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, std::string mailbox_to_notify);
+        explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
     private:
         double flops;
         SimulationMessage *msg;
-        std::string mailbox_to_notify;
+        simgrid::s4u::Mailbox *mailbox_to_notify;
         int main() override;
 
     };

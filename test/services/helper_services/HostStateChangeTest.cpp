@@ -71,7 +71,7 @@ private:
         hosts.push_back("Host2");
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
-                                                    this->getSharedPtr<wrench::ExecutionController>(), this->mailbox_name, {}));
+                                                    this->getSharedPtr<wrench::ExecutionController>(), this->mailbox, {}));
         ssd->setSimulation(this->simulation);
         ssd->start(ssd, true, false);
 
@@ -80,7 +80,7 @@ private:
 
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
         } catch (std::shared_ptr<wrench::NetworkError> &e) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -92,7 +92,7 @@ private:
         simgrid::s4u::Host::by_name("Host2")->turn_on();
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
         } catch (std::shared_ptr<wrench::NetworkError> &e) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -107,7 +107,7 @@ private:
         if (this->notify_when_speed_change) {
 
             try {
-                message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+                message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
                 throw std::runtime_error("Did not get a message before the timeout");
             }

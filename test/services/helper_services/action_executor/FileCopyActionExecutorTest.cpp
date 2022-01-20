@@ -143,7 +143,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss2));
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox_name, file_copy_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox, file_copy_action, nullptr));
         // Start it
         file_copy_action_executor->setSimulation(this->simulation);
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -151,7 +151,7 @@ private:
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }

@@ -40,10 +40,10 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw std::shared_ptr<NetworkError>(
-                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox_name));
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
             } else {
                 throw std::shared_ptr<NetworkError>(
-                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox_name));
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
             }
         }
         return std::move(this->simulation_message);

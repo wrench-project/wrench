@@ -61,7 +61,7 @@ namespace wrench {
      *
      * @return the next callback mailbox
      */
-    std::string Job::getOriginCallbackMailbox() {
+    simgrid::s4u::Mailbox *Job::getOriginCallbackMailbox() {
         return this->originator_mailbox;
     }
 
@@ -72,10 +72,10 @@ namespace wrench {
     void Job::printCallbackMailboxStack() {
         auto mystack = this->callback_mailbox_stack;
         while (not mystack.empty()) {
-            WRENCH_INFO("   STACK : %s", mystack.top().c_str());
+            WRENCH_INFO("   STACK : %s", mystack.top()->get_cname());
             mystack.pop();
         }
-        WRENCH_INFO("   ORIGINAL : %s", this->originator_mailbox.c_str());
+        WRENCH_INFO("   ORIGINAL : %s", this->originator_mailbox->get_cname());
     }
 
     /**
@@ -85,11 +85,11 @@ namespace wrench {
      *
      * @return the next callback mailbox
      */
-    std::string Job::popCallbackMailbox() {
+    simgrid::s4u::Mailbox *Job::popCallbackMailbox() {
         if (this->callback_mailbox_stack.empty()) {
             return this->originator_mailbox;
         }
-        std::string mailbox = this->callback_mailbox_stack.top();
+        auto mailbox = this->callback_mailbox_stack.top();
         this->callback_mailbox_stack.pop();
         return mailbox;
     }
@@ -98,7 +98,7 @@ namespace wrench {
      * @brief Get the job's "next" callback mailbox, without popping it
      * @return the next callback mailbox
      */
-    std::string Job::getCallbackMailbox() {
+    simgrid::s4u::Mailbox *Job::getCallbackMailbox() {
         if (this->callback_mailbox_stack.empty()) {
             return this->originator_mailbox;
         }
@@ -110,7 +110,7 @@ namespace wrench {
      *
      * @param mailbox: the mailbox name
      */
-    void Job::pushCallbackMailbox(std::string mailbox) {
+    void Job::pushCallbackMailbox(simgrid::s4u::Mailbox *mailbox) {
         this->callback_mailbox_stack.push(mailbox);
     }
 

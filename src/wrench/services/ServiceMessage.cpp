@@ -29,10 +29,10 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox, bool send_failure_notifications,
+    ServiceStopDaemonMessage::ServiceStopDaemonMessage(simgrid::s4u::Mailbox *ack_mailbox, bool send_failure_notifications,
                                                        ComputeService::TerminationCause termination_cause,
                                                        double payload)
-            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(std::move(ack_mailbox)), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}
+            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(ack_mailbox), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}
 
     /**
      * @brief Constructor

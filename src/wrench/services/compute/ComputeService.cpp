@@ -47,12 +47,12 @@ namespace wrench {
         }
         this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
 
-        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
 
         // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
-        std::string ack_mailbox = S4U_Mailbox::generateUniqueMailboxName("stop");
+        auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::putMessage(this->mailbox,
                                     new ServiceStopDaemonMessage(
                                             ack_mailbox,
                                             send_failure_notifications,
@@ -154,9 +154,8 @@ namespace wrench {
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
-                                   const std::string mailbox_name_prefix,
                                    std::string scratch_space_mount_point) :
-            Service(hostname, service_name, mailbox_name_prefix) {
+            Service(hostname, service_name) {
 
         this->state = ComputeService::UP;
 
@@ -186,9 +185,8 @@ namespace wrench {
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
-                                   const std::string mailbox_name_prefix,
                                    std::shared_ptr<StorageService> scratch_space) :
-            Service(hostname, service_name, mailbox_name_prefix) {
+            Service(hostname, service_name) {
 
         this->state = ComputeService::UP;
         this->scratch_space_storage_service = scratch_space;
@@ -383,10 +381,10 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "info request" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("at_least_one_core_with_idle_resources");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
                     answer_mailbox,
                     num_cores,
                     ram,
@@ -492,10 +490,10 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "info request" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
                     answer_mailbox,
                     key,
                     this->getMessagePayloadValue(

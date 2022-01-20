@@ -39,8 +39,8 @@ namespace wrench {
             std::set<std::shared_ptr<ComputeService>> &compute_services,
             std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
             std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
-            std::string &reply_mailbox)
-            : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
+            simgrid::s4u::Mailbox *reply_mailbox)
+            : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
 
         this->startup_overhead = startup_overhead;
@@ -78,7 +78,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
-                    this->hostname.c_str(), this->mailbox_name.c_str());
+                    this->hostname.c_str(), this->mailbox->get_cname());
 
         std::vector<std::shared_ptr<Job>> scheduled_jobs;
 

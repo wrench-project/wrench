@@ -44,15 +44,15 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        std::string popCallbackMailbox();
+        simgrid::s4u::Mailbox *popCallbackMailbox();
 
         void printCallbackMailboxStack();
 
-        void pushCallbackMailbox(std::string);
+        void pushCallbackMailbox(simgrid::s4u::Mailbox *mailbox);
 
-        std::string getCallbackMailbox();
+        simgrid::s4u::Mailbox *getCallbackMailbox();
 
-        std::string getOriginCallbackMailbox();
+        simgrid::s4u::Mailbox *getOriginCallbackMailbox();
 
         void setParentComputeService(std::shared_ptr<ComputeService> compute_service);
 
@@ -81,11 +81,11 @@ namespace wrench {
         std::map<std::string, std::string> service_specific_args;
 
         /** @brief Stack of callback mailboxes (to pop notifications) */
-        std::stack<std::string> callback_mailbox_stack;
+        std::stack<simgrid::s4u::Mailbox *> callback_mailbox_stack;
         /** @brief The Job Manager in charge of this job **/
         std::shared_ptr<JobManager> job_manager;
         /** @brief The originator's mailbox */
-        std::string originator_mailbox;
+        simgrid::s4u::Mailbox *originator_mailbox;
 
 //        /** @brief The workflow this job belong to */
 //        Workflow *workflow;

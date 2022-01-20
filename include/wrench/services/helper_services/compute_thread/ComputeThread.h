@@ -32,7 +32,7 @@ namespace wrench {
 
     public:
 
-        ComputeThread(std::string hostname, double flops, std::string reply_mailbox);
+        ComputeThread(std::string hostname, double flops, simgrid::s4u::Mailbox *reply_mailbox);
 
         int main() override;
 
@@ -42,7 +42,7 @@ namespace wrench {
 
     private:
         double flops;
-        std::string reply_mailbox;
+        simgrid::s4u::Mailbox *reply_mailbox;
 
     };
 

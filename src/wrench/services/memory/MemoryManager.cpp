@@ -30,7 +30,7 @@ namespace wrench {
                                  int interval,
                                  int expired_time,
                                  std::string hostname) :
-            Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
+            Service(hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
         // Get RAM disk size
         this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");

@@ -171,7 +171,7 @@ namespace wrench {
       reply_decisions = nlohmann::json::parse(reply_data);
       decision_events = reply_decisions["events"];
 
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_network_listener_mailbox");
+      auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
       for (auto decisions:decision_events) {
 
         std::string decision_type = decisions["type"];

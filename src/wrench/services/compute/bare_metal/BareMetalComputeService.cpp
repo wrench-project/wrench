@@ -201,11 +201,11 @@ namespace wrench {
 
         WRENCH_INFO("BareMetalComputeService::submitCompoundJob()");
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "run a standard job" message to the daemon's mailbox_name
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::putMessage(this->mailbox,
                                     new ComputeServiceSubmitCompoundJobRequestMessage(
                                             answer_mailbox, job, service_specific_args,
                                             this->getMessagePayloadValue(
@@ -255,7 +255,6 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
                        "bare_metal",
-                       "bare_metal",
                        scratch_space_mount_point) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -278,7 +277,6 @@ namespace wrench {
                                                      std::map<std::string, std::string> property_list,
                                                      std::map<std::string, double> messagepayload_list
     ) : ComputeService(hostname,
-                       "bare_metal",
                        "bare_metal",
                        scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
@@ -317,7 +315,6 @@ namespace wrench {
             std::string suffix, std::shared_ptr<StorageService> scratch_space
     ) : ComputeService(hostname,
                        "bare_metal" + suffix,
-                       "bare_metal" + suffix,
                        scratch_space) {
         initiateInstance(hostname,
                          std::move(compute_resources),
@@ -344,7 +341,6 @@ namespace wrench {
             std::map<std::string, double> messagepayload_list,
             std::shared_ptr<StorageService> scratch_space) :
             ComputeService(hostname,
-                           "bare_metal",
                            "bare_metal",
                            scratch_space) {
         initiateInstance(hostname,
@@ -430,7 +426,7 @@ namespace wrench {
             // Set up a service termination detector for the action execution service if necessary
             auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
                     new ServiceTerminationDetector(this->hostname, this->action_execution_service,
-                                                   this->mailbox_name, false, true));
+                                                   this->mailbox, false, true));
             termination_detector->setSimulation(this->simulation);
             termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
         }
@@ -466,8 +462,9 @@ namespace wrench {
         // Wait for a message
         std::shared_ptr<SimulationMessage> message;
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> &error) { WRENCH_INFO(
+            message = S4U_Mailbox::getMessage(this->mailbox);
+        } catch (std::shared_ptr<NetworkError> &error) {
+            WRENCH_INFO(
                     "Got a network error while getting some message... ignoring");
             return true;
         }
@@ -538,11 +535,11 @@ namespace wrench {
     void BareMetalComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_compound_job");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         //  send a "terminate a compound job" message to the daemon's mailbox_name
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::putMessage(this->mailbox,
                                     new ComputeServiceTerminateCompoundJobRequestMessage(
                                             answer_mailbox, job, this->getMessagePayloadValue(
                                                     BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
@@ -579,7 +576,7 @@ namespace wrench {
     *
     */
     void BareMetalComputeService::processSubmitCompoundJob(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run a compound job with %ld actions", job->getActions().size());
@@ -675,7 +672,7 @@ namespace wrench {
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
     void BareMetalComputeService::processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job,
-                                                                       const std::string &answer_mailbox) {
+                                                                       simgrid::s4u::Mailbox *answer_mailbox) {
 
         // If the job doesn't exit, we reply right away
         if (this->current_jobs.find(job) == this->current_jobs.end()) {
@@ -710,7 +707,7 @@ namespace wrench {
  * @param num_cores: the desired number of cores
  * @param ram: the desired RAM
  */
-    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox,
+    void BareMetalComputeService::processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                      unsigned long num_cores,
                                                                                      double ram) {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
@@ -726,7 +723,7 @@ namespace wrench {
  * @param answer_mailbox: the mailbox to which the description message should be sent
  * @param key: the desired resource information (i.e., dictionary key) that's needed)
  */
-    void BareMetalComputeService::processGetResourceInformation(const std::string &answer_mailbox,
+    void BareMetalComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                                 const std::string &key) {
 
         std::map<std::string, double> dict;

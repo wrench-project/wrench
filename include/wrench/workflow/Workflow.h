@@ -118,7 +118,7 @@ namespace wrench {
         /***********************/
 
 
-        std::string getCallbackMailbox();
+        simgrid::s4u::Mailbox *getCallbackMailbox();
 
         /***********************/
         /** \endcond           */
@@ -152,7 +152,7 @@ namespace wrench {
         /* Set of files (also kept track by the simulation!) */
         std::set<std::shared_ptr<DataFile>> data_files;
 
-        std::string callback_mailbox;
+        simgrid::s4u::Mailbox *callback_mailbox;
 
 //        Simulation *simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
     };

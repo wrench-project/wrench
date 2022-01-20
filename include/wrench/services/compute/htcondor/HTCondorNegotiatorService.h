@@ -38,7 +38,7 @@ namespace wrench {
                                   std::set<std::shared_ptr<ComputeService>> &compute_services,
                                   std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
                                   std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
-                                  std::string &reply_mailbox);
+                                  simgrid::s4u::Mailbox *reply_mailbox);
 
         ~HTCondorNegotiatorService();
 
@@ -57,7 +57,7 @@ namespace wrench {
         /** startup overhead **/
         double startup_overhead;
         /** mailbox to reply **/
-        std::string reply_mailbox;
+        simgrid::s4u::Mailbox *reply_mailbox;
         /** set of compute resources **/
         std::set<std::shared_ptr<ComputeService>> compute_services;
         /**map of ongoing jobs **/

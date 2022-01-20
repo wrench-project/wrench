@@ -49,7 +49,9 @@ namespace wrench {
          * @brief The S4U way of defining the actor's "main" method
          */
         void operator()() {
+            S4U_Daemon::map_actor_to_recv_mailbox[this->daemon->s4u_actor->get_pid()] = this->daemon->recv_mailbox;
             this->daemon->runMainMethod();
+            S4U_Daemon::map_actor_to_recv_mailbox.erase(this->daemon->s4u_actor->get_pid());
         }
 
     private:

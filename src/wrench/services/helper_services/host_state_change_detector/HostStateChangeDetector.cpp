@@ -50,9 +50,9 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
                                                          std::vector<std::string> hosts_to_monitor,
                                                          bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,
-                                                         std::string mailbox_to_notify,
+                                                         simgrid::s4u::Mailbox *mailbox_to_notify,
                                                          std::map<std::string, std::string> property_list) :
-        Service(host_on_which_to_run, "host_state_change_detector", "host_state_change_detector") {
+        Service(host_on_which_to_run, "host_state_change_detector") {
     this->hosts_to_monitor = hosts_to_monitor;
     this->notify_when_turned_on = notify_when_turned_on;
     this->notify_when_turned_off = notify_when_turned_off;
@@ -124,7 +124,7 @@ int wrench::HostStateChangeDetector::main() {
                 continue;
             }
 
-            WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed state", this->mailbox_to_notify.c_str(),
+            WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed state", this->mailbox_to_notify->get_cname(),
                         hostname.c_str());
             S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
         }
@@ -144,7 +144,7 @@ int wrench::HostStateChangeDetector::main() {
                 continue;
             }
 
-            WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed speed", this->mailbox_to_notify.c_str(),
+            WRENCH_INFO("Notifying mailbox '%s' that host '%s' has changed speed", this->mailbox_to_notify->get_cname(),
                         hostname.c_str());
             S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
         }

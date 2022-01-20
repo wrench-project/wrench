@@ -90,7 +90,6 @@ namespace wrench {
                                              std::string suffix) :
             ComputeService(hostname,
                            "BatchComputeService" + suffix,
-                           "BatchComputeService" + suffix,
                            scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -372,10 +371,10 @@ namespace wrench {
         }
 
         // Send a "run a BatchComputeService job" message to the daemon's mailbox_name
-        auto answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
             S4U_Mailbox::dputMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new BatchComputeServiceJobRequestMessage(
                             answer_mailbox, batch_job,
                             this->getMessagePayloadValue(
@@ -411,12 +410,12 @@ namespace wrench {
     void BatchComputeService::terminateCompoundJob(std::shared_ptr<CompoundJob> job) {
         assertServiceIsUp();
 
-        auto answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_compound_job");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         // Send a "terminate a  job" message to the daemon's mailbox_name
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new ComputeServiceTerminateCompoundJobRequestMessage(
                             answer_mailbox,
                             job,
@@ -602,7 +601,7 @@ namespace wrench {
             terminateRunningCompoundJob(compound_job, termination_cause);
             // Popping, because I am terminating it, so the executor won't pop, and right now
             // if I am at the top of the stack!
-            if (compound_job->getCallbackMailbox() == this->mailbox_name) {
+            if (compound_job->getCallbackMailbox() == this->mailbox) {
                 compound_job->popCallbackMailbox();
             }
             if (send_failure_notifications) {
@@ -751,7 +750,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -822,7 +821,7 @@ namespace wrench {
      * @param job: the BatchComputeService job object
      * @param answer_mailbox: the mailbox to which answer messages should be sent
      */
-    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, std::string answer_mailbox) {
+    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, simgrid::s4u::Mailbox *answer_mailbox) {
         WRENCH_INFO("Asked to run a BatchComputeService job with id %ld", job->getJobID());
 
 
@@ -1023,7 +1022,7 @@ namespace wrench {
                 "Creating a BareMetalComputeServiceOneShot for a compound job on %ld nodes with %ld cores per node",
                 num_nodes_allocated, cores_per_node_asked_for);
 
-        compound_job->pushCallbackMailbox(this->mailbox_name);
+        compound_job->pushCallbackMailbox(this->mailbox);
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(new
                                                                                 BareMetalComputeServiceOneShot(
                 compound_job,
@@ -1056,7 +1055,7 @@ namespace wrench {
         std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
                                                                       batch_job->getEndingTimestamp(),
                                                                       this->hostname,
-                                                                      this->mailbox_name, msg,
+                                                                      this->mailbox, msg,
                                                                       "batch_standard");
         compound_job_alarms[compound_job] = alarm_ptr;
 
@@ -1067,7 +1066,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which the description message should be sent
     * @param key: the desired resource information (i.e., dictionary key) that's needed)
     */
-    void BatchComputeService::processGetResourceInformation(const std::string &answer_mailbox, const std::string &key) {
+    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key) {
         // Build a dictionary
         std::map<std::string, double> dict;
 
@@ -1169,7 +1168,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
     void BatchComputeService::processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job,
-                                                                   std::string answer_mailbox) {
+                                                                   simgrid::s4u::Mailbox *answer_mailbox) {
         std::shared_ptr<BatchJob> batch_job = nullptr;
         // Is it running?
         bool is_running = false;
@@ -1360,7 +1359,7 @@ namespace wrench {
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      */
-    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(const std::string &answer_mailbox,
+    void BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  unsigned long num_cores, double ram) {
         throw std::runtime_error(
                 "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A BatchComputeService compute service does not support this operation");
