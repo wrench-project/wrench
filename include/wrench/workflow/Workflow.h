@@ -112,26 +112,12 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-
-
-        simgrid::s4u::Mailbox *getCallbackMailbox();
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     private:
         friend class WMS;
         friend class Simulation;
         friend class WorkflowTask;
 
         Workflow();
-
-
 
         struct Vertex{ std::shared_ptr<WorkflowTask>task;};
         typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Vertex> DAG;
@@ -152,9 +138,6 @@ namespace wrench {
         /* Set of files (also kept track by the simulation!) */
         std::set<std::shared_ptr<DataFile>> data_files;
 
-        simgrid::s4u::Mailbox *callback_mailbox;
-
-//        Simulation *simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
     };
 };
 
