@@ -30,8 +30,8 @@ namespace wrench {
      * @param hostname: the hostname on which the data movement manager is to run
      * @param creator_mailbox: the mailbox of the manager's creator
      */
-    DataMovementManager::DataMovementManager(std::string hostname, std::string &creator_mailbox) :
-            Service(hostname, "data_movement_manager", "data_movement_manager") {
+    DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) :
+            Service(hostname, "data_movement_manager") {
 
         this->creator_mailbox = creator_mailbox;
 
@@ -53,7 +53,7 @@ namespace wrench {
      */
     void DataMovementManager::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+            S4U_Mailbox::putMessage(this->mailbox, new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -94,7 +94,7 @@ namespace wrench {
         try {
             this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(
                     new CopyRequestSpecs(file, src, dst, file_registry_service)));
-            wrench::StorageService::initiateFileCopy(this->mailbox_name, file,
+            wrench::StorageService::initiateFileCopy(this->mailbox, file,
                                                        src, dst);
         } catch (ExecutionException &e) {
             throw;
@@ -152,7 +152,7 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox_name.c_str());
+        WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox->get_cname());
 
         while (processNextMessage()) {
 
@@ -175,7 +175,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;
@@ -238,7 +238,7 @@ namespace wrench {
      *
      * @return a mailbox
      */
-    std::string &DataMovementManager::getCreatorMailbox() {
+    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
         return this->creator_mailbox;
     }
 

@@ -60,7 +60,7 @@ namespace wrench {
         friend class WMS;
         friend class ExecutionController;
 
-        explicit DataMovementManager(std::string hostname, std::string &creator_mailbox);
+        explicit DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox);
 
         /***********************/
         /** \endcond           */
@@ -70,9 +70,9 @@ namespace wrench {
 
         int main() override;
 
-        std::string &getCreatorMailbox();
+        simgrid::s4u::Mailbox *getCreatorMailbox();
 
-        std::string creator_mailbox;
+        simgrid::s4u::Mailbox *creator_mailbox;
 
         bool processNextMessage();
 

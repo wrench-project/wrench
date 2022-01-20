@@ -23,7 +23,7 @@ class BogusMessageTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Service> service = nullptr;
-    std::string dst_mailbox;
+    simgrid::s4u::Mailbox *dst_mailbox;
 
     void do_BogusMessage_Test(std::string service_type);
 
@@ -165,7 +165,7 @@ private:
         if (this->create_data_movement_manager)
         {
             auto dmm = this->createDataMovementManager();
-            this->test->dst_mailbox = dmm->mailbox_name;
+            this->test->dst_mailbox = dmm->mailbox;
         }
         this->waitForAndProcessNextEvent();
         return 0;
@@ -215,18 +215,18 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     // Create a service
     if (service_type == "file_registry") {
         this->service = simulation->add(new wrench::FileRegistryService(hostname));
-        this->dst_mailbox = this->service->mailbox_name;
+        this->dst_mailbox = this->service->mailbox;
     } else if (service_type == "simple_storage") {
         this->service = simulation->add(new wrench::SimpleStorageService(hostname, {"/"}));
-        this->dst_mailbox = this->service->mailbox_name;
+        this->dst_mailbox = this->service->mailbox;
     } else if (service_type == "wms") {
         auto wms = new NoopWMS(this, hostname, false);
         this->service = simulation->add(wms);
-        this->dst_mailbox = wms->mailbox_name;
+        this->dst_mailbox = wms->mailbox;
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);
-        this->dst_mailbox = ""; // Will be set by the WMS on DMM is created
+        this->dst_mailbox = nullptr; // Will be set by the WMS on DMM is created
     }
 
     // Create the Bogus Message WMS

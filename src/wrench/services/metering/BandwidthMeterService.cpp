@@ -23,7 +23,7 @@ namespace wrench {
      * @param measurement_periods: the measurement period for each monitored link
      */
     BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
-            Service(hostname, "bandwidth_meter", "bandwidth_meter") {
+            Service(hostname, "bandwidth_meter") {
         if (measurement_periods.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
@@ -51,7 +51,7 @@ namespace wrench {
      */
     BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::vector<std::string> &linknames,
                                            double measurement_period) :
-            Service(hostname, "bandwidth_meter", "bandwidth_meter") {
+            Service(hostname, "bandwidth_meter") {
         if (linknames.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
@@ -83,8 +83,8 @@ namespace wrench {
      */
     void BandwidthMeterService::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new ServiceStopDaemonMessage("", false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
+            S4U_Mailbox::putMessage(this->mailbox,
+                                    new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -97,7 +97,7 @@ namespace wrench {
     int BandwidthMeterService::main() {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->mailbox_name.c_str());
+        WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->mailbox->get_cname());
         for (auto const &l : this->measurement_periods) {
             WRENCH_INFO("  - %s", l.first.c_str());
         }
@@ -153,7 +153,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }

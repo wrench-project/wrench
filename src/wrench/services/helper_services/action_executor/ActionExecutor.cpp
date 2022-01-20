@@ -36,7 +36,7 @@ namespace wrench {
             std::string hostname,
             unsigned long num_cores,
             double ram_footprint,
-            std::string callback_mailbox,
+            simgrid::s4u::Mailbox *callback_mailbox,
             std::shared_ptr <Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) :
             ExecutionController(hostname, "action_executor") {
@@ -45,7 +45,7 @@ namespace wrench {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");
         }
 
-        this->callback_mailbox = std::move(callback_mailbox);
+        this->callback_mailbox = callback_mailbox;
         this->action = action;
         this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;

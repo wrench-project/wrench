@@ -86,7 +86,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
 
         ~Service() override;
 
-        Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix);
+        Service(std::string hostname, std::string process_name_prefix);
 
         // Property stuff
         void setProperty(std::string, std::string);

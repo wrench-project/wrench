@@ -39,7 +39,7 @@ namespace wrench {
             std::string hostname,
             std::map<std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list) :
-            Service(hostname, "file_registry", "file_registry") {
+            Service(hostname, "file_registry") {
 
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -65,10 +65,10 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
                     answer_mailbox, file,
                     this->getMessagePayloadValue(
                             FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
@@ -123,11 +123,11 @@ namespace wrench {
                     " does not exist");
         }
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new FileRegistryFileLookupByProximityRequestMessage(
                             answer_mailbox, file,
                             reference_host,
@@ -170,11 +170,11 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new FileRegistryAddEntryRequestMessage(
                             answer_mailbox, file, location,
                             this->getMessagePayloadValue(
@@ -214,11 +214,11 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new FileRegistryRemoveEntryRequestMessage(
                             answer_mailbox, file, location,
                             this->getMessagePayloadValue(
@@ -275,7 +275,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }

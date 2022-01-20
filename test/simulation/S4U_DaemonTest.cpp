@@ -78,7 +78,7 @@ class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
     Sleep100Daemon(std::string hostname) :
-            S4U_Daemon(hostname, "sleep100daemon", "sleep100daemon") {}
+            S4U_Daemon(hostname, "sleep100daemon") {}
 
     int main() override {
         simgrid::s4u::this_actor::execute(100);

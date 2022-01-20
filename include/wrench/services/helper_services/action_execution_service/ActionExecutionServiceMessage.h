@@ -40,14 +40,14 @@ namespace wrench {
     class ActionExecutionServiceSubmitActionRequestMessage : public ActionExecutionServiceMessage {
     public:
         ActionExecutionServiceSubmitActionRequestMessage(
-                const std::string &reply_mailbox,
+                simgrid::s4u::Mailbox *reply_mailbox,
                 std::shared_ptr<Action> action,
                 double payload);
 
         /** @brief The action to be executed */
         std::shared_ptr<Action> action;
         /** @brief The reply mailbox */
-        std::string reply_mailbox;
+        simgrid::s4u::Mailbox *reply_mailbox;
     };
 
     /**
@@ -72,13 +72,13 @@ namespace wrench {
     class ActionExecutionServiceTerminateActionRequestMessage : public ActionExecutionServiceMessage {
     public:
         ActionExecutionServiceTerminateActionRequestMessage(
-                const std::string &reply_mailbox,
+                simgrid::s4u::Mailbox *reply_mailbox,
                 std::shared_ptr<Action> action,
                 ComputeService::TerminationCause termination_cause,
                 double payload);
 
         /** @brief The reply mailbox */
-        std::string reply_mailbox;
+        simgrid::s4u::Mailbox *reply_mailbox;
         /** @brief The action to terminate  */
         std::shared_ptr<Action> action;
         /** @brief The termination cause */

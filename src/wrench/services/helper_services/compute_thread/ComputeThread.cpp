@@ -24,9 +24,9 @@ namespace wrench {
      * @param flops: the number of flops to perform
      * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent (if empty, no message is sent)
      */
-    ComputeThread::ComputeThread(std::string hostname, double flops, std::string reply_mailbox)
+    ComputeThread::ComputeThread(std::string hostname, double flops, simgrid::s4u::Mailbox *reply_mailbox)
             :
-            Service(hostname, "compute_thread", "compute_thread") {
+            Service(hostname, "compute_thread") {
         this->flops = flops;
         this->reply_mailbox = reply_mailbox;
     }
@@ -41,7 +41,7 @@ namespace wrench {
                     S4U_Simulation::getFlopRate());
         try {
             S4U_Simulation::compute(this->flops);
-            if (not this->reply_mailbox.empty()) {
+            if (this->reply_mailbox) {
                 try {
                     S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
                 } catch (std::shared_ptr<NetworkError> &e) {

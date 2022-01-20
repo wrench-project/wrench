@@ -30,7 +30,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(std::string &answer_mailbox,
+    BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                      std::string job_args_to_scheduler,
                                                                                      double payload)
             : BatchComputeServiceMessage("BATCH_SIMULATION_BEGINS", payload) {
@@ -73,11 +73,11 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(const std::string &answer_mailbox,
+    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
             : BatchComputeServiceMessage("BatchExecuteJobFromBatSchedMessage", payload), answer_mailbox(answer_mailbox), batsched_decision_reply(batsched_decision_reply) {
-        if (answer_mailbox.empty()) {
+        if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
         }
@@ -152,14 +152,14 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(const std::string &answer_mailbox,
+    BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<BatchJob> job, double payload)
             : BatchComputeServiceMessage("BatchComputeServiceJobRequestMessage", payload), answer_mailbox(answer_mailbox), job(job) {
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
         }
-        if (answer_mailbox.empty()) {
+        if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer mailbox");
         }

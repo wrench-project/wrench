@@ -102,33 +102,33 @@ namespace wrench {
         unsigned long getNewUniqueNumber();
 
         bool processFileDeleteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
-                                      std::string answer_mailbox);
+                                      simgrid::s4u::Mailbox *answer_mailbox);
 
-        bool processFileWriteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation>, std::string answer_mailbox,
+        bool processFileWriteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation>, simgrid::s4u::Mailbox *answer_mailbox,
                                      unsigned long buffer_size);
 
         bool
         processFileReadRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
-                               double num_bytes_to_read, std::string answer_mailbox,
-                               std::string mailbox_to_receive_the_file_content, unsigned long buffer_size);
+                               double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
+                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
         bool processFileCopyRequest(std::shared_ptr<DataFile>file,
                                     std::shared_ptr <FileLocation> src,
                                     std::shared_ptr <FileLocation> dst,
-                                    std::string answer_mailbox);
+                                    simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileTransferThreadNotification(
                 std::shared_ptr <FileTransferThread> ftt,
                 std::shared_ptr<DataFile>file,
-                std::string src_mailbox,
+                simgrid::s4u::Mailbox *src_mailbox,
                 std::shared_ptr <FileLocation> src_location,
-                std::string dst_mailbox,
+                simgrid::s4u::Mailbox *dst_mailbox,
                 std::shared_ptr <FileLocation> dst_location,
                 bool success,
                 std::shared_ptr <FailureCause> failure_cause,
-                std::string answer_mailbox_if_read,
-                std::string answer_mailbox_if_write,
-                std::string answer_mailbox_if_copy);
+                simgrid::s4u::Mailbox *answer_mailbox_if_read,
+                simgrid::s4u::Mailbox *answer_mailbox_if_write,
+                simgrid::s4u::Mailbox *answer_mailbox_if_copy);
 
         unsigned long num_concurrent_connections;
 

@@ -85,7 +85,7 @@ namespace wrench {
 
         bool processNextMessage() override;
 
-        virtual void processMigrateVM(const std::string &answer_mailbox,
+        virtual void processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                       const std::string &vm_name,
                                       const std::string &dest_pm_hostname);
 

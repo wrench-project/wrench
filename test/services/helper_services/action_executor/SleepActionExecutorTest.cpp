@@ -135,14 +135,14 @@ private:
         auto sleep_action = job->addSleepAction("", 10.0);
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox_name, sleep_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox, sleep_action, nullptr));
         // Start it
         sleep_action_executor->setSimulation(this->simulation);
         sleep_action_executor->start(sleep_action_executor, true, false);
         // Wait for a message from it
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
         }

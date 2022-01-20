@@ -126,7 +126,7 @@ namespace wrench {
 
         void processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor);
 
-        void processActionTerminationRequest(std::shared_ptr<Action> action, const std::string &answer_mailbox, ComputeService::TerminationCause termination_cause);
+        void processActionTerminationRequest(std::shared_ptr<Action> action, simgrid::s4u::Mailbox *answer_mailbox, ComputeService::TerminationCause termination_cause);
 
         bool processNextMessage();
 
@@ -150,7 +150,7 @@ namespace wrench {
         void killAction(std::shared_ptr<Action> action, std::shared_ptr<FailureCause> cause);
 
 
-        void processSubmitAction(const std::string &answer_mailbox, std::shared_ptr<Action> action);
+        void processSubmitAction(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<Action> action);
 
         std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<Action> action,
                                                               std::string required_host, unsigned long required_num_cores,

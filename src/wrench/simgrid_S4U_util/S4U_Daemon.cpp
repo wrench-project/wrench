@@ -28,14 +28,15 @@ std::map<std::string, unsigned long> num_actors;
 
 namespace wrench {
 
+    std::map<aid_t, simgrid::s4u::Mailbox*> S4U_Daemon::map_actor_to_recv_mailbox;
+
     /**
      * @brief Constructor (daemon with a mailbox)
      *
      * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
-     * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
-    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
+    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
 
         if (not simgrid::s4u::Engine::is_initialized()) {
             throw std::runtime_error("Simulation must be initialized before services can be created");
@@ -72,26 +73,17 @@ namespace wrench {
         this->hostname = hostname;
         this->simulation = nullptr;
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
-        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
-        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+//        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+//        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+        this->mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("mb"));
+        this->recv_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("rmb"));
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
     }
 
-#define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
-
     S4U_Daemon::~S4U_Daemon() {
 
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
-
-        /** The code below was to avoid a memory_manager_service leak on the actor! However, weirdly,
-         *  it now causes problems due to SimGrid complaining that on_exit() functions
-         *  shouldn't do blocking things.... So it's commented-out for now
-         */
-#if (CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK == 1)
-         auto mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-         mailbox->set_receiver(nullptr);
-#endif
 
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
@@ -160,7 +152,7 @@ namespace wrench {
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
-        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+//        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
@@ -195,7 +187,7 @@ namespace wrench {
 
         // Set the mailbox_name receiver (causes memory_manager_service leak)
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
-        simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
+        this->mailbox->set_receiver(this->s4u_actor);
 
 
     }
@@ -379,6 +371,14 @@ namespace wrench {
      */
     void S4U_Daemon::setSimulation(Simulation *simulation) {
         this->simulation = simulation;
+    }
+
+    /**
+     * @brief Return the running actor's recv mailbox
+     * @return the mailbox
+     */
+    simgrid::s4u::Mailbox *S4U_Daemon::getRunningActorRecvMailbox() {
+        return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
     }
 
 };

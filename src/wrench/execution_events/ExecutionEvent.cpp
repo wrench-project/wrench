@@ -34,7 +34,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    std::shared_ptr<ExecutionEvent> ExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
+    std::shared_ptr<ExecutionEvent> ExecutionEvent::waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox) {
         return ExecutionEvent::waitForNextExecutionEvent(mailbox, -1);
     }
 
@@ -50,7 +50,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::shared_ptr<ExecutionEvent>
-    ExecutionEvent::waitForNextExecutionEvent(std::string mailbox, double timeout) {
+    ExecutionEvent::waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox, double timeout) {
 
         // Get the message from the mailbox_name
         std::unique_ptr<SimulationMessage> message = nullptr;

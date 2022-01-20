@@ -28,11 +28,11 @@ namespace wrench {
      * @param file: the file to look up
      * @param payload: the message size in bytes
      */
-    FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(const std::string &answer_mailbox,
+    FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<DataFile>file, double payload) :
             FileRegistryMessage("FILE_LOOKUP_REQUEST", payload), answer_mailbox(answer_mailbox), file(file) {
 
-        if ((answer_mailbox == "") || file == nullptr) {
+        if ((answer_mailbox == nullptr) || file == nullptr) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(): Invalid argument");
         }
@@ -65,10 +65,10 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
-            std::string answer_mailbox, std::shared_ptr<DataFile>file, std::string reference_host,
+            simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file, std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) :
             FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_REQUEST", payload) {
-        if ((file == nullptr) || (answer_mailbox == "") || (reference_host == "") ||
+        if ((file == nullptr) || (answer_mailbox == nullptr) || (reference_host == "") ||
             (network_proximity_service == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(): Invalid Argument");
@@ -107,12 +107,12 @@ namespace wrench {
      * @param location: the file location of that entry
      * @param payload: the message size in bytes
      */
-    FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(const std::string &answer_mailbox,
+    FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  double payload) :
             FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload), answer_mailbox(answer_mailbox), file(file), location(location) {
-        if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
         }
@@ -137,12 +137,12 @@ namespace wrench {
      * @param location: the location for the new entry
      * @param payload: the message size in bytes
      */
-    FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(const std::string &answer_mailbox,
+    FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                            std::shared_ptr<DataFile>file,
                                                                            std::shared_ptr<FileLocation> location,
                                                                            double payload) :
             FileRegistryMessage("ADD_ENTRY_REQUEST", payload), answer_mailbox(answer_mailbox), file(file), location(location) {
-        if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
         }

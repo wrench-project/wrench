@@ -280,7 +280,7 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
-        this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
+        this->callback_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox"));
     }
 
     /**
@@ -441,7 +441,7 @@ namespace wrench {
      *
      * @return the mailbox name
      */
-    std::string Workflow::getCallbackMailbox()  {
+    simgrid::s4u::Mailbox *Workflow::getCallbackMailbox()  {
         return this->callback_mailbox;
     }
 

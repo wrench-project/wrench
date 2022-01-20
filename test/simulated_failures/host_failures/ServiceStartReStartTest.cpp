@@ -101,7 +101,7 @@ private:
         wrench::Simulation::turnOffHost("FailedHost");
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         sleeper->setSimulation(this->simulation);
         try {
             sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
@@ -173,7 +173,7 @@ private:
     int main() override {
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         sleeper->setSimulation(this->simulation);
         sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
 
@@ -192,7 +192,7 @@ private:
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }

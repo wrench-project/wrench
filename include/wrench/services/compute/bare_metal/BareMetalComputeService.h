@@ -185,7 +185,7 @@ namespace wrench {
 
         void processActionDone(std::shared_ptr<Action> action);
 
-        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, const std::string &answer_mailbox);
+        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processNextMessage();
 
@@ -194,15 +194,15 @@ namespace wrench {
 
         void terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
 
-        void processGetResourceInformation(const std::string &answer_mailbox, const std::string &key);
+        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
 //        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 
-        void processSubmitCompoundJob(const std::string &answer_mailbox, std::shared_ptr<CompoundJob> job,
+        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
-                const std::string &answer_mailbox, unsigned long num_cores, double ram);
+                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
 //        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<WorkflowTask>task,
 //                                                              std::string required_host, unsigned long required_num_cores, double required_ram,

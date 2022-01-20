@@ -91,7 +91,7 @@ namespace wrench {
             std::map <std::string, std::string> property_list,
             std::map<std::string, double> messagepayload_list,
             std::string suffix) :
-            StorageService(std::move(hostname), mount_points, "simple_storage" + suffix, "simple_storage" + suffix) {
+            StorageService(std::move(hostname), mount_points, "simple_storage" + suffix) {
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
         this->validateProperties();
@@ -169,7 +169,7 @@ namespace wrench {
         std::shared_ptr <SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr <NetworkError> &cause) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true; // oh well
@@ -256,7 +256,7 @@ namespace wrench {
      * @return true if this process should keep running
      */
     bool SimpleStorageService::processFileWriteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
-                                                       std::string answer_mailbox, unsigned long buffer_size) {
+                                                       simgrid::s4u::Mailbox *answer_mailbox, unsigned long buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr <FailureCause> failure_cause = nullptr;
 
@@ -299,7 +299,7 @@ namespace wrench {
             fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
 
             // Generate a mailbox_name name on which to receive the file
-            std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
+            auto file_reception_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("file_reception"));
 
             // Reply with a "go ahead, send me the file" message
             S4U_Mailbox::dputMessage(
@@ -321,9 +321,9 @@ namespace wrench {
                                            file->getSize(),
                                            file_reception_mailbox,
                                            location,
-                                           "",
+                                           nullptr,
                                            answer_mailbox,
-                                           "",
+                                           nullptr,
                                            buffer_size));
             ftt->setSimulation(this->simulation);
 
@@ -339,7 +339,7 @@ namespace wrench {
                             location,
                             false,
                             failure_cause,
-                            "",
+                            nullptr,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
         }
@@ -360,8 +360,8 @@ namespace wrench {
     bool SimpleStorageService::processFileReadRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> location,
                                                       double num_bytes_to_read,
-                                                      std::string answer_mailbox,
-                                                      std::string mailbox_to_receive_the_file_content,
+                                                      simgrid::s4u::Mailbox *answer_mailbox,
+                                                      simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                                       unsigned long buffer_size) {
 
         // Figure out whether this succeeds or not
@@ -410,8 +410,8 @@ namespace wrench {
                                            location,
                                            mailbox_to_receive_the_file_content,
                                            answer_mailbox,
-                                           "",
-                                           "",
+                                           nullptr,
+                                           nullptr,
                                            buffer_size));
             ftt->setSimulation(this->simulation);
 
@@ -433,7 +433,7 @@ namespace wrench {
     bool SimpleStorageService::processFileCopyRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> src_location,
                                                       std::shared_ptr <FileLocation> dst_location,
-                                                      std::string answer_mailbox) {
+                                                      simgrid::s4u::Mailbox *answer_mailbox) {
 //        // File System  and path at the destination exists?
 //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
 //
@@ -508,8 +508,8 @@ namespace wrench {
                                        file->getSize(),
                                        src_location,
                                        dst_location,
-                                       "",
-                                       "",
+                                       nullptr,
+                                       nullptr,
                                        answer_mailbox,
                                        this->buffer_size));
         ftt->setSimulation(this->simulation);
@@ -549,15 +549,15 @@ namespace wrench {
      */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr <FileTransferThread> ftt,
                                                                      std::shared_ptr<DataFile>file,
-                                                                     std::string src_mailbox,
+                                                                     simgrid::s4u::Mailbox *src_mailbox,
                                                                      std::shared_ptr <FileLocation> src_location,
-                                                                     std::string dst_mailbox,
+                                                                     simgrid::s4u::Mailbox *dst_mailbox,
                                                                      std::shared_ptr <FileLocation> dst_location,
                                                                      bool success,
                                                                      std::shared_ptr <FailureCause> failure_cause,
-                                                                     std::string answer_mailbox_if_read,
-                                                                     std::string answer_mailbox_if_write,
-                                                                     std::string answer_mailbox_if_copy) {
+                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_read,
+                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_write,
+                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_copy) {
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO(
@@ -587,21 +587,21 @@ namespace wrench {
         }
 
         // Send back the relevant ack if this was a read
-        if (not answer_mailbox_if_read.empty()) {
+        if (answer_mailbox_if_read) {
             WRENCH_DEBUG(
                     "Sending back an ack since this was a file read and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
         }
 
         // Send back the relevant ack if this was a write
-        if (not answer_mailbox_if_write.empty()) {
+        if (answer_mailbox_if_write) {
             WRENCH_DEBUG(
                     "Sending back an ack since this was a file write and some client is waiting for me to say something");
             S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
         }
 
         // Send back the relevant ack if this was a copy
-        if (not answer_mailbox_if_copy.empty()) {
+        if (answer_mailbox_if_copy) {
             WRENCH_DEBUG(
                     "Sending back an ack since this was a file copy and some client is waiting for me to say something");
             if ((src_location == nullptr) or (dst_location == nullptr)) {
@@ -634,7 +634,7 @@ namespace wrench {
      */
     bool SimpleStorageService::processFileDeleteRequest(std::shared_ptr<DataFile>file,
                                                         std::shared_ptr <FileLocation> location,
-                                                        std::string answer_mailbox) {
+                                                        simgrid::s4u::Mailbox *answer_mailbox) {
         std::shared_ptr <FailureCause> failure_cause = nullptr;
 
         auto fs = this->file_systems[location->getMountPoint()].get();

@@ -233,7 +233,7 @@ private:
                 new wrench::ActionExecutor("Host2",
                                            num_cores,
                                            ram,
-                                           this->mailbox_name,
+                                           this->mailbox,
                                            action, nullptr));
 
         // Start it

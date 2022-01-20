@@ -33,13 +33,13 @@ namespace wrench {
    * @throw std::invalid_arguments
    */
     ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             const std::map<std::string, std::string> service_specific_args,
             double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload),
             answer_mailbox(answer_mailbox), job(job), service_specific_args(service_specific_args) {
-        if ((answer_mailbox.empty()) || (job == nullptr)) {
+        if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(): Invalid arguments");
         }
@@ -122,11 +122,11 @@ namespace wrench {
     * @throw std::invalid_arguments
     */
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             double payload) :
             ComputeServiceMessage("TERMINATE_COMPOUND_JOB_REQUEST", payload), answer_mailbox(answer_mailbox), job(job) {
-        if ((answer_mailbox == "") || (job == nullptr)) {
+        if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(): Invalid arguments");
         }
@@ -286,11 +286,11 @@ namespace wrench {
     * @throw std::invalid_arguments
     */
     ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(
-            std::string answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<PilotJob> job,
             double payload) :
             ComputeServiceMessage("TERMINATE_PILOT_JOB_REQUEST", payload) {
-        if ((answer_mailbox == "") || (job == nullptr)) {
+        if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
         }
@@ -335,11 +335,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(
-            const std::string& answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &key,
             double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload), answer_mailbox(answer_mailbox), key(key) {
-        if (answer_mailbox.empty() or key.empty()) {
+        if ((answer_mailbox == nullptr) or key.empty()) {
             throw std::invalid_argument(
                     "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
         }
@@ -369,11 +369,11 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-            const std::string &answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
+            simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
             "DOES_AT_LEAST_ONE_HOST_HAVE_THIS_MANY_IDLE_CORES_REQUEST",
             payload) {
 
-        if (answer_mailbox.empty()) {
+        if (not answer_mailbox) {
             throw std::invalid_argument(
                     "ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(): "
                     "Invalid arguments");

@@ -38,9 +38,8 @@ namespace wrench {
      */
     StorageService::StorageService(const std::string &hostname,
                                    const std::set<std::string> mount_points,
-                                   const std::string &service_name,
-                                   const std::string &mailbox_name_prefix) :
-            Service(hostname, service_name, mailbox_name_prefix) {
+                                   const std::string &service_name) :
+            Service(hostname, service_name) {
         if (mount_points.empty()) {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
         }
@@ -144,9 +143,9 @@ namespace wrench {
         assertServiceIsUp();
 
         // Send a message to the daemon
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("how_much_free_space");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
                     answer_mailbox,
                     this->getMessagePayloadValue(
                             StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
@@ -191,10 +190,10 @@ namespace wrench {
         assertServiceIsUp(storage_service);
 
         // Send a message to the daemon
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_file");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
             S4U_Mailbox::putMessage(
-                    location->getStorageService()->mailbox_name,
+                    location->getStorageService()->mailbox,
                     new StorageServiceFileLookupRequestMessage(
                             answer_mailbox,
                             file,
@@ -257,10 +256,10 @@ namespace wrench {
         assertServiceIsUp(storage_service);
 
         // Send a message to the daemon
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(storage_service->mailbox_name,
+            S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileReadRequestMessage(
                                             answer_mailbox,
                                             answer_mailbox,
@@ -351,10 +350,10 @@ namespace wrench {
         assertServiceIsUp(storage_service);
 
         // Send a  message to the daemon
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(storage_service->mailbox_name,
+            S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileWriteRequestMessage(
                                             answer_mailbox,
                                             file,
@@ -387,12 +386,12 @@ namespace wrench {
                 try {
                     double remaining = file->getSize();
                     while (remaining > storage_service->buffer_size) {
-                        S4U_Mailbox::putMessage(msg->data_write_mailbox_name,
+                        S4U_Mailbox::putMessage(msg->data_write_mailbox,
                                                 new StorageServiceFileContentChunkMessage(
                                                         file, storage_service->buffer_size, false));
                         remaining -= storage_service->buffer_size;
                     }
-                    S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentChunkMessage(
+                    S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
                             file, remaining, true));
 
                 } catch (std::shared_ptr<NetworkError> &cause) {
@@ -515,9 +514,9 @@ namespace wrench {
 
         bool unregister = (file_registry_service != nullptr);
         // Send a message to the daemon
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
-            S4U_Mailbox::putMessage(storage_service->mailbox_name,
+            S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileDeleteRequestMessage(
                                             answer_mailbox,
                                             file,
@@ -574,14 +573,14 @@ namespace wrench {
         assertServiceIsUp(dst_location->getStorageService());
 
         // Send a message to the daemon of the dst service
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
 
         try {
             S4U_Mailbox::putMessage(
-                    dst_location->getStorageService()->mailbox_name,
+                    dst_location->getStorageService()->mailbox,
                     new StorageServiceFileCopyRequestMessage(
                             answer_mailbox,
                             file,
@@ -624,7 +623,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(std::string &answer_mailbox, std::shared_ptr<DataFile>file,
+    void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file,
                                           std::shared_ptr<FileLocation> src_location,
                                           std::shared_ptr<FileLocation> dst_location) {
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
@@ -641,7 +640,7 @@ namespace wrench {
         // Send a message to the daemon on the dst location
         try {
             S4U_Mailbox::putMessage(
-                    dst_location->getStorageService()->mailbox_name,
+                    dst_location->getStorageService()->mailbox,
                     new StorageServiceFileCopyRequestMessage(
                             answer_mailbox,
                             file,

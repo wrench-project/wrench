@@ -43,7 +43,7 @@ namespace wrench {
                                              std::string scratch_space_mount_point,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, double> messagepayload_list) :
-            ComputeService(hostname, "cloud_service", "cloud_service",
+            ComputeService(hostname, "cloud_service",
                            scratch_space_mount_point) {
         if (execution_hosts.empty()) {
             throw std::invalid_argument(
@@ -86,7 +86,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "get execution hosts" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_execution_hosts");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -155,7 +155,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "create vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -210,7 +210,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("shutdown_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -246,7 +246,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -316,7 +316,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("suspend_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -351,7 +351,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("resume_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -387,7 +387,7 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "shutdown vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("destroy_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -470,7 +470,7 @@ namespace wrench {
 
         WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s",
                     this->hostname.c_str(),
-                    this->mailbox_name.c_str());
+                    this->mailbox->get_cname());
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -490,12 +490,12 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    std::shared_ptr<SimulationMessage> CloudComputeService::sendRequest(std::string &answer_mailbox,
+    std::shared_ptr<SimulationMessage> CloudComputeService::sendRequest(simgrid::s4u::Mailbox *answer_mailbox,
                                                                         ComputeServiceMessage *message) {
         serviceSanityCheck();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, message);
+            S4U_Mailbox::putMessage(this->mailbox, message);
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -526,7 +526,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -608,7 +608,7 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
-    void CloudComputeService::processGetExecutionHosts(const std::string &answer_mailbox) {
+    void CloudComputeService::processGetExecutionHosts(simgrid::s4u::Mailbox *answer_mailbox) {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new CloudComputeServiceGetExecutionHostsAnswerMessage(
@@ -629,7 +629,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudComputeService::processCreateVM(const std::string &answer_mailbox,
+    void CloudComputeService::processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                               unsigned long requested_num_cores,
                                               double requested_ram,
                                               std::string desired_vm_name,
@@ -725,7 +725,7 @@ namespace wrench {
      * @param send_failure_notifications: whether to send failure notifications
      * @param termination_cause: termination cause (if failure notifications are sent)
      */
-    void CloudComputeService::processShutdownVM(const std::string &answer_mailbox,
+    void CloudComputeService::processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
                                                 const std::string &vm_name,
                                                 bool send_failure_notifications,
                                                 ComputeService::TerminationCause termination_cause) {
@@ -871,7 +871,7 @@ namespace wrench {
      * @param vm_name: the name of the VM
      * @param pm_name: the name of the physical host on which to start the VM (empty string if up to the service to pick a host)
      */
-    void CloudComputeService::processStartVM(const std::string &answer_mailbox,
+    void CloudComputeService::processStartVM(simgrid::s4u::Mailbox *answer_mailbox,
                                              const std::string &vm_name,
                                              const std::string &pm_name) {
         auto vm_pair = this->vm_list[vm_name];
@@ -949,7 +949,7 @@ namespace wrench {
                 // Create a failure detector for the service
                 auto termination_detector = std::shared_ptr<ServiceTerminationDetector>(
                         new ServiceTerminationDetector(this->hostname, std::get<1>(this->vm_list[vm_name]),
-                                                       this->mailbox_name, false, true));
+                                                       this->mailbox, false, true));
                 termination_detector->setSimulation(this->simulation);
                 termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
 
@@ -971,7 +971,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
-    void CloudComputeService::processSuspendVM(const std::string &answer_mailbox,
+    void CloudComputeService::processSuspendVM(simgrid::s4u::Mailbox *answer_mailbox,
                                                const std::string &vm_name) {
         auto vm_pair = this->vm_list[vm_name];
         auto vm = vm_pair.first;
@@ -1016,7 +1016,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_name: the name of the VM
      */
-    void CloudComputeService::processResumeVM(const std::string &answer_mailbox,
+    void CloudComputeService::processResumeVM(simgrid::s4u::Mailbox *answer_mailbox,
                                               const std::string &vm_name) {
         WRENCH_INFO("Asked to resume VM %s", vm_name.c_str());
         auto vm_pair = this->vm_list[vm_name];
@@ -1054,7 +1054,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which the answer message should be sent
     * @param vm_name: the name of the VM
     */
-    void CloudComputeService::processDestroyVM(const std::string &answer_mailbox,
+    void CloudComputeService::processDestroyVM(simgrid::s4u::Mailbox *answer_mailbox,
                                                const std::string &vm_name) {
         WRENCH_INFO("Asked to destroy VM %s", vm_name.c_str());
         auto vm_pair = this->vm_list[vm_name];
@@ -1089,7 +1089,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the description message should be sent
      * @param key: the desired resource information (i.e., dictionary key) that's needed)
      */
-    void CloudComputeService::processGetResourceInformation(const std::string &answer_mailbox,
+    void CloudComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                             const std::string &key) {
         // Build a dictionary
         std::map<std::string, double> dict;
@@ -1210,7 +1210,7 @@ namespace wrench {
      * @param ram: the desired RAM
      */
     void CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(
-            const std::string &answer_mailbox, unsigned long num_cores, double ram) {
+            simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram) {
         throw std::runtime_error(
                 "CloudComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A Cloud service does not support this operation");
     }
