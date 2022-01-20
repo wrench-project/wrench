@@ -280,7 +280,6 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
-        this->callback_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox"));
     }
 
     /**
@@ -433,16 +432,6 @@ namespace wrench {
             throw std::invalid_argument("Workflow::getTaskNumberOfParents(): Invalid arguments");
         }
         return this->dag.getNumberOfParents(task.get());
-    }
-
-
-    /**
-     * @brief Get the mailbox name associated to this workflow
-     *
-     * @return the mailbox name
-     */
-    simgrid::s4u::Mailbox *Workflow::getCallbackMailbox()  {
-        return this->callback_mailbox;
     }
 
     /**
