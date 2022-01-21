@@ -20,6 +20,8 @@
 #include  <wrench/failure_causes/FileAlreadyBeingCopied.h>
 #include  <wrench/failure_causes/NetworkError.h>
 
+#include <memory>
+
 WRENCH_LOG_CATEGORY(wrench_core_data_movement_manager, "Log category for Data Movement Manager");
 
 namespace wrench {
@@ -92,10 +94,8 @@ namespace wrench {
 
 
         try {
-            this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(
-                    new CopyRequestSpecs(file, src, dst, file_registry_service)));
-            wrench::StorageService::initiateFileCopy(this->mailbox, file,
-                                                       src, dst);
+            this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(file, src, dst, file_registry_service));
+            wrench::StorageService::initiateFileCopy(this->mailbox, file,src, dst);
         } catch (ExecutionException &e) {
             throw;
         }
