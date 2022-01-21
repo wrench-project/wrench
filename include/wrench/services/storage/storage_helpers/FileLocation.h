@@ -11,6 +11,7 @@
 #define WRENCH_FILELOCATION_H
 
 #include <memory>
+#include <iostream>
 
 
 namespace wrench {
