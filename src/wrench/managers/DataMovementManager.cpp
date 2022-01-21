@@ -204,7 +204,9 @@ namespace wrench {
                 (*(*it)).dst->getStorageService();
                 if (*(*it) == request) {
                     request.file_registry_service = (*it)->file_registry_service;
+                    std::cerr << "ERATING PENDING FILE COPY\n";
                     this->pending_file_copies.erase(it); // remove the entry
+                    std::cerr << "ERASED PENDING FILE COPY\n";
                     break;
                 }
             }
