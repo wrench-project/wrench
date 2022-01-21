@@ -192,6 +192,8 @@ namespace wrench {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
+            request.src->getStorageService();
+            request.dst->getStorageService();
             for (auto it = this->pending_file_copies.begin();
                  it != this->pending_file_copies.end();
                  ++it) {
