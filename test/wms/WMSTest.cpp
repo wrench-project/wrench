@@ -94,44 +94,44 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-//        // Create a job manager
-//        auto job_manager = this->createJobManager();
-//
-//        // Create and start a VM on the cloud service
-//        auto cloud = this->test->cs_cloud;
-//        auto vm_name = cloud->createVM(4, 0.0);
-//        auto vm_cs = cloud->startVM(vm_name);
-//
-//        // Get a "STANDARD JOB COMPLETION" event (default handler)
-//        auto task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
-//        auto job1 = job_manager->createStandardJob(task1);
-//        job_manager->submitJob(job1, vm_cs);
-//        this->waitForAndProcessNextEvent();
-//
-//        auto batch = this->test->cs_batch;
-//
-//        // Get a "PILOT JOB STARTED" event (default handler)
-//        // This pilot job takes the whole machine!
-//        auto job2 = job_manager->createPilotJob();
-//        job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
-//        this->waitForAndProcessNextEvent();
-//
-//        // Submit another pilot job, which won't be running for a while
-//        auto job2_1 = job_manager->createPilotJob();
-//        job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
-//        // Get the list of pending pilot jobs
-//
-//        // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-//        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 100.0, 1, 1, 0);
-//        auto job3 = job_manager->createStandardJob(task2);
-//        job_manager->submitJob(job3, job2->getComputeService());
-//        this->waitForAndProcessNextEvent();
-//        this->waitForAndProcessNextEvent();
-//
-//        // Get a "PILOT JOB STARTED" event (default handler)  (for job2_1)
-//        this->waitForAndProcessNextEvent();
-//        // Get a "PILOT JOB EXPIRED" event (default handler)   (for job2_1)
-//        this->waitForAndProcessNextEvent();
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create and start a VM on the cloud service
+        auto cloud = this->test->cs_cloud;
+        auto vm_name = cloud->createVM(4, 0.0);
+        auto vm_cs = cloud->startVM(vm_name);
+
+        // Get a "STANDARD JOB COMPLETION" event (default handler)
+        auto task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
+        auto job1 = job_manager->createStandardJob(task1);
+        job_manager->submitJob(job1, vm_cs);
+        this->waitForAndProcessNextEvent();
+
+        auto batch = this->test->cs_batch;
+
+        // Get a "PILOT JOB STARTED" event (default handler)
+        // This pilot job takes the whole machine!
+        auto job2 = job_manager->createPilotJob();
+        job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
+        this->waitForAndProcessNextEvent();
+
+        // Submit another pilot job, which won't be running for a while
+        auto job2_1 = job_manager->createPilotJob();
+        job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
+        // Get the list of pending pilot jobs
+
+        // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 100.0, 1, 1, 0);
+        auto job3 = job_manager->createStandardJob(task2);
+        job_manager->submitJob(job3, job2->getComputeService());
+        this->waitForAndProcessNextEvent();
+        this->waitForAndProcessNextEvent();
+
+        // Get a "PILOT JOB STARTED" event (default handler)  (for job2_1)
+        this->waitForAndProcessNextEvent();
+        // Get a "PILOT JOB EXPIRED" event (default handler)   (for job2_1)
+        this->waitForAndProcessNextEvent();
 
 
         // Get a "FILE COPY COMPLETION" event (default handler)
@@ -144,22 +144,22 @@ private:
         this->waitForAndProcessNextEvent();
         std::cerr << "DONE WITH FILE COPY\n";
 
-//        // Get a "FILE COPY FAILURE" event (default handler)
-//        data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
-//                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
-//                                                            wrench::FileLocation::LOCATION(this->test->storage_service2),
-//                                                            nullptr);
-//        this->waitForAndProcessNextEvent();
-//
-//        // Set a timer
-//        double timer_off_date = wrench::Simulation::getCurrentSimulatedDate() + 10;
-//        this->setTimer(timer_off_date, "timer went off");
-//        this->waitForAndProcessNextEvent();
-//        if (std::abs( wrench::Simulation::getCurrentSimulatedDate() - timer_off_date) > 0.1) {
-//            throw std::runtime_error("Did not get the timer event at the right date (" +
-//            std::to_string(wrench::Simulation::getCurrentSimulatedDate()) + " instead of " +
-//            std::to_string(timer_off_date) + ")");
-//        }
+        // Get a "FILE COPY FAILURE" event (default handler)
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service1),
+                                                            wrench::FileLocation::LOCATION(this->test->storage_service2),
+                                                            nullptr);
+        this->waitForAndProcessNextEvent();
+
+        // Set a timer
+        double timer_off_date = wrench::Simulation::getCurrentSimulatedDate() + 10;
+        this->setTimer(timer_off_date, "timer went off");
+        this->waitForAndProcessNextEvent();
+        if (std::abs( wrench::Simulation::getCurrentSimulatedDate() - timer_off_date) > 0.1) {
+            throw std::runtime_error("Did not get the timer event at the right date (" +
+            std::to_string(wrench::Simulation::getCurrentSimulatedDate()) + " instead of " +
+            std::to_string(timer_off_date) + ")");
+        }
 
         return 0;
     }
