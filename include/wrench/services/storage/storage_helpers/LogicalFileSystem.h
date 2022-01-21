@@ -62,7 +62,7 @@ namespace wrench {
 
         void stageFile(std::shared_ptr<DataFile> file, std::string absolute_path);
 
-        static std::map<std::string, StorageService*> mount_points;
+        static std::map<std::string, StorageService *> mount_points;
 
         std::map<std::string, std::set<std::shared_ptr<DataFile>>> content;
 

@@ -15,7 +15,7 @@ WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical F
 
 namespace wrench {
 
-    std::map<std::string, StorageService*> LogicalFileSystem::mount_points;
+    std::map<std::string, StorageService *> LogicalFileSystem::mount_points;
 
     /**
      * @brief Constructor
