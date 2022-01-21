@@ -160,9 +160,6 @@ namespace wrench {
         FileTransferThreadNotificationMessage *msg_to_send_back = nullptr;
         std::shared_ptr<NetworkError> failure_cause = nullptr;
 
-        std::cerr << "FT A: " << this->src_location.use_count() << "\n";
-        std::cerr << "FT A: " << this->dst_location.use_count() << "\n";
-
         WRENCH_INFO(
                 "New FileTransferThread (file=%s, bytes_to_transfer=%.2lf, src_mailbox=%s; src_location=%s; dst_mailbox=%s; dst_location=%s; "
                 "answer_mailbox_if_read=%s; answer_mailbox_if_write=%s; answer_mailbox_if_copy=%s; buffer size=%lu",
@@ -241,8 +238,6 @@ namespace wrench {
         try {
             // Send report back to the service
             // (a dput() right before death is always dicey, so this is a put())
-            std::cerr << "FT SENDING BACK: " << msg_to_send_back->src_location.use_count() << "\n";
-            std::cerr << "FT SENDING BACK: " << msg_to_send_back->dst_location.use_count() << "\n";
             S4U_Mailbox::putMessage(this->parent->mailbox, msg_to_send_back);
         } catch (std::shared_ptr<NetworkError> &e) {
             // oh well...

@@ -33,8 +33,6 @@ namespace wrench {
     public:
 
         ~FileTransferThread() {
-            std::cerr << "FILE TRANSFER THREAD DESTRUC\n";
-            std::cerr << src_location.use_count() << "\n";
         }
 
 

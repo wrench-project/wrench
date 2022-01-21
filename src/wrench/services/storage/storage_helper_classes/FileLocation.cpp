@@ -21,7 +21,6 @@ namespace wrench {
     std::shared_ptr<FileLocation> FileLocation::SCRATCH = std::shared_ptr<FileLocation>(new FileLocation(nullptr, "", ""));
 
     FileLocation::~FileLocation() {
-        WRENCH_INFO("IN FILE LOCATION DESTRUCTOR: %p\n", this);
     }
 
     /**

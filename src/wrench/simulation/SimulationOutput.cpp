@@ -1793,10 +1793,8 @@ namespace wrench {
                                                           std::shared_ptr <FileLocation> src,
                                                           std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
-            std::cerr << "ADDING TIMESTAMP\n";
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(
                     new SimulationTimestampFileCopyCompletion(date, file, src, dst));
-            std::cerr << "ADDED TIMESTAMP\n";
         }
     }
 
