@@ -434,7 +434,9 @@ namespace wrench {
                                                       std::shared_ptr <FileLocation> src_location,
                                                       std::shared_ptr <FileLocation> dst_location,
                                                       simgrid::s4u::Mailbox *answer_mailbox) {
-//        // File System  and path at the destination exists?
+
+        std::cerr << "IM PROCESS FILE COPY REQ\n";
+        //        // File System  and path at the destination exists?
 //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
 //
 //            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
