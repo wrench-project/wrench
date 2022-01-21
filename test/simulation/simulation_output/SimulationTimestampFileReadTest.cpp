@@ -219,7 +219,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
             std::make_pair(xl_file_start, xl_file_end),
     };
 
-    wrench::StorageService *service = storage_service.get();
+    std::shared_ptr<wrench::StorageService> service = storage_service;
 
 
     for (auto &fc : file_read_timestamps) {
@@ -254,7 +254,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
     // test constructors for invalid arguments
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadStart(0.0,
                                                                    nullptr,
-                                                                   wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                   wrench::FileLocation::LOCATION(this->storage_service),
                                                                    service,
                                                                    task1), std::invalid_argument);
 
@@ -266,14 +266,14 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadStart(0.0,
                                                                    this->file_1,
-                                                                   wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                   wrench::FileLocation::LOCATION(this->storage_service),
                                                                    nullptr,
                                                                    task1), std::invalid_argument);
 
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadFailure(0.0,
                                                                      nullptr,
-                                                                     wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                     wrench::FileLocation::LOCATION(this->storage_service),
                                                                      service,
                                                                      task1), std::invalid_argument);
 
@@ -285,13 +285,13 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadFailure(0.0,
                                                                      this->file_1,
-                                                                     wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                     wrench::FileLocation::LOCATION(this->storage_service),
                                                                      nullptr,
                                                                      task1), std::invalid_argument);
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadCompletion(0.0,
                                                                         nullptr,
-                                                                        wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                        wrench::FileLocation::LOCATION(this->storage_service),
                                                                         service,
                                                                         task1), std::invalid_argument);
 
@@ -303,7 +303,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadCompletion(0.0,
                                                                         this->file_1,
-                                                                        wrench::FileLocation::LOCATION(this->storage_service).get(),
+                                                                        wrench::FileLocation::LOCATION(this->storage_service),
                                                                         nullptr,
                                                                         task1), std::invalid_argument);
 

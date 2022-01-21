@@ -624,16 +624,16 @@ namespace wrench {
                     case Action::READY:
                         break;
                     case Action::STARTED:
-                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get(), t);
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
                         break;
                     case Action::COMPLETED:
-                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get(), t);
-                        simulation->getOutput().addTimestampFileReadCompletion(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get(), t);
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadCompletion(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
                         break;
                     case Action::KILLED:
                     case Action::FAILED:
-                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get(), t);
-                        simulation->getOutput().addTimestampFileReadFailure(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation().get(), fra->getUsedFileLocation()->getStorageService().get(), t);
+                        simulation->getOutput().addTimestampFileReadStart(fra->getStartDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileReadFailure(fra->getEndDate(), fra->getFile(), fra->getUsedFileLocation(), fra->getUsedFileLocation()->getStorageService(), t);
                         break;
                 }
             }
@@ -715,16 +715,16 @@ namespace wrench {
                     case Action::READY:
                         break;
                     case Action::STARTED:
-                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get(), t);
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
                         break;
                     case Action::COMPLETED:
-                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get(), t);
-                        simulation->getOutput().addTimestampFileWriteCompletion(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get(), t);
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteCompletion(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
                         break;
                     case Action::KILLED:
                     case Action::FAILED:
-                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get(), t);
-                        simulation->getOutput().addTimestampFileWriteFailure(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation().get(), fwa->getFileLocation()->getStorageService().get(), t);
+                        simulation->getOutput().addTimestampFileWriteStart(fwa->getStartDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
+                        simulation->getOutput().addTimestampFileWriteFailure(fwa->getEndDate(), fwa->getFile(), fwa->getFileLocation(), fwa->getFileLocation()->getStorageService(), t);
                         break;
                 }
             }
