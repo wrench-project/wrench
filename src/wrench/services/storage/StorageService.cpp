@@ -633,9 +633,11 @@ namespace wrench {
         assertServiceIsUp(src_location->getStorageService());
         assertServiceIsUp(dst_location->getStorageService());
 
+        std::cerr << "ADDING TIME STAMP\n";
         src_location->getStorageService()->simulation->getOutput().addTimestampFileCopyStart(Simulation::getCurrentSimulatedDate(), file,
                                                                                              src_location,
                                                                                              dst_location);
+        std::cerr << "ADDED TIME STAMP\n";
 
         // Send a message to the daemon on the dst location
         try {
@@ -652,6 +654,7 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
+        std::cerr << "PUT MESSAGE\n";
     }
 
     /**
