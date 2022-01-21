@@ -93,6 +93,7 @@ namespace wrench {
         }
 
 
+        std::cerr << "PENDING\n";
         try {
             this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(file, src, dst, file_registry_service));
             wrench::StorageService::initiateFileCopy(this->mailbox, file,src, dst);
