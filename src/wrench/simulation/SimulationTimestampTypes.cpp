@@ -248,14 +248,14 @@ namespace wrench {
     /**
     * @brief A static unordered multimap of SimulationTimestampFileCopyStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
     */
-    std::unordered_multimap<File, SimulationTimestampFileCopy *> SimulationTimestampFileCopy::pending_file_copies;
+    std::unordered_multimap<FileCopy, SimulationTimestampFileCopy *> SimulationTimestampFileCopy::pending_file_copies;
 
 
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileCopyFailure, SimulationTimestampFileCopyCompletion, SimulationTimestampFileCopyStart) with a SimulationTimestampFileCopyStart object
      */
     void SimulationTimestampFileCopy::setEndpoints() {
-        auto pending_copies_itr = pending_file_copies.find(File(this->file, this->source.get(), this->destination.get()));
+        auto pending_copies_itr = pending_file_copies.find(FileCopy(this->file, this->source, this->destination));
         if (pending_copies_itr != pending_file_copies.end()) {
             // set my endpoint to the SimulationTimestampFileCopyStart
             this->endpoint = (*pending_copies_itr).second;
@@ -294,7 +294,7 @@ namespace wrench {
                     "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
 
-        pending_file_copies.insert(std::make_pair(File(this->file, this->source.get(), this->destination.get()), this));
+        pending_file_copies.insert(std::make_pair(FileCopy(this->file, this->source.get(), this->destination.get()), this));
     }
 
 
@@ -410,14 +410,14 @@ namespace wrench {
     /**
      * @brief A static unordered multimap of SimulationTimestampFileReadStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
      */
-    std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, std::shared_ptr<WorkflowTask>>> SimulationTimestampFileRead::pending_file_reads;
+    std::unordered_multimap<FileReadWrite, std::pair<SimulationTimestampFileRead *, std::shared_ptr<WorkflowTask>>> SimulationTimestampFileRead::pending_file_reads;
 
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileReadFailure, SimulationTimestampFileReadTerminated, SimulationTimestampFileReadStart) with a SimulationTimestampFileReadStart object
      */
     void SimulationTimestampFileRead::setEndpoints() {
         // find the SimulationTimestampFileRead object containing the same task
-        auto pending_reads_itr = pending_file_reads.find(File(this->file, this->source.get(), this->service.get()));
+        auto pending_reads_itr = pending_file_reads.find(FileReadWrite(this->file, this->source, this->service));
         if (pending_reads_itr != pending_file_reads.end()) {
             // set my endpoint to the SimulationTimestampFileReadStart
             this->endpoint = (*pending_reads_itr).second.first;
@@ -462,7 +462,7 @@ namespace wrench {
         }
 
 
-        pending_file_reads.insert(std::make_pair(File(this->file, this->source.get(), this->service.get()), std::make_pair(this, this->task)));
+        pending_file_reads.insert(std::make_pair(FileReadWrite(this->file, this->source, this->service), std::make_pair(this, this->task)));
     }
 
 
@@ -578,14 +578,14 @@ namespace wrench {
     /**
      * @brief A static unordered multimap of SimulationTimestampFileWriteStart objects that have yet to be matched with Failure, Terminated or Completion timestamps
      */
-    std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, std::shared_ptr<WorkflowTask>>> SimulationTimestampFileWrite::pending_file_writes;
+    std::unordered_multimap<FileReadWrite, std::pair<SimulationTimestampFileWrite *, std::shared_ptr<WorkflowTask>>> SimulationTimestampFileWrite::pending_file_writes;
 
     /**
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileWriteFailure, SimulationTimestampFileWriteTerminated, SimulationTimestampFileWriteStart) with a SimulationTimestampFileWriteStart object
      */
     void SimulationTimestampFileWrite::setEndpoints() {
         // find the SimulationTimestampFileWrite object containing the same task
-        auto pending_writes_itr = pending_file_writes.find(File(this->file, this->destination.get(), this->service.get()));
+        auto pending_writes_itr = pending_file_writes.find(FileReadWrite(this->file, this->destination, this->service));
         if (pending_writes_itr != pending_file_writes.end()) {
             // set my endpoint to the SimulationTimestampFileWriteStart
             this->endpoint = (*pending_writes_itr).second.first;
@@ -629,7 +629,7 @@ namespace wrench {
         }
 
 
-        pending_file_writes.insert(std::make_pair(File(this->file, this->destination.get(), this->service.get()), std::make_pair(this, this->task)));
+        pending_file_writes.insert(std::make_pair(FileReadWrite(this->file, this->destination, this->service), std::make_pair(this, this->task)));
 
     }
 

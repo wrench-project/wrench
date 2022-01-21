@@ -20,18 +20,29 @@ using namespace std;
 /** \cond              */
 /***********************/
 
-typedef std::tuple<std::shared_ptr<wrench::DataFile>, void *, void *> File;
+typedef std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::StorageService>> FileReadWrite;
+typedef std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> FileCopy;
 typedef std::tuple<std::string, std::string, int> DiskAccess;
 
 namespace std {
     template <>
-    struct hash<File>{
+    struct hash<FileCopy>{
     public :
-        size_t operator()(const File &file ) const
+        size_t operator()(const FileCopy &file ) const
         {
-            return std::hash<void *>()(std::get<0>(file).get()) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
+            return std::hash<void *>()(std::get<0>(file).get()) ^ std::hash<void *>()(std::get<1>(file).get()) ^ std::hash<void *>()(std::get<2>(file).get());
         }
     };
+
+    template <>
+    struct hash<FileReadWrite>{
+    public :
+        size_t operator()(const FileReadWrite &file ) const
+        {
+            return std::hash<void *>()(std::get<0>(file).get()) ^ std::hash<void *>()(std::get<1>(file).get()) ^ std::hash<void *>()(std::get<2>(file).get());
+        }
+    };
+
 
     template <>
     struct hash<DiskAccess>{
@@ -205,7 +216,7 @@ namespace wrench {
          * @brief the data structure that holds the ongoing file reads.
          */
         ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, double>, decltype(&file_hash)> pending_file_reads;
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileRead *, std::shared_ptr<WorkflowTask>>> pending_file_reads;
+        static std::unordered_multimap<FileReadWrite, std::pair<SimulationTimestampFileRead *, std::shared_ptr<WorkflowTask>>> pending_file_reads;
 
         void setEndpoints();
         friend class SimulationOutput;
@@ -288,7 +299,7 @@ namespace wrench {
          * @brief the data structure that holds the ongoing file writes.
          */
         ///static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, double>, decltype(&file_hash)> pending_file_writes;
-        static std::unordered_multimap<File, std::pair<SimulationTimestampFileWrite *, std::shared_ptr<WorkflowTask>>> pending_file_writes;
+        static std::unordered_multimap<FileReadWrite, std::pair<SimulationTimestampFileWrite *, std::shared_ptr<WorkflowTask>>> pending_file_writes;
 
         void setEndpoints();
 
@@ -366,7 +377,7 @@ namespace wrench {
         /**
          * @brief the data structure that holds the ongoing file writes.
          */
-         static std::unordered_multimap<File, SimulationTimestampFileCopy *> pending_file_copies;
+         static std::unordered_multimap<FileCopy, SimulationTimestampFileCopy *> pending_file_copies;
 
         void setEndpoints();
     };
