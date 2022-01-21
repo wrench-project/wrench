@@ -161,7 +161,6 @@ namespace wrench {
 
         while (processNextMessage()) {
 
-
         }
 
         WRENCH_INFO("Data Movement Manager terminating");
@@ -194,12 +193,14 @@ namespace wrench {
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage*>(message.get())) {
 
+            std::cerr << "IN PROCESSING StorageServiceFileCopyAnswerMessage\n";
+
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
             std::cerr << "msg->src " << msg->src.use_count() << "\n";
             std::cerr << "msg->dst " << msg->dst.use_count() << "\n";
-            std::cerr << "msg->src " << request.src.use_count() << "\n";
-            std::cerr << "msg->dst " << request.dst.use_count() << "\n";
+            std::cerr << "request->src " << request.src.use_count() << "\n";
+            std::cerr << "request->dst " << request.dst.use_count() << "\n";
             msg->src->getStorageService();
             request.src->getStorageService();
             request.dst->getStorageService();
