@@ -195,6 +195,10 @@ namespace wrench {
             for (auto it = this->pending_file_copies.begin();
                  it != this->pending_file_copies.end();
                  ++it) {
+                request.src->getStorageService();
+                request.dst->getStorageService();
+                (*(*it)).src->getStorageService();
+                (*(*it)).dst->getStorageService();
                 if (*(*it) == request) {
                     request.file_registry_service = (*it)->file_registry_service;
                     this->pending_file_copies.erase(it); // remove the entry
