@@ -1789,12 +1789,14 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyCompletion(double date,
-                                                          std::shared_ptr<DataFile>file,
+                                                          std::shared_ptr<DataFile> file,
                                                           std::shared_ptr <FileLocation> src,
                                                           std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
+            std::cerr << "ADDING TIMESTAMP\n";
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(
                     new SimulationTimestampFileCopyCompletion(date, file, src, dst));
+            std::cerr << "ADDED TIMESTAMP\n";
         }
     }
 

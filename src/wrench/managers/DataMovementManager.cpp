@@ -198,12 +198,23 @@ namespace wrench {
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
             std::cerr << "msg->src " << msg->src.use_count() << "\n";
+            std::cerr << "msg->src " << msg->src.get() << "\n";
             std::cerr << "msg->dst " << msg->dst.use_count() << "\n";
+            std::cerr << "msg->dst " << msg->dst.get() << "\n";
             std::cerr << "request->src " << request.src.use_count() << "\n";
+            std::cerr << "request->src " << request.src.get() << "\n";
             std::cerr << "request->dst " << request.dst.use_count() << "\n";
+            std::cerr << "request->dst " << request.dst.get() << "\n";
+            std::cerr << msg->src->getMountPoint() << "\n";
+            std::cerr << "XXXX\n";
             msg->src->getStorageService();
+            std::cerr << "XXXX\n";
             request.src->getStorageService();
+            std::cerr << "XXXX\n";
+            msg->dst->getStorageService();
+            std::cerr << "XXXX\n";
             request.dst->getStorageService();
+            std::cerr << "XXXX\n";
             for (auto it = this->pending_file_copies.begin();
                  it != this->pending_file_copies.end();
                  ++it) {

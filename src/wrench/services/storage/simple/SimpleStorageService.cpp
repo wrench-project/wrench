@@ -147,6 +147,7 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
+            std::cerr << "SS: IN MAIN LOOP\n";
             this->startPendingFileTransferThread();
         }
 
@@ -577,7 +578,9 @@ namespace wrench {
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // May be no corresponding timestamp.
                 try {
+                    std::cerr << "ADDING TIME STAM{\n";
                     this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
+                    std::cerr << "ADDED TIME STAM{\n";
                 } catch (invalid_argument &e) {
                 }
 

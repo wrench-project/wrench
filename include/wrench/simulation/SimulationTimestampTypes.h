@@ -22,6 +22,13 @@ using namespace std;
 
 typedef std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::StorageService>> FileReadWrite;
 typedef std::tuple<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation>> FileCopy;
+
+//struct FileCopy {
+//    std::shared_ptr<wrench::DataFile> file;
+//    std::shared_ptr<wrench::FileLocation> src;
+//    std::shared_ptr<wrench::FileLocation> dst;
+//};
+
 typedef std::tuple<std::string, std::string, int> DiskAccess;
 
 namespace std {
@@ -31,6 +38,7 @@ namespace std {
         size_t operator()(const FileCopy &file ) const
         {
             return std::hash<void *>()(std::get<0>(file).get()) ^ std::hash<void *>()(std::get<1>(file).get()) ^ std::hash<void *>()(std::get<2>(file).get());
+//            return std::hash<void *>()(file.file.get()) ^ std::hash<void *>()(file.src.get()) ^ std::hash<void *>()(file.dst.get());
         }
     };
 

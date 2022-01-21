@@ -255,16 +255,21 @@ namespace wrench {
      * @brief Sets the endpoint of the calling object (SimulationTimestampFileCopyFailure, SimulationTimestampFileCopyCompletion, SimulationTimestampFileCopyStart) with a SimulationTimestampFileCopyStart object
      */
     void SimulationTimestampFileCopy::setEndpoints() {
+        std::cerr << "###### 1\n";
         auto pending_copies_itr = pending_file_copies.find(FileCopy(this->file, this->source, this->destination));
+        std::cerr << "###### 2\n";
         if (pending_copies_itr != pending_file_copies.end()) {
+        std::cerr << "###### 3\n";
             // set my endpoint to the SimulationTimestampFileCopyStart
             this->endpoint = (*pending_copies_itr).second;
 
             // set the SimulationTimestampFileCopyStart's endpoint to me
             (*pending_copies_itr).second->endpoint = this;
 
+        std::cerr << "###### 4\n";
             // the SimulationTimestampFileCopyStart is no longer waiting to be matched with an end timestamp, remove it from the map
             pending_file_copies.erase(pending_copies_itr);
+        std::cerr << "###### 5\n";
         } else {
             throw std::runtime_error(
                     "SimulationTimestampFileCopy::setEndpoints() could not find a SimulationTimestampFileCopyStart object.");
@@ -294,7 +299,7 @@ namespace wrench {
                     "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
 
-        pending_file_copies.insert(std::make_pair(FileCopy(this->file, this->source.get(), this->destination.get()), this));
+        pending_file_copies.insert(std::make_pair(FileCopy(this->file, this->source, this->destination), this));
     }
 
 
@@ -339,6 +344,7 @@ namespace wrench {
         WRENCH_DEBUG("Inserting a FileCopyCompletion timestamp for file copy");
 
 
+        std::cerr << "AAAAAA\n";
         // all information about a file copy should be passed
         if ((this->file == nullptr)
             || (this->source == nullptr)
@@ -347,8 +353,9 @@ namespace wrench {
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() cannot take nullptr arguments");
         }
-
+        std::cerr << "AAAAAAAAAAA\n";
         setEndpoints();
+        std::cerr << "BBBBB\n";
     }
 
     /**
