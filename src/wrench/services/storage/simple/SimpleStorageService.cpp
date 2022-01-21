@@ -587,7 +587,6 @@ namespace wrench {
             }
         }
 
-        std::cerr << "SENDING BACK THE ACK? SUCCESS = " << success << "\n";
             // Send back the relevant ack if this was a read
             if (answer_mailbox_if_read and success) { WRENCH_INFO(
                         "Sending back an ack since this was a file read and some client is waiting for me to say something");

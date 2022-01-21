@@ -605,7 +605,6 @@ namespace wrench {
                 compound_job->popCallbackMailbox();
             }
             if (send_failure_notifications) {
-                WRENCH_INFO("SENDING FAILURE NOTIFICATION");
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(bach_job->getJobID()),
                         std::shared_ptr<FailureCause>(
@@ -618,7 +617,7 @@ namespace wrench {
         while (not this->batch_queue.empty()) {
             auto batch_job = (*(this->batch_queue.begin()));
             auto compound_job = batch_job->getCompoundJob();
-            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM PENDING LIST", compound_job->getName().c_str());
+//            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM PENDING LIST", compound_job->getName().c_str());
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
                 case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
@@ -638,7 +637,6 @@ namespace wrench {
                 action->setFailureCause(failure_cause);
             }
             if (send_failure_notifications) {
-                WRENCH_INFO("SENDING FAILURE NOTIFICATION");
                 this->sendCompoundJobFailureNotification(
                         compound_job, std::to_string(batch_job->getJobID()),
                         std::shared_ptr<FailureCause>(
@@ -651,7 +649,7 @@ namespace wrench {
         while (not this->waiting_jobs.empty()) {
             auto batch_job = (*(this->waiting_jobs.begin()));
             auto compound_job = batch_job->getCompoundJob();
-            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM WAITING LIST", compound_job->getName().c_str());
+//            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM WAITING LIST", compound_job->getName().c_str());
 
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
