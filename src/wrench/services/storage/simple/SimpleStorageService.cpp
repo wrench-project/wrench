@@ -147,7 +147,6 @@ namespace wrench {
 
         /** Main loop **/
         while (this->processNextMessage()) {
-            std::cerr << "SS: IN MAIN LOOP\n";
             this->startPendingFileTransferThread();
         }
 
@@ -436,7 +435,6 @@ namespace wrench {
                                                       std::shared_ptr <FileLocation> dst_location,
                                                       simgrid::s4u::Mailbox *answer_mailbox) {
 
-        std::cerr << "IM PROCESS FILE COPY REQ\n";
         //        // File System  and path at the destination exists?
 //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
 //
@@ -578,9 +576,7 @@ namespace wrench {
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // May be no corresponding timestamp.
                 try {
-                    std::cerr << "ADDING TIME STAM{\n";
                     this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
-                    std::cerr << "ADDED TIME STAM{\n";
                 } catch (invalid_argument &e) {
                 }
 

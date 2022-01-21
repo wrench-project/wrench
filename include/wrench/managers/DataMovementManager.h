@@ -83,9 +83,6 @@ namespace wrench {
             std::shared_ptr<FileRegistryService> file_registry_service;
 
             ~CopyRequestSpecs() {
-                std::cerr << "IN COPY REQUEST SPECS DESTRUCTOR!\n";
-                std::cerr << ".. " << this->src.use_count() << "\n";
-                std::cerr << ".. " << this->dst.use_count() << "\n";
             }
 
             CopyRequestSpecs(std::shared_ptr<DataFile> file,
