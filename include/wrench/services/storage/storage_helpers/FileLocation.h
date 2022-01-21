@@ -29,6 +29,10 @@ namespace wrench {
 
     public:
 
+        ~FileLocation() {
+            std::cerr << "IN FILE LOCATION DESTRUCTOR\n";
+        }
+
         /**
          * @brief Static location that denotes a compute service's scratch space
          */
