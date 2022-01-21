@@ -257,6 +257,8 @@ namespace wrench {
     void FileTransferThread::receiveFileFromNetwork(std::shared_ptr<DataFile>file,
                                                     simgrid::s4u::Mailbox *mailbox,
                                                     std::shared_ptr<FileLocation> location) {
+
+        WRENCH_INFO("RECEINVING FILE FROM NETWORK");
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
             throw std::runtime_error(
@@ -275,6 +277,7 @@ namespace wrench {
                                          msg->getName() + "] message!");
             }
 
+            std::cerr << "FTT: GOT THE FIRST CHUNK\n";
             try {
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
@@ -336,6 +339,7 @@ namespace wrench {
                 }
 
             } catch (std::shared_ptr<NetworkError> &e) {
+                std::cerr << "FTT: IN CATCH\n";
                 throw;
             }
         }

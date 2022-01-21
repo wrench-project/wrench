@@ -40,7 +40,7 @@ namespace wrench {
      *
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox) {
-        WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
+        WRENCH_INFO("Getting a message from mailbox_name '%s'", mailbox->get_cname());
 //        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg;
         try {
@@ -55,7 +55,7 @@ namespace wrench {
             MessageManager::removeReceivedMessage(mailbox_name, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox->get_cname());
+        WRENCH_INFO("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox->get_cname());
         return std::unique_ptr<SimulationMessage>(msg);
     }
 
@@ -74,7 +74,7 @@ namespace wrench {
             return S4U_Mailbox::getMessage(mailbox);
         }
 
-        WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox->get_cname(), timeout);
+        WRENCH_INFO("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox->get_cname(), timeout);
 //        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 //        void *data = nullptr;
         wrench::SimulationMessage *msg;
@@ -97,7 +97,7 @@ namespace wrench {
         MessageManager::removeReceivedMessage(mailbox_name, msg);
 #endif
 
-        WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox->get_cname());
+        WRENCH_INFO("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox->get_cname());
 
         return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -111,7 +111,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     void S4U_Mailbox::putMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
-        WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox '%s'",
+        WRENCH_INFO("Putting a %s message (%.2lf bytes) to mailbox '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
 //        simgrid::s4u::Mailbox *mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
@@ -139,7 +139,7 @@ namespace wrench {
      */
     void S4U_Mailbox::dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
 
-        WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox_name '%s'",
+        WRENCH_INFO("Dputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
 
@@ -174,7 +174,7 @@ namespace wrench {
     std::shared_ptr<S4U_PendingCommunication>
     S4U_Mailbox::iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
 
-        WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
+        WRENCH_INFO("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
 
@@ -211,7 +211,7 @@ namespace wrench {
 
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-        WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox->get_cname());
+        WRENCH_INFO("Igetting a message from mailbox_name '%s'", mailbox->get_cname());
 
         std::shared_ptr<S4U_PendingCommunication> pending_communication = std::shared_ptr<S4U_PendingCommunication>(
                 new S4U_PendingCommunication(mailbox, S4U_PendingCommunication::OperationType::RECEIVING));

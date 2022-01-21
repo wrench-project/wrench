@@ -587,41 +587,40 @@ namespace wrench {
             }
         }
 
-        // Send back the relevant ack if this was a read
-        if (answer_mailbox_if_read) {
-            WRENCH_DEBUG(
-                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
-            S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
-        }
-
-        // Send back the relevant ack if this was a write
-        if (answer_mailbox_if_write) {
-            WRENCH_DEBUG(
-                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
-            S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
-        }
-
-        // Send back the relevant ack if this was a copy
-        if (answer_mailbox_if_copy) {
-            WRENCH_DEBUG(
-                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
-            if ((src_location == nullptr) or (dst_location == nullptr)) {
-                throw std::runtime_error("SimpleStorageService::processFileTransferThreadNotification(): "
-                                         "src_location and dst_location must be non-null");
+        std::cerr << "SENDING BACK THE ACK? SUCCESS = " << success << "\n";
+            // Send back the relevant ack if this was a read
+            if (answer_mailbox_if_read and success) { WRENCH_INFO(
+                        "Sending back an ack since this was a file read and some client is waiting for me to say something");
+                S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
             }
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox_if_copy,
-                    new StorageServiceFileCopyAnswerMessage(
-                            file,
-                            src_location,
-                            dst_location,
-                            nullptr,
-                            false,
-                            success,
-                            failure_cause,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        }
+
+            // Send back the relevant ack if this was a write
+            if (answer_mailbox_if_write and success) {
+                WRENCH_INFO(
+                        "Sending back an ack since this was a file write and some client is waiting for me to say something");
+                S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
+            }
+
+            // Send back the relevant ack if this was a copy
+            if (answer_mailbox_if_copy) { WRENCH_INFO(
+                        "Sending back an ack since this was a file copy and some client is waiting for me to say something");
+                if ((src_location == nullptr) or (dst_location == nullptr)) {
+                    throw std::runtime_error("SimpleStorageService::processFileTransferThreadNotification(): "
+                                             "src_location and dst_location must be non-null");
+                }
+                S4U_Mailbox::dputMessage(
+                        answer_mailbox_if_copy,
+                        new StorageServiceFileCopyAnswerMessage(
+                                file,
+                                src_location,
+                                dst_location,
+                                nullptr,
+                                false,
+                                success,
+                                failure_cause,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+            }
 
         return true;
     }
