@@ -360,8 +360,8 @@ namespace wrench {
      * @param task: a task associated to  this file read (or nullptr)
      */
     SimulationTimestampFileRead::SimulationTimestampFileRead(double date, std::shared_ptr<DataFile>file,
-                                                             FileLocation *src_location,
-                                                             StorageService *service,
+                                                             std::shared_ptr<FileLocation>  src_location,
+                                                             std::shared_ptr<StorageService>  service,
                                                              std::shared_ptr<WorkflowTask>task) :
             file(file), source(src_location), service(service), task(task){
         this->date = date;
@@ -379,7 +379,7 @@ namespace wrench {
      * @brief retrieves the location from which the DataFile is being copied
      * @return the read's source location
      */
-    FileLocation *SimulationTimestampFileRead::getSource() {
+    std::shared_ptr<FileLocation>  SimulationTimestampFileRead::getSource() {
         return this->source;
     }
 
@@ -387,7 +387,7 @@ namespace wrench {
      * @brief retrieves the storage service for file read
      * @return point to the service associated with this read
      */
-    StorageService *SimulationTimestampFileRead::getService() {
+    std::shared_ptr<StorageService>  SimulationTimestampFileRead::getService() {
         return this->service;
     }
 
@@ -417,7 +417,7 @@ namespace wrench {
      */
     void SimulationTimestampFileRead::setEndpoints() {
         // find the SimulationTimestampFileRead object containing the same task
-        auto pending_reads_itr = pending_file_reads.find(File(this->file, this->source, this->service));
+        auto pending_reads_itr = pending_file_reads.find(File(this->file, this->source.get(), this->service.get()));
         if (pending_reads_itr != pending_file_reads.end()) {
             // set my endpoint to the SimulationTimestampFileReadStart
             this->endpoint = (*pending_reads_itr).second.first;
@@ -446,8 +446,8 @@ namespace wrench {
      */
     SimulationTimestampFileReadStart::SimulationTimestampFileReadStart(double date,
                                                                        std::shared_ptr<DataFile>file,
-                                                                       FileLocation *src,
-                                                                       StorageService *service,
+                                                                       std::shared_ptr<FileLocation>  src,
+                                                                       std::shared_ptr<StorageService>  service,
                                                                        std::shared_ptr<WorkflowTask>task) :
             SimulationTimestampFileRead(date, file, src, service, task) {
         WRENCH_DEBUG("Inserting a FileReadStart timestamp for file read");
@@ -462,7 +462,7 @@ namespace wrench {
         }
 
 
-        pending_file_reads.insert(std::make_pair(File(this->file, this->source, this->service), std::make_pair(this, this->task)));
+        pending_file_reads.insert(std::make_pair(File(this->file, this->source.get(), this->service.get()), std::make_pair(this, this->task)));
     }
 
 
@@ -475,8 +475,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(double date, std::shared_ptr<DataFile>file,
-                                                                           FileLocation *src,
-                                                                           StorageService *service,
+                                                                           std::shared_ptr<FileLocation>  src,
+                                                                           std::shared_ptr<StorageService>  service,
                                                                            std::shared_ptr<WorkflowTask>task) :
             SimulationTimestampFileRead(date, file, src, service, task) {
         WRENCH_DEBUG("Inserting a FileReadFailure timestamp for file read");
@@ -501,8 +501,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(double date, std::shared_ptr<DataFile>file,
-                                                                                 FileLocation *src,
-                                                                                 StorageService *service,
+                                                                                 std::shared_ptr<FileLocation>  src,
+                                                                                 std::shared_ptr<StorageService>  service,
                                                                                  std::shared_ptr<WorkflowTask>task) :
             SimulationTimestampFileRead(date, file, src, service, task)  {
         WRENCH_DEBUG("Inserting a FileReadCompletion timestamp for file read");
@@ -528,8 +528,8 @@ namespace wrench {
      */
     SimulationTimestampFileWrite::SimulationTimestampFileWrite(double date,
                                                                std::shared_ptr<DataFile>file,
-                                                               FileLocation *dst_location,
-                                                               StorageService *service,
+                                                               std::shared_ptr<FileLocation>  dst_location,
+                                                               std::shared_ptr<StorageService>  service,
                                                                std::shared_ptr<WorkflowTask>task) :
             file(file), destination(dst_location), service(service), task(task){
         this->date = date;
@@ -547,7 +547,7 @@ namespace wrench {
      * @brief retrieves the location from which the DataFile is being copied
      * @return the write's destination location
      */
-    FileLocation *SimulationTimestampFileWrite::getDestination() {
+    std::shared_ptr<FileLocation>  SimulationTimestampFileWrite::getDestination() {
         return this->destination;
     }
 
@@ -555,7 +555,7 @@ namespace wrench {
      * @brief retrieves the Service that ordered file write
      * @return point to the service associated with this write
      */
-    StorageService *SimulationTimestampFileWrite::getService() {
+    std::shared_ptr<StorageService>  SimulationTimestampFileWrite::getService() {
         return this->service;
     }
 
@@ -585,7 +585,7 @@ namespace wrench {
      */
     void SimulationTimestampFileWrite::setEndpoints() {
         // find the SimulationTimestampFileWrite object containing the same task
-        auto pending_writes_itr = pending_file_writes.find(File(this->file, this->destination, this->service));
+        auto pending_writes_itr = pending_file_writes.find(File(this->file, this->destination.get(), this->service.get()));
         if (pending_writes_itr != pending_file_writes.end()) {
             // set my endpoint to the SimulationTimestampFileWriteStart
             this->endpoint = (*pending_writes_itr).second.first;
@@ -613,8 +613,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(double date, std::shared_ptr<DataFile>file,
-                                                                         FileLocation *dst,
-                                                                         StorageService *service,
+                                                                         std::shared_ptr<FileLocation>  dst,
+                                                                         std::shared_ptr<StorageService>  service,
                                                                          std::shared_ptr<WorkflowTask>task) :
             SimulationTimestampFileWrite(date, file, dst, service, task) {
         WRENCH_DEBUG("Inserting a FileWriteStart timestamp for file write");
@@ -629,7 +629,7 @@ namespace wrench {
         }
 
 
-        pending_file_writes.insert(std::make_pair(File(this->file, this->destination, this->service), std::make_pair(this, this->task)));
+        pending_file_writes.insert(std::make_pair(File(this->file, this->destination.get(), this->service.get()), std::make_pair(this, this->task)));
 
     }
 
@@ -643,8 +643,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure(double date, std::shared_ptr<DataFile>file,
-                                                                             FileLocation *dst,
-                                                                             StorageService *service,
+                                                                             std::shared_ptr<FileLocation>  dst,
+                                                                             std::shared_ptr<StorageService>  service,
                                                                              std::shared_ptr<WorkflowTask>task) :
             SimulationTimestampFileWrite(date, file, dst, service, task) {
         WRENCH_DEBUG("Inserting a FileWriteFailure timestamp for file write");
@@ -669,8 +669,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampFileWriteCompletion::SimulationTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile>file,
-                                                                                   FileLocation *dst,
-                                                                                   StorageService *service,
+                                                                                   std::shared_ptr<FileLocation>  dst,
+                                                                                   std::shared_ptr<StorageService>  service,
                                                                                    std::shared_ptr<WorkflowTask>task) :
             SimulationTimestampFileWrite(date, file, dst, service, task)  {
         WRENCH_DEBUG("Inserting a FileWriteCompletion timestamp for file write");

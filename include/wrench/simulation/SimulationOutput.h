@@ -95,22 +95,22 @@ namespace wrench {
 
         void addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask>task);
 
-        void addTimestampFileReadStart(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+        void addTimestampFileReadStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
                                        std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileReadFailure(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+        void addTimestampFileReadFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
                                          std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileReadCompletion(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+        void addTimestampFileReadCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
                                             std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileWriteStart(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+        void addTimestampFileWriteStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
                                         std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileWriteFailure(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+        void addTimestampFileWriteFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
                                           std::shared_ptr<WorkflowTask>task = nullptr);
 
-        void addTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile>file, FileLocation *src, StorageService *service,
+        void addTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
                                              std::shared_ptr<WorkflowTask>task = nullptr);
 
         void addTimestampFileCopyStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,

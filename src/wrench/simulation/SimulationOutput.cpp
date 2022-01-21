@@ -1641,8 +1641,8 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampFileReadStart(double date,
                                                      std::shared_ptr<DataFile>file,
-                                                     FileLocation *src,
-                                                     StorageService *service,
+                                                     std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<StorageService> service,
                                                      std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileReadStart>()) {
             this->addTimestamp<SimulationTimestampFileReadStart>(
@@ -1659,10 +1659,10 @@ namespace wrench {
     * @param task: the workflow task for which this read is done (or nullptr);
     */
     void SimulationOutput::addTimestampFileReadFailure(double date,
-                                                       std::shared_ptr<DataFile>file,
-                                                       FileLocation *src,
-                                                       StorageService *service,
-                                                       std::shared_ptr<WorkflowTask>task) {
+                                                       std::shared_ptr<DataFile> file,
+                                                       std::shared_ptr<FileLocation> src,
+                                                       std::shared_ptr<StorageService> service,
+                                                       std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadFailure>()) {
             this->addTimestamp<SimulationTimestampFileReadFailure>(
                     new SimulationTimestampFileReadFailure(date, file, src, service, task));
@@ -1680,8 +1680,8 @@ namespace wrench {
     void
     SimulationOutput::addTimestampFileReadCompletion(double date,
                                                      std::shared_ptr<DataFile>file,
-                                                     FileLocation *src,
-                                                     StorageService *service,
+                                                     std::shared_ptr<FileLocation>  src,
+                                                     std::shared_ptr<StorageService>  service,
                                                      std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
 
@@ -1700,8 +1700,8 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampFileWriteStart(double date,
                                                       std::shared_ptr<DataFile>file,
-                                                      FileLocation *src,
-                                                      StorageService *service,
+                                                      std::shared_ptr<FileLocation>  src,
+                                                      std::shared_ptr<StorageService>  service,
                                                       std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
             this->addTimestamp<SimulationTimestampFileWriteStart>(
@@ -1719,8 +1719,8 @@ namespace wrench {
     */
     void SimulationOutput::addTimestampFileWriteFailure(double date,
                                                         std::shared_ptr<DataFile>file,
-                                                        FileLocation *src,
-                                                        StorageService *service,
+                                                        std::shared_ptr<FileLocation>  src,
+                                                        std::shared_ptr<StorageService>  service,
                                                         std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileWriteFailure>()) {
             this->addTimestamp<SimulationTimestampFileWriteFailure>(
@@ -1739,8 +1739,8 @@ namespace wrench {
     void
     SimulationOutput::addTimestampFileWriteCompletion(double date,
                                                       std::shared_ptr<DataFile>file,
-                                                      FileLocation *src,
-                                                      StorageService *service,
+                                                      std::shared_ptr<FileLocation>  src,
+                                                      std::shared_ptr<StorageService>  service,
                                                       std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampFileWriteCompletion>(
