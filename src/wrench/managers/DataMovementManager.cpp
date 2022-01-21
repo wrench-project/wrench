@@ -190,7 +190,6 @@ namespace wrench {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
-            std::cerr << msg->src->getMountPoint() << "\n";
             msg->src->getStorageService();
             request.src->getStorageService();
             msg->dst->getStorageService();

@@ -257,12 +257,13 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto chunk_receiving_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("chunks"));
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
                                     new StorageServiceFileReadRequestMessage(
                                             answer_mailbox,
-                                            answer_mailbox,
+                                            chunk_receiving_mailbox,
                                             file,
                                             location,
                                             num_bytes_to_read,
@@ -297,7 +298,7 @@ namespace wrench {
                 while (true) {
                     std::shared_ptr<SimulationMessage> file_content_message = nullptr;
                     try {
-                        file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+                        file_content_message = S4U_Mailbox::getMessage(chunk_receiving_mailbox);
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         throw ExecutionException(cause);
                     }
@@ -368,6 +369,7 @@ namespace wrench {
         // Wait for a reply
         std::shared_ptr<SimulationMessage> message;
 
+        std::cerr << "WAITING FOR REPLY ON MAILBOX " << answer_mailbox->get_name() << "\n";
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -383,6 +385,7 @@ namespace wrench {
             if (storage_service->buffer_size == 0) {
                 throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
             } else {
+                std::cerr << "WRITING THE DATA!\n";
                 try {
                     double remaining = file->getSize();
                     while (remaining > storage_service->buffer_size) {
@@ -395,11 +398,13 @@ namespace wrench {
                             file, remaining, true));
 
                 } catch (std::shared_ptr<NetworkError> &cause) {
+                    std::cerr << "IN CATCH!\n";
+                    WRENCH_INFO("IN CATCH");
                     throw ExecutionException(cause);
                 }
 
                 //Waiting for the final ack
-
+                std::cerr << "WAITING FOR THE FINAL ACK\n";
                 try {
                     message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
                 } catch (std::shared_ptr<NetworkError> &cause) {
@@ -407,12 +412,12 @@ namespace wrench {
                 }
                 if (not dynamic_cast<StorageServiceAckMessage *>(message.get())) {
                     throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
+                                             message->getName() + "] message instead of final ack!");
                 }
             }
 
         } else {
-            throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+            throw std::runtime_error("StorageService::writeFile(): Received a totally unexpected [" +
                                      message->getName() + "] message!");
         }
     }
