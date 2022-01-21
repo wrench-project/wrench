@@ -369,7 +369,6 @@ namespace wrench {
         // Wait for a reply
         std::shared_ptr<SimulationMessage> message;
 
-        std::cerr << "WAITING FOR REPLY ON MAILBOX " << answer_mailbox->get_name() << "\n";
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -385,7 +384,6 @@ namespace wrench {
             if (storage_service->buffer_size == 0) {
                 throw std::runtime_error("StorageService::writeFile(): Zero buffer size not implemented yet");
             } else {
-                std::cerr << "WRITING THE DATA!\n";
                 try {
                     double remaining = file->getSize();
                     while (remaining > storage_service->buffer_size) {
@@ -398,13 +396,10 @@ namespace wrench {
                             file, remaining, true));
 
                 } catch (std::shared_ptr<NetworkError> &cause) {
-                    std::cerr << "IN CATCH!\n";
-                    WRENCH_INFO("IN CATCH");
                     throw ExecutionException(cause);
                 }
 
                 //Waiting for the final ack
-                std::cerr << "WAITING FOR THE FINAL ACK\n";
                 try {
                     message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
                 } catch (std::shared_ptr<NetworkError> &cause) {
