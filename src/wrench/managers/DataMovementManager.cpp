@@ -94,12 +94,16 @@ namespace wrench {
 
 
         std::cerr << "PENDING\n";
+        std::cerr << "REF: " << src.use_count() << "\n";
         try {
             this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(file, src, dst, file_registry_service));
+        std::cerr << "REF: " << src.use_count() << "\n";
             wrench::StorageService::initiateFileCopy(this->mailbox, file,src, dst);
+        std::cerr << "REF: " << src.use_count() << "\n";
         } catch (ExecutionException &e) {
             throw;
         }
+        std::cerr << "AFTER PENDING\n";
     }
 
     /**
@@ -192,6 +196,10 @@ namespace wrench {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
+            std::cerr << "msg->src " << msg->src.use_count() << "\n";
+            std::cerr << "msg->dst " << msg->dst.use_count() << "\n";
+            std::cerr << "msg->src " << request.src.use_count() << "\n";
+            std::cerr << "msg->dst " << request.dst.use_count() << "\n";
             msg->src->getStorageService();
             request.src->getStorageService();
             request.dst->getStorageService();
@@ -204,7 +212,7 @@ namespace wrench {
                 (*(*it)).dst->getStorageService();
                 if (*(*it) == request) {
                     request.file_registry_service = (*it)->file_registry_service;
-                    std::cerr << "ERATING PENDING FILE COPY\n";
+                    std::cerr << "ERASING PENDING FILE COPY\n";
                     this->pending_file_copies.erase(it); // remove the entry
                     std::cerr << "ERASED PENDING FILE COPY\n";
                     break;
