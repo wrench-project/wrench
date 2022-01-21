@@ -140,6 +140,7 @@ private:
                                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
                                                             wrench::FileLocation::LOCATION(this->test->storage_service2),
                                                             nullptr);
+        std::cerr << "WAITING FOR NEXT EVENT\n";
         this->waitForAndProcessNextEvent();
         std::cerr << "DONE WITH FILE COPY\n";
 
