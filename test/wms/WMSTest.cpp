@@ -135,11 +135,13 @@ private:
 
 
         // Get a "FILE COPY COMPLETION" event (default handler)
+        std::cerr << "INITIATING FILE COPY\n";
         data_movement_manager->initiateAsynchronousFileCopy(this->test->small_file,
                                                             wrench::FileLocation::LOCATION(this->test->storage_service1),
                                                             wrench::FileLocation::LOCATION(this->test->storage_service2),
                                                             nullptr);
         this->waitForAndProcessNextEvent();
+        std::cerr << "DONE WITH FILE COPY\n";
 
         // Get a "FILE COPY FAILURE" event (default handler)
         data_movement_manager->initiateAsynchronousFileCopy(this->test->big_file,
