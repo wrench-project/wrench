@@ -82,7 +82,7 @@ namespace wrench {
             std::shared_ptr<FileLocation> dst;
             std::shared_ptr<FileRegistryService> file_registry_service;
 
-            CopyRequestSpecs(std::shared_ptr<DataFile>file,
+            CopyRequestSpecs(std::shared_ptr<DataFile> file,
                              std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
                              std::shared_ptr<FileRegistryService> file_registry_service) :
