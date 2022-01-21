@@ -14,6 +14,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/Service.h"
 #include "wrench/services/storage/StorageService.h"
+#include <iostream>
 
 namespace wrench {
 
@@ -31,6 +32,10 @@ namespace wrench {
 
     public:
 
+        ~FileTransferThread() {
+            std::cerr << "FILE TRANSFER THREAD DESTRUC\n";
+            std::cerr << src_location.use_count() << "\n";
+        }
 
 
         FileTransferThread(std::string hostname,
