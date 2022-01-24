@@ -44,10 +44,10 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
 
         bool isUp();
 
-        std::string getPropertyValueAsString(std::string);
-        double getPropertyValueAsDouble(std::string);
-        unsigned long getPropertyValueAsUnsignedLong(std::string);
-        bool getPropertyValueAsBoolean(std::string);
+        std::string getPropertyValueAsString(const std::string&);
+        double getPropertyValueAsDouble(const std::string&);
+        unsigned long getPropertyValueAsUnsignedLong(const std::string&);
+        bool getPropertyValueAsBoolean(const std::string&);
 
         void assertServiceIsUp();
 
@@ -62,7 +62,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         /** \cond INTERNAL     */
         /***********************/
 
-        double getMessagePayloadValue(std::string);
+        double getMessagePayloadValue(const std::string&);
 
         void setStateToDown();
 
@@ -89,13 +89,13 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         Service(std::string hostname, std::string process_name_prefix);
 
         // Property stuff
-        void setProperty(std::string, std::string);
+        void setProperty(const std::string&, const std::string&);
 
         void setProperties(std::unordered_map<std::string, std::string> default_property_values,
                            std::unordered_map<std::string, std::string> overriden_property_values);
 
         // MessagePayload stuff
-        void setMessagePayload(std::string, double);
+        void setMessagePayload(const std::string&, double);
 
         void setMessagePayloads(std::unordered_map<std::string, double> default_messagepayload_values,
                                 std::unordered_map<std::string, double> overriden_messagepayload_values);
