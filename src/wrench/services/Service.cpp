@@ -50,7 +50,7 @@ namespace wrench {
       * @param property: the property
       * @param value: the property value
       */
-    void Service::setProperty(std::string property, std::string value) {
+    void Service::setProperty(const std::string& property, const std::string& value) {
         if (this->property_list.find(property) != this->property_list.end()) {
             this->property_list[property] = value;
         } else {
@@ -65,7 +65,7 @@ namespace wrench {
     * @param value: the message payload value
     * @throw std::invalid_argument
     */
-    void Service::setMessagePayload(std::string messagepayload, double value) {
+    void Service::setMessagePayload(const std::string& messagepayload, double value) {
         // Check that the value is a >=0 double
 
         if (value < 0) {
@@ -83,7 +83,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::string Service::getPropertyValueAsString(std::string property) {
+    std::string Service::getPropertyValueAsString(const std::string& property) {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
                     "Service::getPropertyValueAsString(): Cannot find value for property " + property +
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getPropertyValueAsDouble(std::string property) {
+    double Service::getPropertyValueAsDouble(const std::string& property) {
         double value;
         std::string string_value;
         try {
@@ -125,7 +125,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    unsigned long Service::getPropertyValueAsUnsignedLong(std::string property) {
+    unsigned long Service::getPropertyValueAsUnsignedLong(const std::string& property) {
         unsigned long value;
         std::string string_value;
         try {
@@ -152,7 +152,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getMessagePayloadValue(std::string message_payload) {
+    double Service::getMessagePayloadValue(const std::string& message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             throw std::invalid_argument(
                     "Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
@@ -169,7 +169,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    bool Service::getPropertyValueAsBoolean(std::string property) {
+    bool Service::getPropertyValueAsBoolean(const std::string& property) {
         bool value;
         std::string string_value;
         try {
