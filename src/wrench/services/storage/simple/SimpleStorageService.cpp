@@ -70,8 +70,8 @@ namespace wrench {
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                std::set <std::string> mount_points,
-                                               std::map <std::string, std::string> property_list,
-                                               std::map<std::string, double> messagepayload_list) :
+                                               std::unordered_map <std::string, std::string> property_list,
+                                               std::unordered_map<std::string, double> messagepayload_list) :
             SimpleStorageService(std::move(hostname), mount_points, property_list, messagepayload_list,
                                  "_" + std::to_string(getNewUniqueNumber())) {}
 
@@ -88,8 +88,8 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(
             std::string hostname,
             std::set <std::string> mount_points,
-            std::map <std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
+            std::unordered_map <std::string, std::string> property_list,
+            std::unordered_map<std::string, double> messagepayload_list,
             std::string suffix) :
             StorageService(std::move(hostname), mount_points, "simple_storage" + suffix) {
         this->setProperties(this->default_property_values, property_list);

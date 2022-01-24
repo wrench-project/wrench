@@ -42,8 +42,8 @@ namespace wrench {
         S4U_VirtualMachine(const std::string &vm_hostname,
                            unsigned long num_cores,
                            double ram_memory,
-                           std::map<std::string, std::string> property_list,
-                           std::map<std::string, double> messagepayload_list);
+                           std::unordered_map<std::string, std::string> property_list,
+                           std::unordered_map<std::string, double> messagepayload_list);
 
         void start(std::string &pm_name);
 
@@ -58,8 +58,8 @@ namespace wrench {
         std::string getPhysicalHostname();
         unsigned long getNumCores();
         double getMemory();
-        std::map<std::string, std::string> getPropertyList();
-        std::map<std::string, double> getMessagePayloadList();
+        std::unordered_map<std::string, std::string> getPropertyList();
+        std::unordered_map<std::string, double> getMessagePayloadList();
 
         State getState();
         std::string getStateAsString();
@@ -72,8 +72,8 @@ namespace wrench {
         unsigned long num_cores;
         double ram_memory;
         std::string pm_name;
-        std::map<std::string, std::string> property_list;
-        std::map<std::string, double> messagepayload_list;
+        std::unordered_map<std::string, std::string> property_list;
+        std::unordered_map<std::string, double> messagepayload_list;
     };
 
     /***********************/

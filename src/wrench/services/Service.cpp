@@ -350,8 +350,8 @@ namespace wrench {
      * @param default_property_values: list of default properties
      * @param overridden_poperty_values: list of overridden properties (override the default)
      */
-    void Service::setProperties(std::map<std::string, std::string> default_property_values,
-                                std::map<std::string, std::string> overridden_poperty_values) {
+    void Service::setProperties(std::unordered_map<std::string, std::string> default_property_values,
+                                std::unordered_map<std::string, std::string> overridden_poperty_values) {
         // Set default properties
         for (auto const &p : default_property_values) {
             this->setProperty(p.first, p.second);
@@ -368,8 +368,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
-                                     std::map<std::string, double> overridden_messagepayload_values) {
+    void Service::setMessagePayloads(std::unordered_map<std::string, double> default_messagepayload_values,
+                                     std::unordered_map<std::string, double> overridden_messagepayload_values) {
        
         // Set default messagepayloads
         for (auto const &p : default_messagepayload_values) {

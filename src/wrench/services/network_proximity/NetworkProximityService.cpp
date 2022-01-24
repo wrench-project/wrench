@@ -47,8 +47,8 @@ namespace wrench {
      */
     NetworkProximityService::NetworkProximityService(std::string hostname,
                                                      std::vector<std::string> hosts_in_network,
-                                                     std::map<std::string, std::string> property_list,
-                                                     std::map<std::string, double> messagepayload_list
+                                                     std::unordered_map<std::string, std::string> property_list,
+                                                     std::unordered_map<std::string, double> messagepayload_list
     ) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
