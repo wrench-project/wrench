@@ -342,7 +342,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create a storage services
     double message_payload = 1;
-    std::map<std::string, double> payloads =
+    std::unordered_map<std::string, double> payloads =
             {
                     {wrench::StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::StorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, message_payload},

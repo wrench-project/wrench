@@ -74,8 +74,8 @@ namespace wrench {
             unsigned long num_cores,
             double ram_memory,
             std::string desired_vm_name,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
+            std::unordered_map<std::string, std::string> property_list,
+            std::unordered_map<std::string, double> messagepayload_list,
             double payload) :
             CloudComputeServiceMessage("CREATE_VM_REQUEST", payload),
             num_cores(num_cores), ram_memory(ram_memory), desired_vm_name(desired_vm_name), property_list(property_list),

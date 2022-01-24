@@ -49,7 +49,7 @@ namespace wrench {
                                                      std::string batch_service_mailbox,
                                                      std::string sched_port,
                                                      std::string data_to_send,
-                                                     std::map<std::string, std::string> property_list) :
+                                                     std::unordered_map<std::string, std::string> property_list) :
             BatschedNetworkListener(hostname, batch_service, batch_service_mailbox,
                                     sched_port, data_to_send, property_list, "") {
     }
@@ -68,7 +68,7 @@ namespace wrench {
     BatschedNetworkListener::BatschedNetworkListener(
             std::string hostname, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox,
             std::string sched_port,
-            std::string data_to_send, std::map<std::string, std::string> property_list,
+            std::string data_to_send, std::unordered_map<std::string, std::string> property_list,
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 

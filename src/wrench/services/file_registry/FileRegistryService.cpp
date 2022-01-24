@@ -37,8 +37,8 @@ namespace wrench {
      */
     FileRegistryService::FileRegistryService(
             std::string hostname,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list) :
+            std::unordered_map<std::string, std::string> property_list,
+            std::unordered_map<std::string, double> messagepayload_list) :
             Service(hostname, "file_registry") {
 
         this->setProperties(this->default_property_values, property_list);

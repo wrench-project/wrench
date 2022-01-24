@@ -26,7 +26,7 @@ namespace wrench {
      */
     class HTCondorComputeService : public ComputeService {
     private:
-        std::map<std::string, std::string> default_property_values = {
+        std::unordered_map<std::string, std::string> default_property_values = {
                 {HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "0.0"},
                 {HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "0.0"},
                 {HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "0.0"},
@@ -34,7 +34,7 @@ namespace wrench {
                 {HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "0.0"},
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+        std::unordered_map<std::string, double> default_messagepayload_values = {
                 {HTCondorComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {HTCondorComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {HTCondorComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -53,8 +53,8 @@ namespace wrench {
     public:
         HTCondorComputeService(const std::string &hostname,
                                std::set<std::shared_ptr<ComputeService>> compute_services,
-                               std::map<std::string, std::string> property_list = {},
-                               std::map<std::string, double> messagepayload_list = {});
+                               std::unordered_map<std::string, std::string> property_list = {},
+                               std::unordered_map<std::string, double> messagepayload_list = {});
 
         virtual bool supportsStandardJobs() override;
         virtual bool supportsCompoundJobs() override;
