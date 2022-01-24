@@ -91,23 +91,23 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         // Property stuff
         void setProperty(std::string, std::string);
 
-        void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> overriden_property_values);
+        void setProperties(std::unordered_map<std::string, std::string> default_property_values,
+                           std::unordered_map<std::string, std::string> overriden_property_values);
 
         // MessagePayload stuff
         void setMessagePayload(std::string, double);
 
-        void setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
-                                std::map<std::string, double> overriden_messagepayload_values);
+        void setMessagePayloads(std::unordered_map<std::string, double> default_messagepayload_values,
+                                std::unordered_map<std::string, double> overriden_messagepayload_values);
 
 
         void serviceSanityCheck();
 
         /** @brief The service's property list */
-        std::map<std::string, std::string> property_list;
+        std::unordered_map<std::string, std::string> property_list;
 
         /** @brief The service's messagepayload list */
-        std::map<std::string, double> messagepayload_list;
+        std::unordered_map<std::string, double> messagepayload_list;
 
         /** @brief The service's name */
         std::string name;

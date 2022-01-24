@@ -58,8 +58,8 @@ namespace wrench {
     BatchComputeService::BatchComputeService(const std::string &hostname,
                                              std::vector<std::string> compute_hosts,
                                              std::string scratch_space_mount_point,
-                                             std::map<std::string, std::string> property_list,
-                                             std::map<std::string, double> messagepayload_list
+                                             std::unordered_map<std::string, std::string> property_list,
+                                             std::unordered_map<std::string, double> messagepayload_list
     ) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
                             ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
                             std::move(messagepayload_list), "") {}
@@ -85,8 +85,8 @@ namespace wrench {
                                              unsigned long cores_per_host,
                                              double ram_per_host,
                                              std::string scratch_space_mount_point,
-                                             std::map<std::string, std::string> property_list,
-                                             std::map<std::string, double> messagepayload_list,
+                                             std::unordered_map<std::string, std::string> property_list,
+                                             std::unordered_map<std::string, double> messagepayload_list,
                                              std::string suffix) :
             ComputeService(hostname,
                            "BatchComputeService" + suffix,

@@ -44,12 +44,12 @@ namespace wrench {
     class SimpleStorageService : public StorageService {
 
     private:
-        std::map <std::string, std::string> default_property_values = {
+        std::unordered_map <std::string, std::string> default_property_values = {
                 {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"},
                 {SimpleStorageServiceProperty::BUFFER_SIZE,                         "10485760"}, // 10 MEGA BYTE
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+        std::unordered_map<std::string, double> default_messagepayload_values = {
                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,         1024},
                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,      1024},
                 {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD,  1024},
@@ -70,8 +70,8 @@ namespace wrench {
         // Public Constructor
         SimpleStorageService(std::string hostname,
                              std::set <std::string> mount_points,
-                             std::map <std::string, std::string> property_list = {},
-                             std::map<std::string, double> messagepayload_list = {});
+                             std::unordered_map <std::string, std::string> property_list = {},
+                             std::unordered_map<std::string, double> messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -91,8 +91,8 @@ namespace wrench {
         // Low-level Constructor
         SimpleStorageService(std::string hostname,
                              std::set <std::string> mount_points,
-                             std::map <std::string, std::string> property_list,
-                             std::map<std::string, double> messagepayload_list,
+                             std::unordered_map <std::string, std::string> property_list,
+                             std::unordered_map<std::string, double> messagepayload_list,
                              std::string suffix);
 
         int main() override;

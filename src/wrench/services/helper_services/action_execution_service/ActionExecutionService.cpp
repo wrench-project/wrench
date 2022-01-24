@@ -206,8 +206,8 @@ namespace wrench {
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::shared_ptr<Service> parent_service,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list
+            std::unordered_map<std::string, std::string> property_list,
+            std::unordered_map<std::string, double> messagepayload_list
     ) : Service(hostname,
                 "action_execution_service") {
 

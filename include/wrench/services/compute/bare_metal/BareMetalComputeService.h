@@ -49,13 +49,13 @@ namespace wrench {
 
     private:
 
-        std::map<std::string, std::string> default_property_values = {
+        std::unordered_map<std::string, std::string> default_property_values = {
                 {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
                 {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+        std::unordered_map<std::string, double> default_messagepayload_values = {
                 {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    1024},
                 {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 1024},
                 {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         1024},
@@ -91,16 +91,16 @@ namespace wrench {
         BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 std::string scratch_space_mount_point,
-                                std::map<std::string, std::string> property_list = {},
-                                std::map<std::string, double> messagepayload_list = {}
+                                std::unordered_map<std::string, std::string> property_list = {},
+                                std::unordered_map<std::string, double> messagepayload_list = {}
         );
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::vector<std::string> compute_hosts,
                                 std::string scratch_space_mount_point,
-                                std::map<std::string, std::string> property_list = {},
-                                std::map<std::string, double> messagepayload_list = {}
+                                std::unordered_map<std::string, std::string> property_list = {},
+                                std::unordered_map<std::string, double> messagepayload_list = {}
         );
 
         virtual bool supportsStandardJobs() override;
@@ -127,16 +127,16 @@ namespace wrench {
 
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                std::map<std::string, std::string> property_list,
-                                std::map<std::string, double> messagepayload_list,
+                                std::unordered_map<std::string, std::string> property_list,
+                                std::unordered_map<std::string, double> messagepayload_list,
                                 double ttl,
                                 std::shared_ptr<PilotJob> pj, std::string suffix,
                                 std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                std::map<std::string, std::string> property_list,
-                                std::map<std::string, double> messagepayload_list,
+                                std::unordered_map<std::string, std::string> property_list,
+                                std::unordered_map<std::string, double> messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
 
         void validateProperties();
@@ -145,8 +145,8 @@ namespace wrench {
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                              std::map<std::string, std::string> property_list,
-                              std::map<std::string, double> messagepayload_list,
+                              std::unordered_map<std::string, std::string> property_list,
+                              std::unordered_map<std::string, double> messagepayload_list,
                               double ttl,
                               std::shared_ptr<PilotJob> pj);
 
