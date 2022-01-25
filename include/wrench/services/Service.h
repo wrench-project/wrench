@@ -17,9 +17,11 @@
 #include <memory>
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/ServiceProperty.h"
 
 namespace wrench {
-
+    typedef std::unordered_map<WRENCH_PROPERTY_TYPE,std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
+    typedef std::map<std::string,double> WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE;
     class FailureCause;
 
     /**
@@ -44,10 +46,10 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
 
         bool isUp();
 
-        std::string getPropertyValueAsString(const std::string&);
-        double getPropertyValueAsDouble(const std::string&);
-        unsigned long getPropertyValueAsUnsignedLong(const std::string&);
-        bool getPropertyValueAsBoolean(const std::string&);
+        std::string getPropertyValueAsString(const WRENCH_PROPERTY_TYPE&);
+        double getPropertyValueAsDouble(const WRENCH_PROPERTY_TYPE&);
+        unsigned long getPropertyValueAsUnsignedLong(const WRENCH_PROPERTY_TYPE&);
+        bool getPropertyValueAsBoolean(const WRENCH_PROPERTY_TYPE&);
 
         void assertServiceIsUp();
 
@@ -89,25 +91,25 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         Service(std::string hostname, std::string process_name_prefix);
 
         // Property stuff
-        void setProperty(const std::string&, const std::string&);
+        void setProperty(const WRENCH_PROPERTY_TYPE&, const std::string&);
 
-        void setProperties(std::unordered_map<std::string, std::string> default_property_values,
-                           std::unordered_map<std::string, std::string> overriden_property_values);
+        void setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
+                           WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
 
         // MessagePayload stuff
         void setMessagePayload(const std::string&, double);
 
-        void setMessagePayloads(std::unordered_map<std::string, double> default_messagepayload_values,
-                                std::unordered_map<std::string, double> overriden_messagepayload_values);
+        void setMessagePayloads(WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values,
+                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE overriden_messagepayload_values);
 
 
         void serviceSanityCheck();
 
         /** @brief The service's property list */
-        std::unordered_map<std::string, std::string> property_list;
+        WRENCH_PROPERTY_COLLECTION_TYPE property_list;
 
         /** @brief The service's messagepayload list */
-        std::unordered_map<std::string, double> messagepayload_list;
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
 
         /** @brief The service's name */
         std::string name;

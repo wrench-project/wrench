@@ -41,8 +41,8 @@ namespace wrench {
      */
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                                    std::set<std::shared_ptr<ComputeService>> compute_services,
-                                                   std::unordered_map<std::string, std::string> property_list,
-                                                   std::unordered_map<std::string, double> messagepayload_list) :
+                                                   WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                   WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
             ComputeService(hostname, "htcondor_service", "") {
 
         // Set default and specified properties

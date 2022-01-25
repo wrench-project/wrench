@@ -13,12 +13,12 @@
 
 #include <string>
 
-#define DECLARE_PROPERTY_NAME(name) static const std::string name
 
-#define SET_PROPERTY_NAME(classname, name) const std::string classname::name=#name
+
 
 namespace wrench {
-
+    typedef int WRENCH_PROPERTY_TYPE;
+    extern WRENCH_PROPERTY_TYPE WRENCH_PROPERTY_COUNT;
     /**
      * @brief Configurable properties for a Service
      */
@@ -29,6 +29,8 @@ namespace wrench {
     };
 
 };
+#define DECLARE_PROPERTY_NAME(name) static const wrench::WRENCH_PROPERTY_TYPE name
+#define SET_PROPERTY_NAME(classname, name) const wrench::WRENCH_PROPERTY_TYPE classname::name=++wrench::WRENCH_PROPERTY_COUNT
 
 
 #endif //WRENCH_SERVICEPROPERTY_H

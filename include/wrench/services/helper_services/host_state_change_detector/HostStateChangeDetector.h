@@ -26,7 +26,7 @@ namespace wrench {
     class HostStateChangeDetector : public Service {
 
     private:
-        std::unordered_map<std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {HostStateChangeDetectorProperty::MONITORING_PERIOD,                            "1.0"}
         };
 
@@ -39,7 +39,7 @@ namespace wrench {
                                          bool notify_when_speed_change,
                                          std::shared_ptr<S4U_Daemon> creator,
                                          simgrid::s4u::Mailbox *mailbox_to_notify,
-                                         std::unordered_map<std::string, std::string> property_list = {}
+                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {}
         );
 
         void kill();

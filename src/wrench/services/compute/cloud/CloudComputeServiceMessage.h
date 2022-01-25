@@ -63,8 +63,8 @@ namespace wrench {
                                                   unsigned long num_cores,
                                                   double ram_memory,
                                                   std::string desired_vm_name,
-                                                  std::unordered_map<std::string, std::string> property_list,
-                                                  std::unordered_map<std::string, double> messagepayload_list,
+                                                  WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                  WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
                                                   double payload);
 
     public:
@@ -77,9 +77,9 @@ namespace wrench {
         /** @brief The desired name for the VM ("" means "pick for me") */
         std::string desired_vm_name;
         /** @brief A property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults") */
-        std::unordered_map<std::string, std::string> property_list;
+        WRENCH_PROPERTY_COLLECTION_TYPE property_list;
         /** @brief A message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults") */
-        std::unordered_map<std::string, double> messagepayload_list;
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
     };
 
     /**
