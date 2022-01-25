@@ -342,7 +342,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create a storage services
     double message_payload = 1;
-    WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE payloads =
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE payloads =
             {
                     {wrench::StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::StorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, message_payload},
