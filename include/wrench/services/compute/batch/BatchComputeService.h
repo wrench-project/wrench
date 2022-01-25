@@ -53,7 +53,7 @@ namespace wrench {
          */
     private:
 
-        std::unordered_map<std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
@@ -77,7 +77,7 @@ namespace wrench {
                 {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,              "false"}
         };
 
-        std::unordered_map<std::string, double> default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                 {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 1024},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,1024},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
@@ -108,8 +108,8 @@ namespace wrench {
         BatchComputeService(const std::string &hostname,
                             std::vector<std::string> compute_hosts,
                             std::string scratch_space_mount_point,
-                            std::unordered_map<std::string, std::string> property_list = {},
-                            std::unordered_map<std::string, double> messagepayload_list = {}
+                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
         );
 
         bool supportsStandardJobs() override;
@@ -154,8 +154,8 @@ namespace wrench {
                             unsigned long cores_per_host,
                             double ram_per_host,
                             std::string scratch_space_mount_point,
-                            std::unordered_map<std::string, std::string> property_list,
-                            std::unordered_map<std::string, double> messagepayload_list,
+                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
                             std::string suffix
         );
 

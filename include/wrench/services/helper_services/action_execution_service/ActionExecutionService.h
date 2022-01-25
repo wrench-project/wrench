@@ -39,12 +39,12 @@ namespace wrench {
 
     private:
 
-        std::unordered_map<std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
                 {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
         };
 
-        std::unordered_map<std::string, double> default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
         };
 
     public:
@@ -53,8 +53,8 @@ namespace wrench {
         ActionExecutionService(const std::string &hostname,
                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                         std::shared_ptr<Service> parent_service,
-                        std::unordered_map<std::string, std::string> property_list = {},
-                        std::unordered_map<std::string, double> messagepayload_list = {}
+                        WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
         );
 
         /***********************/

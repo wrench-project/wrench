@@ -35,13 +35,13 @@ namespace wrench {
     class FileRegistryService : public Service {
 
     private:
-        std::unordered_map <std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,       "0.0"},
                 {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST,    "0.0"},
                 {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0.0"},
         };
 
-        std::unordered_map<std::string, double> default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
                 {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          1024},
                 {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       1024},
                 {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,  1024},
@@ -55,8 +55,8 @@ namespace wrench {
     public:
         // Public Constructor
         FileRegistryService(std::string hostname,
-                            std::unordered_map <std::string, std::string> property_list = {},
-                            std::unordered_map<std::string, double> messagepayload_list = {}
+                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
         );
 
         /****************************/
