@@ -40,7 +40,7 @@ namespace wrench {
                                                    double message_size, double measurement_period,
                                                    double noise,
                                                    int noise_seed,
-                                                   std::unordered_map<std::string, double> messagepayload_list) :
+                                                   WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
             NetworkProximityDaemon(simulation, std::move(hostname), network_proximity_service_mailbox,
                                    message_size, measurement_period, noise, noise_seed,messagepayload_list, "") {
     }
@@ -67,7 +67,7 @@ namespace wrench {
             double message_size, double measurement_period,
             double noise,
             int noise_seed,
-            std::unordered_map<std::string, double> messagepayload_list,
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
             std::string suffix = "") :
             Service(std::move(hostname), "network_daemon" + suffix) {
 

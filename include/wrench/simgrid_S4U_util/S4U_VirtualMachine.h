@@ -13,6 +13,8 @@
 
 #include <simgrid/s4u/VirtualMachine.hpp>
 #include <set>
+#include <wrench/services/Service.h>
+
 
 namespace wrench {
 
@@ -30,7 +32,7 @@ namespace wrench {
         /**
          * @brief A map to keep track of VM-to-PM mapping
          */
-        static std::unordered_map<std::string, std::string> vm_to_pm_map;
+        static std::unordered_map<std::string,std::string> vm_to_pm_map;
 
         /** @brief VM state enum */
         enum State {
@@ -42,8 +44,8 @@ namespace wrench {
         S4U_VirtualMachine(const std::string &vm_hostname,
                            unsigned long num_cores,
                            double ram_memory,
-                           std::unordered_map<std::string, std::string> property_list,
-                           std::unordered_map<std::string, double> messagepayload_list);
+                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
 
         void start(std::string &pm_name);
 
@@ -58,8 +60,8 @@ namespace wrench {
         std::string getPhysicalHostname();
         unsigned long getNumCores();
         double getMemory();
-        std::unordered_map<std::string, std::string> getPropertyList();
-        std::unordered_map<std::string, double> getMessagePayloadList();
+        WRENCH_PROPERTY_COLLECTION_TYPE getPropertyList();
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE getMessagePayloadList();
 
         State getState();
         std::string getStateAsString();
@@ -72,8 +74,8 @@ namespace wrench {
         unsigned long num_cores;
         double ram_memory;
         std::string pm_name;
-        std::unordered_map<std::string, std::string> property_list;
-        std::unordered_map<std::string, double> messagepayload_list;
+        WRENCH_PROPERTY_COLLECTION_TYPE property_list;
+        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
     };
 
     /***********************/

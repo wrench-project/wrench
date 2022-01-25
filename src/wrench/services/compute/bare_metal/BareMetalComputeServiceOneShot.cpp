@@ -52,8 +52,8 @@ namespace wrench {
             std::shared_ptr<CompoundJob> job,
             const std::string &hostname,
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-            std::unordered_map<std::string, std::string> property_list,
-            std::unordered_map<std::string, double> messagepayload_list,
+            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space
