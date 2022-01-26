@@ -93,24 +93,24 @@ namespace wrench {
         std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
 
         // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
-        std::map<std::string, double> ram_availabilities;
-        std::map<std::string, unsigned long> running_thread_counts;
+        std::unordered_map<std::string, double> ram_availabilities;
+        std::unordered_map<std::string, unsigned long> running_thread_counts;
 
         std::shared_ptr<Service> parent_service = nullptr;
 
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
+        std::unordered_map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         // Set of running jobs
         std::set<std::shared_ptr<Action> > running_actions;
 
         // Action execution specs
-        std::map<std::shared_ptr<Action> , std::tuple<std::string, unsigned long>> action_run_specs;
+        std::unordered_map<std::shared_ptr<Action> , std::tuple<std::string, unsigned long>> action_run_specs;
 
         std::set<std::shared_ptr<Action>> all_actions;
         std::deque<std::shared_ptr<Action>> ready_actions;
 
         // Set of running ActionExecutors
-        std::map<std::shared_ptr<Action> , std::shared_ptr<ActionExecutor>> action_executors;
+        std::unordered_map<std::shared_ptr<Action> , std::shared_ptr<ActionExecutor>> action_executors;
 
         int main() override;
 
