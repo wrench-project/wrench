@@ -250,6 +250,7 @@ namespace wrench {
         for (auto const &p : this->parents) {
             if (p->getState() != Action::State::COMPLETED) {
                 ready = false;
+                break;
             }
         }
         if (ready) {
