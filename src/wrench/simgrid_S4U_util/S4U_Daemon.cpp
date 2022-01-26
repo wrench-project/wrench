@@ -28,7 +28,7 @@ std::map<std::string, unsigned long> num_actors;
 
 namespace wrench {
 
-    std::map<aid_t, simgrid::s4u::Mailbox*> S4U_Daemon::map_actor_to_recv_mailbox;
+    std::unordered_map<aid_t, simgrid::s4u::Mailbox*> S4U_Daemon::map_actor_to_recv_mailbox;
 
     /**
      * @brief Constructor (daemon with a mailbox)

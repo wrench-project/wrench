@@ -157,14 +157,14 @@ namespace wrench {
         std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
 
 
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
+        std::unordered_map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
         std::set<std::shared_ptr<Action>> not_ready_actions;
         std::vector<std::shared_ptr<Action>> ready_actions;
         std::set<std::shared_ptr<Action>> dispatched_actions;
-        std::map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
+        std::unordered_map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
 
         double ttl;
         double death_date;
