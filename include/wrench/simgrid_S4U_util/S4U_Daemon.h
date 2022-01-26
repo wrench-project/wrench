@@ -42,7 +42,7 @@ namespace wrench {
 
     public:
 
-        static std::map<aid_t , simgrid::s4u::Mailbox*> map_actor_to_recv_mailbox;
+        static std::unordered_map<aid_t , simgrid::s4u::Mailbox*> map_actor_to_recv_mailbox;
 
         /** @brief The name of the daemon */
         std::string process_name;

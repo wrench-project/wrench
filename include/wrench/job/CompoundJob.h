@@ -194,7 +194,7 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
 
         std::map<std::string, std::string> service_specific_args;
 
-        std::map<Action::State, std::set<std::shared_ptr<Action>>> state_task_map;
+        std::unordered_map<Action::State, std::set<std::shared_ptr<Action>>> state_task_map;
 
     };
 
