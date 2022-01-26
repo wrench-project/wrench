@@ -383,7 +383,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 // t4 was executed twice, so its execution history should be of size 2
     ASSERT_EQ(t4_history.size(), 2);
 
-// t4's second execution was successfull, so all values in its history for the second execution should be set
+// t4's second execution was successful, so all values in its history for the second execution should be set
     wrench::WorkflowTask::WorkflowTaskExecution t4_successful_execution = t4_history.top();
     std::vector<double> t4_successful_execution_history_values = {
             t4_successful_execution.task_start,
