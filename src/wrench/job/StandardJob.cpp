@@ -596,18 +596,15 @@ namespace wrench {
             t->setStartDate(-1.0);
             t->setEndDate(-1.0);
 
-            /*
-             * Set the execution host
-             */
-            std::string execution_host;
-            for (const auto &a : this->task_file_read_actions[t]) {
-                if (!a->getExecutionHistory().top().execution_host.empty()) {
-                    execution_host = a->getExecutionHistory().top().execution_host;
-                    break;
-                }
-            }
+            std::string execution_host = this->task_compute_actions[t]->getExecutionHistory().top().execution_host;
+
             if (execution_host.empty()) {
-                execution_host = this->task_compute_actions[t]->getExecutionHistory().top().execution_host;
+                for (const auto &a : this->task_file_read_actions[t]) {
+                    if (!a->getExecutionHistory().top().execution_host.empty()) {
+                        execution_host = a->getExecutionHistory().top().execution_host;
+                        break;
+                    }
+                }
             }
 
             t->setExecutionHost(execution_host);
