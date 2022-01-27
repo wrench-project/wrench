@@ -647,14 +647,12 @@ namespace wrench {
     double Workflow::getCompletionDate() {
         double makespan = -1.0;
         // Get te last level
-        std::vector<std::shared_ptr<WorkflowTask>> last_tasks = this->getTasksInTopLevelRange(this->getNumLevels() - 1,
-                                                                               this->getNumLevels() - 1);
-        for (auto task : last_tasks) {
-            if (task->getState() != WorkflowTask::State::COMPLETED) {
+        for (auto const &task : this->tasks) {
+            if (task.second->getState() != WorkflowTask::State::COMPLETED) {
                 makespan = -1.0;
                 break;
             } else {
-                makespan = std::max<double>(makespan, task->getEndDate());
+                makespan = std::max<double>(makespan, task.second->getEndDate());
             }
         }
         return makespan;
