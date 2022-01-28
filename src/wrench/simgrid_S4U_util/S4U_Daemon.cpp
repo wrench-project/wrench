@@ -82,8 +82,6 @@ namespace wrench {
     }
 
     S4U_Daemon::~S4U_Daemon() {
-        this->mailbox->set_receiver(nullptr);
-        this->recv_mailbox->set_receiver(nullptr);
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
 #ifdef ACTOR_TRACKING_OUTPUT
@@ -251,6 +249,8 @@ namespace wrench {
         this->has_returned_from_main = true;
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
+        this->mailbox->set_receiver(nullptr);
+        this->recv_mailbox->set_receiver(nullptr);
     }
 
 
