@@ -82,7 +82,8 @@ namespace wrench {
     }
 
     S4U_Daemon::~S4U_Daemon() {
-
+        this->mailbox->set_receiver(nullptr);
+        this->recv_mailbox->set_receiver(nullptr);
         WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
 #ifdef ACTOR_TRACKING_OUTPUT
@@ -185,9 +186,10 @@ namespace wrench {
 
         }
 
-        // Set the mailbox_name receiver (causes memory_manager_service leak)
+        // Set the mailbox receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         this->mailbox->set_receiver(this->s4u_actor);
+        this->recv_mailbox->set_receiver(this->s4u_actor);
 
 
     }
