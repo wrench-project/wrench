@@ -518,13 +518,13 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
 
     // host2 is idle for 6 seconds and records timestamps in 3.0 second intervals
     // we should end up with 2 timestamps
-    ASSERT_EQ(2, host2_timestamps.size());
+    ASSERT_EQ(3, host2_timestamps.size());
 
     // expected values (timestamp, consumption)
     std::vector<std::pair<double, double>> host2_expected_timestamps = {
             {0.0, 0.0},
-            {3.0, 300.0}
-//            {6.0, 600.0}
+            {3.0, 300.0},
+            {6.0, 600.0}
     };
 
     for (size_t i = 0; i < host2_timestamps.size(); ++i) {
