@@ -187,7 +187,7 @@ namespace wrench {
         // Set the mailbox receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         this->mailbox->set_receiver(this->s4u_actor);
-        this->recv_mailbox->set_receiver(this->s4u_actor);
+//        this->recv_mailbox->set_receiver(this->s4u_actor);
 
 
     }
@@ -250,7 +250,7 @@ namespace wrench {
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
         this->mailbox->set_receiver(nullptr);
-        this->recv_mailbox->set_receiver(nullptr);
+//        this->recv_mailbox->set_receiver(nullptr);
     }
 
 
