@@ -1186,6 +1186,10 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
                     {
                         "time": 4.0,
                         "joules": 400.0
+                    },
+                    {
+                        "time":6.0,
+                        "joules":600.0
                     }
                 ],
                 "hostname": "host2",
