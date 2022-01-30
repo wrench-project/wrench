@@ -241,11 +241,11 @@ namespace wrench {
 //        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
 //        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
         if (this->dst_mailbox) {
-            std::cerr << "FTT: RETIRINING " << this->dst_mailbox->get_name() << "\n";
+            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
 //            S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
         }
         if (this->src_mailbox) {
-            std::cerr << "FTT: RETIRINING " << this->src_mailbox->get_name() << "\n";
+            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
 //            S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
         }
 
@@ -369,7 +369,6 @@ namespace wrench {
                                                     std::shared_ptr<FileLocation> location,
                                                     double num_bytes_to_transfer,
                                                     simgrid::s4u::Mailbox *mailbox) {
-       WRENCH_INFO("XXXX IN sendLocalFileToNetwork()\n");
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
             throw std::runtime_error(
