@@ -257,7 +257,7 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        auto chunk_receiving_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("chunks"));
+        auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
@@ -271,6 +271,7 @@ namespace wrench {
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
+            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw ExecutionException(cause);
         }
 
@@ -280,6 +281,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
+            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw ExecutionException(cause);
         }
 
@@ -287,10 +289,12 @@ namespace wrench {
             // If it's not a success, throw an exception
             if (not msg->success) {
                 std::shared_ptr<FailureCause> &cause = msg->failure_cause;
+                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw ExecutionException(cause);
             }
 
             if (storage_service->buffer_size == 0) {
+                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 
             } else {
@@ -300,19 +304,24 @@ namespace wrench {
                     try {
                         file_content_message = S4U_Mailbox::getMessage(chunk_receiving_mailbox);
                     } catch (std::shared_ptr<NetworkError> &cause) {
+                        S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                         throw ExecutionException(cause);
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
                             file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
+                            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                             break;
                         }
                     } else {
+                        S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                         throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                                  file_content_message->getName() + "] message!");
                     }
                 }
+
+                S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
 
                 //Waiting for the final ack
                 try {
@@ -327,6 +336,7 @@ namespace wrench {
             }
 
         } else {
+            S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }

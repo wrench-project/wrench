@@ -39,14 +39,20 @@ namespace wrench {
 				static void dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
 				static std::shared_ptr<S4U_PendingCommunication> iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
 				static std::shared_ptr<S4U_PendingCommunication> igetMessage(simgrid::s4u::Mailbox *mailbox);
-//				static void clear_dputs();
 
-				static std::string generateUniqueMailboxName(std::string);
 				static unsigned long generateUniqueSequenceNumber();
 
-		private:
+                static simgrid::s4u::Mailbox *getTemporaryMailbox();
+                static void retireTemporaryMailbox(simgrid::s4u::Mailbox *mailbox);
 
-//				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::CommPtr>> dputs;
+                static void createMailboxPool(unsigned long num_mailboxes);
+
+                static simgrid::s4u::Mailbox *generateUniqueMailbox(std::string prefix);
+
+		private:
+		        static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
+                static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
+
 
 		};
 

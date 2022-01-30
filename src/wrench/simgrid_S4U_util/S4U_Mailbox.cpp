@@ -28,6 +28,9 @@ WRENCH_LOG_CATEGORY(wrench_core_mailbox, "Mailbox");
 
 namespace wrench {
 
+    std::deque<simgrid::s4u::Mailbox *> S4U_Mailbox::free_mailboxes;
+    std::set<simgrid::s4u::Mailbox *> S4U_Mailbox::used_mailboxes;
+
     class WorkflowTask;
 
     /**
@@ -241,14 +244,51 @@ namespace wrench {
 
 
     /**
-     * @brief Generate a unique mailbox name given a prefix (this method
-     *        simply appends an increasing sequence number to the prefix)
+     * @brief Get a temporary mailbox
      *
-     * @param prefix: a prefix for the mailbox name
-     * @return a unique mailbox name as a string
+     * @return a temporary mailbox
      */
-    std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
-        return prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
+    simgrid::s4u::Mailbox *S4U_Mailbox::getTemporaryMailbox() {
+        if (S4U_Mailbox::free_mailboxes.empty()) {
+            throw std::runtime_error("S4U_Mailbox::getTemporaryMailbox(): Out of mailboxes! ");
+        }
+        auto mailbox = *(S4U_Mailbox::free_mailboxes.end() - 1);
+        S4U_Mailbox::free_mailboxes.pop_back();
+        S4U_Mailbox::used_mailboxes.insert(mailbox);
+        return mailbox;
     }
+
+
+    /**
+     * @brief Retire a temporary mailbox
+     * @param mailbox: the mailbox to retire
+     */
+    void S4U_Mailbox::retireTemporaryMailbox(simgrid::s4u::Mailbox *mailbox) {
+        if (S4U_Mailbox::used_mailboxes.find(mailbox) == S4U_Mailbox::used_mailboxes.end()) {
+            return;
+        }
+        S4U_Mailbox::used_mailboxes.erase(mailbox);
+        S4U_Mailbox::free_mailboxes.push_front(mailbox);
+    }
+
+    /**
+     * @brief Create the pool of mailboxes to use
+     * @param num_mailboxes: numb mailboxes in pool
+     */
+    void S4U_Mailbox::createMailboxPool(unsigned long num_mailboxes) {
+        for (unsigned long i=0; i < num_mailboxes; i++) {
+            S4U_Mailbox::free_mailboxes.push_back(simgrid::s4u::Mailbox::by_name("tmp" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber())));
+        }
+    }
+
+    /**
+     * @brief Generate a unique (non-temporary) mailbox
+     * @param prefix: mailbox name prefix
+     * @return
+     */
+    simgrid::s4u::Mailbox *S4U_Mailbox::generateUniqueMailbox(std::string prefix) {
+        return simgrid::s4u::Mailbox::by_name(prefix + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber()));
+    }
+
 
 };
