@@ -299,7 +299,7 @@ namespace wrench {
             fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
 
             // Generate a mailbox_name name on which to receive the file
-            auto file_reception_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("file_reception"));
+            auto file_reception_mailbox = S4U_Mailbox::getTemporaryMailbox();
 
             // Reply with a "go ahead, send me the file" message
             S4U_Mailbox::dputMessage(

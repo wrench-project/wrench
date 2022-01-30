@@ -66,15 +66,15 @@ namespace wrench {
         /* Create random amounts of work in GFlop, input sizes in bytes, and output sizes in bytes */
         std::vector<std::tuple<double, std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::DataFile>>> actions;
         actions.reserve(num_actions);
-        for (int i=0; i < num_actions; i++) {
+            auto input_file = wrench::Simulation::addFile("input_file_", mb_dist(rng));
+            this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+            auto output_file = wrench::Simulation::addFile("output_file_", mb_dist(rng));
+        for (int i=0; i < 1; i++) {
             // Create action work
             auto work = gflop_dist(rng);
             // Create input file
-            auto input_file = wrench::Simulation::addFile("input_file_" + std::to_string(i), mb_dist(rng));
             // Create a copy of the input file on the storage service
-            this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
             // Create output file
-            auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(i), mb_dist(rng));
             actions.emplace_back(work, input_file, output_file);
         }
         
@@ -87,16 +87,16 @@ namespace wrench {
             WRENCH_INFO("Creating a 2-compute-action job");
             auto job = job_manager->createCompoundJob("job_" + std::to_string(i/2));
             // Action i with 2 cores
-            auto file_read_1 = job->addFileReadAction("file_read_" + std::to_string(i), std::get<1>(actions.at(i)), wrench::FileLocation::LOCATION(this->storage_service));
-            auto compute_1 = job->addComputeAction("computation_" + std::to_string(i), std::get<0>(actions.at(i)), 0.0, 2, 2, wrench::ParallelModel::AMDAHL(0.9));
-            auto file_write_1 = job->addFileWriteAction("file_write_" + std::to_string(i), std::get<2>(actions.at(i)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_read_1 = job->addFileReadAction("file_read_" + std::to_string(i), std::get<1>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto compute_1 = job->addComputeAction("computation_" + std::to_string(i), std::get<0>(actions.at(0)), 0.0, 2, 2, wrench::ParallelModel::AMDAHL(0.9));
+            auto file_write_1 = job->addFileWriteAction("file_write_" + std::to_string(i), std::get<2>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
             job->addActionDependency(file_read_1, compute_1);
             job->addActionDependency(compute_1, file_write_1);
 
             // Action i+1 with 4 cores
-            auto file_read_2 = job->addFileReadAction("file_read_" + std::to_string(i+1), std::get<1>(actions.at(i+1)), wrench::FileLocation::LOCATION(this->storage_service));
-            auto compute_2 = job->addComputeAction("computation_" + std::to_string(i+1), std::get<0>(actions.at(i+1)), 0.0, 4, 4, wrench::ParallelModel::AMDAHL(0.9));
-            std::shared_ptr<Action> file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(actions.at(i+1)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_read_2 = job->addFileReadAction("file_read_" + std::to_string(i+1), std::get<1>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto compute_2 = job->addComputeAction("computation_" + std::to_string(i+1), std::get<0>(actions.at(0)), 0.0, 4, 4, wrench::ParallelModel::AMDAHL(0.9));
+            std::shared_ptr<Action> file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
             job->addActionDependency(file_read_2, compute_2);
             job->addActionDependency(compute_2, file_write_2);
 
