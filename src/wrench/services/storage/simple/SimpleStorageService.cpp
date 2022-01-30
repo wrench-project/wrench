@@ -299,8 +299,8 @@ namespace wrench {
             fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
 
             // Generate a mailbox_name name on which to receive the file
-//            auto file_reception_mailbox = S4U_Mailbox::getTemporaryMailbox();
-            auto file_reception_mailbox = S4U_Mailbox::generateUniqueMailbox("faa_does_not_work");
+            auto file_reception_mailbox = S4U_Mailbox::getTemporaryMailbox();
+//            auto file_reception_mailbox = S4U_Mailbox::generateUniqueMailbox("faa_does_not_work");
 
             // Reply with a "go ahead, send me the file" message
             S4U_Mailbox::dputMessage(

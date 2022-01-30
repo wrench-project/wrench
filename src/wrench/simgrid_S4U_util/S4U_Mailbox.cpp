@@ -254,18 +254,27 @@ namespace wrench {
         if (S4U_Mailbox::free_mailboxes.empty()) {
             throw std::runtime_error("S4U_Mailbox::getTemporaryMailbox(): Out of mailboxes! ");
         }
+
+        std::cerr << "FREE MAILBOX: " << S4U_Mailbox::free_mailboxes.size() << "\n";
+
         auto mailbox = *(S4U_Mailbox::free_mailboxes.end() - 1);
         S4U_Mailbox::free_mailboxes.pop_back();
         std::cerr << simgrid::s4u::this_actor::get_pid() << " GOT TEMPORARY MAILBOX " << mailbox->get_name() << "\n";
+
+        if (not mailbox->empty()) {
+            std::cerr << "############### WASTING MAILBOX!!\n";
+            return S4U_Mailbox::getTemporaryMailbox(); // Recursive call!
+        }
+
         S4U_Mailbox::used_mailboxes.insert(mailbox);
 
-        // Drain the mailbox of possible old messages (e.g., due to failures, etc.)
-        while (not mailbox->empty()) {
-            std::cerr << "***** DRAINING\n";
-            auto msg = mailbox->get<SimulationMessage>();
-            std::cerr << "***** DRAINED: " << msg->getName() << " from " << mailbox->get_name() << "\n";
-//            throw std::runtime_error("HOLY CRAP!\n");
-        }
+//        // Drain the mailbox of possible old messages (e.g., due to failures, etc.)
+//        while (not mailbox->empty()) {
+//            std::cerr << "***** DRAINING\n";
+//            auto msg = mailbox->get<SimulationMessage>();
+//            std::cerr << "***** DRAINED: " << msg->getName() << " from " << mailbox->get_name() << "\n";
+////            throw std::runtime_error("HOLY CRAP!\n");
+//        }
 
         return mailbox;
     }
