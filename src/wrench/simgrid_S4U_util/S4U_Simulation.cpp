@@ -35,7 +35,8 @@ namespace wrench {
     void S4U_Simulation::initialize(int *argc, char **argv) {
         this->engine = new simgrid::s4u::Engine(argc, argv);
         simgrid::s4u::Engine::get_instance()->set_config("surf/precision:1e-9");
-        S4U_Mailbox::createMailboxPool(100000);
+        // TODO: Make this hardcoded value a command-line argument
+        S4U_Mailbox::createMailboxPool(2000);
         this->initialized = true;
         sg_storage_file_system_init();
     }
