@@ -240,7 +240,14 @@ namespace wrench {
 //        if (answer_mailbox_if_read) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_read);
 //        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
 //        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
-        if (this->dst_mailbox) S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
+        if (this->dst_mailbox) {
+            std::cerr << "FTT: RETIRINING " << this->dst_mailbox->get_name() << "\n";
+//            S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
+        }
+        if (this->src_mailbox) {
+            std::cerr << "FTT: RETIRINING " << this->src_mailbox->get_name() << "\n";
+//            S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
+        }
 
         try {
             // Send report back to the service
@@ -362,6 +369,7 @@ namespace wrench {
                                                     std::shared_ptr<FileLocation> location,
                                                     double num_bytes_to_transfer,
                                                     simgrid::s4u::Mailbox *mailbox) {
+       WRENCH_INFO("XXXX IN sendLocalFileToNetwork()\n");
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
             throw std::runtime_error(
@@ -390,7 +398,7 @@ namespace wrench {
 
                     remaining -= (double) (this->buffer_size);
                     if (req) {
-                        req->wait();
+                        req->wait(100.00);
 //                        WRENCH_INFO("Bytes sent over the network were received");
                     }
 //                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
@@ -403,8 +411,10 @@ namespace wrench {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
-                req->wait();WRENCH_INFO("Bytes sent over the network were received");
+                req->wait(100.00);
+                WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
+                std::cerr << "FTT IN THROW!\n";
                 throw;
             }
         }
@@ -485,7 +495,7 @@ namespace wrench {
 
         // Send a message to the source
         auto request_answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-//        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("foo");
+//        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("works_by_itself");
         auto mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
 
         try {

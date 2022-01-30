@@ -24,6 +24,7 @@ WRENCH_LOG_CATEGORY(wrench_core_pending_communication, "Log category for Pending
 
 namespace wrench {
 
+
     /**
      * @brief Wait for the pending communication to complete
      *
@@ -44,6 +45,40 @@ namespace wrench {
             } else {
                 throw std::shared_ptr<NetworkError>(
                         new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+            }
+        }
+        return std::move(this->simulation_message);
+    }
+
+    /**
+     * @brief Wait for the pending communication to complete with a timeout
+     * @param timeout: a timeout in seconds
+     *
+     * @return A (unique pointer to a) simulation message
+     *
+     * @throw std::shared_ptr<NetworkError>
+     */
+    std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
+
+        try {
+            if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
+                this->comm_ptr->wait_until(timeout);
+            }
+        } catch (simgrid::NetworkFailureException &e) {
+            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
+            } else {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+            }
+        } catch (simgrid::TimeoutException &e) {
+            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, mailbox->get_name()));
+            } else {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, mailbox->get_name()));
             }
         }
         return std::move(this->simulation_message);
