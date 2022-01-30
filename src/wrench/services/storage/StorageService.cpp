@@ -257,7 +257,9 @@ namespace wrench {
 
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        std::cerr << "IN READFILE()\n";
         auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
+//        auto chunk_receiving_mailbox = S4U_Mailbox::generateUniqueMailbox("foo");
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
@@ -271,6 +273,7 @@ namespace wrench {
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
+            std::cerr << "IN READFILE() THROW\n";
             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw ExecutionException(cause);
         }
@@ -279,12 +282,15 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
+            std::cerr << "IN READFILE() GETTING \n";
             message = S4U_Mailbox::getMessage(answer_mailbox, storage_service->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
+            std::cerr << "IN READFILE() THROW 2\n";
             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw ExecutionException(cause);
         }
 
+        std::cerr << "IN READFILE() HERE\n";
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
@@ -336,6 +342,7 @@ namespace wrench {
             }
 
         } else {
+            std::cerr << "UNEXPECED MESSAGE FROM MAILBOX " << chunk_receiving_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
             throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                      message->getName() + "] message!");

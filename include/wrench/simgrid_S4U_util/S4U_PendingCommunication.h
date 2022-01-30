@@ -47,6 +47,7 @@ namespace wrench {
         S4U_PendingCommunication(simgrid::s4u::Mailbox *mailbox, OperationType operation_type) : mailbox(mailbox), operation_type(operation_type) {}
 
         std::unique_ptr<SimulationMessage> wait();
+        std::unique_ptr<SimulationMessage> wait(double timeout);
 
         static unsigned long waitForSomethingToHappen(
                 std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms,
