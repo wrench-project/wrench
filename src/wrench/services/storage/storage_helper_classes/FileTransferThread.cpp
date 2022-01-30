@@ -397,7 +397,7 @@ namespace wrench {
 
                     remaining -= (double) (this->buffer_size);
                     if (req) {
-                        req->wait(100.00);
+                        req->wait();
 //                        WRENCH_INFO("Bytes sent over the network were received");
                     }
 //                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
@@ -410,10 +410,10 @@ namespace wrench {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
 //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
-                req->wait(100.00);
+                req->wait();
                 WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
-                std::cerr << "FTT IN THROW!\n";
+                std::cerr << "FTT IN THROW *** " << e->isTimeout() << "\n";
                 throw;
             }
         }
