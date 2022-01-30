@@ -75,8 +75,8 @@ namespace wrench {
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
 //        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
 //        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
-        this->mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("mb"));
-        this->recv_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("rmb"));
+        this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
+        this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
     }

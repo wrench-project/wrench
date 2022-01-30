@@ -108,11 +108,11 @@ namespace wrench {
      * @param file: the file corresponding to the connection
      * @param src_location: a location to read data from
      * @param dst_location: a location to send data to
-     * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
+     * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_mailbox_if_write: the mailbox to send an answer to in case this was a file write ("" if none). This
+     * @param answer_mailbox_if_write: the mailbox to send an answer to in case this was a file write (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
-     * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy ("" if none). This
+     * @param answer_mailbox_if_copy: the mailbox to send an answer to in case this was a file copy (nullptr if none). This
      *        will simply be reported to the parent service, who may use it as needed
      * @param buffer_size: the buffer size to use
      */
@@ -234,6 +234,13 @@ namespace wrench {
         } else {
             throw std::runtime_error("FileTransferThread::main(): Invalid src/dst combination");
         }
+
+        // Call retire on all mailboxes passed, which is pretty brute force be should work
+        // TODO: Figure out which ones to retire in the methods called above
+//        if (answer_mailbox_if_read) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_read);
+//        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
+//        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
+        if (this->dst_mailbox) S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
 
         try {
             // Send report back to the service
@@ -477,9 +484,9 @@ namespace wrench {
         }
 
         // Send a message to the source
-        auto request_answer_mailbox = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName("read_file_request"));
-        auto mailbox_that_should_receive_file_content = simgrid::s4u::Mailbox::by_name(S4U_Mailbox::generateUniqueMailboxName(
-                "read_file_chunks"));
+        auto request_answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+//        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("foo");
+        auto mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
 
         try {
             S4U_Mailbox::putMessage(
@@ -495,6 +502,7 @@ namespace wrench {
                             src_location->getStorageService()->getMessagePayloadValue(
                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
+            S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw;
         }
 
@@ -504,15 +512,18 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
+            S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw;
         }
 
         if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
             // If it's not a success, throw an exception
             if (not msg->success) {
+                S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
                 throw msg->failure_cause;
             }
         } else {
+            S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw std::runtime_error("FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
                                      message->getName() + "] message!");
         }
@@ -521,6 +532,7 @@ namespace wrench {
                     mailbox_that_should_receive_file_content->get_cname());
 
         if (this->buffer_size == 0) {
+            S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
             throw std::runtime_error(
                     "FileTransferThread::downloadFileFromStorageService(): Zero buffer size not implemented yet");
 
@@ -533,6 +545,7 @@ namespace wrench {
                         dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
+                    S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
                     throw std::runtime_error(
                             "FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
                             msg->getName() + "] message!");
@@ -560,11 +573,14 @@ namespace wrench {
                             dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
+                        S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
                         throw std::runtime_error(
                                 "FileTransferThread::downloadFileFromStorageService(): Received an unexpected [" +
                                 msg->getName() + "] message!");
                     }
                 }
+                S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
+
                 // Do the I/O for the last chunk
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
@@ -575,6 +591,7 @@ namespace wrench {
                                             dst_location->getMountPoint());
                 }
             } catch (std::shared_ptr<NetworkError> &e) {
+                S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
                 throw;
             }
         }
