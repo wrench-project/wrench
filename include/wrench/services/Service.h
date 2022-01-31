@@ -20,7 +20,7 @@
 #include "wrench/services/ServiceProperty.h"
 
 namespace wrench {
-    typedef std::unordered_map<WRENCH_PROPERTY_TYPE,std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
+    typedef std::map<WRENCH_PROPERTY_TYPE,std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
     typedef std::map<std::string,double> WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE;
     class FailureCause;
 
@@ -46,10 +46,10 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
 
         bool isUp();
 
-        std::string getPropertyValueAsString(const WRENCH_PROPERTY_TYPE&);
-        double getPropertyValueAsDouble(const WRENCH_PROPERTY_TYPE&);
-        unsigned long getPropertyValueAsUnsignedLong(const WRENCH_PROPERTY_TYPE&);
-        bool getPropertyValueAsBoolean(const WRENCH_PROPERTY_TYPE&);
+        std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE);
+        double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
+        unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
+        bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
 
         void assertServiceIsUp();
 
@@ -91,7 +91,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         Service(std::string hostname, std::string process_name_prefix);
 
         // Property stuff
-        void setProperty(const WRENCH_PROPERTY_TYPE&, const std::string&);
+        void setProperty(WRENCH_PROPERTY_TYPE, const std::string&);
 
         void setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
                            WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
