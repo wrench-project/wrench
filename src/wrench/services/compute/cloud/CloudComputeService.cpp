@@ -41,8 +41,8 @@ namespace wrench {
     CloudComputeService::CloudComputeService(const std::string &hostname,
                                              std::vector<std::string> execution_hosts,
                                              std::string scratch_space_mount_point,
-                                             std::map<std::string, std::string> property_list,
-                                             std::map<std::string, double> messagepayload_list) :
+                                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                             WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
             ComputeService(hostname, "cloud_service",
                            scratch_space_mount_point) {
         if (execution_hosts.empty()) {
@@ -119,8 +119,8 @@ namespace wrench {
      */
     std::string CloudComputeService::createVM(unsigned long num_cores,
                                               double ram_memory,
-                                              std::map<std::string, std::string> property_list,
-                                              std::map<std::string, double> messagepayload_list) {
+                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
         return this->createVM(num_cores, ram_memory, "", property_list, messagepayload_list);
     }
 
@@ -141,8 +141,8 @@ namespace wrench {
     std::string CloudComputeService::createVM(unsigned long num_cores,
                                               double ram_memory,
                                               std::string desired_vm_name,
-                                              std::map<std::string, std::string> property_list,
-                                              std::map<std::string, double> messagepayload_list) {
+                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
         if (num_cores == ComputeService::ALL_CORES) {
             throw std::invalid_argument(
                     "CloudComputeService::createVM(): the VM's number of cores cannot be ComputeService::ALL_CORES");
@@ -633,8 +633,8 @@ namespace wrench {
                                               unsigned long requested_num_cores,
                                               double requested_ram,
                                               std::string desired_vm_name,
-                                              std::map<std::string, std::string> property_list,
-                                              std::map<std::string, double> messagepayload_list) {
+                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) {
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
                     (requested_num_cores == ComputeService::ALL_CORES ? "max" : std::to_string(
                             requested_num_cores)).c_str(),

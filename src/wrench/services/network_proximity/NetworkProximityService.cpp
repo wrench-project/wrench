@@ -47,8 +47,8 @@ namespace wrench {
      */
     NetworkProximityService::NetworkProximityService(std::string hostname,
                                                      std::vector<std::string> hosts_in_network,
-                                                     std::map<std::string, std::string> property_list,
-                                                     std::map<std::string, double> messagepayload_list
+                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list
     ) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
@@ -285,7 +285,7 @@ namespace wrench {
             double proximity_value = NetworkProximityService::NOT_AVAILABLE;
             double timestamp = NetworkProximityService::NOT_AVAILABLE;
 
-            std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
+            std::string network_service_type = this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
 
             if (msg->hosts.first == msg->hosts.second) {
                 proximity_value = 0.0;
@@ -383,7 +383,7 @@ namespace wrench {
     NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon> sender_daemon) {
         // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
         // else if it is an 'alltoall' network service, coverage is set at 1.0
-        double coverage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_COVERAGE");
+        double coverage = this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE);
         unsigned long max_pool_size = this->network_daemons.size() - 1;
 
         // if the network_service type is 'alltoall', sender_daemon selects from a pool of all other network daemons

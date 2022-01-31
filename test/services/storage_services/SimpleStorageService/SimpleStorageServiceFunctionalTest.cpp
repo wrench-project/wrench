@@ -1106,7 +1106,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
             new wrench::SimpleStorageService(hostname, {"/disk510"})));
 
     ASSERT_NO_THROW(storage_service_100 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk100"}, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "infinity"}})));
+            new wrench::SimpleStorageService(hostname, {"/disk100"}, {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "infinity"}})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

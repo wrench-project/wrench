@@ -32,16 +32,16 @@ namespace wrench {
 
         BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
                                 std::string batch_service_mailbox, std::string sched_port,
-                                std::string data_to_send,std::map<std::string, std::string> property_list = {});
+                                std::string data_to_send,WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
     private:
-        std::map<std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 };
 
-        std::map<std::string, double> default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                 };
 
         BatschedNetworkListener(std::string, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             std::string data_to_send, std::map<std::string, std::string> property_list, std::string suffix);
+                             std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list, std::string suffix);
 
 
         int main() override;
