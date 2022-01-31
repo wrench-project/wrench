@@ -24,7 +24,7 @@
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
-
+namespace std{inline std::string to_string(std::string a){return a;}}
 
 namespace wrench {
 
@@ -50,7 +50,7 @@ namespace wrench {
       * @param property: the property
       * @param value: the property value
       */
-    void Service::setProperty(const WRENCH_PROPERTY_TYPE& property, const std::string& value) {
+    void Service::setProperty(WRENCH_PROPERTY_TYPE property, const std::string& value) {
         if (this->property_list.find(property) != this->property_list.end()) {
             this->property_list[property] = value;
         } else {
@@ -83,7 +83,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::string Service::getPropertyValueAsString(const WRENCH_PROPERTY_TYPE& property) {
+    std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
                     "Service::getPropertyValueAsString(): Cannot find value for property " + std::to_string(property) +
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getPropertyValueAsDouble(const WRENCH_PROPERTY_TYPE& property) {
+    double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) {
         double value;
         std::string string_value;
         try {
@@ -125,7 +125,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    unsigned long Service::getPropertyValueAsUnsignedLong(const WRENCH_PROPERTY_TYPE& property) {
+    unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) {
         unsigned long value;
         std::string string_value;
         try {
@@ -169,7 +169,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    bool Service::getPropertyValueAsBoolean(const WRENCH_PROPERTY_TYPE& property) {
+    bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
         bool value;
         std::string string_value;
         try {
