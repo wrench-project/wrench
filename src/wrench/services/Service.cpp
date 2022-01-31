@@ -24,7 +24,7 @@
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
-
+namespace std{inline std::string to_string(std::string a){return a;}}
 
 namespace wrench {
 
@@ -50,7 +50,7 @@ namespace wrench {
       * @param property: the property
       * @param value: the property value
       */
-    void Service::setProperty(std::string property, std::string value) {
+    void Service::setProperty(WRENCH_PROPERTY_TYPE property, const std::string& value) {
         if (this->property_list.find(property) != this->property_list.end()) {
             this->property_list[property] = value;
         } else {
@@ -65,7 +65,7 @@ namespace wrench {
     * @param value: the message payload value
     * @throw std::invalid_argument
     */
-    void Service::setMessagePayload(std::string messagepayload, double value) {
+    void Service::setMessagePayload(const std::string& messagepayload, double value) {
         // Check that the value is a >=0 double
 
         if (value < 0) {
@@ -83,10 +83,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::string Service::getPropertyValueAsString(std::string property) {
+    std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsString(): Cannot find value for property " + property +
+                    "Service::getPropertyValueAsString(): Cannot find value for property " + std::to_string(property) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->property_list[property];
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getPropertyValueAsDouble(std::string property) {
+    double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) {
         double value;
         std::string string_value;
         try {
@@ -112,7 +112,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lf", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
+                    "Service::getPropertyValueAsDouble(): Invalid double property value " + std::to_string(property) + " " +
                     this->getPropertyValueAsString(property));
         }
         return value;
@@ -125,7 +125,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    unsigned long Service::getPropertyValueAsUnsignedLong(std::string property) {
+    unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) {
         unsigned long value;
         std::string string_value;
         try {
@@ -138,7 +138,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + property +
+                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + std::to_string(property) +
                     " " +
                     this->getPropertyValueAsString(property));
         }
@@ -152,7 +152,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getMessagePayloadValue(std::string message_payload) {
+    double Service::getMessagePayloadValue(const std::string& message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             throw std::invalid_argument(
                     "Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
@@ -169,7 +169,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    bool Service::getPropertyValueAsBoolean(std::string property) {
+    bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
         bool value;
         std::string string_value;
         try {
@@ -183,7 +183,7 @@ namespace wrench {
             return false;
         } else {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + property + " " +
+                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + std::to_string(property) + " " +
                     this->getPropertyValueAsString(property));
         }
     }
@@ -350,8 +350,8 @@ namespace wrench {
      * @param default_property_values: list of default properties
      * @param overridden_poperty_values: list of overridden properties (override the default)
      */
-    void Service::setProperties(std::map<std::string, std::string> default_property_values,
-                                std::map<std::string, std::string> overridden_poperty_values) {
+    void Service::setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
+                                WRENCH_PROPERTY_COLLECTION_TYPE overridden_poperty_values) {
         // Set default properties
         for (auto const &p : default_property_values) {
             this->setProperty(p.first, p.second);
@@ -368,8 +368,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
-                                     std::map<std::string, double> overridden_messagepayload_values) {
+    void Service::setMessagePayloads(WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values,
+                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE overridden_messagepayload_values) {
        
         // Set default messagepayloads
         for (auto const &p : default_messagepayload_values) {

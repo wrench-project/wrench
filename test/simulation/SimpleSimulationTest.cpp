@@ -359,10 +359,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
 
     // Try to get a bogus property as string or double
-    ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong("BOGUS"), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsBoolean("BOGUS"), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsString(-1), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsDouble(-1), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong(-1), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsBoolean(-1), std::invalid_argument);
 
     ASSERT_THROW(storage_service->getMessagePayloadValue("BOGUS"), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(

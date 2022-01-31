@@ -177,7 +177,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
 
     // Create a file registry service
     double message_payload = 2;
-    std::map<std::string, double> payloads =
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE payloads =
             {
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
@@ -186,7 +186,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
                     {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, message_payload}
             };
-    std::map<std::string, std::string> props =
+    wrench::WRENCH_PROPERTY_COLLECTION_TYPE props =
             {
                     {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"}
             };

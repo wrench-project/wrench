@@ -15,6 +15,7 @@
 
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
+#include "wrench/services/Service.h"
 
 WRENCH_LOG_CATEGORY(virtualized_cluster_service_test, "Log category for VirtualizedClusterServiceTest");
 
@@ -825,7 +826,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 class StopAllVMsTestWMS : public wrench::ExecutionController {
 
 public:
-    std::map<std::string, double> default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024}
     };
 
@@ -927,7 +928,7 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
 class ShutdownVMTestWMS : public wrench::ExecutionController {
 
 public:
-    std::map<std::string, double> default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  1024},
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}
     };
@@ -1165,7 +1166,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
 class ShutdownVMAndThenShutdownServiceTestWMS : public wrench::ExecutionController {
 
 public:
-    std::map<std::string, double> default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  1024},
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}
     };
@@ -1283,7 +1284,7 @@ void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test
 class SubmitToVMTestWMS : public wrench::ExecutionController {
 
 public:
-    std::map<std::string, double> default_messagepayload_values = {
+    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  1024},
             {wrench::VirtualizedClusterComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024}
     };

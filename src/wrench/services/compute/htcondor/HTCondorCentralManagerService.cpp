@@ -42,8 +42,8 @@ namespace wrench {
             const std::string &hostname,
             double negotiator_startup_overhead,
             std::set <shared_ptr<ComputeService>> compute_services,
-            std::map <std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list)
+            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list)
             : ComputeService(hostname, "htcondor_central_manager", "") {
         this->negotiator_startup_overhead = negotiator_startup_overhead;
         this->compute_services = compute_services;
