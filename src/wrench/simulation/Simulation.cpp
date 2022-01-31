@@ -23,6 +23,7 @@
 #include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/data_file/DataFile.h>
 
@@ -115,6 +116,7 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
+        bool mailbox_pool_size_set = false;
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
@@ -133,6 +135,19 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-logs-full"))
                     ) {
                 xbt_log_control_set("root.thresh:info");
+            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
+                char *equal_sign = strchr(argv[i], '=');
+                if (!equal_sign) {
+                    std::cerr << "Invalid --wrench-mailbox-pool-size argument.\n";
+                    exit(1);
+                }
+                unsigned long pool_size = strtoul(equal_sign+1, nullptr, 10);
+                if (pool_size <= 0) {
+                    std::cerr << "Invalid --wrench-mailbox-pool-size argument value.\n";
+                    exit(1);
+                }
+                S4U_Mailbox::mailbox_pool_size = pool_size;
+                mailbox_pool_size_set = true;
             } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
                 sg_host_energy_plugin_init();
                 Simulation::energy_enabled = true;
@@ -185,8 +200,12 @@ namespace wrench {
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+            std::cout << "   --wrench-mailbox-pool-size=<integer>: set the number of SimGrid mailboxes used by WRENCH (default: 50000).\n";
+            std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
+            std::cout << "      failures, for which WRENCH has a hard time avoiding all mailbox-related memory leaks\n";
             std::cerr << "\n";
         }
+
 
         *argc = 0;
         for (auto a : cleanedup_args) {
@@ -239,6 +258,11 @@ namespace wrench {
             argv[*argc] = strdup("--help");
             (*argc)++;
         }
+
+        if (not mailbox_pool_size_set) {
+            S4U_Mailbox::createMailboxPool(5000);
+        }
+
 
         Simulation::initialized = true;
     }

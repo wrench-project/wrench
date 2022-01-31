@@ -115,10 +115,10 @@ TEST_F(BatchServiceAvailabilityTimeLineTest, NodeAvailabilityTimeLineTest)
 void BatchServiceAvailabilityTimeLineTest::do_NodeAvailabilityTimeLineTest_test() {
 
     // Create and initialize a simulation
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -200,10 +200,10 @@ TEST_F(BatchServiceAvailabilityTimeLineTest, CoreAvailabilityTimeLineTest)
 void BatchServiceAvailabilityTimeLineTest::do_CoreAvailabilityTimeLineTest_test() {
 
     // Create and initialize a simulation
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-full-log");
+//    argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();

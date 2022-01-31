@@ -407,6 +407,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     }
     fclose(stderr_file);
 
+
     ASSERT_EQ(linecount, num_log_lines);
 
     // Just in case
