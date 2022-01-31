@@ -807,11 +807,11 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-    // Create a Storage Service (note the BOGUS property, which is for testing puposes
-    //  and doesn't matter because we do not stop the service)
+    // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk1"},
-                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+                                             {},
+                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
@@ -1016,17 +1016,17 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
-    // Create a Storage Service (note the BOGUS property, which is for testing puposes
-    //  and doesn't matter because we do not stop the service)
+    // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk1"},
-                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+                                             {},
+                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
 
-    // Create a Storage Service (note the BOGUS property, which is for testing puposes
-    //  and doesn't matter because we do not stop the service)
+    // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk2"},
-                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+                                             {},
+                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
