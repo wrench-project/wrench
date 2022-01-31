@@ -241,12 +241,12 @@ namespace wrench {
 //        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
 //        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
         if (this->dst_mailbox) {
-            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
-//            S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
+//            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
+            S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
         }
         if (this->src_mailbox) {
-            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
-//            S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
+//            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
+            S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
         }
 
         try {
@@ -413,7 +413,6 @@ namespace wrench {
                 req->wait();
                 WRENCH_INFO("Bytes sent over the network were received");
             } catch (std::shared_ptr<NetworkError> &e) {
-                std::cerr << "FTT IN THROW *** " << e->isTimeout() << "\n";
                 throw;
             }
         }
