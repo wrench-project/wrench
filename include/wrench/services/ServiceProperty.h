@@ -31,6 +31,7 @@ namespace wrench {
 };
 #define DECLARE_PROPERTY_NAME(name) static const wrench::WRENCH_PROPERTY_TYPE name
 #define SET_PROPERTY_NAME(classname, name) const wrench::WRENCH_PROPERTY_TYPE classname::name=++wrench::WRENCH_PROPERTY_COUNT
-
+//++wrench::WRENCH_PROPERTY_COUNT
+//#name
 
 #endif //WRENCH_SERVICEPROPERTY_H
