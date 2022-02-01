@@ -364,7 +364,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong(-1), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsBoolean(-1), std::invalid_argument);
 
-    ASSERT_THROW(storage_service->getMessagePayloadValue("BOGUS"), std::invalid_argument);
+    ASSERT_THROW(storage_service->getMessagePayloadValue(-1), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
             wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
 

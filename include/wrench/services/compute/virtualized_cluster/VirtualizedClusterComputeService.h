@@ -32,7 +32,7 @@ namespace wrench {
                 {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
         };
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -56,7 +56,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                                          std::vector<std::string> &execution_hosts,
                                          std::string scratch_space_mount_point,
                                          WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                         WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
