@@ -100,7 +100,7 @@ private:
         auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
         tl->add(500.0, 30.0, bj3);
 
-        tl->print();
+//        tl->print();
         tl->clear();
 
         return 0;
@@ -185,7 +185,7 @@ private:
         auto bj3 = std::shared_ptr<wrench::BatchJob>(new wrench::BatchJob(wj2, 3, 20, 20, 1, "who", 0, 0));
         tl->add(500.0, 30.0, bj3);
 
-        tl->print();
+//        tl->print();
         tl->clear();
 
         return 0;
