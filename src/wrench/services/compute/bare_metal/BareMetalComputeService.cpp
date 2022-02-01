@@ -252,7 +252,7 @@ namespace wrench {
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::string scratch_space_mount_point,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
     ) : ComputeService(hostname,
                        "bare_metal",
                        scratch_space_mount_point) {
@@ -275,7 +275,7 @@ namespace wrench {
                                                      const std::vector<std::string> compute_hosts,
                                                      std::string scratch_space_mount_point,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list
+                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
     ) : ComputeService(hostname,
                        "bare_metal",
                        scratch_space_mount_point) {
@@ -309,7 +309,7 @@ namespace wrench {
             const std::string &hostname,
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
             std::string suffix, std::shared_ptr<StorageService> scratch_space
@@ -338,7 +338,7 @@ namespace wrench {
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::shared_ptr<StorageService> scratch_space) :
             ComputeService(hostname,
                            "bare_metal",
@@ -365,7 +365,7 @@ namespace wrench {
             const std::string &hostname,
             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj) {
         if (ttl < 0) {

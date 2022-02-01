@@ -27,7 +27,7 @@ namespace wrench {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {};
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {HTCondorCentralManagerServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {HTCondorCentralManagerServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {HTCondorCentralManagerServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
@@ -51,7 +51,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                                       double negotiator_startup_overhead,
                                       std::set<std::shared_ptr<ComputeService>> compute_services,
                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                      WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual bool supportsStandardJobs() override;
         virtual bool supportsCompoundJobs() override;

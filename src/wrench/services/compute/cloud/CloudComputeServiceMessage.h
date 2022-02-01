@@ -64,7 +64,7 @@ namespace wrench {
                                                   double ram_memory,
                                                   std::string desired_vm_name,
                                                   WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                  WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                                                  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                                   double payload);
 
     public:
@@ -79,7 +79,7 @@ namespace wrench {
         /** @brief A property list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults") */
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
         /** @brief A message payload list for the bare_metal_standard_jobs that will run on the VM ({} means "use all defaults") */
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
     };
 
     /**

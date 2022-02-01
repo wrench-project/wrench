@@ -37,7 +37,7 @@ namespace wrench {
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 };
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 };
 
         BatschedNetworkListener(std::string, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox, std::string sched_port,

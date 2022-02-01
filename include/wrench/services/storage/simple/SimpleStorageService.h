@@ -49,7 +49,7 @@ namespace wrench {
                 {SimpleStorageServiceProperty::BUFFER_SIZE,                         "10485760"}, // 10 MEGA BYTE
         };
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,         1024},
                 {SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,      1024},
                 {SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD,  1024},
@@ -71,7 +71,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
         SimpleStorageService(std::string hostname,
                              std::set <std::string> mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                             WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -92,7 +92,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
         SimpleStorageService(std::string hostname,
                              std::set <std::string> mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                             WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                              std::string suffix);
 
         int main() override;

@@ -41,7 +41,7 @@ namespace wrench {
                 {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0.0"},
         };
 
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          1024},
                 {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       1024},
                 {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,  1024},
@@ -56,7 +56,7 @@ namespace wrench {
         // Public Constructor
         FileRegistryService(std::string hostname,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         /****************************/
