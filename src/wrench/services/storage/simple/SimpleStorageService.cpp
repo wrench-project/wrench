@@ -71,7 +71,7 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                std::set <std::string> mount_points,
                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                               WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
+                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             SimpleStorageService(std::move(hostname), mount_points, property_list, messagepayload_list,
                                  "_" + std::to_string(getNewUniqueNumber())) {}
 
@@ -89,7 +89,7 @@ namespace wrench {
             std::string hostname,
             std::set <std::string> mount_points,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::string suffix) :
             StorageService(std::move(hostname), mount_points, "simple_storage" + suffix) {
         this->setProperties(this->default_property_values, property_list);

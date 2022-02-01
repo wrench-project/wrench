@@ -37,7 +37,7 @@ namespace wrench {
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED,             "1"}
         };
 
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, 1024},
@@ -67,7 +67,7 @@ namespace wrench {
         NetworkProximityService(std::string db_hostname,
                                 std::vector<std::string> hosts_in_network,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         /***********************/

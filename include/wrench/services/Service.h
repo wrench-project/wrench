@@ -18,10 +18,10 @@
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/ServiceProperty.h"
-
+#include "wrench/services/ServiceMessagePayload.h"
 namespace wrench {
     typedef std::map<WRENCH_PROPERTY_TYPE,std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
-    typedef std::map<std::string,double> WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE;
+    typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE ,double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
     class FailureCause;
 
     /**
@@ -64,7 +64,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         /** \cond INTERNAL     */
         /***********************/
 
-        double getMessagePayloadValue(const std::string&);
+        double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
 
         void setStateToDown();
 
@@ -97,10 +97,10 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
                            WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
 
         // MessagePayload stuff
-        void setMessagePayload(const std::string&, double);
+        void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
 
-        void setMessagePayloads(WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values,
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE overriden_messagepayload_values);
+        void setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overriden_messagepayload_values);
 
 
         void serviceSanityCheck();
@@ -109,7 +109,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
 
         /** @brief The service's messagepayload list */
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
 
         /** @brief The service's name */
         std::string name;

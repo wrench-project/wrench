@@ -23,7 +23,7 @@ namespace wrench {
 //     * @brief A helper nested class to facilitate unit conversion
 //     * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
 //     */
-//    class unit_scale : public WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE {
+//    class unit_scale : public WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE {
 //    public:
 //        using std::unordered_map<std::string, double>::unordered_map;
 //        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>

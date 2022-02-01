@@ -44,7 +44,7 @@ namespace wrench {
                 {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
         };
 
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
         };
 
     public:
@@ -54,7 +54,7 @@ namespace wrench {
                         std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                         std::shared_ptr<Service> parent_service,
                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
+                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         /***********************/
