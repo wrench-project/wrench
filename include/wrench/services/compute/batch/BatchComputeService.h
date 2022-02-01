@@ -77,7 +77,7 @@ namespace wrench {
                 {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,              "false"}
         };
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 1024},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,1024},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
@@ -109,7 +109,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                             std::vector<std::string> compute_hosts,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         bool supportsStandardJobs() override;
@@ -155,7 +155,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                             double ram_per_host,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                             std::string suffix
         );
 

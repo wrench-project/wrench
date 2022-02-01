@@ -12,14 +12,18 @@
 #define WRENCH_SERVICEMESSAGEPAYLOAD_H
 
 #include <string>
+namespace wrench{
+    typedef int WRENCH_MESSAGEPAYLOAD_TYPE;
+    extern WRENCH_MESSAGEPAYLOAD_TYPE WRENCH_MESSAGEPAYLOAD_COUNT;
 
-#define DECLARE_MESSAGEPAYLOAD_NAME(name) static const std::string name
+}
+#define DECLARE_MESSAGEPAYLOAD_NAME(name) static const WRENCH_MESSAGEPAYLOAD_TYPE name
 
 
-#define SET_MESSAGEPAYLOAD_NAME(classname, name) const std::string classname::name=#name
-
+#define SET_MESSAGEPAYLOAD_NAME(classname, name) const WRENCH_MESSAGEPAYLOAD_TYPE classname::name=++WRENCH_MESSAGEPAYLOAD_COUNT
+//#name
+//++WRENCH_MESSAGEPAYLOAD_COUNT
 namespace wrench {
-
 
     /**
      * @brief Configurable message payloads for a Service

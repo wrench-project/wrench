@@ -177,7 +177,7 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
 
     // Create a file registry service
     double message_payload = 2;
-    wrench::WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE payloads =
+    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE payloads =
             {
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},

@@ -55,7 +55,7 @@ namespace wrench {
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
         };
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    1024},
                 {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 1024},
                 {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         1024},
@@ -92,7 +92,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                                 const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 std::string scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         // Public Constructor
@@ -100,7 +100,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                                 const std::vector<std::string> compute_hosts,
                                 std::string scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {}
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         virtual bool supportsStandardJobs() override;
@@ -128,7 +128,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 double ttl,
                                 std::shared_ptr<PilotJob> pj, std::string suffix,
                                 std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
@@ -136,7 +136,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
 
         void validateProperties();
@@ -146,7 +146,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
         void initiateInstance(const std::string &hostname,
                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                              WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                               double ttl,
                               std::shared_ptr<PilotJob> pj);
 
