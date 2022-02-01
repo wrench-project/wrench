@@ -65,12 +65,12 @@ namespace wrench {
     * @param value: the message payload value
     * @throw std::invalid_argument
     */
-    void Service::setMessagePayload(const std::string& messagepayload, double value) {
+    void Service::setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE messagepayload, double value) {
         // Check that the value is a >=0 double
 
         if (value < 0) {
             throw std::invalid_argument(
-                    "Service::setMessagePayload(): Invalid message payload value " + messagepayload + ": " +
+                    "Service::setMessagePayload(): Invalid message payload value " + std::to_string(messagepayload) + ": " +
                     std::to_string(value));
         }
         this->messagepayload_list[messagepayload] = value;
@@ -152,10 +152,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getMessagePayloadValue(const std::string& message_payload) {
+    double Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             throw std::invalid_argument(
-                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
+                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + std::to_string(message_payload) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->messagepayload_list[message_payload];
@@ -368,8 +368,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE default_messagepayload_values,
-                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE overridden_messagepayload_values) {
+    void Service::setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overridden_messagepayload_values) {
        
         // Set default messagepayloads
         for (auto const &p : default_messagepayload_values) {

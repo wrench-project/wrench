@@ -39,7 +39,7 @@ namespace wrench {
                                                                        std::vector<std::string> &execution_hosts,
                                                                        std::string scratch_space_mount_point,
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                                       WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list)
+                                                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
             :
             CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
 

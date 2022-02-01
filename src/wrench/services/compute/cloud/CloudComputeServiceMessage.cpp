@@ -75,7 +75,7 @@ namespace wrench {
             double ram_memory,
             std::string desired_vm_name,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double payload) :
             CloudComputeServiceMessage("CREATE_VM_REQUEST", payload),
             num_cores(num_cores), ram_memory(ram_memory), desired_vm_name(desired_vm_name), property_list(property_list),

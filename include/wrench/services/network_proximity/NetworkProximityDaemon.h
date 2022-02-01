@@ -32,7 +32,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                simgrid::s4u::Mailbox *network_proximity_service_mailbox,
                                double message_size,double measurement_period,
-                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
+                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
     private:
 
@@ -43,7 +43,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                simgrid::s4u::Mailbox *network_proximity_service_mailbox,
                                double message_size,double measurement_period,
-                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list, std::string suffix);
+                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list, std::string suffix);
 
 
         double message_size;

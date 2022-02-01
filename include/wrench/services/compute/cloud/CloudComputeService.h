@@ -40,7 +40,7 @@ namespace wrench {
                 {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
         };
 
-WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -72,7 +72,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                             std::vector<std::string> execution_hosts,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual bool supportsStandardJobs() override;
         virtual bool supportsCompoundJobs() override;
@@ -85,13 +85,13 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
         virtual std::string createVM(unsigned long num_cores,
                                      double ram_memory,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual std::string createVM(unsigned long num_cores,
                                      double ram_memory,
                                      std::string desired_vm_name,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list = {});
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual void shutdownVM(const std::string &vm_name);
 
@@ -162,7 +162,7 @@ WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE  default_messagepayload_values = {
                                      double requested_ram,
                                      std::string desired_vm_name,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
         );
 
         virtual void

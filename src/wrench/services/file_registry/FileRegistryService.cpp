@@ -38,7 +38,7 @@ namespace wrench {
     FileRegistryService::FileRegistryService(
             std::string hostname,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list) :
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             Service(hostname, "file_registry") {
 
         this->setProperties(this->default_property_values, property_list);

@@ -48,7 +48,7 @@ namespace wrench {
     NetworkProximityService::NetworkProximityService(std::string hostname,
                                                      std::vector<std::string> hosts_in_network,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                     WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list
+                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
     ) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
