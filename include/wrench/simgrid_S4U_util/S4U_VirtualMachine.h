@@ -45,7 +45,7 @@ namespace wrench {
                            unsigned long num_cores,
                            double ram_memory,
                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                           WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list);
+                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
         void start(std::string &pm_name);
 
@@ -61,7 +61,7 @@ namespace wrench {
         unsigned long getNumCores();
         double getMemory();
         WRENCH_PROPERTY_COLLECTION_TYPE getPropertyList();
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE getMessagePayloadList();
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE getMessagePayloadList();
 
         State getState();
         std::string getStateAsString();
@@ -75,7 +75,7 @@ namespace wrench {
         double ram_memory;
         std::string pm_name;
         WRENCH_PROPERTY_COLLECTION_TYPE property_list;
-        WRENCH_MESSAGE_PAYLOAD_COLLECTION_TYPE messagepayload_list;
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
     };
 
     /***********************/
