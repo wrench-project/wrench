@@ -28,7 +28,7 @@ namespace wrench {
      */
     class ActionExecutorMessage : public SimulationMessage {
     protected:
-        explicit ActionExecutorMessage(std::string name);
+        explicit ActionExecutorMessage();
     };
 
     /**
