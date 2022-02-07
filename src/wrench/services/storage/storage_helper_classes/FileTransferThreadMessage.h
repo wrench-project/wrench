@@ -38,8 +38,8 @@ namespace wrench {
          * @param name: the message name
          * @param payload: the message payload
          */
-        FileTransferThreadMessage(std::string name, double payload) :
-                ServiceMessage("FileTransferThreadMessage::" + name, payload) {}
+        FileTransferThreadMessage(double payload) :
+                ServiceMessage(payload) {}
     };
 
 
@@ -73,7 +73,7 @@ namespace wrench {
                                               simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                               simgrid::s4u::Mailbox *answer_mailbox_if_copy,
                                               bool success, std::shared_ptr<FailureCause> failure_cause) :
-                FileTransferThreadMessage("FileTransferThreadNotificationMessage", 0),
+                FileTransferThreadMessage(0),
                 file_transfer_thread(file_transfer_thread),
                 file(file),
                 src_mailbox(src_mailbox), src_location(src_location),

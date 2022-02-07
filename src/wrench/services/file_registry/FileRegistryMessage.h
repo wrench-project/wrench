@@ -29,7 +29,7 @@ namespace wrench {
      */
     class FileRegistryMessage : public ServiceMessage {
     protected:
-        FileRegistryMessage(std::string name, double payload);
+        FileRegistryMessage(double payload);
 
     };
 

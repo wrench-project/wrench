@@ -18,8 +18,8 @@ namespace wrench {
      *
      * @param name: the message name
      */
-    ComputeThreadMessage::ComputeThreadMessage(std::string name) :
-            SimulationMessage("ComputeTheradMessage::" + name, 0) {
+    ComputeThreadMessage::ComputeThreadMessage() :
+            SimulationMessage( 0) {
     }
 
     /**
@@ -27,7 +27,7 @@ namespace wrench {
      *
      */
     ComputeThreadDoneMessage::ComputeThreadDoneMessage() :
-            ComputeThreadMessage("ComputeThreadDoneMessage") {
+            ComputeThreadMessage() {
     }
 
 }

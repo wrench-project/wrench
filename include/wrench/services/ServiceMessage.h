@@ -26,7 +26,7 @@ namespace wrench {
      */
     class ServiceMessage : public SimulationMessage {
     protected:
-        ServiceMessage(std::string name, double payload);
+        ServiceMessage( double payload);
 
     };
 
