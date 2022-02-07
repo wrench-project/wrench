@@ -15,6 +15,7 @@
 #include <map>
 #include <iostream>
 
+
 namespace wrench {
 
     /***********************/
@@ -28,13 +29,13 @@ namespace wrench {
 
     public:
 
-        SimulationMessage(std::string name, double payload);
+        SimulationMessage( double payload);
         virtual ~SimulationMessage();
 
         virtual std::string getName();
 
         /** @brief The message name */
-        std::string name;
+        //std::string name;//we dont need this anymore :)
         /** @brief The message size in bytes */
         double payload;
     };

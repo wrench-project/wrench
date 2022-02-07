@@ -29,7 +29,7 @@ namespace wrench {
      */
     class CloudComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        CloudComputeServiceMessage(const std::string &name, double payload);
+        CloudComputeServiceMessage( double payload);
     };
 
     /**
