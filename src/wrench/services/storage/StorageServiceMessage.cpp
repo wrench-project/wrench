@@ -8,7 +8,7 @@
  */
 
 
-#include "StorageServiceMessage.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/data_file/DataFile.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>

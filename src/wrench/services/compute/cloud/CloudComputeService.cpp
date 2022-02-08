@@ -11,7 +11,7 @@
 #include <cfloat>
 #include <numeric>
 
-#include "CloudComputeServiceMessage.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>

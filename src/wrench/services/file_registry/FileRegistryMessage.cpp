@@ -8,7 +8,7 @@
  */
 
 
-#include "FileRegistryMessage.h"
+#include "wrench/services/file_registry/FileRegistryMessage.h"
 
 namespace wrench {
 

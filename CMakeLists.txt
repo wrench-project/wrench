@@ -211,7 +211,7 @@ set(SOURCE_FILES
         src/wrench/services/metering/BandwidthMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
-        src/wrench/managers/JobManagerMessage.h
+        include/wrench/managers/JobManagerMessage.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -232,26 +232,26 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
         src/wrench/services/compute/batch/batch_schedulers/BatchScheduler.cpp
         src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h
+        include/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
         src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
-        src/wrench/services/compute/cloud/CloudComputeServiceMessage.h
+        include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
         src/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceProperty.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
@@ -262,23 +262,23 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.cpp
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryMessage.cpp
-        src/wrench/services/file_registry/FileRegistryMessage.h
+        include/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/network_proximity/NetworkProximityDaemon.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
-        src/wrench/services/network_proximity/NetworkProximityMessage.h
+        include/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkProximityService.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceProperty.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/StorageServiceMessage.cpp
-        src/wrench/services/storage/StorageServiceMessage.h
+        include/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
@@ -286,13 +286,13 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
-        src/wrench/services/storage/storage_helper_classes/FileTransferThreadMessage.h
+        include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
         src/wrench/services/memory/Block.cpp
         src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
-        src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
+        include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
