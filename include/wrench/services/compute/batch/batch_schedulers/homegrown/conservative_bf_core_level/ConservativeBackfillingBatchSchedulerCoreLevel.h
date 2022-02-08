@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_CONSERVATIVEBFBATCHSCHEDULERCORELEVEL_H
-#define WRENCH_CONSERVATIVEBFBATCHSCHEDULERCORELEVEL_H
+#ifndef WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULERCORELEVEL_H
+#define WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULERCORELEVEL_H
 
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h"
@@ -23,11 +23,11 @@ namespace wrench {
     /**
      * @brief A class that defines a conservative backfilling batch_standard_and_pilot_jobs scheduler
      */
-    class CONSERVATIVEBFBatchSchedulerCoreLevel : public HomegrownBatchScheduler {
+    class ConservativeBackfillingBatchSchedulerCoreLevel : public HomegrownBatchScheduler {
 
     public:
 
-        explicit CONSERVATIVEBFBatchSchedulerCoreLevel(BatchComputeService *cs);
+        explicit ConservativeBackfillingBatchSchedulerCoreLevel(BatchComputeService *cs);
 
         void processQueuedJobs() override;
 
@@ -56,4 +56,4 @@ namespace wrench {
 
 
 
-#endif //WRENCH_CONSERVATIVEBFBATCHSCHEDULERCORELEVEL_H
+#endif //WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULERCORELEVEL_H

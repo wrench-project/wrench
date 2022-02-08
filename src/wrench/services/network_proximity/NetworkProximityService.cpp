@@ -20,7 +20,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/ServiceMessage.h>
-#include "NetworkProximityMessage.h"
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/failure_causes/NetworkError.h>
 

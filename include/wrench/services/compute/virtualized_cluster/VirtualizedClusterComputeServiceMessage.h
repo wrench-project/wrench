@@ -11,9 +11,9 @@
 #ifndef WRENCH_VIRTUALIZEDCLUSTERSERVICEMESSAGE_H
 #define WRENCH_VIRTUALIZEDCLUSTERSERVICEMESSAGE_H
 
-#include <vector>
+#include "../../../../../../../../../../Library/Developer/CommandLineTools/SDKs/MacOSX12.1.sdk/usr/include/c++/v1/vector"
 
-#include "wrench/services/compute/ComputeServiceMessage.h"
+#include "../ComputeServiceMessage.h"
 
 namespace wrench {
 
