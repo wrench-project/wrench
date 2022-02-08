@@ -14,7 +14,7 @@
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/exceptions/ExecutionException.h>
-#include <services/storage/StorageServiceMessage.h>
+#include <wrench/services/storage/StorageServiceMessage.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/managers/DataMovementManager.h>
 #include  <wrench/failure_causes/FileAlreadyBeingCopied.h>

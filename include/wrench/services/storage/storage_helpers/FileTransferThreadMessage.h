@@ -7,10 +7,8 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_FILETRANSFERTHREADMESSAGE_H
 #define WRENCH_FILETRANSFERTHREADMESSAGE_H
-
 
 #include <memory>
 

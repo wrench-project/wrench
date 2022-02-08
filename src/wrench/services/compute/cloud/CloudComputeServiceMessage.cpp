@@ -8,7 +8,7 @@
  *
  */
 
-#include "CloudComputeServiceMessage.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
 #include <iostream>
 
 namespace wrench {

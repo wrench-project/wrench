@@ -17,12 +17,12 @@
 #include <wrench/execution_controller/ExecutionController.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
-#include "services/file_registry/FileRegistryMessage.h"
+#include "wrench/services/file_registry/FileRegistryMessage.h"
 #include <wrench/services/compute/ComputeServiceMessage.h>
-#include "services/storage/StorageServiceMessage.h"
-#include "services/compute/cloud/CloudComputeServiceMessage.h"
-#include "services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
-#include "services/network_proximity/NetworkProximityMessage.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
 #include <wrench/services/compute/batch/BatchJob.h>
 #include <wrench/failure_causes/FatalFailure.h>
 #include <wrench/managers/JobManager.h>

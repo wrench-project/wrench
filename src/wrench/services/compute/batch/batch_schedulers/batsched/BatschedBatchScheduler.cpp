@@ -24,7 +24,7 @@
 #endif
 
 #include <wrench/logging/TerminalOutput.h>
-#include "BatschedBatchScheduler.h"
+#include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>

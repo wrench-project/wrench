@@ -9,7 +9,7 @@
  */
 
 #include <wrench/simgrid_S4U_util/S4U_Daemon.h>
-#include "simgrid_S4U_util/S4U_DaemonActor.h"
+#include "wrench/simgrid_S4U_util/S4U_DaemonActor.h"
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>

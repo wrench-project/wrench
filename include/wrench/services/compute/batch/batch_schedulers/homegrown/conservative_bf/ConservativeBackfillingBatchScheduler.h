@@ -7,12 +7,12 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
-#define WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
+#ifndef WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H
+#define WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H
 
 #include "wrench/services/compute/batch/BatchComputeService.h"
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h"
-#include <services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h>
+#include <wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h>
 
 namespace wrench {
 
@@ -23,11 +23,11 @@ namespace wrench {
     /**
      * @brief A class that defines a conservative backfilling batch_standard_and_pilot_jobs scheduler
      */
-    class CONSERVATIVEBFBatchScheduler : public HomegrownBatchScheduler {
+    class ConservativeBackfillingBatchScheduler : public HomegrownBatchScheduler {
 
     public:
 
-        explicit CONSERVATIVEBFBatchScheduler(BatchComputeService *cs);
+        explicit ConservativeBackfillingBatchScheduler(BatchComputeService *cs);
 
         void processQueuedJobs() override;
 
@@ -56,4 +56,4 @@ namespace wrench {
 
 
 
-#endif //WRENCH_CONSERVATIVEBFBATCHSCHEDULER_H
+#endif //WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H

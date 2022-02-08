@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "NetworkProximityMessage.h"
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
 
 namespace wrench {
     /**

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "FCFSBatchScheduler.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
 #include <wrench/simulation/Simulation.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
