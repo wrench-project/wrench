@@ -13,6 +13,8 @@
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <filesystem>
+#include <iostream>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
@@ -183,16 +185,20 @@ namespace wrench {
      */
     std::string FileLocation::sanitizePath(std::string path) {
 
-
         if (path.empty()) {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
 
+        std::filesystem::path sanitized_path = "/" + path + "/";
+
+        return sanitized_path.lexically_normal();
+
         // Cannot have certain substring (why not)
-        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
+//        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
+        char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
         for (auto const &c : unallowed_characters) {
             if (path.find(c) != std::string::npos) {
-                throw std::invalid_argument("FileLocation::sanitizePath(): Unallowed character '" + c + "' in path (" + path + ")");
+                throw std::invalid_argument("FileLocation::sanitizePath(): Unallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }
         }
 
