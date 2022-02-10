@@ -600,12 +600,26 @@ namespace wrench {
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
-            throw std::invalid_argument("Unknown hostname " + hostname);
+            throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
         }
         if (host->get_properties()->find(property_name) == host->get_properties()->end()) {
-            throw std::invalid_argument("Unknown property " + property_name);
+            throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown property " + property_name);
         }
         return host->get_property(property_name);
+    }
+
+/**
+ * @brief Set a property associated to a host specified in the platform file
+ * @param hostname: the host name
+ * @param property_name: the property name
+ * @param property_value: the property value
+ */
+    void S4U_Simulation::setHostProperty(std::string hostname, std::string property_name, std::string property_value) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
+        }
+        host->set_property(property_name, property_value);
     }
 
 /**

@@ -227,6 +227,37 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+        // Properties
+        try {
+            wrench::S4U_Simulation::getHostProperty("Bogus", "stuff");
+            throw std::runtime_error("Getting property for bogus host should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            wrench::S4U_Simulation::getHostProperty("Host1", "custom_property");
+            throw std::runtime_error("Getting property for bogus property key should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            wrench::S4U_Simulation::setHostProperty("Bogus", "custom_property", "whatever");
+            throw std::runtime_error("Setting property for bogus host should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            wrench::S4U_Simulation::setHostProperty("Host1", "custom_property", "whatever");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Setting property for valid host should have worked");
+        }
+        try {
+            auto value = wrench::S4U_Simulation::getHostProperty("Host1", "custom_property");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting property for valid host should have worked");
+        }
+        if (wrench::S4U_Simulation::getHostProperty("Host1", "custom_property") != "whatever") {
+            throw std::runtime_error("Getting property for valid host should have returned the set value");
+        }
+
+
         return 0;
     }
 };

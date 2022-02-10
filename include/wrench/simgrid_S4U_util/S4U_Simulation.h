@@ -71,6 +71,7 @@ namespace wrench {
 
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);
+        static void setHostProperty(std::string hostname, std::string property_name, std::string property_value);
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);
