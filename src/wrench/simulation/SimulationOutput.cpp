@@ -1547,6 +1547,7 @@ namespace wrench {
      * @brief Constructor
      */
     SimulationOutput::SimulationOutput() {
+
         // By default enable all task timestamps
         this->setEnabled<SimulationTimestampTaskStart>(true);
         this->setEnabled<SimulationTimestampTaskFailure>(true);
