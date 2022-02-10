@@ -185,10 +185,10 @@ namespace wrench {
      */
     std::string FileLocation::sanitizePath(std::string path) {
 
+        if (path == "/") return "/";  // make the common case fast
         if (path.empty()) {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
-        if (path == "////") return "/";  // make the common case fast
 
         // Adding a leading space because, weirdly, lexically_normal() doesn't behave
         // correctly on Linux without it (it doesn't reduce "////" to "/", but does
