@@ -869,6 +869,8 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
+
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
@@ -1005,6 +1007,8 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithLocationMapMultiple_tes
 
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
@@ -1265,6 +1269,8 @@ void BareMetalComputeServiceOneTaskTest::do_ExecutionWithPrePostCopiesTaskCleanu
 
     // Staging the input_file on storage service #1
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
