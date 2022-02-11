@@ -194,6 +194,8 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
         ASSERT_NO_THROW(simulation->stageFile(f, source_storage_service));
     }
 
+    simulation->getOutput().enableFileReadWriteCopyTimestamps(true);
+
     ASSERT_NO_THROW(simulation->launch());
 
     int expected_start_timestamps = 6;
