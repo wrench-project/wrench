@@ -1548,21 +1548,23 @@ namespace wrench {
      * @brief Constructor
      */
     SimulationOutput::SimulationOutput() {
-        // By default enable all task timestamps
-        this->setEnabled<SimulationTimestampTaskStart>(true);
-        this->setEnabled<SimulationTimestampTaskFailure>(true);
-        this->setEnabled<SimulationTimestampTaskCompletion>(true);
-        this->setEnabled<SimulationTimestampTaskTermination>(true);
+        // Disable everything by default!
+        
+        // By default disable all task timestamps
+        this->setEnabled<SimulationTimestampTaskStart>(false);
+        this->setEnabled<SimulationTimestampTaskFailure>(false);
+        this->setEnabled<SimulationTimestampTaskCompletion>(false);
+        this->setEnabled<SimulationTimestampTaskTermination>(false);
 
-        // By default enable all file read timestamps
-        this->setEnabled<SimulationTimestampFileReadStart>(true);
-        this->setEnabled<SimulationTimestampFileReadFailure>(true);
-        this->setEnabled<SimulationTimestampFileReadCompletion>(true);
+        // By default disable all file read timestamps
+        this->setEnabled<SimulationTimestampFileReadStart>(false);
+        this->setEnabled<SimulationTimestampFileReadFailure>(false);
+        this->setEnabled<SimulationTimestampFileReadCompletion>(false);
 
-        // By default enable all file write timestamps
-        this->setEnabled<SimulationTimestampFileWriteStart>(true);
-        this->setEnabled<SimulationTimestampFileWriteFailure>(true);
-        this->setEnabled<SimulationTimestampFileWriteCompletion>(true);
+        // By default disable all file write timestamps
+        this->setEnabled<SimulationTimestampFileWriteStart>(false);
+        this->setEnabled<SimulationTimestampFileWriteFailure>(false);
+        this->setEnabled<SimulationTimestampFileWriteCompletion>(false);
 
         //By default disable (for now) all disk read timestamps
         this->setEnabled<SimulationTimestampDiskReadStart>(false);
@@ -1574,17 +1576,17 @@ namespace wrench {
         this->setEnabled<SimulationTimestampDiskWriteFailure>(false);
         this->setEnabled<SimulationTimestampDiskWriteCompletion>(false);
 
-        // By default enable all file copy timestamps
-        this->setEnabled<SimulationTimestampFileCopyStart>(true);
-        this->setEnabled<SimulationTimestampFileCopyFailure>(true);
-        this->setEnabled<SimulationTimestampFileCopyCompletion>(true);
+        // By default disable all file copy timestamps
+        this->setEnabled<SimulationTimestampFileCopyStart>(false);
+        this->setEnabled<SimulationTimestampFileCopyFailure>(false);
+        this->setEnabled<SimulationTimestampFileCopyCompletion>(false);
 
-        // By default enable all power timestamps
-        this->setEnabled<SimulationTimestampPstateSet>(true);
-        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+        // By default disable all power timestamps
+        this->setEnabled<SimulationTimestampPstateSet>(false);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(false);
 
-        // By default enable all link usage timestamps
-        this->setEnabled<SimulationTimestampLinkUsage>(true);
+        // By default disable all link usage timestamps
+        this->setEnabled<SimulationTimestampLinkUsage>(false);
     }
 
     /**

@@ -1111,6 +1111,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
             )
     ));
 
+    simulation->getOutput().enableEnergyTimestamps(true);
+
     EXPECT_NO_THROW(simulation->launch());
 
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
@@ -1342,6 +1344,8 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     for (auto const &file : link_usage_workflow->getInputFiles()) {
         simulation->stageFile(file, client_storage_service);
     }
+
+    simulation->getOutput().enableBandwidthTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
