@@ -17,7 +17,7 @@
 #include <wrench/services/ServiceMessage.h>
 
 #include <wrench/services/file_registry/FileRegistryService.h>
-#include "FileRegistryMessage.h"
+#include "wrench/services/file_registry/FileRegistryMessage.h"
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/exceptions/ExecutionException.h>

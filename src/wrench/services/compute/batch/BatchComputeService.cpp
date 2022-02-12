@@ -23,11 +23,11 @@
 #include <wrench/util/PointerUtil.h>
 #include <wrench/util/TraceFileLoader.h>
 #include <wrench/job/PilotJob.h>
-#include "services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
-#include "batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
-#include "batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h"
-#include "batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h"
-#include "batch_schedulers/batsched/BatschedBatchScheduler.h"
+#include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h"
+#include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
 #include <wrench/failure_causes/FunctionalityNotAvailable.h>
 #include <wrench/failure_causes/JobKilled.h>
 #include <wrench/failure_causes/ServiceIsDown.h>
@@ -190,9 +190,9 @@ namespace wrench {
         if (batch_scheduling_alg == "fcfs") {
             this->scheduler = std::unique_ptr<BatchScheduler>(new FCFSBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new CONSERVATIVEBFBatchScheduler(this));
+            this->scheduler = std::unique_ptr<BatchScheduler>(new ConservativeBackfillingBatchScheduler(this));
         } else if (batch_scheduling_alg == "conservative_bf_core_level") {
-            this->scheduler = std::unique_ptr<BatchScheduler>(new CONSERVATIVEBFBatchSchedulerCoreLevel(this));
+            this->scheduler = std::unique_ptr<BatchScheduler>(new ConservativeBackfillingBatchSchedulerCoreLevel(this));
         }
 #endif
 

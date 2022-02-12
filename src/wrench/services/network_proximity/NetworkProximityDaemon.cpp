@@ -15,7 +15,7 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <random>
-#include "NetworkProximityMessage.h"
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Network Daemons Service");

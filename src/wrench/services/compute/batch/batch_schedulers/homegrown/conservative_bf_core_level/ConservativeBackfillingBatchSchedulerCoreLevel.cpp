@@ -10,11 +10,11 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/Simulation.h>
 
-#include "CONSERVATIVEBFBatchScheduler.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h"
 
 //#define  PRINT_SCHEDULE 1
 
-WRENCH_LOG_CATEGORY(wrench_core_conservative_bf_batch_scheduler, "Log category for CONSERVATIVEBFBatchScheduler");
+WRENCH_LOG_CATEGORY(wrench_core_conservative_bf_batch_scheduler_core_level, "Log category for ConservativeBackfillingBatchSchedulerCoreLevel");
 
 namespace wrench {
 
@@ -22,27 +22,33 @@ namespace wrench {
      * @brief Constructor
      * @param cs: The BatchComputeService for which this scheduler is working
      */
-    CONSERVATIVEBFBatchScheduler::CONSERVATIVEBFBatchScheduler(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {
-        this->schedule = std::unique_ptr<NodeAvailabilityTimeLine>(new NodeAvailabilityTimeLine(cs->total_num_of_nodes));
+    ConservativeBackfillingBatchSchedulerCoreLevel::ConservativeBackfillingBatchSchedulerCoreLevel(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {
+        this->schedule = std::unique_ptr<CoreAvailabilityTimeLine>(new CoreAvailabilityTimeLine(cs->total_num_of_nodes, cs->num_cores_per_node));
     }
 
     /**
      * @brief Method to process a job submission
      * @param batch_job: the newly submitted BatchComputeService job
      */
-    void CONSERVATIVEBFBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
+    void ConservativeBackfillingBatchSchedulerCoreLevel::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
 
-        WRENCH_INFO("Scheduling a new BatchComputeService job, %lu, that needs %lu nodes",
-                    batch_job->getJobID(),  batch_job->getRequestedNumNodes());
+        WRENCH_INFO("Scheduling a new BatchComputeService job, %lu, that needs %lu nodes and %lu cores per node",
+                    batch_job->getJobID(),  batch_job->getRequestedNumNodes(), batch_job->getRequestedCoresPerNode());
 
         // Update the time origin
         this->schedule->setTimeOrigin((u_int32_t)Simulation::getCurrentSimulatedDate());
 
         // Find its earliest possible start time
-        auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
-//        WRENCH_INFO("The Earliest start time is: %u", est);
+        auto ret_value = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(),  batch_job->getRequestedCoresPerNode());
+        auto est = ret_value.first;
+        auto node_indices = ret_value.second;
+//        WRENCH_INFO("The Earliest start time is %u on these nodes:", est);
+//        for (auto const &i : node_indices) {
+//            WRENCH_INFO("\t- %d", i);
+//        }
 
         // Insert it in the schedule
+        batch_job->setAllocatedNodeIndices(node_indices);
         this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
         batch_job->conservative_bf_start_date = est;
         batch_job->conservative_bf_expected_end_date = est + batch_job->getRequestedTime();
@@ -57,9 +63,9 @@ namespace wrench {
     /**
      * @brief Method to schedule (possibly) the next jobs to be scheduled
      */
-    void CONSERVATIVEBFBatchScheduler::processQueuedJobs() {
+    void ConservativeBackfillingBatchSchedulerCoreLevel::processQueuedJobs() {
 
-        if (this->cs->batch_queue.empty()){
+        if (this->cs->batch_queue.empty()) {
             return;
         }
 
@@ -80,6 +86,7 @@ namespace wrench {
                 continue;
             }
 
+
             // Get the workflow job associated to the picked BatchComputeService job
             std::shared_ptr<CompoundJob> compound_job = batch_job->getCompoundJob();
 
@@ -87,6 +94,8 @@ namespace wrench {
             unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long requested_time = batch_job->getRequestedTime();
+
+//            WRENCH_INFO("LET'S DO IT: %lu hosts, %lu cores", num_nodes_asked_for, cores_per_node_asked_for);
 
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
             if (resources.empty()) {
@@ -112,7 +121,7 @@ namespace wrench {
     /**
      * @brief Method to compact the schedule
      */
-    void CONSERVATIVEBFBatchScheduler::compactSchedule() {
+    void ConservativeBackfillingBatchSchedulerCoreLevel::compactSchedule() {
 
         WRENCH_INFO("Compacting schedule...");
 
@@ -140,9 +149,12 @@ namespace wrench {
 
             // Find the earliest start time
 //            WRENCH_INFO("FINDING EARLIEST START TIME");
-            auto est = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes());
+            auto ret_value = this->schedule->findEarliestStartTime(batch_job->getRequestedTime(), batch_job->getRequestedNumNodes(), batch_job->getRequestedCoresPerNode());
+            auto est = ret_value.first;
+            auto node_indices = ret_value.second;
 //            WRENCH_INFO("EARLIEST START TIME FOR IT: %u", est);
             // Insert it in the schedule
+            batch_job->setAllocatedNodeIndices(node_indices);
             this->schedule->add(est, est + batch_job->getRequestedTime(), batch_job);
 //            WRENCH_INFO("RE-INSERTED THERE!");
 //            this->schedule->print();
@@ -185,8 +197,8 @@ namespace wrench {
      * @brief Method to process a job completion
      * @param batch_job: the job that completed
      */
-    void CONSERVATIVEBFBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
-        WRENCH_INFO("Notified of completion of BatchComputeService job, %lu", batch_job->getJobID());
+    void ConservativeBackfillingBatchSchedulerCoreLevel::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
+        WRENCH_INFO("Notified of completion of BatchComputeService job with id %lu", batch_job->getJobID());
 
         auto now = (u_int32_t)Simulation::getCurrentSimulatedDate();
         this->schedule->setTimeOrigin(now);
@@ -205,7 +217,7 @@ namespace wrench {
     * @brief Method to process a job termination
     * @param batch_job: the job that was terminated
     */
-    void CONSERVATIVEBFBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
+    void ConservativeBackfillingBatchSchedulerCoreLevel::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
         this->processJobCompletion(batch_job);
     }
@@ -214,7 +226,7 @@ namespace wrench {
     * @brief Method to process a job failure
     * @param batch_job: the job that failed
     */
-    void CONSERVATIVEBFBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
+    void ConservativeBackfillingBatchSchedulerCoreLevel::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Just like a job Completion to me!
         this->processJobCompletion(batch_job);
     }
@@ -225,10 +237,9 @@ namespace wrench {
      * @param cores_per_node: number of cores per node
      * @param ram_per_node: amount of RAM
      * @return a host:<core,RAM> map
-     *
      */
     std::map<std::string, std::tuple<unsigned long, double>>
-    CONSERVATIVEBFBatchScheduler::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
+    ConservativeBackfillingBatchSchedulerCoreLevel::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
 
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
@@ -249,8 +260,8 @@ namespace wrench {
                                      std::to_string(Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first)) + "cores)");
         }
 
-        // IMPORTANT: We always give all cores to a job on a node!
-        cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
+//        // IMPORTANT: We always give all cores to a job on a node!
+//        cores_per_node = Simulation::getHostNumCores(cs->available_nodes_to_cores.begin()->first);
 
         std::map<std::string, std::tuple<unsigned long, double>> resources = {};
         std::vector<std::string> hosts_assigned = {};
@@ -284,7 +295,7 @@ namespace wrench {
      * @param set_of_jobs: a set of job specs
      * @return map of estimates
      */
-    std::map<std::string, double> CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(
+    std::map<std::string, double> ConservativeBackfillingBatchSchedulerCoreLevel::getStartTimeEstimates(
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
         std::map<std::string, double> to_return;
 
@@ -293,11 +304,13 @@ namespace wrench {
             u_int64_t num_nodes = std::get<1>(j);
             u_int64_t num_cores_per_host = this->cs->num_cores_per_node;  // Ignore this one. Assume all  cores!
             if (std::get<3>(j) > UINT32_MAX) {
-                throw std::runtime_error("CONSERVATIVEBFBatchScheduler::getStartTimeEstimates(): job duration too large");
+                throw std::runtime_error("ConservativeBackfillingBatchSchedulerCoreLevel::getStartTimeEstimates(): job duration too large");
             }
             auto duration = (u_int32_t)(std::get<3>(j));
 
-            auto est = this->schedule->findEarliestStartTime(duration, num_nodes);
+            auto ret_value = this->schedule->findEarliestStartTime(duration, num_nodes, num_cores_per_host);
+            auto est = ret_value.first;
+            auto node_indices = ret_value.second;
             if (est <  UINT32_MAX) {
                 to_return[id] = (double) est;
             } else {

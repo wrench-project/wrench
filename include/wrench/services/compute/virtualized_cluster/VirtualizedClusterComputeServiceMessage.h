@@ -13,7 +13,7 @@
 
 #include <vector>
 
-#include "wrench/services/compute/ComputeServiceMessage.h"
+#include "../ComputeServiceMessage.h"
 
 namespace wrench {
 

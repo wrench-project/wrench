@@ -26,7 +26,7 @@
 #include <wrench/job/PilotJob.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
-#include "JobManagerMessage.h"
+#include "wrench/managers/JobManagerMessage.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_job_manager, "Log category for Job Manager");
 
