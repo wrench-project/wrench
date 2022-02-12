@@ -8,7 +8,7 @@
  *
  */
 
-#include "VirtualizedClusterComputeServiceMessage.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 
 namespace wrench {
 

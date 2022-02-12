@@ -164,7 +164,7 @@ TEST_F(BadPlatformTest, BadPlatform) {
             this->bad_format_xml,
             this->bad_ram1_xml,
             this->bad_ram2_xml,
-            this->bad_disk1_xml,
+//            this->bad_disk1_xml,  // "white spaces are ok!"
             this->bad_disk2_xml,
             this->bad_disk3_xml,
             this->zero_bandwidth_link

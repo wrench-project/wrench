@@ -11,8 +11,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench-dev.h>
-#include "WorkloadTraceFileReplayer.h"
-#include "WorkloadTraceFileReplayerEventReceiver.h"
+#include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
+#include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_workload_trace_file_replayer, "Log category for Trace File Replayer");
 

@@ -12,7 +12,7 @@
 
 #include <vector>
 #include <boost/icl/interval_map.hpp>
-#include "BatchJobSetCoreLevel.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h"
 
 /***********************/
 /** \cond              */

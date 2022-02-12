@@ -118,6 +118,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
             new SimulationTimestampPstateSetTestWMS(
                     this, host)));
 
+    simulation->getOutput().enableEnergyTimestamps(true);
     EXPECT_NO_THROW(simulation->launch());
 
     // Check constructor for SimulationTimestampPstateSet timestamps
@@ -207,6 +208,8 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationTimestampEnergyConsumptionTestWMS(
                     this, host)));
+
+    simulation->getOutput().enableEnergyTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -335,6 +338,8 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
                     this, workflow, host
             )
     ));
+
+    simulation->getOutput().enableEnergyTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -474,6 +479,8 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
                     this, host
             )
     ));
+
+    simulation->getOutput().enableEnergyTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
