@@ -144,8 +144,8 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
     private:
         friend class WorkloadTraceFileReplayer;
         friend class FCFSBatchScheduler;
-        friend class CONSERVATIVEBFBatchScheduler;
-        friend class CONSERVATIVEBFBatchSchedulerCoreLevel;
+        friend class ConservativeBackfillingBatchScheduler;
+        friend class ConservativeBackfillingBatchSchedulerCoreLevel;
 
         friend class BatschedBatchScheduler;
 

@@ -11,8 +11,8 @@
 #include <cfloat>
 #include <numeric>
 
-#include "VirtualizedClusterComputeServiceMessage.h"
-#include "../cloud/CloudComputeServiceMessage.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
 #include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
