@@ -18,7 +18,7 @@
 namespace wrench {
 
    /**
-    * @brief Configurable properties for a bare_metal
+    * @brief Configurable properties for a bare_metal_standard_jobs
     */
     class BareMetalComputeServiceProperty : public ComputeServiceProperty {
 
@@ -26,8 +26,10 @@ namespace wrench {
 
         /** @brief The overhead to start a thread, in seconds **/
         DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
-        /** @brief Whether the service should terminate when all hosts are down **/
-        DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
+        /** @brief If true, fail action after an executor crash, otherwise re-ready it and try again **/
+        DECLARE_PROPERTY_NAME(FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
+        /** @brief If true, service will terminate whenever all resources are down **/
+       DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
     };
 

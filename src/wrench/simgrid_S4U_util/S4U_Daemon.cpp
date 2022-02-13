@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,12 +8,12 @@
  *
  */
 
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
-#include "simgrid_S4U_util/S4U_DaemonActor.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
+#include "wrench/simgrid_S4U_util/S4U_DaemonActor.h"
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <boost/algorithm/string.hpp>
-#include <wrench/workflow/failure_causes/HostError.h>
+#include <wrench/failure_causes/HostError.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -28,14 +28,15 @@ std::map<std::string, unsigned long> num_actors;
 
 namespace wrench {
 
+    std::unordered_map<aid_t, simgrid::s4u::Mailbox*> S4U_Daemon::map_actor_to_recv_mailbox;
+
     /**
      * @brief Constructor (daemon with a mailbox)
      *
      * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
-     * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
-    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
+    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
 
         if (not simgrid::s4u::Engine::is_initialized()) {
             throw std::runtime_error("Simulation must be initialized before services can be created");
@@ -72,26 +73,16 @@ namespace wrench {
         this->hostname = hostname;
         this->simulation = nullptr;
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
-        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
-        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+//        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+//        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+        this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
+        this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
         this->has_returned_from_main = false;
     }
 
-#define CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK 0
-
     S4U_Daemon::~S4U_Daemon() {
-
-//        WRENCH_INFO("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
-
-        /** The code below was to avoid a memory_manager_service leak on the actor! However, weirdly,
-         *  it now causes problems due to SimGrid complaining that on_exit() functions
-         *  shouldn't do blocking things.... So it's commented-out for now
-         */
-#if (CLEAN_UP_MAILBOX_TO_AVOID_MEMORY_LEAK == 1)
-         auto mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
-         mailbox->set_receiver(nullptr);
-#endif
+        WRENCH_DEBUG("IN DAEMON DESTRUCTOR (%s)'", this->getName().c_str());
 
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
@@ -160,7 +151,7 @@ namespace wrench {
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
-        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+//        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
@@ -193,15 +184,16 @@ namespace wrench {
 
         }
 
-        // Set the mailbox_name receiver (causes memory_manager_service leak)
+        // Set the mailbox receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
-        simgrid::s4u::Mailbox::by_name(this->mailbox_name)->set_receiver(this->s4u_actor);
+        this->mailbox->set_receiver(this->s4u_actor);
+//        this->recv_mailbox->set_receiver(this->s4u_actor);
 
 
     }
 
     /**
-     * @brief Sets up the on_exit functionf for the actor
+     * @brief Sets up the on_exit function for the actor
      */
     void S4U_Daemon::setupOnExitFunction() {
 
@@ -214,7 +206,7 @@ namespace wrench {
             if (not this->isSetToAutoRestart()) {
                 auto life_saver = this->life_saver;
                 this->life_saver = nullptr;
-                Service::increaseNumCompletedServicesCount();
+//                Service::increaseNumCompletedServicesCount();
 #ifdef MESSAGE_MANAGER
                 MessageManager::cleanUpMessages(this->mailbox_name);
 #endif
@@ -245,23 +237,30 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
+
+        S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
         this->num_starts++;
         // Compute zero flop so that nothing happens
         // until the host has a >0 pstate
         S4U_Simulation::computeZeroFlop();
         this->state = State::UP;
-        this->return_value = this->main();
+        auto stuff = this->main();
+        this->return_value = stuff;
         this->has_returned_from_main = true;
         this->state = State::DOWN;
+        S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
+        this->mailbox->set_receiver(nullptr);
+//        this->recv_mailbox->set_receiver(nullptr);
     }
 
 
 /**
  * @brief Kill the daemon/actor (does nothing if already dead)
  *
+ * @return true if actor was killed, false if not (e.g., daemon was already dead)
  * @throw std::shared_ptr<FatalFailure>
  */
-    void S4U_Daemon::killActor() {
+    bool S4U_Daemon::killActor() {
 
         // Do the kill only if valid actor and not already done
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
@@ -270,7 +269,12 @@ namespace wrench {
             } catch (simgrid::Exception &e) {
                 throw std::runtime_error("simgrid::s4u::Actor::kill() failed... this shouldn't have happened");
             }
+            // Really not sure why now we're setting this to true... but if we don't some tests fail.
+            // Something to investigate at some point
             this->has_returned_from_main = true;
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -357,4 +361,29 @@ namespace wrench {
     void S4U_Daemon::releaseDaemonLock() {
         this->daemon_lock->unlock();
     }
+
+    /**
+     * @brief Get the service's simulation
+     * @return a simulation
+     */
+    Simulation *S4U_Daemon::getSimulation() {
+        return this->simulation;
+    }
+
+    /**
+     * @brief Set the service's simulation
+     * @param simulation: a simulation
+     */
+    void S4U_Daemon::setSimulation(Simulation *simulation) {
+        this->simulation = simulation;
+    }
+
+    /**
+     * @brief Return the running actor's recv mailbox
+     * @return the mailbox
+     */
+    simgrid::s4u::Mailbox *S4U_Daemon::getRunningActorRecvMailbox() {
+        return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
+    }
+
 };

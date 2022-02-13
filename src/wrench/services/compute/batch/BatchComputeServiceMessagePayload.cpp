@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/batch/BatchComputeServiceMessagePayload.h"
+#include <wrench/services/compute/batch/BatchComputeServiceMessagePayload.h>
 
 namespace wrench {
 

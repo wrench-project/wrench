@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/SleeperVictim.h"
-#include <wrench/workflow/failure_causes/HostError.h>
+#include <wrench/failure_causes/HostError.h>
 
 WRENCH_LOG_CATEGORY(service_start_restart_test, "Log category for ServiceStartRestartTest");
 
@@ -22,18 +22,21 @@ WRENCH_LOG_CATEGORY(service_start_restart_test, "Log category for ServiceStartRe
 class ServiceReStartHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_StartServiceOnDownHostTest_test();
     void do_ServiceRestartTest_test();
 
 protected:
 
+    ~ServiceReStartHostFailuresTest() {
+        workflow->clear();
+    }
+
     ServiceReStartHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
 
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
@@ -50,7 +53,7 @@ protected:
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
@@ -78,12 +81,12 @@ protected:
 /**          START SERVICE ON DOWN HOST TEST                         **/
 /**********************************************************************/
 
-class StartServiceOnDownHostTestWMS : public wrench::WMS {
+class StartServiceOnDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     StartServiceOnDownHostTestWMS(ServiceReStartHostFailuresTest *test,
                                   std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -98,8 +101,8 @@ private:
         wrench::Simulation::turnOffHost("FailedHost");
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        sleeper->simulation = this->simulation;
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        sleeper->setSimulation(this->simulation);
         try {
             sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
         } catch (std::shared_ptr<wrench::HostError> &e) {
@@ -120,7 +123,7 @@ TEST_F(ServiceReStartHostFailuresTest, StartServiceOnDownHostTest) {
 void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -135,16 +138,14 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new StartServiceOnDownHostTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -156,12 +157,12 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
 /**                    SERVICE RESTART TEST                          **/
 /**********************************************************************/
 
-class ServiceRestartTestWMS : public wrench::WMS {
+class ServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     ServiceRestartTestWMS(ServiceReStartHostFailuresTest *test,
                           std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -172,26 +173,26 @@ private:
     int main() override {
 
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
-        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        sleeper->simulation = this->simulation;
+        auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        sleeper->setSimulation(this->simulation);
         sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
 
         // Starting a host-switcher-offer
         auto death = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 10, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        death->simulation = this->simulation;
+        death->setSimulation(this->simulation);
         death->start(death, true, false); // Daemonized, no auto-restart
 
         // Starting a host-switcher-oner
         auto life = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 30, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        life->simulation = this->simulation;
+        life->setSimulation(this->simulation);
         life->start(life, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
@@ -211,7 +212,7 @@ TEST_F(ServiceReStartHostFailuresTest, ServiceRestartTest) {
 void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -226,16 +227,14 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new ServiceRestartTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

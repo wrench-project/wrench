@@ -27,7 +27,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
 
         /**
-         * @brief The batch scheduling algorithm. Can be:
+         * @brief The batch_standard_and_pilot_jobs scheduling algorithm. Can be:
          *    - If ENABLE_BATSCHED is set to off / not set:
          *      - "fcfs": First Come First Serve (default)
          *      - "conservative_bf": a home-grown implementation of FCFS with conservative backfilling, which only allocates resources at the node level (i.e., two jobs can never run on the same node even if that node has enough cores to support both jobs)
@@ -43,7 +43,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
 
         /**
-         * @brief The batch queue ordering algorithm. Can be:
+         * @brief The batch_standard_and_pilot_jobs queue ordering algorithm. Can be:
          *     - If ENABLE_BATSCHED is set to off / not set: ignored
          *     - If ENABLE_BATSCHED is set to on:
          *       - whatever queue ordering algorithm is supported by Batsched
@@ -62,9 +62,9 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
         /** @brief The algorithm to pick which ready computational task (within a standard job
-         *         executed by the batch service), in case multiple tasks are ready, should run first. This is typically
-         *         not managed by a batch scheduler, but by some application-level script that executes
-         *         a set of tasks within compute resources allocated by the batch scheduler. Possible values are:
+         *         executed by the batch_standard_and_pilot_jobs service), in case multiple tasks are ready, should run first. This is typically
+         *         not managed by a batch_standard_and_pilot_jobs scheduler, but by some application-level script that executes
+         *         a set of tasks within compute resources allocated by the batch_standard_and_pilot_jobs scheduler. Possible values are:
          *                  - maximum_flops (default)
          *                  - maximum_minimum_cores
          *                  - minimum_top_level
@@ -77,9 +77,9 @@ namespace wrench {
          * case it must have extension ".swf", or in the JSON format as used in the BATSIM project
          * (see https://github.com/oar-team/batsim), in which case is must have the ".json" extension).
          * The jobs in the trace whose node/host/processor/core requirements exceed the capacity
-         * of the batch service will simply be capped at that capacity. Job submission times in the trace files
-         * are relative to the batch's start time (i.e., all jobs in the trace files will be replayed
-         * assuming that the batch starts at time zero). Note that in the BATSIM JSON format, the trace does not
+         * of the batch_standard_and_pilot_jobs service will simply be capped at that capacity. Job submission times in the trace files
+         * are relative to the batch_standard_and_pilot_jobs's start time (i.e., all jobs in the trace files will be replayed
+         * assuming that the batch_standard_and_pilot_jobs starts at time zero). Note that in the BATSIM JSON format, the trace does not
          * contains requested vs. actual trace runtimes, and to all requested runtimes are 100% accurate.
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);
@@ -124,7 +124,7 @@ namespace wrench {
 
         /**
          * @brief Integral number of seconds that the Batch Scheduler adds to the runtime of each incoming
-         *        job. This is something production batch systems do to avoid too aggressive job
+         *        job. This is something production batch_standard_and_pilot_jobs systems do to avoid too aggressive job
          *        terminations. For instance,
          *        if a job says it wants to run for (at most) 60 seconds, the system
          *        will actually assume the job wants to run for (at most) 60 + 5 seconds.
@@ -134,7 +134,7 @@ namespace wrench {
         /** @brief Simulate computation as just a sleep instead of an actual compute thread. This is for scalability reason,
          *        and only simulation-valid
         *         if one is sure that cores are space shared (i.e., only a single compute thread can ever
-        *         run on a core at once). Since space-sharing at the core level is typically the case in batch-scheduled
+        *         run on a core at once). Since space-sharing at the core level is typically the case in batch_standard_and_pilot_jobs-scheduled
          *        clusters, this is likely fine.
          *           - "true": simulate computation as sleep
          *           - "false": do not simulate computation as sleep (default)

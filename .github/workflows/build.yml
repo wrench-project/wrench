@@ -1,6 +1,14 @@
-name: Build
+name: Build-Linux
 
-on: [ push ]
+on:
+  push:
+    paths-ignore:
+      - 'doc/**'
+      - '**.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -31,11 +39,6 @@ jobs:
           - build: "Ubuntu Focal - clang-10"
             DIST: ubuntu-focal
             COMPILER: clang10
-            batsched: off
-
-          - build: "Debian Stretch - g++-6"
-            DIST: debian-stretch
-            COMPILER: gcc6
             batsched: off
 
           - build: "Debian Buster - g++-8"

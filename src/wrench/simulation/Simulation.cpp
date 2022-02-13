@@ -12,19 +12,20 @@
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 
-#include <wrench/wms/WMS.h>
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/Service.h"
-#include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
-#include "wrench/services/file_registry/FileRegistryService.h"
-#include "wrench/services/storage/StorageService.h"
-#include "wrench/simulation/Simulation.h"
+#include <wrench/execution_controller/ExecutionController.h>
+#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/Service.h>
+#include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
+#include <wrench/services/file_registry/FileRegistryService.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/simulation/Simulation.h>
 #include "simgrid/plugins/energy.h"
-#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
-#include "wrench/services/memory/MemoryManager.h"
-#include "wrench/workflow/WorkflowFile.h"
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/services/memory/MemoryManager.h>
+#include <wrench/data_file/DataFile.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
@@ -41,6 +42,11 @@ namespace wrench {
     bool Simulation::energy_enabled = false;
     bool Simulation::host_shutdown_enabled = false;
     bool Simulation::pagecache_enabled = false;
+
+    bool Simulation::initialized = false;
+
+    std::map<std::string, std::shared_ptr<DataFile>> Simulation::data_files;
+
 
     /**
      * \cond
@@ -79,9 +85,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
         this->s4u_simulation->shutdown();
-        // Clearing all tracked service, which will cause all services that are not
-        // pointed to by main() to be deleted.
-        Service::clearTrackedServices();
         this->compute_services.clear();
     }
 
@@ -95,6 +98,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
+
+        if (Simulation::initialized) {
+            throw std::runtime_error("Simulation::init(): Simulation already initialized");
+        }
+
         if (*argc < 1) {
             throw std::invalid_argument("Simulation::init(): Invalid argc argument (must be >= 1)");
         }
@@ -108,11 +116,13 @@ namespace wrench {
         bool wrench_help_requested = false;
         bool simulator_help_requested = false;
         bool version_requested = false;
+        bool mailbox_pool_size_set = false;
 
         // By  default, logs are disabled
         xbt_log_control_set("root.thresh:critical");
 
         std::vector<std::string> cleanedup_args;
+
 
         for (i = 0; i < *argc; i++) {
             if (not strcmp(argv[i], "--help")) {
@@ -125,11 +135,24 @@ namespace wrench {
                        (not strcmp(argv[i], "--wrench-logs-full"))
                     ) {
                 xbt_log_control_set("root.thresh:info");
+            } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
+                char *equal_sign = strchr(argv[i], '=');
+                if (!equal_sign) {
+                    std::cerr << "Invalid --wrench-mailbox-pool-size argument.\n";
+                    exit(1);
+                }
+                unsigned long pool_size = strtoul(equal_sign+1, nullptr, 10);
+                if (pool_size <= 0) {
+                    std::cerr << "Invalid --wrench-mailbox-pool-size argument value.\n";
+                    exit(1);
+                }
+                S4U_Mailbox::mailbox_pool_size = pool_size;
+                mailbox_pool_size_set = true;
             } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
                 sg_host_energy_plugin_init();
-                this->energy_enabled = true;
+                Simulation::energy_enabled = true;
             } else if (not strcmp(argv[i], "--wrench-host-shutdown-simulation")) {
-                this->host_shutdown_enabled = true;
+                Simulation::host_shutdown_enabled = true;
             } else if ((not strcmp(argv[i], "--help-wrench")) or
                        (not strcmp(argv[i], "--wrench-help"))) {
                 wrench_help_requested = true;
@@ -148,14 +171,14 @@ namespace wrench {
         sg_vm_live_migration_plugin_init();
 
         // Register a callback on host state changes to warn users
-        // that the --activate-host-shutdown flag should have been passed
+        // that the --wrench-host-shutdown-simulation flag should have been passed
         // to the simulator if host shutdowns are to be simulated
         simgrid::s4u::Host::on_state_change.connect(
                 [](simgrid::s4u::Host const &h) {
                     if (not Simulation::host_shutdown_enabled) {
                         throw std::runtime_error(
                                 "It looks like you are simulating host failures/shutdowns during the simulated execution."
-                                " Please restart your simulation passing it the --activate-host-shutdown command-line flag.");
+                                " Please restart your simulation passing it the --wrench-host-shutdown-simulation command-line flag.");
                     }
                 });
 
@@ -177,11 +200,16 @@ namespace wrench {
             std::cout << "     (use --log=xxx.threshold=info to enable log category xxxx)\n";
             std::cout << "   --help-logs for detailed help on (SimGrid's) logging options/syntax)\n";
             std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+            std::cout << "   --wrench-mailbox-pool-size=<integer>: set the number of SimGrid mailboxes used by WRENCH (default: 50000).\n";
+            std::cout << "      This value may need to be increased, especially for simulations that simulate many\n";
+            std::cout << "      failures, for which WRENCH has a hard time avoiding all mailbox-related memory leaks\n";
             std::cerr << "\n";
         }
 
+
         *argc = 0;
         for (auto a : cleanedup_args) {
+            //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
         }
@@ -230,6 +258,13 @@ namespace wrench {
             argv[*argc] = strdup("--help");
             (*argc)++;
         }
+
+        if (not mailbox_pool_size_set) {
+            S4U_Mailbox::createMailboxPool(5000);
+        }
+
+
+        Simulation::initialized = true;
     }
 
     /**
@@ -349,7 +384,7 @@ namespace wrench {
         double usage = S4U_Simulation::getLinkUsage(link_name);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestampLinkUsage(link_name, usage);
+            this->getOutput().addTimestampLinkUsage(Simulation::getCurrentSimulatedDate(), link_name, usage);
         }
 
         return usage;
@@ -409,6 +444,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::launch() {
+
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
@@ -421,10 +457,10 @@ namespace wrench {
         // Even if the energy-plugin is not activated, getCurrentPstate(hostname) can
         // still be called.
         for (const auto &hostname: this->getHostnameList()) {
-            this->getOutput().addTimestampPstateSet(hostname, getCurrentPstate(hostname));
+            this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(), hostname, getCurrentPstate(hostname));
         }
 
-        // Start all services (and the WMS)
+        // Start all services (including execution controllers)
         try {
             this->startAllProcesses();
         } catch (std::runtime_error &e) {
@@ -467,56 +503,12 @@ namespace wrench {
             throw std::runtime_error("Simulation platform has not been setup");
         }
 
-        // Check that there is a WMS
-        if (this->wmses.empty()) {
+        // Check that there is at least one execution controller
+        if (this->execution_controllers.empty()) {
             throw std::runtime_error(
-                    "A WMS should have been instantiated and passed to Simulation.setWMS()");
+                    "An execution controller should have been instantiated and passed to Simulation.add()");
         }
 
-        // Check that every WMS has a workflow
-        for (const auto &wms : this->wmses) {
-            if (wms->getWorkflow() == nullptr) {
-                throw std::runtime_error(
-                        "The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
-            }
-        }
-
-        // Check that WMSs can do their work
-        for (auto &wms : this->wmses) {
-            // Check that at least one StorageService is running (only needed if there are files in the workflow),
-            if (not wms->workflow->getFiles().empty()) {
-                bool one_storage_service_running = false;
-                for (const auto &storage_service : this->storage_services) {
-                    if (storage_service->state == Service::UP) {
-                        one_storage_service_running = true;
-                        break;
-                    }
-                }
-                if (not one_storage_service_running) {
-                    throw std::runtime_error(
-                            "At least one StorageService should have been instantiated add passed to Simulation.add()");
-                }
-            }
-
-            // Check that a FileRegistryService is running if needed
-            if (not wms->workflow->getInputFiles().empty()) {
-                if (this->file_registry_services.empty()) {
-                    throw std::runtime_error(
-                            "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
-                            "because there are workflow input files to be staged.");
-                }
-            }
-
-            // Check that each input file is staged on the file registry services
-            for (auto file : wms->workflow->getInputFiles()) {
-                for (auto frs : this->file_registry_services) {
-                    if (frs->entries.find(file) == frs->entries.end()) {
-                        throw std::runtime_error(
-                                "Workflow input file " + file->getID() + " is not staged on any storage service!");
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -526,9 +518,9 @@ namespace wrench {
      */
     void Simulation::startAllProcesses() {
         try {
-            // Start the WMSes
-            for (const auto &wms : this->wmses) {
-                wms->start(wms, false, false);  // Not daemonized, no auto-restart
+            // Start the execution controllers
+            for (const auto &execution_controller : this->execution_controllers) {
+                execution_controller->start(execution_controller, false, false);  // Not daemonized, no auto-restart
             }
 
             // Start the compute services
@@ -615,18 +607,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a WMS to the simulation.
+     * @brief Add an Execution Controller to the simulation.
      *
-     * @param service: a WMS
+     * @param service: an execution controller
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(std::shared_ptr<WMS> service) {
+    void Simulation::addService(std::shared_ptr<ExecutionController> service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
         service->simulation = this;
-        this->wmses.insert(service);
+        this->execution_controllers.insert(service);
     }
 
     /**
@@ -698,7 +690,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service) {
+    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> storage_service) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
     }
 
@@ -712,7 +704,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<StorageService> storage_service,
+    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> storage_service,
                                std::string directory_absolute_path) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
     }
@@ -722,7 +714,7 @@ namespace wrench {
      * @param file: the file
      * @param location: the location
      */
-    void Simulation::stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -735,12 +727,6 @@ namespace wrench {
         if (this->file_registry_services.empty()) {
             throw std::runtime_error(
                     "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
-        }
-
-        // Check that the file is not the output of anything
-        if (file->isOutput()) {
-            throw std::runtime_error(
-                    "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
         }
 
         // Put the file on the storage service (not via the service daemon)
@@ -768,15 +754,15 @@ namespace wrench {
     void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskReadFailure(hostname, mount_point, num_bytes,
+            this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskReadCompletion(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
     }
 
     /**
@@ -796,23 +782,23 @@ namespace wrench {
                                                             std::string write_mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, read_mount_point, num_bytes_to_read,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                     temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskWriteStart(hostname, write_mount_point, num_bytes_to_write,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                      temp_unique_sequence_number);
         try {
             S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(num_bytes_to_read, num_bytes_to_write, hostname,
                                                                    read_mount_point, write_mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, write_mount_point, num_bytes_to_write,
+            this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                            temp_unique_sequence_number);
-            this->getOutput().addTimestampDiskReadFailure(hostname, read_mount_point, num_bytes_to_read,
+            this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                           temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, write_mount_point, num_bytes_to_write,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, write_mount_point, num_bytes_to_write,
                                                           temp_unique_sequence_number);
-        this->getOutput().addTimestampDiskReadCompletion(hostname, read_mount_point, num_bytes_to_read,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
                                                          temp_unique_sequence_number);
     }
 
@@ -828,15 +814,15 @@ namespace wrench {
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(hostname, mount_point, num_bytes,
+            this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
                                                            temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, mount_point, num_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -847,12 +833,12 @@ namespace wrench {
      * @param n_bytes: number of read bytes
      * @param location: file location
      */
-    void Simulation::readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location) {
+    void Simulation::readWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskReadStart(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                     temp_unique_sequence_number);
 
         auto mem_mng = getMemoryManagerByHost(hostname);
@@ -879,7 +865,7 @@ namespace wrench {
 //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
 
-        this->getOutput().addTimestampDiskReadCompletion(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                          temp_unique_sequence_number);
     }
 
@@ -892,14 +878,14 @@ namespace wrench {
      * @param is_dirty: true or false
      */
     void
-    Simulation::writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location,
+    Simulation::writebackWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location,
                                          bool is_dirty) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
 
-        this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
@@ -931,7 +917,7 @@ namespace wrench {
             remaining -= to_cache;
         }
 
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -942,13 +928,13 @@ namespace wrench {
      * @param n_bytes: number of written bytes
      * @param location: file location
      */
-    void Simulation::writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes,
+    void Simulation::writeThroughWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes,
                                                  std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
@@ -959,7 +945,7 @@ namespace wrench {
         mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
         mem_mng->addToCache(file->getID(), location, n_bytes, false);
 
-        this->getOutput().addTimestampDiskWriteCompletion(hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -1166,7 +1152,7 @@ namespace wrench {
         double consumption = S4U_Simulation::getEnergyConsumedByHost(hostname);
 
         if (record_as_time_stamp) {
-            this->getOutput().addTimestampEnergyConsumption(hostname, consumption);
+            this->getOutput().addTimestampEnergyConsumption(Simulation::getCurrentSimulatedDate(), hostname, consumption);
         }
 
         return consumption;
@@ -1210,7 +1196,7 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
-        this->getOutput().addTimestampPstateSet(hostname, pstate);
+        this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(),hostname, pstate);
     }
 
     /**
@@ -1259,7 +1245,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new compute service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1289,7 +1275,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new storage service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new storage service during  execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1315,7 +1301,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new network proximity service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new network proximity service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1341,7 +1327,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new file registry service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new file registry service during execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -1476,6 +1462,89 @@ namespace wrench {
                 }
             }
         }
+    }
+
+    /**
+      * @brief Get the list of all files in the simulation
+      *
+      * @return a reference to the map of files in the simulation, indexed by file ID
+      */
+    std::map<std::string, std::shared_ptr<DataFile>> &Simulation::getFileMap() {
+        return Simulation::data_files;
+    }
+
+    /**
+    * @brief Find a DataFile based on its ID
+    *
+    * @param id: a string id
+    *
+    * @return the DataFile instance (or throws a std::invalid_argument if not found)
+    *
+    * @throw std::invalid_argument
+    */
+    std::shared_ptr<DataFile> Simulation::getFileByID(const std::string &id) {
+        if (Simulation::data_files.find(id) == Simulation::data_files.end()) {
+            throw std::invalid_argument("Workflow::getFileByID(): Unknown DataFile ID " + id);
+        } else {
+            return Simulation::data_files[id];
+        }
+    }
+
+    /**
+     * @brief Add a new file to the simulation (use at your own peril if you're using the workflow API - use Workflow::addFile() instead)
+     *
+     * @param id: a unique string id
+     * @param size: a file size in bytes
+     *
+     * @return the DataFile instance
+     *
+     * @throw std::invalid_argument
+     */
+    std::shared_ptr<DataFile> Simulation::addFile(const std::string id, double size) {
+
+        if (size < 0) {
+            throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
+        }
+
+        // Create the DataFile object
+        if (Simulation::data_files.find(id) != Simulation::data_files.end()) {
+            throw std::invalid_argument("Simulation::addFile(): DataFile with id '" +
+                                        id + "' already exists");
+        }
+
+        auto file = std::shared_ptr<DataFile>(new DataFile(id, size));
+
+        // Add if to the set of workflow files
+        Simulation::data_files[file->id] = file;
+
+        return file;
+    }
+
+    /**
+     * @brief Remove a file from the simulation (use at your own peril if you're using the workflow API - use Workflow::removeFile() instead)
+     * @param file : file to remove
+     */
+    void Simulation::removeFile(std::shared_ptr<DataFile> file) {
+        if (Simulation::data_files.find(file->getID()) == Simulation::data_files.end()) {
+            throw std::invalid_argument("Simulation::removeFile(): Unknown file");
+        }
+        Simulation::data_files.erase(file->getID());
+    }
+
+    /**
+     * @brief Determine if the simulation has been initialized
+     * @return  true or false
+     */
+    bool Simulation::isInitialized() {
+        return Simulation::initialized;
+    }
+
+    /**
+     * @brief Create a simulation
+     * @return a simulation
+     */
+    std::shared_ptr<Simulation> Simulation::createSimulation() {
+        return std::shared_ptr<Simulation>(new Simulation);
     }
 
 }

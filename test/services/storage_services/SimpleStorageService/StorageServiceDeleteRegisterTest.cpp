@@ -10,8 +10,8 @@
 class SimpleStorageServiceDeleteRegisterTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_1;
-    wrench::WorkflowFile *file_2;
+    std::shared_ptr<wrench::DataFile> file_1;
+    std::shared_ptr<wrench::DataFile> file_2;
 
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
 
@@ -20,9 +20,14 @@ public:
     void do_DeleteRegisterTest();
 
 protected:
+
+    ~SimpleStorageServiceDeleteRegisterTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceDeleteRegisterTest() {
         // simple workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // create the files
         file_1 = workflow->addFile("file_1", FILE_SIZE);
@@ -32,7 +37,7 @@ protected:
         // Create a 2-host platform file
         // [WMSHost]-----[StorageHost]
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"StorageHost\" speed=\"1f\"> "
@@ -54,35 +59,30 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
-class SimpleStorageServiceDeleteRegisterTestWMS : public wrench::WMS {
+class SimpleStorageServiceDeleteRegisterTestWMS : public wrench::ExecutionController {
 public:
     SimpleStorageServiceDeleteRegisterTestWMS(SimpleStorageServiceDeleteRegisterTest *test,
-                                              const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                              const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                              std::shared_ptr<wrench::FileRegistryService> file_registry_service,
+                                              const std::shared_ptr<wrench::StorageService> &storage_service,
+                                              const std::shared_ptr<wrench::FileRegistryService> &file_registry_service,
                                               std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
-                        hostname, "test") {
+            wrench::ExecutionController(hostname, "test"), test(test), storage_service(storage_service),
+            file_registry_service(file_registry_service) {
         this->test = test;
     }
 
 private:
     SimpleStorageServiceDeleteRegisterTest *test;
+    std::shared_ptr<wrench::StorageService> storage_service;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
     int main() {
 
-        // get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
-
-        // get the single storage service
-        auto storage_service = *(this->getAvailableStorageServices().begin());
-
         // register both files
-        wrench::WorkflowFile *file_1 = this->test->file_1;
-        wrench::WorkflowFile *file_2 = this->test->file_2;
+        std::shared_ptr<wrench::DataFile> file_1 = this->test->file_1;
+        std::shared_ptr<wrench::DataFile> file_2 = this->test->file_2;
 
         file_registry_service->addEntry(file_1, wrench::FileLocation::LOCATION(storage_service));
         file_registry_service->addEntry(file_2, wrench::FileLocation::LOCATION(storage_service));
@@ -119,7 +119,7 @@ TEST_F(SimpleStorageServiceDeleteRegisterTest, DeleteAndRegister) {
 
 void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     // ??
     int argc = 1;
@@ -147,13 +147,9 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceDeleteRegisterTestWMS(
-            this, {compute_service}, {storage_service}, file_registry_service, "WMSHost")));
-
-    wms->addWorkflow(this->workflow);
-
-
+            this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service));
@@ -162,8 +158,8 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }

@@ -13,28 +13,29 @@
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
-#include <wrench/exceptions/WorkflowExecutionException.h>
-#include <services/storage/StorageServiceMessage.h>
-#include <wrench/workflow/WorkflowFile.h>
-#include <wrench/wms/WMS.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/storage/StorageServiceMessage.h>
+#include <wrench/data_file/DataFile.h>
 #include <wrench/managers/DataMovementManager.h>
-#include  <wrench/workflow/failure_causes/FileAlreadyBeingCopied.h>
-#include  <wrench/workflow/failure_causes/NetworkError.h>
+#include  <wrench/failure_causes/FileAlreadyBeingCopied.h>
+#include  <wrench/failure_causes/NetworkError.h>
+
+#include <memory>
 
 WRENCH_LOG_CATEGORY(wrench_core_data_movement_manager, "Log category for Data Movement Manager");
 
 namespace wrench {
 
-
     /**
      * @brief Constructor
      *
-     * @param wms: the WMS that uses this data movement manager
+     * @param hostname: the hostname on which the data movement manager is to run
+     * @param creator_mailbox: the mailbox of the manager's creator
      */
-    DataMovementManager::DataMovementManager(std::shared_ptr<WMS> wms) :
-            Service(wms->hostname, "data_movement_manager", "data_movement_manager") {
+    DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) :
+            Service(hostname, "data_movement_manager") {
 
-        this->wms = wms;
+        this->creator_mailbox = creator_mailbox;
 
 
     }
@@ -49,14 +50,14 @@ namespace wrench {
     /**
      * @brief Stop the manager
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void DataMovementManager::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+            S4U_Mailbox::putMessage(this->mailbox, new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
     }
 
@@ -68,9 +69,9 @@ namespace wrench {
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
-    void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
+    void DataMovementManager::initiateAsynchronousFileCopy(std::shared_ptr<DataFile>file,
                                                            std::shared_ptr<FileLocation> src,
                                                            std::shared_ptr<FileLocation> dst,
                                                            std::shared_ptr<FileRegistryService> file_registry_service) {
@@ -83,21 +84,19 @@ namespace wrench {
         try {
             for (auto const &p : this->pending_file_copies) {
                 if (*p == request) {
-                    throw WorkflowExecutionException(
+                    throw ExecutionException(
                             std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
                 }
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
 
         try {
-            this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(
-                    new CopyRequestSpecs(file, src, dst, file_registry_service)));
-            wrench::StorageService::initiateFileCopy(this->mailbox_name, file,
-                                                       src, dst);
-        } catch (WorkflowExecutionException &e) {
+            this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(file, src, dst, file_registry_service));
+            wrench::StorageService::initiateFileCopy(this->mailbox, file,src, dst);
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -110,9 +109,9 @@ namespace wrench {
      * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
-    void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
+    void DataMovementManager::doSynchronousFileCopy(std::shared_ptr<DataFile>file,
                                                     std::shared_ptr<FileLocation> src,
                                                     std::shared_ptr<FileLocation> dst,
                                                     std::shared_ptr<FileRegistryService> file_registry_service) {
@@ -125,13 +124,13 @@ namespace wrench {
         try {
             for (auto const &p : this->pending_file_copies) {
                 if (*p == request) {
-                    throw WorkflowExecutionException(
+                    throw ExecutionException(
                             std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
                 }
             }
 
             StorageService::copyFile(file, src, dst);
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
 
@@ -139,7 +138,7 @@ namespace wrench {
             if (file_registry_service) {
                 file_registry_service->addEntry(file, dst);
             }
-        } catch (WorkflowExecutionException &e) {
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -153,10 +152,9 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox_name.c_str());
+        WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox->get_cname());
 
         while (processNextMessage()) {
-
 
         }
 
@@ -176,7 +174,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_INFO("Oops... somebody tried to send a message, but that failed...");
             return true;
@@ -192,9 +190,17 @@ namespace wrench {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
+            msg->src->getStorageService();
+            request.src->getStorageService();
+            msg->dst->getStorageService();
+            request.dst->getStorageService();
             for (auto it = this->pending_file_copies.begin();
                  it != this->pending_file_copies.end();
                  ++it) {
+                request.src->getStorageService();
+                request.dst->getStorageService();
+                (*(*it)).src->getStorageService();
+                (*(*it)).dst->getStorageService();
                 if (*(*it) == request) {
                     request.file_registry_service = (*it)->file_registry_service;
                     this->pending_file_copies.erase(it); // remove the entry
@@ -208,7 +214,7 @@ namespace wrench {
                 try {
                     request.file_registry_service->addEntry(request.file, request.dst);
                     file_registry_service_updated = true;
-                } catch (WorkflowExecutionException &e) {
+                } catch (ExecutionException &e) {
                     WRENCH_INFO("Oops, couldn't do it");
                     // don't throw, just keep file_registry_service_update to false
                 }
@@ -216,7 +222,7 @@ namespace wrench {
 
             WRENCH_INFO("Forwarding status message");
             // Forward it back
-            S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
+            S4U_Mailbox::dputMessage(this->creator_mailbox,
                                      new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                              msg->src,
                                                                              msg->dst,
@@ -233,6 +239,14 @@ namespace wrench {
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
 
+    }
+
+    /** @brief Get the mailbox of the service that created this data movement manager
+     *
+     * @return a mailbox
+     */
+    simgrid::s4u::Mailbox *DataMovementManager::getCreatorMailbox() {
+        return this->creator_mailbox;
     }
 
 

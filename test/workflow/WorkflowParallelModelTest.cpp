@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ class ParallelModelTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
-    wrench::WorkflowTask *task = nullptr;
+    std::shared_ptr<wrench::WorkflowTask> task = nullptr;
 
     void do_AdmdahlParallelModelTest_test();
     void do_ConstantEfficiencyParallelModelTest_test();
@@ -33,7 +33,7 @@ protected:
 
 
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"WMSHost\" speed=\"1f\" core=\"4\">"
@@ -53,26 +53,26 @@ protected:
 };
 
 
-class ParallelModelTestWMS : public wrench::WMS {
+class ParallelModelTestWMS : public wrench::ExecutionController {
 public:
-    ParallelModelTestWMS(ParallelModelTest *test, std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+    ParallelModelTestWMS(ParallelModelTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
     ParallelModelTest *test;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     int main() {
         auto job_manager = this->createJobManager();
 
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTaskByID("task"));
+        auto job = job_manager->createStandardJob(this->workflow->getTaskByID("task1"));
         job_manager->submitJob(job, this->test->compute_service);
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
-            event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+            event = this->waitForNextEvent();
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -93,7 +93,7 @@ TEST_F(ParallelModelTest, AmdahlParallelModelTest) {
 }
 
 void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -114,14 +114,13 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
                             wrench::ComputeService::ALL_RAM))}, "",
             {})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, wms_host)));
-
-    auto workflow = new wrench::Workflow();
+            this, workflow, wms_host)));
     double work = 100.0;
     double alpha = 0.3;
-    this->task = workflow->addTask("task", work, 1, 4, 0.0);
+    this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::AMDAHL(alpha));
 
     auto parallel_model = task->getParallelModel();
@@ -129,19 +128,18 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     ASSERT_NE(real_parallel_model, nullptr);
     ASSERT_EQ(real_parallel_model->getAlpha(), 0.3);
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
     ASSERT_NO_THROW(simulation->launch());
 
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
     double expected_makespan = (alpha * work)  / 4 + (1 - alpha) * work;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
-        throw std::runtime_error("Unexpected task makespan: " + std::to_string(makespan) +
+        throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
         " instead of " + std::to_string(expected_makespan));
     }
 
-    delete simulation;
+    workflow->clear();
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -158,7 +156,7 @@ TEST_F(ParallelModelTest, ConstantEfficiencyParallelModelTest) {
 }
 
 void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -179,22 +177,19 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
                             wrench::ComputeService::ALL_RAM))}, "",
             {})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, wms_host)));
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    auto workflow = wrench::Workflow::createWorkflow();
+    ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(this, workflow, wms_host)));
 
-    auto workflow = new wrench::Workflow();
     double work = 100.0;
     double efficiency = 0.3;
-    this->task = workflow->addTask("task", work, 1, 4, 0.0);
+    this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(efficiency));
 
     auto parallel_model = task->getParallelModel();
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(parallel_model);
     ASSERT_NE(real_parallel_model, nullptr);
     ASSERT_EQ(real_parallel_model->getEfficiency(), 0.3);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -204,11 +199,12 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     WRENCH_INFO("--> %lf %lf\n", makespan, expected_makespan);
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
-        throw std::runtime_error("Unexpected task makespan: " + std::to_string(makespan) +
+        throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
                                  " instead of " + std::to_string(expected_makespan));
     }
 
-    delete simulation;
+    workflow->clear();
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -225,7 +221,7 @@ TEST_F(ParallelModelTest, CustomParallelModelTest) {
 }
 
 void ParallelModelTest::do_CustomParallelModelTest_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -246,13 +242,13 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
                             wrench::ComputeService::ALL_RAM))}, "",
             {})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, wms_host)));
+            this, workflow, wms_host)));
 
-    auto workflow = new wrench::Workflow();
     double work = 100.0;
-    this->task = workflow->addTask("task", work, 1, 4, 0.0);
+    this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
             [] (double work, unsigned long num_threads) {
                 std::vector<double> works;
@@ -268,19 +264,18 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::CustomParallelModel>(parallel_model);
     ASSERT_NE(real_parallel_model, nullptr);
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
     ASSERT_NO_THROW(simulation->launch());
 
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
     double expected_makespan = 40.0;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
-        throw std::runtime_error("Unexpected task makespan: " + std::to_string(makespan) +
+        throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
                                  " instead of " + std::to_string(expected_makespan));
     }
 
-    delete simulation;
+    workflow->clear();
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

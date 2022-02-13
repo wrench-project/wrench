@@ -14,20 +14,23 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
-#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
-
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/ServiceProperty.h"
+#include "wrench/services/ServiceMessagePayload.h"
 namespace wrench {
+    typedef std::map<WRENCH_PROPERTY_TYPE,std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
+    typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE ,double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+    class FailureCause;
 
     /**
      * @brief A service that can be added to the simulation and that can be used by a WMS
      *        when executing a workflow
      */
-    class Service : public S4U_Daemon {
+class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> {
 
     public:
-
-
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -39,13 +42,14 @@ namespace wrench {
         void resume();
 
         std::string getHostname();
+        std::string getPhysicalHostname();
 
         bool isUp();
 
-        std::string getPropertyValueAsString(std::string);
-        double getPropertyValueAsDouble(std::string);
-        unsigned long getPropertyValueAsUnsignedLong(std::string);
-        bool getPropertyValueAsBoolean(std::string);
+        std::string getPropertyValueAsString(WRENCH_PROPERTY_TYPE);
+        double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
+        unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
+        bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
 
         void assertServiceIsUp();
 
@@ -60,13 +64,9 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        double getMessagePayloadValue(std::string);
+        double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
 
         void setStateToDown();
-
-        static void increaseNumCompletedServicesCount();
-        static void clearTrackedServices();
-        static void cleanupTrackedServices();
 
         /***********************/
         /** \endcond           */
@@ -86,30 +86,30 @@ namespace wrench {
 
         friend class Simulation;
 
-        ~Service();
+        ~Service() override;
 
-        Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix);
+        Service(std::string hostname, std::string process_name_prefix);
 
         // Property stuff
-        void setProperty(std::string, std::string);
+        void setProperty(WRENCH_PROPERTY_TYPE, const std::string&);
 
-        void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> overriden_property_values);
+        void setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
+                           WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
 
         // MessagePayload stuff
-        void setMessagePayload(std::string, double);
+        void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
 
-        void setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
-                                std::map<std::string, double> overriden_messagepayload_values);
+        void setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overriden_messagepayload_values);
 
 
         void serviceSanityCheck();
 
         /** @brief The service's property list */
-        std::map<std::string, std::string> property_list;
+        WRENCH_PROPERTY_COLLECTION_TYPE property_list;
 
         /** @brief The service's messagepayload list */
-        std::map<std::string, double> messagepayload_list;
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list;
 
         /** @brief The service's name */
         std::string name;
@@ -126,42 +126,14 @@ namespace wrench {
          */
         template <class T>
         std::shared_ptr<T> getSharedPtr() {
-            if (Service::service_shared_ptr_map.find(this) == Service::service_shared_ptr_map.end()) {
-                throw std::runtime_error("Service::getSharedPtr(): master shared_ptr to service not found! This should happen only "
-                                         "if the service has not been started, in which case this method shouldn't have been called");
-            }
-            auto shared_ptr = std::dynamic_pointer_cast<T>(Service::service_shared_ptr_map[this]);
-            if (not shared_ptr) {
-                throw std::runtime_error("Service::getSharedPtr(): Invalid provided template");
-            }
-            return shared_ptr;
-        }
-
-        /**
-         * @brief Method to retrieve the shared_ptr to a service based on the service's name (not efficient)
-         * @tparam T: the class of the service (the base class is Service)
-         * @param name: the service's name
-         * @return a shared_ptr (or nullptr if not found)
-         */
-        template <class T>
-        static std::shared_ptr<T> getServiceByName(std::string name) {
-            for (auto const &s : Service::service_shared_ptr_map) {
-                if (s.first->getName() == name) {
-                    return std::dynamic_pointer_cast<T>(s.second);
-                }
-            }
-            return nullptr;
+            return std::dynamic_pointer_cast<T>(this->shared_from_this());
         }
 
 
-    private:
-
-        static std::unordered_map<Service *, std::shared_ptr<Service>> service_shared_ptr_map;
-
+        /** @brief A boolean that indicates if the service is in the middle of shutting down **/
         bool shutting_down = false;
 
-        static unsigned long num_terminated_services;
-
+    private:
 
         /***********************/
         /** \endcond           */

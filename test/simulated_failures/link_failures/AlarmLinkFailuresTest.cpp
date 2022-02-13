@@ -16,7 +16,7 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include <wms/WMSMessage.h>
+#include <wrench/execution_controller/ExecutionControllerMessage.h>
 
 WRENCH_LOG_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailuresTest");
 
@@ -26,16 +26,22 @@ class AlarmLinkFailuresTest : public ::testing::Test {
 public:
 
     void do_AlarmLinkFailure_Test();
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
+
+    ~AlarmLinkFailuresTest() {
+        workflow->clear();
+    }
+
     AlarmLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
@@ -53,7 +59,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
 
 };
 
@@ -61,12 +66,12 @@ protected:
 /**  LINK FAILURE  TEST                                              **/
 /**********************************************************************/
 
-class AlarmLinkFailuresTestWMS : public wrench::WMS {
+class AlarmLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -77,15 +82,15 @@ private:
     int main() {
 
         // Create an Alarm service that will go of in 10 seconds
-        std::string mailbox = this->getWorkflow()->getCallbackMailbox();
+        auto mailbox = this->mailbox;
         wrench::Alarm::createAndStartAlarm(this->simulation, 10,"Host2", mailbox,
-                                           new wrench::AlarmWMSTimerMessage("hello", 10000), "wms_timer");
+                                           new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
         // Start the link killer that will turn off link1 in 20 seconds
         auto switcher = std::shared_ptr<wrench::ResourceSwitcher>(
                 new wrench::ResourceSwitcher("Host1", 20, "link1",
                                              wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::LINK));
-        switcher->simulation = this->simulation;
+        switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
 
         // Wait for the message
@@ -109,7 +114,7 @@ TEST_F(AlarmLinkFailuresTest, SimpleRandomTest) {
 void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -120,17 +125,15 @@ void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new AlarmLinkFailuresTestWMS(
                     this, "Host1")));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

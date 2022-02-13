@@ -1,0 +1,63 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the WMS will run -->
+        <host id="WMSHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the BatchComputeService will run -->
+        <host id="BatchHeadNode" speed="1Gf" core="1">
+            <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/scratch/"/>
+            </disk>
+        </host>
+
+        <host id="BatchNode1" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+        <host id="BatchNode2" speed="50Gf" core="10">
+            <prop id="ram" value="64GB" />
+        </host>
+
+        <!-- A network link -->
+        <link id="network_link" bandwidth="50MBps" latency="20us"/>
+        <!-- WMSHost's local "loopback" link -->
+        <link id="loopback_WMSHost" bandwidth="1000EBps" latency="0us"/>
+        <!--BatchHeadNode's local "loopback" link -->
+        <link id="loopback_BatchHeadNode" bandwidth="1000EBps" latency="0us"/>
+        <!--BatchNode1's local "loopback" link -->
+        <link id="loopback_BatchNode1" bandwidth="1000EBps" latency="0us"/>
+        <!--BatchNode2's local "loopback" link -->
+        <link id="loopback_BatchNode2" bandwidth="1000EBps" latency="0us"/>
+
+        <!-- The network link connects the two hosts -->
+        <route src="WMSHost" dst="BatchHeadNode"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="BatchNode1"> <link_ctn id="network_link"/> </route>
+        <route src="WMSHost" dst="BatchNode2"> <link_ctn id="network_link"/> </route>
+        <route src="BatchHeadNode" dst="BatchNode1"> <link_ctn id="network_link"/> </route>
+        <route src="BatchHeadNode" dst="BatchNode2"> <link_ctn id="network_link"/> </route>
+        <route src="BatchNode1" dst="BatchNode2"> <link_ctn id="network_link"/> </route>
+
+        <!-- Each loopback link connects each host to itself -->
+        <route src="WMSHost" dst="WMSHost">
+            <link_ctn id="loopback_WMSHost"/>
+        </route>
+        <route src="BatchHeadNode" dst="BatchHeadNode">
+            <link_ctn id="loopback_BatchHeadNode"/>
+        </route>
+        <route src="BatchNode1" dst="BatchNode1">
+            <link_ctn id="loopback_BatchNode1"/>
+        </route>
+        <route src="BatchNode2" dst="BatchNode2">
+            <link_ctn id="loopback_BatchNode2"/>
+        </route>
+
+    </zone>
+</platform>

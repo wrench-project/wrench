@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,16 +7,16 @@
  * (at your option) any later version.
  */
 
-#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
+#include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/workflow/WorkflowTask.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/services/compute/cloud/CloudComputeService.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/simulation/SimulationTimestampTypes.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/workflow/WorkflowTask.h>
+#include <wrench/workflow/Workflow.h>
+#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
+#include <wrench/simulation/Simulation.h>
+#include <wrench/simulation/SimulationTimestampTypes.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_task, "Log category for WorkflowTask");
 
@@ -41,8 +41,8 @@ namespace wrench {
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
-            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
-            internal_state(WorkflowTask::InternalState::TASK_READY),
+//            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
+//            internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
@@ -54,7 +54,7 @@ namespace wrench {
      * @param file: the file
      * @throw std::invalid_argument
      */
-    void WorkflowTask::addInputFile(WorkflowFile *file) {
+    void WorkflowTask::addInputFile(std::shared_ptr<DataFile>file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
@@ -71,11 +71,11 @@ namespace wrench {
 
         // Add the file
         this->input_files[file->getID()] = file;
-        file->setInputOf(this);
+        this->workflow->task_input_files[file].insert(this->getSharedPtr());
 
         // Add control dependency
-        if (file->getOutputOf()) {
-            workflow->addControlDependency(file->getOutputOf(), this);
+        if (this->workflow->task_output_files.find(file) != this->workflow->task_output_files.end()) {
+            workflow->addControlDependency(this->workflow->task_output_files[file], this->getSharedPtr());
         }
     }
 
@@ -84,7 +84,7 @@ namespace wrench {
      *
      * @param file: the file
      */
-    void WorkflowTask::addOutputFile(WorkflowFile *file) {
+    void WorkflowTask::addOutputFile(std::shared_ptr<DataFile>file) {
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -94,18 +94,18 @@ namespace wrench {
         }
 
         // If the file is already output of another task, complain
-        if (file->getOutputOf() != nullptr) {
+        if (this->workflow->isFileOutputOfSomeTask(file)) {
             throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
                                         "' is already an output file of another task (task '" +
-                                        file->getOutputOf()->getID() + "')");
+                                                this->workflow->getTaskThatOutputs(file)->getID() + "')");
         }
 
         // Otherwise proceeed
         this->output_files[file->getID()] = file;
-        file->setOutputOf(this);
+        this->workflow->task_output_files[file] = this->getSharedPtr();
 
-        for (auto const &x : file->getInputOf()) {
-            workflow->addControlDependency(this, x.second);
+        for (auto const &x : this->workflow->getTasksThatInput(file)) {
+            workflow->addControlDependency(this->getSharedPtr(), x);
         }
     }
 
@@ -159,8 +159,8 @@ namespace wrench {
      *
      * @return a number of children
      */
-    unsigned long WorkflowTask::getNumberOfChildren() const {
-        return this->workflow->getTaskNumberOfChildren(this);
+    unsigned long WorkflowTask::getNumberOfChildren() {
+        return this->workflow->getTaskNumberOfChildren(this->getSharedPtr());
     }
 
     /**
@@ -168,8 +168,8 @@ namespace wrench {
      *
      * @return a list of workflow tasks
      */
-    std::vector<WorkflowTask *> WorkflowTask::getChildren() const {
-        return this->getWorkflow()->getTaskChildren(this);
+    std::vector<std::shared_ptr<WorkflowTask>> WorkflowTask::getChildren() {
+        return this->getWorkflow()->getTaskChildren(this->getSharedPtr());
     }
 
     /**
@@ -177,8 +177,8 @@ namespace wrench {
      *
      * @return a number of parents
      */
-    unsigned long WorkflowTask::getNumberOfParents() const {
-        return this->workflow->getTaskNumberOfParents(this);
+    unsigned long WorkflowTask::getNumberOfParents() {
+        return this->workflow->getTaskNumberOfParents(this->getSharedPtr());
     }
 
     /**
@@ -186,8 +186,8 @@ namespace wrench {
      *
      * @return a list of workflow tasks
      */
-    std::vector<WorkflowTask *> WorkflowTask::getParents() const {
-        return this->getWorkflow()->getTaskParents(this);
+    std::vector<std::shared_ptr<WorkflowTask>> WorkflowTask::getParents() {
+        return this->getWorkflow()->getTaskParents(this->getSharedPtr());
     }
 
     /**
@@ -200,13 +200,34 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the state of the task
+    * @brief Get the state of the task as a string
     *
-    * @return a task state
+    * @return a string
     */
-    WorkflowTask::State WorkflowTask::getUpcomingState() const {
-        return this->upcoming_visible_state;
+    std::string WorkflowTask::getStateAsString() const {
+        switch (this->visible_state) {
+            case WorkflowTask::State::NOT_READY:
+                return "NOT_READY";
+            case WorkflowTask::State::READY:
+                return "READY";
+            case WorkflowTask::State::PENDING:
+                return "PENDING";
+            case WorkflowTask::State::COMPLETED:
+                return "COMPLETED";
+            case WorkflowTask::State::UNKNOWN:
+            default:
+                return "UNKNOWN";
+        }
     }
+
+//    /**
+//    * @brief Get the state of the task
+//    *
+//    * @return a task state
+//    */
+//    WorkflowTask::State WorkflowTask::getUpcomingState() const {
+//        return this->upcoming_visible_state;
+//    }
 
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
@@ -267,7 +288,7 @@ namespace wrench {
      * @brief Get the workflow that contains the task
      * @return a workflow
      */
-    Workflow *WorkflowTask::getWorkflow() const {
+    std::shared_ptr<Workflow> WorkflowTask::getWorkflow() const {
         return this->workflow;
     }
 
@@ -287,65 +308,30 @@ namespace wrench {
      * @param state: the task state
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
-
-//      WRENCH_INFO("WorkflowTask::setState(): SETTING %s's VISIBLE STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
-
-        // Sanity check
-        bool sane = true;
-        switch (state) {
-            case NOT_READY:
-                if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-                    sane = false;
-                }
-                break;
-            case READY:
-                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
-                    sane = false;
-                }
-                break;
-            case PENDING:
-                if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
-                    (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
-                    sane = false;
-                }
-                break;
-            case COMPLETED:
-                if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
-                    sane = false;
-                }
-                break;
-            case UNKNOWN:
-                sane = false;
-                break;
-        }
-
-        if (not sane) {
-            throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-                                     this->getID() + "'s visible state to " +
-                                     stateToString(state) + " when its internal " +
-                                     "state is " + stateToString(this->internal_state));
+        if (this->visible_state == WorkflowTask::State::READY) {
+            this->workflow->ready_tasks.erase(this->getSharedPtr());
         }
         this->visible_state = state;
+        if (state == WorkflowTask::State::READY) {
+            this->workflow->ready_tasks.insert(this->getSharedPtr());
+        }
     }
 
-    /**
-     * @brief Set the upcoming visible state of the task
-     *
-     * @param state: the task state
-     */
-    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
-        this->upcoming_visible_state = state;
-    }
+//    /**
+//     * @brief Set the upcoming visible state of the task
+//     *
+//     * @param state: the task state
+//     */
+//    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
+//        this->upcoming_visible_state = state;
+//    }
 
     /**
      * @brief Set the task's containing job
      *
      * @param job: the job
      */
-    void WorkflowTask::setJob(WorkflowJob *job) {
+    void WorkflowTask::setJob(Job *job) {
         this->job = job;
     }
 
@@ -353,7 +339,7 @@ namespace wrench {
      * @brief Get the task's containing job
      * @return job: the job
      */
-    WorkflowJob *WorkflowTask::getJob() const {
+    Job *WorkflowTask::getJob() const {
         return this->job;
     }
 
@@ -439,12 +425,26 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task's start date.
+     * @brief Set the task's start date (which pushing a new execution history!)
      *
      * @param date: the start date
      */
     void WorkflowTask::setStartDate(double date) {
         this->execution_history.push(WorkflowTask::WorkflowTaskExecution(date));
+    }
+
+    /**
+     * @brief Update the task's start date.
+     *
+     * @param date: the start date
+     */
+    void WorkflowTask::updateStartDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_start = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::updateStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+        this->execution_history.top().task_start = date;
     }
 
     /**
@@ -605,11 +605,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of input WorkflowFile objects for the task
+     * @brief Get the list of input DataFile objects for the task
      * @return a list workflow files
      */
-    std::vector<WorkflowFile *> WorkflowTask::getInputFiles() const {
-        std::vector<WorkflowFile *> input;
+    std::vector<std::shared_ptr<DataFile>> WorkflowTask::getInputFiles() const {
+        std::vector<std::shared_ptr<DataFile>> input;
 
         for (auto f: this->input_files) {
             input.push_back(f.second);
@@ -618,11 +618,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the list of output WorkflowFile objects for the task
+     * @brief Get the list of output DataFile objects for the task
      * @return a list of workflow files
      */
-    std::vector<WorkflowFile *> WorkflowTask::getOutputFiles() const {
-        std::vector<WorkflowFile *> output;
+    std::vector<std::shared_ptr<DataFile>> WorkflowTask::getOutputFiles() const {
+        std::vector<std::shared_ptr<DataFile>> output;
 
         for (auto f: this->output_files) {
             output.push_back(f.second);
@@ -703,7 +703,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
+     * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the execution controller)
      * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
      */
     double WorkflowTask::getTerminationDate() const {
@@ -715,7 +715,7 @@ namespace wrench {
      * @return the task's updated top level
      */
     unsigned long WorkflowTask::updateTopLevel() {
-        std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
+        std::vector<std::shared_ptr<WorkflowTask>> parents = this->workflow->getTaskParents(this->getSharedPtr());
         if (parents.empty()) {
             this->toplevel = 0;
         } else {
@@ -725,7 +725,7 @@ namespace wrench {
             }
             this->toplevel = 1 + max_toplevel;
         }
-        std::vector<WorkflowTask *> children = this->workflow->getTaskChildren(this);
+        std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
         for (auto child : children) {
             child->updateTopLevel();
         }
@@ -833,6 +833,29 @@ namespace wrench {
      */
     std::shared_ptr<ParallelModel> WorkflowTask::getParallelModel() const {
         return this->parallel_model;
+    }
+
+    /**
+     * @brief Update task readiness
+     */
+    void WorkflowTask::updateReadiness() {
+        if (this->getState() == WorkflowTask::State::NOT_READY) {
+            for (auto const &parent : this->getParents()) {
+                if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                    return;
+                }
+            }
+            this->setState(WorkflowTask::State::READY);
+        } else if (this->getState() == WorkflowTask::State::READY) {
+            for (auto const &parent : this->getParents()) {
+                if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                    this->setState(WorkflowTask::State::NOT_READY);
+                    return;
+                }
+            }
+        } else {
+            // do nothing
+        }
     }
 
 };

@@ -17,9 +17,10 @@
 #include <climits>
 
 #include "wrench/services/Service.h"
-#include "wrench/workflow/job/WorkflowJob.h"
-#include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/Job.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/PilotJob.h"
+#include "wrench/job/CompoundJob.h"
 
 namespace wrench {
 
@@ -36,7 +37,6 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        friend class StandardJobExecutorTest;
         friend class Simulation;
 
         /***********************/
@@ -60,19 +60,45 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
+
+        /**
+         * @brief Job termination cause enum
+         */
+        enum TerminationCause {
+            TERMINATION_NONE,
+            TERMINATION_COMPUTE_SERVICE_TERMINATED,
+            TERMINATION_JOB_KILLED,
+            TERMINATION_JOB_TIMEOUT
+        };
+
+
         virtual ~ComputeService() {}
 
         void stop() override;
 
-//        void submitJob(WorkflowJob *job, const std::map<std::string, std::string>& = {});
+        virtual void stop(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        void terminateJob(std::shared_ptr<WorkflowJob> job);
+        void terminateJob(std::shared_ptr<CompoundJob> job);
 
-        bool supportsStandardJobs();
+        /**
+         * @brief Returns true if the service supports standard jobs
+         * @return true or false
+         */
+        virtual bool supportsStandardJobs() = 0;
 
-        bool supportsPilotJobs();
+        /**
+         * @brief Returns true if the service supports pilot jobs
+         * @return true or false
+         */
+        virtual bool supportsCompoundJobs() = 0;
 
-        bool hasScratch();
+        /**
+         * @brief Returns true if the service supports compound jobs
+         * @return true or false
+         */
+        virtual bool supportsPilotJobs() = 0;
+
+        virtual bool hasScratch() const;
 
         unsigned long getNumHosts();
 
@@ -109,60 +135,50 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
+
         /**
-         * @brief Method to submit a standard job to the service
+         * @brief Method to submit a compound job to the service
          *
          * @param job: The job being submitted
          * @param service_specific_arguments: the set of service-specific arguments
          */
         virtual void
-        submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+        submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
+
 
         /**
-         * @brief Method to submit a pilot job to the service
-         *
-         * @param job: The job being submitted
-         * @param service_specific_arguments: the set of service-specific arguments
-         */
-        virtual void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_arguments) = 0;
-
-        /**
-         * @brief Method to terminate a running standard job
+         * @brief Method to terminate a compound job
          * @param job: the standard job
          */
-        virtual void terminateStandardJob(std::shared_ptr<StandardJob> job) = 0;
+        virtual void terminateCompoundJob(std::shared_ptr<CompoundJob> job) = 0;
 
-        /**
-         * @brief Method to terminate a running pilot job
-         * @param job: the pilot job
-         */
-        virtual void terminatePilotJob(std::shared_ptr<PilotJob> job) = 0;
-
-        /**
-         * @brief Method that returns the computer service's scratch space's storage service
-         * @return the scratch space, or nullptr if none
-         */
         std::shared_ptr<StorageService> getScratch();
+
 
 
         ComputeService(const std::string &hostname,
                        std::string service_name,
-                       std::string mailbox_name_prefix,
                        std::string scratch_space_mount_point);
 
     protected:
 
+
         friend class JobManager;
 
-        void submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string>& = {});
+        void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string>& = {});
+
+        virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+                                                      std::map<std::string, std::string> &service_specific_args) ;
+
+        virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);
 
         ComputeService(const std::string &hostname,
                        std::string service_name,
-                       std::string mailbox_name_prefix,
                        std::shared_ptr<StorageService> scratch_space);
 
         /** @brief A scratch storage service associated to the compute service */
         std::shared_ptr<StorageService> scratch_space_storage_service;
+
 
         /***********************/
         /** \endcond          **/
@@ -180,10 +196,9 @@ namespace wrench {
 
     private:
 
-
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
-        std::map<std::string, std::map<std::string, double>> getServiceResourceInformation();
+        std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries);
 
     };
 

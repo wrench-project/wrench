@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/file_registry/FileRegistryServiceMessagePayload.h"
+#include <wrench/services/file_registry/FileRegistryServiceMessagePayload.h>
 
 namespace wrench {
 

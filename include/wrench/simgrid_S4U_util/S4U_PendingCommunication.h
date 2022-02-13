@@ -14,7 +14,7 @@
 
 #include <vector>
 #include <simgrid/s4u/Comm.hpp>
-#include <wrench/util/MessageManager.h>
+#include "wrench/util/MessageManager.h"
 
 //#include "S4U_PendingCommunication.h"
 
@@ -41,12 +41,13 @@ namespace wrench {
         /**
          * @brief Constructor
          *
-         * @param mailbox_name: the mailbox name
+         * @param mailbox: the mailbox
          * @param operation_type: the operation type
          */
-        S4U_PendingCommunication(std::string mailbox_name, OperationType operation_type) : mailbox_name(mailbox_name), operation_type(operation_type) {}
+        S4U_PendingCommunication(simgrid::s4u::Mailbox *mailbox, OperationType operation_type) : mailbox(mailbox), operation_type(operation_type) {}
 
         std::unique_ptr<SimulationMessage> wait();
+        std::unique_ptr<SimulationMessage> wait(double timeout);
 
         static unsigned long waitForSomethingToHappen(
                 std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms,
@@ -62,8 +63,8 @@ namespace wrench {
         simgrid::s4u::CommPtr comm_ptr;
         /** @brief The message */
         std::unique_ptr<SimulationMessage> simulation_message;
-        /** @brief The mailbox name */
-        std::string mailbox_name;
+        /** @brief The mailbox */
+        simgrid::s4u::Mailbox *mailbox;
         /** @brief The operation type */
         OperationType operation_type;
     };

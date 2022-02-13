@@ -8,10 +8,10 @@
  */
 
 #include <fstream>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 #include <wrench-dev.h>
 #include <nlohmann/json.hpp>
-#include "wrench/util/TraceFileLoader.h"
+#include <wrench/util/TraceFileLoader.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_trace_file_loader, "Log category for Trace File Loader");
 
@@ -73,7 +73,7 @@ namespace wrench {
 
         if (tokens.size() < 2) {
             throw std::invalid_argument(
-                    "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or '.json'");
+                    "TraceFileLoader::loadFromTraceFile(): BatchComputeService workload trace file name must end with '.swf' or '.json'");
         }
         std::string extension = tokens[tokens.size() - 1];
         if (extension == "swf") {
@@ -82,7 +82,7 @@ namespace wrench {
             return loadFromTraceFileJSON(filename, ignore_invalid_jobs, desired_submit_time_of_first_job);
         } else {
             throw std::invalid_argument(
-                    "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or '.json'");
+                    "TraceFileLoader::loadFromTraceFile(): BatchComputeService workload trace file name must end with '.swf' or '.json'");
         }
     }
 
@@ -112,7 +112,7 @@ namespace wrench {
         std::ifstream infile(filename);
         if (not infile.is_open()) {
             throw std::invalid_argument(
-                    "TraceFileLoader::loadFromTraceFileSWF(): Cannot open batch workload trace file " + filename);
+                    "TraceFileLoader::loadFromTraceFileSWF(): Cannot open BatchComputeService workload trace file " + filename);
         }
 
 
@@ -137,7 +137,7 @@ namespace wrench {
                 try {
                     if (tokens.size() < 10) {
                         throw std::invalid_argument(
-                                "TraceFileLoader::loadFromTraceFileSWF(): Seeing less than 10 fields per line in batch workload trace file '" +
+                                "TraceFileLoader::loadFromTraceFileSWF(): Seeing less than 10 fields per line in BatchComputeService workload trace file '" +
                                 filename +
                                 "'");
                     }
@@ -152,7 +152,7 @@ namespace wrench {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid submission time '" +
                                             item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 if (original_submit_time_of_first_job < 0) {
                                     original_submit_time_of_first_job = sub_time;
@@ -168,7 +168,7 @@ namespace wrench {
                                 if (sscanf(item.c_str(), "%lf", &time) != 1) {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid run time '" + item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 break;
                             case 4: // Number of Allocated Processors
@@ -176,7 +176,7 @@ namespace wrench {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid number of processors '" +
                                             item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 break;
                             case 5:// Average CPU time Used
@@ -188,7 +188,7 @@ namespace wrench {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested number of processors '" +
                                             item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 break;
                             case 8: // Requested time
@@ -197,7 +197,7 @@ namespace wrench {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested time '" +
                                             item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 break;
                             case 9: // Requested memory_manager_service
@@ -206,7 +206,7 @@ namespace wrench {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested memory_manager_service '" +
                                             item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 requested_ram *= 1024.0;
                                 break;
@@ -217,7 +217,7 @@ namespace wrench {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid userid '" +
                                             item +
-                                            "' in batch workload trace file");
+                                            "' in BatchComputeService workload trace file");
                                 }
                                 break;
                             case 12: // Group ID
@@ -234,7 +234,7 @@ namespace wrench {
                                 break;
                             default:
                                 throw std::invalid_argument(
-                                        "TraceFileLoader::loadFromTraceFileSWF(): Unknown batch workload trace file column, maybe there are more than 18 columns?"
+                                        "TraceFileLoader::loadFromTraceFileSWF(): Unknown BatchComputeService workload trace file column, maybe there are more than 18 columns?"
                                 );
                         }
                         itemnum++;
@@ -249,11 +249,11 @@ namespace wrench {
                     if ((requested_time < 0) or (time < 0)) {
                         throw std::invalid_argument(
                                 "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative flops (" +
-                                std::to_string(time) + ") and negative requested flops ("+ std::to_string(requested_time) + ") in batch workload trace file");
+                                std::to_string(time) + ") and negative requested flops ("+ std::to_string(requested_time) + ") in BatchComputeService workload trace file");
                     }
                     if (requested_time < time) {
                         WRENCH_WARN(
-                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time (%lf) smaller than actual time (%lf) in batch workload trace file [fixing it]", requested_time, time);
+                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with requested time (%lf) smaller than actual time (%lf) in BatchComputeService workload trace file [fixing it]", requested_time, time);
                         requested_time = time;
                     }
 
@@ -263,14 +263,14 @@ namespace wrench {
 
                     if (sub_time < 0) {
                         throw std::invalid_argument(
-                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative submission time in batch workload trace file");
+                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative submission time in BatchComputeService workload trace file");
                     }
                     if (requested_num_nodes <= 0) {
                         requested_num_nodes = num_nodes;
                     }
                     if (requested_num_nodes <= 0) {
                         throw std::invalid_argument(
-                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative (requested) number of node in batch workload trace file");
+                                "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative (requested) number of node in BatchComputeService workload trace file");
                     }
                     if (userid == 0) {
                         username = "user";
@@ -279,10 +279,10 @@ namespace wrench {
                     }
                 } catch (std::invalid_argument &e) {
                     if (ignore_invalid_jobs) {
-                        WRENCH_WARN("%s (in batch workload file %s) IGNORING", e.what(), filename.c_str());
+                        WRENCH_WARN("%s (in BatchComputeService workload file %s) IGNORING", e.what(), filename.c_str());
                         continue;
                     } else {
-                        throw std::invalid_argument("Error while reading batch workload trace file " + filename + ": " +  e.what());
+                        throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " +  e.what());
                     }
                 }
 
@@ -330,7 +330,7 @@ namespace wrench {
             file.open(filename);
         } catch (const std::ifstream::failure &e) {
             throw std::invalid_argument(
-                    "TraceFileLoader::loadFromTraceFileJSON(): Cannot open JSON batch workload trace file " + filename);
+                    "TraceFileLoader::loadFromTraceFileJSON(): Cannot open JSON BatchComputeService workload trace file " + filename);
         }
 
         try {
@@ -346,7 +346,7 @@ namespace wrench {
             jobs = j.at("jobs");
         } catch (std::exception &e) {
             throw std::invalid_argument(
-                    "TraceFileLoader::loadFromTraceFileJSON(): Could not find 'jobs' in JSON batch workload trace file");
+                    "TraceFileLoader::loadFromTraceFileJSON(): Could not find 'jobs' in JSON BatchComputeService workload trace file");
         }
 
                 double original_submit_time_of_first_job = -1;
@@ -363,7 +363,7 @@ namespace wrench {
                 if (not json_job.is_object()) {
                     // Broken JSON
                     throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFileJSON(): broken job specification in JSON batch workload trace file");
+                            "TraceFileLoader::loadFromTraceFileJSON(): broken job specification in JSON BatchComputeService workload trace file");
                 }
 
 
@@ -377,13 +377,13 @@ namespace wrench {
                     walltime = json_job.at("walltime");
                 } catch (std::exception &e) {
                     throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
+                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON BatchComputeService workload trace file");
                 }
 
                 // Fix/check values
                 if ((res <= 0) or (subtime < 0) or (walltime < 0)) {
                     throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON batch workload trace file");
+                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON BatchComputeService workload trace file");
                 }
                 if (desired_submit_time_of_first_job >= 0) {
                     subtime += (desired_submit_time_of_first_job - original_submit_time_of_first_job);
@@ -395,10 +395,10 @@ namespace wrench {
                 requested_time = walltime;
             } catch (std::invalid_argument &e) {
                 if (ignore_invalid_jobs) {
-                    WRENCH_WARN("%s (in batch workload file %s)", e.what(), filename.c_str());
+                    WRENCH_WARN("%s (in BatchComputeService workload file %s)", e.what(), filename.c_str());
                     continue;
                 } else {
-                    throw std::invalid_argument("Error while reading batch workload trace file " + filename + ": " +  e.what());
+                    throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " +  e.what());
                 }
             }
 

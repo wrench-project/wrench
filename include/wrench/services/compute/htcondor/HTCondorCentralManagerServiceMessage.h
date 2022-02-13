@@ -11,8 +11,8 @@
 #define WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H
 
 #include "wrench/services/ServiceMessage.h"
-#include "wrench/workflow/job/StandardJob.h"
-#include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/job/StandardJob.h"
+#include "wrench/job/Job.h"
 
 #include <vector>
 
@@ -36,10 +36,10 @@ namespace wrench {
      */
     class NegotiatorCompletionMessage : public HTCondorCentralManagerServiceMessage {
     public:
-        NegotiatorCompletionMessage(std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs, double payload);
+        NegotiatorCompletionMessage(std::vector<std::shared_ptr<Job>> scheduled_jobs, double payload);
 
         /** @brief List of scheduled jobs */
-        std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
+        std::vector<std::shared_ptr<Job>> scheduled_jobs;
     };
 
     /**

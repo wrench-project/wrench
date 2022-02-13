@@ -8,16 +8,16 @@
  */
 
 
-#include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <wrench-dev.h>
-#include "WorkloadTraceFileReplayerEventReceiver.h"
+#include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.h"
 
-WRENCH_LOG_CATEGORY(wrench_core_one_job_wms, "Log category for One Job WMS");
+WRENCH_LOG_CATEGORY(wrench_core_one_job_wms, "Log category for WorkloadTraceFileReplayerEventReceiver");
 
 namespace wrench {
 
     /**
-     * @brief main method of the OneJobWMS daemon
+     * @brief main method of the WorkloadTraceFileReplayerEventReceiver daemon
      * @return 0 on success
      */
     int WorkloadTraceFileReplayerEventReceiver::main() {
@@ -31,9 +31,9 @@ namespace wrench {
 
             // Wait for the workflow execution event
             WRENCH_INFO("Waiting for job completion...");
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
+                event = this->waitForNextEvent();
 
                 if (auto real_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                     job = real_event->standard_job;
@@ -47,7 +47,7 @@ namespace wrench {
                     throw std::runtime_error(
                             "WorkloadTraceFileReplayerEventReceiver::main(): Unexpected workflow execution event");
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
                 continue;
 

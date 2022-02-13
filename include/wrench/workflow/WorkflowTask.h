@@ -13,9 +13,11 @@
 #include <map>
 #include <stack>
 #include <set>
+#include <memory>
 
-#include "wrench/workflow/job/WorkflowJob.h"
-#include "wrench/workflow/WorkflowFile.h"
+
+#include "wrench/job/Job.h"
+#include "wrench/data_file/DataFile.h"
 #include "wrench/workflow/parallel_model/ParallelModel.h"
 #include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
 #include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
@@ -28,7 +30,7 @@ namespace wrench {
     /**
      * @brief A computational task in a Workflow
      */
-    class WorkflowTask {
+    class WorkflowTask : public std::enable_shared_from_this<WorkflowTask> {
 
     public:
         const std::string& getID() const;
@@ -45,19 +47,21 @@ namespace wrench {
 
         double getMemoryRequirement() const;
 
-        unsigned long getNumberOfChildren() const;
+        unsigned long getNumberOfChildren();
 
-        std::vector<WorkflowTask *> getChildren() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getChildren();
 
-        unsigned long getNumberOfParents() const;
+        unsigned long getNumberOfParents();
 
-        std::vector<WorkflowTask *> getParents() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getParents();
 
-        void addInputFile(WorkflowFile *file);
+        void addInputFile(std::shared_ptr<DataFile>file);
 
-        void addOutputFile(WorkflowFile *file);
+        void addOutputFile(std::shared_ptr<DataFile>file);
 
         unsigned int getFailureCount();
+
+        std::shared_ptr<WorkflowTask> getSharedPtr() { return this->shared_from_this(); }
 
 
         /***********************/
@@ -80,9 +84,9 @@ namespace wrench {
 
         static std::string stateToString(WorkflowTask::State state);
 
-        WorkflowJob *getJob() const;
+        Job *getJob() const;
 
-        Workflow *getWorkflow() const;
+        std::shared_ptr<Workflow> getWorkflow() const;
 
         std::string getClusterID() const;
 
@@ -104,9 +108,9 @@ namespace wrench {
 
         unsigned long getBytesWritten() const;
 
-        std::vector<WorkflowFile *> getInputFiles() const;
+        std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
 
-        std::vector<WorkflowFile *> getOutputFiles() const;
+        std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
 
         unsigned long getTopLevel() const;
 
@@ -142,6 +146,8 @@ namespace wrench {
 
         WorkflowTask::State getState() const;
 
+        std::string getStateAsString() const;
+
         std::string getColor() const;
 
         void setColor(std::string);
@@ -164,6 +170,8 @@ namespace wrench {
             TASK_FAILED
         };
 
+        void updateReadiness();
+
         static std::string stateToString(WorkflowTask::InternalState state);
 
         unsigned long updateTopLevel();
@@ -172,15 +180,17 @@ namespace wrench {
 
         void setState(WorkflowTask::State);
 
-        void setUpcomingState(WorkflowTask::State);
-
-        WorkflowTask::State getUpcomingState() const;
+//        void setUpcomingState(WorkflowTask::State);
+//
+//        WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
 
-        void setJob(WorkflowJob *job);
+        void setJob(Job *job);
 
         void setStartDate(double date);
+
+        void updateStartDate(double date);
 
         void setEndDate(double date);
 
@@ -275,10 +285,10 @@ namespace wrench {
         State upcoming_visible_state;      // A visible state that will become active once a WMS has process a previously sent workflow execution event
         InternalState internal_state;      // Not to be exposed to developer level
 
-        Workflow *workflow;                // Containing workflow
+        std::shared_ptr<Workflow> workflow;                // Containing workflow
 
-        std::map<std::string, WorkflowFile *> output_files;   // List of output files
-        std::map<std::string, WorkflowFile *> input_files;    // List of input files
+        std::map<std::string, std::shared_ptr<DataFile>> output_files;   // List of output files
+        std::map<std::string, std::shared_ptr<DataFile>> input_files;    // List of input files
 
         // Private constructor (called by Workflow)
         WorkflowTask(std::string id,
@@ -288,7 +298,7 @@ namespace wrench {
                      double memory_requirement);
 
         // Containing job
-        WorkflowJob *job;
+        Job *job;
 
         std::stack<WorkflowTaskExecution> execution_history;
 

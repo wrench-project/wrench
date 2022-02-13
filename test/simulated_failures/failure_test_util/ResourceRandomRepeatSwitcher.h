@@ -10,7 +10,7 @@
 #ifndef WRENCH_RESOURCERANDOMREPEATSWITCHER_H
 #define WRENCH_RESOURCERANDOMREPEATSWITCHER_H
 
-#include <wrench/services/Service.h>
+#include "wrench/services/Service.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
