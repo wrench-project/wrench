@@ -23,23 +23,32 @@ WRENCH_LOG_CATEGORY(network_proximity_link_failures, "Log category for NetworkPr
 class NetworkProximityLinkFailuresTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file;
-    wrench::WorkflowTask *task;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file;
+    std::shared_ptr<wrench::WorkflowTask> task;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+
+    std::shared_ptr<wrench::Workflow> workflow;
+
+
+    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
 
     void do_NetworkProximityLinkFailures_Test();
 
 protected:
+    ~NetworkProximityLinkFailuresTest() {
+        workflow->clear();
+    }
+
     NetworkProximityLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"StableHost\" speed=\"1f\" core=\"10\"/> "
@@ -74,7 +83,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -83,14 +91,12 @@ protected:
 /**  FAILURE TEST                                                    **/
 /**********************************************************************/
 
-class NetworkProxLinkFailuresTestWMS : public wrench::WMS {
+class NetworkProxLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     NetworkProxLinkFailuresTestWMS(NetworkProximityLinkFailuresTest *test,
-                                   std::set<std::shared_ptr<wrench::NetworkProximityService>> network_proximity_services,
                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {},
-                        network_proximity_services, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -110,7 +116,7 @@ private:
                                                              wrench::ResourceRandomRepeatSwitcher::LINK));
 
 
-            switcher->simulation = this->simulation;
+            switcher->setSimulation(this->simulation);
             switcher->start(switcher, true, false); // Daemonized, no auto-restart
 
         }
@@ -125,8 +131,8 @@ private:
             auto first_pair_to_compute_proximity = std::make_pair(host1, host2);
 
             wrench::Simulation::sleep(100);
-            auto result = (*(this->getAvailableNetworkProximityServices().begin()))->getHostPairDistance(
-                           first_pair_to_compute_proximity);
+            auto result = this->test->network_proximity_service->getHostPairDistance(
+                    first_pair_to_compute_proximity);
             WRENCH_INFO("%s-%s: %.3lf %.3lf", host1.c_str(), host2.c_str(), result.first, result.second);
         }
 
@@ -135,13 +141,13 @@ private:
 };
 
 TEST_F(NetworkProximityLinkFailuresTest, RandomLinkFailuress) {
-    DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
+DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
 }
 
 void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -156,33 +162,24 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
     std::vector<std::string> hosts_in_network = {"Host1", "Host2", "Host3"};
 
-    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service;
-
 
     ASSERT_NO_THROW(network_proximity_service = simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network,
-                   {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"100"},
-                    {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1"},
-                    {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"10"}},
-                    {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, 0}})));
+                                                                                                    {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"100"},
+                                                                                                     {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1"},
+                                                                                                     {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"10"}},
+                                                                                                    {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, 0}})));
 
-                // Create a WMS
-                std::shared_ptr<wrench::WMS> wms = nullptr;;
-                ASSERT_NO_THROW(wms = simulation->add(
-                        new NetworkProxLinkFailuresTestWMS(this,
-                                                           (std::set<std::shared_ptr<wrench::NetworkProximityService>>){network_proximity_service},
-                                                           stable_hostname)));
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new NetworkProxLinkFailuresTestWMS(this,
+                                               stable_hostname)));
 
-                wms->addWorkflow(this->workflow.get(), 0.0);
+    // Running a "run a single task1" simulation
+    ASSERT_NO_THROW(simulation->launch());
 
-
-
-                // Running a "run a single task" simulation
-                ASSERT_NO_THROW(simulation->launch());
-
-                delete simulation;
-
-                for (int i=0; i < argc; i++)
-     free(argv[i]);
-                free(argv);
-            }
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
 

@@ -29,7 +29,9 @@ WRENCH_LOG_CATEGORY(storage_service_link_failures_test, "Log category for Storag
 class StorageServiceLinkFailuresTest : public ::testing::Test {
 
 public:
-    std::vector<wrench::WorkflowFile *> files;
+    std::shared_ptr<wrench::Workflow> workflow;
+
+    std::vector<std::shared_ptr<wrench::DataFile> > files;
     std::vector<std::shared_ptr<wrench::StorageService>> storage_services;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
@@ -39,11 +41,11 @@ protected:
     StorageServiceLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> ";
 
@@ -86,7 +88,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
 
 };
 
@@ -94,12 +95,12 @@ protected:
 /**  LINK FAILURE TEST                                               **/
 /**********************************************************************/
 
-class StorageServiceLinkFailuresTestWMS : public wrench::WMS {
+class StorageServiceLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceLinkFailuresTestWMS(StorageServiceLinkFailuresTest *test,
                                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->rng.seed(666);
     }
@@ -112,7 +113,7 @@ private:
 
     std::shared_ptr<wrench::DataMovementManager> data_movement_manager;
 
-    wrench::WorkflowFile *findRandomFileOnStorageService(std::shared_ptr<wrench::StorageService> ss) {
+    std::shared_ptr<wrench::DataFile> findRandomFileOnStorageService(std::shared_ptr<wrench::StorageService> ss) {
         std::uniform_int_distribution<unsigned long> dist_files(0, this->test->files.size()-1);
 
         for (int trial = 0; trial < NUM_FILES; trial++) {
@@ -161,11 +162,11 @@ private:
         this->data_movement_manager->initiateAsynchronousFileCopy(
                 file, source, destination, this->test->file_registry_service);
 
-        // Wait for the eventm (with a timeout)
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        // Wait for the event (with a timeout)
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
-            event = this->getWorkflow()->waitForNextExecutionEvent(100);
-        } catch (wrench::WorkflowExecutionException &e) {
+            event = this->waitForNextEvent(100);
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
         if (event == nullptr) {
@@ -175,7 +176,7 @@ private:
             return;
         }
         if (auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event)) {
-            throw wrench::WorkflowExecutionException(real_event->failure_cause);
+            throw wrench::ExecutionException(real_event->failure_cause);
         }
 
     }
@@ -220,7 +221,7 @@ private:
                 0, this->test->storage_services.size()-1);
 
         auto dest = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
-        auto file = this->getWorkflow()->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
+        auto file = this->test->workflow->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
         wrench::StorageService::writeFile(file, dest);
         wrench::StorageService::deleteFile(file, dest);
     }
@@ -233,14 +234,14 @@ private:
         auto switcher1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 1045, 1, 5,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher1->simulation = this->simulation;
+        switcher1->setSimulation(this->simulation);
         switcher1->start(switcher1, true, false); // Daemonized, no auto-restart
 
         // Create a link switcher on/off er for link2
         auto switcher2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 234, 1, 15, 1, 5,
                                                          "link2", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher2->simulation = this->simulation;
+        switcher2->setSimulation(this->simulation);
         switcher2->start(switcher2, true, false); // Daemonized, no auto-restart
 
 
@@ -258,7 +259,7 @@ private:
             // Do a random synchronous file copy
             try {
                 this->doRandomSynchronousFileCopy();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_1++;
                 }
@@ -269,7 +270,7 @@ private:
             // Do a random asynchronous copy
             try {
                 this->doRandomAsynchronousFileCopy();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     e.getCause()->toString();
                 }
@@ -280,7 +281,7 @@ private:
             // Do a random delete
             try {
                 this->doRandomFileDelete();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_3++;
                 }
@@ -291,7 +292,7 @@ private:
             // Do a random file read
             try {
                 this->doRandomFileRead();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_4++;
                 }
@@ -302,7 +303,7 @@ private:
             // Do a random file write
             try {
                 this->doRandomFileWrite();
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 if (std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     network_failure_5++;
                 }
@@ -328,10 +329,11 @@ TEST_F(StorageServiceLinkFailuresTest, SimpleRandomTest) {
 void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
-    int argc = 1;
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc =1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -340,7 +342,7 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create a storage services
     double message_payload = 1;
-    std::map<std::string, double> payloads =
+    wrench::WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE payloads =
             {
                     {wrench::StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::StorageServiceMessagePayload::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD, message_payload},
@@ -404,16 +406,12 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
         }
     }
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(
             new StorageServiceLinkFailuresTestWMS(
                     this, "Host1"));
 
-    wms->addWorkflow(workflow);
-
     simulation->launch();
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

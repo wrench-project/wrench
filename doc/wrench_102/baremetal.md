@@ -5,21 +5,20 @@ A `wrench::StandardJob` can be submitted to a bare-metal compute service
 via a job manager. For instance:
 
 ~~~~~~~~~~~~~{.cpp}
-// Get the first bare-metal compute service (assuming there's at least one)
-auto bare_metal_service = *(this->getAvailableComputeServices<wrench::BareMetalComputeService>().begin());
+std::shared_ptr<wrench::BareMetalComputeService> some_bare_metal_service;
 
 // Create a job manager
 auto job_manager = this->createJobManager();
 
-// Create a simple standard job with 4 workflow tasks
+// Create a standard job with 4 workflow tasks 
 auto job = job_manager->createStandardJob(
-                 {this->getWorklow()->getTaskByID("task1"),
+                 {this->getWorklow()->getTaskByID("task"),
                   this->getWorklow()->getTaskByID("task2"),
                   this->getWorklow()->getTaskByID("task3"),
                   this->getWorklow()->getTaskByID("task4")});
 
 // Submit the job to the bare-metal service
-job_manager->submitJob(job, baremetal_cs);
+job_manager->submitJob(job, some_bare_metal_service);
 
 //  Wait for and process the next event (should be a standard job completion or failure)
 this->waitForAndProcessNextEvent();
@@ -31,7 +30,7 @@ properties (see class `wrench::BareMetalComputeServiceProperty`) can be set
 to change the algorithms used by the service to determine resource
 allocations.
 
-In some cases, the WMS may want to influence or enforce resource
+In some cases, the execution controller may want to influence or enforce resource
 allocations for the tasks in the jobs. For this purpose,  the
 `wrench::JobManager::submitJob()` method takes an optional
 **service-specific argument**. This  argument is a `std::map<std::string,
@@ -65,8 +64,8 @@ In the above  example, for instance, the job  submission could be done  as:
 // Create a service-specific argument
 std::map<std::string, std::string> service_specific_args;
 
-// task1 will run on host Node1 with as many cores as possible
-service_specific_args["task1"] = "Node1";
+// task will run on host Node1 with as many cores as possible
+service_specific_args["task"] = "Node1";
 
 // task2 will run on host Node2 with 16 cores
 service_specific_args["task2"] = "Node2:16";
@@ -78,16 +77,16 @@ service_specific_args["task3"] = "";  // could be omitted altogether
 service_specific_args["task4"] = "4";
 
 // Submit the job
-job_manager->submitJob(job, baremetal_cs, service_specific_args);
+job_manager->submitJob(job, some_bare_metal_service, service_specific_args);
 
 [...]
 ~~~~~~~~~~~~~
 
 If the service-specific arguments are invalid (e.g., invalid hostname, unknown task, 
 number of cores too large), the `wrench::JobManager::submitJob()` method 
-throws a `wrench::WorkflowExecutionException`.
+throws a `wrench::ExecutionException`.
 
-See the WMS implementation in `examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp` for a more complete example.
+See the execution controller implementation in `examples/basic-examples/bare-metal-bag-of-tasks/TwoTasksAtATimeWMS.cpp` for a more complete example.
 
 
 ---

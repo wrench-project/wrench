@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,14 @@
 
 #endif
 
-#include "wrench/logging/TerminalOutput.h"
-#include "BatschedBatchScheduler.h"
-#include "wrench/services/compute/batch/BatchComputeService.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
+#include <wrench/logging/TerminalOutput.h>
+#include "wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h"
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_batsched_batch_scheduler, "Log category for BatschedBatchScheduler");
 
@@ -144,12 +144,12 @@ namespace wrench {
                     throw std::invalid_argument(
                             "startBatsched(): Scheduling algorithm " +
                             this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
-                            " not supported by the batch service");
+                            " not supported by the BatchComputeService service");
                 case 2:
                     throw std::invalid_argument(
                             "startBatsched(): Queuing option " +
                             this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM) +
-                            "not supported by the batch service");
+                            "not supported by the BatchComputeService service");
                 case 3:
                     throw std::runtime_error(
                             "startBatsched(): Cannot start the batsched process");
@@ -246,7 +246,7 @@ namespace wrench {
             try {
                 message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
             } catch (std::shared_ptr<NetworkError> &cause) {
-                throw WorkflowExecutionException(cause);
+                throw ExecutionException(cause);
             }
 
             if (auto msg = dynamic_cast<BatchQueryAnswerMessage*>(message.get())) {
@@ -373,9 +373,7 @@ namespace wrench {
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
-        WRENCH_INFO("CALLING NOTIFYJOBEVENTSTOBATSCHED");
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
-        WRENCH_INFO("CALLED NOTIFYJOBEVENTSTOBATSCHED");
 
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "FAILED");
 #else
@@ -466,7 +464,7 @@ namespace wrench {
     /**
      * @brief Appends a job to the CSV Output file
      *
-     * @param batch_job: the batch job
+     * @param batch_job: the BatchComputeService job
      * @param status: "COMPLETED", "TERMINATED" (by user), "FAILED" (timeout)
      */
     void BatschedBatchScheduler::appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status) {

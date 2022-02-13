@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/ServiceMessage.h>
 
-#include "wrench/services/file_registry/FileRegistryService.h"
-#include "FileRegistryMessage.h"
+#include <wrench/services/file_registry/FileRegistryService.h>
+#include "wrench/services/file_registry/FileRegistryMessage.h"
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/workflow/WorkflowFile.h>
-#include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/data_file/DataFile.h>
+#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_registry_service,
                     "Log category for File Registry Service");
@@ -37,9 +37,9 @@ namespace wrench {
      */
     FileRegistryService::FileRegistryService(
             std::string hostname,
-            std::map<std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list) :
-            Service(hostname, "file_registry", "file_registry") {
+            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
+            Service(hostname, "file_registry") {
 
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -54,26 +54,26 @@ namespace wrench {
      * @param file: the file to lookup
      * @return The list locations for the file
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(WorkflowFile *file) {
+    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(std::shared_ptr<DataFile>file) {
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
         }
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
                     answer_mailbox, file,
                     this->getMessagePayloadValue(
                             FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -82,7 +82,7 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
 
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage*>(message.get())) {
@@ -105,7 +105,7 @@ namespace wrench {
      * @return a map of <distance , file location> pairs
      */
     std::map<double, std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(
-            WorkflowFile *file,
+            std::shared_ptr<DataFile>file,
             std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service) {
 
@@ -123,11 +123,11 @@ namespace wrench {
                     " does not exist");
         }
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new FileRegistryFileLookupByProximityRequestMessage(
                             answer_mailbox, file,
                             reference_host,
@@ -135,7 +135,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -143,7 +143,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage*>(message.get())) {
@@ -159,28 +159,28 @@ namespace wrench {
      * @param file: a file
      * @param location: a file location
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntry(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
         }
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new FileRegistryAddEntryRequestMessage(
                             answer_mailbox, file, location,
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -188,7 +188,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage*>(message.get())) {
@@ -203,28 +203,28 @@ namespace wrench {
      * @param file: a file
      * @param location: a file location
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::removeEntry(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
         }
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new FileRegistryRemoveEntryRequestMessage(
                             answer_mailbox, file, location,
                             this->getMessagePayloadValue(
                                     FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -232,7 +232,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage*>(message.get())) {
@@ -275,7 +275,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -374,7 +374,7 @@ namespace wrench {
      * @param file: a file
      * @param storage_service: a storage_service
      */
-    void FileRegistryService::addEntryToDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntryToDatabase(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
                     location->getStorageService()->getHostname().c_str());
         if (this->entries.find(file) == this->entries.end()) {
@@ -395,7 +395,7 @@ namespace wrench {
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr<FileLocation> location) {
+    bool FileRegistryService::removeEntryFromDatabase(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
         WRENCH_INFO("Removing file (%s) from the file registry", file->getID().c_str());
         if (this->entries.find(file) != this->entries.end()) {
             for (auto const &l : this->entries[file]) {

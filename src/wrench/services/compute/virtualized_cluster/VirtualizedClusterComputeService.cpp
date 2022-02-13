@@ -11,13 +11,13 @@
 #include <cfloat>
 #include <numeric>
 
-#include "VirtualizedClusterComputeServiceMessage.h"
-#include "../cloud/CloudComputeServiceMessage.h"
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/helpers/ServiceTerminationDetectorMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
+#include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
+#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 
 
 WRENCH_LOG_CATEGORY(wrench_core_virtualized_cluster_service, "Log category for Virtualized Cluster Service");
@@ -38,8 +38,8 @@ namespace wrench {
     VirtualizedClusterComputeService::VirtualizedClusterComputeService(const std::string &hostname,
                                                                        std::vector<std::string> &execution_hosts,
                                                                        std::string scratch_space_mount_point,
-                                                                       std::map<std::string, std::string> property_list,
-                                                                       std::map<std::string, double> messagepayload_list)
+                                                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
             :
             CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
 
@@ -58,7 +58,7 @@ namespace wrench {
      * @param pm_name: the physical host on which to start the VM
      *
      * @return The compute service running on the VM
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      */
     std::shared_ptr<BareMetalComputeService>
@@ -75,7 +75,7 @@ namespace wrench {
 
         assertServiceIsUp();
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("start_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -86,7 +86,7 @@ namespace wrench {
 
         if (auto msg = dynamic_cast<CloudComputeServiceStartVMAnswerMessage *>(answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
             return msg->cs;
         } else {
@@ -111,7 +111,7 @@ namespace wrench {
         }
 
         // send a "migrate vm" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("migrate_vm");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         std::shared_ptr<SimulationMessage> answer_message = sendRequest(
                 answer_mailbox,
@@ -123,11 +123,11 @@ namespace wrench {
         if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(
                 answer_message.get())) {
             if (not msg->success) {
-                throw WorkflowExecutionException(msg->failure_cause);
+                throw ExecutionException(msg->failure_cause);
             }
         } else {
             throw std::runtime_error(
-                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + msg->getName() + "] message");
+                    "VirtualizedClusterComputeService::migrateVM(): Unexpected [" + answer_message->getName() + "] message");
         }
     }
 
@@ -141,7 +141,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);WRENCH_INFO(
                 "Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
                 this->hostname.c_str(),
-                this->mailbox_name.c_str());
+                this->mailbox->get_cname());
 
         /** Main loop **/
         while (this->processNextMessage()) {
@@ -168,7 +168,7 @@ namespace wrench {
         std::shared_ptr<SimulationMessage> message;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -180,7 +180,7 @@ namespace wrench {
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-            this->stopAllVMs();
+            this->stopAllVMs(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -192,7 +192,7 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-            processGetResourceInformation(msg->answer_mailbox);
+            processGetResourceInformation(msg->answer_mailbox, msg->key);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceGetExecutionHostsRequestMessage *>(message.get())) {
@@ -206,7 +206,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceShutdownVMRequestMessage *>(message.get())) {
-            processShutdownVM(msg->answer_mailbox, msg->vm_name);
+            processShutdownVM(msg->answer_mailbox, msg->vm_name, msg->send_failure_notifications, msg->termination_cause);
             return true;
 
         } else if (auto msg = dynamic_cast<CloudComputeServiceStartVMRequestMessage *>(message.get())) {
@@ -226,20 +226,12 @@ namespace wrench {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-            processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            return true;
-
-        } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-            processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
-            return true;
-
         } else if (auto msg = dynamic_cast<ServiceHasTerminatedMessage *>(message.get())) {
             if (auto bmcs = std::dynamic_pointer_cast<BareMetalComputeService>(msg->service)) {
                 processBareMetalComputeServiceTermination(bmcs, msg->exit_code);
             } else {
                 throw std::runtime_error(
-                        "VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for a non-bare_metal!");
+                        "VirtualizedClusterComputeService::processNextMessage(): Received a service termination message for an unknown BareMetalComputeService!");
             }
             return true;
         } else {
@@ -257,7 +249,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void
-    VirtualizedClusterComputeService::processMigrateVM(const std::string &answer_mailbox, const std::string &vm_name,
+    VirtualizedClusterComputeService::processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name,
                                                        const std::string &dest_pm_hostname) {
 
 

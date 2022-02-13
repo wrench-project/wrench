@@ -15,8 +15,8 @@
 WRENCH_LOG_CATEGORY(computer_victim, "Log category for Computer");
 
 
-wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, std::string mailbox_to_notify)
-        : Service(host_on_which_to_run, "victim", "victim") {
+wrench::ComputerVictim::ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify)
+        : Service(host_on_which_to_run, "victim") {
     this->flops = flops;
     this->msg = msg;
     this->mailbox_to_notify = mailbox_to_notify;

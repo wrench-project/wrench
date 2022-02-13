@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include <wrench/services/network_proximity/NetworkProximityServiceProperty.h>
 
 
 namespace wrench {
@@ -22,6 +22,8 @@ namespace wrench {
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
 
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
+
+    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
 
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 

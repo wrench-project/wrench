@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,25 +25,31 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service = nullptr, backup_storage_service = nullptr;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
-    std::unique_ptr<wrench::Workflow> workflow;
-    wrench::WorkflowTask *t1, *t2, *t4, *t5, *t6;
-    wrench::WorkflowFile *large_input_file, *small_input_file, *t4_output_file;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::WorkflowTask> t1, t2, t4, t5, t6;
+    std::shared_ptr<wrench::DataFile> large_input_file, small_input_file, t4_output_file;
 
     void do_WorkflowTaskExecutionHistory_test();
 
 protected:
-    WorkflowTaskTest() {
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-        t1 = workflow->addTask("task-01", 100000, 1, 1, 0);
-        t2 = workflow->addTask("task-02", 100, 2, 4, 0);
+    ~WorkflowTaskTest() {
+      workflow->clear();
+    }
+
+    WorkflowTaskTest() {
+
+        workflow = wrench::Workflow::createWorkflow();
+
+        t1 = workflow->addTask("task1-01", 100000, 1, 1, 0);
+        t2 = workflow->addTask("task1-02", 100, 2, 4, 0);
         t2->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.5));
         t2->setAverageCPU(90.2);
 
         workflow->addControlDependency(t1, t2);
 
         // t3 is created in InputOutputFile test..
-        t4 = workflow->addTask("task-04", 10, 1, 3, 0);
+        t4 = workflow->addTask("task1-04", 10, 1, 3, 0);
 
 
         large_input_file = workflow->addFile("large_input_file", 1000000);
@@ -57,11 +63,11 @@ protected:
         t4->setBytesWritten(1000);
         t4->setAverageCPU(50.5);
 
-        t5 = workflow->addTask("task-05", 100, 1, 2, 0);
-        t6 = workflow->addTask("task-06", 100, 1, 3, 0);
+        t5 = workflow->addTask("task1-05", 100, 1, 2, 0);
+        t6 = workflow->addTask("task1-06", 100, 1, 3, 0);
 
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\">"
@@ -90,12 +96,14 @@ protected:
 };
 
 TEST_F(WorkflowTaskTest, TaskStructure) {
+
+
     // WorkflowTask structure sanity check
-    ASSERT_EQ(t1->getWorkflow(), workflow.get());
+    ASSERT_EQ(t1->getWorkflow(), workflow);
 
     ASSERT_NE(t1->getID(), t2->getID());
-    ASSERT_EQ(t1->getID(), "task-01");
-    ASSERT_NE(t2->getID(), "task-01");
+    ASSERT_EQ(t1->getID(), "task1-01");
+    ASSERT_NE(t2->getID(), "task1-01");
 
     ASSERT_GT(t1->getFlops(), t2->getFlops());
 
@@ -120,9 +128,11 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
     ASSERT_EQ(t2->getChildren().size(), 0);
 
     ASSERT_EQ(t1->getClusterID(), "");
+
 }
 
 TEST_F(WorkflowTaskTest, GetSet) {
+
     t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_NOT_READY);
     ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
@@ -209,8 +219,9 @@ TEST_F(WorkflowTaskTest, GetSet) {
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
-    wrench::WorkflowFile *f1 = workflow->addFile("file-01", 10);
-    wrench::WorkflowFile *f2 = workflow->addFile("file-02", 100);
+
+    std::shared_ptr<wrench::DataFile> f1 = workflow->addFile("file-01", 10);
+    std::shared_ptr<wrench::DataFile> f2 = workflow->addFile("file-02", 100);
 
     t1->addInputFile(f1);
     t1->addOutputFile(f2);
@@ -224,7 +235,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
     ASSERT_THROW(workflow->removeFile(f1), std::invalid_argument);
     ASSERT_THROW(workflow->removeFile(f2), std::invalid_argument);
 
-    wrench::WorkflowTask *t3 = workflow->addTask("task-03", 50, 2, 4, 0);
+    std::shared_ptr<wrench::WorkflowTask> t3 = workflow->addTask("task1-03", 50, 2, 4, 0);
     t3->addInputFile(f2);
 
     ASSERT_EQ(t3->getNumberOfParents(), 1);
@@ -251,13 +262,11 @@ TEST_F(WorkflowTaskTest, StateToString) {
 /**            WorkflowTaskExecutionHistoryTest                      **/
 /**********************************************************************/
 
-class WorkflowTaskExecutionHistoryTestWMS : public wrench::WMS {
+class WorkflowTaskExecutionHistoryTestWMS : public wrench::ExecutionController {
 public:
     WorkflowTaskExecutionHistoryTestWMS(WorkflowTaskTest *test,
-                                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                         std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -274,23 +283,25 @@ private:
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                                   {this->test->t4_output_file,
                                                                                           wrench::FileLocation::LOCATION(this->test->storage_service)}});
+
         job_manager->submitJob(job_that_will_fail, this->test->compute_service);
 
         // while large_input_file is being read, we delete small_input_file so that the one task job will fail
-        wrench::StorageService::deleteFile(this->getWorkflow()->getFileByID("zz_small_input_file"),
+        wrench::StorageService::deleteFile(this->test->workflow->getFileByID("zz_small_input_file"),
                                            wrench::FileLocation::LOCATION(this->test->storage_service),
                                            this->test->file_registry_service);
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
-            event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+            event = this->waitForNextEvent();
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
         if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Job should have failed!");
         }
+        auto t4_history = this->test->t4->getExecutionHistory();
 
         auto job_that_will_complete = job_manager->createStandardJob(this->test->t4,
                                                                                      {{this->test->small_input_file,
@@ -302,16 +313,20 @@ private:
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
-
         auto job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5);
         job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        job_manager->terminateJob(job_that_will_be_terminated);
+            job_manager->terminateJob(job_that_will_be_terminated);
+
 
         auto job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6);
         job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
         wrench::S4U_Simulation::sleep(10.0);
-        this->test->compute_service->stop();
+
+        this->test->compute_service->stop(true, wrench::ComputeService::TerminationCause::TERMINATION_JOB_KILLED);
+//        this->test->compute_service->stop();
+
+        this->waitForAndProcessNextEvent();
 
         return 0;
     }
@@ -322,7 +337,7 @@ TEST_F(WorkflowTaskTest, WorkflowTaskExecutionHistoryTest) {
 }
 
 void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -349,12 +364,10 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_NO_THROW(
             backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new WorkflowTaskExecutionHistoryTestWMS(
-            this, {compute_service}, {storage_service, backup_storage_service}, wms_host
+            this, wms_host
     )));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -370,7 +383,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 // t4 was executed twice, so its execution history should be of size 2
     ASSERT_EQ(t4_history.size(), 2);
 
-// t4's second execution was successfull, so all values in its history for the second execution should be set
+// t4's second execution was successful, so all values in its history for the second execution should be set
     wrench::WorkflowTask::WorkflowTaskExecution t4_successful_execution = t4_history.top();
     std::vector<double> t4_successful_execution_history_values = {
             t4_successful_execution.task_start,
@@ -401,12 +414,11 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     t4_history.pop();
 
-// t4's first execution was unsuccessful, only task_start, read_input_start, execution_host, and num_cores_allocated should be set, everything else should be -1
+// t4's first execution was unsuccessful, only task_start, read_input_start, execution_host should be set, everything else should be -1
     wrench::WorkflowTask::WorkflowTaskExecution t4_unsuccessful_execution = t4_history.top();
     ASSERT_NE(t4_unsuccessful_execution.task_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.read_input_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.task_failed, -1.0);
-    ASSERT_EQ(t4_unsuccessful_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t4_unsuccessful_execution.execution_host.c_str(), "ExecutionHost");
 
 // the rest of the values should be set to -1 since the task failed while reading input
@@ -423,17 +435,17 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     auto t5_terminated_execution = t5_history.top();
     ASSERT_NE(t5_terminated_execution.task_start, -1.0);
-    ASSERT_NE(t5_terminated_execution.read_input_start, -1.0);
-    ASSERT_NE(t5_terminated_execution.read_input_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.read_input_start, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.read_input_end, -1.0);
     ASSERT_NE(t5_terminated_execution.computation_start, -1.0);
     ASSERT_NE(t5_terminated_execution.task_terminated, -1.0);
 
-    ASSERT_EQ(t5_terminated_execution.computation_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.write_output_start, -1.0);
-    ASSERT_EQ(t5_terminated_execution.write_output_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.task_failed, -1.0);
-    ASSERT_EQ(t5_terminated_execution.task_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.num_cores_allocated, 2);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.computation_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.write_output_start, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.write_output_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.task_failed, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.task_end, -1.0);
+    ASSERT_DOUBLE_EQ(t5_terminated_execution.num_cores_allocated, 2);
     ASSERT_STREQ(t5_terminated_execution.execution_host.c_str(), "ExecutionHost");
 
 // t6 should have ran then failed right after computation started because the compute service was stopped
@@ -442,20 +454,20 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
 
     auto t6_failed_execution = t6_history.top();
     ASSERT_NE(t6_failed_execution.task_start, -1.0);
-    ASSERT_NE(t6_failed_execution.read_input_start, -1.0);
-    ASSERT_NE(t6_failed_execution.read_input_end, -1.0);
+    ASSERT_DOUBLE_EQ(t6_failed_execution.read_input_start, -1.0);
+    ASSERT_DOUBLE_EQ(t6_failed_execution.read_input_end, -1.0);
     ASSERT_NE(t6_failed_execution.computation_start, -1.0);
-    ASSERT_NE(t6_failed_execution.task_failed, -1.0);
+    ASSERT_DOUBLE_EQ(t6_failed_execution.task_failed, -1.0);
 
     ASSERT_EQ(t6_failed_execution.computation_end, -1.0);
     ASSERT_EQ(t6_failed_execution.write_output_start, -1.0);
     ASSERT_EQ(t6_failed_execution.write_output_end, -1.0);
-    ASSERT_EQ(t6_failed_execution.task_terminated, -1.0);
+    ASSERT_NE(t6_failed_execution.task_terminated, -1.0);
     ASSERT_EQ(t6_failed_execution.task_end, -1.0);
     ASSERT_EQ(t6_failed_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

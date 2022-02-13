@@ -3,7 +3,7 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 
 project(wrench CXX)
 
-# Make Release de default build type
+# Make Release the default build type
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -20,7 +20,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 find_package(Boost REQUIRED)
 find_package(SimGrid REQUIRED)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "1")
@@ -51,7 +51,7 @@ include_directories(/opt/local/include)
 set(HEADER_FILES
         include/wrench-dev.h
         include/wrench.h
-        include/wrench/exceptions/WorkflowExecutionException.h
+        include/wrench/exceptions/ExecutionException.h
         include/wrench/logging/TerminalOutput.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/managers/JobManager.h
@@ -64,6 +64,7 @@ set(HEADER_FILES
         include/wrench/services/compute/ComputeServiceMessagePayload.h
         include/wrench/services/compute/ComputeServiceProperty.h
         include/wrench/services/compute/bare_metal/BareMetalComputeService.h
+        include/wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h
         include/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.h
         include/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h
         include/wrench/services/compute/batch/BatchComputeService.h
@@ -82,23 +83,23 @@ set(HEADER_FILES
         include/wrench/services/compute/htcondor/HTCondorComputeServiceMessagePayload.h
         include/wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h
         include/wrench/services/compute/htcondor/HTCondorNegotiatorService.h
-        include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
-        include/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h
-        include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
+        include/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h
+        include/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h
+        include/wrench/services/helper_services/action_execution_service/ActionExecutionService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h
-        include/wrench/services/compute/workunit_executor/Workunit.h
-        include/wrench/services/compute/workunit_executor/WorkunitExecutor.h
+        include/wrench/services/helper_services/action_executor/ActionExecutor.h
+        include/wrench/services/helper_services/action_executor/ActionExecutorMessage.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
-        include/wrench/services/helpers/Alarm.h
-        include/wrench/services/helpers/HostStateChangeDetector.h
-        include/wrench/services/helpers/HostStateChangeDetectorMessage.h
-        include/wrench/services/helpers/HostStateChangeDetectorProperty.h
-        include/wrench/services/helpers/ServiceTerminationDetector.h
-        include/wrench/services/helpers/ServiceTerminationDetectorMessage.h
+        include/wrench/services/helper_services/alarm/Alarm.h
+        include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h
+        include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h
+        include/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.h
+        include/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h
+        include/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h
         include/wrench/services/network_proximity/NetworkProximityDaemon.h
         include/wrench/services/network_proximity/NetworkProximityService.h
         include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
@@ -128,48 +129,59 @@ set(HEADER_FILES
         include/wrench/util/PointerUtil.h
         include/wrench/util/TraceFileLoader.h
         include/wrench/util/UnitParser.h
-        include/wrench/wms/DynamicOptimization.h
-        include/wrench/wms/StaticOptimization.h
-        include/wrench/wms/WMS.h
-        include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
-        include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
-        include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
-        include/wrench/workflow/execution_events/StandardJobCompletedEvent.h
-        include/wrench/workflow/execution_events/StandardJobFailedEvent.h
-        include/wrench/workflow/execution_events/PilotJobStartedEvent.h
-        include/wrench/workflow/execution_events/PilotJobExpiredEvent.h
-        include/wrench/workflow/execution_events/FileCopyCompletedEvent.h
-        include/wrench/workflow/execution_events/FileCopyFailedEvent.h
-        include/wrench/workflow/execution_events/TimerEvent.h
-        include/wrench/workflow/failure_causes/ComputeThreadHasDied.h
-        include/wrench/workflow/failure_causes/FailureCause.h
-        include/wrench/workflow/failure_causes/FatalFailure.h
-        include/wrench/workflow/failure_causes/FileAlreadyBeingCopied.h
-        include/wrench/workflow/failure_causes/FileNotFound.h
-        include/wrench/workflow/failure_causes/FunctionalityNotAvailable.h
-        include/wrench/workflow/failure_causes/HostError.h
-        include/wrench/workflow/failure_causes/InvalidDirectoryPath.h
-        include/wrench/workflow/failure_causes/JobKilled.h
-        include/wrench/workflow/failure_causes/JobTimeout.h
-        include/wrench/workflow/failure_causes/JobTypeNotSupported.h
-        include/wrench/workflow/failure_causes/NetworkError.h
-        include/wrench/workflow/failure_causes/NoScratchSpace.h
-        include/wrench/workflow/failure_causes/NotAllowed.h
-        include/wrench/workflow/failure_causes/NotEnoughResources.h
-        include/wrench/workflow/failure_causes/ServiceIsDown.h
-        include/wrench/workflow/failure_causes/ServiceIsSuspended.h
-        include/wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h
-        include/wrench/workflow/job/PilotJob.h
-        include/wrench/workflow/job/StandardJob.h
-        include/wrench/workflow/job/WorkflowJob.h
+        include/wrench/execution_events/ExecutionEvent.h
+        include/wrench/execution_events/CompoundJobCompletedEvent.h
+        include/wrench/execution_events/CompoundJobFailedEvent.h
+        include/wrench/execution_events/StandardJobCompletedEvent.h
+        include/wrench/execution_events/StandardJobFailedEvent.h
+        include/wrench/execution_events/PilotJobStartedEvent.h
+        include/wrench/execution_events/PilotJobExpiredEvent.h
+        include/wrench/execution_events/FileCopyCompletedEvent.h
+        include/wrench/execution_events/FileCopyFailedEvent.h
+        include/wrench/execution_events/TimerEvent.h
+        include/wrench/failure_causes/ComputeThreadHasDied.h
+        include/wrench/failure_causes/FailureCause.h
+        include/wrench/failure_causes/SomeActionsHaveFailed.h
+        include/wrench/failure_causes/FatalFailure.h
+        include/wrench/failure_causes/FileAlreadyBeingCopied.h
+        include/wrench/failure_causes/FileNotFound.h
+        include/wrench/failure_causes/FunctionalityNotAvailable.h
+        include/wrench/failure_causes/HostError.h
+        include/wrench/failure_causes/InvalidDirectoryPath.h
+        include/wrench/failure_causes/JobKilled.h
+        include/wrench/failure_causes/JobTimeout.h
+        include/wrench/failure_causes/NetworkError.h
+        include/wrench/failure_causes/NoScratchSpace.h
+        include/wrench/failure_causes/NotAllowed.h
+        include/wrench/failure_causes/NotEnoughResources.h
+        include/wrench/failure_causes/ServiceIsDown.h
+        include/wrench/failure_causes/ServiceIsSuspended.h
+        include/wrench/failure_causes/StorageServiceNotEnoughSpace.h
+        include/wrench/job/PilotJob.h
+        include/wrench/job/StandardJob.h
+        include/wrench/job/CompoundJob.h
+        include/wrench/action/Action.h
+        include/wrench/action/SleepAction.h
+        include/wrench/action/CustomAction.h
+        include/wrench/action/FileReadAction.h
+        include/wrench/action/FileWriteAction.h
+        include/wrench/action/FileCopyAction.h
+        include/wrench/action/FileDeleteAction.h
+        include/wrench/action/FileRegistryAction.h
+        include/wrench/action/FileRegistryAddEntryAction.h
+        include/wrench/action/FileRegistryDeleteEntryAction.h
+        include/wrench/action/ComputeAction.h
+        include/wrench/job/Job.h
         include/wrench/workflow/DagOfTasks.h
         include/wrench/workflow/parallel_model/ParallelModel.h
         include/wrench/workflow/parallel_model/AmdahlParallelModel.h
         include/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h
         include/wrench/workflow/parallel_model/CustomParallelModel.h
+        include/wrench/execution_controller/ExecutionController.h
+        include/wrench/execution_controller/ExecutionControllerMessage.h
+        include/wrench/data_file/DataFile.h
         )
 
 # source files
@@ -178,28 +190,28 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
-        src/wrench/helper_services/alarm/Alarm.cpp
-        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
-        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
-        src/wrench/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
-        src/wrench/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
-        src/wrench/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutor.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessage.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessage.h
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorMessagePayload.cpp
-        src/wrench/helper_services/standard_job_executor/StandardJobExecutorProperty.cpp
-        src/wrench/helper_services/work_unit_executor/ComputeThread.cpp
-        src/wrench/helper_services/work_unit_executor/ComputeThread.h
-        src/wrench/helper_services/work_unit_executor/Workunit.cpp
-        src/wrench/helper_services/work_unit_executor/WorkunitExecutor.cpp
+        src/wrench/services/helper_services/alarm/Alarm.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
+        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
+        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
+        src/wrench/services/helper_services/action_execution_service/ActionExecutionService.cpp
+        src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.cpp
+        src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.cpp
+        src/wrench/services/helper_services/compute_thread/ComputeThread.cpp
+        src/wrench/services/helper_services/compute_thread/ComputeThreadMessage.cpp
+        include/wrench/services/helper_services/compute_thread/ComputeThread.h
+        include/wrench/services/helper_services/compute_thread/ComputeThreadMessage.h
+        src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
+        src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/metering/EnergyMeterService.cpp
         src/wrench/services/metering/BandwidthMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
-        src/wrench/managers/JobManagerMessage.h
+        include/wrench/managers/JobManagerMessage.h
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessagePayload.cpp
@@ -209,6 +221,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/ComputeServiceMessagePayload.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeService.cpp
+        src/wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.cpp
         src/wrench/services/compute/batch/BatchComputeService.cpp
@@ -219,26 +232,26 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
         src/wrench/services/compute/batch/batch_schedulers/BatchScheduler.cpp
         src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h
+        include/wrench/services/compute/batch/batch_schedulers/batsched/BatschedBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/CONSERVATIVEBFBatchScheduler.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/BatchJobSet.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/ConservativeBackfillingBatchScheduler.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CONSERVATIVEBFBatchSchedulerCoreLevel.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/BatchJobSetCoreLevel.h
+        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.cpp
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h
         src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.cpp
-        src/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
+        include/wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h
         src/wrench/services/compute/batch/workload_helper_classes/TraceFileLoader.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/cloud/CloudComputeService.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceMessage.cpp
-        src/wrench/services/compute/cloud/CloudComputeServiceMessage.h
+        include/wrench/services/compute/cloud/CloudComputeServiceMessage.h
         src/wrench/services/compute/cloud/CloudComputeServiceMessagePayload.cpp
         src/wrench/services/compute/cloud/CloudComputeServiceProperty.cpp
         src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
@@ -249,23 +262,23 @@ set(SOURCE_FILES
         src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.cpp
-        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryMessage.cpp
-        src/wrench/services/file_registry/FileRegistryMessage.h
+        include/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/network_proximity/NetworkProximityDaemon.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
-        src/wrench/services/network_proximity/NetworkProximityMessage.h
+        include/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkProximityService.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceProperty.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/StorageServiceMessage.cpp
-        src/wrench/services/storage/StorageServiceMessage.h
+        include/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
@@ -273,13 +286,13 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/storage_helper_classes/FileLocation.cpp
         src/wrench/services/storage/storage_helper_classes/FileTransferThread.cpp
-        src/wrench/services/storage/storage_helper_classes/FileTransferThreadMessage.h
+        include/wrench/services/storage/storage_helpers/FileTransferThreadMessage.h
         src/wrench/services/storage/storage_helper_classes/LogicalFileSystem.cpp
         src/wrench/services/memory/Block.cpp
         src/wrench/services/memory/MemoryManager.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
-        src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
+        include/wrench/simgrid_S4U_util/S4U_DaemonActor.h
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
@@ -291,42 +304,49 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestampTypes.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/util/PointerUtil.cpp
-        src/wrench/util/PointerUtil.cpp
         src/wrench/util/UnitParser.cpp
-        src/wrench/wms/WMS.cpp
-        src/wrench/wms/WMSMessage.cpp
-        src/wrench/wms/WMSMessage.h
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/DagOfTasks.cpp
-        src/wrench/workflow/WorkflowFile.cpp
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/parallel_model/ParallelModel.cpp
         src/wrench/workflow/parallel_model/AmdahlParallelModel.cpp
         src/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.cpp
         src/wrench/workflow/parallel_model/CustomParallelModel.cpp
-        src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
-        src/wrench/workflow/failure_causes/ComputeThreadHasDied.cpp
-        src/wrench/workflow/failure_causes/FailureCause.cpp
-        src/wrench/workflow/failure_causes/FatalFailure.cpp
-        src/wrench/workflow/failure_causes/FileAlreadyBeingCopied.cpp
-        src/wrench/workflow/failure_causes/FileNotFound.cpp
-        src/wrench/workflow/failure_causes/FunctionalityNotAvailable.cpp
-        src/wrench/workflow/failure_causes/HostError.cpp
-        src/wrench/workflow/failure_causes/InvalidDirectoryPath.cpp
-        src/wrench/workflow/failure_causes/JobKilled.cpp
-        src/wrench/workflow/failure_causes/JobTimeout.cpp
-        src/wrench/workflow/failure_causes/JobTypeNotSupported.cpp
-        src/wrench/workflow/failure_causes/NetworkError.cpp
-        src/wrench/workflow/failure_causes/NoScratchSpace.cpp
-        src/wrench/workflow/failure_causes/NotAllowed.cpp
-        src/wrench/workflow/failure_causes/NotEnoughResources.cpp
-        src/wrench/workflow/failure_causes/ServiceIsDown.cpp
-        src/wrench/workflow/failure_causes/ServiceIsSuspended.cpp
-        src/wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.cpp
-        src/wrench/workflow/job/PilotJob.cpp
-        src/wrench/workflow/job/StandardJob.cpp
-        src/wrench/workflow/job/WorkflowJob.cpp
+        src/wrench/execution_events/ExecutionEvent.cpp
+        src/wrench/failure_causes/ComputeThreadHasDied.cpp
+        src/wrench/failure_causes/FailureCause.cpp
+        src/wrench/failure_causes/SomeActionsHaveFailed.cpp
+        src/wrench/failure_causes/FatalFailure.cpp
+        src/wrench/failure_causes/FileAlreadyBeingCopied.cpp
+        src/wrench/failure_causes/FileNotFound.cpp
+        src/wrench/failure_causes/FunctionalityNotAvailable.cpp
+        src/wrench/failure_causes/HostError.cpp
+        src/wrench/failure_causes/InvalidDirectoryPath.cpp
+        src/wrench/failure_causes/JobKilled.cpp
+        src/wrench/failure_causes/JobTimeout.cpp
+        src/wrench/failure_causes/NetworkError.cpp
+        src/wrench/failure_causes/NoScratchSpace.cpp
+        src/wrench/failure_causes/NotAllowed.cpp
+        src/wrench/failure_causes/NotEnoughResources.cpp
+        src/wrench/failure_causes/ServiceIsDown.cpp
+        src/wrench/failure_causes/ServiceIsSuspended.cpp
+        src/wrench/failure_causes/StorageServiceNotEnoughSpace.cpp
+        src/wrench/job/PilotJob.cpp
+        src/wrench/job/StandardJob.cpp
+        src/wrench/job/CompoundJob.cpp
+        src/wrench/action/Action.cpp
+        src/wrench/action/SleepAction.cpp
+        src/wrench/action/CustomAction.cpp
+        src/wrench/action/FileReadAction.cpp
+        src/wrench/action/FileWriteAction.cpp
+        src/wrench/action/FileCopyAction.cpp
+        src/wrench/action/FileDeleteAction.cpp
+        src/wrench/action/FileRegistryAction.cpp
+        src/wrench/action/ComputeAction.cpp
+        src/wrench/job/Job.cpp
+        src/wrench/execution_controller/ExecutionController.cpp
+        src/wrench/execution_controller/ExecutionControllerMessage.cpp
+        src/wrench/data_file/DataFile.cpp
         )
 
 # test files
@@ -343,7 +363,10 @@ set(TEST_FILES
         test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/services/memory_manager_service/MemoryManagerTest.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceOneTaskTest.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiActionTests.cpp
+        test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceMultiJobTests.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceOneTaskTest.cpp
         test/services/storage_services/LogicalFileSystem/LogicalFileSystemTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/services/storage_services/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
@@ -352,26 +375,33 @@ set(TEST_FILES
         test/services/storage_services/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
         test/services/storage_services/SimpleStorageService/ZeroSizeFileTest.cpp
         test/services/storage_services/SimpleStorageService/ChunkingTest.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceTestStandardJobs.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceTestPilotJobs.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceSchedulingTest.cpp
-        test/services/helper_services/StandardJobExecutorTest.cpp
-        test/services/helper_services/WorkunitExecutorTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestStandardJobs.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceTestPilotJobs.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceSchedulingTest.cpp
+        test/services/helper_services/action_executor/ComputeActionExecutorTest.cpp
+        test/services/helper_services/action_executor/SleepActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileReadActionExecutorTest.cpp
+        test/services/helper_services/action_executor/CustomActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
+        test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
+        test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/helper_services/ComputeThreadTest.cpp
-        test/services/compute_services/bare_metal/BareMetalComputeServiceResourceInformationTest.cpp
-        test/services/compute_services/batch/HomeGrownTimeLineTest.cpp
-        test/services/compute_services/batch/BatchServiceTest.cpp
-        test/services/compute_services/batch/BatchServiceFCFSTest.cpp
-        test/services/compute_services/batch/BatchServiceCONSERVATIVEBFTest.cpp
-        test/services/compute_services/batch/BatchServiceTraceFileTest.cpp
-        test/services/compute_services/batch/BatchServiceOutputCSVFileTest.cpp
-        test/services/compute_services/batch/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
-        test/services/compute_services/batch/BatchServiceBatschedContiguityTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
+        test/services/compute_services/batch_compound_jobs/BatchComputeServiceOneActionTests.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceFCFSTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceCONSERVATIVEBFTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceTraceFileTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceOutputCSVFileTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
+        test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
-        test/wms/WMSOptimizationsTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceResourceAllocationAlgorithmTest.cpp
         test/services/network_proximity_service/NetworkProximityTest.cpp
@@ -390,15 +420,13 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/simulation_output/SimulationTimestampEnergyTest.cpp
         test/simulation/InvalidXMLTest.cpp
-        test/services/compute_services/bare_metal/ScratchSpaceTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
         test/simulation/S4U_DaemonTest.cpp
         test/simulation/S4U_VirtualMachineTest.cpp
         test/simulation/S4U_SimulationTest.cpp
-        test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         test/misc/BogusMessageTest.cpp
-        examples/real-workflow-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/services/compute_services/bare_metal/ScratchSpaceTest.cpp
+        test/services/compute_services/bare_metal_standard_jobs/ScratchSpaceTest.cpp
         test/energy_consumption/EnergyConsumptionTest.cpp
         test/simulation/simulation_output/SimulationDumpJSONTest.cpp
         test/services/compute_services/htcondor/HTCondorServiceTest.cpp
@@ -412,7 +440,6 @@ set(TEST_FILES
         test/simulated_failures/host_failures/FailureDetectorHostFailuresTest.cpp
         test/simulated_failures/host_failures/BareMetalComputeServiceHostFailuresTest.cpp
         test/simulated_failures/host_failures/CloudComputeServiceHostFailuresTest.cpp
-        test/simulated_failures/host_failures/StandardJobExecutorHostFailuresTest.cpp
         test/simulated_failures/host_failures/NetworkProximityHostFailuresTest.cpp
         test/simulated_failures/host_failures/StorageServiceReStartHostFailuresTest.cpp
         test/simulated_failures/link_failures/FileRegistryLinkFailuresTest.cpp
@@ -429,7 +456,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp)
+        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
+        )
 
 find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(GTEST_LIBRARY NAMES gtest)

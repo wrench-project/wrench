@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ WRENCH_LOG_CATEGORY(virtualized_cluster_service_resource_allocation_test, "Log c
 class VirtualizedClusterServiceResourceAllocationTest : public ::testing::Test {
 
 public:
+    std::shared_ptr<wrench::Workflow> workflow;
+
+
     std::shared_ptr<wrench::CloudComputeService> cloud_service_first_fit = nullptr;
     std::shared_ptr<wrench::CloudComputeService> cloud_service_best_fit_ram_first = nullptr;
     std::shared_ptr<wrench::CloudComputeService> cloud_service_best_fit_cores_first = nullptr;
@@ -31,15 +34,19 @@ public:
 
 
 protected:
+
+    ~VirtualizedClusterServiceResourceAllocationTest() {
+        workflow->clear();
+    }
+
     VirtualizedClusterServiceResourceAllocationTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Gateway\" speed=\"1f\" > "
@@ -109,8 +116,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 };
 
 
@@ -118,12 +123,12 @@ protected:
 /**   VM RESOURCE ALLOCATION ALGORITHMS TEST                         **/
 /**********************************************************************/
 
-class VMResourceAllocationTestWMS : public wrench::WMS {
+class VMResourceAllocationTestWMS : public wrench::ExecutionController {
 
 public:
-    VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test, std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+    VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test,
+                                std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -141,7 +146,7 @@ private:
         try {
             this->test->cloud_service_first_fit->startVM("vm_2");
             throw std::runtime_error("FirstFit Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_first_fit->shutdownVM("vm_1");
@@ -159,7 +164,7 @@ private:
         try {
             this->test->cloud_service_first_fit->startVM("vm_3");
             throw std::runtime_error("FirstFit Fail Case #2: Starting the 3rd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_first_fit->shutdownVM("vm_1");
@@ -177,7 +182,7 @@ private:
         try {
             this->test->cloud_service_best_fit_cores_first->startVM("vm_2");
             throw std::runtime_error("BestFitCoresFirst Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_best_fit_cores_first->shutdownVM("vm_1");
@@ -193,7 +198,7 @@ private:
         try {
             this->test->cloud_service_best_fit_ram_first->startVM("vm_2");
             throw std::runtime_error("BestFitRAMFirst Fail Case #1: Starting the 2nd VM should have caused a NotEnoughResources error");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         this->test->cloud_service_best_fit_ram_first->shutdownVM("vm_1");
@@ -212,7 +217,7 @@ TEST_F(VirtualizedClusterServiceResourceAllocationTest, VMResourceAllocationAlgo
 void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlgorithm_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -249,14 +254,12 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-cores-first"}}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     wms = simulation->add(new VMResourceAllocationTestWMS(this, hostname));
-
-    wms->addWorkflow(workflow);
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

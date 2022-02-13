@@ -15,11 +15,12 @@
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
-#include <wrench/workflow/failure_causes/FailureCause.h>
+#include <wrench/failure_causes/FailureCause.h>
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
 
@@ -34,6 +35,7 @@ namespace wrench {
     void S4U_Simulation::initialize(int *argc, char **argv) {
         this->engine = new simgrid::s4u::Engine(argc, argv);
         simgrid::s4u::Engine::get_instance()->set_config("surf/precision:1e-9");
+        S4U_Mailbox::createMailboxPool(S4U_Mailbox::mailbox_pool_size);
         this->initialized = true;
         sg_storage_file_system_init();
     }
@@ -558,6 +560,12 @@ namespace wrench {
  * @return a memory_manager_service capacity in bytes
  */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
+        static std::map<simgrid::s4u::Host *, double> memoized;
+
+        if (memoized.find(host) != memoized.end()) {
+            return memoized[host];
+        }
+
         std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory_manager_service", "Memory", "MEMORY"};
         double capacity_value = S4U_Simulation::DEFAULT_RAM;
 
@@ -579,6 +587,7 @@ namespace wrench {
                 }
             }
         }
+        memoized[host] = capacity_value;
         return capacity_value;
     }
 
@@ -591,12 +600,26 @@ namespace wrench {
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
-            throw std::invalid_argument("Unknown hostname " + hostname);
+            throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
         }
         if (host->get_properties()->find(property_name) == host->get_properties()->end()) {
-            throw std::invalid_argument("Unknown property " + property_name);
+            throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown property " + property_name);
         }
         return host->get_property(property_name);
+    }
+
+/**
+ * @brief Set a property associated to a host specified in the platform file
+ * @param hostname: the host name
+ * @param property_name: the property name
+ * @param property_value: the property value
+ */
+    void S4U_Simulation::setHostProperty(std::string hostname, std::string property_name, std::string property_value) {
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (host == nullptr) {
+            throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
+        }
+        host->set_property(property_name, property_value);
     }
 
 /**
@@ -654,7 +677,7 @@ namespace wrench {
  * @throw std::invalid_argument
  * @throw std::runtime_error
  */
-    void S4U_Simulation::setPstate(const std::string &hostname, int pstate) {
+    void S4U_Simulation::setPstate(const std::string &hostname, unsigned long pstate) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
@@ -664,7 +687,7 @@ namespace wrench {
                                         std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
-            host->set_pstate((unsigned long)pstate);
+            host->set_pstate(pstate);
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
@@ -702,7 +725,7 @@ namespace wrench {
  * @return The index of the current pstate of the host (as specified in the platform xml description file)
  * @throw std::runtime_error
  */
-    int S4U_Simulation::getCurrentPstate(const std::string &hostname) {
+    unsigned long S4U_Simulation::getCurrentPstate(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);

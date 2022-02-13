@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
  *
  */
 
-#include "VirtualizedClusterComputeServiceMessage.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 
 namespace wrench {
 
@@ -34,13 +34,13 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(
-            const std::string &answer_mailbox,
+            simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             const std::string &dest_pm_hostname,
             double payload) :
             VirtualizedClusterComputeServiceMessage("MIGRATE_VM_REQUEST", payload) {
 
-        if (answer_mailbox.empty() || dest_pm_hostname.empty() || vm_name.empty()) {
+        if ((answer_mailbox == nullptr) || dest_pm_hostname.empty() || vm_name.empty()) {
             throw std::invalid_argument(
                     "VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(): Invalid arguments");
         }

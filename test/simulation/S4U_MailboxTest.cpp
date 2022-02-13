@@ -19,7 +19,7 @@ class S4U_MailboxTest : public ::testing::Test {
 
 public:
 
-    std::shared_ptr<wrench::WMS> wms1, wms2;
+    std::shared_ptr<wrench::ExecutionController> wms1, wms2;
 
     void do_AsynchronousCommunication_test();
 
@@ -29,7 +29,7 @@ protected:
 
         // Create a two-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"1\"/> "
@@ -52,12 +52,12 @@ protected:
 /**  ASYNCHRONOUS COMMUNICATION TEST                                 **/
 /**********************************************************************/
 
-class AsynchronousCommunicationTestWMS : public wrench::WMS {
+class AsynchronousCommunicationTestWMS : public wrench::ExecutionController {
 
 public:
     AsynchronousCommunicationTestWMS(S4U_MailboxTest *test,
                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -82,13 +82,13 @@ private:
             }
 
             // One send
-            auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 100));
+            auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo", 100));
             pending_send->wait();
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
-            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 100)));
-            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
+            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo1", 100)));
+            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo2", 100)));
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
             sends.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
@@ -96,8 +96,8 @@ private:
 
             // Two sends, timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_timeout;
-            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 100)));
-            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
+            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo1", 100)));
+            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo2", 100)));
             double now = wrench::Simulation::getCurrentSimulatedDate();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 10);
             if (index != ULONG_MAX) {
@@ -112,7 +112,7 @@ private:
             sends_timeout.at(index)->wait();
 
             // One send, network failure
-            pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo", 100));
+            pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo", 100));
             wrench::Simulation::sleep(10);
             wrench::Simulation::turnOffLink("1");
             try {
@@ -130,8 +130,8 @@ private:
 
             // Two asynchronous sends, network failure
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_failure;
-            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo1", 100)));
-            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox_name, new wrench::SimulationMessage("foo2", 100)));
+            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo1", 100)));
+            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo2", 100)));
             wrench::Simulation::sleep(10);
             simgrid::s4u::Link::by_name("1")->turn_off();
 //            WRENCH_INFO("SIZE= %ld", sends_failure.size());
@@ -156,7 +156,7 @@ private:
 
             // One synchronous sends, network failure
             try {
-                wrench::S4U_Mailbox::putMessage(this->test->wms2->mailbox_name,
+                wrench::S4U_Mailbox::putMessage(this->test->wms2->mailbox,
                                                 new wrench::SimulationMessage("foo", 100));
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
@@ -170,25 +170,25 @@ private:
             /** RECEIVER **/
 
             // One recv
-            auto pending_recv = wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox_name);
+            auto pending_recv = wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox);
             pending_recv->wait();
 
             // Two recv, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> recvs;
-            recvs.push_back(wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox_name));
-            recvs.push_back(wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox_name));
+            recvs.push_back(wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox));
+            recvs.push_back(wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox));
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(recvs, -1);
             recvs.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(recvs, -1);
             recvs.at(index)->wait();
 
             // Two recvs (sends are timing out)
-            wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
-            wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
+            wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
+            wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
 
             // One recv (which fails)
             try {
-                wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
+                wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
                 e->toString();
@@ -198,12 +198,12 @@ private:
 
             // Two synchronous recv, network failure
             try {
-                wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
+                wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
             }
             try {
-                wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox_name);
+                wrench::S4U_Mailbox::getMessage(this->test->wms2->mailbox);
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
                 e->toString();
@@ -211,7 +211,7 @@ private:
             }
 
             // One asynchronous recv, network failure
-            pending_recv = wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox_name);
+            pending_recv = wrench::S4U_Mailbox::igetMessage(this->test->wms2->mailbox);
             wrench::Simulation::sleep(10);
             try {
                 pending_recv->wait();
@@ -235,12 +235,12 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
 
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
-    int argc = 2;
+    int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-    argv[1] = strdup("--wrench-log-full");
+//    argv[1] = strdup("--wrench-log-full");
 
     simulation->init(&argc, argv);
 
@@ -248,17 +248,11 @@ void S4U_MailboxTest::do_AsynchronousCommunication_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMSs
-    this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this,"Host1"));
-    this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this,"Host2"));
-
-    // Create a bogus workflow
-    auto workflow =  std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-    this->wms1->addWorkflow(workflow.get());
-    this->wms2->addWorkflow(workflow.get());
+    auto workflow =  wrench::Workflow::createWorkflow();
+    this->wms1 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host1"));
+    this->wms2 = simulation->add(new AsynchronousCommunicationTestWMS(this, "Host2"));
 
     simulation->launch();
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

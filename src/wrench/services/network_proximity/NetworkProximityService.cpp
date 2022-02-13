@@ -14,15 +14,15 @@
 #include <random>
 
 #include <wrench/logging/TerminalOutput.h>
-#include "wrench/services/network_proximity/NetworkProximityService.h"
+#include <wrench/services/network_proximity/NetworkProximityService.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/ServiceMessage.h>
-#include "NetworkProximityMessage.h"
-#include <wrench/exceptions/WorkflowExecutionException.h>
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_network_proximity_service, "Log category for Network Proximity Service");
 
@@ -47,9 +47,9 @@ namespace wrench {
      */
     NetworkProximityService::NetworkProximityService(std::string hostname,
                                                      std::vector<std::string> hosts_in_network,
-                                                     std::map<std::string, std::string> property_list,
-                                                     std::map<std::string, double> messagepayload_list
-    ) : Service(hostname, "network_proximity", "network_proximity") {
+                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
+    ) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
         if (this->hosts_in_network.size() < 2) {
@@ -89,17 +89,17 @@ namespace wrench {
 
         WRENCH_INFO("Obtaining current coordinates of network daemon on host %s", requested_host.c_str());
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_get_coordinate_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new CoordinateLookupRequestMessage(
                             answer_mailbox, requested_host,
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -107,7 +107,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
@@ -125,7 +125,7 @@ namespace wrench {
      *           - The proximity value between the pair of hosts (or DBL_MAX if none)
      *           - The timestamp of the oldest measurement use to compute the proximity value (or -1.0 if none)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getHostPairDistance(std::pair<std::string, std::string> hosts) {
@@ -140,17 +140,17 @@ namespace wrench {
                              hosts.second.c_str());
         }
 
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
             S4U_Mailbox::putMessage(
-                    this->mailbox_name,
+                    this->mailbox,
                     new NetworkProximityLookupRequestMessage(
                             answer_mailbox, std::move(hosts),
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -158,7 +158,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
@@ -202,13 +202,15 @@ namespace wrench {
         for (auto h : this->hosts_in_network) {
             std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
                     new NetworkProximityDaemon(
-                            this->simulation, h, this->mailbox_name,
+                            this->simulation, h, this->mailbox,
                             this->getPropertyValueAsDouble(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
                             this->getPropertyValueAsDouble(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
                             this->getPropertyValueAsDouble(
                                     NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
+                            this->getPropertyValueAsDouble(
+                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED),
                             this->messagepayload_list));
             this->network_daemons.push_back(np_daemon);
 
@@ -248,7 +250,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
@@ -283,7 +285,7 @@ namespace wrench {
             double proximity_value = NetworkProximityService::NOT_AVAILABLE;
             double timestamp = NetworkProximityService::NOT_AVAILABLE;
 
-            std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
+            std::string network_service_type = this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
 
             if (msg->hosts.first == msg->hosts.second) {
                 proximity_value = 0.0;
@@ -329,11 +331,11 @@ namespace wrench {
                     msg->daemon);
 
             S4U_Mailbox::dputMessage(
-                    msg->daemon->mailbox_name,
+                    msg->daemon->mailbox,
                     new NextContactDaemonAnswerMessage(
                             chosen_peer->getHostname(),
                             chosen_peer,
-                            chosen_peer->mailbox_name,
+                            chosen_peer->mailbox,
                             this->getMessagePayloadValue(
                                     NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
@@ -381,7 +383,7 @@ namespace wrench {
     NetworkProximityService::getCommunicationPeer(const std::shared_ptr<NetworkProximityDaemon> sender_daemon) {
         // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
         // else if it is an 'alltoall' network service, coverage is set at 1.0
-        double coverage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_COVERAGE");
+        double coverage = this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE);
         unsigned long max_pool_size = this->network_daemons.size() - 1;
 
         // if the network_service type is 'alltoall', sender_daemon selects from a pool of all other network daemons
@@ -400,13 +402,14 @@ namespace wrench {
 
         // all the network daemons EXCEPT the sender get pushed into this vector
         for (unsigned long index = 0; index < this->network_daemons.size(); ++index) {
-            if (this->network_daemons[index]->mailbox_name != sender_daemon->mailbox_name) {
+            if (this->network_daemons[index]->mailbox != sender_daemon->mailbox) {
                 peer_list.push_back(index);
             }
         }
 
         // set the seed unique to the sending daemon
-        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
+//        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
+        sender_rng.seed(0);
 
         std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);
 

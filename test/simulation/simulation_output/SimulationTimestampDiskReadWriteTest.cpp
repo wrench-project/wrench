@@ -18,15 +18,20 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
 
-    wrench::WorkflowFile *file_1;
+    std::shared_ptr<wrench::DataFile> file_1;
 
     void do_SimulationTimestampDiskReadWriteBasic_test();
 
 protected:
+
+    ~SimulationTimestampDiskReadWriteTest() {
+        workflow->clear();
+    }
+
     SimulationTimestampDiskReadWriteTest() {
 
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"1\" > "
@@ -57,14 +62,14 @@ protected:
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
 
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         file_1 = workflow->addFile("file_1", 100.0);
 
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -78,14 +83,11 @@ protected:
  * and SimulationTimestampDiskReadWriteCompletion objects are added to their respective simulation
  * traces at the appropriate times.
  */
-class SimulationTimestampDiskReadWriteBasicTestWMS : public wrench::WMS {
+class SimulationTimestampDiskReadWriteBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampDiskReadWriteBasicTestWMS(SimulationTimestampDiskReadWriteTest *test,
-                                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                              std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -113,7 +115,7 @@ TEST_F(SimulationTimestampDiskReadWriteTest, SimulationTimestampDiskReadWriteBas
 }
 
 void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBasic_test(){
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -135,16 +137,12 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampDiskReadWriteBasicTestWMS(
-            this, {}, {storage_service_1,  storage_service_2}, file_registry_service, host1
-    )));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
-
+            this, host1)));
 
     //stage files
-    std::set<wrench::WorkflowFile *> files_to_stage = {file_1};
+    std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1};
 
     for (auto const &f  : files_to_stage) {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service_1));
@@ -175,8 +173,6 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     diskwrite_timestamps.front()->getContent()->getHostname();
     diskwrite_timestamps.front()->getContent()->getMount();
 
-
-    delete simulation;
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

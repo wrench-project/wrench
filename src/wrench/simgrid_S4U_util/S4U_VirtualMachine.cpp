@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,17 +10,16 @@
 
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simgrid/plugins/live_migration.h>
-
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_virtual_machine, "Log category for S4U_VirtualMachine");
 
 namespace wrench {
 
-    std::unordered_map<std::string, std::string> S4U_VirtualMachine::vm_to_pm_map;
+    std::unordered_map<std::string,std::string> S4U_VirtualMachine::vm_to_pm_map;
 
     /**
      * @brief Constructor
@@ -33,8 +32,8 @@ namespace wrench {
      */
     S4U_VirtualMachine::S4U_VirtualMachine(const std::string &vm_name,
                                            unsigned long num_cores, double ram_memory,
-                                           std::map<std::string, std::string> property_list,
-                                           std::map<std::string, double> messagepayload_list) :
+                                           WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                           WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
             property_list(property_list), messagepayload_list(messagepayload_list) {
 
@@ -179,18 +178,18 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the property list for the bare_metal that is to run on the VM ({} means "use all defaults")
+     * @brief Get the property list for the bare-metal compute service that is to run on the VM ({} means "use all defaults")
      * @return a property list
      */
-    std::map<std::string, std::string> S4U_VirtualMachine::getPropertyList() {
+    WRENCH_PROPERTY_COLLECTION_TYPE S4U_VirtualMachine::getPropertyList() {
         return this->property_list;
     }
 
     /**
-     * @brief Get the message payload list for the bare_metal that will run on the VM ({} means "use all defaults")
+     * @brief Get the message payload list for the bare-metal compute service that will run on the VM ({} means "use all defaults")
      * @return a message payload list
      */
-    std::map<std::string, double> S4U_VirtualMachine::getMessagePayloadList() {
+    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE S4U_VirtualMachine::getMessagePayloadList() {
         return this->messagepayload_list;
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,15 +8,15 @@
  */
 
 #include <wrench/services/storage/simple/SimpleStorageService.h>
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/ComputeServiceProperty.h"
-#include "wrench/services/compute/ComputeServiceMessagePayload.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/compute/ComputeService.h>
+#include <wrench/services/compute/ComputeServiceProperty.h>
+#include <wrench/services/compute/ComputeServiceMessagePayload.h>
+#include <wrench/simulation/Simulation.h>
+#include <wrench/services/compute/ComputeServiceMessage.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_compute_service, "Log category for Compute Service");
 
@@ -27,34 +27,85 @@ namespace wrench {
     constexpr double ComputeService::ALL_RAM;
 
     /**
-     * @brief Stop the compute service - must be called by the stop()
-     *        method of derived classes
+     * @brief Stop the compute service
      */
     void ComputeService::stop() {
-        Service::stop();
+        this->stop(false, ComputeService::TerminationCause::TERMINATION_NONE);
+    }
+
+    /**
+     * @brief Stop the compute service
+     * @param send_failure_notifications: whether to send job failure notifications or not
+     * @param termination_cause: the cause (reason) of the service's termination
+     */
+    void ComputeService::stop(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
+        /** THIS IS CODE DUPLICATION FROM Service::stop(), which is not great **/
+
+        // Do nothing if the service is already down
+        if ((this->state == Service::DOWN) or (this->shutting_down)) {
+            return;
+        }
+        this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
+
+        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
+
+        // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
+        auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        try {
+            S4U_Mailbox::putMessage(this->mailbox,
+                                    new ServiceStopDaemonMessage(
+                                            ack_mailbox,
+                                            send_failure_notifications,
+                                            termination_cause,
+                                            this->getMessagePayloadValue(
+                                                    ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            this->shutting_down = false;
+            throw ExecutionException(cause);
+        }
+
+        // Wait for the ack
+        std::unique_ptr<SimulationMessage> message = nullptr;
+
+        try {
+            message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+            this->shutting_down = false;
+            throw ExecutionException(cause);
+        }
+
+        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
+            this->state = Service::DOWN;
+        } else {
+            throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
+        }
+
+        // Set the service state to down
+        this->shutting_down = false;
+        this->state = Service::DOWN;
     }
 
     /**
      * @brief Submit a job to the compute service
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
-     *      - to a bare_metal: {}
-     *          - If no entry is provided for a taskID, the service will pick on which host and with how many cores to run the task
-     *          - If a number of cores is provided (e.g., {"task1", "12"}), the service will pick the host on which to run the task
-     *          - If a hostname and a number of cores is provided (e.g., {"task1", "host1:12"}, the service will run the task on that host
+     *      - to a BareMetalComputeService: {}
+     *          - If no entry is provided for an actionID, the service will pick on which host and with how many cores to run the task
+     *          - If a number of cores is provided (e.g., {"action1", "12"}), the service will pick the host on which to run the task
+     *          - If a hostname and a number of cores is provided (e.g., {"action1", "host1:12"}, the service will run the action on that host
      *            with the specified number of cores
-     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}]} (SLURM-like)
+     *      - to a BatchComputeService: {"-t":"<int>","-N":"<int>","-c":"<int>"[,{"-u":"<string>"}], [{actionID:[host[:num_cores]]}
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
      *         - "-c": number of requested cores per compute host
      *         - "-u": username (optional)
      *      - to a CloudComputeService: {}
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(std::shared_ptr<WorkflowJob> job, const std::map<std::string, std::string> &service_specific_args) {
+    void ComputeService::submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
@@ -63,12 +114,8 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                this->submitStandardJob(sjob, service_specific_args);
-            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                this->submitPilotJob(pjob, service_specific_args);
-            }
-        } catch (WorkflowExecutionException &e) {
+            this->submitCompoundJob(job, service_specific_args);
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -79,10 +126,10 @@ namespace wrench {
      * @param job: the job to terminate
      *
      * @throw std::invalid_argument
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void ComputeService::terminateJob(std::shared_ptr<WorkflowJob> job) {
+    void ComputeService::terminateJob(std::shared_ptr<CompoundJob> job) {
 
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
@@ -91,12 +138,8 @@ namespace wrench {
         assertServiceIsUp();
 
         try {
-            if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                this->terminateStandardJob(sjob);
-            } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                this->terminatePilotJob(pjob);
-            }
-        } catch (WorkflowExecutionException &e) {
+            this->terminateCompoundJob(job);
+        } catch (ExecutionException &e) {
             throw;
         }
     }
@@ -111,9 +154,8 @@ namespace wrench {
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
-                                   const std::string mailbox_name_prefix,
                                    std::string scratch_space_mount_point) :
-            Service(hostname, service_name, mailbox_name_prefix) {
+            Service(hostname, service_name) {
 
         this->state = ComputeService::UP;
 
@@ -143,75 +185,52 @@ namespace wrench {
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
-                                   const std::string mailbox_name_prefix,
                                    std::shared_ptr<StorageService> scratch_space) :
-            Service(hostname, service_name, mailbox_name_prefix) {
+            Service(hostname, service_name) {
 
         this->state = ComputeService::UP;
         this->scratch_space_storage_service = scratch_space;
     }
 
     /**
-     * @brief Get whether the compute service supports standard jobs or not
-     * @return true or false
-     */
-    bool ComputeService::supportsStandardJobs() {
-        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS);
-    }
-
-    /**
-     * @brief Get whether the compute service supports pilot jobs or not
-     * @return true or false
-     */
-    bool ComputeService::supportsPilotJobs() {
-        return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_PILOT_JOBS);
-    }
-
-    /**
      * @brief Get the number of hosts that the compute service manages
      * @return the host count
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumHosts() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("num_hosts");
+        } catch (ExecutionException &e) {
             throw;
         }
 
-        unsigned long count = 0;
-        if (dict.find("num_hosts") != dict.end()) {
-            count += (unsigned long) (*(dict["num_hosts"].begin())).second;
-        }
-        return count;
+        return (unsigned long) (*(dict.begin())).second;;
     }
 
     /**
       * @brief Get the list of the compute service's compute host
       * @return a vector of hostnames
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       * @throw std::runtime_error
       */
     std::vector<std::string> ComputeService::getHosts() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("num_cores");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         std::vector<std::string> to_return;
 
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_cores"]) {
-                to_return.emplace_back(x.first);
-            }
+        for (auto const &x : dict) {
+            to_return.emplace_back(x.first);
         }
 
         return to_return;
@@ -223,24 +242,22 @@ namespace wrench {
       * @brief Get core counts for each of the compute service's host
       * @return a map of core counts, indexed by hostnames
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       * @throw std::runtime_error
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("num_cores");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, unsigned long> to_return;
 
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_cores"]) {
-                to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
 
         return to_return;
@@ -250,23 +267,21 @@ namespace wrench {
       * @brief Get the total core counts for all hosts of the compute service
       * @return total core counts
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       * @throw std::runtime_error
       */
     unsigned long ComputeService::getTotalNumCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("num_cores");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         unsigned long count = 0;
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_cores"]) {
-                count += (unsigned long) x.second;
-            }
+        for (auto const &x : dict) {
+            count += (unsigned long) x.second;
         }
         return count;
     }
@@ -274,26 +289,27 @@ namespace wrench {
 
     /**
      * @brief Get idle core counts for each of the compute service's host
-     * @return the idle core counts (could be empty)
+     * @return the idle core counts (could be empty). Note that this doesn't
+     *        mean that asking for these cores right will mean immediate execution (since
+     *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
+     *        actions that are not using all available resources).
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("num_idle_cores");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, unsigned long> to_return;
 
-        if (dict.find("num_idle_cores") != dict.end()) {
-            for (auto x : dict["num_idle_cores"]) {
-                to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
 
         return to_return;
@@ -303,58 +319,60 @@ namespace wrench {
      * @brief Get ram availability for each of the compute service's host
      * @return the ram availability map (could be empty)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("ram_availabilities");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, double> to_return;
 
-        if (dict.find("ram_availabilities") != dict.end()) {
-            for (auto x : dict["ram_availabilities"]) {
-                to_return.insert(std::make_pair(x.first, (double) x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, (double) x.second));
         }
 
         return to_return;
     }
 
     /**
-     * @brief Get the total idle core count for all hosts of the compute service
-     * @return total idle core count
+     * @brief Get the total idle core count for all hosts of the compute service. Note that this doesn't
+     *        mean that asking for these cores right will mean immediate execution (since
+     *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
+     *        actions that are not using all available resources).
+     * @return total idle core count.
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getTotalNumIdleCores() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("num_idle_cores");
+        } catch (ExecutionException &e) {
             throw;
         }
 
 
         unsigned long count = 0;
-        if (dict.find("num_cores") != dict.end()) {
-            for (auto x : dict["num_idle_cores"]) {
-                count += (unsigned long) x.second;
-            }
+        for (auto const &x : dict) {
+            count += (unsigned long) x.second;
         }
         return count;
     }
 
     /**
      * @brief Method to find out if, right now, the compute service has at least one host
-     *        with some idle number of cores and some available RAM
+     *        with some idle number of cores and some available RAM. Note that this doesn't
+     *        mean that asking for these resources right will mean immediate execution (since
+     *        jobs may be pending and "ahead" in the queue, e.g., because they depend on current
+     *        actions that are not using all available resources).
      * @param num_cores: the desired number of cores
      * @param ram: the desired RAM
      * @return true if idle resources are available, false otherwise
@@ -363,17 +381,17 @@ namespace wrench {
         assertServiceIsUp();
 
         // send a "info request" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
                     answer_mailbox,
                     num_cores,
                     ram,
                     this->getMessagePayloadValue(
                             ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the reply
@@ -381,7 +399,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage*>(message.get())) {
@@ -389,7 +407,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "bare_metal::isThereAtLeastOneHostWithIdleResources(): unexpected [" + msg->getName() +
+                    "BareMetalComputeService::isThereAtLeastOneHostWithIdleResources(): unexpected [" + message->getName() +
                     "] message");
         }
     }
@@ -398,22 +416,20 @@ namespace wrench {
     * @brief Get the per-core flop rate of the compute service's hosts
     * @return a list of flop rates in flop/sec
     *
-    * @throw WorkflowExecutionException
+    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("flop_rates");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, double> to_return;
-        if (dict.find("flop_rates") != dict.end()) {
-            for (auto x : dict["flop_rates"]) {
-                to_return.insert(std::make_pair(x.first, x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, x.second));
         }
 
         return to_return;
@@ -423,23 +439,21 @@ namespace wrench {
     * @brief Get the RAM capacities for each of the compute service's hosts
     * @return a map of RAM capacities, indexed by hostname
     *
-    * @throw WorkflowExecutionException
+    * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("ram_capacities");
+        } catch (ExecutionException &e) {
             throw;
         }
 
         std::map<std::string, double> to_return;
 
-        if (dict.find("ram_capacities") != dict.end()) {
-            for (auto x : dict["ram_capacities"]) {
-                to_return.insert(std::make_pair(x.first, x.second));
-            }
+        for (auto const &x : dict) {
+            to_return.insert(std::make_pair(x.first, x.second));
         }
 
         return to_return;
@@ -449,41 +463,43 @@ namespace wrench {
      * @brief Get the time-to-live of the compute service
      * @return the ttl in seconds
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     double ComputeService::getTTL() {
 
-        std::map<std::string, std::map<std::string, double>> dict;
+        std::map<std::string, double> dict;
         try {
-            dict = this->getServiceResourceInformation();
-        } catch (WorkflowExecutionException &e) {
+            dict = this->getServiceResourceInformation("ttl");
+        } catch (ExecutionException &e) {
             throw;
         }
 
-        return (*(dict["ttl"].begin())).second;
+        return (*(dict.begin())).second;
     }
 
     /**
      * @brief Get information about the compute service as a dictionary of vectors
+     * @param key: the desired resource information (i.e., dictionary key) that's needed)
      * @return service information
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
-    std::map<std::string, std::map<std::string, double>> ComputeService::getServiceResourceInformation() {
+    std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key) {
 
         assertServiceIsUp();
 
         // send a "info request" message to the daemon's mailbox_name
-        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
+            S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
                     answer_mailbox,
+                    key,
                     this->getMessagePayloadValue(
                             ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Get the reply
@@ -491,7 +507,7 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage*>(message.get())) {
@@ -499,7 +515,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "bare_metal::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                    "BareMetalComputeService::getServiceResourceInformation(): unexpected [" + message->getName() +
                     "] message");
         }
     }
@@ -542,8 +558,30 @@ namespace wrench {
     * @brief Checks if the compute service has a scratch space
     * @return true if the compute service has some scratch storage space, false otherwise
     */
-    bool ComputeService::hasScratch() {
+    bool ComputeService::hasScratch() const {
         return (this->scratch_space_storage_service != nullptr);
     }
+
+    /**
+     * @brief Method the validates service-specific arguments (throws std::invalid_argument if invalid)
+     * @param job: the job that's being submitted
+     * @param service_specific_args: the service-specific arguments
+     */
+    void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+                                                          map<std::string, std::string> &service_specific_args)  {
+        throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
+    }
+
+
+    /**
+     * @brief Method to validate that a job's use of the scratch space if ok. Throws exception if not.
+     * @param service_specific_args: the job;'s service-specific arguments (useful for some services)
+     */
+    void ComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
+        if (not this->hasScratch()) {
+            throw std::invalid_argument("Compute service does not have scratch space");
+        }
+    }
+
 
 };

@@ -30,14 +30,19 @@ public:
     void do_ResourceInformationLinkFailure_test();
 
 protected:
+
+    ~BareMetalComputeServiceLinkFailuresTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
@@ -87,7 +92,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -95,12 +100,12 @@ protected:
 /**  LINK FAILURE TEST DURING RESOURCE INFORMATION                   **/
 /**********************************************************************/
 
-class BareMetalComputeServiceResourceInformationTestWMS : public wrench::WMS {
+class BareMetalComputeServiceResourceInformationTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
                                                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -114,7 +119,7 @@ private:
         auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 50, 1, 10,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
-        switcher->simulation = this->simulation;
+        switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
 
         // Do a bunch of resource requests
@@ -154,7 +159,7 @@ private:
                         break;
                 }
 
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
 //                WRENCH_INFO("Got an exception");
                 num_failures++;
                 if (not std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
@@ -176,7 +181,7 @@ TEST_F(BareMetalComputeServiceLinkFailuresTest, ResourceInformationTest) {
 void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -200,14 +205,11 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
             }));
 
     auto wms = simulation->add(
-            new BareMetalComputeServiceResourceInformationTestWMS(
-                    this, "Host1"));
-
-    wms->addWorkflow(workflow);
+            new BareMetalComputeServiceResourceInformationTestWMS(this, "Host1"));
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

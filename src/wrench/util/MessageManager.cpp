@@ -10,9 +10,9 @@
 #ifdef MESSAGE_MANAGER
 
 #include <iostream>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
-#include "wrench/util/MessageManager.h"
+#include <wrench/util/MessageManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_message_manager, "Log category for MessageManager");
 
