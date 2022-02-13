@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,70 +10,23 @@
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
-#include "wrench/services/Service.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/services/ServiceMessagePayload.h"
-#include "wrench/workflow/failure_causes/ServiceIsDown.h"
-#include "wrench/workflow/failure_causes/ServiceIsSuspended.h"
-#include "wrench/workflow/failure_causes/HostError.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
-#include "wrench/workflow/failure_causes/NotAllowed.h"
+#include <wrench/services/ServiceMessage.h>
+#include <wrench/simgrid_S4U_util/S4U_Daemon.h>
+#include <wrench/services/Service.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/ServiceMessagePayload.h>
+#include <wrench/failure_causes/ServiceIsDown.h>
+#include <wrench/failure_causes/ServiceIsSuspended.h>
+#include <wrench/failure_causes/HostError.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NotAllowed.h>
+#include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
-
+namespace std{inline std::string to_string(std::string a){return a;}}
 
 namespace wrench {
-
-    std::unordered_map<Service *, std::shared_ptr<Service>> Service::service_shared_ptr_map;
-    unsigned long Service::num_terminated_services = 0;
-
-    /**
-     * @brief Increase the completed service count
-     */
-    void Service::increaseNumCompletedServicesCount() {
-        Service::num_terminated_services++;
-    }
-
-    /**
-     * @brief Forget all tracked services
-     */
-    void Service::clearTrackedServices() {
-        Service::service_shared_ptr_map.clear();
-    }
-
-    /**
-     * @brief Go through the tracked services and remove all entries with a refcount of 1!
-     */
-    void Service::cleanupTrackedServices() {
-#if 0
-        std::set<Service *> to_cleanup;
-
-        // TODO: Perhaps do this as one step?
-        for (auto const &x : Service::service_shared_ptr_map) {
-//            WRENCH_DEBUG("---> %s (%ld)", x.second->getName().c_str(), x.second.use_count());
-            if (x.second.use_count() == 1) {
-                to_cleanup.insert(x.first);
-            }
-        }
-
-        for (auto const &x : to_cleanup) {
-            Service::service_shared_ptr_map.erase(x);
-        }
-#endif
-
-        auto it = Service::service_shared_ptr_map.begin();
-        while (it != Service::service_shared_ptr_map.end()) {
-            if (it->second.use_count() == 1) {
-                it = Service::service_shared_ptr_map.erase(it);
-            } else {
-                it++;
-            }
-        }
-
-    }
 
     /**
      * @brief Destructor
@@ -86,10 +39,9 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the name of the host on which the service will run
      * @param process_name_prefix: the prefix for the process name
-     * @param mailbox_name_prefix: the prefix for the mailbox name
      */
-    Service::Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix) :
-            S4U_Daemon(hostname, process_name_prefix, mailbox_name_prefix) {
+    Service::Service(std::string hostname, std::string process_name_prefix) :
+            S4U_Daemon(hostname, process_name_prefix) {
         this->name = process_name_prefix;
     }
 
@@ -98,7 +50,7 @@ namespace wrench {
       * @param property: the property
       * @param value: the property value
       */
-    void Service::setProperty(std::string property, std::string value) {
+    void Service::setProperty(WRENCH_PROPERTY_TYPE property, const std::string& value) {
         if (this->property_list.find(property) != this->property_list.end()) {
             this->property_list[property] = value;
         } else {
@@ -113,12 +65,12 @@ namespace wrench {
     * @param value: the message payload value
     * @throw std::invalid_argument
     */
-    void Service::setMessagePayload(std::string messagepayload, double value) {
+    void Service::setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE messagepayload, double value) {
         // Check that the value is a >=0 double
 
         if (value < 0) {
             throw std::invalid_argument(
-                    "Service::setMessagePayload(): Invalid message payload value " + messagepayload + ": " +
+                    "Service::setMessagePayload(): Invalid message payload value " + std::to_string(messagepayload) + ": " +
                     std::to_string(value));
         }
         this->messagepayload_list[messagepayload] = value;
@@ -131,10 +83,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::string Service::getPropertyValueAsString(std::string property) {
+    std::string Service::getPropertyValueAsString(WRENCH_PROPERTY_TYPE property) {
         if (this->property_list.find(property) == this->property_list.end()) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsString(): Cannot find value for property " + property +
+                    "Service::getPropertyValueAsString(): Cannot find value for property " + std::to_string(property) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->property_list[property];
@@ -147,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getPropertyValueAsDouble(std::string property) {
+    double Service::getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE property) {
         double value;
         std::string string_value;
         try {
@@ -160,7 +112,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lf", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
+                    "Service::getPropertyValueAsDouble(): Invalid double property value " + std::to_string(property) + " " +
                     this->getPropertyValueAsString(property));
         }
         return value;
@@ -173,7 +125,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    unsigned long Service::getPropertyValueAsUnsignedLong(std::string property) {
+    unsigned long Service::getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE property) {
         unsigned long value;
         std::string string_value;
         try {
@@ -186,7 +138,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + property +
+                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + std::to_string(property) +
                     " " +
                     this->getPropertyValueAsString(property));
         }
@@ -200,10 +152,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double Service::getMessagePayloadValue(std::string message_payload) {
+    double Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             throw std::invalid_argument(
-                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + message_payload +
+                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + std::to_string(message_payload) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->messagepayload_list[message_payload];
@@ -217,7 +169,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    bool Service::getPropertyValueAsBoolean(std::string property) {
+    bool Service::getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE property) {
         bool value;
         std::string string_value;
         try {
@@ -231,7 +183,7 @@ namespace wrench {
             return false;
         } else {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + property + " " +
+                    "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + std::to_string(property) + " " +
                     this->getPropertyValueAsString(property));
         }
     }
@@ -254,21 +206,21 @@ namespace wrench {
             // Service object deleted from under its feet
             this->createLifeSaver(this_service);
 
-            // Keep track of the master share_ptr reference to this service
-            Service::service_shared_ptr_map[this] = this_service;
+//            // Keep track of the master share_ptr reference to this service
+//            Service::service_shared_ptr_map[this] = this_service;
 
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
 
-            // Print some information a out the currently tracked daemons
-            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
-                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
+//            // Print some information a out the currently tracked daemons
+//            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
+//                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
 
-            if ((Service::service_shared_ptr_map.size() > 5000) or
-                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
-                Service::cleanupTrackedServices();
-                Service::num_terminated_services = 0;
-            }
+//            if ((Service::service_shared_ptr_map.size() > 5000) or
+//                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
+//                Service::cleanupTrackedServices();
+//                Service::num_terminated_services = 0;
+//            }
 
         } catch (std::shared_ptr<HostError> &e) {
             throw;
@@ -279,7 +231,7 @@ namespace wrench {
     /**
      * @brief Synchronously stop the service (does nothing if the service is already stopped)
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void Service::stop() {
@@ -291,19 +243,21 @@ namespace wrench {
         }
         this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
 
-        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+        WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
 
         // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
-        std::string ack_mailbox = S4U_Mailbox::generateUniqueMailboxName("stop");
+        auto ack_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
+            S4U_Mailbox::putMessage(this->mailbox,
                                     new ServiceStopDaemonMessage(
                                             ack_mailbox,
+                                            false,
+                                            ComputeService::TerminationCause::TERMINATION_NONE,
                                             this->getMessagePayloadValue(
                                                     ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             this->shutting_down = false;
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         // Wait for the ack
@@ -313,7 +267,7 @@ namespace wrench {
             message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             this->shutting_down = false;
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
 
         if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
@@ -344,12 +298,12 @@ namespace wrench {
     /**
       * @brief Resume the service
       *
-      * @throw WorkflowExecutionException
+      * @throw ExecutionException
       */
     void Service::resume() {
         if (this->state != Service::SUSPENDED) {
             std::string what = "Service cannot be resumed because it is not in the suspended state";
-            throw WorkflowExecutionException(std::shared_ptr<NotAllowed>(
+            throw ExecutionException(std::shared_ptr<NotAllowed>(
                     new NotAllowed(this->getSharedPtr<Service>(), what)));
         }
         this->resumeActor();
@@ -362,6 +316,18 @@ namespace wrench {
     */
     std::string Service::getHostname() {
         return this->hostname;
+    }
+
+    /**
+    * @brief Get the physical name of the host on which the service is / will be running
+    * @return the physical hostname
+    */
+    std::string Service::getPhysicalHostname() {
+        if (S4U_VirtualMachine::vm_to_pm_map.find(this->hostname) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+            return S4U_VirtualMachine::vm_to_pm_map[this->hostname];
+        } else {
+            return this->hostname;
+        }
     }
 
     /**
@@ -384,8 +350,8 @@ namespace wrench {
      * @param default_property_values: list of default properties
      * @param overridden_poperty_values: list of overridden properties (override the default)
      */
-    void Service::setProperties(std::map<std::string, std::string> default_property_values,
-                                std::map<std::string, std::string> overridden_poperty_values) {
+    void Service::setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
+                                WRENCH_PROPERTY_COLLECTION_TYPE overridden_poperty_values) {
         // Set default properties
         for (auto const &p : default_property_values) {
             this->setProperty(p.first, p.second);
@@ -402,8 +368,8 @@ namespace wrench {
      * @param default_messagepayload_values: list of default message payloads
      * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
-    void Service::setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
-                                     std::map<std::string, double> overridden_messagepayload_values) {
+    void Service::setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overridden_messagepayload_values) {
        
         // Set default messagepayloads
         for (auto const &p : default_messagepayload_values) {
@@ -444,15 +410,15 @@ namespace wrench {
 
     /**
      * @brief Throws an exception if the service is not up
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      */
     void Service::assertServiceIsUp() {
         if (this->state == Service::DOWN) {
-            throw WorkflowExecutionException(
+            throw ExecutionException(
                     std::shared_ptr<FailureCause>(new ServiceIsDown(this->getSharedPtr<Service>())));
         }
         if (this->state == Service::SUSPENDED) {
-            throw WorkflowExecutionException(
+            throw ExecutionException(
                     std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }

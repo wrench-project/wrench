@@ -20,39 +20,48 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond INTERNAL     */
-		/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-		class SimulationMessage;
-		class S4U_PendingCommunication;
+    class SimulationMessage;
+    class S4U_PendingCommunication;
 
-		/**
-		 * @brief Wrappers around S4U's communication methods
-		 */
-		class S4U_Mailbox {
+    /**
+     * @brief Wrappers around S4U's communication methods
+     */
+    class S4U_Mailbox {
 
-		public:
-				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox);
-				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
-				static void putMessage(std::string mailbox, SimulationMessage *m);
-				static void dputMessage(std::string mailbox_name, SimulationMessage *msg);
-				static std::shared_ptr<S4U_PendingCommunication> iputMessage(std::string mailbox_name, SimulationMessage *msg);
-				static std::shared_ptr<S4U_PendingCommunication> igetMessage(std::string mailbox_name);
-//				static void clear_dputs();
+    public:
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox);
+        static std::unique_ptr<SimulationMessage> getMessage(simgrid::s4u::Mailbox *mailbox, double timeout);
+        static void putMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *m);
+        static void dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
+        static std::shared_ptr<S4U_PendingCommunication> iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg);
+        static std::shared_ptr<S4U_PendingCommunication> igetMessage(simgrid::s4u::Mailbox *mailbox);
 
-				static std::string generateUniqueMailboxName(std::string);
-				static unsigned long generateUniqueSequenceNumber();
+        static unsigned long generateUniqueSequenceNumber();
 
-		private:
+        static simgrid::s4u::Mailbox *getTemporaryMailbox();
+        static void retireTemporaryMailbox(simgrid::s4u::Mailbox *mailbox);
 
-//				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::CommPtr>> dputs;
+        static void createMailboxPool(unsigned long num_mailboxes);
 
-		};
+        static simgrid::s4u::Mailbox *generateUniqueMailbox(std::string prefix);
 
-		/***********************/
-		/** \endcond           */
-		/***********************/
+        static unsigned long mailbox_pool_size;
+
+    private:
+        static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
+        static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
+        static std::deque<simgrid::s4u::Mailbox *> mailboxes_to_drain;
+
+
+    };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

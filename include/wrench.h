@@ -11,7 +11,6 @@
 #define WRENCH_WRENCH_H
 
 #include "wrench/simulation/Simulation.h"
-#include "wrench/workflow/Workflow.h"
 
 // Services and Service Properties
 #include "wrench/services/compute/bare_metal/BareMetalComputeService.h"
@@ -31,20 +30,13 @@
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 
-// WMS Implementations
-#include "wrench/wms/WMS.h"
-
-// Scheduler
-#include "wrench/wms/scheduler/StandardJobScheduler.h"
-#include "wrench/wms/scheduler/PilotJobScheduler.h"
-
-// Scheduling Optimizations
-#include "wrench/wms/StaticOptimization.h"
-#include "wrench/wms/DynamicOptimization.h"
-
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
+
+// Workflow
+#include "wrench/workflow/Workflow.h"
+#include "wrench/workflow/WorkflowTask.h"
 
 // Tools
 #include "wrench/tools/pegasus/PegasusWorkflowParser.h"

@@ -8,14 +8,14 @@
  */
 
 #include <wrench-dev.h>
-#include "wrench/services/storage/storage_helpers/LogicalFileSystem.h"
+#include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical File System");
 
 
 namespace wrench {
 
-    std::map<std::string, StorageService*> LogicalFileSystem::mount_points;
+    std::map<std::string, StorageService *> LogicalFileSystem::mount_points;
 
     /**
      * @brief Constructor
@@ -125,7 +125,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::storeFileInDirectory(WorkflowFile *file, std::string absolute_path) {
+    void LogicalFileSystem::storeFileInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path) {
         assertInitHasBeenCalled();
         // If directory does not exit, create it
         if (not doesDirectoryExist(absolute_path)) {
@@ -148,7 +148,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::removeFileFromDirectory(WorkflowFile *file, std::string absolute_path) {
+    void LogicalFileSystem::removeFileFromDirectory(std::shared_ptr<DataFile>file, std::string absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         assertFileIsInDirectory(file, absolute_path);
@@ -177,7 +177,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    bool LogicalFileSystem::isFileInDirectory(WorkflowFile *file, std::string absolute_path) {
+    bool LogicalFileSystem::isFileInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path) {
         assertInitHasBeenCalled();
         // If directory does not exist, say "no"
         if (not doesDirectoryExist(absolute_path)) {
@@ -195,7 +195,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    std::set<WorkflowFile *> LogicalFileSystem::listFilesInDirectory(std::string absolute_path) {
+    std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(std::string absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         return this->content[absolute_path];
@@ -235,7 +235,7 @@ namespace wrench {
  * @param absolute_path: the path where it will be written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::reserveSpace(WorkflowFile *file, std::string absolute_path) {
+    void LogicalFileSystem::reserveSpace(std::shared_ptr<DataFile>file, std::string absolute_path) {
         assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
 
@@ -257,7 +257,7 @@ namespace wrench {
  * @param absolute_path: the path where it would have been written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::unreserveSpace(WorkflowFile *file, std::string absolute_path) {
+    void LogicalFileSystem::unreserveSpace(std::shared_ptr<DataFile>file, std::string absolute_path) {
         assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
 
@@ -281,7 +281,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::stageFile(WorkflowFile *file, std::string absolute_path) {
+    void LogicalFileSystem::stageFile(std::shared_ptr<DataFile> file, std::string absolute_path) {
 
         // If Space is not sufficient, forget it
         if (this->occupied_space + file->getSize() > this->total_capacity) {
@@ -296,7 +296,12 @@ namespace wrench {
             this->content[absolute_path] = {};
         }
 
-        this->content[absolute_path].insert(file);
-        this->occupied_space += file->getSize();
+        // If file does  not already exist, create it
+        if (this->content.find(absolute_path) != this->content.end()) {
+            this->content[absolute_path].insert(file);
+            this->occupied_space += file->getSize();
+        } else {
+            return;
+        }
     }
 }

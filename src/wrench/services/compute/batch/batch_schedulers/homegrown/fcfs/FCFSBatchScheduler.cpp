@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,10 +7,10 @@
  * (at your option) any later version.
  */
 
-#include "FCFSBatchScheduler.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/batch/BatchComputeService.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/fcfs/FCFSBatchScheduler.h"
+#include <wrench/simulation/Simulation.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_fcfs_batch_scheduler, "Log category for FCFSBatchScheduler");
 
@@ -19,7 +19,7 @@ namespace wrench {
     /**
     * @brief Overriden Method to pick the next job to schedule
     *
-    * @return A batch job, or nullptr is none is found
+    * @return A BatchComputeService job, or nullptr is none is found
     */
     std::shared_ptr<BatchJob> FCFSBatchScheduler::pickNextJobToSchedule() {
         if (this->cs->batch_queue.empty()) {
@@ -186,10 +186,11 @@ namespace wrench {
 
         // Update core availabilities for jobs that are currently running
         for (auto job : cs->running_jobs) {
-            double time_to_finish = std::max<double>(0, job->getBeginTimestamp() +
-                                                        job->getRequestedTime() -
+            auto batch_job = job.second;
+            double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
+                                                        batch_job->getRequestedTime() -
                                                         cs->simulation->getCurrentSimulatedDate());
-            for (auto resource : job->getResourcesAllocated()) {
+            for (auto resource : batch_job->getResourcesAllocated()) {
                 std::string hostname = resource.first;
                 unsigned long num_cores = std::get<0>(resource.second);
                 double ram = std::get<1>(resource.second);
@@ -344,8 +345,8 @@ namespace wrench {
                 break;
             }
 
-            // Get the workflow job associated to the picked batch job
-            std::shared_ptr<WorkflowJob> workflow_job = batch_job->getWorkflowJob();
+            // Get the compound job associated to the picked BatchComputeService job
+            std::shared_ptr<CompoundJob> compound_job = batch_job->getCompoundJob();
 
             // Find on which resources to actually run the job
             unsigned long cores_per_node_asked_for = batch_job->getRequestedCoresPerNode();
@@ -363,16 +364,16 @@ namespace wrench {
                 break;
             }
 
-            WRENCH_INFO("Starting job %s", workflow_job->getName().c_str());
+            WRENCH_INFO("Starting compound job %s", compound_job->getName().c_str());
 
-            // Remove the job from the batch queue
+            // Remove the job from the BatchComputeService queue
             this->cs->removeJobFromBatchQueue(batch_job);
 
             // Add it to the running list
-            this->cs->running_jobs.insert(batch_job);
+            this->cs->running_jobs[batch_job->getCompoundJob()]  = batch_job;
 
             // Start it!
-            this->cs->startJob(resources, workflow_job, batch_job, num_nodes_asked_for, requested_time,
+            this->cs->startJob(resources, compound_job, batch_job, num_nodes_asked_for, requested_time,
                                cores_per_node_asked_for);
 
 
@@ -381,7 +382,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
@@ -389,7 +390,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
@@ -397,7 +398,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
@@ -405,7 +406,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param job_id: a batch job id
+     * @param job_id: a BatchComputeService job id
      */
     void processUnknownJobTermination(std::string job_id) {
         // Do nothing
@@ -413,7 +414,7 @@ namespace wrench {
 
     /**
      * @brief No-op method
-     * @param batch_job: a batch job
+     * @param batch_job: a BatchComputeService job
      */
     void FCFSBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing

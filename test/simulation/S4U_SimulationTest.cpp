@@ -25,14 +25,19 @@ public:
     void do_basicAPI_Test();
 
 protected:
+
+    ~S4U_SimulationTest() {
+        workflow->clear();
+    }
+
     S4U_SimulationTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"> "
@@ -80,7 +85,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -89,13 +94,12 @@ protected:
 /**********************************************************************/
 
 
-class S4U_SimulationAPITestWMS : public wrench::WMS {
+class S4U_SimulationAPITestWMS : public wrench::ExecutionController {
 
 public:
     S4U_SimulationAPITestWMS(S4U_SimulationTest *test,
                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -223,6 +227,37 @@ private:
         } catch (std::invalid_argument &e) {
         }
 
+        // Properties
+        try {
+            wrench::S4U_Simulation::getHostProperty("Bogus", "stuff");
+            throw std::runtime_error("Getting property for bogus host should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            wrench::S4U_Simulation::getHostProperty("Host1", "custom_property");
+            throw std::runtime_error("Getting property for bogus property key should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            wrench::S4U_Simulation::setHostProperty("Bogus", "custom_property", "whatever");
+            throw std::runtime_error("Setting property for bogus host should have thrown");
+        } catch (std::invalid_argument &e) {
+        }
+        try {
+            wrench::S4U_Simulation::setHostProperty("Host1", "custom_property", "whatever");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Setting property for valid host should have worked");
+        }
+        try {
+            auto value = wrench::S4U_Simulation::getHostProperty("Host1", "custom_property");
+        } catch (std::invalid_argument &e) {
+            throw std::runtime_error("Getting property for valid host should have worked");
+        }
+        if (wrench::S4U_Simulation::getHostProperty("Host1", "custom_property") != "whatever") {
+            throw std::runtime_error("Getting property for valid host should have returned the set value");
+        }
+
+
         return 0;
     }
 };
@@ -234,7 +269,7 @@ TEST_F(S4U_SimulationTest, BasicAPI) {
 void S4U_SimulationTest::do_basicAPI_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -248,19 +283,16 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new S4U_SimulationAPITestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

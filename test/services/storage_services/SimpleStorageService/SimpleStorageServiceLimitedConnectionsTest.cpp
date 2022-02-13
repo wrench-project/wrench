@@ -28,7 +28,7 @@ WRENCH_LOG_CATEGORY(simple_storage_service_limited_connection_test, "Log categor
 class SimpleStorageServiceLimitedConnectionsTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *files[NUM_PARALLEL_TRANSFERS];
+    std::shared_ptr<wrench::DataFile> files[NUM_PARALLEL_TRANSFERS];
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_wms_unlimited = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_wms_limited = nullptr;
@@ -39,10 +39,15 @@ public:
 
 
 protected:
+
+    ~SimpleStorageServiceLimitedConnectionsTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceLimitedConnectionsTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow = wrench::Workflow::createWorkflow();
 
       // Create the files
       for (size_t i=0; i < NUM_PARALLEL_TRANSFERS; i++) {
@@ -51,7 +56,7 @@ protected:
 
       // Create a 3-host platform file
       std::string xml = "<?xml version='1.0'?>"
-                                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                 "<platform version=\"4.1\"> "
                                 "   <zone id=\"AS0\" routing=\"Full\"> "
                                 "       <host id=\"Host1\" speed=\"1Gf\" > "
@@ -103,7 +108,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -111,16 +116,14 @@ protected:
 /**  CONCURRENT FILE COPIES TEST                                     **/
 /**********************************************************************/
 
-class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : public wrench::WMS {
+class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
             SimpleStorageServiceLimitedConnectionsTest *test,
-            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
             const std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-      this->test = test;
+            wrench::ExecutionController(hostname, "test"),
+            test(test) {
     }
 
 private:
@@ -132,9 +135,6 @@ private:
 
       // Create a data movement manager
       auto data_movement_manager = this->createDataMovementManager();
-
-      // Get a file registry
-      auto file_registry_service = this->getAvailableFileRegistryService();
 
       // Reading
       for (auto dst_storage_service : {this->test->storage_service_unlimited, this->test->storage_service_limited}) {
@@ -158,7 +158,7 @@ private:
 
         double elapsed[NUM_PARALLEL_TRANSFERS];
         for (int i = 0; i < NUM_PARALLEL_TRANSFERS; i++) {
-          std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+          std::shared_ptr<wrench::ExecutionEvent> event1 = this->waitForNextEvent();
           if (not std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(event1)) {
             throw std::runtime_error("Unexpected Workflow Execution Event: " + event1->toString());
           }
@@ -218,7 +218,7 @@ TEST_F(SimpleStorageServiceLimitedConnectionsTest, ConcurrencyFileCopies) {
 void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test() {
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -234,7 +234,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
                                               {std::make_pair("WMSHost",
                                                               std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                               "",
-                                              {{wrench::BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                              {})));
 
   // Create a Local storage service with unlimited connections
   ASSERT_NO_THROW(storage_service_wms_unlimited = simulation->add(
@@ -243,7 +243,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   // Create a Local storage service with limited connections
   ASSERT_NO_THROW(storage_service_wms_limited = simulation->add(
           new wrench::SimpleStorageService("WMSHost", {"/disk2"},
-                                           {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
+                                           {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"}})));
 
   // Create a Storage service with unlimited connections
   ASSERT_NO_THROW(storage_service_unlimited = simulation->add(
@@ -252,16 +252,13 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   // Create a Storage Service limited to 3 connections
   ASSERT_NO_THROW(storage_service_limited = simulation->add(
           new wrench::SimpleStorageService("Host2", {"/"},
-                                           {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
+                                           {{wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "3"}})));
 
   // Create a WMS
-  std::shared_ptr<wrench::WMS> wms = nullptr;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
-                  this, {compute_service}, {storage_service_wms_unlimited, storage_service_wms_limited, storage_service_unlimited, storage_service_limited},
-                  "WMSHost")));
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+                  this, "WMSHost")));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService("WMSHost"));
@@ -272,10 +269,10 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
     ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms_limited));
   }
 
-  // Running a "run a single task" simulation
+  // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
-  delete simulation;
+
   for (int i=0; i < argc; i++)
      free(argv[i]);
   free(argv);

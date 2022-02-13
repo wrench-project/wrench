@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
@@ -32,8 +32,7 @@ WRENCH_LOG_CATEGORY(comprehensive_integration_host_failure_test, "Log category f
 class ComprehensiveIntegrationHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
     std::map<std::string, bool> faulty_map;
 
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
@@ -56,14 +55,18 @@ protected:
         return to_return;
     }
 
+    ~ComprehensiveIntegrationHostFailuresTest() {
+        workflow->clear();
+    }
+
     ComprehensiveIntegrationHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>\n"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">\n"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">\n"
                           "<platform version=\"4.1\">\n"
                           "   <zone id=\"AS0\" routing=\"Full\">\n";
 
@@ -155,21 +158,19 @@ protected:
 /**          INTEGRATION TEST                                        **/
 /**********************************************************************/
 
-class IntegrationFailureTestTestWMS : public wrench::WMS {
+class IntegrationFailureTestTestWMS : public wrench::ExecutionController {
 
 public:
     IntegrationFailureTestTestWMS(ComprehensiveIntegrationHostFailuresTest *test,
-                                  std::string &hostname,
-                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                  std::set<std::shared_ptr<wrench::StorageService>> storage_services
+                                  std::string &hostname
     ) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
 
-    std::map<std::string, std::shared_ptr<wrench::BareMetalComputeService>> vms;
+    std::set<std::string> vms;
     std::map<std::shared_ptr<wrench::BareMetalComputeService>, bool> vm_used;
     ComprehensiveIntegrationHostFailuresTest *test;
     std::shared_ptr<wrench::JobManager> job_manager;
@@ -184,7 +185,7 @@ private:
                                                          CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF, CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF,
                                                          CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
                                                          victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
-        switcher->simulation = this->simulation;
+        switcher->setSimulation(this->simulation);
         switcher->start(switcher, true, false); // Daemonized, no auto-restart
     }
 
@@ -195,13 +196,12 @@ private:
         if (this->test->faulty_map.find("cloud") != this->test->faulty_map.end()) {
             // Create my sef of VMs
             try {
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 2; i++) { // TODO: MAKE IT 6
                     auto vm_name = this->test->cloud_service->createVM(2, 45);
-                    auto vm_cs = this->test->cloud_service->startVM(vm_name);
-                    this->vms[vm_name] = vm_cs;
-                    this->vm_used[vm_cs] = false;
+                    this->test->cloud_service->startVM(vm_name);
+                    this->vms.insert(vm_name);
                 }
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Should be able to create VMs!!");
             }
         }
@@ -213,8 +213,8 @@ private:
             }
             if (faulty.first == "cloud") {
                 createMonkey("CloudHost1");
-                createMonkey("CloudHost2");
-                createMonkey("CloudHost3");
+//                createMonkey("CloudHost2");
+//                createMonkey("CloudHost3");
 
             } else if (faulty.first == "baremetal") {
                 createMonkey("BareMetalHost1");
@@ -227,14 +227,14 @@ private:
         }
 
 
-        while (not this->getWorkflow()->isDone()) {
+        while (not this->test->workflow->isDone()) {
 
             // Try to restart down VMs
             for (auto const &vm : this->vms) {
-                if (this->test->cloud_service->isVMDown(vm.first)) {
+                if (this->test->cloud_service->isVMDown(vm)) {
                     try {
-                        this->test->cloud_service->startVM(vm.first);
-                    } catch (wrench::WorkflowExecutionException &e) {
+                        this->test->cloud_service->startVM(vm);
+                    } catch (wrench::ExecutionException &e) {
                         auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                         if (cause) {
                             // oh well
@@ -246,10 +246,10 @@ private:
                 }
             }
 
-            while (scheduleAReadyTask()) {}
+            while (scheduleAReadyTask()) {
+            }
 
             if (not this->waitForAndProcessNextEvent(50.00)) {
-//                WRENCH_INFO("TIMEOUT");
             }
         }
 
@@ -258,15 +258,17 @@ private:
 
     bool scheduleAReadyTask() {
 
-        // Find a ready task
-        wrench::WorkflowTask *task = nullptr;
-        for (auto const &t : this->getWorkflow()->getTasks()) {
+        // Find a ready task1
+        std::shared_ptr<wrench::WorkflowTask> task = nullptr;
+        for (auto const &t : this->test->workflow->getTasks()) {
             if (t->getState() == wrench::WorkflowTask::READY) {
                 task = t;
                 break;
             }
         }
-        if (not task) return false; // no ready task right now
+        if (not task) {
+            return false; // no ready task1 right now
+        }
 
         // Pick a storage service
         std::shared_ptr<wrench::StorageService> target_storage_service;
@@ -282,7 +284,7 @@ private:
         // Pick a compute resource (trying the cloud first)
         std::shared_ptr<wrench::ComputeService> target_cs = nullptr;
         for (auto &vm : this->vms) {
-            auto vm_cs = vm.second;
+            auto vm_cs = this->test->cloud_service->getVMComputeService(vm);
             if (vm_cs->isUp() and (not this->vm_used[vm_cs])) {
                 target_cs = vm_cs;
                 this->vm_used[vm_cs] = true;
@@ -308,8 +310,8 @@ private:
         });
         this->job_manager->submitJob(job, target_cs);
 
-//        WRENCH_INFO("Submitted task '%s' to '%s' with files to read from '%s",
-//                    task->getID().c_str(),
+//        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
+//                    task1->getID().c_str(),
 //                    target_cs->getName().c_str(),
 //                    target_storage_service->getName().c_str());
         return true;
@@ -408,13 +410,13 @@ TEST_F(ComprehensiveIntegrationHostFailuresTest, WholeEnchilada) {
 void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(std::map<std::string, bool> args) {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-log");
 
-//    argv[1] = strdup("--wrench-full-log");
 
     this->faulty_map = args;
 
@@ -445,7 +447,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
                         "/scratch",
-                        {}, {})));
+                        {
+                         {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
     }
 
     // Create Cloud Service
@@ -453,8 +456,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         std::string cloudhead = "CloudHead";
         std::vector<std::string> cloudhosts;
         cloudhosts.push_back("CloudHost1");
-        cloudhosts.push_back("CloudHost2");
-        cloudhosts.push_back("CloudHost3");
+//        cloudhosts.push_back("CloudHost2");
+//        cloudhosts.push_back("CloudHost3");
         this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(
                 simulation->add(new wrench::CloudComputeService(
                         cloudhead,
@@ -469,7 +472,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     // Create workflow tasks and stage input file
     srand(666);
     for (int i=0; i < NUM_TASKS; i++) {
-//        auto task = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
+//        auto task1 = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
         auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 40);
         auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
         auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
@@ -488,17 +491,12 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     auto wms = simulation->add(
             new IntegrationFailureTestTestWMS(
                     this,
-                    wms_host,
-                    {this->baremetal_service, this->cloud_service},
-                    {this->storage_service1, this->storage_service2}));
+                    wms_host));
 
-    wms->addWorkflow(workflow);
-
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

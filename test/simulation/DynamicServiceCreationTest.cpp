@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,34 @@
 class DynamicServiceCreationTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
-    wrench::WorkflowFile *output_file5;
-    wrench::WorkflowFile *output_file6;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file1;
+    std::shared_ptr<wrench::DataFile> output_file2;
+    std::shared_ptr<wrench::DataFile> output_file3;
+    std::shared_ptr<wrench::DataFile> output_file4;
+    std::shared_ptr<wrench::DataFile> output_file5;
+    std::shared_ptr<wrench::DataFile> output_file6;
+    std::shared_ptr<wrench::WorkflowTask> task1;
+    std::shared_ptr<wrench::WorkflowTask> task2;
+    std::shared_ptr<wrench::WorkflowTask> task3;
+    std::shared_ptr<wrench::WorkflowTask> task4;
+    std::shared_ptr<wrench::WorkflowTask> task5;
+    std::shared_ptr<wrench::WorkflowTask> task6;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_getReadyTasksTest_test();
 
 protected:
 
+    ~DynamicServiceCreationTest() {
+        workflow->clear();
+    }
+
     DynamicServiceCreationTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -83,7 +86,7 @@ protected:
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
@@ -130,15 +133,12 @@ protected:
 /**            GET READY TASKS SIMULATION TEST ON ONE HOST           **/
 /**********************************************************************/
 
-class DynamicServiceCreationReadyTasksTestWMS : public wrench::WMS {
+class DynamicServiceCreationReadyTasksTestWMS : public wrench::ExecutionController {
 
 public:
     DynamicServiceCreationReadyTasksTestWMS(DynamicServiceCreationTest *test,
-                                            const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                            const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -191,8 +191,8 @@ private:
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
                 new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                                { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
-        std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
+                                                { })));
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks = this->test->workflow->getReadyTasks();
 
         // Create a VM
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
@@ -212,11 +212,11 @@ private:
                         {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
-                    throw std::runtime_error("A one-task job should say it has one task");
+                    throw std::runtime_error("A one-task1 job should say it has one task1");
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
 
@@ -226,10 +226,10 @@ private:
 
         // Wait for workflow execution events
         for (auto task : tasks) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+                event = this->waitForNextEvent();
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -239,7 +239,7 @@ private:
 
         for (auto & j : one_task_jobs) {
             if (j->getNumCompletedTasks() != 1) {
-                throw std::runtime_error("A job with one completed task should say it has one completed task");
+                throw std::runtime_error("A job with one completed task1 should say it has one completed task1");
             }
         }
 
@@ -254,7 +254,7 @@ TEST_F(DynamicServiceCreationTest, DynamicServiceCreationReadyTasksTestWMS) {
 void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -287,12 +287,9 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new DynamicServiceCreationReadyTasksTestWMS(this, {}, {storage_service}, hostname)));
-
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new DynamicServiceCreationReadyTasksTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -303,7 +300,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

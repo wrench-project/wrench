@@ -27,9 +27,9 @@ WRENCH_LOG_CATEGORY(simple_storage_service_performance_test, "Log category for S
 class SimpleStorageServicePerformanceTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_1;
-    wrench::WorkflowFile *file_2;
-    wrench::WorkflowFile *file_3;
+    std::shared_ptr<wrench::DataFile> file_1;
+    std::shared_ptr<wrench::DataFile> file_2;
+    std::shared_ptr<wrench::DataFile> file_3;
     std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
 
@@ -75,11 +75,15 @@ public:
 
 
 protected:
+
+    ~SimpleStorageServicePerformanceTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServicePerformanceTest() {
 
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         file_1 = workflow->addFile("file_1", FILE_SIZE);
@@ -88,7 +92,7 @@ protected:
 
         // Create a 3-host platform file (network bandwidth == disk bandwidth)
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SrcHost\" speed=\"1f\"> "
@@ -131,8 +135,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 
@@ -140,22 +143,19 @@ protected:
 /**  CONCURRENT FILE COPIES TEST                                     **/
 /**********************************************************************/
 
-class SimpleStorageServiceConcurrentFileCopiesTestWMS : public wrench::WMS {
+class SimpleStorageServiceConcurrentFileCopiesTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleStorageServiceConcurrentFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
-                                                    const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                                    const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                                     std::string hostname,
                                                     double buffer_size) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
-        this->buffer_size = buffer_size;
+            wrench::ExecutionController(hostname, "test"), test(test), buffer_size(buffer_size) {
     }
 
 private:
 
     SimpleStorageServicePerformanceTest *test;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
     double buffer_size;
 
     int main() {
@@ -163,15 +163,13 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-        auto file_registry_service = this->getAvailableFileRegistryService();
-
         // Time the time it takes to transfer a file from Src to Dst
         double copy1_start = wrench::Simulation::getCurrentSimulatedDate();
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
                                                             wrench::FileLocation::LOCATION(this->test->storage_service_1),
                                                             wrench::FileLocation::LOCATION(this->test->storage_service_2));
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event1 = this->waitForNextEvent();
         double event1_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
         // Now do 2 of them in parallel
@@ -186,10 +184,10 @@ private:
                                                             wrench::FileLocation::LOCATION(this->test->storage_service_2));
 
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event2 = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event2 = this->waitForNextEvent();
         double event2_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event3 = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event3 = this->waitForNextEvent();
         double event3_arrival = wrench::Simulation::getCurrentSimulatedDate();
 
 
@@ -256,7 +254,7 @@ TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
 void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double buffer_size) {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -280,13 +278,10 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
                                              {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceConcurrentFileCopiesTestWMS(
-                    this, {compute_service}, {storage_service_1, storage_service_2},
-                    "WMSHost", buffer_size)));
-
-    wms->addWorkflow(this->workflow);
+                    this, "WMSHost", buffer_size)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService("WMSHost"));
@@ -296,10 +291,10 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
     ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -311,20 +306,19 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
 /**  FILE READ  TEST                                                 **/
 /**********************************************************************/
 
-class SimpleStorageServiceFileReadTestWMS : public wrench::WMS {
+class SimpleStorageServiceFileReadTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleStorageServiceFileReadTestWMS(SimpleStorageServicePerformanceTest *test,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string hostname, double buffer_size) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
-        this->buffer_size = buffer_size;
+            wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service), buffer_size(buffer_size) {
     }
 
 private:
 
     SimpleStorageServicePerformanceTest *test;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
     double buffer_size;
 
     int main() {
@@ -332,12 +326,11 @@ private:
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
 
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         double before_read = wrench::Simulation::getCurrentSimulatedDate();
         try {
             wrench::StorageService::readFile(this->test->file_1, wrench::FileLocation::LOCATION(this->test->storage_service_1));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(e.what());
         }
 
@@ -375,7 +368,7 @@ TEST_F(SimpleStorageServicePerformanceTest, FileRead) {
 void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -391,27 +384,25 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
                     {wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}
             })));
 
+    auto file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost"));
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
             new SimpleStorageServiceFileReadTestWMS(
-                    this, {storage_service_1},
+                    this, file_registry_service,
                     "WMSHost", buffer_size)));
 
-    wms->addWorkflow(this->workflow);
-
     // Create a file registry
-    simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Staging all files on the  storage service
     ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service_1));
     ASSERT_NO_THROW(simulation->stageFile(file_2, storage_service_1));
     ASSERT_NO_THROW(simulation->stageFile(file_3, storage_service_1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

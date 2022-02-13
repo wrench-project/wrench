@@ -13,7 +13,7 @@
 
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceProperty.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessagePayload.h"
-#include <wrench/services/compute/cloud/CloudComputeService.h>
+#include "wrench/services/compute/cloud/CloudComputeService.h"
 
 namespace wrench {
 
@@ -28,11 +28,11 @@ namespace wrench {
      */
     class VirtualizedClusterComputeService : public CloudComputeService {
     private:
-        std::map<std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -55,8 +55,8 @@ namespace wrench {
         VirtualizedClusterComputeService(const std::string &hostname,
                                          std::vector<std::string> &execution_hosts,
                                          std::string scratch_space_mount_point,
-                                         std::map<std::string, std::string> property_list = {},
-                                         std::map<std::string, double> messagepayload_list = {});
+                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -85,7 +85,7 @@ namespace wrench {
 
         bool processNextMessage() override;
 
-        virtual void processMigrateVM(const std::string &answer_mailbox,
+        virtual void processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                       const std::string &vm_name,
                                       const std::string &dest_pm_hostname);
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,11 +9,10 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/ResourceSwitcher.h"
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
@@ -24,17 +23,21 @@ WRENCH_LOG_CATEGORY(storage_service_start_restart_host_failures_test, "Log categ
 class StorageServiceReStartHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::StorageService> storage_service;
 
     void do_StorageServiceRestartTest_test();
 
 protected:
 
+    ~StorageServiceReStartHostFailuresTest() {
+        workflow->clear();
+    }
+
     StorageServiceReStartHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
         std::string trace_file_content = "PERIODICITY 100\n"
@@ -50,7 +53,7 @@ protected:
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\" > "
@@ -93,14 +96,12 @@ protected:
 /**          START SERVICE ON DOWN HOST TEST                         **/
 /**********************************************************************/
 
-class StorageServiceRestartTestWMS : public wrench::WMS {
+class StorageServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceRestartTestWMS(StorageServiceReStartHostFailuresTest *test,
-                                 std::string &hostname,
-                                 std::shared_ptr<wrench::StorageService> storage_service
-    ) :
-            wrench::WMS(nullptr, nullptr, {}, {storage_service}, {}, nullptr, hostname, "test") {
+                                 std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -113,52 +114,52 @@ private:
         // Starting a FailedHost murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        resurector->simulation = this->simulation;
+        resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
-        auto file = this->getWorkflow()->getFileByID("file");
-        auto storage_service = *(this->getAvailableStorageServices().begin());
+        auto file = this->test->workflow->getFileByID("file");
+        auto storage_service = this->test->storage_service;
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
 
         // Starting a FailedHost murderer!!
         murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
                                                                                           wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
                                                                                             wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        resurector->simulation = this->simulation;
+        resurector->setSimulation(this->simulation);
         resurector->start(murderer, true, false); // Daemonized, no auto-restart
 
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
             throw std::runtime_error("Should not have been able to read the file (first attempt)");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             // Expected
         }
         wrench::Simulation::sleep(1000);
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should  have been able to read the file (second attempt)");
         }
 
@@ -173,7 +174,7 @@ TEST_F(StorageServiceReStartHostFailuresTest, StorageServiceReStartTest) {
 void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -187,15 +188,13 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Get a hostname
     std::string failed_host = "FailedHost";
-    auto storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, {"/"}));
+    storage_service = simulation->add(new wrench::SimpleStorageService(failed_host, {"/"}));
 
     // Create a WMS
     std::string stable_host = "StableHost";
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new StorageServiceRestartTestWMS(this, stable_host, storage_service)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new StorageServiceRestartTestWMS(this, stable_host)));
 
     auto file = workflow->addFile("file", 10000000);
 
@@ -203,10 +202,10 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     simulation->stageFile(file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

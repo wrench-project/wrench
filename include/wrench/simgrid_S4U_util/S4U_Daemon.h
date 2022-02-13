@@ -41,18 +41,27 @@ namespace wrench {
 
 
     public:
+
+        static std::unordered_map<aid_t , simgrid::s4u::Mailbox*> map_actor_to_recv_mailbox;
+
         /** @brief The name of the daemon */
         std::string process_name;
-        /** @brief The initial name of the daemon's mailbox */
-        std::string initial_mailbox_name;
-        /** @brief The current name of the daemon's mailbox */
-        std::string mailbox_name;
+//        /** @brief The initial name of the daemon's mailbox */
+//        std::string initial_mailbox_name;
+//        /** @brief The current name of the daemon's mailbox */
+//        std::string mailbox_name;
+
+        /** @brief The daemon's mailbox **/
+        simgrid::s4u::Mailbox *mailbox;
+        /** @brief The daemon's receive mailbox (to send to another daemon so that that daemon can reply) **/
+        simgrid::s4u::Mailbox *recv_mailbox;
+
         /** @brief The name of the host on which the daemon is running */
         std::string hostname;
 
+        static simgrid::s4u::Mailbox *getRunningActorRecvMailbox();
 
-
-        S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix);
+        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         // Daemon without a mailbox (not needed?)
 //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
@@ -101,9 +110,20 @@ namespace wrench {
         /** @brief The daemon's life saver */
         LifeSaver *life_saver = nullptr;
 
+        /** @brief Method to acquire the daemon's lock */
+        void acquireDaemonLock();
+
+        /** @brief Method to release the daemon's lock */
+        void releaseDaemonLock();
+
+        Simulation *getSimulation();
+
+        void setSimulation(Simulation *simulation);
+
+    protected:
         /** @brief a pointer to the simulation object */
         Simulation *simulation;
-    protected:
+
 
         /** @brief The service's state */
         State state;
@@ -111,11 +131,9 @@ namespace wrench {
         friend class S4U_DaemonActor;
         void runMainMethod();
 
-        void killActor();
+        bool killActor();
 
-        void acquireDaemonLock();
 
-        void releaseDaemonLock();
 
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;

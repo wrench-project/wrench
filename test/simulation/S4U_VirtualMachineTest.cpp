@@ -22,14 +22,19 @@ public:
     void do_basic_Test();
 
 protected:
+
+    ~S4U_VirtualMachineTest() {
+        workflow->clear();
+    }
+
     S4U_VirtualMachineTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
@@ -64,7 +69,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -72,7 +77,7 @@ class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
     Sleep100Daemon(std::string hostname) :
-            S4U_Daemon(hostname, "sleep100daemon", "sleep100daemon") {}
+            S4U_Daemon(hostname, "sleep100daemon") {}
 
     int main() override {
         simgrid::s4u::this_actor::execute(100);
@@ -86,12 +91,12 @@ public:
 /**********************************************************************/
 
 
-class S4U_VirtualMachineTestWMS : public wrench::WMS {
+class S4U_VirtualMachineTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_VirtualMachineTestWMS(S4U_VirtualMachineTest *test,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -163,7 +168,7 @@ TEST_F(S4U_VirtualMachineTest, Basic) {
 void S4U_VirtualMachineTest::do_basic_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -178,17 +183,13 @@ void S4U_VirtualMachineTest::do_basic_Test() {
 
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new S4U_VirtualMachineTestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

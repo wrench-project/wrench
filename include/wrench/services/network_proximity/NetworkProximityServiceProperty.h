@@ -10,7 +10,7 @@
 #ifndef WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
 #define WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
 
-#include <wrench/services/ServiceProperty.h>
+#include "wrench/services/ServiceProperty.h"
 
 namespace wrench {
 
@@ -39,6 +39,9 @@ namespace wrench {
         /** @brief The maximum random uniformly distributed noise (in seconds) to be added to the measurement period (useful
          * to avoid idiosyncratic effects of perfect synchrony) (default: 20) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
+
+        /** @brief The seed for the noise random number generator **/
+        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED);
 
         /** @brief The percentage of other network proximity daemons that each network proximity daemon will conduct RTT measurements with (default: 1.0)**/
         DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_COVERAGE);

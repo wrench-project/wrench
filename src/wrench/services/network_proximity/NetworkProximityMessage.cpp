@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "NetworkProximityMessage.h"
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
 
 namespace wrench {
     /**
@@ -26,17 +26,15 @@ namespace wrench {
      * @param hosts: the pair of hosts to look up
      * @param payload: the message size in bytes
      */
-    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(std::string answer_mailbox,
+    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::pair<std::string, std::string> hosts,
                                                                                double payload) :
-            NetworkProximityMessage("PROXIMITY_LOOKUP_REQUEST", payload) {
+            NetworkProximityMessage("PROXIMITY_LOOKUP_REQUEST", payload), answer_mailbox(answer_mailbox), hosts(hosts) {
 
-        if ((answer_mailbox == "") || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        if ((answer_mailbox == nullptr) || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
             throw std::invalid_argument(
                     "NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->hosts = hosts;
     }
 
 
@@ -102,7 +100,7 @@ namespace wrench {
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
                                                                    std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
-                                                                   std::string next_mailbox_to_send, double payload) :
+                                                                   simgrid::s4u::Mailbox *next_mailbox_to_send, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_ANSWER", payload) {
         this->next_host_to_send = next_host_to_send;
         this->next_daemon_to_send = next_daemon_to_send;
@@ -124,15 +122,13 @@ namespace wrench {
      * @param requested_host: the naje of the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
-    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox,
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                    std::string requested_host, double payload) :
-            NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
-        if (answer_mailbox == "" || requested_host == "") {
+            NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload), answer_mailbox(answer_mailbox), requested_host(requested_host) {
+        if (answer_mailbox == nullptr || requested_host == "") {
             throw std::invalid_argument(
                     "CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->requested_host = requested_host;
     }
 
     /**

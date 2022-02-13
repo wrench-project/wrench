@@ -14,8 +14,10 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
+
 #include "Version.h"
-#include <wrench/simulation/SimulationOutput.h>
+#include "wrench/simulation/SimulationOutput.h"
 
 
 namespace wrench {
@@ -31,8 +33,8 @@ namespace wrench {
     class BareMetalComputeService;
     class CloudComputeService;
     class VirtualizedClusterComputeService;
-    class WMS;
-    class WorkflowFile;
+    class ExecutionController;
+    class DataFile;
     class SimulationOutput;
     class S4U_Simulation;
     class FileLocation;
@@ -46,11 +48,14 @@ namespace wrench {
     class Simulation {
 
     public:
-        Simulation();
+
+        static std::shared_ptr<Simulation> createSimulation();
 
         ~Simulation();
 
         void init(int *, char **);
+
+        static bool isInitialized();
 
         void instantiatePlatform(std::string);
         void instantiatePlatform(const std::function<void()>&);
@@ -60,6 +65,12 @@ namespace wrench {
         static double getHostMemoryCapacity(std::string hostname);
         static unsigned long getHostNumCores(std::string hostname);
         static double getHostFlopRate(std::string hostname);
+
+        static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
+        static void removeFile(std::shared_ptr<DataFile>file);
+        static std::shared_ptr<DataFile> getFileByID(const std::string &id);
+        static std::shared_ptr<DataFile> addFile(std::string, double);
+
 
 
         void launch();
@@ -90,8 +101,8 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss);
-        void stageFile(WorkflowFile *file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
+        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> ss);
+        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -140,9 +151,9 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
-        void readWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
-        void writebackWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
-        void writeThroughWithMemoryCache(WorkflowFile *file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void readWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void writebackWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void writeThroughWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location);
         MemoryManager* getMemoryManagerByHost(std::string hostname);
 
         static double getMemoryCapacity();
@@ -158,16 +169,19 @@ namespace wrench {
         static bool isEnergySimulationEnabled();
 
 
-            /***********************/
+        /***********************/
         /** \endcond           */
         /***********************/
 
     private:
+
+        Simulation();
+
         SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
-        std::set<std::shared_ptr<WMS>> wmses;
+        std::set<std::shared_ptr<ExecutionController>> execution_controllers;
 
         std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
 
@@ -185,7 +199,7 @@ namespace wrench {
 
         static int unique_disk_sequence_number;
 
-        void stageFile(WorkflowFile *file, std::shared_ptr<FileLocation> location);
+        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location);
 
         void platformSanityCheck();
         void checkSimulationSetup();
@@ -195,7 +209,7 @@ namespace wrench {
         void addService(std::shared_ptr<ComputeService> service);
         void addService(std::shared_ptr<StorageService> service);
         void addService(std::shared_ptr<NetworkProximityService> service);
-        void addService(std::shared_ptr<WMS> service);
+        void addService(std::shared_ptr<ExecutionController> service);
         void addService(std::shared_ptr<FileRegistryService> service);
         void addService(std::shared_ptr<EnergyMeterService> service);
         void addService(std::shared_ptr<BandwidthMeterService> service);
@@ -209,10 +223,20 @@ namespace wrench {
 
         unsigned int on_state_change_callback_id;
 
+
         static bool energy_enabled;
         static bool host_shutdown_enabled;
         static bool pagecache_enabled;
+
+        static bool initialized;
+
+    private:
+        /* Map of files */
+        static std::map<std::string, std::shared_ptr<DataFile>> data_files;
+
     };
+
+
 
 };
 

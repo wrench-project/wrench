@@ -14,13 +14,13 @@ WRENCH_LOG_CATEGORY(data_movement_manager_copy_register_test, "Log category for 
 class DataMovementManagerCopyRegisterTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *src_file_1;
-    wrench::WorkflowFile *src_file_2;
-    wrench::WorkflowFile *src_file_3;
+    std::shared_ptr<wrench::DataFile> src_file_1;
+    std::shared_ptr<wrench::DataFile> src_file_2;
+    std::shared_ptr<wrench::DataFile> src_file_3;
 
-    wrench::WorkflowFile *src2_file_1;
-    wrench::WorkflowFile *src2_file_2;
-    wrench::WorkflowFile *src2_file_3;
+    std::shared_ptr<wrench::DataFile> src2_file_1;
+    std::shared_ptr<wrench::DataFile> src2_file_2;
+    std::shared_ptr<wrench::DataFile> src2_file_3;
 
     std::shared_ptr<wrench::StorageService> dst_storage_service = nullptr;
     std::shared_ptr<wrench::StorageService> src_storage_service = nullptr;
@@ -31,10 +31,15 @@ public:
     void do_CopyRegister_test();
 
 protected:
+
+    ~DataMovementManagerCopyRegisterTest() {
+        workflow->clear();
+    }
+
     DataMovementManagerCopyRegisterTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         src_file_1 = workflow->addFile("file_1", FILE_SIZE);
@@ -47,7 +52,7 @@ protected:
 
         // Create a 3-host platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SrcHost\" speed=\"1f\"> "
@@ -87,34 +92,30 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
 /**********************************************************************/
 /**  FILE COPY AND REGISTER TEST                                     **/
 /**********************************************************************/
 
-class DataMovementManagerCopyRegisterTestWMS : public wrench::WMS {
+class DataMovementManagerCopyRegisterTestWMS : public wrench::ExecutionController {
 
 public:
     DataMovementManagerCopyRegisterTestWMS(DataMovementManagerCopyRegisterTest *test,
-                                           const std::set<std::shared_ptr<wrench::ComputeService>> compute_services,
-                                           const std::set<std::shared_ptr<wrench::StorageService>> storage_services,
                                            std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                            std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service,
-                        hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service)  {
     }
 
 private:
     DataMovementManagerCopyRegisterTest *test;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service;
 
     int main() {
 
 
         auto data_movement_manager = this->createDataMovementManager();
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // try synchronous copy and register
 
@@ -124,7 +125,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
 
-        } catch (wrench::WorkflowExecutionEvent &e)  {
+        } catch (wrench::ExecutionEvent &e)  {
             throw std::runtime_error("Synchronous file copy failed");
         }
 
@@ -153,31 +154,31 @@ private:
                                                          file_registry_service);
 
             throw std::runtime_error("Synchronous file copy failed");
-        } catch (wrench::WorkflowExecutionException &e)  {
+        } catch (wrench::ExecutionException &e)  {
         }
 
         // Create a new file registry service to resume normal testing
         file_registry_service = std::shared_ptr<wrench::FileRegistryService>(
                 new wrench::FileRegistryService(this->hostname, {}, {}));
-        file_registry_service->simulation = this->simulation;
+        file_registry_service->setSimulation(this->simulation);
         file_registry_service->start(file_registry_service, true, false);
 
 
         // try asynchronous copy and register
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event;
+        std::shared_ptr<wrench::ExecutionEvent> async_copy_event;
 
         try {
             data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_1,
                                                                 wrench::FileLocation::LOCATION(this->test->src2_storage_service),
                                                                 wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                                 file_registry_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Got an exception while trying to instantiate a file copy: " + std::string(e.what()));
         }
 
         try {
-            async_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+            async_copy_event = this->waitForNextEvent();
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
         }
 
@@ -200,7 +201,7 @@ private:
 
         // try 2 asynchronous copies of the same file
         bool double_copy_failed = false;
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event;
+        std::shared_ptr<wrench::ExecutionEvent> async_dual_copy_event;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_2,
                                                             wrench::FileLocation::LOCATION(this->test->src_storage_service),
@@ -212,11 +213,11 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->src_storage_service),
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             double_copy_failed = true;
         }
 
-        async_dual_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
+        async_dual_copy_event = this->waitForNextEvent();
 
         auto src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
 
@@ -242,7 +243,7 @@ private:
         // try 1 asynchronous and 1 synchronous copy of the same file
         double_copy_failed = false;
 
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_dual_copy_event2;
+        std::shared_ptr<wrench::ExecutionEvent> async_dual_copy_event2;
 
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src_file_3,
@@ -255,13 +256,13 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->src_storage_service),
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             if (std::dynamic_pointer_cast<wrench::FileAlreadyBeingCopied>(e.getCause())) {
                 double_copy_failed = true;
             }
         }
 
-        async_dual_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
+        async_dual_copy_event2 = this->waitForNextEvent();
 
         auto async_dual_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_dual_copy_event2);
 
@@ -292,7 +293,7 @@ private:
         }
 
         // try 1 asynchronous copy and then kill the file registry service right after the copy is instantiated
-        std::shared_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
+        std::shared_ptr<wrench::ExecutionEvent> async_copy_event2;
 
         data_movement_manager->initiateAsynchronousFileCopy(this->test->src2_file_2,
                                                             wrench::FileLocation::LOCATION(this->test->src2_storage_service),
@@ -301,7 +302,7 @@ private:
 
         file_registry_service->stop();
 
-        async_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
+        async_copy_event2 = this->waitForNextEvent();
 
         auto async_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_copy_event2);
 
@@ -331,7 +332,7 @@ TEST_F(DataMovementManagerCopyRegisterTest, CopyAndRegister) {
 
 void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
@@ -364,11 +365,9 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
-            this, {compute_service}, {src_storage_service, src2_storage_service, dst_storage_service}, file_registry_service, "WMSHost")));
-
-    wms->addWorkflow(this->workflow);
+            this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
@@ -381,7 +380,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

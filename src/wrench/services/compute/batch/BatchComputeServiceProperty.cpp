@@ -7,17 +7,13 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
+#include <wrench/services/compute/batch/BatchComputeServiceProperty.h>
 
 namespace wrench {
 
     SET_PROPERTY_NAME(BatchComputeServiceProperty, TASK_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, HOST_SELECTION_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, TASK_SELECTION_ALGORITHM);
-
-////    SET_PROPERTY_NAME(BatchComputeServiceProperty, SUPPORTS_GRID_UNIVERSE);
-//    SET_PROPERTY_NAME(BatchComputeServiceProperty, GRID_PRE_EXECUTION_DELAY);
-//    SET_PROPERTY_NAME(BatchComputeServiceProperty, GRID_POST_EXECUTION_DELAY);
 
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_SCHEDULING_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, BATCH_QUEUE_ORDERING_ALGORITHM);

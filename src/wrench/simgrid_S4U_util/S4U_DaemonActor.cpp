@@ -9,7 +9,7 @@
  *
  */
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_daemon_actor, "Log category for S4U_DaemonActor");
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
 class SimulationCommandLineArgumentsTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_versionArgument_test();
 
@@ -36,14 +35,19 @@ public:
     void do_ActivateEnergyArgument_test();
 
 protected:
+
+    ~SimulationCommandLineArgumentsTest() {
+        workflow->clear();
+    }
+
     SimulationCommandLineArgumentsTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
@@ -57,13 +61,12 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
-class SimulationCommandLineArgumentsWMS : public wrench::WMS {
+class SimulationCommandLineArgumentsWMS : public wrench::ExecutionController {
 
 public:
     SimulationCommandLineArgumentsWMS(SimulationCommandLineArgumentsTest *test,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -93,7 +96,7 @@ TEST_F(SimulationCommandLineArgumentsTest, VersionArgument) {
 
 void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -139,7 +142,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
 
     ASSERT_GE(linecount, 2);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -157,7 +160,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpWrenchArgument) {
 
 void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -194,7 +197,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     ASSERT_GE(linecount, 5);
     ASSERT_LE(linecount, 15);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -210,7 +213,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpSimGridArgument) {
 }
 
 void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -250,7 +253,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     ASSERT_GE(linecount, 100);
     ASSERT_LE(linecount, 300);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -268,7 +271,7 @@ TEST_F(SimulationCommandLineArgumentsTest, HelpArgument) {
 
 void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -280,7 +283,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     ASSERT_EQ(argc, 2);
     ASSERT_EQ(!strcmp(argv[1], "--help"), 1);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -296,7 +299,7 @@ TEST_F(SimulationCommandLineArgumentsTest, NoColorArgument) {
 
 void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -312,11 +315,9 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -348,7 +349,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     ASSERT_EQ(found_color, false);
 
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -370,7 +371,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     xbt_log_control_set("root.thresh:info");
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -386,11 +387,9 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -408,12 +407,13 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     }
     fclose(stderr_file);
 
+
     ASSERT_EQ(linecount, num_log_lines);
 
     // Just in case
     xbt_log_control_set("root.thresh:critical");
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -432,7 +432,7 @@ TEST_F(SimulationCommandLineArgumentsTest, ActivateEnergyArgument) {
 
 void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -443,15 +443,12 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
-    wms->addWorkflow(workflow);
-
     simulation->launch();
 
-    delete simulation;
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
