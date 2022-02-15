@@ -25,9 +25,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tools/wrench/wrench-init/wrench-init
         )
 
 # install wrench-dashboard
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tools/wrench/wrench-dashboard
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tools/wrench/wrench-dashboard/wrench-dashboard
         DESTINATION bin
-        PATTERN "*"
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
