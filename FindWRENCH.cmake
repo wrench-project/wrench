@@ -50,14 +50,22 @@ find_library(WRENCH_LIBRARY
         NAMES wrench
         PATHS ${WRENCH_PATH}/lib /opt/wrench/lib
         )
+
+find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY
+        NAMES wrenchpegasusworkflowparser
+        PATHS ${WRENCH_PATH}/lib /opt/wrench/lib
+        )
+
+
 mark_as_advanced(WRENCH_INCLUDE_DIR)
 mark_as_advanced(WRENCH_LIBRARY)
+mark_as_advanced(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY)
 
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(WRENCH
         FOUND_VAR WRENCH_FOUND
-        REQUIRED_VARS WRENCH_INCLUDE_DIR WRENCH_LIBRARY
+        REQUIRED_VARS WRENCH_INCLUDE_DIR WRENCH_LIBRARY WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY
         VERSION_VAR WRENCH_VERSION
         REASON_FAILURE_MESSAGE "The WRENCH package could not be located. If you installed WRENCH in a non-standard location, pass -DWRENCH_PATH=<path to location> to cmake (e.g., cmake -DWRENCH_PATH=/opt/somewhere/)"
         FAIL_MESSAGE "Could not find the WRENCH installation"
@@ -65,6 +73,7 @@ find_package_handle_standard_args(WRENCH
 
 
 if (WRENCH_FOUND AND NOT CMAKE_VERSION VERSION_LESS 2.8.12)
+
     add_library(WRENCH::WRENCH SHARED IMPORTED)
     set_target_properties(WRENCH::WRENCH PROPERTIES
             INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${WRENCH_INCLUDE_DIR}
