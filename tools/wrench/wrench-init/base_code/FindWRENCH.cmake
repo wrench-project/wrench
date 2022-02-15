@@ -41,6 +41,19 @@ cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_path(WRENCH_INCLUDE_DIR
+        NAMES wrench-dev.h
+        PATHS ${WRENCH_PATH}/include /opt/wrench/include
+        )
+
+find_library(WRENCH_LIBRARY
+        NAMES wrench
+        PATHS ${WRENCH_PATH}/lib /opt/wrench/lib
+        )
+mark_as_advanced(WRENCH_jINCLUDE_DIR)
+mark_as_advanced(WRENCH_LIBRARY)
+
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(WRENCH
         FOUND_VAR WRENCH_FOUND
