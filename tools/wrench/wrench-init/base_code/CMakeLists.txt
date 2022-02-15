@@ -23,11 +23,6 @@ set(SOURCE_FILES
         src/Simulator.cpp
         )
 
-# wrench library and dependencies
-#find_library(WRENCH_LIBRARY NAMES wrench)
-#find_library(WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY NAMES wrenchpegasusworkflowparser)
-#find_library(PUGIXML_LIBRARY NAMES pugixml)
-
 # generating the executable
 add_executable(my-wrench-simulator ${SOURCE_FILES})
 
