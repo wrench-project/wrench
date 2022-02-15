@@ -19,6 +19,7 @@ project-folder/
 ├── CMakeLists.txt
 ├── CMakeModules
 │   └── FindSimGrid.cmake
+│   └── FindWRENCH.cmake
 ├── src/
 │   ├── Simulator.cpp
 │   ├── Controller.cpp
