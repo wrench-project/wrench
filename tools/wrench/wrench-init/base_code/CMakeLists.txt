@@ -15,7 +15,7 @@ find_package(SimGrid REQUIRED)
 find_package(Boost REQUIRED)
 
 # include directories
-include_directories(include/ /usr/local/include /opt/local/include ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(include/ /usr/local/include/ /opt/local/include/ ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 # source files
 set(SOURCE_FILES
@@ -34,16 +34,16 @@ add_executable(my-wrench-simulator ${SOURCE_FILES})
 if (ENABLE_BATSCHED)
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
+            ${SimGrid_LIBRARY}
 #            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
 #            ${PUGIXML_LIBRARY}
-            ${SimGrid_LIBRARY}
             -lzmq)
 else()
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
+            ${SimGrid_LIBRARY}
 #            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
 #            ${PUGIXML_LIBRARY}
-            ${SimGrid_LIBRARY}
             )
 endif()
 
