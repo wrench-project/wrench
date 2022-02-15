@@ -18,8 +18,8 @@ namespace wrench {
      *
      * @param name: the message name
      */
-    ActionExecutorMessage::ActionExecutorMessage(std::string name) :
-            SimulationMessage("ActionExecutorMessage::" + name, 0) {
+    ActionExecutorMessage::ActionExecutorMessage() :
+            SimulationMessage( 0) {
     }
 
     /**
@@ -28,7 +28,7 @@ namespace wrench {
      * @param action_executor: The Action Executor
      */
     ActionExecutorDoneMessage::ActionExecutorDoneMessage(std::shared_ptr<ActionExecutor> action_executor) :
-            ActionExecutorMessage("ActionExecutorDoneMessage") {
+            ActionExecutorMessage() {
         this->action_executor = std::move(action_executor);
     }
 

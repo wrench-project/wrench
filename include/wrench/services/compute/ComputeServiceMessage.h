@@ -31,7 +31,7 @@ namespace wrench {
      */
     class ComputeServiceMessage : public ServiceMessage {
     protected:
-        ComputeServiceMessage(std::string name, double payload);
+        ComputeServiceMessage(double payload);
     };
 
 
