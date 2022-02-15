@@ -76,6 +76,7 @@ def main():
     # Copy all relevant files
     _create_file(FILE_CONTENT_CMAKELISTS_TXT, args.project_dir + "/CMakeLists.txt")
     _create_file(FILE_CONTENT_FINDSIMGRID_CMAKE, args.project_dir + "/CMakeModules/FindSimGrid.cmake")
+    _create_file(FILE_CONTENT_FINDWRENCH_CMAKE, args.project_dir + "/CMakeModules/FindWRENCH.cmake")
     _create_file(FILE_CONTENT_PLATFORM_XML, args.project_dir + "/data/platform.xml")
 
     if (args.api == "workflow"):
