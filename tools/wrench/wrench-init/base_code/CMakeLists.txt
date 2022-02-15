@@ -9,11 +9,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
+# Find WRENCH, SimGrid, and Boost
 find_package(WRENCH REQUIRED)
 find_package(SimGrid REQUIRED)
 find_package(Boost REQUIRED)
 
-# include directories for dependencies and WRENCH libraries
+# include directories
 include_directories(include/ /usr/local/include /opt/local/include ${WRENCH_INCLUDE_DIR} ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 
 # source files
@@ -26,19 +27,23 @@ set(SOURCE_FILES
 # generating the executable
 add_executable(my-wrench-simulator ${SOURCE_FILES})
 
+# PugiXML, needed if using the WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY
+#find_library(PUGIXML_LIBRARY NAMES pugixml)
+
+# Specify libraries to link
 if (ENABLE_BATSCHED)
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
 #            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
+#            ${PUGIXML_LIBRARY}
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
-            -lzmq )
+            -lzmq)
 else()
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
 #            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
+#            ${PUGIXML_LIBRARY}
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             )
 endif()
 
