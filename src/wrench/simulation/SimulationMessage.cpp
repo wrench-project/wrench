@@ -11,6 +11,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/data_file/DataFile.h>
+#include <typeinfo>
+#include <boost/core/demangle.hpp>
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_message, "Log category for SimulationMessage");
 
@@ -28,11 +30,10 @@ namespace wrench {
      * @param name: message name (a "human-readable type" really)
      * @param payload: message size in bytes
      */
-    SimulationMessage::SimulationMessage(std::string name, double payload) {
-        if ((name.empty()) || (payload < 0)) {
+    SimulationMessage::SimulationMessage(double payload) {
+        if (payload < 0) {
             throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
         }
-        this->name = name;
         this->payload = payload;
     }
 
@@ -41,7 +42,8 @@ namespace wrench {
      * @return the name
      */
     std::string SimulationMessage::getName() {
-        return this->name;
+        char const * name = typeid( *this).name();
+        return boost::core::demangle( name );
     }
 
 

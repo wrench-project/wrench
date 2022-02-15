@@ -23,7 +23,7 @@ namespace wrench {
     */
     class ExecutionControllerMessage : public SimulationMessage {
     protected:
-        ExecutionControllerMessage(std::string name, double payload);
+        ExecutionControllerMessage(double payload);
     };
 
 

@@ -24,7 +24,7 @@ namespace wrench{
      */
     class BatchComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        BatchComputeServiceMessage(std::string name, double payload);
+        BatchComputeServiceMessage( double payload);
     };
 
     /**

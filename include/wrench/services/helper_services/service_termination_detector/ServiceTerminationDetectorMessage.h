@@ -27,7 +27,7 @@ namespace wrench {
      */
     class ServiceTerminationDetectorMessage : public SimulationMessage {
     protected:
-        explicit ServiceTerminationDetectorMessage(std::string name);
+        explicit ServiceTerminationDetectorMessage();
     };
 
     /**

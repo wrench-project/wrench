@@ -32,7 +32,7 @@ namespace wrench {
      */
     class StorageServiceMessage : public ServiceMessage {
     protected:
-        StorageServiceMessage(std::string name, double payload);
+        StorageServiceMessage(double payload);
     };
 
 
@@ -295,7 +295,7 @@ namespace wrench {
     */
     class StorageServiceAckMessage : public StorageServiceMessage {
     public:
-        StorageServiceAckMessage() : StorageServiceMessage("ACK",0) {}
+        StorageServiceAckMessage() : StorageServiceMessage(0) {}
     };
 
 
