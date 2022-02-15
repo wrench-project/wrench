@@ -26,7 +26,7 @@ echo "\"\"\""
 echo ""
 
 echo "FILE_CONTENT_FINDWRENCH_CMAKE = r\"\"\""
-cat $1"/conf/cmake/FindWRENCH.cmake"
+cat $1"/tools/wrench/wrench-init/base_code/FindWRENCH.cmake"
 echo "\"\"\""
 echo ""
 
