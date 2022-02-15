@@ -50,7 +50,7 @@ find_library(WRENCH_LIBRARY
         NAMES wrench
         PATHS ${WRENCH_PATH}/lib /opt/wrench/lib
         )
-mark_as_advanced(WRENCH_jINCLUDE_DIR)
+mark_as_advanced(WRENCH_INCLUDE_DIR)
 mark_as_advanced(WRENCH_LIBRARY)
 
 
