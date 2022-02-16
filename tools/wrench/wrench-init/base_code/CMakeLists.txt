@@ -35,6 +35,7 @@ if (ENABLE_BATSCHED)
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
             ${SimGrid_LIBRARY}
+            ${Boost_LIBRARIES}
 #            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
 #            ${PUGIXML_LIBRARY}
             -lzmq)
@@ -42,6 +43,7 @@ else()
     target_link_libraries(my-wrench-simulator
             ${WRENCH_LIBRARY}
             ${SimGrid_LIBRARY}
+            ${Boost_LIBRARIES}
 #            ${WRENCH_PEGASUS_WORKFLOW_PARSER_LIBRARY}
 #            ${PUGIXML_LIBRARY}
             )
