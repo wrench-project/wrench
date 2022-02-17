@@ -11,7 +11,7 @@
 #include <wrench.h>
 
 #include "CondorWMS.h" // WMS implementation
-#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
+#include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
 
 
 /**

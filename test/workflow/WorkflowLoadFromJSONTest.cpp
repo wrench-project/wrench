@@ -12,7 +12,7 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/workflow/Workflow.h>
 #include "../include/UniqueTmpPathPrefix.h"
-#include <wrench/tools/pegasus/PegasusWorkflowParser.h>
+#include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
 class WorkflowLoadFromJSONTest : public ::testing::Test {
 protected:
@@ -26,7 +26,7 @@ protected:
                 "  \"wms\": {\n"
                 "    \"url\": \"http://pegasus.isi.edu\", \n"
                 "    \"version\": \"4.9.0panorama\", \n"
-                "    \"name\": \"Pegasus\"\n"
+                "    \"name\": \"WfCommons\"\n"
                 "  }, \n"
                 "  \"author\": {\n"
                 "    \"name\": \"rafsilva\", \n"
@@ -3190,10 +3190,10 @@ TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
 
     std::shared_ptr<wrench::Workflow> workflow;
 
-    ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
+    ASSERT_THROW(workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
                  std::invalid_argument);
     ASSERT_NO_THROW(
-            workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
+            workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
     ASSERT_EQ(workflow->getNumberOfTasks(), 71);
     ASSERT_EQ(workflow->getFileMap().size(), 69);
 

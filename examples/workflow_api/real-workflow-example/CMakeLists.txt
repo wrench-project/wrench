@@ -17,12 +17,12 @@ add_custom_target(
 
 add_dependencies(examples wrench-example-real-workflow)
 add_dependencies(wrench-example-real-workflow wrench-example-real-workflow-files)
-add_dependencies(wrench-example-real-workflow wrenchpegasusworkflowparser)
+add_dependencies(wrench-example-real-workflow wrenchwfcommonsworkflowparser)
 
 if (ENABLE_BATSCHED)
     target_link_libraries(wrench-example-real-workflow
             wrench
-            wrenchpegasusworkflowparser
+            wrenchwfcommonsworkflowparser
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
@@ -31,7 +31,7 @@ if (ENABLE_BATSCHED)
 else()
     target_link_libraries(wrench-example-real-workflow
             wrench
-            wrenchpegasusworkflowparser
+            wrenchwfcommonsworkflowparser
             ${SimGrid_LIBRARY}
             ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
