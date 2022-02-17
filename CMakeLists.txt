@@ -340,7 +340,6 @@ set(TEST_FILES
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowParallelModelTest.cpp
-        test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal/BareMetalComputeServiceOneTaskTest.cpp
@@ -449,9 +448,9 @@ install(DIRECTORY include/ DESTINATION include)
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
 else ()
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
 endif ()
 
 

@@ -1,0 +1,255 @@
+{
+  "name": "pipeline",
+  "workflow": {
+    "tasks": [
+      {
+        "name": "mp2rage_skullstripping",
+        "type": "compute",
+        "memory": 4000000000,
+        "runtime": 137.2023715,
+        "cores": 1,
+        "parents": [],
+        "childrens": [
+            "mgdm_segmentation"
+        ],
+        "files": [
+            {
+                "link": "input",
+                "name": "sub001_sess1_INV2.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_T1w.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_T1map.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_strip-inv2.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_strip-mask.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_strip-t1w.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_strip-t1map.nii",
+                "size": 98304352
+            }
+        ]
+      },
+      {
+        "name": "mgdm_segmentation",
+        "type": "compute",
+        "memory": 4000000000,
+        "runtime": 614.2867069244385,
+        "cores": 1,
+        "parents": [
+            "mp2rage_skullstripping"
+        ],
+        "childrens": [
+            "extract_brain_region"
+        ],
+        "files": [
+            {
+                "link": "input",
+                "name": "sub001_sess1_strip-t1w.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_strip-t1map.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_mgdm-seg.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_mgdm-dist.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_mgdm-lbls.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_mgdm-mems.nii",
+                "size": 589824352
+            }
+        ]
+      },
+      {
+        "name": "extract_brain_region",
+        "type": "compute",
+        "memory": 4000000000,
+        "runtime": 75.760314464569,
+        "cores": 1,
+        "parents": [
+            "mgdm_segmentation"
+        ],
+        "childrens": [
+            "extract_brain_region"
+        ],
+        "files": [
+            {
+                "link": "input",
+                "name": "sub001_sess1_strip-seg.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_strip-dist.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_strip-lbls.nii",
+                "size": 589824352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_strip-mems.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xmask-lcrwm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xproba-lcrwm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xlvl-lcrwm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xmask-lcrgm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xproba-lcrgm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xlvl-lcrgm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xmask-lcrbg.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xproba-lcrbg.nii",
+                "size": 98304352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_xlvl-lcrbg.nii",
+                "size": 98304352
+            }
+        ]
+      },
+      {
+        "name": "cruise_cortex_extraction",
+        "type": "compute",
+        "memory": 4000000000,
+        "runtime": 272.45085048675537,
+        "cores": 1,
+        "parents": [
+            "extract_brain_region"
+        ],
+        "childrens": [
+        ],
+        "files": [
+            {
+                "link": "input",
+                "name": "sub001_sess1_left_cerebrum_xmask-lcrwm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_left_cerebrum_xproba-lcrwm.nii",
+                "size": 98304352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_left_cerebrum_xproba-lcrgm.nii",
+                "size": 589824352
+            },
+            {
+                "link": "input",
+                "name": "sub001_sess1_left_cerebrum_xproba-lcrbg.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-cortex.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-gwb.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-cgb.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-avg.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-thick.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-pwm.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-pgm.nii",
+                "size": 589824352
+            },
+            {
+                "link": "output",
+                "name": "sub001_sess1_left_cerebrum_cruise-pcsf.nii",
+                "size": 589824352
+            }
+        ]
+      }
+    ]
+  }
+}
+

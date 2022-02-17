@@ -1,0 +1,79 @@
+{
+  "name": "simple-workflow",
+  "workflow": {
+    "tasks": [
+      {
+        "name": "task01",
+        "type": "compute",
+        "memory": 75000000000,
+        "runtime": 0.110,
+        "cores": 1,
+        "parents": [],
+        "childrens": [
+            "task02"
+        ],
+        "files": [
+            {
+                "link": "input",
+                "name": "file1.dat",
+                "size": 75000000000
+            },
+            {
+                "link": "output",
+                "name": "file2.dat",
+                "size": 75000000000
+            }
+        ]
+      },
+      {
+        "name": "task02",
+        "type": "compute",
+        "memory": 75000000000,
+        "runtime": 0.110,
+        "cores": 1,
+        "parents": [
+          "task01"
+        ],
+        "childrens": [
+            "task03"
+        ],
+        "files": [
+            {
+                "link": "input",
+                "name": "file2.dat",
+                "size": 75000000000
+            },
+            {
+                "link": "output",
+                "name": "file3.dat",
+                "size": 75000000000
+            }
+        ]
+      },
+      {
+        "name": "task03",
+        "type": "compute",
+        "memory": 75000000000,
+        "runtime": 0.110,
+        "cores": 1,
+        "parents": [
+          "task02"
+        ],
+        "childrens": [ ],
+        "files": [
+            {
+                "link": "input",
+                "name": "file3.dat",
+                "size": 75000000000
+            },
+            {
+                "link": "output",
+                "name": "file4.dat",
+                "size": 75000000000
+            }
+        ]
+      }
+    ]
+  }
+}
+
