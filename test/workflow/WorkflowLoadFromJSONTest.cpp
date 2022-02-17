@@ -12,7 +12,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/workflow/Workflow.h"
 #include "../include/UniqueTmpPathPrefix.h"
-#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
+#include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
 
 class WorkflowLoadFromJSONTest : public ::testing::Test {
 protected:
@@ -20,13 +20,13 @@ protected:
         std::string json =
                 "{\n"
                 "  \"name\": \"1000genome-20180208T172637Z-0\", \n"
-                "  \"description\": \"Trace generated with wrench-pegasus-parser.py from http://wrench-project.org\", \n"
+                "  \"description\": \"Trace generated with wrench-wfcommons-parser.py from http://wrench-project.org\", \n"
                 "  \"createdAt\": \"2018-05-23T15:40:49.012950Z\", \n"
                 "  \"schemaVersion\": \"1.0\", \n"
                 "  \"wms\": {\n"
-                "    \"url\": \"http://pegasus.isi.edu\", \n"
+                "    \"url\": \"http://wfcommons.isi.edu\", \n"
                 "    \"version\": \"4.9.0panorama\", \n"
-                "    \"name\": \"Pegasus\"\n"
+                "    \"name\": \"WfCommons\"\n"
                 "  }, \n"
                 "  \"author\": {\n"
                 "    \"name\": \"rafsilva\", \n"
@@ -34,7 +34,7 @@ protected:
                 "  }, \n"
                 "  \"workflow\": {\n"
                 "    \"makespan\": 1869.0, \n"
-                "    \"jobs\": [\n"
+                "    \"tasks\": [\n"
                 "      {\n"
                 "        \"name\": \"individuals_ID0000001\", \n"
                 "        \"type\": \"compute\", \n"
@@ -2687,10 +2687,10 @@ protected:
                 "        \"avgCPU\": 96.8067, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/00/register_local_0_0.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/00/register_local_0_0.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -2718,10 +2718,10 @@ protected:
                 "        \"avgCPU\": 112.1739, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/00/register_local_0_2.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/00/register_local_0_2.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -2749,10 +2749,10 @@ protected:
                 "        \"avgCPU\": 124.0093, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/00/register_local_0_1.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/00/register_local_0_1.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -2768,10 +2768,10 @@ protected:
                 "        \"avgCPU\": 72.2646, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/00/register_local_1_0.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/00/register_local_1_0.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -3055,10 +3055,10 @@ protected:
                 "        \"avgCPU\": 124.0741, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/01/register_local_2_1.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/01/register_local_2_1.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -3073,10 +3073,10 @@ protected:
                 "        \"avgCPU\": 120.7547, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/01/register_local_2_2.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/01/register_local_2_2.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -3092,10 +3092,10 @@ protected:
                 "        \"avgCPU\": 124.5902, \n"
                 "        \"arguments\": [\n"
                 "          \"--conf\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/pegasus.2658153277482434111.properties\", \n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/wfcommons.2658153277482434111.properties\", \n"
                 "          \"-v\", \n"
                 "          \"--insert\", \n"
-                "          \"/home/panorama/1000genome-workflow/submit/panorama/pegasus/1000genome-20180208T172637Z/run0001/00/01/register_local_2_0.in\"\n"
+                "          \"/home/panorama/1000genome-workflow/submit/panorama/wfcommons/1000genome-20180208T172637Z/run0001/00/01/register_local_2_0.in\"\n"
                 "        ], \n"
                 "        \"machine\": \"master\"\n"
                 "      }, \n"
@@ -3191,10 +3191,10 @@ TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
 
     wrench::Workflow *workflow = nullptr;
 
-    ASSERT_THROW(workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
+    ASSERT_THROW(workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
                  std::invalid_argument);
     ASSERT_NO_THROW(
-            workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
+            workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
     ASSERT_EQ(workflow->getNumberOfTasks(), 71);
     ASSERT_EQ(workflow->getFiles().size(), 69);
 

@@ -25,6 +25,6 @@ endforeach ()
 # install example files
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/examples
         DESTINATION wrench
-        FILES_MATCHING PATTERN "*.json" PATTERN "*.xml" PATTERN "*.dax"
+        FILES_MATCHING PATTERN "*.json" PATTERN "*.xml"
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )

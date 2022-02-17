@@ -12,7 +12,7 @@
 
 #include "SimpleWMS.h"
 #include "scheduler/CloudStandardJobScheduler.h"
-#include <wrench/tools/pegasus/PegasusWorkflowParser.h>
+#include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
 
 static bool ends_with(const std::string& str, const std::string& suffix) {
@@ -54,18 +54,16 @@ int main(int argc, char **argv) {
 
     /* The first argument is the platform description file, written in XML following the SimGrid-defined DTD */
     char *platform_file = argv[1];
-    /* The second argument is the workflow description file, written in XML using the DAX DTD */
+    /* The second argument is the workflow description file, written in JSON Using the WfCommons::WfFormat format */
     char *workflow_file = argv[2];
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
     wrench::Workflow *workflow;
-    if (ends_with(workflow_file, "dax")) {
-        workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(workflow_file, "1000Gf");
-    } else if (ends_with(workflow_file,"json")) {
-        workflow = wrench::PegasusWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
+    if (ends_with(workflow_file,"json")) {
+        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
     } else {
-        std::cerr << "Workflow file name must end with '.dax' or '.json'" << std::endl;
+        std::cerr << "Workflow file name must end with '.json'" << std::endl;
         exit(1);
     }
     std::cerr << "The workflow has " << workflow->getNumberOfTasks() << " tasks " << std::endl;

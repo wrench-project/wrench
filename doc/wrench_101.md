@@ -272,8 +272,7 @@ in `examples/basic-examples/bare-metal-multicore-tasks` for an example
 simulator in which tasks with different parallel efficiency models are created and executed. 
 
 The `wrench::Workflow` class also provides member functions to import workflows from
-workflow description files in standard [JSON format](https://github.com/workflowhub/workflow-schema) and 
-[DAX format](http://workflowarchive.org).
+workflow description files in standard [JSON format](https://github.com/wfcommons/wfformat).
 
 The input files to the workflow must be available (at some storage service) before
 the simulated workflow execution begins.  These are the files that are input 
