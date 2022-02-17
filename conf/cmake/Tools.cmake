@@ -39,19 +39,19 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tools/wrench/wrench-dashboard/wrench-d
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
         )
 
-# compile/install the pegasus workflow parser
-set(PEGASUS_WORKFLOW_PARSER_SOURCE_FILES
-        tools/pegasus/src/PegasusWorkflowParser.cpp
+# compile/install the wfcommons workflow parser
+set(WFCOMMONS_WORKFLOW_PARSER_SOURCE_FILES
+        tools/wfcommons/src/WfCommonsWorkflowParser.cpp
         )
 
-set(PEGASUS_WORKFLOW_PARSER_HEADER_FILES
-        include/wrench/tools/pegasus/PegasusWorkflowParser.h
+set(WFCOMMONS_WORKFLOW_PARSER_HEADER_FILES
+        include/wrench/tools/wfcommons/WfCommonsWorkflowParser.h
         )
 
-add_library(wrenchpegasusworkflowparser STATIC ${PEGASUS_WORKFLOW_PARSER_SOURCE_FILES})
-install(TARGETS wrenchpegasusworkflowparser DESTINATION lib)
-install(FILES "${PEGASUS_WORKFLOW_PARSER_HEADER_FILES}"
-        DESTINATION include/wrench/tools/pegasus/
+add_library(wrenchwfcommonsworkflowparser STATIC ${WFCOMMONS_WORKFLOW_PARSER_SOURCE_FILES})
+install(TARGETS wrenchwfcommonsworkflowparser DESTINATION lib)
+install(FILES "${WFCOMMONS_WORKFLOW_PARSER_HEADER_FILES}"
+        DESTINATION include/wrench/tools/wfcommons/
         )
 
 # compile/install the wrench-daemon

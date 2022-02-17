@@ -10,6 +10,7 @@
 #include <iostream>
 #include <wrench.h>
 #include <wrench/services/memory/MemoryManager.h>
+#include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 #include "ConcurrentPipelineWMS.h" // WMS implementation
 
 /**
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating simulated platform..." << std::endl;
     simulation->instantiatePlatform(platform_file);
 
-    auto workflow = wrench::PegasusWorkflowParser::createWorkflowFromDAX(workflow_file, "1Gf");
+    auto workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "1Gf");
 //    wrench::Workflow *workflow = nighres_workflow(16000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;

@@ -101,7 +101,7 @@ private:
        auto mailbox = simgrid::s4u::Mailbox::by_name("mailbox");
        try {
            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
-                                              new wrench::SimulationMessage("whatever", 1), "bogus");
+                                              new wrench::SimulationMessage(1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
        } catch (std::shared_ptr<wrench::HostError> &e) {}
 

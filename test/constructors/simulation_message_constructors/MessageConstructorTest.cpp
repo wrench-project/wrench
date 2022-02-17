@@ -131,8 +131,8 @@ private:
                                                                                 1, "me", 10.0, 0.0));
 
 
-        auto msg = new wrench::SimulationMessage("name", 666);
-        if (msg->getName() != "name") {
+        auto msg = new wrench::SimulationMessage(666);
+        if (msg->getName().empty()) {
             throw std::runtime_error(std::string("Throwing a ") + __FILE__ + ":" + std::to_string(__LINE__));
         }
 
