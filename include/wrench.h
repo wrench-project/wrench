@@ -47,7 +47,7 @@
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
 // Tools
-#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
+#include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
 
 
 #endif //WRENCH_WRENCH_H

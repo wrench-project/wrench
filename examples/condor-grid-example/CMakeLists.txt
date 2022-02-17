@@ -4,8 +4,8 @@ set(SOURCE_FILES
         CondorWMS.h
         CondorWMS.cpp
         CondorGridSimulator.cpp
-        ../../tools/pegasus/src/PegasusWorkflowParser.cpp
-        ../../include/wrench/tools/pegasus/PegasusWorkflowParser.h
+        ../../tools/wfcommons/src/WfCommonsWorkflowParser.cpp
+        ../../include/wrench/tools/wfcommons/WfCommonsWorkflowParser.h
         )
 
 # condor grid
