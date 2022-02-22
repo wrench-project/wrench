@@ -413,7 +413,7 @@ namespace wrench {
         this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
 //        this->appendJobInfoToCSVOutputFile(job_id, "TERMINATED");
 #else
-        throw std::runtime_error("BatschedBatchScheduler::processUknownJobTermination(): BATSCHED_ENABLE should be set to 'on'");
+        throw std::runtime_error("BatschedBatchScheduler::processUnknownJobTermination(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
 

@@ -95,7 +95,7 @@ namespace wrench {
                     }
 
                     if (type != "compute") {
-                        throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has uknown type " + type);
+                        throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has unknown type " + type);
                     }
 
                     task = workflow->addTask(name, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
