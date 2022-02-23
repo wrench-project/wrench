@@ -65,6 +65,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         /***********************/
 
         double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
+        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& getMessagePayloadList() const;
 
         void setStateToDown();
 
@@ -97,8 +98,6 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
                            WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
 
         // MessagePayload stuff
-        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& getMessagePayloadList() const;
-
         void setMessagePayload(WRENCH_MESSAGEPAYLOAD_TYPE, double);
 
         void setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
