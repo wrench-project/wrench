@@ -209,6 +209,14 @@ namespace wrench {
         return this->messagepayload_list[message_payload];
     }
 
+    /**
+     * @brief Get all the message payloads of the Service
+     * @return the message payload values
+     *
+     */
+    const std::map<std::string, double>& Service::getMessagePayloadList() const {
+        return this->messagepayload_list;
+    }
 
     /**
      * @brief Get a property of the Service as a boolean

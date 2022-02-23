@@ -97,6 +97,8 @@ namespace wrench {
                            std::map<std::string, std::string> overriden_property_values);
 
         // MessagePayload stuff
+        const std::map<std::string, double>& getMessagePayloadList() const;
+
         void setMessagePayload(std::string, double);
 
         void setMessagePayloads(std::map<std::string, double> default_messagepayload_values,
