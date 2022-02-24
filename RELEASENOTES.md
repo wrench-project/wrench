@@ -8,11 +8,9 @@ release of WRENCH version 1.x. In a few weeks WRENCH version 2.0 will be release
 minor changes to the current "workflow" API, a new more generic "non-workflow" API, as well as
 significantly decreased simulation time and memory footprint. 
 
-
 **Note**: WRENCH 1.11 requires [SimGrid 3.30](https://simgrid.org)
 
 ---
-
 
 ### WRENCH 1.10
 
