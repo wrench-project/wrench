@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,23 +8,23 @@
  */
 
 #include <climits>
-#include <services/storage/storage_helper_classes/FileTransferThreadMessage.h>
-#include <wrench/workflow/failure_causes/InvalidDirectoryPath.h>
-#include <wrench/workflow/failure_causes/FileNotFound.h>
-#include <wrench/workflow/failure_causes/StorageServiceNotEnoughSpace.h>
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/services/storage/storage_helpers/FileTransferThreadMessage.h>
+#include <wrench/failure_causes/InvalidDirectoryPath.h>
+#include <wrench/failure_causes/FileNotFound.h>
+#include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
+#include <wrench/failure_causes/NetworkError.h>
 
-#include "wrench/services/storage/simple/SimpleStorageService.h"
-#include "wrench/services/ServiceMessage.h"
-#include "services/storage/StorageServiceMessage.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/simulation/SimulationTimestampTypes.h"
-#include "wrench/services/storage/storage_helpers/FileLocation.h"
-#include "wrench/services/memory/MemoryManager.h"
+#include <wrench/services/storage/simple/SimpleStorageService.h>
+#include <wrench/services/ServiceMessage.h>
+#include "wrench/services/storage/StorageServiceMessage.h"
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/data_file/DataFile.h>
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/simulation/SimulationTimestampTypes.h>
+#include <wrench/services/storage/storage_helpers/FileLocation.h>
+#include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_simple_storage_service,
                     "Log category for Simple Storage Service");
@@ -70,8 +70,8 @@ namespace wrench {
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                std::set <std::string> mount_points,
-                                               std::map <std::string, std::string> property_list,
-                                               std::map<std::string, double> messagepayload_list) :
+                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
             SimpleStorageService(std::move(hostname), mount_points, property_list, messagepayload_list,
                                  "_" + std::to_string(getNewUniqueNumber())) {}
 
@@ -88,10 +88,10 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(
             std::string hostname,
             std::set <std::string> mount_points,
-            std::map <std::string, std::string> property_list,
-            std::map<std::string, double> messagepayload_list,
+            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::string suffix) :
-            StorageService(std::move(hostname), mount_points, "simple_storage" + suffix, "simple_storage" + suffix) {
+            StorageService(std::move(hostname), mount_points, "simple_storage" + suffix) {
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
         this->validateProperties();
@@ -169,7 +169,7 @@ namespace wrench {
         std::shared_ptr <SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name);
+            message = S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr <NetworkError> &cause) {
             WRENCH_INFO("Got a network error while getting some message... ignoring");
             return true; // oh well
@@ -221,7 +221,7 @@ namespace wrench {
             return processFileWriteRequest(msg->file, msg->location, msg->answer_mailbox, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage*>(message.get())) {
-            return processFileReadRequest(msg->file, msg->location, msg->answer_mailbox,
+            return processFileReadRequest(msg->file, msg->location, msg->num_bytes_to_read, msg->answer_mailbox,
                                           msg->mailbox_to_receive_the_file_content, msg->buffer_size);
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
@@ -255,8 +255,8 @@ namespace wrench {
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::shared_ptr <FileLocation> location,
-                                                       std::string answer_mailbox, unsigned long buffer_size) {
+    bool SimpleStorageService::processFileWriteRequest(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location,
+                                                       simgrid::s4u::Mailbox *answer_mailbox, unsigned long buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr <FailureCause> failure_cause = nullptr;
 
@@ -299,7 +299,8 @@ namespace wrench {
             fs->reserveSpace(file, location->getAbsolutePathAtMountPoint());
 
             // Generate a mailbox_name name on which to receive the file
-            std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
+            auto file_reception_mailbox = S4U_Mailbox::getTemporaryMailbox();
+//            auto file_reception_mailbox = S4U_Mailbox::generateUniqueMailbox("faa_does_not_work");
 
             // Reply with a "go ahead, send me the file" message
             S4U_Mailbox::dputMessage(
@@ -318,13 +319,14 @@ namespace wrench {
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
                                            file,
+                                           file->getSize(),
                                            file_reception_mailbox,
                                            location,
-                                           "",
+                                           nullptr,
                                            answer_mailbox,
-                                           "",
+                                           nullptr,
                                            buffer_size));
-            ftt->simulation = this->simulation;
+            ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_back(ftt);
@@ -338,7 +340,7 @@ namespace wrench {
                             location,
                             false,
                             failure_cause,
-                            "",
+                            nullptr,
                             this->getMessagePayloadValue(
                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
         }
@@ -349,16 +351,18 @@ namespace wrench {
     /**
      * @brief Handle a file read request
      * @param file: the file
-     * @param src_partition: the file partition to read the file from
+     * @param location: the file's location
+     * @param num_bytes_to_read: the number of bytes to read
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
      * @param buffer_size: the buffer_size to use
      * @return
      */
-    bool SimpleStorageService::processFileReadRequest(WorkflowFile *file,
+    bool SimpleStorageService::processFileReadRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> location,
-                                                      std::string answer_mailbox,
-                                                      std::string mailbox_to_receive_the_file_content,
+                                                      double num_bytes_to_read,
+                                                      simgrid::s4u::Mailbox *answer_mailbox,
+                                                      simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                                       unsigned long buffer_size) {
 
         // Figure out whether this succeeds or not
@@ -403,13 +407,14 @@ namespace wrench {
                     new FileTransferThread(this->hostname,
                                            this->getSharedPtr<StorageService>(),
                                            file,
+                                           num_bytes_to_read,
                                            location,
                                            mailbox_to_receive_the_file_content,
                                            answer_mailbox,
-                                           "",
-                                           "",
+                                           nullptr,
+                                           nullptr,
                                            buffer_size));
-            ftt->simulation = this->simulation;
+            ftt->setSimulation(this->simulation);
 
             // Add it to the Pool of pending data communications
             this->pending_file_transfer_threads.push_front(ftt);
@@ -426,11 +431,12 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @return
      */
-    bool SimpleStorageService::processFileCopyRequest(WorkflowFile *file,
+    bool SimpleStorageService::processFileCopyRequest(std::shared_ptr<DataFile>file,
                                                       std::shared_ptr <FileLocation> src_location,
                                                       std::shared_ptr <FileLocation> dst_location,
-                                                      std::string answer_mailbox) {
-//        // File System  and path at the destination exists?
+                                                      simgrid::s4u::Mailbox *answer_mailbox) {
+
+        //        // File System  and path at the destination exists?
 //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
 //
 //            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(
@@ -464,7 +470,7 @@ namespace wrench {
         // File is not already here
         if (not fs->isFileInDirectory(file, dst_location->getAbsolutePathAtMountPoint())) {
             if (not fs->hasEnoughFreeSpace(file->getSize())) {
-                this->simulation->getOutput().addTimestampFileCopyFailure(file, src_location, dst_location);
+                this->simulation->getOutput().addTimestampFileCopyFailure(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
 
                 try {
                     S4U_Mailbox::putMessage(
@@ -501,13 +507,14 @@ namespace wrench {
                 new FileTransferThread(this->hostname,
                                        this->getSharedPtr<StorageService>(),
                                        file,
+                                       file->getSize(),
                                        src_location,
                                        dst_location,
-                                       "",
-                                       "",
+                                       nullptr,
+                                       nullptr,
                                        answer_mailbox,
                                        this->buffer_size));
-        ftt->simulation = this->simulation;
+        ftt->setSimulation(this->simulation);
         this->pending_file_transfer_threads.push_back(ftt);
 
         return true;
@@ -543,16 +550,16 @@ namespace wrench {
      * @return false if the daemon should terminate
      */
     bool SimpleStorageService::processFileTransferThreadNotification(std::shared_ptr <FileTransferThread> ftt,
-                                                                     WorkflowFile *file,
-                                                                     std::string src_mailbox,
+                                                                     std::shared_ptr<DataFile>file,
+                                                                     simgrid::s4u::Mailbox *src_mailbox,
                                                                      std::shared_ptr <FileLocation> src_location,
-                                                                     std::string dst_mailbox,
+                                                                     simgrid::s4u::Mailbox *dst_mailbox,
                                                                      std::shared_ptr <FileLocation> dst_location,
                                                                      bool success,
                                                                      std::shared_ptr <FailureCause> failure_cause,
-                                                                     std::string answer_mailbox_if_read,
-                                                                     std::string answer_mailbox_if_write,
-                                                                     std::string answer_mailbox_if_copy) {
+                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_read,
+                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_write,
+                                                                     simgrid::s4u::Mailbox *answer_mailbox_if_copy) {
         // Remove the ftt from the list of running ftt
         if (this->running_file_transfer_threads.find(ftt) == this->running_file_transfer_threads.end()) {
             WRENCH_INFO(
@@ -570,7 +577,7 @@ namespace wrench {
                 // Deal with time stamps, previously we could test whether a real timestamp was passed, now this.
                 // May be no corresponding timestamp.
                 try {
-                    this->simulation->getOutput().addTimestampFileCopyCompletion(file, src_location, dst_location);
+                    this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
                 } catch (invalid_argument &e) {
                 }
 
@@ -581,41 +588,39 @@ namespace wrench {
             }
         }
 
-        // Send back the relevant ack if this was a read
-        if (not answer_mailbox_if_read.empty() and success) {
-            WRENCH_DEBUG(
-                    "Sending back an ack since this was a file read and some client is waiting for me to say something");
-            S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
-        }
-
-        // Send back the relevant ack if this was a write
-        if (not answer_mailbox_if_write.empty() and success) {
-            WRENCH_DEBUG(
-                    "Sending back an ack since this was a file write and some client is waiting for me to say something");
-            S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
-        }
-
-        // Send back the relevant ack if this was a copy
-        if (not answer_mailbox_if_copy.empty()) {
-            WRENCH_DEBUG(
-                    "Sending back an ack since this was a file copy and some client is waiting for me to say something");
-            if ((src_location == nullptr) or (dst_location == nullptr)) {
-                throw std::runtime_error("SimpleStorageService::processFileTransferThreadNotification(): "
-                                         "src_location and dst_location must be non-null");
+            // Send back the relevant ack if this was a read
+            if (answer_mailbox_if_read and success) { WRENCH_INFO(
+                        "Sending back an ack since this was a file read and some client is waiting for me to say something");
+                S4U_Mailbox::dputMessage(answer_mailbox_if_read, new StorageServiceAckMessage());
             }
-            S4U_Mailbox::dputMessage(
-                    answer_mailbox_if_copy,
-                    new StorageServiceFileCopyAnswerMessage(
-                            file,
-                            src_location,
-                            dst_location,
-                            nullptr,
-                            false,
-                            success,
-                            failure_cause,
-                            this->getMessagePayloadValue(
-                                    SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        }
+
+            // Send back the relevant ack if this was a write
+            if (answer_mailbox_if_write and success) {
+                WRENCH_INFO(
+                        "Sending back an ack since this was a file write and some client is waiting for me to say something");
+                S4U_Mailbox::dputMessage(answer_mailbox_if_write, new StorageServiceAckMessage());
+            }
+
+            // Send back the relevant ack if this was a copy
+            if (answer_mailbox_if_copy) { WRENCH_INFO(
+                        "Sending back an ack since this was a file copy and some client is waiting for me to say something");
+                if ((src_location == nullptr) or (dst_location == nullptr)) {
+                    throw std::runtime_error("SimpleStorageService::processFileTransferThreadNotification(): "
+                                             "src_location and dst_location must be non-null");
+                }
+                S4U_Mailbox::dputMessage(
+                        answer_mailbox_if_copy,
+                        new StorageServiceFileCopyAnswerMessage(
+                                file,
+                                src_location,
+                                dst_location,
+                                nullptr,
+                                false,
+                                success,
+                                failure_cause,
+                                this->getMessagePayloadValue(
+                                        SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+            }
 
         return true;
     }
@@ -623,13 +628,13 @@ namespace wrench {
     /**
      * @brief Process a file deletion request
      * @param file: the file to delete
-     * @param dst_partition: the partition in which it is
+     * @param location: the file location
      * @param answer_mailbox: the mailbox to which the notification should be sent
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFileDeleteRequest(WorkflowFile *file,
+    bool SimpleStorageService::processFileDeleteRequest(std::shared_ptr<DataFile>file,
                                                         std::shared_ptr <FileLocation> location,
-                                                        std::string answer_mailbox) {
+                                                        simgrid::s4u::Mailbox *answer_mailbox) {
         std::shared_ptr <FailureCause> failure_cause = nullptr;
 
         auto fs = this->file_systems[location->getMountPoint()].get();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
+#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
 
 namespace wrench {
 
@@ -17,8 +17,8 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    HTCondorCentralManagerServiceMessage::HTCondorCentralManagerServiceMessage(std::string name, double payload)
-            : ServiceMessage("HTCondorCentralManagerServiceMessage::" + name, payload) {}
+    HTCondorCentralManagerServiceMessage::HTCondorCentralManagerServiceMessage( double payload)
+            : ServiceMessage( payload) {}
 
     /**
      * @brief Constructor
@@ -26,8 +26,8 @@ namespace wrench {
      * @param scheduled_jobs: list of pending jobs upon negotiator completion
      * @param payload: the message size in bytes
      */
-    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs, double payload)
-            : HTCondorCentralManagerServiceMessage("NEGOTIATOR_DONE", payload), scheduled_jobs(scheduled_jobs) {}
+    NegotiatorCompletionMessage::NegotiatorCompletionMessage(std::vector<std::shared_ptr<Job>> scheduled_jobs, double payload)
+            : HTCondorCentralManagerServiceMessage( payload), scheduled_jobs(scheduled_jobs) {}
 
 
     /**
@@ -36,6 +36,6 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CentralManagerWakeUpMessage::CentralManagerWakeUpMessage(double payload)
-            : HTCondorCentralManagerServiceMessage("WAKE_UP", payload) {}
+            : HTCondorCentralManagerServiceMessage( payload) {}
             
 }

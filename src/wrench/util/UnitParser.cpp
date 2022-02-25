@@ -14,7 +14,7 @@
 #include <vector>
 #include <cerrno>
 #include <stdlib.h>
-#include "wrench/util/UnitParser.h"
+#include <wrench/util/UnitParser.h>
 
 namespace wrench {
 
@@ -23,7 +23,7 @@ namespace wrench {
 //     * @brief A helper nested class to facilitate unit conversion
 //     * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
 //     */
-//    class unit_scale : public std::unordered_map<std::string, double> {
+//    class unit_scale : public WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE {
 //    public:
 //        using std::unordered_map<std::string, double>::unordered_map;
 //        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
@@ -72,6 +72,7 @@ namespace wrench {
         char *ptr;
         const char *c_string = string.c_str();
         errno = 0;
+
         double res = strtod(c_string, &ptr);
         if (errno == ERANGE)
             throw std::runtime_error("Value out of range when parsing value " + string);

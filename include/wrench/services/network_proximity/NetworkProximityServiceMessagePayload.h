@@ -10,7 +10,7 @@
 #ifndef WRENCH_NETWORKPROXIMITYSERVICEMESSAGEPAYLOAD_H
 #define WRENCH_NETWORKPROXIMITYSERVICEMESSAGEPAYLOAD_H
 
-#include <wrench/services/ServiceMessagePayload.h>
+#include "wrench/services/ServiceMessagePayload.h"
 
 namespace wrench {
 

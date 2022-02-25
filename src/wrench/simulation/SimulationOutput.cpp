@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/simulation/Simulation.h"
-#include "wrench/simulation/SimulationOutput.h"
-#include "wrench/workflow/Workflow.h"
+#include <wrench/simulation/Simulation.h>
+#include <wrench/simulation/SimulationOutput.h>
+#include <wrench/workflow/Workflow.h>
 #include "simgrid/s4u.hpp"
 #include "simgrid/plugins/energy.h"
 
@@ -166,7 +166,7 @@ namespace wrench {
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
-    void SimulationOutput::dumpUnifiedJSON(Workflow *workflow, std::string file_path,
+    void SimulationOutput::dumpUnifiedJSON(std::shared_ptr<Workflow> workflow, std::string file_path,
                                            bool include_platform,
                                            bool include_workflow_exec,
                                            bool include_workflow_graph,
@@ -208,6 +208,7 @@ namespace wrench {
 
         std::ofstream output(file_path);
         output << std::setw(4) << unified_json << std::endl;
+
         output.close();
     }
 
@@ -523,7 +524,7 @@ namespace wrench {
       *
       * @throws std::invalid_argument
       */
-    void SimulationOutput::dumpWorkflowExecutionJSON(Workflow *workflow,
+    void SimulationOutput::dumpWorkflowExecutionJSON(std::shared_ptr<Workflow> workflow,
                                                      std::string file_path,
                                                      bool generate_host_utilization_layout,
                                                      bool writing_file) {
@@ -710,8 +711,8 @@ namespace wrench {
     /**
      * @brief Writes a JSON graph representation of the Workflow to a file.
      * 
-     * A node is added for each WorkflowTask and WorkflowFile. A WorkflowTask will have the type "task" and
-     *  a WorkflowFile will have the type "file". A directed link is added for each dependency in the Workflow.
+     * A node is added for each WorkflowTask and DataFile. A WorkflowTask will have the type "task" and
+     *  a DataFile will have the type "file". A directed link is added for each dependency in the Workflow.
      *
      * <pre>
      * {
@@ -748,7 +749,7 @@ namespace wrench {
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpWorkflowGraphJSON(wrench::Workflow *workflow,
+    void SimulationOutput::dumpWorkflowGraphJSON(std::shared_ptr<wrench::Workflow> workflow,
                                                  std::string file_path,
                                                  bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
@@ -773,11 +774,11 @@ namespace wrench {
         }
 
         // add the file vertices
-        for (const auto &file : workflow->getFiles()) {
+        for (const auto &file : workflow->getFileMap()) {
             vertices.push_back({
                                        {"type", "file"},
-                                       {"id",   file->getID()},
-                                       {"size", file->getSize()}
+                                       {"id",   file.first},
+                                       {"size", file.second->getSize()}
                                });
         }
 
@@ -1537,7 +1538,7 @@ namespace wrench {
      * @brief Destructor
      */
     SimulationOutput::~SimulationOutput() {
-        for (auto t : this->traces) {
+    for (auto t : this->traces) {
             delete t.second;
         }
         this->traces.clear();
@@ -1547,22 +1548,23 @@ namespace wrench {
      * @brief Constructor
      */
     SimulationOutput::SimulationOutput() {
+        // Disable everything by default!
+        
+        // By default disable all task timestamps
+        this->setEnabled<SimulationTimestampTaskStart>(false);
+        this->setEnabled<SimulationTimestampTaskFailure>(false);
+        this->setEnabled<SimulationTimestampTaskCompletion>(false);
+        this->setEnabled<SimulationTimestampTaskTermination>(false);
 
-        // By default enable all task timestamps
-        this->setEnabled<SimulationTimestampTaskStart>(true);
-        this->setEnabled<SimulationTimestampTaskFailure>(true);
-        this->setEnabled<SimulationTimestampTaskCompletion>(true);
-        this->setEnabled<SimulationTimestampTaskTermination>(true);
+        // By default disable all file read timestamps
+        this->setEnabled<SimulationTimestampFileReadStart>(false);
+        this->setEnabled<SimulationTimestampFileReadFailure>(false);
+        this->setEnabled<SimulationTimestampFileReadCompletion>(false);
 
-        // By default enable all file read timestamps
-        this->setEnabled<SimulationTimestampFileReadStart>(true);
-        this->setEnabled<SimulationTimestampFileReadFailure>(true);
-        this->setEnabled<SimulationTimestampFileReadCompletion>(true);
-
-        // By default enable all file write timestamps
-        this->setEnabled<SimulationTimestampFileWriteStart>(true);
-        this->setEnabled<SimulationTimestampFileWriteFailure>(true);
-        this->setEnabled<SimulationTimestampFileWriteCompletion>(true);
+        // By default disable all file write timestamps
+        this->setEnabled<SimulationTimestampFileWriteStart>(false);
+        this->setEnabled<SimulationTimestampFileWriteFailure>(false);
+        this->setEnabled<SimulationTimestampFileWriteCompletion>(false);
 
         //By default disable (for now) all disk read timestamps
         this->setEnabled<SimulationTimestampDiskReadStart>(false);
@@ -1574,327 +1576,359 @@ namespace wrench {
         this->setEnabled<SimulationTimestampDiskWriteFailure>(false);
         this->setEnabled<SimulationTimestampDiskWriteCompletion>(false);
 
-        // By default enable all file copy timestamps
-        this->setEnabled<SimulationTimestampFileCopyStart>(true);
-        this->setEnabled<SimulationTimestampFileCopyFailure>(true);
-        this->setEnabled<SimulationTimestampFileCopyCompletion>(true);
+        // By default disable all file copy timestamps
+        this->setEnabled<SimulationTimestampFileCopyStart>(false);
+        this->setEnabled<SimulationTimestampFileCopyFailure>(false);
+        this->setEnabled<SimulationTimestampFileCopyCompletion>(false);
 
-        // By default enable all power timestamps
-        this->setEnabled<SimulationTimestampPstateSet>(true);
-        this->setEnabled<SimulationTimestampEnergyConsumption>(true);
+        // By default disable all power timestamps
+        this->setEnabled<SimulationTimestampPstateSet>(false);
+        this->setEnabled<SimulationTimestampEnergyConsumption>(false);
 
-        // By default enable all link usage timestamps
-        this->setEnabled<SimulationTimestampLinkUsage>(true);
+        // By default disable all link usage timestamps
+        this->setEnabled<SimulationTimestampLinkUsage>(false);
     }
 
     /**
      * @brief Add a task start timestamp
+     * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskStart(WorkflowTask *task) {
+    void SimulationOutput::addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampTaskStart>()) {
-            this->addTimestamp<SimulationTimestampTaskStart>(new SimulationTimestampTaskStart(task));
+            this->addTimestamp<SimulationTimestampTaskStart>(new SimulationTimestampTaskStart(date, task));
         }
     }
 
     /**
      * @brief Add a task start failure
+     * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskFailure(WorkflowTask *task) {
+    void SimulationOutput::addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampTaskFailure>()) {
-            this->addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
+            this->addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(date, task));
         }
     }
 
     /**
      * @brief Add a task start completion
+     * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskCompletion(WorkflowTask *task) {
+    void SimulationOutput::addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampTaskCompletion>()) {
-            this->addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(task));
+            this->addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(date, task));
         }
     }
 
     /**
     * @brief Add a task start termination
+    * @param date: the date
     * @param task: a workflow task
     */
-    void SimulationOutput::addTimestampTaskTermination(WorkflowTask *task) {
+    void SimulationOutput::addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampTaskTermination>()) {
-            this->addTimestamp<SimulationTimestampTaskTermination>(new SimulationTimestampTaskTermination(task));
+            this->addTimestamp<SimulationTimestampTaskTermination>(new SimulationTimestampTaskTermination(date, task));
         }
     }
 
     /**
      * @brief Add a file read start timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param service: the source storage service
      * @param task: the workflow task for which this read is done (or nullptr);
      */
-    void SimulationOutput::addTimestampFileReadStart(WorkflowFile *file,
-                                                     FileLocation *src,
-                                                     StorageService *service,
-                                                     WorkflowTask *task) {
+    void SimulationOutput::addTimestampFileReadStart(double date,
+                                                     std::shared_ptr<DataFile>file,
+                                                     std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<StorageService> service,
+                                                     std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileReadStart>()) {
             this->addTimestamp<SimulationTimestampFileReadStart>(
-                    new SimulationTimestampFileReadStart(file, src, service, task));
+                    new SimulationTimestampFileReadStart(date, file, src, service, task));
         }
     }
 
     /**
     * @brief Add a file read failure timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the source location
     * @param service: the source storage service
     * @param task: the workflow task for which this read is done (or nullptr);
     */
-    void SimulationOutput::addTimestampFileReadFailure(WorkflowFile *file,
-                                                       FileLocation *src,
-                                                       StorageService *service,
-                                                       WorkflowTask *task) {
+    void SimulationOutput::addTimestampFileReadFailure(double date,
+                                                       std::shared_ptr<DataFile> file,
+                                                       std::shared_ptr<FileLocation> src,
+                                                       std::shared_ptr<StorageService> service,
+                                                       std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadFailure>()) {
             this->addTimestamp<SimulationTimestampFileReadFailure>(
-                    new SimulationTimestampFileReadFailure(file, src, service, task));
+                    new SimulationTimestampFileReadFailure(date, file, src, service, task));
         }
     }
 
     /**
     * @brief Add a file read completion timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the source location
     * @param service: the source storage service
     * @param task: the workflow task for which this read is done (or nullptr);
     */
     void
-    SimulationOutput::addTimestampFileReadCompletion(WorkflowFile *file,
-                                                     FileLocation *src,
-                                                     StorageService *service,
-                                                     WorkflowTask *task) {
+    SimulationOutput::addTimestampFileReadCompletion(double date,
+                                                     std::shared_ptr<DataFile>file,
+                                                     std::shared_ptr<FileLocation>  src,
+                                                     std::shared_ptr<StorageService>  service,
+                                                     std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
+
             this->addTimestamp<SimulationTimestampFileReadCompletion>(
-                    new SimulationTimestampFileReadCompletion(file, src, service, task));
+                    new SimulationTimestampFileReadCompletion(date, file, src, service, task));
         }
     }
 
     /**
      * @brief Add a file write start timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the target location
      * @param service: the target storage service
      * @param task: the workflow task for which this write is done (or nullptr);
      */
-    void SimulationOutput::addTimestampFileWriteStart(WorkflowFile *file,
-                                                      FileLocation *src,
-                                                      StorageService *service,
-                                                      WorkflowTask *task) {
+    void SimulationOutput::addTimestampFileWriteStart(double date,
+                                                      std::shared_ptr<DataFile>file,
+                                                      std::shared_ptr<FileLocation>  src,
+                                                      std::shared_ptr<StorageService>  service,
+                                                      std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
             this->addTimestamp<SimulationTimestampFileWriteStart>(
-                    new SimulationTimestampFileWriteStart(file, src, service, task));
+                    new SimulationTimestampFileWriteStart(date, file, src, service, task));
         }
     }
 
     /**
     * @brief Add a file write failure timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the target location
     * @param service: the target storage service
     * @param task: the workflow task for which this write is done (or nullptr);
     */
-    void SimulationOutput::addTimestampFileWriteFailure(WorkflowFile *file,
-                                                        FileLocation *src,
-                                                        StorageService *service,
-                                                        WorkflowTask *task) {
+    void SimulationOutput::addTimestampFileWriteFailure(double date,
+                                                        std::shared_ptr<DataFile>file,
+                                                        std::shared_ptr<FileLocation>  src,
+                                                        std::shared_ptr<StorageService>  service,
+                                                        std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileWriteFailure>()) {
             this->addTimestamp<SimulationTimestampFileWriteFailure>(
-                    new SimulationTimestampFileWriteFailure(file, src, service, task));
+                    new SimulationTimestampFileWriteFailure(date, file, src, service, task));
         }
     }
 
     /**
     * @brief Add a file write completion timestamp
+    * @param date: the date
     * @param file: a workflow file
     * @param src: the target location
     * @param service: the target storage service
     * @param task: the workflow task for which this write is done (or nullptr);
     */
     void
-    SimulationOutput::addTimestampFileWriteCompletion(WorkflowFile *file,
-                                                      FileLocation *src,
-                                                      StorageService *service,
-                                                      WorkflowTask *task) {
+    SimulationOutput::addTimestampFileWriteCompletion(double date,
+                                                      std::shared_ptr<DataFile>file,
+                                                      std::shared_ptr<FileLocation>  src,
+                                                      std::shared_ptr<StorageService>  service,
+                                                      std::shared_ptr<WorkflowTask>task) {
         if (this->isEnabled<SimulationTimestampFileWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampFileWriteCompletion>(
-                    new SimulationTimestampFileWriteCompletion(file, src, service, task));
+                    new SimulationTimestampFileWriteCompletion(date, file, src, service, task));
         }
     }
 
     /**
      * @brief Add a file copy start timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the target location
      */
-    void SimulationOutput::addTimestampFileCopyStart(WorkflowFile *file,
+    void SimulationOutput::addTimestampFileCopyStart(double date,
+                                                     std::shared_ptr<DataFile>file,
                                                      std::shared_ptr <FileLocation> src,
                                                      std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
-            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(file, src, dst));
+            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(date, file, src, dst));
         }
     }
 
     /**
      * @brief Add a file copy failure timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the target location
      */
-    void SimulationOutput::addTimestampFileCopyFailure(WorkflowFile *file,
+    void SimulationOutput::addTimestampFileCopyFailure(double date,
+                                                       std::shared_ptr<DataFile>file,
                                                        std::shared_ptr <FileLocation> src,
                                                        std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
             this->addTimestamp<SimulationTimestampFileCopyFailure>(
-                    new SimulationTimestampFileCopyFailure(file, src, dst));
+                    new SimulationTimestampFileCopyFailure(date, file, src, dst));
         }
     }
 
     /**
      * @brief Add a file copy completion timestamp
+     * @param date: the date
      * @param file: a workflow file
      * @param src: the source location
      * @param dst: the target location
      */
-    void SimulationOutput::addTimestampFileCopyCompletion(WorkflowFile *file,
+    void SimulationOutput::addTimestampFileCopyCompletion(double date,
+                                                          std::shared_ptr<DataFile> file,
                                                           std::shared_ptr <FileLocation> src,
                                                           std::shared_ptr <FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(
-                    new SimulationTimestampFileCopyCompletion(file, src, dst));
+                    new SimulationTimestampFileCopyCompletion(date, file, src, dst));
         }
     }
 
     /**
      * @brief Add a file read start timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskReadStart(std::string hostname,
+    void SimulationOutput::addTimestampDiskReadStart(double date,
+                                                     std::string hostname,
                                                      std::string mount,
                                                      double bytes,
                                                      int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
             this->addTimestamp<SimulationTimestampDiskReadStart>(
-                    new SimulationTimestampDiskReadStart(hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskReadStart(date, hostname, mount, bytes, unique_sequence_number));
         }
     }
 
     /**
      * @brief Add a file read failure timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskReadFailure(std::string hostname,
+    void SimulationOutput::addTimestampDiskReadFailure(double date, std::string hostname,
                                                        std::string mount,
                                                        double bytes,
                                                        int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
             this->addTimestamp<SimulationTimestampDiskReadFailure>(
-                    new SimulationTimestampDiskReadFailure(hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskReadFailure(date, hostname, mount, bytes, unique_sequence_number));
         }
     }
 
     /**
      * @brief Add a file read completion timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskReadCompletion(std::string hostname,
+    void SimulationOutput::addTimestampDiskReadCompletion(double date, std::string hostname,
                                                           std::string mount,
                                                           double bytes,
                                                           int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskReadCompletion>(
-                    new SimulationTimestampDiskReadCompletion(hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskReadCompletion(date, hostname, mount, bytes, unique_sequence_number));
         }
     }
 
     /**
      * @brief Add a file write start timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskWriteStart(std::string hostname,
+    void SimulationOutput::addTimestampDiskWriteStart(double date, std::string hostname,
                                                       std::string mount,
                                                       double bytes,
                                                       int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
             this->addTimestamp<SimulationTimestampDiskWriteStart>(
-                    new SimulationTimestampDiskWriteStart(hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskWriteStart(date, hostname, mount, bytes, unique_sequence_number));
         }
     }
 
     /**
      * @brief Add a file write failure timestamp
+     * @param date: the date
      * @param hostname: hostname being read from
      * @param mount: mountpoint of disk
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskWriteFailure(std::string hostname,
+    void SimulationOutput::addTimestampDiskWriteFailure(double date, std::string hostname,
                                                         std::string mount,
                                                         double bytes,
                                                         int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
             this->addTimestamp<SimulationTimestampDiskWriteFailure>(
-                    new SimulationTimestampDiskWriteFailure(hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskWriteFailure(date, hostname, mount, bytes, unique_sequence_number));
         }
     }
 
     /**
     * @brief Add a file write completion timestamp
+    * @param date: the date
     * @param hostname: hostname being read from
     * @param mount: mountpoint of disk
     * @param bytes: number of bytes read
     * @param unique_sequence_number: an integer id
     */
-    void SimulationOutput::addTimestampDiskWriteCompletion(std::string hostname,
+    void SimulationOutput::addTimestampDiskWriteCompletion(double date, std::string hostname,
                                                            std::string mount,
                                                            double bytes,
                                                            int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampDiskWriteCompletion>(
-                    new SimulationTimestampDiskWriteCompletion(hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskWriteCompletion(date, hostname, mount, bytes, unique_sequence_number));
         }
     }
 
     /**
      * @brief Add a pstate change/set timestamp
+     * @param date: the date
      * @param hostname: a hostname
      * @param pstate: a pstate index
      */
-    void SimulationOutput::addTimestampPstateSet(std::string hostname,
+    void SimulationOutput::addTimestampPstateSet(double date, std::string hostname,
                                                  int pstate) {
         if (this->isEnabled<SimulationTimestampPstateSet>()) {
-            this->addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(hostname, pstate));
+            this->addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(date, hostname, pstate));
         }
     }
 
     /**
      * @brief Add an energy consumption timestamp
+     * @param date: the date
      * @param hostname: a hostname
      * @param joules: consumption in joules
      */
-    void SimulationOutput::addTimestampEnergyConsumption(std::string hostname,
+    void SimulationOutput::addTimestampEnergyConsumption(double date, std::string hostname,
                                                          double joules) {
         static std::unordered_map <std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
 
@@ -1902,7 +1936,7 @@ namespace wrench {
             return;
         }
 
-        auto new_timestamp = new SimulationTimestampEnergyConsumption(hostname, joules);
+        auto new_timestamp = new SimulationTimestampEnergyConsumption(date, hostname, joules);
 
         // If less thant 2 time-stamp for that host, just record and add
         if (last_two_timestamps[hostname].size() < 2) {
@@ -1928,10 +1962,11 @@ namespace wrench {
 
     /**
      * @brief Add a link usage timestamp
+     * @param date: the date
      * @param linkname: a linkname
      * @param bytes_per_second: link usage in bytes_per_second
      */
-    void SimulationOutput::addTimestampLinkUsage(std::string linkname,
+    void SimulationOutput::addTimestampLinkUsage(double date, std::string linkname,
                                                  double bytes_per_second) {
         static std::unordered_map <std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
 
@@ -1939,7 +1974,7 @@ namespace wrench {
             return;
         }
 
-        auto new_timestamp = new SimulationTimestampLinkUsage(linkname, bytes_per_second);
+        auto new_timestamp = new SimulationTimestampLinkUsage(date, linkname, bytes_per_second);
 
         // If less thant 2 time-stamp for that link, just record and add
         if (last_two_timestamps[linkname].size() < 2) {

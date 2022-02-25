@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/HostStateChangeDetectorMessage.h>
+#include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../../include/TestWithFork.h"
 
@@ -50,14 +50,12 @@ protected:
 /**  HOST STATE CHANGE DETECTOR SERVICE TEST                         **/
 /**********************************************************************/
 
-class HostStateChangeDetectorTestWMS : public wrench::WMS {
+class HostStateChangeDetectorTestWMS : public wrench::ExecutionController {
 
 public:
     HostStateChangeDetectorTestWMS(HostStateChangeDetectorServiceTest *test,
                                    std::string hostname, bool notify_when_speed_change) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
-        this->notify_when_speed_change = notify_when_speed_change;
+            wrench::ExecutionController(hostname, "test"),test(test), notify_when_speed_change(notify_when_speed_change) {
     }
 
 
@@ -73,8 +71,8 @@ private:
         hosts.push_back("Host2");
         auto ssd = std::shared_ptr<wrench::HostStateChangeDetector>(
                 new wrench::HostStateChangeDetector(this->hostname, hosts, true, true, this->notify_when_speed_change,
-                                                    this->getSharedPtr<wrench::WMS>(), this->mailbox_name, {}));
-        ssd->simulation = this->simulation;
+                                                    this->getSharedPtr<wrench::ExecutionController>(), this->mailbox, {}));
+        ssd->setSimulation(this->simulation);
         ssd->start(ssd, true, false);
 
         wrench::Simulation::sleep(10);
@@ -82,7 +80,7 @@ private:
 
         std::shared_ptr<wrench::SimulationMessage> message;
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
         } catch (std::shared_ptr<wrench::NetworkError> &e) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -94,7 +92,7 @@ private:
         simgrid::s4u::Host::by_name("Host2")->turn_on();
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
         } catch (std::shared_ptr<wrench::NetworkError> &e) {
             throw std::runtime_error("Did not get a message before the timeout");
         }
@@ -109,7 +107,7 @@ private:
         if (this->notify_when_speed_change) {
 
             try {
-                message = wrench::S4U_Mailbox::getMessage(this->mailbox_name, 10);
+                message = wrench::S4U_Mailbox::getMessage(this->mailbox, 10);
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
                 throw std::runtime_error("Did not get a message before the timeout");
             }
@@ -133,7 +131,7 @@ TEST_F(HostStateChangeDetectorServiceTest, StateChangeDetectionTest) {
 void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notify_when_speed_change) {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -146,15 +144,11 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMS
-    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this,"Host1", notify_when_speed_change));
-
-    // Create a bogus workflow
-    auto workflow =  std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-    wms->addWorkflow(workflow.get());
+    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this, "Host1", notify_when_speed_change));
 
     simulation->launch();
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

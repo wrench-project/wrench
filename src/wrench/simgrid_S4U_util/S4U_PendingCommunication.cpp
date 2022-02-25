@@ -9,20 +9,21 @@
 
 #include <memory>
 #include <iostream>
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 #ifdef MESSAGE_MANAGER
 #include <wrench/util/MessageManager.h>
 #endif
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
-#include "wrench/simulation/SimulationMessage.h"
-#include "wrench/workflow/failure_causes/FailureCause.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
+#include <wrench/simulation/SimulationMessage.h>
+#include <wrench/failure_causes/FailureCause.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_pending_communication, "Log category for Pending Communication");
 
 namespace wrench {
+
 
     /**
      * @brief Wait for the pending communication to complete
@@ -40,10 +41,44 @@ namespace wrench {
         } catch (simgrid::NetworkFailureException &e) {
             if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
                 throw std::shared_ptr<NetworkError>(
-                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox_name));
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
             } else {
                 throw std::shared_ptr<NetworkError>(
-                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox_name));
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+            }
+        }
+        return std::move(this->simulation_message);
+    }
+
+    /**
+     * @brief Wait for the pending communication to complete with a timeout
+     * @param timeout: a timeout in seconds
+     *
+     * @return A (unique pointer to a) simulation message
+     *
+     * @throw std::shared_ptr<NetworkError>
+     */
+    std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait(double timeout) {
+
+        try {
+            if (this->comm_ptr->get_state() != simgrid::s4u::Activity::State::FINISHED) {
+                this->comm_ptr->wait_until(timeout);
+            }
+        } catch (simgrid::NetworkFailureException &e) {
+            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::FAILURE, mailbox->get_name()));
+            } else {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::FAILURE, mailbox->get_name()));
+            }
+        } catch (simgrid::TimeoutException &e) {
+            if (this->operation_type == S4U_PendingCommunication::OperationType::SENDING) {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::SENDING, NetworkError::TIMEOUT, mailbox->get_name()));
+            } else {
+                throw std::shared_ptr<NetworkError>(
+                        new NetworkError(NetworkError::OperationType::RECEIVING, NetworkError::TIMEOUT, mailbox->get_name()));
             }
         }
         return std::move(this->simulation_message);
@@ -90,7 +125,7 @@ namespace wrench {
             pending_s4u_comms.push_back((*it)->comm_ptr);
         }
 
-        unsigned long index = 0;
+        ssize_t index = 0;
         bool one_comm_failed = false;
         try {
             index =  simgrid::s4u::Comm::wait_any_for(pending_s4u_comms, timeout);
@@ -104,14 +139,13 @@ namespace wrench {
             one_comm_failed = true;
         }
 
-
         if (index == -1) {
             return ULONG_MAX;
         }
 
         if (one_comm_failed) {
-            for (index = 0; index < (int) pending_s4u_comms.size(); index++) {
-                if (pending_s4u_comms[index]->get_state() == simgrid::s4u::Activity::State::FAILED) {
+            for (auto & pending_s4u_comm : pending_s4u_comms) {
+                if (pending_s4u_comm->get_state() == simgrid::s4u::Activity::State::FAILED) {
                     break;
                 }
             }

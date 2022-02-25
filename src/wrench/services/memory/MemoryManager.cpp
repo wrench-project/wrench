@@ -8,9 +8,9 @@
  *
  */
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/workflow/failure_causes/HostError.h"
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/failure_causes/HostError.h>
 #include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_periodic_flush, "Log category for Periodic Flush");
@@ -30,7 +30,7 @@ namespace wrench {
                                  int interval,
                                  int expired_time,
                                  std::string hostname) :
-            Service(hostname, "page_cache_manager_" + hostname, "page_cache_manager_" + hostname),
+            Service(hostname, "page_cache_manager_" + hostname),
             memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
         // Get RAM disk size
         this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");

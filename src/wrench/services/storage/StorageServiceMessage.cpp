@@ -8,8 +8,8 @@
  */
 
 
-#include "StorageServiceMessage.h"
-#include <wrench/workflow/WorkflowFile.h>
+#include "wrench/services/storage/StorageServiceMessage.h"
+#include <wrench/data_file/DataFile.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/simulation/SimulationOutput.h>
@@ -24,8 +24,8 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    StorageServiceMessage::StorageServiceMessage(std::string name, double payload) :
-            ServiceMessage("StorageService::" + name, payload) {
+    StorageServiceMessage::StorageServiceMessage(double payload) :
+            ServiceMessage(payload) {
 
     }
 
@@ -36,14 +36,13 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(std::string answer_mailbox,
+    StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  double payload)
-            : StorageServiceMessage("FREE_SPACE_REQUEST", payload) {
-        if ((answer_mailbox == "")) {
+            : StorageServiceMessage( payload), answer_mailbox(answer_mailbox) {
+        if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -55,8 +54,7 @@ namespace wrench {
      */
     StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(
             std::map<std::string, double> free_space, double payload)
-            : StorageServiceMessage(
-            "FREE_SPACE_ANSWER", payload) {
+            : StorageServiceMessage(payload) {
         for (auto const &f : free_space) {
             if (f.second < 0) {
                 throw std::invalid_argument(
@@ -75,19 +73,15 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
-                                                                                   WorkflowFile *file,
+    StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                                                   std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
-            : StorageServiceMessage("FILE_LOOKUP_REQUEST",
-                                    payload) {
-        if ((file == nullptr) || (location == nullptr) || (answer_mailbox.empty())) {
+            : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location) {
+        if ((file == nullptr) || (location == nullptr) || (answer_mailbox == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->location = location;
     }
 
     /**
@@ -98,11 +92,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(WorkflowFile *file,
+    StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile>file,
                                                                                  bool file_is_available,
                                                                                  double payload)
-            : StorageServiceMessage(
-            "FILE_LOOKUP_ANSWER", payload) {
+            : StorageServiceMessage(payload) {
 
         if (file == nullptr) {
             throw std::invalid_argument(
@@ -121,20 +114,16 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
-                                                                                   WorkflowFile *file,
+    StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                                                   std::shared_ptr<DataFile>file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
-            : StorageServiceMessage("FILE_DELETE_REQUEST",
-                                    payload) {
+            : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location) {
 
-        if ((answer_mailbox == "") || (file == nullptr) || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(): Invalid arguments");
         }
-        this->file = file;
-        this->answer_mailbox = answer_mailbox;
-        this->location = location;
     }
 
     /**
@@ -147,12 +136,12 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
+    StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<StorageService> storage_service,
                                                                                  bool success,
                                                                                  std::shared_ptr<FailureCause> failure_cause,
                                                                                  double payload)
-            : StorageServiceMessage("FILE_DELETE_ANSWER", payload) {
+            : StorageServiceMessage(payload) {
 
         if ((file == nullptr) || (storage_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -177,28 +166,17 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
-                                                                               WorkflowFile *file,
+    StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                                               std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
-                                                                               double payload) : StorageServiceMessage(
-            "FILE_COPY_REQUEST", payload) {
-        if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)
+                                                                               double payload) : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), src(src), dst(dst), file_registry_service(file_registry_service) {
+        if ((answer_mailbox == nullptr) || (file == nullptr) || (src == nullptr)
             || (dst == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->src = src;
-        this->dst = dst;
-        this->file_registry_service = file_registry_service;
-
-
-        /**
-         *
-         */
     }
 
     /**
@@ -214,7 +192,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
+    StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(std::shared_ptr<DataFile>file,
                                                                              std::shared_ptr<FileLocation> src,
                                                                              std::shared_ptr<FileLocation> dst,
                                                                              std::shared_ptr<FileRegistryService> file_registry_service,
@@ -222,7 +200,7 @@ namespace wrench {
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
-            : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
+            : StorageServiceMessage( payload) {
         if ((file == nullptr) || (src == nullptr) || (dst == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr)) ||
@@ -250,23 +228,17 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
-                                                                                 WorkflowFile *file,
+    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                                                 std::shared_ptr<DataFile>file,
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  unsigned long buffer_size,
                                                                                  double payload)
-            : StorageServiceMessage("FILE_WRITE_REQUEST",
-                                    payload) {
+            : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location), buffer_size(buffer_size) {
 
-        if ((answer_mailbox.empty()) || (file == nullptr) || (location == nullptr)) {
+        if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
-        this->payload = payload;
-        this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->location = location;
-        this->buffer_size = buffer_size;
     }
 
     /**
@@ -280,17 +252,16 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
+    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                bool success,
                                                                                std::shared_ptr<FailureCause> failure_cause,
-                                                                               std::string data_write_mailbox_name,
-                                                                               double payload) : StorageServiceMessage(
-            "FILE_WRITE_ANSWER", payload) {
+                                                                               simgrid::s4u::Mailbox *data_write_mailbox,
+                                                                               double payload) : StorageServiceMessage(payload) {
 
         if ((file == nullptr) || (location == nullptr) ||
-            (success && (data_write_mailbox_name.empty())) ||
-            (!success && (!data_write_mailbox_name.empty())) ||
+            (success && (data_write_mailbox == nullptr)) ||
+            (!success && (data_write_mailbox != nullptr)) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(): Invalid arguments");
@@ -299,7 +270,7 @@ namespace wrench {
         this->location = location;
         this->success = success;
         this->failure_cause = failure_cause;
-        this->data_write_mailbox_name = data_write_mailbox_name;
+        this->data_write_mailbox = data_write_mailbox;
     }
 
   /**
@@ -308,29 +279,24 @@ namespace wrench {
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
    * @param location: the location where the file is stored
+   * @param num_bytes_to_read: the number of bytes to read
    * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
    */
-    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
-                                                                               std::string mailbox_to_receive_the_file_content,
-                                                                               WorkflowFile *file,
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                                               simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
+                                                                               std::shared_ptr<DataFile>file,
                                                                                std::shared_ptr<FileLocation> location,
+                                                                               double num_bytes_to_read,
                                                                                unsigned long buffer_size,
-                                                                               double payload) : StorageServiceMessage(
-            "FILE_READ_REQUEST",
-            payload) {
-        if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") ||
-            (file == nullptr) || (location == nullptr)) {
+                                                                               double payload) : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), mailbox_to_receive_the_file_content(mailbox_to_receive_the_file_content), file(file), location(location), num_bytes_to_read(num_bytes_to_read), buffer_size(buffer_size) {
+        if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
+            (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
             throw std::invalid_argument(
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
-        this->answer_mailbox = answer_mailbox;
-        this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
-        this->file = file;
-        this->location = location;
-        this->buffer_size = buffer_size;
     }
 
     /**
@@ -343,13 +309,11 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
+    StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(std::shared_ptr<DataFile>file,
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
-                                                                             double payload) : StorageServiceMessage(
-            "FILE_READ_ANSWER",
-            payload) {
+                                                                             double payload) : StorageServiceMessage(payload) {
         if ((file == nullptr) || (location == nullptr) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
@@ -368,8 +332,7 @@ namespace wrench {
     * @param last_chunk: whether this is the last chunk in the file
     */
     StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
-            WorkflowFile *file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(
-            "FILE_CHUNK", chunk_size) {
+            std::shared_ptr<DataFile>file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage(chunk_size) {
         if (file == nullptr) {
             throw std::invalid_argument(
                     "StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(): Invalid arguments");

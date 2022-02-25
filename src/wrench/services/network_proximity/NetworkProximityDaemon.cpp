@@ -9,18 +9,19 @@
 
 
 #include <wrench/logging/TerminalOutput.h>
-#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
+#include <wrench/services/network_proximity/NetworkProximityDaemon.h>
+#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <random>
-#include "NetworkProximityMessage.h"
+#include "wrench/services/network_proximity/NetworkProximityMessage.h"
 
 
 WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Network Daemons Service");
 
 namespace wrench {
+
 
     /**
      * @brief Constructor
@@ -30,16 +31,18 @@ namespace wrench {
      * @param message_size the size of the message to be sent between network daemons to compute proximity
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
+     * @param noise_seed seed for the noise RNG
      * @param messagepayload_list: a message payload list
      */
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
                                                    std::string hostname,
-                                                   std::string network_proximity_service_mailbox,
+                                                   simgrid::s4u::Mailbox *network_proximity_service_mailbox,
                                                    double message_size, double measurement_period,
                                                    double noise,
-                                                   std::map<std::string, double> messagepayload_list) :
-            NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
-                                   message_size, measurement_period, noise, messagepayload_list, "") {
+                                                   int noise_seed,
+                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
+            NetworkProximityDaemon(simulation, std::move(hostname), network_proximity_service_mailbox,
+                                   message_size, measurement_period, noise, noise_seed,messagepayload_list, "") {
     }
 
 
@@ -52,6 +55,7 @@ namespace wrench {
      * @param measurement_period: the time-difference between two message transfer to compute proximity
      * @param noise: the maximum magnitude of random noises added to the measurement_period at each iteration,
      *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
+     * @param noise_seed seed for the noise RNG
      * @param messagepayload_list: a message payload list
      * @param suffix: suffix to append to the service name and mailbox
      */
@@ -59,12 +63,13 @@ namespace wrench {
     NetworkProximityDaemon::NetworkProximityDaemon(
             Simulation *simulation,
             std::string hostname,
-            std::string network_proximity_service_mailbox,
+            simgrid::s4u::Mailbox *network_proximity_service_mailbox,
             double message_size, double measurement_period,
             double noise,
-            std::map<std::string, double> messagepayload_list,
+            int noise_seed,
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::string suffix = "") :
-            Service(std::move(hostname), "network_daemon" + suffix, "network_daemon" + suffix) {
+            Service(std::move(hostname), "network_daemon" + suffix) {
 
         // Set the message payloads
         setMessagePayloads(messagepayload_list, {});
@@ -73,11 +78,12 @@ namespace wrench {
         this->message_size = message_size;
         this->measurement_period = measurement_period;
         this->max_noise = noise;
+        this->rng.seed(noise_seed);
 
-        this->next_mailbox_to_send = "";
+        this->next_mailbox_to_send = nullptr;
         this->next_daemon_to_send = nullptr;
         this->next_host_to_send = "";
-        this->network_proximity_service_mailbox = std::move(network_proximity_service_mailbox);
+        this->network_proximity_service_mailbox = network_proximity_service_mailbox;
 
     }
 
@@ -98,7 +104,6 @@ namespace wrench {
      */
     double NetworkProximityDaemon::getTimeUntilNextMeasurement() {
 
-        static std::default_random_engine rng(0);
         static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
         double noise = noise_dist(rng);
         return S4U_Simulation::getClock() + measurement_period + noise;
@@ -134,13 +139,14 @@ namespace wrench {
             if (countdown > 0) {
                 life = this->processNextMessage(countdown);
             } else {
-                if ((not this->next_mailbox_to_send.empty()) &&
+                if ((this->next_mailbox_to_send) &&
                     (S4U_Simulation::isHostOn(this->next_host_to_send)) &&
                     (this->next_daemon_to_send->isUp())) {
 
                     double start_time = S4U_Simulation::getClock();
 
-                    WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",this->message_size, this->next_mailbox_to_send.c_str());
+                    WRENCH_INFO("Synchronously sending a NetworkProximityTransferMessage  (%lf) to %s",
+                                this->message_size, this->next_mailbox_to_send->get_cname());
                     try {
                         S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                                 new NetworkProximityTransferMessage(
@@ -165,7 +171,7 @@ namespace wrench {
                                                                                               NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
 
                     next_host_to_send = "";
-                    next_mailbox_to_send = "";
+                    next_mailbox_to_send = nullptr;
 
                     time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
@@ -199,7 +205,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             if (not cause->isTimeout()) {
                 WRENCH_INFO("Got a network error... oh well (%s)",

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,12 +8,12 @@
  */
 
 
-#include "wrench/workflow/parallel_model/ParallelModel.h"
-#include "wrench/workflow/parallel_model/AmdahlParallelModel.h"
-#include "wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h"
-#include "wrench/workflow/parallel_model/CustomParallelModel.h"
+#include <wrench/workflow/parallel_model/ParallelModel.h>
+#include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
+#include <wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.h>
+#include <wrench/workflow/parallel_model/CustomParallelModel.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_parallel_model, "Log category for ParallelModel");
 

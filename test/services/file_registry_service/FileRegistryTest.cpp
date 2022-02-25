@@ -21,19 +21,28 @@ WRENCH_LOG_CATEGORY(file_registry_service_test, "Log category for File Registry 
 class FileRegistryTest : public ::testing::Test {
 
 public:
+
+    std::shared_ptr<wrench::Workflow> workflow;
+
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
+    std::shared_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
 
     void do_FileRegistry_Test();
     void do_lookupEntry_Test();
 
 protected:
+    ~FileRegistryTest() {
+        workflow->clear();
+    }
+
     FileRegistryTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow = wrench::Workflow::createWorkflow();
 
       // Create a one-host platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -112,7 +121,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
 
 };
 
@@ -120,16 +128,12 @@ protected:
 /**  SIMPLE FILE REGISTRY TEST                                       **/
 /**********************************************************************/
 
-class FileRegistryTestWMS : public wrench::WMS {
+class FileRegistryTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryTestWMS(FileRegistryTest *test,
-                        const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
-      this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -138,9 +142,9 @@ private:
 
     int main() {
 
-      auto file1 = this->getWorkflow()->addFile("file1", 100.0);
-      auto file2 = this->getWorkflow()->addFile("file2", 100.0);
-      auto frs = this->getAvailableFileRegistryService();
+      auto file1 = this->test->workflow->addFile("file1", 100.0);
+      auto file2 = this->test->workflow->addFile("file2", 100.0);
+      auto frs = this->test->file_registry_service;
 
       std::set<std::shared_ptr<wrench::FileLocation>> locations;
 
@@ -244,7 +248,7 @@ private:
       try {
         frs->removeEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
         throw std::runtime_error("Should not be able to remove an entry from a service that is down");
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         // Check Exception
         auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
@@ -269,7 +273,7 @@ TEST_F(FileRegistryTest, SimpleFunctionality) {
 void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -296,24 +300,18 @@ void FileRegistryTest::do_FileRegistry_Test() {
           new wrench::SimpleStorageService(hostname, {"/otherdisk"})));
 
   // Create a file registry service
-  std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
   ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   ASSERT_NO_THROW(wms = simulation->add(
           new FileRegistryTestWMS(
-                  this,
-                  {compute_service}, {storage_service1, storage_service2}, file_registry_service, hostname)));
+                  this, hostname)));
 
-
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-  // Running a "run a single task" simulation
+  // Running a "run a single task1" simulation
   ASSERT_NO_THROW(simulation->launch());
 
-  delete simulation;
+
 
   for (int i=0; i < argc; i++)
      free(argv[i]);
@@ -323,17 +321,12 @@ void FileRegistryTest::do_FileRegistry_Test() {
 /**   LOOKUP ENTRY BY PROXIMITY TEST                                 **/
 /**********************************************************************/
 
-class FileRegistryLookupEntryTestWMS : public wrench::WMS {
+class FileRegistryLookupEntryTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryLookupEntryTestWMS(FileRegistryTest *test,
-                                   const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                   const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                   const std::set<std::shared_ptr<wrench::NetworkProximityService>> &network_proximity_services,
-                                   std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, network_proximity_services, file_registry_service, hostname, "test") {
-      this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -342,10 +335,10 @@ private:
 
     int main() {
 
-      wrench::WorkflowFile *file1 = this->getWorkflow()->addFile("file1", 100.0);
-      wrench::WorkflowFile * nullptr_file = nullptr;
-      auto frs = this->getAvailableFileRegistryService();
-      auto nps = *(this->getAvailableNetworkProximityServices().begin());
+      std::shared_ptr<wrench::DataFile> file1 = this->test->workflow->addFile("file1", 100.0);
+      std::shared_ptr<wrench::DataFile>  nullptr_file = nullptr;
+      auto frs = this->test->file_registry_service;
+      auto nps = this->test->network_proximity_service;
 
       frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service1));
       frs->addEntry(file1, wrench::FileLocation::LOCATION(this->test->storage_service2));
@@ -405,7 +398,7 @@ private:
       try {
         frs->lookupEntry(file1);
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         // Check Exception
         auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
@@ -422,7 +415,7 @@ private:
       try {
         file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps);
         throw std::runtime_error("Should not be able to lookup a file when the service is down");
-      } catch (wrench::WorkflowExecutionException &e) {
+      } catch (wrench::ExecutionException &e) {
         // Check Exception
         auto cause = std::dynamic_pointer_cast<wrench::ServiceIsDown>(e.getCause());
         if (not cause) {
@@ -447,7 +440,7 @@ TEST_F(FileRegistryTest, LookupEntry) {
 void FileRegistryTest::do_lookupEntry_Test() {
 
   // Create and initialize a simulation
-  auto simulation = new wrench::Simulation();
+  auto simulation = wrench::Simulation::createSimulation();
   int argc = 1;
   char **argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("unit_test");
@@ -462,7 +455,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
   std::string host3 = "Host3";
   std::string host4 = "Host4";
 
-  auto network_proximity_service = simulation->add(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
+  network_proximity_service = simulation->add(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
 
   storage_service1 = simulation->add(
           new wrench::SimpleStorageService(host1, {"/"}));
@@ -474,19 +467,16 @@ void FileRegistryTest::do_lookupEntry_Test() {
           new wrench::SimpleStorageService(host4, {"/"}));
 
 
-  auto file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
+  file_registry_service = simulation->add(new wrench::FileRegistryService(host1));
 
-  std::shared_ptr<wrench::WMS> wms = nullptr;;
+  std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
   wms = simulation->add(
           new FileRegistryLookupEntryTestWMS(
-                  this,
-                  {}, {storage_service1, storage_service2, storage_service3}, {network_proximity_service}, file_registry_service, host1));
-
-  wms->addWorkflow(workflow);
+                  this,  host1));
 
   ASSERT_NO_THROW(simulation->launch());
 
-  delete simulation;
+
 
   for (int i=0; i < argc; i++)
      free(argv[i]);

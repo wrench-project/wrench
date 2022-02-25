@@ -11,7 +11,8 @@
 #include <random>
 #include <wrench-dev.h>
 
-#include "helper_services/work_unit_executor/ComputeThread.h"
+#include <wrench/services/helper_services/compute_thread/ComputeThread.h>
+#include <wrench/services/helper_services/compute_thread/ComputeThreadMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
@@ -27,10 +28,15 @@ public:
     void do_KillAfterDeath_test();
 
 protected:
+
+    ~ComputeThreadTest() {
+        workflow->clear();
+    }
+
     ComputeThreadTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
@@ -55,7 +61,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -64,15 +70,13 @@ protected:
 /**  DO WORKING TEST                                                **/
 /**********************************************************************/
 
-class ComputeThreadWorkingTestWMS : public wrench::WMS {
+class ComputeThreadWorkingTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadWorkingTestWMS(ComputeThreadTest *test,
-                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+                                std::string hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
-
 
 private:
 
@@ -81,12 +85,12 @@ private:
     int main() {
 
         // Create a compute thread on Host 3 that should report to me
-        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox_name));
-        thread->simulation = this->simulation;
+        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox));
+        thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Get the message
-        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox);
 
         if (not dynamic_cast<wrench::ComputeThreadDoneMessage*>(message.get())) {
             throw std::runtime_error("Didn't receive the expected ComputeThreadDoneMessage message");
@@ -104,7 +108,7 @@ TEST_F(ComputeThreadTest, Working) {
 void ComputeThreadTest::do_Working_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -118,17 +122,13 @@ void ComputeThreadTest::do_Working_test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadWorkingTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
-
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -137,12 +137,13 @@ void ComputeThreadTest::do_Working_test() {
 /**  DO KILL AFTER DEATH TEST                                        **/
 /**********************************************************************/
 
-class ComputeThreadKillAfterDeathTestWMS : public wrench::WMS {
+class ComputeThreadKillAfterDeathTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadKillAfterDeathTestWMS(ComputeThreadTest *test,
-                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+                                       std::shared_ptr<wrench::Workflow> workflow,
+                                       std::string hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
         this->test = test;
     }
 
@@ -154,12 +155,12 @@ private:
     int main() {
 
         // Create a compute thread on Host 3 that should report to me
-        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox_name));
-        thread->simulation = this->simulation;
+        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, this->mailbox));
+        thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Get the message
-        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+        auto message = wrench::S4U_Mailbox::getMessage(this->mailbox);
 
         // Sleep and kill
         wrench::Simulation::sleep(1000);
@@ -177,7 +178,7 @@ TEST_F(ComputeThreadTest, KillAfterDeath) {
 void ComputeThreadTest::do_KillAfterDeath_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -191,17 +192,12 @@ void ComputeThreadTest::do_KillAfterDeath_test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadKillAfterDeathTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadKillAfterDeathTestWMS(this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
-
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
-

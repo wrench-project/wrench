@@ -5,7 +5,7 @@ Creating a file registry service                        {#guide-101-fileregistry
 
 # Overview #            {#guide-fileregistry-overview}
 
-A file registry service is a simple store of key-values pairs where keys are files (i.e., `wrench::WorkflowFile`) and values are file locations
+A file registry service is a simple store of key-values pairs where keys are files (i.e., `wrench::DataFile`) and values are file locations
 (i.e., `wrench::FileLocation`).  It is used to keep track of the location of file copies. In real-world deployments, this service
 is often called a "replica catalog". 
 

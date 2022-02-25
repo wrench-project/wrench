@@ -11,8 +11,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench-dev.h>
-#include "WorkloadTraceFileReplayer.h"
-#include "WorkloadTraceFileReplayerEventReceiver.h"
+#include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayer.h"
+#include "wrench/services/compute/batch/workload_helper_classes/WorkloadTraceFileReplayerEventReceiver.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_workload_trace_file_replayer, "Log category for Trace File Replayer");
 
@@ -21,8 +21,8 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the name of the host on which the trace file replayer will be started
-     * @param batch_service: the batch service to which it submits jobs
-     * @param num_cores_per_node: the number of cores per host on the batch service
+     * @param batch_service: the BatchComputeService service to which it submits jobs
+     * @param num_cores_per_node: the number of cores per host on the BatchComputeService service
      * @param use_actual_runtimes_as_requested_runtimes: if true, use actual runtimes as requested runtimes
      * @param workload_trace: the workload trace to be replayed
      */
@@ -32,10 +32,8 @@ namespace wrench {
                                                          bool use_actual_runtimes_as_requested_runtimes,
                                                          std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace
     ) :
-            WMS(nullptr, nullptr,
-                {batch_service}, {},
-                {},
-                nullptr, hostname,
+            ExecutionController(
+                hostname,
                 "workload_tracefile_replayer"),
             workload_trace(workload_trace),
             batch_service(batch_service),
@@ -48,17 +46,12 @@ namespace wrench {
         // Create a Job Manager
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
-        // Create and handle a bogus workflow
-        this->workflow = std::shared_ptr<Workflow>(new Workflow());
-        this->addWorkflow(this->workflow.get());
-
-        // Create the dual WMS that will just receive workflow execution events so that I don't have to
+        // Create the execution controller that will just receive workflow execution events so that I don't have to
         std::shared_ptr<WorkloadTraceFileReplayerEventReceiver> event_receiver = std::shared_ptr<WorkloadTraceFileReplayerEventReceiver>(
                 new WorkloadTraceFileReplayerEventReceiver(this->hostname, job_manager));
 
         // Start the WorkloadTraceFileReplayerEventReceiver
-        event_receiver->addWorkflow(workflow.get(), S4U_Simulation::getClock());
-        event_receiver->simulation = this->simulation;
+        event_receiver->setSimulation(this->simulation);
         event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
 
         double core_flop_rate = (*(this->batch_service->getCoreFlopRate().begin())).second;
@@ -88,30 +81,22 @@ namespace wrench {
             double requested_ram = std::get<4>(job);
             int num_nodes = std::get<5>(job);
 
-            // Create the set of tasks
-            std::vector<WorkflowTask *> to_submit;
-            for (int i = 0; i < num_nodes; i++) {
+            // Create a job
+            auto cjob = job_manager->createCompoundJob(this->getName() + "_job_" + std::to_string(job_count));
+            // Add its compute actions
+            for (int i=0; i < num_nodes; i++) {
                 double time_fudge = 1; // 1 second seems to make it all work!
                 double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
-                WorkflowTask *task = workflow->addTask(
+                cjob->addComputeAction(
                         this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
-                        task_flops,
+                        task_flops, requested_ram,
                         num_cores_per_node, num_cores_per_node,
-                        requested_ram);
-                to_submit.push_back(task);
+                        ParallelModel::CONSTANTEFFICIENCY(1.0));
             }
 
-            // Create a Standard Job with only the tasks
-            std::shared_ptr<StandardJob> standard_job;
-            try {
-                standard_job = job_manager->createStandardJob(to_submit);
-            } catch (std::invalid_argument &e) {
-                WRENCH_INFO("Couldn't create a standard job: %s (ignoring)", e.what());
-                continue;
-            }
             job_count++;
 
-            // Create the batch-specific argument
+            // Create the BatchComputeService-specific argument
             std::map<std::string, std::string> batch_job_args;
             batch_job_args["-N"] = std::to_string(num_nodes); // Number of nodes/taks
             batch_job_args["-t"] = std::to_string(1 + requested_time / 60); // Time in minutes (note the +1)
@@ -119,7 +104,7 @@ namespace wrench {
             batch_job_args["-u"] = username; // username
             batch_job_args["-color"] = "green";
 
-            // Submit this job to the batch service
+            // Submit this job to the BatchComputeService service
             WRENCH_INFO("#%lu: Submitting a [-N:%s, -t:%s, -c:%s, -u:%s] job",
                         counter++,
                         batch_job_args["-N"].c_str(),
@@ -127,8 +112,8 @@ namespace wrench {
                         batch_job_args["-c"].c_str(),
                         batch_job_args["-u"].c_str());
             try {
-                job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
-            } catch (WorkflowExecutionException &e) {
+                job_manager->submitJob(cjob, this->batch_service, batch_job_args);
+            } catch (ExecutionException &e) {
                 WRENCH_INFO("Couldn't submit a replayed job: %s (ignoring)", e.getCause()->toString().c_str());
             }
 

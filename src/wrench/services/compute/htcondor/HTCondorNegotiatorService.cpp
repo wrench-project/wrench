@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,16 +7,15 @@
  * (at your option) any later version.
  */
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h"
-#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h"
-#include "wrench/services/compute/htcondor/HTCondorNegotiatorService.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/workflow/WorkflowTask.h"
-#include "wrench/workflow/job/PilotJob.h"
-#include "wrench/workflow/job/StandardJob.h"
-#include <wrench/workflow/failure_causes/NetworkError.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h>
+#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h>
+#include <wrench/services/compute/htcondor/HTCondorNegotiatorService.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/job/PilotJob.h>
+#include <wrench/job/CompoundJob.h>
+#include <wrench/failure_causes/NetworkError.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/bare_metal/BareMetalComputeService.h>
 
@@ -38,10 +37,10 @@ namespace wrench {
             std::string &hostname,
             double startup_overhead,
             std::set<std::shared_ptr<ComputeService>> &compute_services,
-            std::map<std::shared_ptr<WorkflowJob>, std::shared_ptr<ComputeService>> &running_jobs,
-            std::vector<std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>>> &pending_jobs,
-            std::string &reply_mailbox)
-            : Service(hostname, "htcondor_negotiator", "htcondor_negotiator"), reply_mailbox(reply_mailbox),
+            std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<ComputeService>> &running_jobs,
+            std::vector<std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>>> &pending_jobs,
+            simgrid::s4u::Mailbox *reply_mailbox)
+            : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
               compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
 
         this->startup_overhead = startup_overhead;
@@ -56,17 +55,17 @@ namespace wrench {
     }
 
     /**
-     * @brief Compare the priority between two workflow jobs
+     * @brief Compare the priority between two jobs
      *
-     * @param lhs: pointer to a workflow job
-     * @param rhs: pointer to a workflow job
+     * @param lhs: pointer to a job
+     * @param rhs: pointer to a job
      *
-     * @return whether the priority of the left-hand-side workflow job is higher
+     * @return whether the priority of the left-hand-side workflow job is lower
      */
     bool HTCondorNegotiatorService::JobPriorityComparator::operator()(
-            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &lhs,
-            std::tuple<std::shared_ptr<WorkflowJob>, std::map<std::string, std::string>> &rhs) {
-        return std::get<0>(lhs)->getPriority() > std::get<0>(rhs)->getPriority();
+            std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &lhs,
+            std::tuple<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> &rhs) {
+        return std::get<0>(lhs)->getPriority() < std::get<0>(rhs)->getPriority();
     }
 
     /**
@@ -79,9 +78,9 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
-                    this->hostname.c_str(), this->mailbox_name.c_str());
+                    this->hostname.c_str(), this->mailbox->get_cname());
 
-        std::vector<std::shared_ptr<WorkflowJob>> scheduled_jobs;
+        std::vector<std::shared_ptr<Job>> scheduled_jobs;
 
         // Simulate some overhead
         S4U_Simulation::sleep(this->startup_overhead);
@@ -94,18 +93,13 @@ namespace wrench {
 
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
-            bool is_standard_job = (std::dynamic_pointer_cast<StandardJob>(job) != nullptr);
+            bool is_standard_job = (std::dynamic_pointer_cast<CompoundJob>(job) != nullptr);
 
             auto target_compute_service = pickTargetComputeService(job, service_specific_arguments);
 
             if (target_compute_service) {
                 job->pushCallbackMailbox(this->reply_mailbox);
-                if (auto sjob = std::dynamic_pointer_cast<StandardJob>(job)) {
-                    target_compute_service->submitStandardJob(sjob, service_specific_arguments);
-                } else {
-                    auto pjob = std::dynamic_pointer_cast<PilotJob>(job);
-                    target_compute_service->submitPilotJob(pjob, service_specific_arguments);
-                }
+                target_compute_service->submitCompoundJob(job, service_specific_arguments);
                 this->running_jobs.insert(std::make_pair(job, target_compute_service));
                 scheduled_jobs.push_back(job);
             }
@@ -127,17 +121,17 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Helper method to pick a target compute service for a job
-     * @param job
-     * @param service_specific_arguments
-     * @return
-     */
+/**
+ * @brief Helper method to pick a target compute service for a job
+ * @param job
+ * @param service_specific_arguments
+ * @return
+ */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeService(
-            std::shared_ptr<WorkflowJob> job, std::map<std::string,
+            std::shared_ptr<CompoundJob> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
-        bool is_grid_universe = (service_specific_arguments.find("universe") != service_specific_arguments.end());
+        bool is_grid_universe = (service_specific_arguments.find("-universe") != service_specific_arguments.end());
 
         if (is_grid_universe) {
             return pickTargetComputeServiceGridUniverse(job, service_specific_arguments);
@@ -147,19 +141,19 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Helper method to pick a target compute service for a job for a Grid universe job
-     * @param job: job to run
-     * @param service_specific_arguments: service-specific arguments
-     * @return
-     */
+/**
+ * @brief Helper method to pick a target compute service for a job for a Grid universe job
+ * @param job: job to run
+ * @param service_specific_arguments: service-specific arguments
+ * @return
+ */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(
-            std::shared_ptr<WorkflowJob> job, std::map<std::string,
+            std::shared_ptr<CompoundJob> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
 
-        // Figure out which batch compute services are available
+        // Figure out which BatchComputeService compute services are available
         for (auto const &cs : this->compute_services) {
             if (auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs)) {
                 available_batch_compute_services.insert(batch_cs);
@@ -191,7 +185,7 @@ namespace wrench {
             }
         }
 
-        // Find the target batch compute service
+        // Find the target BatchComputeService compute service
         std::shared_ptr<BatchComputeService> target_batch_cs = nullptr;
         for (auto const &batch_cs : available_batch_compute_services) {
             if (batch_cs->getName() == service_specific_arguments["-service"]) {
@@ -201,7 +195,7 @@ namespace wrench {
         }
         if (target_batch_cs == nullptr) {
             throw std::invalid_argument("HTCondorNegotiatorService::pickTargetComputeServiceGridUniverse(): "
-                                        "-service service-specific argument specifies a batch compute service named '" +
+                                        "-service service-specific argument specifies a BatchComputeService compute service named '" +
                                         service_specific_arguments["-service"] +
                                         "', but no such service is known to the HTCondorComputeService");
         }
@@ -210,32 +204,26 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Helper method to pick a target compute service for a job for a Non-Grid universe job
-     * @param job: job to run
-     * @param service_specific_arguments: service-specific arguments
-     * @return
-     */
+/**
+ * @brief Helper method to pick a target compute service for a job for a Non-Grid universe job
+ * @param job: job to run
+ * @param service_specific_arguments: service-specific arguments
+ * @return
+ */
     std::shared_ptr<ComputeService> HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(
-            std::shared_ptr<WorkflowJob> job, std::map<std::string,
+            std::shared_ptr<CompoundJob> job, std::map<std::string,
             std::string> service_specific_arguments) {
 
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
-        if (std::dynamic_pointer_cast<PilotJob>(job)) {
-            throw std::invalid_argument("HTCondorNegotiatorService::pickTargetComputeServiceNonGridUniverse(): "
-                                        "Non-Grid universe pilot jobs are currently not supported");
-        }
-        auto sjob = std::dynamic_pointer_cast<StandardJob>(job);
-
-        // Figure out which batch compute services are available
+        // Figure out which BatchComputeService compute services are available
         for (auto const &cs : this->compute_services) {
             // Only BareMetalComputeServices can be used
             if (not std::dynamic_pointer_cast<BareMetalComputeService>(cs)) {
                 continue;
             }
             // If job type is not supported, nevermind (shouldn't happen really)
-            if (std::dynamic_pointer_cast<StandardJob>(job) and (not cs->supportsStandardJobs())) {
+            if (std::dynamic_pointer_cast<CompoundJob>(job) and (not cs->supportsCompoundJobs())) {
                 continue;
             }
 
@@ -245,8 +233,11 @@ namespace wrench {
                                             "service-specific arguments for Non-Grid universe jobs are currently not supported");
             }
 
-            bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(sjob->getMinimumRequiredNumCores(),
-                                                                                    sjob->getMinimumRequiredMemory());
+            unsigned long min_required_num_cores = job->getMinimumRequiredNumCores();
+            double min_required_memory = job->getMinimumRequiredMemory();
+
+            bool enough_idle_resources = cs->isThereAtLeastOneHostWithIdleResources(min_required_num_cores,
+                                                                                    min_required_memory);
 #if 0
             // Check on RAM constraints
             auto ram_resources = cs->getPerHostAvailableMemoryCapacity();

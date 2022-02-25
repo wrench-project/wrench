@@ -6,7 +6,7 @@ WRENCH Release Notes
 (February 25, 2022) This release includes only **minor changes** and **bug fixes**. This is the last
 release of WRENCH version 1.x. WRENCH version 2.0 will be released soon, which will include
 minor changes to the current "workflow" API, a new more generic "non-workflow" API, as well as
-significantly decreased simulation time and memory footprint. 
+significantly decreased simulation time and memory footprint.
 
 **Note**: WRENCH 1.11 requires [SimGrid 3.30](https://simgrid.org)
 
@@ -75,7 +75,7 @@ significantly decreased simulation time and memory footprint.
 - Removed dependency to Lemon library: we now use Boost, which is already used by SimGrid ([#159](https://github.com/wrench-project/wrench/issues/159))
 - Simulation logging in now disabled by default: can be enabled using `--wrench-full-log` ([#158](https://github.com/wrench-project/wrench/issues/158))
 - Refactored the BatchComputeService class: includes a conservative backfilling algorithm for validation purposes ([#152](https://github.com/wrench-project/wrench/issues/152))
-- Improvements to simulation output processing and JSON output: includes task, host, disk I/O, and energy ([#154](https://github.com/wrench-project/wrench/issues/154), [#122](https://github.com/wrench-project/wrench/issues/122), [#129](https://github.com/wrench-project/wrench/issues/129), [#133](https://github.com/wrench-project/wrench/issues/133))
+- Improvements to simulation output processing and JSON output: includes task1, host, disk I/O, and energy ([#154](https://github.com/wrench-project/wrench/issues/154), [#122](https://github.com/wrench-project/wrench/issues/122), [#129](https://github.com/wrench-project/wrench/issues/129), [#133](https://github.com/wrench-project/wrench/issues/133))
 - Improvements to the WRENCH Dashboard: [#130](https://github.com/wrench-project/wrench/issues/130), [#136](https://github.com/wrench-project/wrench/issues/136), [#137](https://github.com/wrench-project/wrench/issues/137), [#139](https://github.com/wrench-project/wrench/issues/139), [#146](https://github.com/wrench-project/wrench/issues/146), [#147](https://github.com/wrench-project/wrench/issues/147), [#148](https://github.com/wrench-project/wrench/issues/148), [#164](https://github.com/wrench-project/wrench/issues/164)
 - Bug fixes and small enhancements: [#110](https://github.com/wrench-project/wrench/issues/110), [#141](https://github.com/wrench-project/wrench/issues/141), [#143](https://github.com/wrench-project/wrench/issues/143), [#144](https://github.com/wrench-project/wrench/issues/144), [#145](https://github.com/wrench-project/wrench/issues/145), [#151](https://github.com/wrench-project/wrench/issues/151), [#153](https://github.com/wrench-project/wrench/issues/153), [#160](https://github.com/wrench-project/wrench/issues/160), [#162](https://github.com/wrench-project/wrench/issues/162), [#163](https://github.com/wrench-project/wrench/issues/163)
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h"
+#include <wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h>
 
 namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(HTCondorCentralManagerServiceMessagePayload, HTCONDOR_NEGOTIATOR_DONE_MESSAGE_PAYLOAD);

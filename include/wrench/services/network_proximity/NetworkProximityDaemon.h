@@ -30,18 +30,20 @@ namespace wrench {
     public:
 
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
-                               std::string network_proximity_service_mailbox,
+                               simgrid::s4u::Mailbox *network_proximity_service_mailbox,
                                double message_size,double measurement_period,
-                               double noise, std::map<std::string, double> messagepayload_list);
+                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
     private:
 
         friend class Simulation;
 
+        std::default_random_engine rng;
+
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
-                               std::string network_proximity_service_mailbox,
+                               simgrid::s4u::Mailbox *network_proximity_service_mailbox,
                                double message_size,double measurement_period,
-                               double noise, std::map<std::string, double> messagepayload_list, std::string suffix);
+                               double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list, std::string suffix);
 
 
         double message_size;
@@ -49,10 +51,10 @@ namespace wrench {
         double max_noise;
 
         std::string suffix;
-        std::string next_mailbox_to_send;
+        simgrid::s4u::Mailbox *next_mailbox_to_send;
         std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send;
         std::string next_host_to_send;
-        std::string network_proximity_service_mailbox;
+        simgrid::s4u::Mailbox *network_proximity_service_mailbox;
 
         int main() override;
         void cleanup(bool has_returned_from_main, int return_value) override;

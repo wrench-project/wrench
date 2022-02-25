@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,8 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/metering/EnergyMeterService.h"
-#include <wrench/wms/WMS.h>
+#include <wrench/services/metering/EnergyMeterService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench-dev.h>
 
@@ -25,7 +24,7 @@ namespace wrench {
      * @param measurement_periods: the measurement period for each metered host
      */
     EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
-            Service(hostname, "energy_meter", "energy_meter") {
+            Service(hostname, "energy_meter") {
 
         if (measurement_periods.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
@@ -54,7 +53,7 @@ namespace wrench {
      */
     EnergyMeterService::EnergyMeterService(const std::string hostname, const std::vector<std::string> &hostnames,
                                            double measurement_period) :
-            Service(hostname, "energy_meter", "energy_meter") {
+            Service(hostname, "energy_meter") {
 
         if (hostnames.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
@@ -82,14 +81,15 @@ namespace wrench {
     /**
      * @brief Stop the energy meter
      *
-     * @throw WorkflowExecutionException
+     * @throw ExecutionException
      * @throw std::runtime_error
      */
     void EnergyMeterService::stop() {
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+            S4U_Mailbox::putMessage(this->mailbox,
+                                    new ServiceStopDaemonMessage(nullptr, false, ComputeService::TerminationCause::TERMINATION_NONE, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
+            throw ExecutionException(cause);
         }
     }
 
@@ -101,7 +101,7 @@ namespace wrench {
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
-        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox_name.c_str());
+        WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox->get_cname());
 
         /** Main loop **/
         while (true) {
@@ -155,7 +155,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
-            message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
+            message = S4U_Mailbox::getMessage(this->mailbox, timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
