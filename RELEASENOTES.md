@@ -1,6 +1,17 @@
 WRENCH Release Notes
 ------
 
+### WRENCH 1.11
+
+(February 25, 2022) This release includes only **minor changes** and **bug fixes**. This is the last
+release of WRENCH version 1.x. WRENCH version 2.0 will be released soon, which will include
+minor changes to the current "workflow" API, a new more generic "non-workflow" API, as well as
+significantly decreased simulation time and memory footprint.
+
+**Note**: WRENCH 1.11 requires [SimGrid 3.30](https://simgrid.org)
+
+---
+
 ### WRENCH 1.10
 
 (October 16, 2021) This release includes a series of **new features**, **enhancements**, and **bug fixes**, including:
