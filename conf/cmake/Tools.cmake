@@ -54,5 +54,3 @@ install(FILES "${WFCOMMONS_WORKFLOW_PARSER_HEADER_FILES}"
         DESTINATION include/wrench/tools/wfcommons/
         )
 
-# compile/install the wrench-daemon
-add_subdirectory("${CMAKE_HOME_DIRECTORY}/tools/wrench/wrench-daemon")
