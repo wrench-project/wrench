@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/simulation/SimulationTrace.h"
+#include <wrench/simulation/SimulationTrace.h>
 
 namespace wrench {
 

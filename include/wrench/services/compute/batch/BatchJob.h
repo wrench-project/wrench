@@ -1,7 +1,7 @@
 #ifndef WRENCH_BATCHJOB_H
 #define WRENCH_BATCHJOB_H
 
-#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/job/CompoundJob.h"
 
 namespace wrench {
 
@@ -10,13 +10,13 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A batch job, which encapsulates a WorkflowJob and additional information
-     *        used by a batch
+     * @brief A batch_standard_and_pilot_jobs job, which encapsulates a Job and additional information
+     *        used by a batch_standard_and_pilot_jobs
      */
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
-        BatchJob(std::shared_ptr<WorkflowJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
+        BatchJob(std::shared_ptr<CompoundJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
                  unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp);
 
 
@@ -31,7 +31,7 @@ namespace wrench {
         double getEndingTimestamp();
         double getArrivalTimestamp();
         unsigned long getRequestedNumNodes();
-        std::shared_ptr<WorkflowJob> getWorkflowJob();
+        std::shared_ptr<CompoundJob> getCompoundJob();
         void setEndingTimestamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
         void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
@@ -54,8 +54,8 @@ namespace wrench {
 
     private:
 
-        friend class CONSERVATIVEBFBatchScheduler;
-        friend class CONSERVATIVEBFBatchSchedulerCoreLevel;
+        friend class ConservativeBackfillingBatchScheduler;
+        friend class ConservativeBackfillingBatchSchedulerCoreLevel;
 
         u_int32_t conservative_bf_start_date;           // Field used by CONSERVATIVE_BF
         u_int32_t conservative_bf_expected_end_date;    // Field used by CONSERVATIVE_BF
@@ -63,7 +63,7 @@ namespace wrench {
         unsigned long job_id;
         unsigned long requested_num_nodes;
         unsigned long  requested_time;
-        std::shared_ptr<WorkflowJob> job;
+        std::shared_ptr<CompoundJob> compound_job;
         unsigned long requested_cores_per_node;
         std::string username;
         double begin_time_stamp;

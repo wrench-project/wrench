@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/ComputeServiceMessagePayload.h"
+#include <wrench/services/compute/ComputeServiceMessagePayload.h>
 
 namespace wrench {
 
@@ -31,5 +31,11 @@ namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, COMPOUND_JOB_DONE_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(ComputeServiceMessagePayload, TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD);
 
 };

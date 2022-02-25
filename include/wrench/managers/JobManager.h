@@ -15,20 +15,28 @@
 #include <set>
 
 #include "wrench/services/Service.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
+
 
 namespace wrench {
 
+    class FailureCause;
+
     class WMS;
+
+    class ExecutionController;
 
     class Workflow;
 
     class WorkflowTask;
 
-    class WorkflowFile;
+    class DataFile;
 
-    class WorkflowJob;
+    class Job;
 
     class PilotJob;
+
+    class CompoundJob;
 
     class StandardJob;
 
@@ -42,60 +50,68 @@ namespace wrench {
 
 
     /**
- * @brief A helper daemon (co-located with and explicitly started by a WMS), which is used to
+ * @brief A helper daemon (co-located with and explicitly started by an execution controller), which is used to
  *        handle all job executions
  */
     class JobManager : public Service {
 
     public:
 
-
         void stop() override;
 
         void kill();
 
+        std::shared_ptr<CompoundJob> createCompoundJob(std::string name);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation> > file_locations,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
+        std::shared_ptr<StandardJob> createStandardJob(const std::vector<std::shared_ptr<WorkflowTask>>& tasks,
+                                                       const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation> >& file_locations,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
-                                                       std::vector<std::tuple<WorkflowFile *, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
+        std::shared_ptr<StandardJob> createStandardJob(const std::vector<std::shared_ptr<WorkflowTask>>& tasks,
+                                                       std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> pre_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> post_file_copies,
+                                                       std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> cleanup_file_deletions);
 
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(const std::vector<std::shared_ptr<WorkflowTask>>& tasks,
+                                                       const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>& file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks,
-                                                       std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(const std::vector<std::shared_ptr<WorkflowTask>>& tasks,
+                                                       std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(WorkflowTask *task,
-                                                       std::map<WorkflowFile *, std::shared_ptr<FileLocation>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(const std::shared_ptr<WorkflowTask>&task,
+                                                       const std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>& file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(WorkflowTask *task,
-                                                       std::map<WorkflowFile *, std::vector<std::shared_ptr<FileLocation>>> file_locations);
+        std::shared_ptr<StandardJob> createStandardJob(const std::shared_ptr<WorkflowTask>&task,
+                                                       std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations);
 
-        std::shared_ptr<StandardJob> createStandardJob(std::vector<WorkflowTask *> tasks);
+        std::shared_ptr<StandardJob> createStandardJob(const std::vector<std::shared_ptr<WorkflowTask>>& tasks);
 
-        std::shared_ptr<StandardJob> createStandardJob(WorkflowTask *task);
+        std::shared_ptr<StandardJob> createStandardJob(const std::shared_ptr<WorkflowTask>&task);
 
         std::shared_ptr<PilotJob> createPilotJob();
 
-        void submitJob(std::shared_ptr<WorkflowJob> job, std::shared_ptr<ComputeService> compute_service,
+        void submitJob(const std::shared_ptr<StandardJob>& job, const std::shared_ptr<ComputeService>& compute_service,
                        std::map<std::string, std::string> service_specific_args = {});
 
-        void terminateJob(std::shared_ptr<WorkflowJob> job);
+        void submitJob(const std::shared_ptr<CompoundJob>& job, const std::shared_ptr<ComputeService>& compute_service,
+                       std::map<std::string, std::string> service_specific_args = {});
 
-//        void forgetJob(WorkflowJob *job);
+        void submitJob(const std::shared_ptr<PilotJob>& job, const std::shared_ptr<ComputeService>& compute_service,
+                       std::map<std::string, std::string> service_specific_args = {});
 
-        std::set<std::shared_ptr<PilotJob>> getPendingPilotJobs();
+        void terminateJob(const std::shared_ptr<StandardJob>& job);
 
-        std::set<std::shared_ptr<PilotJob>> getRunningPilotJobs();
+        void terminateJob(const std::shared_ptr<CompoundJob>& job);
+
+        void terminateJob(const std::shared_ptr<PilotJob>& job);
+
+        simgrid::s4u::Mailbox *getCreatorMailbox();
+
+        unsigned long getNumRunningPilotJobs() const;
 
         /***********************/
         /** \cond INTERNAL    */
@@ -105,9 +121,10 @@ namespace wrench {
 
     protected:
 
+        friend class ExecutionController;
         friend class WMS;
 
-        explicit JobManager(std::shared_ptr<WMS> wms);
+        explicit JobManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox);
 
         /***********************/
         /** \endcond           */
@@ -117,36 +134,44 @@ namespace wrench {
 
         int main() override;
 
+        void dispatchJobs();
+
+        void dispatchJob(const std::shared_ptr<CompoundJob>& job);
+
         bool processNextMessage();
 
         void
-        processStandardJobCompletion(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service);
+        processStandardJobCompletion(const std::shared_ptr<StandardJob>& job, std::shared_ptr<ComputeService> compute_service);
 
         void
-        processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service,
-                                  std::shared_ptr<FailureCause> cause);
+        processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service);
 
-        void processPilotJobStart(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
+        void
+        processCompoundJobCompletion(const std::shared_ptr<CompoundJob>& job, std::shared_ptr<ComputeService> compute_service);
 
-        void processPilotJobExpiration(std::shared_ptr<PilotJob> job, std::shared_ptr<ComputeService> compute_service);
+        void
+        processCompoundJobFailure(const std::shared_ptr<CompoundJob>& job, std::shared_ptr<ComputeService> compute_service);
 
+        void processPilotJobStart(const std::shared_ptr<PilotJob>& job, std::shared_ptr<ComputeService> compute_service);
 
-        // Relevant WMS
-        std::shared_ptr<WMS> wms;
+        void processPilotJobExpiration(const std::shared_ptr<PilotJob>& job, std::shared_ptr<ComputeService> compute_service);
 
-        // Job lists
-        std::set<std::shared_ptr<StandardJob>> new_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> pending_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> running_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> completed_standard_jobs;
-        std::set<std::shared_ptr<StandardJob>> failed_standard_jobs;
+        void processPilotJobFailure(const std::shared_ptr<PilotJob>& job, std::shared_ptr<ComputeService> compute_service, std::shared_ptr<FailureCause> cause);
 
-        std::set<std::shared_ptr<PilotJob>> new_pilot_jobs;
-        std::set<std::shared_ptr<PilotJob>> pending_pilot_jobs;
-        std::set<std::shared_ptr<PilotJob>> running_pilot_jobs;
-        std::set<std::shared_ptr<PilotJob>> completed_pilot_jobs;
+        // Mailbox of the creator of this job manager
+        simgrid::s4u::Mailbox *creator_mailbox;
 
-    };
+        std::vector<std::shared_ptr<CompoundJob>> jobs_to_dispatch;
+        std::set<std::shared_ptr<CompoundJob>> jobs_dispatched;
+
+        unsigned long num_running_pilot_jobs = 0;
+
+//        std::map<std::shared_ptr<CompoundJob>, std::map<std::string, std::string>> cjob_args;
+
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<StandardJob>> cjob_to_sjob_map;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<PilotJob>> cjob_to_pjob_map;
+
+        };
 
     /***********************/
     /** \endcond            */

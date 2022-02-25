@@ -1,19 +1,10 @@
-#!/usr/bin/env python3
-#
-# Copyright (c) 2019-2021. The WRENCH Team.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
 
 import argparse
 import logging
 import os
+import shutil
 
 logger = logging.getLogger(__name__)
-
 
 def _configure_logging(debug):
     """
@@ -31,19 +22,19 @@ def _configure_logging(debug):
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
-
 def _create_subdirectories(project_dir):
     """
     Create the subdirectories for the project
     :param project_dir: project directory
     """
     logger.debug('Creating subdirectories structure')
-    sub_dirs = ['CMakeModules', 'src', 'test', 'doc', 'build', 'data', 'data/platform-files']
+    sub_dirs = ['CMakeModules', 'src', 'include', 'build', 'data']
     for sub_dir in sub_dirs:
         if not os.path.isdir(project_dir + '/' + sub_dir):
             os.mkdir(project_dir + '/' + sub_dir)
             logger.debug('  Created subdirectory: %s' % project_dir + '/' + sub_dir)
 
+<<<<<<< HEAD
 
 def _write_contents(filename, contents):
     """
@@ -714,13 +705,19 @@ def _write_platform(project_dir, compute_service):
     ])
     _write_contents(project_dir + '/data/platform-files/hosts.xml', file_contents)
 
+=======
+def _create_file(content, file_path):
+    ascii_file = open(file_path, "w")
+    ascii_file.write(content)
+    ascii_file.close()
+>>>>>>> wrench-2.0
 
 def main():
     # Application's arguments
-    parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based project.')
+    parser = argparse.ArgumentParser(description='Create a skeleton for a WRENCH-based simulator source code.')
     parser.add_argument('project_dir', metavar='PROJECT_DIR', help='Project directory name')
-    parser.add_argument('-c', '--compute_service', action='store', metavar='COMPUTE_SERVICE',
-                        help='Specify a Compute Service (cloud or batch)', default='cloud')
+    parser.add_argument('-a', '--api', action='store', metavar='API',
+                        help='Specify which API (action or workflow)', default='action')
     parser.add_argument('-d', '--debug', action='store_true', help='Print debug messages to stderr')
     parser.add_argument('-f', '--force', action='store_true',
                         help='Overwrites existing project directory (use sparingly)')
@@ -735,10 +732,10 @@ def main():
                      % args.project_dir)
         exit(1)
 
-    if args.compute_service:
-        args.compute_service = args.compute_service.lower()
-        if args.compute_service not in ['cloud', 'batch']:
-            logger.error('Invalid Compute Service type: %s' % args.compute_service)
+    if args.api:
+        args.api = args.api.lower()
+        if args.api not in ['action', 'workflow']:
+            logger.error('Invalid API specification: %s' % args.api)
             exit(1)
 
     logger.info('Creating WRENCH skeleton project at: %s' % args.project_dir)
@@ -749,27 +746,23 @@ def main():
     # subdirectories structure
     _create_subdirectories(args.project_dir)
 
-    # write CMakeLists.txt
-    _write_cmakelists(args.project_dir)
+    # Copy all relevant files
+    _create_file(FILE_CONTENT_CMAKELISTS_TXT, args.project_dir + "/CMakeLists.txt")
+    _create_file(FILE_CONTENT_FINDSIMGRID_CMAKE, args.project_dir + "/CMakeModules/FindSimGrid.cmake")
+    _create_file(FILE_CONTENT_FINDWRENCH_CMAKE, args.project_dir + "/CMakeModules/FindWRENCH.cmake")
+    _create_file(FILE_CONTENT_PLATFORM_XML, args.project_dir + "/data/platform.xml")
 
-    # write CMakeModules/FindSimGrid.cmake
-    _write_findsimgridcmake(args.project_dir + "/CMakeModules/")
+    if (args.api == "workflow"):
+        _create_file(FILE_CONTENT_SIMULATOR_WORKFLOW_CPP, args.project_dir + "/src/Simulator.cpp")
+        _create_file(FILE_CONTENT_CONTROLLER_WORKFLOW_CPP, args.project_dir + "/src/Controller.cpp")
+        _create_file(FILE_CONTENT_CONTROLLER_WORKFLOW_H, args.project_dir + "/include/Controller.h")
+    else:
+        _create_file(FILE_CONTENT_SIMULATOR_ACTION_CPP, args.project_dir + "/src/Simulator.cpp")
+        _create_file(FILE_CONTENT_CONTROLLER_ACTION_CPP, args.project_dir + "/src/Controller.cpp")
+        _create_file(FILE_CONTENT_CONTROLLER_ACTION_H, args.project_dir + "/include/Controller.h")
 
-    # create SimpleWMS
-    _write_simple_wms(args.project_dir)
-
-    # create SimpleScheduler
-    _write_simple_scheduler(args.project_dir, args.compute_service)
-
-    # create SimpleSimulator.cpp
-    _write_main(args.project_dir, args.compute_service)
-
-    # create platform example file
-    _write_platform(args.project_dir, args.compute_service)
-
-    logger.info('A WRENCH-based skeleton project with a "%s" compute service has been created at: %s' % (
-        args.compute_service, args.project_dir))
-
+    logger.info('A WRENCH-based skeleton project using the %s API has been created in directory %s' % (
+        args.api, args.project_dir))
 
 if __name__ == '__main__':
     main()

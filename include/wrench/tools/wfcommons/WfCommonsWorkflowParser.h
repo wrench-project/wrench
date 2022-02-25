@@ -52,7 +52,8 @@ namespace wrench {
          * @throw std::invalid_argument
          *
          */
-        static Workflow *createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+
+        static std::shared_ptr<Workflow> createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
                                                 bool redundant_dependencies = false,
                                                 unsigned long min_cores_per_task = 1,
                                                 unsigned long max_cores_per_task = 1,
@@ -85,7 +86,11 @@ namespace wrench {
           * @return a workflow
           * @throw std::invalid_argument
           */
+<<<<<<< HEAD
         static Workflow *createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+=======
+        static std::shared_ptr<Workflow> createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+>>>>>>> wrench-2.0
                                                           bool redundant_dependencies = false,
                                                           unsigned long min_cores_per_task = 1,
                                                           unsigned long max_cores_per_task = 1,

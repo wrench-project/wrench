@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the xterms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ResourceRandomRepeatSwitcher.h"
 
@@ -24,12 +24,11 @@ WRENCH_LOG_CATEGORY(bare_metal_compute_service_host_failures_test, "Log category
 class BareMetalComputeServiceHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file;
-    wrench::WorkflowTask *task;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file;
+    std::shared_ptr<wrench::WorkflowTask> task;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
 
@@ -40,17 +39,21 @@ public:
 
 protected:
 
+    ~BareMetalComputeServiceHostFailuresTest() {
+        workflow->clear();
+    }
+
     BareMetalComputeServiceHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create two files
         input_file = workflow->addFile("input_file", 10000.0);
         output_file = workflow->addFile("output_file", 20000.0);
 
-        // Create one task
-        task = workflow->addTask("task", 3600, 1, 1, 0);
+        // Create one task1
+        task = workflow->addTask("task1", 3600, 1, 1, 0);
         task->addInputFile(input_file);
         task->addOutputFile(output_file);
 
@@ -114,13 +117,12 @@ protected:
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
 /**********************************************************************/
 
-class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                                                std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
-                                                                                std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+                                                                                std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -133,13 +135,13 @@ private:
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        resurector->simulation = this->simulation;
+        resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
 
@@ -153,18 +155,18 @@ private:
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         std::map<std::string, std::string> service_specific_args;
-        service_specific_args["task"] = "FailedHost1";
+        service_specific_args["task1"] = "FailedHost1";
         job_manager->submitJob(job, this->test->compute_service, service_specific_args);
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
 
         // Paranoid check
         if (not wrench::StorageService::lookupFile(this->test->output_file,
-                wrench::FileLocation::LOCATION(this->test->storage_service))) {
+                                                   wrench::FileLocation::LOCATION(this->test->storage_service))) {
             throw std::runtime_error("Output file not written to storage service");
         }
 
@@ -179,13 +181,12 @@ TEST_F(BareMetalComputeServiceHostFailuresTest, OneFailureCausingWorkUnitRestart
 void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHost_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-
-
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -203,28 +204,27 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))
                                                 },
                                                 "/scratch",
-                                                {}));
+                                                {
+                                                 {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -234,14 +234,12 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
 /**                    RESTART ON SAME HOST                          **/
 /**********************************************************************/
 
-class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::WMS {
+class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                                             std::string &hostname,
-                                                                             std::shared_ptr<wrench::ComputeService> cs,
-                                                                             std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+                                                                             std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -254,13 +252,13 @@ private:
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
-        resurector->simulation = this->simulation;
+        resurector->setSimulation(this->simulation);
         resurector->start(resurector, true, false); // Daemonized, no auto-restart
 
 
@@ -275,7 +273,7 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
@@ -299,7 +297,7 @@ TEST_F(BareMetalComputeServiceHostFailuresTest, OneFailureCausingWorkUnitRestart
 void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHost_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -322,28 +320,27 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
                                                 "/scratch",
-                                                {}));
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"},
+                                                 }));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -352,14 +349,12 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
 /**                    RANDOM FAILURES                               **/
 /**********************************************************************/
 
-class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::WMS {
+class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                 std::string &hostname,
-                                                 std::shared_ptr<wrench::ComputeService> cs,
-                                                 std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+                                                 std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -383,7 +378,7 @@ private:
             auto switch1 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
                                                              "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
-            switch1->simulation = this->simulation;
+            switch1->setSimulation(this->simulation);
             switch1->start(switch1, true, false); // Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
@@ -391,10 +386,10 @@ private:
             auto switch2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed2, 10, 100, 10, 100,
                                                              "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
-            switch2->simulation = this->simulation;
+            switch2->setSimulation(this->simulation);
             switch2->start(switch2, true, false); // Daemonized, no auto-restart
 
-            // Add a task to the workflow
+            // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 0);
             auto output_file = this->test->workflow->addFile("output_file_" + std::to_string(trial), 20000.0);
             task->addInputFile(this->test->input_file);
@@ -410,7 +405,7 @@ private:
             job_manager->submitJob(job, this->test->compute_service, {});
 
             // Wait for a workflow execution event
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+            std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
                 throw std::runtime_error("Unexpected workflow execution event!");
             }
@@ -435,11 +430,12 @@ TEST_F(BareMetalComputeServiceHostFailuresTest, RandomFailures) {
 void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFailures_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
+//    argv[2] = strdup("--wrench-full-logs");
 
 
     simulation->init(&argc, argv);
@@ -458,28 +454,27 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
                                                 "/scratch",
-                                                {}));
+                                                {
+                                                 {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(input_file, (storage_service));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -489,13 +484,12 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
 /**    FALURE ON SERVICE THAT DIES WHEN ALL RESOURCES ARE DOWN       **/
 /**********************************************************************/
 
-class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS : public wrench::WMS {
+class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS : public wrench::ExecutionController {
 
 public:
     BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                                                           std::string &hostname, std::shared_ptr<wrench::ComputeService> cs,
-                                                                                           std::shared_ptr<wrench::StorageService> ss) :
-            wrench::WMS(nullptr, nullptr, {cs}, {ss}, {}, nullptr, hostname, "test") {
+                                                                                           std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -508,7 +502,7 @@ private:
         // Starting a FailedHost1 murderer!!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
 
@@ -525,7 +519,7 @@ private:
         job_manager->submitJob(job, this->test->compute_service, {});
 
         // Wait for a workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
+        std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event!");
         }
@@ -541,13 +535,12 @@ TEST_F(BareMetalComputeServiceHostFailuresTest, FailureOnServiceThatTerminatesWh
 void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDown_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-
-
+//    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -566,28 +559,26 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
                     },
                     "/scratch",
                     {
-                            {wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "true"}
+                            {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}
                     }));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
-    wms = simulation->add(new BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(this, stable_host, compute_service, storage_service));
-
-    wms->addWorkflow(workflow);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    wms = simulation->add(new BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(stable_host));
     simulation->stageFile(input_file, storage_service);
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }

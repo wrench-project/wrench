@@ -14,23 +14,20 @@
 #include <queue>
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "BareMetalComputeServiceProperty.h"
 #include "BareMetalComputeServiceMessagePayload.h"
-#include "wrench/services/compute/workunit_executor/Workunit.h"
-#include "wrench/services/helpers/HostStateChangeDetector.h"
+#include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
 
 
 
 namespace wrench {
 
     class Simulation;
-
     class StorageService;
-
     class FailureCause;
-
     class Alarm;
+    class Action;
+    class ActionExecutionService;
 
 
     /**
@@ -52,20 +49,19 @@ namespace wrench {
 
     private:
 
-        std::map<std::string, std::string> default_property_values = {
-                {BareMetalComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
-                {BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "false"},
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
+                {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    1024},
                 {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
                 {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         1024},
                 {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,               1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
                 {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,              1024},
                 {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
                 {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -77,6 +73,12 @@ namespace wrench {
                 {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               1024},
                 {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
                 {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD,              1024},
+                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
                 {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     1024},
                 {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      1024},
                 {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -89,102 +91,88 @@ namespace wrench {
         BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 std::string scratch_space_mount_point,
-                                std::map<std::string, std::string> property_list = {},
-                                std::map<std::string, double> messagepayload_list = {}
+                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::vector<std::string> compute_hosts,
                                 std::string scratch_space_mount_point,
-                                std::map<std::string, std::string> property_list = {},
-                                std::map<std::string, double> messagepayload_list = {}
+                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
+
+        virtual bool supportsStandardJobs() override;
+        virtual bool supportsCompoundJobs() override;
+        virtual bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
 
-        void submitStandardJob(std::shared_ptr<StandardJob> job, const std::map<std::string, std::string> &service_specific_args) override;
+        void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) override;
 
-        void submitPilotJob(std::shared_ptr<PilotJob> job, const std::map<std::string, std::string> &service_specific_args) override;
-
-        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
-
-        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
         ~BareMetalComputeService();
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
-    private:
+    protected:
+        friend class JobManager;
 
-        friend class Simulation;
+        void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
+                                                      std::map<std::string, std::string> &service_specific_args) override;
 
-        void validateProperties();
 
-        // Low-level Constructor
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                std::map<std::string, std::string> property_list,
-                                std::map<std::string, double> messagepayload_list,
+                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 double ttl,
                                 std::shared_ptr<PilotJob> pj, std::string suffix,
                                 std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
 
-        // Private Constructor
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                                std::map<std::string, std::string> property_list,
-                                std::map<std::string, double> messagepayload_list,
+                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
+
+        void validateProperties();
+
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                              std::map<std::string, std::string> property_list,
-                              std::map<std::string, double> messagepayload_list,
+                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                               double ttl,
                               std::shared_ptr<PilotJob> pj);
 
 
-        std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+    protected:
 
-        // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
-        std::map<std::string, double> ram_availabilities;
-        std::map<std::string, unsigned long> running_thread_counts;
-
-        unsigned long total_num_cores;
-
-        double ttl;
-        bool has_ttl;
-        double death_date;
         std::shared_ptr<Alarm> death_alarm = nullptr;
-
         std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
 
-        std::map<std::shared_ptr<StandardJob> , std::set<WorkflowFile*>> files_in_scratch;
 
-        // Set of running jobs
-        std::set<std::shared_ptr<StandardJob> > running_jobs;
+        std::unordered_map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
-        // Job task execution specs
-        std::map<std::shared_ptr<StandardJob> , std::map<WorkflowTask *, std::tuple<std::string, unsigned long>>> job_run_specs;
+        std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
-        // Map of all Workunits
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> all_workunits;
+        std::set<std::shared_ptr<Action>> not_ready_actions;
+        std::vector<std::shared_ptr<Action>> ready_actions;
+        std::set<std::shared_ptr<Action>> dispatched_actions;
+        std::unordered_map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
 
-        std::deque<std::shared_ptr<Workunit>> ready_workunits;
-//        std::map<std::shared_ptr<StandardJob> , std::set<Workunit *>> running_workunits;
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<Workunit>>> completed_workunits;
+        double ttl;
+        double death_date;
+        bool has_ttl;
 
-        // Set of running WorkunitExecutors
-        std::map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<WorkunitExecutor>>> workunit_executors;
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
-        void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
+//        void storeFilesStoredInScratch(std::set<std::shared_ptr<DataFile>> scratch_files);
 
         // Cleanup the scratch if I am a pilot job
         void cleanUpScratch();
@@ -193,67 +181,53 @@ namespace wrench {
 
         // Helper functions to make main() a bit more palatable
 
-        void terminate(bool notify_pilot_job_submitters);
+        void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        void failCurrentStandardJobs();
+        void processActionDone(std::shared_ptr<Action> action);
 
-        void processWorkunitExecutorCompletion(std::shared_ptr<WorkunitExecutor> workunit_executor, std::shared_ptr<Workunit> workunit);
-
-        void processWorkunitExecutorFailure(std::shared_ptr<WorkunitExecutor> workunit_executor, std::shared_ptr<Workunit> workunit, std::shared_ptr<FailureCause> cause);
-
-        void processWorkunitExecutorCrash(std::shared_ptr<WorkunitExecutor> workunit_executor);
-
-        void forgetWorkunitExecutor(std::shared_ptr<WorkunitExecutor> workunit_executor);
-
-        void processStandardJobTerminationRequest(std::shared_ptr<StandardJob> job, const std::string &answer_mailbox);
+        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processNextMessage();
 
-        void dispatchReadyWorkunits();
-
-//        void someHostIsBackOn(simgrid::s4u::Host const &h);
-//        bool host_back_on = false;
+        void dispatchReadyActions();
 
 
-        /** @brief Reasons why a standard job could be terminated */
-        enum JobTerminationCause {
-            /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
-            TERMINATED,
+        void terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
 
-            /** @brief The compute service was directed to stop, and any running StandardJob will fail */
-            COMPUTE_SERVICE_KILLED
-        };
+        void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
-        void terminateRunningStandardJob(std::shared_ptr<StandardJob> job, JobTerminationCause termination_cause);
+//        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 
-        void failRunningStandardJob(std::shared_ptr<StandardJob> job, std::shared_ptr<FailureCause> cause);
-
-        void processGetResourceInformation(const std::string &answer_mailbox);
-
-        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
-
-        void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
-                const std::string &answer_mailbox, unsigned long num_cores, double ram);
+                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
-        std::tuple<std::string, unsigned long> pickAllocation(WorkflowTask *task,
-                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
-                                                              std::set<std::string> &hosts_to_avoid);
+//        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<WorkflowTask>task,
+//                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
+//                                                              std::set<std::string> &hosts_to_avoid);
 
-        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
-
-        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
+//        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
+//
+//        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-        bool areAllComputeResourcesDownWithNoWUERunning();
+//        bool areAllComputeResourcesDownWithNoWUERunning();
+
+        static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 
 
         int exit_code = 0;
 
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
+
+        std::shared_ptr<ActionExecutionService> action_execution_service;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     };
 };

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,18 @@
 class SimulationOutputTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-/*    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;*/
+    std::shared_ptr<wrench::Workflow> workflow;
+/*    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file1;
+    std::shared_ptr<wrench::DataFile> output_file2;
+    std::shared_ptr<wrench::DataFile> output_file3;
+    std::shared_ptr<wrench::DataFile> output_file4;
+    std::shared_ptr<wrench::WorkflowTask> task1;
+    std::shared_ptr<wrench::WorkflowTask> task2;
+    std::shared_ptr<wrench::WorkflowTask> task3;
+    std::shared_ptr<wrench::WorkflowTask> task4;
+    std::shared_ptr<wrench::WorkflowTask> task5;
+    std::shared_ptr<wrench::WorkflowTask> task6;*/
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
 
@@ -35,9 +35,13 @@ public:
 
 protected:
 
+    ~SimulationOutputTest() {
+        workflow->clear();
+    }
+
     SimulationOutputTest() {
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
 //      // Create the files
 //      input_file = workflow->addFile("input_file", 10.0);
@@ -59,7 +63,7 @@ protected:
 //      task4->setClusterID("ID2");
 //      task5->setClusterID("ID2");
 //
-//      // Add file-task dependencies
+//      // Add file-task1 dependencies
 //      task1->addInputFile(input_file);
 //      task2->addInputFile(input_file);
 //      task3->addInputFile(input_file);
@@ -99,15 +103,12 @@ protected:
 /**            EMPTY SIMULATION OUTPUT                               **/
 /**********************************************************************/
 
-class EmptySimulationOutputWMS : public wrench::WMS {
+class EmptySimulationOutputWMS : public wrench::ExecutionController {
 
 public:
     EmptySimulationOutputWMS(SimulationOutputTest *test,
-                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                             const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                              std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -117,10 +118,10 @@ private:
     int main() {
 
         try {
-            this->simulation->getOutput().addTimestampTaskStart(nullptr);
-            this->simulation->getOutput().addTimestampTaskCompletion(nullptr);
-            this->simulation->getOutput().addTimestampTaskTermination(nullptr);
-            this->simulation->getOutput().addTimestampTaskFailure(nullptr);
+            this->simulation->getOutput().addTimestampTaskStart(0.0, nullptr);
+            this->simulation->getOutput().addTimestampTaskCompletion(0.0, nullptr);
+            this->simulation->getOutput().addTimestampTaskTermination(0.0, nullptr);
+            this->simulation->getOutput().addTimestampTaskFailure(0.0, nullptr);
             throw std::runtime_error("Should have caught exception!");
         } catch (std::exception &ignore) {
 
@@ -139,7 +140,7 @@ TEST_F(SimulationOutputTest, EmptySimulationOutputTest) {
 void SimulationOutputTest::do_emptyTrace_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -154,20 +155,18 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new EmptySimulationOutputWMS(this, {}, {}, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
+            new EmptySimulationOutputWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    // Get the number of task completions
+    // Get the number of task1 completions
     std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
     trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     ASSERT_EQ(0, trace.size());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

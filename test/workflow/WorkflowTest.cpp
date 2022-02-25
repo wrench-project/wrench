@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2019. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,20 +9,25 @@
 
 #include <gtest/gtest.h>
 
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/Workflow.h"
+#include <wrench/data_file/DataFile.h>
+#include <wrench/simulation/Simulation.h>
+#include <wrench/workflow/WorkflowTask.h>
+#include <wrench/workflow/Workflow.h>
 
 class WorkflowTest : public ::testing::Test {
 protected:
+    ~WorkflowTest() {
+        workflow->clear();
+    }
+
     WorkflowTest() {
-        workflow = new wrench::Workflow();
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
+        workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
-        t1 = workflow->addTask("task-test-01", 1, 1, 1, 0);
-        t2 = workflow->addTask("task-test-02", 1, 1, 1, 0);
-        t3 = workflow->addTask("task-test-03", 1, 1, 1, 0);
-        t4 = workflow->addTask("task-test-04", 1, 1, 1, 0);
+        t1 = workflow->addTask("task1-test-01", 1, 1, 1, 0);
+        t2 = workflow->addTask("task1-test-02", 1, 1, 1, 0);
+        t3 = workflow->addTask("task1-test-03", 1, 1, 1, 0);
+        t4 = workflow->addTask("task1-test-04", 1, 1, 1, 0);
 
         t2->setClusterID("cluster-01");
         t3->setClusterID("cluster-01");
@@ -50,22 +55,21 @@ protected:
     }
 
     // data members
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4;
-    wrench::WorkflowFile *f1, *f2, *f3, *f4, *f5;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::WorkflowTask> t1, t2, t3, t4;
+    std::shared_ptr<wrench::DataFile> f1, f2, f3, f4, f5;
 };
 
 TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_EQ(4, workflow->getNumberOfTasks());
 
-    // testing number of task's parents
+    // testing number of task1's parents
     ASSERT_EQ(0, workflow->getTaskParents(t1).size());
     ASSERT_EQ(1, workflow->getTaskParents(t2).size());
     ASSERT_EQ(1, workflow->getTaskParents(t3).size());
     ASSERT_EQ(2, workflow->getTaskParents(t4).size());
 
-    // testing number of task's children
+    // testing number of task1's children
     ASSERT_EQ(2, workflow->getTaskChildren(t1).size());
     ASSERT_EQ(1, workflow->getTaskChildren(t2).size());
     ASSERT_EQ(1, workflow->getTaskChildren(t3).size());
@@ -83,7 +87,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     ASSERT_EQ(3, workflow->getNumLevels());
 
-    //  Test task "getters"
+    //  Test task1 "getters"
     auto task_map = workflow->getTaskMap();
     ASSERT_EQ(4, task_map.size());
     auto tasks =  workflow->getTasks();
@@ -100,7 +104,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     // Test file "getters"
     auto file_map = workflow->getFileMap();
     ASSERT_EQ(5, file_map.size());
-    auto files = workflow->getFiles();
+    auto files = workflow->getFileMap();
     ASSERT_EQ(5, files.size());
     auto ifile_map = workflow->getInputFileMap();
     ASSERT_EQ(1, ifile_map.size());
@@ -114,7 +118,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_THROW(workflow->getTaskNumberOfChildren(nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->getTaskNumberOfParents(nullptr), std::invalid_argument);
     // Get tasks with a given top-level
-    std::vector<wrench::WorkflowTask *> top_level_equal_to_1_or_2;
+    std::vector<std::shared_ptr<wrench::WorkflowTask> > top_level_equal_to_1_or_2;
     top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1, 2);
     ASSERT_EQ(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t1),
               top_level_equal_to_1_or_2.end());
@@ -151,8 +155,6 @@ TEST_F(WorkflowTest, WorkflowStructure) {
 
     workflow->removeTask(t1);
 
-    // Create a bogus task using the constructor
-
 }
 
 TEST_F(WorkflowTest, ControlDependency) {
@@ -173,39 +175,40 @@ TEST_F(WorkflowTest, ControlDependency) {
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
-    // testing invalid task creation
-    ASSERT_THROW(workflow->addTask("task-error", -100, 1, 1, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 2, 1, 0), std::invalid_argument);
-    ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, -1.0), std::invalid_argument);
+    // testing invalid task1 creation
+    ASSERT_THROW(workflow->addTask("task1-error", -100, 1, 1, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task1-error", 100, 2, 1, 0), std::invalid_argument);
+    ASSERT_THROW(workflow->addTask("task1-error", 100, 1, 1, -1.0), std::invalid_argument);
 
-    // testing whether a task id exists
-    ASSERT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
-    ASSERT_TRUE(workflow->getTaskByID("task-test-01")->getID() == t1->getID());
+    // testing whether a task1 id exists
+    ASSERT_THROW(workflow->getTaskByID("task1-test-00"), std::invalid_argument);
+    ASSERT_TRUE(workflow->getTaskByID("task1-test-01")->getID() == t1->getID());
 
-    // testing whether a task already exists (check via task id)
-    ASSERT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 0), std::invalid_argument);
+    // testing whether a task1 already exists (check via task1 id)
+    ASSERT_THROW(workflow->addTask("task1-test-01", 1, 1, 1, 0), std::invalid_argument);
 
     // remove tasks
     ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
     workflow->removeTask(t1);
 
-    auto bogus_workflow = new wrench::Workflow();
-    wrench::WorkflowTask *bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
+    auto bogus_workflow = wrench::Workflow::createWorkflow();
+    std::shared_ptr<wrench::WorkflowTask> bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 0.0);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(-2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::AMDAHL(2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(-2.0)), std::invalid_argument);
     ASSERT_THROW(bogus->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(2.0)), std::invalid_argument);
     ASSERT_THROW(workflow->removeTask(bogus), std::invalid_argument);
     bogus_workflow->removeTask(bogus);
-    delete bogus_workflow;
 
     ASSERT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
 
+    bogus_workflow->clear();
+
 //  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
-TEST_F(WorkflowTest, WorkflowFile) {
+TEST_F(WorkflowTest, DataFile) {
     ASSERT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
     ASSERT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
 
@@ -214,9 +217,10 @@ TEST_F(WorkflowTest, WorkflowFile) {
 
     ASSERT_EQ(workflow->getInputFiles().size(), 1);
 }
+
 //
 //TEST_F(WorkflowTest, UpdateTaskState) {
-//  // testing update task state
+//  // testing update task1 state
 //  workflow->updateTaskState(t1, wrench::WorkflowTask::State::READY);
 //  ASSERT_EQ(1, workflow->getReadyTasks().size());
 //
@@ -254,15 +258,19 @@ TEST_F(WorkflowTest, Export) {
 
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
+
+    ~AllDependenciesWorkflowTest() {
+        workflow->clear();
+    }
+
     AllDependenciesWorkflowTest() {
-        workflow = new wrench::Workflow();
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
+        workflow = wrench::Workflow::createWorkflow();
 
         // create simple diamond workflow
-        t1 = workflow->addTask("task-test-01", 1, 1, 1, 0);
-        t2 = workflow->addTask("task-test-02", 1, 1, 1, 0);
-        t3 = workflow->addTask("task-test-03", 1, 1, 1, 0);
-        t4 = workflow->addTask("task-test-04", 1, 1, 1, 0);
+        t1 = workflow->addTask("task1-test-01", 1, 1, 1, 0);
+        t2 = workflow->addTask("task1-test-02", 1, 1, 1, 0);
+        t3 = workflow->addTask("task1-test-03", 1, 1, 1, 0);
+        t4 = workflow->addTask("task1-test-04", 1, 1, 1, 0);
 
         workflow->addControlDependency(t1, t2, true);
         workflow->addControlDependency(t1, t3, true);
@@ -273,21 +281,20 @@ protected:
     }
 
     // data members
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
-    wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::WorkflowTask> t1, t2, t3, t4;
 };
 
 TEST_F(AllDependenciesWorkflowTest, AllDependenciesWorkflowStructure) {
     ASSERT_EQ(4, workflow->getNumberOfTasks());
 
-    // testing number of task's parents
+    // testing number of task1's parents
     ASSERT_EQ(0, workflow->getTaskParents(t1).size());
     ASSERT_EQ(1, workflow->getTaskParents(t2).size());
     ASSERT_EQ(2, workflow->getTaskParents(t3).size());
     ASSERT_EQ(3, workflow->getTaskParents(t4).size());
 
-    // testing number of task's children
+    // testing number of task1's children
     ASSERT_EQ(3, workflow->getTaskChildren(t1).size());
     ASSERT_EQ(2, workflow->getTaskChildren(t2).size());
     ASSERT_EQ(1, workflow->getTaskChildren(t3).size());

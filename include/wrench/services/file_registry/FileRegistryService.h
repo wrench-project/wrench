@@ -12,17 +12,17 @@
 
 #include <set>
 
-#include <wrench/services/Service.h>
-#include <wrench/services/network_proximity/NetworkProximityService.h>
-#include <wrench/services/storage/StorageService.h>
-#include <wrench/services/storage/storage_helpers/FileLocation.h>
+#include "wrench/services/Service.h"
+#include "wrench/services/network_proximity/NetworkProximityService.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 #include "FileRegistryServiceProperty.h"
 #include "FileRegistryServiceMessagePayload.h"
 
 namespace wrench {
 
-    class WorkflowFile;
+    class DataFile;
 
     class StorageService;
 
@@ -35,13 +35,13 @@ namespace wrench {
     class FileRegistryService : public Service {
 
     private:
-        std::map <std::string, std::string> default_property_values = {
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,       "0.0"},
                 {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST,    "0.0"},
                 {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0.0"},
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
                 {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          1024},
                 {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       1024},
                 {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,  1024},
@@ -54,24 +54,24 @@ namespace wrench {
 
     public:
         // Public Constructor
-        explicit FileRegistryService(std::string hostname,
-                                     std::map <std::string, std::string> property_list = {},
-                                     std::map<std::string, double> messagepayload_list = {}
+        FileRegistryService(std::string hostname,
+                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
         );
 
         /****************************/
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<std::shared_ptr<FileLocation>> lookupEntry(WorkflowFile *file);
+        std::set<std::shared_ptr<FileLocation>> lookupEntry(std::shared_ptr<DataFile>file);
 
         std::map<double, std::shared_ptr<FileLocation>> lookupEntry(
-                WorkflowFile *file, std::string reference_host,
+                std::shared_ptr<DataFile>file, std::string reference_host,
                 std::shared_ptr <NetworkProximityService> network_proximity_service);
 
-        void addEntry(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        void addEntry(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
-        void removeEntry(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        void removeEntry(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
         /****************************/
         /** \endcond                */
@@ -90,16 +90,16 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        void addEntryToDatabase(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        void addEntryToDatabase(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
-        bool removeEntryFromDatabase(WorkflowFile *file, std::shared_ptr <FileLocation> location);
+        bool removeEntryFromDatabase(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
 
         int main() override;
 
         bool processNextMessage();
 
-        std::map<WorkflowFile *, std::set < std::shared_ptr < FileLocation>>>
-        entries;
+        std::map<std::shared_ptr<DataFile>, std::set < std::shared_ptr < FileLocation>>>
+                entries;
     };
 
 };

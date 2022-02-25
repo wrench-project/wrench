@@ -1,0 +1,68 @@
+<?xml version='1.0'?>
+<!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
+
+        <!-- The host on which the Controller will run -->
+        <host id="UserHost" speed="10Gf" core="1">
+        </host>
+
+        <!-- The host on which the bare-metal compute service will run and also run jobs-->
+        <host id="ComputeHost1" speed="35Gf" core="10">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- Another host on which the bare-metal compute service will be able to run jobs -->
+        <host id="ComputeHost2" speed="35Gf" core="10">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- The host on which the first storage service will run -->
+        <host id="StorageHost1" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the second storage service will run -->
+        <host id="StorageHost2" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="200MBps" write_bw="200MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the cloud compute service will run -->
+        <host id="CloudHeadHost" speed="10Gf" core="1">
+            <disk id="hard_drive" read_bw="100MBps" write_bw="100MBps">
+                <prop id="size" value="5000GiB"/>
+                <prop id="mount" value="/scratch/"/>
+            </disk>
+        </host>
+
+        <!-- The host on which the cloud compute service will start VMs -->
+        <host id="CloudHost" speed="25Gf" core="8">
+            <prop id="ram" value="16GB" />
+        </host>
+
+        <!-- A network link shared by EVERY ONE-->
+        <link id="network_link" bandwidth="50MBps" latency="1ms"/>
+
+        <!-- The same network link connects all hosts together -->
+        <route src="UserHost" dst="ComputeHost1"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="ComputeHost2"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+        <route src="UserHost" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost1" dst="StorageHost1"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost1" dst="ComputeHost2"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost1" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost2" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost2" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
+        <route src="CloudHeadHost" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost1" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+        <route src="StorageHost2" dst="CloudHost"> <link_ctn id="network_link"/> </route>
+
+    </zone>
+</platform>

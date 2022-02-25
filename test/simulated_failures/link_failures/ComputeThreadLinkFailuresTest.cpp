@@ -11,7 +11,7 @@
 #include <random>
 #include <wrench-dev.h>
 
-#include "../../../src/wrench/helper_services/work_unit_executor/ComputeThread.h"
+#include <wrench/services/helper_services/compute_thread/ComputeThread.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
@@ -26,10 +26,14 @@ public:
     void do_LinkFailure_test();
 
 protected:
+    ~ComputeThreadLinkFailuresTest() {
+        workflow->clear();
+    }
+
     ComputeThreadLinkFailuresTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
@@ -54,7 +58,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -63,12 +67,12 @@ protected:
 /**  DO LINK FAILURE TEST                                            **/
 /**********************************************************************/
 
-class ComputeThreadLinkFailuresTestWMS : public wrench::WMS {
+class ComputeThreadLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeThreadLinkFailuresTestWMS(ComputeThreadLinkFailuresTest *test,
-                                          std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+                                     std::string hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -81,12 +85,12 @@ private:
 
         // Create a random service on Host 2
         auto service_on_host2 = std::shared_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService("Host2"));
-        service_on_host2->simulation = this->simulation;
+        service_on_host2->setSimulation(this->simulation);
         service_on_host2->start(service_on_host2, true, false);
 
         // Create a compute thread on Host 3 that should report to the service on Host 2
-        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, service_on_host2->mailbox_name));
-        thread->simulation = this->simulation;
+        auto thread = std::shared_ptr<wrench::ComputeThread>(new wrench::ComputeThread("Host3", 100, service_on_host2->mailbox));
+        thread->setSimulation(this->simulation);
         thread->start(thread, true, false);
 
         // Sleep 10 seconds and turn off link 23
@@ -133,7 +137,7 @@ TEST_F(ComputeThreadLinkFailuresTest, SimpleLinkFailure) {
 void ComputeThreadLinkFailuresTest::do_LinkFailure_test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -147,14 +151,12 @@ void ComputeThreadLinkFailuresTest::do_LinkFailure_test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new ComputeThreadLinkFailuresTestWMS(this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

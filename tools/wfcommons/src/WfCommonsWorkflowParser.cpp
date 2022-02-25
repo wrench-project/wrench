@@ -25,7 +25,11 @@ namespace wrench {
     /**
      * Documentation in .h file
      */
+<<<<<<< HEAD:tools/wfcommons/src/WfCommonsWorkflowParser.cpp
     Workflow *WfCommonsWorkflowParser::createWorkflowFromJSON(const std::string &filename,
+=======
+    std::shared_ptr<Workflow> WfCommonsWorkflowParser::createWorkflowFromJSON(const std::string &filename,
+>>>>>>> wrench-2.0:tools/pegasus/src/PegasusWorkflowParser.cpp
                                                             const std::string &reference_flop_rate,
                                                             bool redundant_dependencies,
                                                             unsigned long min_cores_per_task,
@@ -37,7 +41,11 @@ namespace wrench {
         std::set<std::string> ignored_auxiliary_jobs;
         std::set<std::string> ignored_transfer_jobs;
 
+<<<<<<< HEAD:tools/wfcommons/src/WfCommonsWorkflowParser.cpp
         auto workflow = new Workflow();
+=======
+        auto workflow = Workflow::createWorkflow();
+>>>>>>> wrench-2.0:tools/pegasus/src/PegasusWorkflowParser.cpp
 
         double flop_rate;
 
@@ -63,7 +71,7 @@ namespace wrench {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a workflow exit");
         }
 
-        wrench::WorkflowTask *task;
+        std::shared_ptr<wrench::WorkflowTask> task;
 
         for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
             if (it.key() == "tasks") {
@@ -95,7 +103,11 @@ namespace wrench {
                     }
 
                     if (type != "compute") {
+<<<<<<< HEAD:tools/wfcommons/src/WfCommonsWorkflowParser.cpp
                         throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Job " + name + " has unknown type " + type);
+=======
+                        throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has unknown type " + type);
+>>>>>>> wrench-2.0:tools/pegasus/src/PegasusWorkflowParser.cpp
                     }
 
                     task = workflow->addTask(name, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
@@ -135,7 +147,11 @@ namespace wrench {
                         double size = f.at("size");
                         std::string link = f.at("link");
                         std::string id = f.at("name");
+<<<<<<< HEAD:tools/wfcommons/src/WfCommonsWorkflowParser.cpp
                         WorkflowFile *workflow_file = nullptr;
+=======
+                        std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
+>>>>>>> wrench-2.0:tools/pegasus/src/PegasusWorkflowParser.cpp
                         // Check whether the file already exists
                         try {
                             workflow_file = workflow->getFileByID(id);
@@ -190,7 +206,11 @@ namespace wrench {
     /**
      * Documentation in .h file
      */
+<<<<<<< HEAD:tools/wfcommons/src/WfCommonsWorkflowParser.cpp
     Workflow *WfCommonsWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+=======
+    std::shared_ptr<Workflow> WfCommonsWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
+>>>>>>> wrench-2.0:tools/pegasus/src/PegasusWorkflowParser.cpp
                                                                       bool redundant_dependencies,
                                                                       unsigned long min_cores_per_task,
                                                                       unsigned long max_cores_per_task,

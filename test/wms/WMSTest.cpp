@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,14 @@
 class WMSTest : public ::testing::Test {
 
 public:
-    std::shared_ptr<wrench::ComputeService> cs_cloud = nullptr;
-    std::shared_ptr<wrench::ComputeService> cs_batch = nullptr;
+    std::shared_ptr<wrench::CloudComputeService> cs_cloud = nullptr;
+    std::shared_ptr<wrench::BatchComputeService> cs_batch = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
-    wrench::WorkflowFile *small_file = nullptr;
-    wrench::WorkflowFile *big_file = nullptr;
+    std::shared_ptr<wrench::DataFile> small_file = nullptr;
+    std::shared_ptr<wrench::DataFile> big_file = nullptr;
+
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_DefaultHandlerWMS_test();
     void do_CustomHandlerWMS_test();
@@ -71,23 +73,23 @@ protected:
 /**  WMS REACTING TO EVENTS : DEFAULT HANDLERS                       **/
 /**********************************************************************/
 
-class TestDefaultHandlerWMS : public wrench::WMS {
+class TestDefaultHandlerWMS : public wrench::ExecutionController {
 
 public:
     TestDefaultHandlerWMS(WMSTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                          const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                          double sleep_time,
                           std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
-            ) {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), sleep_time(sleep_time) {
     }
 
 private:
 
     WMSTest *test;
+    double sleep_time;
 
     int main() {
+
+        wrench::Simulation::sleep(this->sleep_time);
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -95,16 +97,13 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
-
         // Create and start a VM on the cloud service
-        auto cloud = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+        auto cloud = this->test->cs_cloud;
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        auto task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        auto task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -117,29 +116,13 @@ private:
         job_manager->submitJob(job2, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         this->waitForAndProcessNextEvent();
 
-        // Get the list of running pilot jobs
-        auto running_pilot_jobs = job_manager->getRunningPilotJobs();
-        if (running_pilot_jobs.size() != 1) {
-            throw std::runtime_error("Should see 1 running pilot job");
-        }
-        if (*running_pilot_jobs.begin() != job2) {
-            throw std::runtime_error("Pilot job should be seen in list of running pilot jobs");
-        }
-
         // Submit another pilot job, which won't be running for a while
         auto job2_1 = job_manager->createPilotJob();
         job_manager->submitJob(job2_1, batch, {{"-N", "1"}, {"-t", "50"}, {"-c", "4"}});
         // Get the list of pending pilot jobs
-        auto pending_pilot_jobs = job_manager->getPendingPilotJobs();
-        if (pending_pilot_jobs.size() != 1) {
-            throw std::runtime_error("Should see 1 pending pilot job");
-        }
-        if (*pending_pilot_jobs.begin() != job2_1) {
-            throw std::runtime_error("Pilot job should be seen in list of pending pilot jobs");
-        }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 100.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 100.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -185,10 +168,11 @@ TEST_F(WMSTest, DefaultEventHandling) {
 
 void WMSTest::do_DefaultHandlerWMS_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -224,12 +208,10 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 
 
     // Create a WMS
-    auto workflow = new wrench::Workflow();
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    workflow = wrench::Workflow::createWorkflow();
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestDefaultHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
+            new TestDefaultHandlerWMS(this, 100, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -242,11 +224,11 @@ void WMSTest::do_DefaultHandlerWMS_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
-    delete simulation;
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -258,25 +240,25 @@ void WMSTest::do_DefaultHandlerWMS_test() {
 /**  WMS REACTING TO EVENTS : CUSTOM HANDLERS                       **/
 /**********************************************************************/
 
-class TestCustomHandlerWMS : public wrench::WMS {
+class TestCustomHandlerWMS : public wrench::ExecutionController {
 
 public:
     TestCustomHandlerWMS(WMSTest *test,
-                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                         const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
+                         double sleep_time,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
-            ) {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test), sleep_time(sleep_time) {
     }
 
 private:
 
     WMSTest *test;
+    double sleep_time;
 
     int counter;
 
     int main() override {
+
+        wrench::Simulation::sleep(this->sleep_time);
 
         // Create a data movement manager
         auto data_movement_manager = this->createDataMovementManager();
@@ -284,15 +266,13 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get the file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
-        auto cloud = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+        auto cloud = this->test->cs_cloud;
         auto vm_name = cloud->createVM(4, 0.0);
         auto vm_cs = cloud->startVM(vm_name);
 
-        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10.0, 1, 1, 0);
         auto job1 = job_manager->createStandardJob(task1);
         job_manager->submitJob(job1, vm_cs);
         this->waitForAndProcessNextEvent();
@@ -310,7 +290,7 @@ private:
         }
 
         // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 200.0, 1, 1, 0);
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 200.0, 1, 1, 0);
         auto job3 = job_manager->createStandardJob(task2);
         job_manager->submitJob(job3, job2->getComputeService());
         this->waitForAndProcessNextEvent();
@@ -351,7 +331,6 @@ private:
                                       std::to_string(timer_off_date));
         }
         if (this->counter != 7) {
-            std::cerr << "this->counter = " << this->counter << "\n";
             throw std::runtime_error("Did not get expected TimerEvent");
         }
 
@@ -394,7 +373,7 @@ TEST_F(WMSTest, CustomEventHandling) {
 
 void WMSTest::do_CustomHandlerWMS_test() {
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -430,12 +409,10 @@ void WMSTest::do_CustomHandlerWMS_test() {
 
 
     // Create a WMS
-    auto *workflow = new wrench::Workflow();
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    workflow = wrench::Workflow::createWorkflow();
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new TestCustomHandlerWMS(this,  {cs_cloud, cs_batch}, {storage_service1, storage_service2}, hostname1)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
+            new TestCustomHandlerWMS(this, 100, hostname1)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(
@@ -448,11 +425,11 @@ void WMSTest::do_CustomHandlerWMS_test() {
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(this->small_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
+    workflow->clear();
 
-    delete simulation;
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

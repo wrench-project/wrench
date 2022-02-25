@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,11 +10,11 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
-#include "CoreAvailabilityTimeLine.h"
+#include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h"
 #include <boost/icl/interval_map.hpp>
 #include <wrench/services/compute/batch/BatchJob.h>
 
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_core_availability_time_line, "Log category for CoreAvailabilityTimeLine");
 
@@ -107,7 +107,7 @@ namespace wrench {
      * @param add: true if we're adding, false otherwise
      * @param start: the start date
      * @param end: the end date
-     * @param job: the batch job
+     * @param job: the BatchComputeService job
      */
     void CoreAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSetCoreLevel();
@@ -189,8 +189,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the batch jobs in the first slot in the node availability timeline
-     * @return a set of batch jobs
+     * @brief Get the BatchComputeService jobs in the first slot in the node availability timeline
+     * @return a set of BatchComputeService jobs
      */
     std::set<std::shared_ptr<BatchJob>> CoreAvailabilityTimeLine::getJobsInFirstSlot() {
         std::set<std::shared_ptr<BatchJob>> to_return;

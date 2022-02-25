@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include <wrench/services/helpers/ServiceTerminationDetectorMessage.h>
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 #include "../failure_test_util/ResourceSwitcher.h"
-#include "wrench/services/helpers/ServiceTerminationDetector.h"
+#include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
 #include "../failure_test_util/SleeperVictim.h"
 #include "../failure_test_util/ComputerVictim.h"
 
@@ -24,18 +24,21 @@ WRENCH_LOG_CATEGORY(failure_detector_host_failure_test, "Log category for Failur
 class FailureDetectorHostFailuresTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_FailureDetectorForSleeperTest_test();
     void do_FailureDetectorForComputerTest_test();
 
 protected:
 
+    ~FailureDetectorHostFailuresTest() {
+        workflow->clear();
+    }
+
     FailureDetectorHostFailuresTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
         std::string trace_file_content = "PERIODICITY 100\n"
@@ -80,12 +83,12 @@ protected:
 /**              FAILURE DETECTOR FOR SLEEPER TEST                   **/
 /**********************************************************************/
 
-class FailureDetectorForSleeperTestWMS : public wrench::WMS {
+class FailureDetectorForSleeperTestWMS : public wrench::ExecutionController {
 
 public:
     FailureDetectorForSleeperTestWMS(FailureDetectorHostFailuresTest *test,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -97,29 +100,29 @@ private:
 
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim1->simulation = this->simulation;
+        auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
-        failure_detector1->simulation = this->simulation;
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox, true, false));
+        failure_detector1->setSimulation(this->simulation);
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim2->simulation = this->simulation;
+        auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
-        failure_detector2->simulation = this->simulation;
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox, true, false));
+        failure_detector2->setSimulation(this->simulation);
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
 
@@ -128,7 +131,7 @@ private:
 
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
@@ -145,7 +148,7 @@ private:
         // And again...
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
@@ -170,7 +173,7 @@ TEST_F(FailureDetectorHostFailuresTest, FailureDetectorForSleeperTest) {
 void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -186,16 +189,14 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FailureDetectorForSleeperTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
@@ -206,12 +207,12 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
 /**              FAILURE DETECTOR FOR COMPUTER TEST                  **/
 /**********************************************************************/
 
-class FailureDetectorForComputerTestWMS : public wrench::WMS {
+class FailureDetectorForComputerTestWMS : public wrench::ExecutionController {
 
 public:
     FailureDetectorForComputerTestWMS(FailureDetectorHostFailuresTest *test,
                                      std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -222,36 +223,36 @@ private:
     int main() override {
 
         // Starting a victim on the FailedHost, which should fail at time 50
-        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim1->simulation = this->simulation;
+        auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        victim1->setSimulation(this->simulation);
         victim1->start(victim1, true, false); // Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
                 wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
-        murderer->simulation = this->simulation;
+        murderer->setSimulation(this->simulation);
         murderer->start(murderer, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox_name, true, false));
-        failure_detector1->simulation = this->simulation;
+        auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox, true, false));
+        failure_detector1->setSimulation(this->simulation);
         failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
-        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox_name));
-        victim2->simulation = this->simulation;
+        auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
+        victim2->setSimulation(this->simulation);
         victim2->start(victim2, true, false); // Daemonized, no auto-restart
 
         // Starting the failure detector!
-        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox_name, true, false));
-        failure_detector2->simulation = this->simulation;
+        auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox, true, false));
+        failure_detector2->setSimulation(this->simulation);
         failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
 
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
 
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message! " + cause->toString());
         }
@@ -267,7 +268,7 @@ private:
 
         // And again...
         try {
-            message = wrench::S4U_Mailbox::getMessage(this->mailbox_name);
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw std::runtime_error("Network error while getting a message!" + cause->toString());
         }
@@ -292,7 +293,7 @@ TEST_F(FailureDetectorHostFailuresTest, FailureDetectorForComputerTest) {
 void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -308,16 +309,14 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new FailureDetectorForComputerTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

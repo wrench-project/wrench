@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ TEST_F(InvalidXMLTest, DISABLED_InvalidXMLPlatformFile) {
 void InvalidXMLTest::do_InvalidXML_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -63,7 +63,7 @@ void InvalidXMLTest::do_InvalidXML_test() {
     // Setting up the platform
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

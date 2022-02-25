@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ TEST_F(BadPlatformTest, BadPlatformFile) {
 void BadPlatformTest::do_badPlatformFileTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -147,7 +147,7 @@ void BadPlatformTest::do_badPlatformFileTest_test() {
 
     ASSERT_THROW(simulation->instantiatePlatform("/bogus"), std::invalid_argument);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -164,7 +164,7 @@ TEST_F(BadPlatformTest, BadPlatform) {
             this->bad_format_xml,
             this->bad_ram1_xml,
             this->bad_ram2_xml,
-            this->bad_disk1_xml,
+//            this->bad_disk1_xml,  // "white spaces are ok!"
             this->bad_disk2_xml,
             this->bad_disk3_xml,
             this->zero_bandwidth_link
@@ -177,7 +177,7 @@ TEST_F(BadPlatformTest, BadPlatform) {
 void BadPlatformTest::do_badPlatformTest_test(std::string xml) {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -190,7 +190,7 @@ void BadPlatformTest::do_badPlatformTest_test(std::string xml) {
     fclose(platform_file);
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

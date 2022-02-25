@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,11 +10,9 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
-#include "wrench/workflow/job/PilotJob.h"
 #include <algorithm>
 #include <simgrid/plugins/energy.h>
 
@@ -32,7 +30,7 @@ public:
     std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service1 = nullptr;
     std::shared_ptr<wrench::ComputeService> compute_service2 = nullptr;
-    wrench::Simulation *simulation = nullptr;
+    std::shared_ptr<wrench::Simulation> simulation = nullptr;
 
     void do_AccessEnergyApiExceptionTests_test();
 
@@ -46,10 +44,17 @@ public:
 
     void do_PluginNotActive_test();
 
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-    EnergyConsumptionTest():workflow(std::unique_ptr<wrench::Workflow>(new wrench::Workflow())) {
+
+    ~EnergyConsumptionTest() {
+        workflow->clear();
+    }
+
+    EnergyConsumptionTest() {
+
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a four-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"
@@ -127,7 +132,7 @@ protected:
 
     }
 
-    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
+        std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
 
@@ -136,14 +141,12 @@ protected:
 /**         ENERGY API TEST WITH BOGUS HOST NAMES                    **/
 /**********************************************************************/
 
-class EnergyApiAccessExceptionsTestWMS : public wrench::WMS {
+class EnergyApiAccessExceptionsTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyApiAccessExceptionsTestWMS(EnergyConsumptionTest *test,
-                                     const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                      std::string& hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
-                        "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -160,7 +163,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -169,39 +172,12 @@ private:
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             std::string my_mailbox = "test_callback_mailbox";
 
+            job_manager->submitJob(job, this->test->compute_service);
+            this->waitForAndProcessNextEvent();
 
-            // Create a StandardJobExecutor that will run stuff on one host and 6 core
-            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-                    new wrench::StandardJobExecutor(
-                            test->simulation,
-                            my_mailbox,
-                            wrench::Simulation::getHostnameList()[1],
-                            job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-                            nullptr,
-                            false,
-                            nullptr,
-                            {},
-                            {}
-                    ));
-            executor->start(executor, true, false); // Daemonized, no auto-restart
-
-            // Wait for a message on my mailbox_name
-            std::shared_ptr<wrench::SimulationMessage> message;
-            try {
-                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-            }
-
-            // Did we get the expected message?
-            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-            if (!msg) {
-                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-            }
 
             try {
-                double value = this->simulation->getEnergyConsumed("dummy_unavailable_host");
+                this->simulation->getEnergyConsumed("dummy_unavailable_host");
                 throw std::runtime_error("Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
@@ -278,7 +254,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -291,6 +267,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
+    std::string compute_hostname = wrench::Simulation::getHostnameList()[1];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -304,32 +281,29 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyApiAccessExceptionsTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
-
+                    this,   hostname)));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -341,13 +315,12 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 /**         ENERGY API TEST WITHOUT ENABLING ENERGY PLUGIN           **/
 /**********************************************************************/
 
-class EnergyApiAccessExceptionsPluginNotActiveTestWMS : public wrench::WMS {
+class EnergyApiAccessExceptionsPluginNotActiveTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyApiAccessExceptionsPluginNotActiveTestWMS(EnergyConsumptionTest *test,
-                                                    const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                                     std::string& hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(hostname,
                         "test") {
         this->test = test;
     }
@@ -365,7 +338,7 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -374,36 +347,8 @@ private:
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             std::string my_mailbox = "test_callback_mailbox";
 
-
-            // Create a StandardJobExecutor that will run stuff on one host and 6 core
-            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-                    new wrench::StandardJobExecutor(
-                            test->simulation,
-                            my_mailbox,
-                            wrench::Simulation::getHostnameList()[1],
-                            job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-                            nullptr,
-                            false,
-                            nullptr,
-                            {},
-                            {}
-                    ));
-            executor->start(executor, true, false); // Daemonized, no auto-restart
-
-            // Wait for a message on my mailbox_name
-            std::shared_ptr<wrench::SimulationMessage> message;
-            try {
-                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-            }
-
-            // Did we get the expected message?
-            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-            if (!msg) {
-                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-            }
+            job_manager->submitJob(job, this->test->compute_service);
+            this->waitForAndProcessNextEvent();
 
             try {
                 double value = this->simulation->getEnergyConsumed("MyHost1");
@@ -474,7 +419,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -487,6 +432,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
+    std::string compute_hostname = wrench::Simulation::getHostnameList()[1];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -500,32 +446,30 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+                    this,  hostname)));
 
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -536,13 +480,12 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 /**                    ENERGY CONSUMPTION TEST                       **/
 /**********************************************************************/
 
-class EnergyConsumptionTestWMS : public wrench::WMS {
+class EnergyConsumptionTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyConsumptionTestWMS(EnergyConsumptionTest *test,
-                             const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                              std::string& hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(hostname,
                         "test") {
         this->test = test;
     }
@@ -558,7 +501,7 @@ private:
         {
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job = job_manager->createStandardJob(task);
@@ -568,37 +511,9 @@ private:
             std::string my_mailbox = "test_callback_mailbox";
             double before = wrench::S4U_Simulation::getClock();
 
+            job_manager->submitJob(job, this->test->compute_service);
 
-            // Create a StandardJobExecutor that will run stuff on one host and 6 core
-            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-                    new wrench::StandardJobExecutor(
-                            test->simulation,
-                            my_mailbox,
-                            wrench::Simulation::getHostnameList()[1],
-                            job,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[1],
-                                            std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-                            nullptr,
-                            false,
-                            nullptr,
-                            {},
-                            {}
-                    ));
-            executor->start(executor, true, false); // Daemonized, no auto-restart
-
-            // Wait for a message on my mailbox_name
-            std::shared_ptr<wrench::SimulationMessage> message;
-            try {
-                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-            }
-
-            // Did we get the expected message?
-            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-            if (!msg) {
-                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-            }
+            this->waitForAndProcessNextEvent();
 
             double after = wrench::S4U_Simulation::getClock();
 
@@ -626,7 +541,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -658,26 +573,23 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyConsumptionTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
-
+                    this, hostname)));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -689,14 +601,12 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 /**                 SIMPLE ENERGY API CHECK TEST                     **/
 /**********************************************************************/
 
-class EnergyAPICheckTestWMS : public wrench::WMS {
+class EnergyAPICheckTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyAPICheckTestWMS(EnergyConsumptionTest *test,
-                          const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                           std::string& hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
-                        "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -779,7 +689,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -811,26 +721,23 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyAPICheckTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
-
+                    this,  hostname)));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -842,13 +749,12 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 /**          ENERGY CONSUMPTION TEST WITH CHANGE IN PSTSATES         **/
 /**********************************************************************/
 
-class EnergyConsumptionPStateChangeTestWMS : public wrench::WMS {
+class EnergyConsumptionPStateChangeTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyConsumptionPStateChangeTestWMS(EnergyConsumptionTest *test,
-                                         const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                                          std::string& hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(hostname,
                         "test") {
         this->test = test;
     }
@@ -867,13 +773,13 @@ private:
             std::vector<std::string> simulation_hosts = wrench::Simulation::getHostnameList();
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job1 = job_manager->createStandardJob(task1);
 
             //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-            wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 10000000000, 1, 1, 1.0);
 
             // Create a StandardJob
             auto job2 = job_manager->createStandardJob(task2);
@@ -885,35 +791,8 @@ private:
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             std::string my_mailbox = "test_callback_mailbox";
 
-            // Create a StandardJobExecutor
-            std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-                    new wrench::StandardJobExecutor(
-                            test->simulation,
-                            my_mailbox,
-                            wrench::Simulation::getHostnameList()[1],
-                            job1,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-                            nullptr,
-                            false,
-                            nullptr,
-                            {},
-                            {}
-                    ));
-            executor->start(executor, true, false); // Daemonized, no auto-restart
-
-            // Wait for a message on my mailbox_name
-            std::shared_ptr<wrench::SimulationMessage> message;
-            try {
-                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-            }
-
-            // Did we get the expected message?
-            auto msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-            if (!msg) {
-                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-            }
+            job_manager->submitJob(job1, this->test->compute_service);
+            this->waitForAndProcessNextEvent();
 
             double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
             double energy_consumed_while_running_with_higher_speed = after_current_energy_consumed_by_host1 - before_current_energy_consumed_by_host1;
@@ -936,33 +815,8 @@ private:
             //let's execute the job, this should take ~100 sec based on the 100MF speed
             my_mailbox = "test_callback_mailbox";
 
-            // Create a StandardJobExecutor
-            executor = std::unique_ptr<wrench::StandardJobExecutor>(
-                    new wrench::StandardJobExecutor(
-                            test->simulation,
-                            my_mailbox,
-                            wrench::Simulation::getHostnameList()[1],
-                            job2,
-                            {std::make_pair(wrench::Simulation::getHostnameList()[1], std::make_tuple(1, wrench::ComputeService::ALL_RAM))},
-                            nullptr,
-                            false,
-                            nullptr,
-                            {},
-                            {}
-                    ));
-            executor->start(executor, true, false); // Daemonized, no auto-restart
-
-            try {
-                message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-            } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-                throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-            }
-
-            // Did we get the expected message?
-            msg = std::dynamic_pointer_cast<wrench::StandardJobExecutorDoneMessage>(message);
-            if (!msg) {
-                throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-            }
+            job_manager->submitJob(job2, this->test->compute_service);
+            this->waitForAndProcessNextEvent();
 
             double after_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
             double energy_consumed_while_running_with_lower_speed = after_current_energy_consumed_by_host2 - before_current_energy_consumed_by_host2;
@@ -979,8 +833,8 @@ private:
             //so, energy_consumed/time_taken might give us an approximate wattage power which should be in between these ranges
             //in fact, we are using these hosts to the full power, so the power wattage should be near the max values
 
-            double exact_max_wattage_power_1 = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
-            double exact_max_wattage_power_2 = this->simulation->getMaxPowerConsumption(simulation_hosts[1]);
+            double exact_max_wattage_power_1 = wrench::Simulation::getMaxPowerConsumption(simulation_hosts[1]);
+            double exact_max_wattage_power_2 = wrench::Simulation::getMaxPowerConsumption(simulation_hosts[1]);
             double EPSILON = 1.0;
             double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed/higher_speed_compuation_time;
             double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed/lower_speed_computation_time;
@@ -1007,7 +861,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1020,6 +874,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
     // Get a hostname
     std::string hostname = wrench::Simulation::getHostnameList()[0];
+    std::string compute_hostname = wrench::Simulation::getHostnameList()[1];
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1033,32 +888,29 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
             new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyConsumptionPStateChangeTestWMS(
-                    this,  {compute_service}, hostname)));
-
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
-
+                    this, hostname)));
 
     // Create two workflow files
-    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
     // of course not be likely to do
     EXPECT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -1071,13 +923,12 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 /**                     PLUGIN NOT ACTIVATED TEST                    **/
 /**********************************************************************/
 
-class PluginNotActivatedTestWMS : public wrench::WMS {
+class PluginNotActivatedTestWMS : public wrench::ExecutionController {
 
 public:
     PluginNotActivatedTestWMS(EnergyConsumptionTest *test,
-                              const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
                               std::string& hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+            wrench::ExecutionController(hostname,
                         "test") {
         this->test = test;
     }
@@ -1120,7 +971,7 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
 
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -1142,15 +993,11 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
-            new PluginNotActivatedTestWMS(this,  {compute_service}, hostname)));
-
-    EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+            new PluginNotActivatedTestWMS(this, hostname)));
 
     EXPECT_NO_THROW(simulation->launch());
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
         free(argv[i]);

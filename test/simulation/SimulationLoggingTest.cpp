@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,22 @@ WRENCH_LOG_CATEGORY(simulation_logging_test, "Log category for Simulation Loggin
 class SimulationLoggingTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_logging_test();
 
 protected:
 
+    ~SimulationLoggingTest() {
+        workflow->clear();
+    }
+
     SimulationLoggingTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
+
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -49,12 +52,12 @@ protected:
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
-class SimulationLoggingWMS : public wrench::WMS {
+class SimulationLoggingWMS : public wrench::ExecutionController {
 
 public:
     SimulationLoggingWMS(SimulationLoggingTest *test,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -94,7 +97,7 @@ void SimulationLoggingTest::do_logging_test() {
     xbt_log_control_set("simulation_logging_test.thresh:debug");
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -105,11 +108,10 @@ void SimulationLoggingTest::do_logging_test() {
     std::string hostname = "DualCoreHost";
 
     auto wms = simulation->add(new SimulationLoggingWMS(this, hostname));
-    wms->addWorkflow(new wrench::Workflow(), 0);
 
     simulation->launch();
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

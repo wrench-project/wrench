@@ -6,12 +6,11 @@ Several interactions with a storage service are done simple by calling
 to lookup, delete, read, and write files. For instance:
 
 ~~~~~~~~~~~~~{.cpp}
-// Get the first simple storage service (assuming there's at least one)
-auto storage_service = *(this->getAvailableComputeServices<wrench::SimpleStorageService>().begin());
+std::shared_ptr<wrench::SimpleStorageService> storage_service;
 // Get the file registry service
-auto file_registry = this->getAvailableFileRegistryService();
+std::shared_ptr<wrench::FileRegistryService> file_registry;
 
-wrench::WorkflowFile *some_file = ...;
+std::shared_ptr<wrench::DataFile> some_file;
 
 [...]
 
@@ -27,13 +26,13 @@ Note that the file registry service is passed to the
 `wrench::StorageService::deleteFile()` method since the file deletion
 should cause the file registry to remove one of its entries.
 
-Reading and writing files is something a WMS typically does not do directly (instead,
+Reading and writing files is something an execution controller typically does not do directly (instead,
 workflow tasks read and write files as they execute). But, if for some reason
-a WMS needs to spend time doing file I/O, it is easily done:
+an execution controller needs to spend time doing file I/O, it is easily done:
 
 ~~~~~~~~~~~~~{.cpp}
 // Read some file from the "/" path at some storage service. 
-// This does nothing but simulate a time overhead during which the WMS is busy
+// This does not change the simulation state besides simulating a time overhead during which the execution controller is busy
 wrench::StorageService::readFile(some_file, wrench::FileLocation::LOCATION(storage_service, "/");
 
 // Write some file to the "/stuff/" path at some storage service. 
@@ -44,8 +43,8 @@ wrench::StorageService::writeFile(some_file, wrench::FileLocation::LOCATION(stor
 ~~~~~~~~~~~~~
 
 
-An operation commonly  performed by a WMS is copying files between storage services (e.g., to 
-enforce some data locality).  This is typically done by [specifying file copy operations as part of standard jobs](@ref wrench-102-jobs). But it can also be done manually by the WMS via
+An operation commonly  performed by an execution controller is copying files between storage services (e.g., to 
+enforce some data locality).  This is typically done by [specifying file copy operations as part of standard jobs](@ref wrench-102-jobs). But it can also be done manually by the execution controller via
 the data movement manager's methods 
 `wrench::DataMovementManager::doSynchronousFileCopy()` and 
 `wrench::DataMovementManager::initiateAsynchronousFileCopy()`.  Here is an example
@@ -56,7 +55,7 @@ in which a file is copied between storage services:
 auto data_movement_manager = this->createDataMovementManager();
 
 // Synchronously copy some_file from storage_service1 to storage_service2
-// While this is taking place, the WMS is busy
+// While this is taking place, the execution controller is busy
 data_movement_manager->doSynchronousFileCopy(some_file, wrench::FileLocation::LOCATION(storage_service1), wrench::FileLocation::LOCATION(storage_service2));
 
 // Asynchronously copy some_file from storage_service2 to storage_service3
@@ -68,6 +67,6 @@ data_movement_manager->initiateAsynchronousFileCopy(some_file, wrench::FileLocat
 this->waitForAndProcessNextEvent();
 ~~~~~~~~~~~~~
 
-See the WMS implementation in `examples/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp` for a more complete example.
+See the execution controller implementation in `examples/basic-examples/bare-metal-data-movement/DataMovementWMS.cpp` for a more complete example.
 
 

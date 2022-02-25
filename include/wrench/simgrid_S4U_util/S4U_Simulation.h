@@ -71,13 +71,14 @@ namespace wrench {
 
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);
+        static void setHostProperty(std::string hostname, std::string property_name, std::string property_value);
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);
 //		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
-        static void setPstate(const std::string &hostname, int pstate);
+        static void setPstate(const std::string &hostname, unsigned long pstate);
         static int getNumberofPstates(const std::string &hostname);
-        static int getCurrentPstate(const std::string &hostname);
+        static unsigned long getCurrentPstate(const std::string &hostname);
         static double getMinPowerConsumption(const std::string &hostname);
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);

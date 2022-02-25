@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,32 +16,34 @@
 class SimpleSimulationTest : public ::testing::Test {
 
 public:
-    wrench::Workflow *workflow;
-    wrench::WorkflowFile *input_file;
-    wrench::WorkflowFile *output_file1;
-    wrench::WorkflowFile *output_file2;
-    wrench::WorkflowFile *output_file3;
-    wrench::WorkflowFile *output_file4;
-    wrench::WorkflowFile *output_file5;
-    wrench::WorkflowFile *output_file6;
-    wrench::WorkflowTask *task1;
-    wrench::WorkflowTask *task2;
-    wrench::WorkflowTask *task3;
-    wrench::WorkflowTask *task4;
-    wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
-    std::shared_ptr<wrench::ComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::DataFile> input_file;
+    std::shared_ptr<wrench::DataFile> output_file1;
+    std::shared_ptr<wrench::DataFile> output_file2;
+    std::shared_ptr<wrench::DataFile> output_file3;
+    std::shared_ptr<wrench::DataFile> output_file4;
+    std::shared_ptr<wrench::DataFile> output_file5;
+    std::shared_ptr<wrench::DataFile> output_file6;
+    std::shared_ptr<wrench::WorkflowTask> task1;
+    std::shared_ptr<wrench::WorkflowTask> task2;
+    std::shared_ptr<wrench::WorkflowTask> task3;
+    std::shared_ptr<wrench::WorkflowTask> task4;
+    std::shared_ptr<wrench::WorkflowTask> task5;
+    std::shared_ptr<wrench::WorkflowTask> task6;
+    std::shared_ptr<wrench::CloudComputeService> compute_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_getReadyTasksTest_test();
 
 protected:
 
+    ~SimpleSimulationTest() {
+        workflow->clear();
+    }
+
     SimpleSimulationTest() {
         // Create the simplest workflow
-        workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
-        workflow = workflow_unique_ptr.get();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create the files
         input_file = workflow->addFile("input_file", 10.0);
@@ -127,15 +129,12 @@ protected:
 /**            GET READY TASKS SIMULATION TEST ON ONE HOST           **/
 /**********************************************************************/
 
-class SimpleSimulationReadyTasksTestWMS : public wrench::WMS {
+class SimpleSimulationReadyTasksTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleSimulationReadyTasksTestWMS(SimpleSimulationTest *test,
-                                      const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                      const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
                                       std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -149,43 +148,32 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        // Get the scheduler pointers just for coverage
-        // Get the scheduler pointers just for coverage
-        if (this->getPilotJobScheduler() != nullptr) {
-            throw std::runtime_error("getPilotJobScheduler() should return nullptr");
-        }
-        if (this->getStandardJobScheduler() != nullptr) {
-            throw std::runtime_error("getStandardJobScheduler() should return nullptr");
-        }
-
-        // Get a file registry service
-        auto file_registry_service = this->getAvailableFileRegistryService();
-
-        std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
+        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks = this->test->workflow->getReadyTasks();
         if (tasks.size() != 5) {
             throw std::runtime_error("Should have five tasks ready to run, due to dependencies");
         }
 
-        std::map<std::string, std::vector<wrench::WorkflowTask *>> clustered_tasks = this->test->workflow->getReadyClusters();
+        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> clustered_tasks = this->test->workflow->getReadyClusters();
         if (clustered_tasks.size() != 3) {
             throw std::runtime_error("Should have exactly three clusters");
         }
 
         // Create a bogus standard job with an empty task list for coverage
         try {
-            job_manager->createStandardJob({});
-            throw std::runtime_error("Should not be able to create a job with an empty task list");
+            std::vector<std::shared_ptr<wrench::WorkflowTask>> empty;
+            job_manager->createStandardJob(empty);
+            throw std::runtime_error("Should not be able to create a job with an empty task1 list");
         } catch (std::invalid_argument &e) {
         }
 
         // Get pointer to cloud service
-        auto cs = *(this->getAvailableComputeServices<wrench::CloudComputeService>().begin());
+        auto cs = this->test->compute_service;
 
         // Create a bogus VM
         try {
             cs->createVM(1000,10000000);
             throw std::runtime_error("Should not be able to create a VM that exceeds the capacity of all hosts on the service");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected failure cause: " + e.getCause()->toString() +
@@ -202,7 +190,7 @@ private:
         try {
             cs->startVM(vm_name);
             throw std::runtime_error("Should not be able to start an already-started VM");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotAllowed>(e.getCause());
             if (not cause) {
                 throw std::runtime_error("Unexpected Failure Cause " + e.getCause()->toString() +
@@ -212,21 +200,21 @@ private:
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
-        for (auto task : tasks) {
+        for (const auto &task : tasks) {
             try {
                 one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file,
                                                                                     wrench::FileLocation::LOCATION(this->test->storage_service)}},
                                                                           {}, {}, {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
-                    throw std::runtime_error("A one-task job should say it has one task");
+                    throw std::runtime_error("A one-task1 job should say it has one task1");
                 }
                 if (one_task_jobs[job_index]->getNumCompletedTasks() != 0) {
-                    throw std::runtime_error("A one-task job that hasn't even started should not say it has a completed task");
+                    throw std::runtime_error("A one-task1 job that hasn't even started should not say it has a completed task1");
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
-            } catch (wrench::WorkflowExecutionException &e) {
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
 
@@ -263,13 +251,12 @@ private:
             throw std::runtime_error("Invalid route between hosts returned");
         }
 
-
         // Wait for workflow execution events
         for (auto const & task : tasks) {
-            std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+            std::shared_ptr<wrench::ExecutionEvent> event;
             try {
-                event = this->getWorkflow()->waitForNextExecutionEvent();
-            } catch (wrench::WorkflowExecutionException &e) {
+                event = this->waitForNextEvent();
+            } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
             }
             if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
@@ -277,13 +264,13 @@ private:
             }
         }
 
-
         // Coverage
         one_task_jobs[0]->getEndDate();
 
-        for (int i = 0; i < 5; i++) {
-            if (one_task_jobs[i]->getNumCompletedTasks() != 1) {
-                throw std::runtime_error("A job with one completed task should say it has one completed task");
+        for (auto & one_task_job : one_task_jobs) {
+            if (one_task_job->getNumCompletedTasks() != 1) {
+                throw std::runtime_error("A job with one completed task1 should say it has one completed task1 (instead of " +
+                std::to_string(one_task_job->getNumCompletedTasks()) + ")");
             }
         }
 
@@ -320,7 +307,7 @@ private:
         try {
             cs->resume();
             throw std::runtime_error("Should not be able to resume a service that's down");
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
         }
 
         data_movement_manager->kill();
@@ -337,11 +324,11 @@ TEST_F(SimpleSimulationTest, SimpleSimulationReadyTasksTestWMS) {
 void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create and initialize a simulation
-    auto *simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-
+//    argv[1] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
@@ -372,52 +359,42 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
 
     // Try to get a bogus property as string or double
-    ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong("BOGUS"), std::invalid_argument);
-    ASSERT_THROW(storage_service->getPropertyValueAsBoolean("BOGUS"), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsString(-1), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsDouble(-1), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong(-1), std::invalid_argument);
+    ASSERT_THROW(storage_service->getPropertyValueAsBoolean(-1), std::invalid_argument);
 
-    ASSERT_THROW(storage_service->getMessagePayloadValue("BOGUS"), std::invalid_argument);
+    ASSERT_THROW(storage_service->getMessagePayloadValue(-1), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
             wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
+
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                            { {wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"},
+                                            {
                                               {wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}
                                               })));
 
     // Try to get the property in bogus ways, for coverage
-    ASSERT_THROW(compute_service->getPropertyValueAsDouble(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
-    ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::BareMetalComputeServiceProperty::SUPPORTS_PILOT_JOBS), std::invalid_argument);
     ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
 
-    // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleSimulationReadyTasksTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
-    ASSERT_THROW(simulation->add((wrench::WMS *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::StorageService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
-
-    // Won't work without a workflow!
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Won't work due to missing file staging
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-
 
     // Try to stage a file without a file registry
     ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
@@ -430,16 +407,12 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     file_registry_service->setNetworkTimeoutValue(100.0);
     file_registry_service->getNetworkTimeoutValue();
 
-    // Staging an invalid file on the storage service
-    ASSERT_THROW(simulation->stageFile(output_file1, storage_service), std::runtime_error);
-
     // Staging the input_file on the storage service
     ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);
