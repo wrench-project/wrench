@@ -23,10 +23,15 @@ public:
     void do_noCleanup_Test();
 
 protected:
+
+    ~S4U_DaemonTest() {
+        workflow->clear();
+    }
+
     S4U_DaemonTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -65,7 +70,7 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
 };
 
@@ -73,7 +78,7 @@ class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
     Sleep100Daemon(std::string hostname) :
-            S4U_Daemon(hostname, "sleep100daemon", "sleep100daemon") {}
+            S4U_Daemon(hostname, "sleep100daemon") {}
 
     int main() override {
         simgrid::s4u::this_actor::execute(100);
@@ -87,12 +92,12 @@ public:
 /**********************************************************************/
 
 
-class S4U_DaemonTestWMS : public wrench::WMS {
+class S4U_DaemonTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_DaemonTestWMS(S4U_DaemonTest *test,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -131,7 +136,7 @@ private:
 
 
         // Start the daemon for real
-        daemon->simulation = this->simulation;
+        daemon->setSimulation(this->simulation);
         daemon->startDaemon(false, false);
 
         daemon->isDaemonized(); // coverage
@@ -167,7 +172,7 @@ TEST_F(S4U_DaemonTest, Basic) {
 void S4U_DaemonTest::do_basic_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -180,22 +185,18 @@ void S4U_DaemonTest::do_basic_Test() {
     // Get a hostname
     std::string hostname = "Host1";
 
-
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_DaemonTestWMS(
-                    this, hostname)));
+            new S4U_DaemonTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 
@@ -206,13 +207,12 @@ void S4U_DaemonTest::do_basic_Test() {
 
 
 
-class S4U_DaemonNoCleanupTestWMS : public wrench::WMS {
+class S4U_DaemonNoCleanupTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_DaemonNoCleanupTestWMS(S4U_DaemonTest *test,
-                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+                               std::string hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -225,7 +225,7 @@ private:
                 std::shared_ptr<Sleep100Daemon>(new Sleep100Daemon("Host2"));
 
         daemon->createLifeSaver(std::shared_ptr<Sleep100Daemon>(daemon));
-        daemon->simulation = this->simulation;
+        daemon->setSimulation(this->simulation);
         daemon->startDaemon(false, false);
 
         // sleep 10 seconds
@@ -245,7 +245,7 @@ TEST_F(S4U_DaemonTest, NoCleanup) {
 void S4U_DaemonTest::do_noCleanup_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -259,19 +259,17 @@ void S4U_DaemonTest::do_noCleanup_Test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new S4U_DaemonNoCleanupTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
-     free(argv[i]);
+        free(argv[i]);
     free(argv);
 }
 

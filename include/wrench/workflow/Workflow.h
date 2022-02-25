@@ -13,13 +13,13 @@
 #include <map>
 #include <set>
 
-#include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
-#include "WorkflowFile.h"
+#include "wrench/execution_events/ExecutionEvent.h"
+#include "wrench/data_file/DataFile.h"
 #include "WorkflowTask.h"
 #include "DagOfTasks.h"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <wrench/workflow/parallel_model/ParallelModel.h>
+#include "wrench/workflow/parallel_model/ParallelModel.h"
 
 class WorkflowTask;
 
@@ -31,30 +31,39 @@ namespace wrench {
     /**
      * @brief A workflow (to be executed by a WMS)
      */
-    class Workflow {
+    class Workflow : public std::enable_shared_from_this<Workflow>  {
 
     public:
-        Workflow();
 
-        WorkflowTask *addTask(std::string, double flops,
+
+        static std::shared_ptr<Workflow> createWorkflow();
+        void clear();
+
+        /**
+         * @brief Get the shared pointer for this object
+         * @return a shared pointer to the object
+         */
+        std::shared_ptr<Workflow> getSharedPtr() { return this->shared_from_this(); }
+
+
+        std::shared_ptr<WorkflowTask> addTask(std::string, double flops,
                               unsigned long min_num_cores,
                               unsigned long max_num_cores,
                               double memory_requirement);
 
-        void removeTask(WorkflowTask *task);
+        void removeTask(std::shared_ptr<WorkflowTask>task);
 
-        void removeFile(WorkflowFile *file);
+        void removeFile(std::shared_ptr<DataFile>file);
+        std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
+        std::shared_ptr<DataFile> addFile(std::string id, double size);
+        std::shared_ptr<DataFile> getFileByID(const std::string &id);
+        std::shared_ptr<WorkflowTask> getTaskByID(const std::string &id);
 
-        WorkflowTask *getTaskByID(const std::string &id);
 
-        WorkflowFile *addFile(std::string, double);
+        static double getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> tasks);
 
-        WorkflowFile *getFileByID(const std::string &id);
-
-        static double getSumFlops(const std::vector<WorkflowTask *> tasks);
-
-        void addControlDependency(WorkflowTask *src, WorkflowTask *dest, bool redundant_dependencies = false);
-        void removeControlDependency(WorkflowTask *src, WorkflowTask *dest);
+        void addControlDependency(std::shared_ptr<WorkflowTask>src, std::shared_ptr<WorkflowTask>dest, bool redundant_dependencies = false);
+        void removeControlDependency(std::shared_ptr<WorkflowTask>src, std::shared_ptr<WorkflowTask>dest);
 
         unsigned long getNumberOfTasks();
 
@@ -64,54 +73,40 @@ namespace wrench {
 
         void exportToEPS(std::string);
 
-        std::vector<WorkflowFile *> getFiles() const;
-        std::map<std::string, WorkflowFile *> getFileMap() const;
-        std::vector<WorkflowFile *> getInputFiles() const;
-        std::map<std::string, WorkflowFile *> getInputFileMap() const;
-        std::vector<WorkflowFile *> getOutputFiles() const;
-        std::map<std::string, WorkflowFile *> getOutputFileMap() const;
+        std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
+        std::map<std::string, std::shared_ptr<DataFile>> getInputFileMap() const;
+        std::vector<std::shared_ptr<DataFile>> getOutputFiles() const;
+        std::map<std::string, std::shared_ptr<DataFile>> getOutputFileMap() const;
 
-        std::vector<WorkflowTask *> getTasks();
-        std::map<std::string, WorkflowTask *> getTaskMap();
-        std::map<std::string, WorkflowTask *> getEntryTaskMap() const;
-        std::vector<WorkflowTask *> getEntryTasks() const;
-        std::map<std::string, WorkflowTask *> getExitTaskMap() const;
-        std::vector<WorkflowTask *> getExitTasks() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getTasks();
+        std::map<std::string, std::shared_ptr<WorkflowTask>> getTaskMap();
+        std::map<std::string, std::shared_ptr<WorkflowTask>> getEntryTaskMap() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getEntryTasks() const;
+        std::map<std::string, std::shared_ptr<WorkflowTask>> getExitTaskMap() const;
+        std::vector<std::shared_ptr<WorkflowTask>> getExitTasks() const;
 
-        std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
-        long getTaskNumberOfParents(const  WorkflowTask *task);
-        std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
-        long getTaskNumberOfChildren(const WorkflowTask *task);
+        std::vector<std::shared_ptr<WorkflowTask>> getTaskParents(const std::shared_ptr<WorkflowTask>task);
+        long getTaskNumberOfParents(const  std::shared_ptr<WorkflowTask>task);
+        std::vector<std::shared_ptr<WorkflowTask>> getTaskChildren(const std::shared_ptr<WorkflowTask>task);
+        long getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask>task);
 
-        bool pathExists(const WorkflowTask *src, const WorkflowTask *dst);
+        bool pathExists(const std::shared_ptr<WorkflowTask>src, const std::shared_ptr<WorkflowTask>dst);
 
+        std::shared_ptr<WorkflowTask> getTaskThatOutputs(std::shared_ptr<DataFile> file);
+        bool isFileOutputOfSomeTask(std::shared_ptr<DataFile> file);
 
+        std::set<std::shared_ptr<WorkflowTask>> getTasksThatInput(std::shared_ptr<DataFile> file);
         bool isDone();
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
+        std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 
-        std::vector<WorkflowTask *> getReadyTasks();
+        std::vector<std::shared_ptr<WorkflowTask>> getReadyTasks();
 
-        std::map<std::string, std::vector<WorkflowTask *>> getReadyClusters();
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
-        std::shared_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(double timeout);
-
-        std::string getCallbackMailbox();
-
-//        void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+        std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> getReadyClusters();
 
         /***********************/
         /** \endcond           */
@@ -119,22 +114,30 @@ namespace wrench {
 
     private:
         friend class WMS;
-
+        friend class Simulation;
         friend class WorkflowTask;
 
-        struct Vertex{ WorkflowTask *task;};
+        Workflow();
+
+        struct Vertex{ std::shared_ptr<WorkflowTask>task;};
         typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Vertex> DAG;
         typedef boost::graph_traits<DAG>::vertex_descriptor vertex_t;
 
         DagOfTasks dag;
 
-        std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
-        std::map<std::string, std::unique_ptr<WorkflowFile>> files;
+        /* Map to find tasks by name */
+        std::map<std::string, std::shared_ptr<WorkflowTask>> tasks;
 
+        /* Set of ready tasks */
+        std::set<std::shared_ptr<WorkflowTask>> ready_tasks;
 
-        std::string callback_mailbox;
-        ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any
-        Simulation *simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
+        /* Map of output files */
+        std::map<std::shared_ptr<DataFile>, std::shared_ptr<WorkflowTask>> task_output_files;
+        std::map<std::shared_ptr<DataFile>, std::set<std::shared_ptr<WorkflowTask>>> task_input_files;
+
+        /* Set of files (also kept track by the simulation!) */
+        std::set<std::shared_ptr<DataFile>> data_files;
+
     };
 };
 

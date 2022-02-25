@@ -17,7 +17,7 @@ WRENCH_LOG_CATEGORY(host_switcher, "Log category for HostSwitcher");
 
 wrench::ResourceSwitcher::ResourceSwitcher(std::string host_on_which_to_run, double sleep_time, std::string resource_to_switch,
         Action action, ResourceType resource_type) :
-        Service(host_on_which_to_run, "host_switcher", "host_switcher"){
+        Service(host_on_which_to_run, "host_switcher"){
     this->sleep_time = sleep_time;
     this->resource_to_switch = resource_to_switch;
     this->action = action;

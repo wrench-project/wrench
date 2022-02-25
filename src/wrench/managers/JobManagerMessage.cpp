@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -7,7 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "JobManagerMessage.h"
+#include "wrench/managers/JobManagerMessage.h"
+
+#include <utility>
 
 namespace wrench {
 
@@ -16,8 +18,8 @@ namespace wrench {
      *
      * @param name: the message name
      */
-    JobManagerMessage::JobManagerMessage(std::string name) :
-            SimulationMessage("JobManagerMessage::" + name, 0) {
+    JobManagerMessage::JobManagerMessage() :
+            SimulationMessage(0) {
     }
 
 
@@ -27,14 +29,14 @@ namespace wrench {
      * @param compute_service: the ComputeService on which it ran 
      * @param necessary_state_changes: necessary task state changes
      */
-    JobManagerStandardJobDoneMessage::JobManagerStandardJobDoneMessage(std::shared_ptr<StandardJob> job,
-                                                                       std::shared_ptr<ComputeService> compute_service,
-                                                                       std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes)
+    JobManagerStandardJobCompletedMessage::JobManagerStandardJobCompletedMessage(std::shared_ptr<StandardJob> job,
+                                                                                 std::shared_ptr<ComputeService> compute_service,
+                                                                                 std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes)
             :
-            JobManagerMessage("JobManagerStandardJobDoneMessage") {
-        this->job = job;
-        this->compute_service = compute_service;
-        this->necessary_state_changes = necessary_state_changes;
+            JobManagerMessage() {
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->necessary_state_changes = std::move(necessary_state_changes);
     }
 
     /**
@@ -47,16 +49,64 @@ namespace wrench {
      */
     JobManagerStandardJobFailedMessage::JobManagerStandardJobFailedMessage(std::shared_ptr<StandardJob> job,
                                                                            std::shared_ptr<ComputeService> compute_service,
-                                                                           std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes,
-                                                                           std::set<WorkflowTask *> necessary_failure_count_increments,
+                                                                           std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes,
+                                                                           std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments,
                                                                            std::shared_ptr<FailureCause> cause) :
-            JobManagerMessage("JobManagerStandardJobFailedMessage") {
-        this->job = job;
-        this->compute_service = compute_service;
-        this->necessary_state_changes = necessary_state_changes;
-        this->necessary_failure_count_increments = necessary_failure_count_increments;
-        this->cause = cause;
+            JobManagerMessage() {
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->necessary_state_changes = std::move(necessary_state_changes);
+        this->necessary_failure_count_increments = std::move(necessary_failure_count_increments);
+        this->cause = std::move(cause);
+    }
+
+    /**
+     * @brief Constructor 
+     * @param job: the job that has failed
+     * @param compute_service: the ComputeService on which it ran 
+     * @param cause: the cause of the failure
+     */
+    JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+                                                                           std::shared_ptr<ComputeService> compute_service,
+                                                                           std::shared_ptr<FailureCause> cause) :
+            JobManagerMessage() {
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->cause = std::move(cause);
     }
 
 
+    /**
+     * @brief Message from by job manager to notify somebody of a standard job successfully completed
+     * @param job: the job
+     * @param compute_service: the compute service that did the job
+     */
+    JobManagerCompoundJobCompletedMessage::JobManagerCompoundJobCompletedMessage(std::shared_ptr<CompoundJob> job,
+                                                                                 std::shared_ptr<ComputeService> compute_service) :
+                                                                       JobManagerMessage() {
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+    }
+
+    /**
+     * @brief Message from by job manager to notify somebody of a standard job has failed to complete
+     * @param job: the job
+     * @param compute_service: the compute service that did the job
+     * @param cause: the failure cause
+     */
+    JobManagerCompoundJobFailedMessage::JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
+                                                                       std::shared_ptr<ComputeService> compute_service,
+                                                                       std::shared_ptr<FailureCause> cause) :
+                                                                       JobManagerMessage() {
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
+        this->cause = std::move(cause);
+    }
+
+    /**
+     * @brief Message sent to the job manager to wake it up
+     */
+    JobManagerWakeupMessage::JobManagerWakeupMessage() :
+            JobManagerMessage() {
+    }
 }

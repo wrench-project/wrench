@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,15 +8,15 @@
  */
 
 
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/batch/BatchComputeService.h"
-#include "wrench/services/compute/batch/BatchComputeServiceMessage.h"
-#include "wrench/services/compute/batch/BatchComputeServiceProperty.h"
-#include "wrench/services/compute/batch/BatschedNetworkListener.h"
-#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
+#include <wrench/exceptions/ExecutionException.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/services/compute/batch/BatchComputeService.h>
+#include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
+#include <wrench/services/compute/batch/BatchComputeServiceProperty.h>
+#include <wrench/services/compute/batch/BatschedNetworkListener.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 #ifdef ENABLE_BATSCHED // Only include these files below if Batsched is enabled
 
@@ -49,7 +49,7 @@ namespace wrench {
                                                      std::string batch_service_mailbox,
                                                      std::string sched_port,
                                                      std::string data_to_send,
-                                                     std::map<std::string, std::string> property_list) :
+                                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list) :
             BatschedNetworkListener(hostname, batch_service, batch_service_mailbox,
                                     sched_port, data_to_send, property_list, "") {
     }
@@ -58,7 +58,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param batch_service: the batch service
+    * @param batch_service: the BatchComputeService service
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param data_to_send: data to send
@@ -68,7 +68,7 @@ namespace wrench {
     BatschedNetworkListener::BatschedNetworkListener(
             std::string hostname, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox,
             std::string sched_port,
-            std::string data_to_send, std::map<std::string, std::string> property_list,
+            std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
@@ -104,7 +104,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Send an "execute" message to the batch service
+     * @brief Send an "execute" message to the BatchComputeService service
      * @param answer_mailbox: mailbox on which ack will be received
      * @param execute_job_reply_data: message to send
      */
@@ -114,20 +114,20 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data, 0));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        throw ExecutionException(cause);
       }
     }
 
     /**
-     * @brief Send a "query answer" message to the batch service
-     * @param estimated_waiting_time: batch queue wait time estimate
+     * @brief Send a "query answer" message to the BatchComputeService service
+     * @param estimated_waiting_time: BatchComputeService queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time) {
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchQueryAnswerMessage(estimated_waiting_time,0));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        throw ExecutionException(cause);
       }
     }
 
@@ -171,7 +171,7 @@ namespace wrench {
       reply_decisions = nlohmann::json::parse(reply_data);
       decision_events = reply_decisions["events"];
 
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_network_listener_mailbox");
+      auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
       for (auto decisions:decision_events) {
 
         std::string decision_type = decisions["type"];

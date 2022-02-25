@@ -14,19 +14,25 @@
 
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
-#include <wrench/workflow/failure_causes/HostError.h>
+#include <wrench/failure_causes/HostError.h>
 
 class AlarmTest : public ::testing::Test {
 
 public:
 
     void do_downHost_Test();
+    std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
+
+    ~AlarmTest() {
+        workflow->clear();
+    }
+
     AlarmTest() {
 
         // Create the simplest workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -65,7 +71,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
 
 };
 
@@ -75,13 +80,12 @@ protected:
 /**********************************************************************/
 
 
-class AlarmDownHostTestWMS : public wrench::WMS {
+class AlarmDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmDownHostTestWMS(AlarmTest *test,
                       std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -94,10 +98,10 @@ private:
        wrench::Simulation::turnOffHost("Host2");
 
        // Start an alarm
-       std::string mailbox = "mailbox";
+       auto mailbox = simgrid::s4u::Mailbox::by_name("mailbox");
        try {
            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
-                                              new wrench::SimulationMessage("whatever", 1), "bogus");
+                                              new wrench::SimulationMessage(1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
        } catch (std::shared_ptr<wrench::HostError> &e) {}
 
@@ -113,7 +117,7 @@ TEST_F(AlarmTest, DownHost) {
 void AlarmTest::do_downHost_Test() {
 
     // Create and initialize a simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -128,16 +132,14 @@ void AlarmTest::do_downHost_Test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new AlarmDownHostTestWMS(this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
-    // Running a "run a single task" simulation
+    // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

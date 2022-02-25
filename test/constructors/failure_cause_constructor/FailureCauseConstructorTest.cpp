@@ -11,10 +11,10 @@
 #include <gtest/gtest.h>
 #include <map>
 
-#include "wrench/workflow/failure_causes/HostError.h"
-#include "wrench/workflow/failure_causes/NetworkError.h"
-#include "wrench/workflow/failure_causes/ComputeThreadHasDied.h"
-#include "wrench/workflow/failure_causes/FatalFailure.h"
+#include <wrench/failure_causes/HostError.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/failure_causes/FatalFailure.h>
 
 class FailureCauseConstructorTest : public ::testing::Test {
 protected:
@@ -54,11 +54,10 @@ TEST_F(FailureCauseConstructorTest, ComputeThreadHasDied) {
     }
 }
 
-
 TEST_F(FailureCauseConstructorTest, FatalFailure) {
 
     wrench::FatalFailure *cause = nullptr;
-    ASSERT_NO_THROW(cause = new wrench::FatalFailure());
+    ASSERT_NO_THROW(cause = new wrench::FatalFailure(""));
     if (cause) {
       cause->toString(); // Coverage
     }

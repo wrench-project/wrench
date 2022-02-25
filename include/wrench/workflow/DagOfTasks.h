@@ -14,7 +14,7 @@
 #include <boost/graph/breadth_first_search.hpp>
 #include <iostream>
 
-#include <wrench/workflow/WorkflowTask.h>
+#include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
 

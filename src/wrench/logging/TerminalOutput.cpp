@@ -10,7 +10,7 @@
 #include <string>
 #include <simgrid/s4u/Actor.hpp>
 #include <iostream>
-#include "wrench/logging/TerminalOutput.h"
+#include <wrench/logging/TerminalOutput.h>
 
 namespace wrench {
 
@@ -25,7 +25,7 @@ namespace wrench {
             "\033[1;37m",
     };
 
-    std::map<simgrid::s4u::Actor *, std::string> TerminalOutput::colormap;
+    std::unordered_map<simgrid::s4u::Actor *, std::string> TerminalOutput::colormap;
     bool TerminalOutput::color_enabled = true;
 
     /**

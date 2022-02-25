@@ -1,30 +1,23 @@
-# list of examples
-set(EXAMPLES_CMAKEFILES_TXT
-        examples/basic-examples/bare-metal-chain/CMakeLists.txt
-        examples/basic-examples/bare-metal-chain-scratch/CMakeLists.txt
-        examples/basic-examples/bare-metal-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/CMakeLists.txt
-        examples/basic-examples/bare-metal-multicore-tasks/CMakeLists.txt
-        examples/basic-examples/bare-metal-complex-job/CMakeLists.txt
-        examples/basic-examples/bare-metal-data-movement/CMakeLists.txt
-        examples/basic-examples/cloud-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/cloud-bag-of-tasks-energy/CMakeLists.txt
-        examples/basic-examples/virtualized-cluster-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/batch-bag-of-tasks/CMakeLists.txt
-        examples/basic-examples/batch-pilot-job/CMakeLists.txt
-        examples/real-workflow-example/CMakeLists.txt
-        examples/condor-grid-example/CMakeLists.txt
-        examples/basic-examples/io-pagecache/CMakeLists.txt
-        )
+add_custom_target(examples)
 
-foreach (cmakefile ${EXAMPLES_CMAKEFILES_TXT})
-    string(REPLACE "/CMakeLists.txt" "" repository ${cmakefile})
-    add_subdirectory("${CMAKE_HOME_DIRECTORY}/${repository}")
-endforeach ()
+add_subdirectory(examples/workflow_api/basic-examples/bare-metal-chain)
+add_subdirectory(examples/workflow_api/basic-examples/bare-metal-chain-scratch)
+add_subdirectory(examples/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform)
+add_subdirectory(examples/workflow_api/basic-examples/bare-metal-multicore-tasks)
+add_subdirectory(examples/workflow_api/basic-examples/bare-metal-complex-job)
+add_subdirectory(examples/workflow_api/basic-examples/bare-metal-data-movement)
+add_subdirectory(examples/workflow_api/basic-examples/cloud-bag-of-tasks)
+add_subdirectory(examples/workflow_api/basic-examples/cloud-bag-of-tasks-energy)
+add_subdirectory(examples/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks)
+add_subdirectory(examples/workflow_api/basic-examples/batch-bag-of-tasks)
+add_subdirectory(examples/workflow_api/basic-examples/batch-pilot-job)
+add_subdirectory(examples/workflow_api/real-workflow-example)
+add_subdirectory(examples/workflow_api/condor-grid-example)
+add_subdirectory(examples/workflow_api/basic-examples/io-pagecache)
 
-# install example files
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/examples
-        DESTINATION wrench
-        FILES_MATCHING PATTERN "*.json" PATTERN "*.xml"
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-        )
+add_subdirectory(examples/action_api/bare-metal-bag-of-actions EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/batch-bag-of-actions EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/cloud-bag-of-actions EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/multi-action-multi-job EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/job-action-failure EXCLUDE_FROM_ALL)
+add_subdirectory(examples/action_api/super-custom-action EXCLUDE_FROM_ALL)

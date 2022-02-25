@@ -8,8 +8,8 @@
 class SimpleStorageServiceChunkingTest : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *file_size_0;
-    wrench::WorkflowFile *file_size_100;
+    std::shared_ptr<wrench::DataFile> file_size_0;
+    std::shared_ptr<wrench::DataFile> file_size_100;
 
     std::shared_ptr<wrench::StorageService> storage_service_1 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service_2 = nullptr;
@@ -17,9 +17,14 @@ public:
     void do_ChunkingTest(std::string mode);
 
 protected:
+
+    ~SimpleStorageServiceChunkingTest() {
+        workflow->clear();
+    }
+
     SimpleStorageServiceChunkingTest() {
         // simple workflow
-        workflow = new wrench::Workflow();
+        workflow = wrench::Workflow::createWorkflow();
 
         // create the files
         file_size_0 = workflow->addFile("file_size_0", 0);
@@ -55,20 +60,15 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-    wrench::Workflow *workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 };
 
-class SimpleStorageServiceChunkingTestWMS : public wrench::WMS {
+class SimpleStorageServiceChunkingTestWMS : public wrench::ExecutionController {
 public:
     SimpleStorageServiceChunkingTestWMS(SimpleStorageServiceChunkingTest *test,
                                         std::string mode,
-                                        const std::set<std::shared_ptr<wrench::StorageService>> &storage_services,
-                                        std::shared_ptr<wrench::FileRegistryService> file_registry_service,
                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, file_registry_service,
-                        hostname, "test") {
-        this->test = test;
-        this->mode = mode;
+            wrench::ExecutionController(hostname, "test"), test(test), mode(mode) {
     }
 
 private:
@@ -124,7 +124,7 @@ TEST_F(SimpleStorageServiceChunkingTest, CopyingFile) {
 void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     // Create and initialize the simulation
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
 
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
@@ -154,11 +154,8 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;
-    ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceChunkingTestWMS(
-            this, mode, {storage_service_1, storage_service_2}, file_registry_service, "WMSHost")));
-
-    wms->addWorkflow(this->workflow);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceChunkingTestWMS(this, mode, "WMSHost")));
 
     // Stage the file on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file_size_0, storage_service_1));
@@ -166,7 +163,7 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
      free(argv[i]);
     free(argv);

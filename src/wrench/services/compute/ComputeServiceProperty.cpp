@@ -7,11 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/ComputeServiceProperty.h"
+#include <wrench/services/compute/ComputeServiceProperty.h>
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_STANDARD_JOBS);
-    SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_PILOT_JOBS);
 
 };

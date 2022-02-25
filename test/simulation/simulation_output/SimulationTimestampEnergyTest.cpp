@@ -12,7 +12,7 @@ WRENCH_LOG_CATEGORY(test_energy, "Log category for SimulationTimestampEnergyTest
 
 class SimulationTimestampEnergyTest: public ::testing::Test {
 public:
-    std::unique_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     void do_SimulationTimestampPstateSet_test();
     void do_SimulationTimestampEnergyConsumption_test();
@@ -22,7 +22,11 @@ public:
 
 protected:
 
-    SimulationTimestampEnergyTest() : workflow(std::unique_ptr<wrench::Workflow>(new wrench::Workflow())) {
+    ~SimulationTimestampEnergyTest() {
+        workflow->clear();
+    }
+
+    SimulationTimestampEnergyTest() : workflow(wrench::Workflow::createWorkflow()) {
         // Create a two-host 1-core platform file along with different pstates
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
@@ -62,12 +66,11 @@ protected:
  * setPstate() is called, a timestamp is recorded and added to the simulation
  * output.
  */
-class SimulationTimestampPstateSetTestWMS : public wrench::WMS {
+class SimulationTimestampPstateSetTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampPstateSetTestWMS(SimulationTimestampEnergyTest *test,
-            std::string &hostname) :
-                wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+                                        std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -97,7 +100,7 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampPstateSetTest) {
 }
 
 void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -110,19 +113,16 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationTimestampPstateSetTestWMS(
-                    this, host
-                    )
-            ));
+                    this, host)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
-
+    simulation->getOutput().enableEnergyTimestamps(true);
     EXPECT_NO_THROW(simulation->launch());
 
     // Check constructor for SimulationTimestampPstateSet timestamps
-    EXPECT_THROW(simulation->getOutput().addTimestampPstateSet("", 0), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().addTimestampPstateSet(wrench::Simulation::getCurrentSimulatedDate(), "", 0), std::invalid_argument);
 
     // Check that the expected SimulationTimestampPstateSet timestamps have been added to simulation output
     auto set_pstate_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampPstateSet>();
@@ -146,7 +146,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
     ASSERT_EQ(2, ts3->getContent()->getPstate());
     ASSERT_EQ("host1", ts3->getContent()->getHostname());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -161,12 +161,11 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampPstateSet_test() {
  * This test assures that the timestamps are added to simulation output when
  * getEnergyTimestamp("hostname", true) is called.
  */
-class SimulationTimestampEnergyConsumptionTestWMS : public wrench::WMS {
+class SimulationTimestampEnergyConsumptionTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampEnergyConsumptionTestWMS(SimulationTimestampEnergyTest *test,
-            std::string &hostname) :
-                wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+                                                std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -192,7 +191,7 @@ TEST_F(SimulationTimestampEnergyTest, SimulationTimestampEnergyConsumptionTest) 
 }
 
 void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -205,19 +204,17 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new SimulationTimestampEnergyConsumptionTestWMS(
-                    this, host
-            )
-    ));
+                    this, host)));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    simulation->getOutput().enableEnergyTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
     // Check constructor for SimulationTimestampEnergyConsumption timestamp
-    EXPECT_THROW(simulation->getOutput().addTimestampEnergyConsumption("", 1.0), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().addTimestampEnergyConsumption(0.0,"", 1.0), std::invalid_argument);
 
     // Check that the expected SimulationTimestampEnergyConsumption timestamps have been added to simulation output
     auto energy_consumption_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();
@@ -235,7 +232,7 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
     ASSERT_EQ("host1", ts2->getContent()->getHostname());
     ASSERT_DOUBLE_EQ(400.0, ts2->getContent()->getConsumption());
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -250,12 +247,12 @@ void SimulationTimestampEnergyTest::do_SimulationTimestampEnergyConsumption_test
  * SimulationTimestampEnergyConsumption timestamps are created for a vector
  * of hosts, all with the same measurement period.
  */
-class EnergyMeterTestWMS : public wrench::WMS {
+class EnergyMeterTestWMS : public wrench::ExecutionController {
 public:
     EnergyMeterTestWMS(SimulationTimestampEnergyTest *test,
-            std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+                       std::shared_ptr<wrench::Workflow> workflow,
+                       std::string &hostname) :
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -322,7 +319,7 @@ TEST_F(SimulationTimestampEnergyTest, EnergyMeterSingleMeasurementPeriodTest) {
 }
 
 void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -335,14 +332,14 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyMeterTestWMS(
-                    this, host
+                    this, workflow, host
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    simulation->getOutput().enableEnergyTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -355,8 +352,8 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
             energy_consumption_timestamps.end(),
             std::back_inserter(host1_timestamps),
             [](wrench::SimulationTimestamp<wrench::SimulationTimestampEnergyConsumption> *ts) -> bool {
-        return (ts->getContent()->getHostname() == "host1" ? true : false);
-    });
+                return (ts->getContent()->getHostname() == "host1" ? true : false);
+            });
 
     // host1 computes for 100 seconds, and records timestamps in 10 second intervals, so
     // we should end up with 11 timestamps (starting with time 0)
@@ -416,7 +413,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
         ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].second, host2_timestamps[i]->getContent()->getConsumption());
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);
@@ -432,12 +429,11 @@ void SimulationTimestampEnergyTest::do_EnergyMeterSingleMeasurementPeriod_test()
  * a map of (hostname, measurement_period) pairs.
  */
 
-class EnergyMeterMultipleMeasurementPeriodTestWMS : public wrench::WMS {
+class EnergyMeterMultipleMeasurementPeriodTestWMS : public wrench::ExecutionController {
 public:
     EnergyMeterMultipleMeasurementPeriodTestWMS(SimulationTimestampEnergyTest *test,
                                                 std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-        this->test = test;
+            wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -464,7 +460,7 @@ TEST_F(SimulationTimestampEnergyTest, EnergyMeterMultipleMeasurmentPeriodTest) {
 }
 
 void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test() {
-    auto simulation = new wrench::Simulation();
+    auto simulation = wrench::Simulation::createSimulation();
     int argc = 2;
     auto argv = (char **)calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -477,14 +473,14 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
     // get the single host
     std::string host = wrench::Simulation::getHostnameList()[0];
 
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     EXPECT_NO_THROW(wms = simulation->add(
             new EnergyMeterMultipleMeasurementPeriodTestWMS(
                     this, host
             )
     ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+    simulation->getOutput().enableEnergyTimestamps(true);
 
     EXPECT_NO_THROW(simulation->launch());
 
@@ -529,13 +525,13 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
 
     // host2 is idle for 6 seconds and records timestamps in 3.0 second intervals
     // we should end up with 2 timestamps
-    ASSERT_EQ(2, host2_timestamps.size());
+    ASSERT_EQ(3, host2_timestamps.size());
 
     // expected values (timestamp, consumption)
     std::vector<std::pair<double, double>> host2_expected_timestamps = {
             {0.0, 0.0},
-            {3.0, 300.0}
-//            {6.0, 600.0}
+            {3.0, 300.0},
+            {6.0, 600.0}
     };
 
     for (size_t i = 0; i < host2_timestamps.size(); ++i) {
@@ -543,7 +539,7 @@ void SimulationTimestampEnergyTest::do_EnergyMeterMultipleMeasurementPeriod_test
         ASSERT_DOUBLE_EQ(host2_expected_timestamps[i].second, host2_timestamps[i]->getContent()->getConsumption());
     }
 
-    delete simulation;
+
     for (int i=0; i < argc; i++)
         free(argv[i]);
     free(argv);

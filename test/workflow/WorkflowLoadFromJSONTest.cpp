@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2020. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,10 +9,10 @@
 
 #include <gtest/gtest.h>
 
-#include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/Workflow.h"
+#include <wrench/data_file/DataFile.h>
+#include <wrench/workflow/Workflow.h>
 #include "../include/UniqueTmpPathPrefix.h"
-#include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
+#include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
 class WorkflowLoadFromJSONTest : public ::testing::Test {
 protected:
@@ -3187,16 +3187,15 @@ protected:
 };
 
 TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
-    std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-    wrench::Workflow *workflow = nullptr;
+    std::shared_ptr<wrench::Workflow> workflow;
 
     ASSERT_THROW(workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON("bogus", "1f", false),
                  std::invalid_argument);
     ASSERT_NO_THROW(
             workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(this->json_file_path, "1f", false));
     ASSERT_EQ(workflow->getNumberOfTasks(), 71);
-    ASSERT_EQ(workflow->getFiles().size(), 69);
+    ASSERT_EQ(workflow->getFileMap().size(), 69);
 
     for (auto task : workflow->getTasks()) {
         if (task->getID() == "register_local_2_0") {

@@ -11,6 +11,7 @@
 #define WRENCH_FILELOCATION_H
 
 #include <memory>
+#include <iostream>
 
 
 namespace wrench {
@@ -28,6 +29,8 @@ namespace wrench {
     class FileLocation {
 
     public:
+
+        ~FileLocation();
 
         /**
          * @brief Static location that denotes a compute service's scratch space

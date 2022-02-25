@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h"
+#include <wrench/services/compute/htcondor/HTCondorComputeServiceProperty.h>
 
 namespace wrench {
 

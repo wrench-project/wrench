@@ -11,14 +11,18 @@
 #ifndef WRENCH_DATAMOVEMENTMANAGER_H
 #define WRENCH_DATAMOVEMENTMANAGER_H
 
+#include <list>
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 
 namespace wrench {
 
     class Workflow;
-    class WorkflowFile;
+    class DataFile;
     class StorageService;
+    class FileRegistryService;
+    class ExecutionController;
     class WMS;
 
     /***********************/
@@ -26,25 +30,26 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A helper daemon (co-located with a WMS) that handles data movement operations
+     * @brief A helper daemon (co-located with an execution controler) that handles data movement operations
      */
     class DataMovementManager : public Service {
 
     public:
 
-        void stop();
+        void stop() override;
 
         void kill();
 
-        void initiateAsynchronousFileCopy(WorkflowFile *file,
+        void initiateAsynchronousFileCopy(std::shared_ptr<DataFile>file,
                                           std::shared_ptr<FileLocation> src,
                                           std::shared_ptr<FileLocation> dst,
                                           std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
 
-        void doSynchronousFileCopy(WorkflowFile *file,
+        void doSynchronousFileCopy(std::shared_ptr<DataFile>file,
                                    std::shared_ptr<FileLocation> src,
                                    std::shared_ptr<FileLocation> dst,
                                    std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
+
 
     protected:
 
@@ -52,10 +57,10 @@ namespace wrench {
         /** \cond INTERNAL    */
         /***********************/
 
-
         friend class WMS;
+        friend class ExecutionController;
 
-        explicit DataMovementManager(std::shared_ptr<WMS> wms);
+        explicit DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox);
 
         /***********************/
         /** \endcond           */
@@ -63,19 +68,24 @@ namespace wrench {
 
     private:
 
-        int main();
+        int main() override;
 
-        std::shared_ptr<WMS> wms = nullptr;
+        simgrid::s4u::Mailbox *getCreatorMailbox();
+
+        simgrid::s4u::Mailbox *creator_mailbox;
 
         bool processNextMessage();
 
         struct CopyRequestSpecs {
-            WorkflowFile *file;
+            std::shared_ptr<DataFile>file;
             std::shared_ptr<FileLocation> src;
             std::shared_ptr<FileLocation> dst;
             std::shared_ptr<FileRegistryService> file_registry_service;
 
-            CopyRequestSpecs(WorkflowFile *file,
+            ~CopyRequestSpecs() {
+            }
+
+            CopyRequestSpecs(std::shared_ptr<DataFile> file,
                              std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
                              std::shared_ptr<FileRegistryService> file_registry_service) :

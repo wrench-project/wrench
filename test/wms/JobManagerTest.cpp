@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2018. The WRENCH Team.
+ * Copyright (c) 2017-2021. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,12 +10,11 @@
 #include <wrench-dev.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/simulation/SimulationMessage.h>
-#include "helper_services/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
-#include "wrench/workflow/job/PilotJob.h"
+#include <wrench/job/PilotJob.h>
 
 #include "../include/TestWithFork.h"
 #include "../include/UniqueTmpPathPrefix.h"
@@ -27,7 +26,11 @@ class JobManagerTest : public ::testing::Test {
 
 
 public:
-    wrench::Simulation *simulation;
+    std::shared_ptr<wrench::Workflow> workflow;
+    std::shared_ptr<wrench::ComputeService> cs1, cs2;
+    std::shared_ptr<wrench::ComputeService> cs;
+
+    std::shared_ptr<wrench::Simulation> simulation;
 
     void do_JobManagerConstructorTest_test();
 
@@ -44,7 +47,7 @@ protected:
     JobManagerTest() {
 
         // Create the simplest workflow
-        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+        workflow = wrench::Workflow::createWorkflow();
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
@@ -94,7 +97,6 @@ protected:
 
     }
 
-    std::unique_ptr<wrench::Workflow> workflow;
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
 };
@@ -104,29 +106,13 @@ protected:
 /**  DO CONSTRUCTOR TEST                                             **/
 /**********************************************************************/
 
-class BogusStandardJobScheduler : public wrench::StandardJobScheduler {
-    void scheduleTasks(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                       const std::vector<wrench::WorkflowTask *> &tasks);
-
-};
-
-void BogusStandardJobScheduler::scheduleTasks(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services,
-                                              const std::vector<wrench::WorkflowTask *> &tasks) {}
-
-class BogusPilotJobScheduler : public wrench::PilotJobScheduler {
-    void schedulePilotJobs(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services) override;
-};
-
-void BogusPilotJobScheduler::schedulePilotJobs(const std::set<std::shared_ptr<wrench::ComputeService>> &compute_services) {}
-
-class JobManagerConstructorTestWMS : public wrench::WMS {
+class JobManagerConstructorTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerConstructorTestWMS(JobManagerTest *test,
+                                 std::shared_ptr<wrench::Workflow> workflow,
                                  std::string hostname) :
-            wrench::WMS(std::unique_ptr<BogusStandardJobScheduler>(new BogusStandardJobScheduler()),
-                        std::unique_ptr<BogusPilotJobScheduler>(new BogusPilotJobScheduler()),
-                        {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -154,7 +140,7 @@ TEST_F(JobManagerTest, ConstructorTest) {
 void JobManagerTest::do_JobManagerConstructorTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -168,16 +154,14 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerConstructorTestWMS(
-                    this, hostname)));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+                    this, workflow, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -189,13 +173,12 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
 /**  DO CREATE JOB TEST                                             **/
 /**********************************************************************/
 
-class JobManagerCreateJobTestWMS : public wrench::WMS {
+class JobManagerCreateJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerCreateJobTestWMS(JobManagerTest *test,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
-                        {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -211,53 +194,53 @@ private:
 
         try {
             job_manager->createStandardJob(nullptr);
-            throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+            throw std::runtime_error("Should not be able to create a standard job with a nullptr task1 in it");
         } catch (std::invalid_argument &e) {
         }
 
 
-        // Create a job with a nullptr task in it
+        // Create a job with a nullptr task1 in it
         try {
-            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr});
-            throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+            job_manager->createStandardJob((std::vector<std::shared_ptr<wrench::WorkflowTask> >) {nullptr});
+            throw std::runtime_error("Should not be able to create a standard job with a nullptr task1 in it");
         } catch (std::invalid_argument &e) {
         }
 
 
         // Create a job  with nothing in it
         try {
-            std::vector<wrench::WorkflowTask *> tasks; // empty
+            std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks; // empty
             job_manager->createStandardJob(tasks);
             throw std::runtime_error("Should not be able to create a standard job with nothing in it");
         } catch (std::invalid_argument &e) {
         }
 
 
-        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 0.0);
-        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 0.0);
-        wrench::WorkflowFile *f = this->getWorkflow()->addFile("f", 100);
+        std::shared_ptr<wrench::WorkflowTask> t1 = this->test->workflow->addTask("t1", 1.0, 1, 1, 0.0);
+        std::shared_ptr<wrench::WorkflowTask> t2 = this->test->workflow->addTask("t2", 1.0, 1, 1, 0.0);
+        std::shared_ptr<wrench::DataFile> f = this->test->workflow->addFile("f", 100);
         t1->addOutputFile(f);
         t2->addInputFile(f);
 
         // Create a job with a null stuff in pre file copy
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
-            pre_file_copies.push_back(std::make_tuple((wrench::WorkflowFile *)nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            pre_file_copies.push_back(std::make_tuple((std::shared_ptr<wrench::DataFile> )nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (nullptr, *, *) pre file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple(f, nullptr, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) pre file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, nullptr));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, *, nullptr) pre file copy");
         } catch (std::invalid_argument &e) {
         }
@@ -265,48 +248,48 @@ private:
 
         // Create a job with a null stuff in post file copy
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
-            post_file_copies.push_back(std::make_tuple((wrench::WorkflowFile *)nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            post_file_copies.push_back(std::make_tuple((std::shared_ptr<wrench::DataFile> )nullptr, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (nullptr, *, *) post file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple(f, nullptr, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, nullptr, *) post file copy");
         } catch (std::invalid_argument &e) {
         }
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, nullptr));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a (*, *, nullptr) post file copy");
         } catch (std::invalid_argument &e) {
         }
 
         // Create a job with SCRATCH as both src and dst
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > pre_file_copies;
             pre_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, pre_file_copies, {}, {});
             throw std::runtime_error("Should not be able to create a standard job with a pre file copy that has SCRATCH has both dst and src");
         } catch (std::invalid_argument &e) {
         }
         // Create a job with SCRATCH as both src and dst
         try {
-            std::vector<std::tuple<wrench::WorkflowFile *, std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
+            std::vector<std::tuple<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>, std::shared_ptr<wrench::FileLocation> > > post_file_copies;
             post_file_copies.push_back(std::make_tuple(f, wrench::FileLocation::SCRATCH, wrench::FileLocation::SCRATCH));
-            job_manager->createStandardJob({}, (std::map<wrench::WorkflowFile*, std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
+            job_manager->createStandardJob({}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){}, {}, post_file_copies, {});
             throw std::runtime_error("Should not be able to create a standard job with a post file copy that has SCRATCH has both dst and src");
         } catch (std::invalid_argument &e) {
         }
         
-        // Create a job with not ok task dependencies
+        // Create a job with not ok task1 dependencies
         try {
-            job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2});
-            throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
+            job_manager->createStandardJob((std::vector<std::shared_ptr<wrench::WorkflowTask> >) {t2});
+            throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task1");
         } catch (std::invalid_argument &e) {
         }
 
@@ -332,7 +315,7 @@ TEST_F(JobManagerTest, CreateJobTest) {
 void JobManagerTest::do_JobManagerCreateJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -346,16 +329,14 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerCreateJobTestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
-
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -367,13 +348,12 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
 /**  DO SUBMIT JOB TEST                                              **/
 /**********************************************************************/
 
-class JobManagerSubmitJobTestWMS : public wrench::WMS {
+class JobManagerSubmitJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerSubmitJobTestWMS(JobManagerTest *test,
                                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,
-                        {}, {}, {}, nullptr, hostname, "test") {
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -387,20 +367,25 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+        std::shared_ptr<wrench::BareMetalComputeService> cs =
+                simulation->add(new wrench::BareMetalComputeService("Host1", {"Host1"}, "", {}, {}));
+
         try {
-            job_manager->submitJob(nullptr, std::shared_ptr<wrench::ComputeService>((wrench::ComputeService *) (1234), [](void *ptr){}), {});
+            std::shared_ptr<wrench::CompoundJob> compound_job = nullptr;
+            job_manager->submitJob(compound_job, cs, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr job");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            job_manager->submitJob(std::shared_ptr<wrench::WorkflowJob>((wrench::WorkflowJob *) (1234), [](void *ptr){}), nullptr, {});
+            auto job = job_manager->createCompoundJob("");
+            job_manager->submitJob(job, nullptr, {});
             throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
         } catch (std::invalid_argument &e) {
         }
 
         try {
-            job_manager->terminateJob(nullptr);
+            job_manager->terminateJob((std::shared_ptr<wrench::CompoundJob>)nullptr);
             throw std::runtime_error("Should not be able to terminate a nullptr job");
         } catch (std::invalid_argument &e) {
         }
@@ -416,7 +401,7 @@ TEST_F(JobManagerTest, SubmitJobTest) {
 void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -430,17 +415,12 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerSubmitJobTestWMS(
                     this, hostname)));
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
-
-
     ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -452,14 +432,12 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 /**  DO SUBMIT JOB TEST                                              **/
 /**********************************************************************/
 
-class JobManagerResubmitJobTestWMS : public wrench::WMS {
+class JobManagerResubmitJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerResubmitJobTestWMS(JobManagerTest *test,
-                                 std::string hostname,
-                                 std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
-            wrench::WMS(nullptr, nullptr,
-                        compute_services, {}, {}, nullptr, hostname, "test") {
+                                 std::string hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -476,7 +454,7 @@ private:
         // Get the compute_services
         std::shared_ptr<wrench::ComputeService> cs_does_support_standard_jobs;
         std::shared_ptr<wrench::ComputeService> cs_does_not_support_standard_jobs;
-        for (auto cs : this->getAvailableComputeServices<wrench::ComputeService>()) {
+        for (auto cs : {this->test->cs1, this->test->cs2}) {
             if (cs->supportsStandardJobs()) {
                 cs_does_support_standard_jobs = cs;
             } else {
@@ -485,31 +463,18 @@ private:
         }
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks());
+        auto job = job_manager->createStandardJob(this->test->workflow->getTasks());
 
         // Try to submit a standard job to the wrong service
         try {
             job_manager->submitJob(job, cs_does_not_support_standard_jobs);
             throw std::runtime_error("Should not be able to submit a standard job to a service that does not support them");
-        } catch (wrench::WorkflowExecutionException &e) {
-            auto cause = std::dynamic_pointer_cast<wrench::JobTypeNotSupported>(e.getCause());
-            if (not cause) {
-                throw std::runtime_error("Got expected exception but unexpected failure cause: " +
-                                         e.getCause()->toString() + " (expected: JobTypeNotSupported)");
-            }
-            if (cause->getJob() != job) {
-                throw std::runtime_error(
-                        "Got expected exxeption and failure cause, but the failure cause does not point to the correct job");
-            }
-            if (cause->getComputeService() != cs_does_not_support_standard_jobs) {
-                throw std::runtime_error(
-                        "Got expected exxeption and failure cause, but the failure cause does not point to the correct compute service");
-            }
+        } catch (std::invalid_argument &ignore) {
         }
 
-        // Check task states
-        wrench::WorkflowTask *task1 = this->getWorkflow()->getTaskByID("task1");
-        wrench::WorkflowTask *task2 = this->getWorkflow()->getTaskByID("task2");
+        // Check task1 states
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->getTaskByID("task1");
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->getTaskByID("task2");
         if (task1->getState() != wrench::WorkflowTask::State::READY) {
             throw std::runtime_error("Unexpected task1 state (should be READY but is " +
                                      wrench::WorkflowTask::stateToString(task1->getState()));
@@ -522,15 +487,15 @@ private:
         // Resubmit the SAME job to the right service
         try {
             job_manager->submitJob(job, cs_does_support_standard_jobs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Should be able to subkmit a standard job to a service that supports them");
         }
 
         // Wait for the workflow execution event
-        std::shared_ptr<wrench::WorkflowExecutionEvent> event;
+        std::shared_ptr<wrench::ExecutionEvent> event;
         try {
-            event = this->getWorkflow()->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
+            event = this->waitForNextEvent();
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
 
@@ -550,7 +515,7 @@ TEST_F(JobManagerTest, ResubmitJobTest) {
 void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -561,38 +526,32 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a ComputeService that does not support standard jobs
-    std::shared_ptr<wrench::ComputeService> cs1, cs2;
 
     ASSERT_NO_THROW(cs1 = simulation->add(
             new wrench::BareMetalComputeService("Host2",
                                                 {std::make_pair("Host2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+                                                {})));
 
     // Create a ComputeService that does support standard jobs
     ASSERT_NO_THROW(cs2 = simulation->add(
             new wrench::BareMetalComputeService("Host3",
                                                 {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerResubmitJobTestWMS(
-                    this, "Host1", {cs1, cs2})));
+                    this, "Host1")));
 
     // Add tasks to the workflow
-    wrench::WorkflowTask *task1 = workflow->addTask("task1", 10.0, 10, 10, 0.0);
-    wrench::WorkflowTask *task2 = workflow->addTask("task2", 10.0, 10, 10, 0.0);
+    std::shared_ptr<wrench::WorkflowTask> task1 = workflow->addTask("task1", 10.0, 10, 10, 0.0);
+    std::shared_ptr<wrench::WorkflowTask> task2 = workflow->addTask("task2", 10.0, 10, 10, 0.0);
     workflow->addControlDependency(task1, task2);
 
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
-
-
     ASSERT_NO_THROW(simulation->launch());
-
-    delete simulation;
 
     for (int i=0; i < argc; i++)
         free(argv[i]);
@@ -605,14 +564,12 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 /**  DO TERMINATE JOB TEST                                           **/
 /**********************************************************************/
 
-class JobManagerTerminateJobTestWMS : public wrench::WMS {
+class JobManagerTerminateJobTestWMS : public wrench::ExecutionController {
 
 public:
     JobManagerTerminateJobTestWMS(JobManagerTest *test,
-                                  std::string hostname,
-                                  std::set<std::shared_ptr<wrench::ComputeService>> compute_services) :
-            wrench::WMS(nullptr, nullptr,
-                        compute_services, {}, {}, nullptr, hostname, "test") {
+                                  std::string hostname) :
+            wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -627,19 +584,19 @@ private:
         auto job_manager = this->createJobManager();
 
         // Get the compute_services
-        auto cs = *(this->getAvailableComputeServices<wrench::ComputeService>().begin());
+        auto cs = this->test->cs;
 
         // Add tasks to the workflow
-        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 80);
-        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 9, 10, 80);
-        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 8, 10, 0);
-        wrench::WorkflowTask *t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 0);
+        std::shared_ptr<wrench::WorkflowTask> t1 = this->test->workflow->addTask("task1", 600, 10, 10, 80);
+        std::shared_ptr<wrench::WorkflowTask> t2 = this->test->workflow->addTask("task2", 600, 9, 10, 80);
+        std::shared_ptr<wrench::WorkflowTask> t3 = this->test->workflow->addTask("task3", 600, 8, 10, 0);
+        std::shared_ptr<wrench::WorkflowTask> t4 = this->test->workflow->addTask("task4", 600, 10, 10, 0);
 
         /* t1 and t2 can't run at the same time in this example, due to RAM */
 
-        this->getWorkflow()->addControlDependency(t1, t3);
-        this->getWorkflow()->addControlDependency(t2, t3);
-        this->getWorkflow()->addControlDependency(t3, t4);
+        this->test->workflow->addControlDependency(t1, t3);
+        this->test->workflow->addControlDependency(t2, t3);
+        this->test->workflow->addControlDependency(t3, t4);
 
         // Setting priorities for coverage
         t1->setPriority(12);
@@ -647,14 +604,14 @@ private:
         t3->setPriority(42);
 
         // Create a standard job
-        auto job = job_manager->createStandardJob(this->getWorkflow()->getTasks());
+        auto job = job_manager->createStandardJob(this->test->workflow->getTasks());
         job->getMinimumRequiredNumCores(); // coverage
         job->getPriority(); // coverage
 
         // Submit the standard job
         try {
             job_manager->submitJob(job, cs);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Should be able to submit the job");
         }
@@ -665,12 +622,12 @@ private:
         // Terminate the job
         try {
             job_manager->terminateJob(job);
-        } catch (wrench::WorkflowExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
                     "Should be able to terminate job");
         }
 
-        // Check task states
+        // Check task1 states
         bool t1_and_t2_valid_states;
 
         t1_and_t2_valid_states = ((t1->getState() == wrench::WorkflowTask::State::COMPLETED) and
@@ -679,7 +636,7 @@ private:
                                   (t2->getState() == wrench::WorkflowTask::State::COMPLETED));
 
         if (not t1_and_t2_valid_states) {
-            throw std::runtime_error("Unexpected task1 and task 2 states (" +
+            throw std::runtime_error("Unexpected task1 and task1 2 states (" +
                                      wrench::WorkflowTask::stateToString(t1->getState()) + " and " +
                                      wrench::WorkflowTask::stateToString(t2->getState()) + ")");
         }
@@ -703,7 +660,7 @@ TEST_F(JobManagerTest, TerminateJobTest) {
 void JobManagerTest::do_JobManagerTerminateJobTest_test() {
 
     // Create and initialize a simulation
-    simulation = new wrench::Simulation();
+    simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
@@ -714,24 +671,21 @@ void JobManagerTest::do_JobManagerTerminateJobTest_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a ComputeService that supports standard jobs
-    std::shared_ptr<wrench::ComputeService> cs = nullptr;
     ASSERT_NO_THROW(cs = simulation->add(
             new wrench::BareMetalComputeService("Host3",
                                                 {std::make_pair("Host3", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+                                                {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::WMS> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
     ASSERT_NO_THROW(wms = simulation->add(
             new JobManagerTerminateJobTestWMS(
-                    this, "Host1", {cs})));
-
-    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+                    this,  "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
-    delete simulation;
+
 
     for (int i=0; i < argc; i++)
      free(argv[i]);

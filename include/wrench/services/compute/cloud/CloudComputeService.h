@@ -19,7 +19,7 @@
 #include "wrench/services/compute/cloud/CloudComputeServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
-#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/job/PilotJob.h"
 
 
 namespace wrench {
@@ -35,14 +35,12 @@ namespace wrench {
      */
     class CloudComputeService : public ComputeService {
     private:
-        std::map<std::string, std::string> default_property_values = {
-                {CloudComputeServiceProperty::SUPPORTS_PILOT_JOBS,              "false"},
-                {CloudComputeServiceProperty::SUPPORTS_STANDARD_JOBS,           "false"},
+        WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                 {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS,      "0.0"},
                 {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
         };
 
-        std::map<std::string, double> default_messagepayload_values = {
+WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
                 {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
                 {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
@@ -73,8 +71,12 @@ namespace wrench {
         CloudComputeService(const std::string &hostname,
                             std::vector<std::string> execution_hosts,
                             std::string scratch_space_mount_point,
-                            std::map<std::string, std::string> property_list = {},
-                            std::map<std::string, double> messagepayload_list = {});
+                            WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
+
+        virtual bool supportsStandardJobs() override;
+        virtual bool supportsCompoundJobs() override;
+        virtual bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -82,16 +84,18 @@ namespace wrench {
 
         virtual std::string createVM(unsigned long num_cores,
                                      double ram_memory,
-                                     std::map<std::string, std::string> property_list = {},
-                                     std::map<std::string, double> messagepayload_list = {});
+                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual std::string createVM(unsigned long num_cores,
                                      double ram_memory,
                                      std::string desired_vm_name,
-                                     std::map<std::string, std::string> property_list = {},
-                                     std::map<std::string, double> messagepayload_list = {});
+                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual void shutdownVM(const std::string &vm_name);
+
+        virtual void shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         virtual std::shared_ptr<BareMetalComputeService> startVM(const std::string &vm_name);
 
@@ -121,15 +125,11 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
-        void submitStandardJob(std::shared_ptr<StandardJob> job,
-                               const std::map<std::string, std::string> &service_specific_args) override;
 
-        void submitPilotJob(std::shared_ptr<PilotJob> job,
-                            const std::map<std::string, std::string> &service_specific_args) override;
+        void submitCompoundJob(std::shared_ptr<CompoundJob> job,
+                               const std::map<std::string, std::string> &service_specific_args) override {};
 
-        void terminateStandardJob(std::shared_ptr<StandardJob> job) override;
-
-        void terminatePilotJob(std::shared_ptr<PilotJob> job) override;
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override {};
 
         void validateProperties();
 
@@ -148,47 +148,51 @@ namespace wrench {
 
         int main() override;
 
-        std::shared_ptr<SimulationMessage> sendRequest(std::string &answer_mailbox, ComputeServiceMessage *message);
+        std::shared_ptr<SimulationMessage> sendRequest(simgrid::s4u::Mailbox *answer_mailbox, ComputeServiceMessage *message);
 
         virtual bool processNextMessage();
 
-        virtual void processGetResourceInformation(const std::string &answer_mailbox);
+        virtual void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
+                                                   const std::string &key);
 
-        virtual void processGetExecutionHosts(const std::string &answer_mailbox);
+        virtual void processGetExecutionHosts(simgrid::s4u::Mailbox *answer_mailbox);
 
-        virtual void processCreateVM(const std::string &answer_mailbox,
+        virtual void processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
                                      std::string desired_vm_name,
-                                     std::map<std::string, std::string> property_list,
-                                     std::map<std::string, double> messagepayload_list
+                                     WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
         );
 
         virtual void
-        processStartVM(const std::string &answer_mailbox, const std::string &vm_name, const std::string &pm_name);
+        processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name, const std::string &pm_name);
 
-        virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processShutdownVM(simgrid::s4u::Mailbox *answer_mailbox,
+                                       const std::string &vm_name,
+                                       bool send_failure_notifications,
+                                       ComputeService::TerminationCause termination_cause);
 
-        virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processSuspendVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
-        virtual void processResumeVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processResumeVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
-        virtual void processDestroyVM(const std::string &answer_mailbox, const std::string &vm_name);
+        virtual void processDestroyVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
-        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
-                                              std::map<std::string, std::string> &service_specific_args);
-
-        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
-                                           std::map<std::string, std::string> &service_specific_args);
+//        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+//                                              std::map<std::string, std::string> &service_specific_args);
+//
+//        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
+//                                           std::map<std::string, std::string> &service_specific_args);
 
         virtual void
         processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
 
         virtual void processIsThereAtLeastOneHostWithAvailableResources(
-                const std::string &answer_mailbox, unsigned long num_cores, double ram);
+                simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
 
-        void stopAllVMs();
+        void stopAllVMs(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         /** \cond */
         static unsigned long VM_ID;

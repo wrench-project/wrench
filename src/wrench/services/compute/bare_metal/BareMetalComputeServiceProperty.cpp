@@ -7,11 +7,12 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h"
+#include <wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h>
 
 namespace wrench {
 
     SET_PROPERTY_NAME(BareMetalComputeServiceProperty, TASK_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(BareMetalComputeServiceProperty, FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
     SET_PROPERTY_NAME(BareMetalComputeServiceProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
 };
