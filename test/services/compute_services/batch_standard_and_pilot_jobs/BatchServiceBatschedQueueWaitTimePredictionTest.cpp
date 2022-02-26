@@ -236,7 +236,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobBrokenEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest)
 #else
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest)
 #endif
@@ -407,7 +407,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobBasicEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest)
 #else
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest)
 #endif
@@ -567,7 +567,7 @@ private:
         {
 
             // Create a sequential task1 that lasts one min and requires 2 cores
-            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 60, 2, 2, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task2", 60, 2, 2, 0);
             task->addInputFile(this->test->workflow->getFileByID("input_file"));
             task->addOutputFile(this->test->workflow->getFileByID("output_file"));
 
@@ -630,7 +630,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobEstimateWaitingTimeTest)
 #else
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobEstimateWaitingTimeTest)
 #endif
@@ -758,7 +758,7 @@ private:
 
 
             // Submit the second job for next 300 seconds and using 2 cores
-            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task2", 299, 1, 1, 0);
             task1->addInputFile(this->test->workflow->getFileByID("input_file"));
             task1->addOutputFile(this->test->workflow->getFileByID("output_file2"));
 
@@ -791,7 +791,7 @@ private:
             }
 
             // Submit the third job for next 300 seconds and using 4 cores
-            std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task3", 299, 1, 1, 0);
             task2->addInputFile(this->test->workflow->getFileByID("input_file"));
             task2->addOutputFile(this->test->workflow->getFileByID("output_file3"));
 
@@ -899,7 +899,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, BatchJobLittleComplexEstimateWaitingTimeTest)
+TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest)
 #else
 TEST_F(BatchServiceBatschedQueueWaitTimePredictionTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest)
 #endif
