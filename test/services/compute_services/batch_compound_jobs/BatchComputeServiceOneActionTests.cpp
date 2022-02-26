@@ -759,7 +759,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchComputeServiceOneActionTest, DISABLED_ServiceCrashed) {
+#else
 TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
+#endif
     DO_TEST_WITH_FORK(do_OneSleepActionServiceCrashed_test);
 }
 
