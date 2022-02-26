@@ -371,7 +371,11 @@ private:
 
 };
 
+#ifdef ENABLE_BATSCHED
+TEST_F(WMSTest, DISABLED_CustomEventHandling) {
+#else
 TEST_F(WMSTest, CustomEventHandling) {
+#endif
     DO_TEST_WITH_FORK(do_CustomHandlerWMS_test);
 }
 
