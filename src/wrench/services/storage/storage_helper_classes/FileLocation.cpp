@@ -199,7 +199,7 @@ namespace wrench {
             // Remove the extra space
             to_return.erase(0, 1);
             return to_return;
-#else /
+#else
         // Cannot have certain substring (why not)
 //        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
         char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};

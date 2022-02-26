@@ -228,14 +228,14 @@ namespace wrench {
 
         std::string data = batch_submission_data.dump();
 
-        std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
+        simgrid::s4u::Mailbox *batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), batchsched_query_mailbox,
                                                     std::to_string(this->batsched_port),
                                                     data));
-        network_listener->simulation = this->cs->simulation;
+        network_listener->setSimulation(this->cs->getSimulation());
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
         network_listener = nullptr; // detached mode
 
@@ -357,10 +357,10 @@ namespace wrench {
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
-                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox_name,
+                        new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox,
                                                     std::to_string(this->batsched_port),
                                                     data));
-        network_listener->simulation = this->cs->simulation;
+        network_listener->setSimulation(this->cs->getSimulation());
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
         network_listener = nullptr; // detached mode
 #else
@@ -452,10 +452,10 @@ namespace wrench {
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(),
-                                                    this->cs->mailbox_name,
+                                                    this->cs->mailbox,
                                                     std::to_string(this->batsched_port),
                                                     data));
-        network_listener->simulation = this->cs->simulation;
+        network_listener->setSimulation(this->cs->getSimulation());
         network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
         network_listener = nullptr; // detached mode
     }
@@ -563,10 +563,10 @@ namespace wrench {
         try {
             std::shared_ptr<BatschedNetworkListener> network_listener =
                     std::shared_ptr<BatschedNetworkListener>(
-                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox_name,
+                            new BatschedNetworkListener(this->cs->hostname, this->cs->getSharedPtr<BatchComputeService>(), this->cs->mailbox,
                                                         std::to_string(this->batsched_port),
                                                         data));
-            network_listener->simulation = this->cs->simulation;
+            network_listener->setSimulation(this->cs->getSimulation());
             network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
             network_listener = nullptr; // detached mode
         } catch (std::runtime_error &e) {
