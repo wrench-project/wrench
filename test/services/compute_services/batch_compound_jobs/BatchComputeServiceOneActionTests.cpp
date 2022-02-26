@@ -1030,7 +1030,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchComputeServiceOneActionTest, DISABLED_JobExpiration) {
+#else
 TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
+#endif
     DO_TEST_WITH_FORK(do_OneSleepJobExpiration_test);
 }
 
