@@ -162,7 +162,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+TEST_F(WMSTest, DISABLED_DefaultEventHandling) {
+#else
 TEST_F(WMSTest, DefaultEventHandling) {
+#endif
     DO_TEST_WITH_FORK(do_DefaultHandlerWMS_test);
 }
 
