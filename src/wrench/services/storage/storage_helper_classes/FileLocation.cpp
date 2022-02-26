@@ -13,8 +13,11 @@
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <filesystem>
 #include <iostream>
+
+#if (__cpluplus >= 201703L)
+#include <filesystem>
+#endif
 
 WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
