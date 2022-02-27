@@ -1168,7 +1168,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, DISABLED_OnePilotJobSubmissionTest) {
+TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 #else
 TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
 #endif
@@ -1202,7 +1202,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
-                                            {})));
+                                            "", {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}, {})));
 
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1346,7 +1346,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, DISABLED_StandardPlusPilotJobSubmissionTest) {
+TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
 #else
 TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
 #endif
@@ -1746,7 +1746,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, DISABLED_StandardJobTimeOutTask) {
+TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
 #else
 TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
 #endif

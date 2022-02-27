@@ -496,13 +496,15 @@ namespace wrench {
      */
     void BatchComputeService::sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id,
                                                                  std::shared_ptr<FailureCause> cause) {
-        WRENCH_INFO("A compound job executor has failed because of timeout %s", job->getName().c_str());
+        WRENCH_INFO("Sending compound job failure notification for job %s", job->getName().c_str());
 
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
-        this->scheduler->processJobFailure(batch_job);
+//        std::cerr << "IN sendCompoundJobFailureNotification \n";
+        // NO IDEA WHAT THIS WAS HERE - DEFINITELY A BUG!
+//        this->scheduler->processJobFailure(batch_job);
 
-        job->printCallbackMailboxStack();
+//        job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
                     job->popCallbackMailbox(),
@@ -983,6 +985,7 @@ namespace wrench {
         WRENCH_INFO("A compound job executor has failed to perform job %s", job->getName().c_str());
 
         // notify the scheduler of the failure
+//        std::cerr << "IN processCompoundJobFailure\n";
         this->scheduler->processJobFailure(batch_job);
 
         this->sendCompoundJobFailureNotification(job, std::to_string((batch_job->getJobID())), cause);
