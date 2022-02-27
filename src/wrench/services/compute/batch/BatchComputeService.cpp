@@ -177,6 +177,13 @@ namespace wrench {
 
         // Create a scheduler
 #ifdef ENABLE_BATSCHED
+        auto batch_scheduling_alg = this->getPropertyValueAsString(
+                BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM);
+        if (this->scheduling_algorithms.find(batch_scheduling_alg) == this->scheduling_algorithms.end()) {
+            throw std::invalid_argument(
+                    " BatchComputeService::BatchComputeService(): unsupported scheduling algorithm " +
+                    batch_scheduling_alg);
+        }
         this->scheduler = std::unique_ptr<BatchScheduler>(new BatschedBatchScheduler(this));
 #else
         auto batch_scheduling_alg = this->getPropertyValueAsString(
