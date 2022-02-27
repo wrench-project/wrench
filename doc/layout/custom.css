@@ -4,7 +4,7 @@ html {
 
 @media (prefers-color-scheme: dark) {
     html:not(.light-mode) {
-        --box-shadow-color: #333;
+        --box-shadow-color: #666;
     }
 }
 
