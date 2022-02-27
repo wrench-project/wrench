@@ -496,7 +496,7 @@ namespace wrench {
      */
     void BatchComputeService::sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id,
                                                                  std::shared_ptr<FailureCause> cause) {
-        WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
+        WRENCH_INFO("A compound job executor has failed because of timeout %s", job->getName().c_str());
 
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
@@ -980,7 +980,7 @@ namespace wrench {
         this->freeUpResources(batch_job->getResourcesAllocated());
         this->removeJobFromRunningList(batch_job);
 
-        WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
+        WRENCH_INFO("A compound job executor has failed to perform job %s", job->getName().c_str());
 
         // notify the scheduler of the failure
         this->scheduler->processJobFailure(batch_job);
