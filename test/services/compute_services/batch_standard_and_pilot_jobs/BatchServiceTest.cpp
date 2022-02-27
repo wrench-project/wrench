@@ -204,7 +204,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, DISABLED_BogusSetupTest) {
+TEST_F(BatchServiceTest, BogusSetupTest) {
 #else
 TEST_F(BatchServiceTest, BogusSetupTest) {
 #endif
