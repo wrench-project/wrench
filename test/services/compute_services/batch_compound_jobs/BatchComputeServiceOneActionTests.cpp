@@ -760,7 +760,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceOneActionTest, DISABLED_ServiceCrashed) {
+TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
 #else
 TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
 #endif
@@ -1031,7 +1031,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceOneActionTest, DISABLED_JobExpiration) {
+TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
 #else
 TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
 #endif
@@ -1186,7 +1186,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchComputeServiceOneActionTest, DISABLED_FileNotThere) {
+TEST_F(BatchComputeServiceOneActionTest, FileNotThere) {
 #else
 TEST_F(BatchComputeServiceOneActionTest, FileNotThere) {
 #endif

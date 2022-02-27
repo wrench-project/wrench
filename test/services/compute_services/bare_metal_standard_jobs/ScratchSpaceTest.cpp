@@ -640,7 +640,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(ScratchSpaceTest, DISABLED_PilotJobScratchSpaceTest) {
+TEST_F(ScratchSpaceTest, PilotJobScratchSpaceTest) {
 #else
 TEST_F(ScratchSpaceTest, PilotJobScratchSpaceTest) {
 #endif

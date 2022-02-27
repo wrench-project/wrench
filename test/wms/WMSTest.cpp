@@ -163,7 +163,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(WMSTest, DISABLED_DefaultEventHandling) {
+TEST_F(WMSTest, DefaultEventHandling) {
 #else
 TEST_F(WMSTest, DefaultEventHandling) {
 #endif
@@ -372,7 +372,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(WMSTest, DISABLED_CustomEventHandling) {
+TEST_F(WMSTest, CustomEventHandling) {
 #else
 TEST_F(WMSTest, CustomEventHandling) {
 #endif

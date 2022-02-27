@@ -128,7 +128,7 @@ namespace wrench {
                     } else if (nested_pid == 0) {
                         char foo;
                         close(tether[1]); // closing write end
-                        read(tether[0], &foo, 1); // blocking read which returns when the parent dies
+                        auto num_bytes_read = read(tether[0], &foo, 1); // blocking read which returns when the parent dies
                         //check if the child that forked batsched is still running
                         if (getpgid(top_pid)) {
                             kill(top_pid, SIGKILL); //kill the other child that has fork-exec'd batsched
@@ -371,7 +371,6 @@ namespace wrench {
 
 
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
-
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
 
