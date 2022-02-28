@@ -206,12 +206,14 @@ namespace wrench {
 
     /**
      * @brief Add a file registry add entry action
+     * @param name: the action's name
      * @param file_registry: the file registry
      * @param file: the file
      * @param file_location: the file location
      * @return
      */
     std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
+            std::string name,
             std::shared_ptr<FileRegistryService> file_registry,
             std::shared_ptr<DataFile>file,
             std::shared_ptr<FileLocation> file_location) {
@@ -223,12 +225,14 @@ namespace wrench {
 
     /**
      * @brief Add a file registry add entry action
+     * @param name: the action's name
      * @param file_registry: the file registry
      * @param file: the file
      * @param file_location: the file location
      * @return
      */
     std::shared_ptr<FileRegistryDeleteEntryAction> CompoundJob::addFileRegistryDeleteEntryAction(
+            std::string name,
             std::shared_ptr<FileRegistryService> file_registry,
             std::shared_ptr<DataFile>file,
             std::shared_ptr<FileLocation> file_location) {

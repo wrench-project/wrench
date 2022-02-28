@@ -25,6 +25,7 @@ public:
     std::shared_ptr<wrench::StorageService> storage_service2 = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service3 = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> compute_service = nullptr;
+    std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
     std::shared_ptr<wrench::Workflow> workflow;
 
@@ -40,6 +41,7 @@ public:
     void do_OneSleepActionServiceDown_test();
     void do_OneSleepActionServiceSuspended_test();
     void do_OneSleepActionBadScratch_test();
+    void do_FileRegistryActions_test();
 
 protected:
 
@@ -388,8 +390,12 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
+        job->setPriority(10.0); // coverage
+        job->getPriority(); // coverage
+        job->getStateAsString(); // coverage
         auto action = job->addSleepAction("my_sleep", 10.0);
         job_manager->submitJob(job, this->test->compute_service, {});
+        job->getStateAsString(); // coverage
 
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
@@ -407,6 +413,7 @@ private:
         }
 
         // Check job state
+        job->getStateAsString(); // coverage
         if (job->getState() != wrench::CompoundJob::State::COMPLETED) {
             throw std::runtime_error("Unexpected job state: " + job->getStateAsString());
         }
@@ -837,6 +844,8 @@ private:
         }
 
         // Chek action stuff
+        job->getStateAsString(); // coverage
+
         if (action->getState() != wrench::Action::State::FAILED) {
             throw std::runtime_error("Unexpected action state " + action->getStateAsString());
         }
@@ -1671,6 +1680,127 @@ void BareMetalComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
                     this, hostname)));
 
     // Running a "do nothing" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    for (int i=0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  FILE REGISTRY ACTION TEST                                       **/
+/**********************************************************************/
+
+class FileRegistryActionTestWMS : public wrench::ExecutionController {
+public:
+    FileRegistryActionTestWMS(BareMetalComputeServiceOneActionTest *test,
+                              std::string &hostname) :
+            wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    BareMetalComputeServiceOneActionTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+
+        {
+            // Create a compound job
+            auto job = job_manager->createCompoundJob("my_job");
+            auto action = job->addFileRegistryAddEntryAction("add_entry", this->test->file_registry_service,
+                                                             this->test->input_file,
+                                                             wrench::FileLocation::LOCATION(
+                                                                     this->test->storage_service1));
+
+            // Submit the job
+            job_manager->submitJob(job, this->test->compute_service, {});
+
+            // Wait for the workflow execution event
+            std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
+            if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+
+        }
+
+        {
+            // Create a compound job
+            auto job = job_manager->createCompoundJob("my_job");
+            auto action = job->addFileRegistryDeleteEntryAction("delete_entry", this->test->file_registry_service,
+                                                                this->test->input_file,
+                                                                wrench::FileLocation::LOCATION(
+                                                                        this->test->storage_service1));
+
+            // Submit the job
+            job_manager->submitJob(job, this->test->compute_service, {});
+
+            // Wait for the workflow execution event
+            std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
+            if (not std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event)) {
+                throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+            }
+        }
+
+
+        return 0;
+    }
+};
+
+TEST_F(BareMetalComputeServiceOneActionTest, FileRegistryActiona) {
+    DO_TEST_WITH_FORK(do_FileRegistryActions_test);
+}
+
+void BareMetalComputeServiceOneActionTest::do_FileRegistryActions_test() {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("one_action_test");
+//    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::BareMetalComputeService("Host3",
+                                                {std::make_pair("Host4",
+                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM))},
+                                                {""},
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_NO_THROW(storage_service1 = simulation->add(
+            new wrench::SimpleStorageService("Host2", {"/"})));
+
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    std::string hostname = "Host1";
+    ASSERT_NO_THROW(wms = simulation->add(
+            new FileRegistryActionTestWMS(
+                    this, hostname)));
+
+    // Creat a File Registry Service
+    file_registry_service = simulation->add(new wrench::FileRegistryService(hostname));
+
+    // Running the simulation
     ASSERT_NO_THROW(simulation->launch());
 
     for (int i=0; i < argc; i++)

@@ -97,10 +97,12 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
                                                           std::shared_ptr<DataFile>file,
                                                           std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile>file,
+        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::string name,
+                                                                                  std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
                                                                                 std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile>file,
+        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::string name,
+                                                                                        std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
                                                                                    std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,

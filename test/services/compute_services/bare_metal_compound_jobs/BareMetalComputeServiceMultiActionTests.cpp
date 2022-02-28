@@ -147,6 +147,19 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
+        try {
+            job->addActionDependency(nullptr, nullptr); // coverage
+            throw std::runtime_error("Should not be able to add nullptr Action dependencies");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            job->addChildJob(nullptr); // coverage
+            throw std::runtime_error("Should not be able to add nullptr Child job");
+        } catch (std::invalid_argument &ignore) {}
+        try {
+            job->addParentJob(nullptr); // coverage
+            throw std::runtime_error("Should not be able to add nullptr Parent job");
+        } catch (std::invalid_argument &ignore) {}
+
 
         std::uniform_real_distribution<double> dist_sleep(10.0, 100.0);
         //Mersenne Twister: Good quality random number generator
@@ -194,6 +207,9 @@ private:
         for (auto const &a : second_chain_tasks) {
             expected_makespan += a->getSleepTime();
         }
+
+        job->printTaskMap(); // coverage
+        job->printActionDependencies(); // coverage
 
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
