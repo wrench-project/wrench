@@ -653,7 +653,8 @@ namespace wrench {
             }
         }
 
-        if (not found_a_host) { WRENCH_INFO("Not host on this service can accommodate this VM");
+        if (not found_a_host) {
+            WRENCH_INFO("Not host on this service can accommodate this VM");
             std::string empty = std::string();
             msg_to_send_back =
                     new CloudComputeServiceCreateVMAnswerMessage(
@@ -665,7 +666,7 @@ namespace wrench {
                                     CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
-            // Pick a VM name (and being paranoid about mistakenly picking an actual hostname!)
+            // Pick a VM name (being paranoid about mistakenly picking an actual hostname!)
             std::string vm_name;
             std::string error_msg;
 
@@ -865,7 +866,7 @@ namespace wrench {
     }
 
     /**
-     * @brief: Process a VM start request by startibnng a VM on a host (using best fit for RAM first, and then for cores)
+     * @brief: Process a VM start request by starting a VM on a host (using best fit for RAM first, and then for cores)
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_name: the name of the VM
@@ -893,7 +894,8 @@ namespace wrench {
             std::string picked_host = this->findHost(vm->getNumCores(), vm->getMemory(), pm_name);
 
             // Did we find a viable host?
-            if (picked_host.empty()) { WRENCH_INFO("Not enough resources to start the VM");
+            if (picked_host.empty()) {
+                WRENCH_INFO("Not enough resources to start the VM");
                 msg_to_send_back =
                         new CloudComputeServiceStartVMAnswerMessage(
                                 false,
