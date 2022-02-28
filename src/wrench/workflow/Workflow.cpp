@@ -646,7 +646,6 @@ namespace wrench {
      */
     double Workflow::getCompletionDate() {
         double makespan = -1.0;
-        // Get te last level
         for (auto const &task : this->tasks) {
             if (task.second->getState() != WorkflowTask::State::COMPLETED) {
                 makespan = -1.0;

@@ -131,8 +131,8 @@ private:
                                                                                 1, "me", 10.0, 0.0));
 
 
-        auto msg = new wrench::SimulationMessage("name", 666);
-        if (msg->getName() != "name") {
+        auto msg = new wrench::SimulationMessage(666);
+        if (msg->getName().empty()) {
             throw std::runtime_error(std::string("Throwing a ") + __FILE__ + ":" + std::to_string(__LINE__));
         }
 
@@ -140,8 +140,8 @@ private:
         auto location = wrench::FileLocation::LOCATION(this->test->storage_service);
 
 
-        CUSTOM_THROW(new wrench::SimulationMessage("", 666), std:invalid_argument);
-        CUSTOM_THROW(new wrench::SimulationMessage("name", -1), std::invalid_argument);
+        //CUSTOM_THROW(new wrench::SimulationMessage("", 666), std:invalid_argument);//names are no longer a thing
+        CUSTOM_THROW(new wrench::SimulationMessage(-1), std::invalid_argument);
 
 
         CUSTOM_NO_THROW(new wrench::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), file, 666));

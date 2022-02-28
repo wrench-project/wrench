@@ -203,7 +203,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, BogusSetupTest) {
+#else
+TEST_F(BatchServiceTest, BogusSetupTest) {
+#endif
     DO_TEST_WITH_FORK(do_BogusSetupTest_test);
 }
 
@@ -553,7 +557,6 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, TerminatePilotJobsTest)
 #else
-
 TEST_F(BatchServiceTest, TerminatePilotJobsTest)
 #endif
 {
@@ -1164,7 +1167,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
+#else
+TEST_F(BatchServiceTest, OnePilotJobSubmissionTest) {
+#endif
     DO_TEST_WITH_FORK(do_PilotJobTaskTest_test);
 }
 
@@ -1195,7 +1202,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
     // Create a Batch Service
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname, {"Host1", "Host2", "Host3", "Host4"},
-                                            {})));
+                                            "", {{wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"}}, {})));
 
     // Create a File Registry Service
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -1338,7 +1345,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
+#else
+TEST_F(BatchServiceTest, StandardPlusPilotJobSubmissionTest) {
+#endif
     DO_TEST_WITH_FORK(do_StandardPlusPilotJobTaskTest_test);
 }
 
@@ -1734,7 +1745,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
+#else
+TEST_F(BatchServiceTest, StandardJobTimeOutTask) {
+#endif
     DO_TEST_WITH_FORK(do_StandardJobTimeOutTaskTest_test);
 }
 
@@ -1857,7 +1872,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceTest, DISABLED_PilotJobTimeOutTaskTest) {
+#else
 TEST_F(BatchServiceTest, PilotJobTimeOutTaskTest) {
+#endif
     DO_TEST_WITH_FORK(do_PilotJobTimeOutTaskTest_test);
 }
 
@@ -3228,7 +3247,6 @@ private:
 #ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, DifferentBatchAlgorithmsSubmissionTest)
 #else
-
 TEST_F(BatchServiceTest, DISABLED_DifferentBatchAlgorithmsSubmissionTest)
 #endif
 {

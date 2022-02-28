@@ -65,6 +65,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         /***********************/
 
         double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
+        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& getMessagePayloadList() const;
 
         void setStateToDown();
 

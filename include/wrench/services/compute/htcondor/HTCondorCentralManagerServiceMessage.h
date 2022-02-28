@@ -27,7 +27,7 @@ namespace wrench {
      */
     class HTCondorCentralManagerServiceMessage : public ServiceMessage {
     protected:
-        HTCondorCentralManagerServiceMessage(std::string name, double payload);
+        HTCondorCentralManagerServiceMessage(double payload);
     };
 
     /**

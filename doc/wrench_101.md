@@ -285,8 +285,8 @@ implementation of `wrench::TwoTasksAtATimeExecutionController`). All the example
 in different ways. *However*, many users are interested in **workflow applications**, for this reason, WRENCH provides
 a `wrench::Workflow` class that has  member functions to manually create tasks and files and add them to a workflow. The use
 of this class is shown in all the examples in directory `examples/workflow_api`.  The `wrench::Workflow` class also provides member functions to import workflows from
-workflow description files in standard [JSON format](https://github.com/workflowhub/workflow-schema) and
-[DAX format](http://workflowarchive.org). Note that an execution controller that executes a workflow is often
+workflow description files in standard [JSON format](https://github.com/wfcommons/wfformat).
+Note that an execution controller that executes a workflow is often
 called a Workflow Management System (WMS). This is why many execution controllers in the examples in directory `examples/workflow_api` have
 WMS in their class names.
 

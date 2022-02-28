@@ -20,7 +20,7 @@ namespace wrench {
      */
     VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(const std::string &name,
                                                                                      double payload) :
-            ComputeServiceMessage("VirtualizedClusterComputeServiceMessage::" + name, payload) {
+            ComputeServiceMessage(payload) {
     }
 
     /**

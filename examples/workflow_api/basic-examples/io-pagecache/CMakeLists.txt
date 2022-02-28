@@ -3,8 +3,8 @@ add_custom_target(
         wrench-example-io-pagecache-files
         COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/single_host.xml ${CMAKE_CURRENT_BINARY_DIR}/single_host.xml ; fi ;"
         COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/two_hosts.xml ${CMAKE_CURRENT_BINARY_DIR}/two_hosts.xml ; fi ;"
-        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/simple_workflow.dax ${CMAKE_CURRENT_BINARY_DIR}/simple_workflow.dax ; fi ;"
-        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/nighres_workflow.dax ${CMAKE_CURRENT_BINARY_DIR}/nighres_workflow.dax ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/simple_workflow.json ${CMAKE_CURRENT_BINARY_DIR}/simple_workflow.json ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/nighres_workflow.json ${CMAKE_CURRENT_BINARY_DIR}/nighres_workflow.json ; fi ;"
         COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_multi.sh ${CMAKE_CURRENT_BINARY_DIR}/run_multi.sh ; fi ;"
         COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_nfs.sh ${CMAKE_CURRENT_BINARY_DIR}/run_nfs.sh ; fi ;"
         COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/run_nighres.sh ${CMAKE_CURRENT_BINARY_DIR}/run_nighres.sh ; fi ;"
@@ -76,9 +76,9 @@ add_dependencies(wrench-example-io-pagecache-nfs wrench-example-io-pagecache-fil
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-nfs wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nfs wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-nfs wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nfs wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
 #install(TARGETS wrench-example-io-pagecache-nfs DESTINATION bin)
@@ -100,9 +100,9 @@ add_dependencies(wrench-example-io-pagecache-nighres wrench-example-io-pagecache
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-nighres wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nighres wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-nighres wrenchpegasusworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nighres wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
 endif()
 
 #install(TARGETS wrench-example-io-pagecache-nighres DESTINATION bin)

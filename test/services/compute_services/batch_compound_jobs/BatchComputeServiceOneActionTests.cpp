@@ -759,7 +759,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
+#else
+TEST_F(BatchComputeServiceOneActionTest, ServiceCrashed) {
+#endif
     DO_TEST_WITH_FORK(do_OneSleepActionServiceCrashed_test);
 }
 
@@ -1026,7 +1030,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
+#else
+TEST_F(BatchComputeServiceOneActionTest, JobExpiration) {
+#endif
     DO_TEST_WITH_FORK(do_OneSleepJobExpiration_test);
 }
 
@@ -1177,7 +1185,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchComputeServiceOneActionTest, FileNotThere) {
+#else
+TEST_F(BatchComputeServiceOneActionTest, FileNotThere) {
+#endif
     DO_TEST_WITH_FORK(do_OneFileReadActionFileNotThere_test);
 }
 

@@ -19,8 +19,8 @@ namespace wrench {
      * @param name: message name
      * @param payload: message size in bytes
      */
-    ComputeServiceMessage::ComputeServiceMessage(std::string name, double payload) :
-            ServiceMessage("ComputeServiceMessage::" + name, payload) {
+    ComputeServiceMessage::ComputeServiceMessage(double payload) :
+            ServiceMessage( payload) {
     }
 
     /**
@@ -37,7 +37,7 @@ namespace wrench {
             std::shared_ptr<CompoundJob> job,
             const std::map<std::string, std::string> service_specific_args,
             double payload) :
-            ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload),
+            ComputeServiceMessage(payload),
             answer_mailbox(answer_mailbox), job(job), service_specific_args(service_specific_args) {
         if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
@@ -60,7 +60,7 @@ namespace wrench {
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
-            ComputeServiceMessage("SUBMIT_COMPOUND_JOB_ANSWER", payload) {
+            ComputeServiceMessage(payload) {
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
@@ -84,7 +84,7 @@ namespace wrench {
     ComputeServiceCompoundJobDoneMessage::ComputeServiceCompoundJobDoneMessage(std::shared_ptr<CompoundJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
                                                                                double payload)
-            : ComputeServiceMessage("COMPOUND_JOB_DONE", payload) {
+            : ComputeServiceMessage(payload) {
         if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceCompoundJobDoneMessage::ComputeServiceCompoundJobDoneMessage(): Invalid arguments");
@@ -104,7 +104,7 @@ namespace wrench {
     ComputeServiceCompoundJobFailedMessage::ComputeServiceCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
                                                                                    std::shared_ptr<ComputeService> cs,
                                                                                    double payload)
-            : ComputeServiceMessage("COMPOUND_JOB_FAILED", payload) {
+            : ComputeServiceMessage(payload) {
         if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceCompoundJobFailedMessage::ComputeServiceCompoundJobFailedMessage(): Invalid arguments");
@@ -125,7 +125,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             double payload) :
-            ComputeServiceMessage("TERMINATE_COMPOUND_JOB_REQUEST", payload), answer_mailbox(answer_mailbox), job(job) {
+            ComputeServiceMessage( payload), answer_mailbox(answer_mailbox), job(job) {
         if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(): Invalid arguments");
@@ -147,7 +147,7 @@ namespace wrench {
                                                                                                      bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
-            ComputeServiceMessage("TERMINATE_COMPOUND_JOB_ANSWER", payload) {
+            ComputeServiceMessage(payload) {
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
@@ -224,7 +224,7 @@ namespace wrench {
     ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(std::shared_ptr<PilotJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
                                                                                double payload)
-            : ComputeServiceMessage("PILOT_JOB_STARTED", payload) {
+            : ComputeServiceMessage(payload) {
 
         if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
@@ -245,7 +245,7 @@ namespace wrench {
     ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(std::shared_ptr<PilotJob> job,
                                                                                std::shared_ptr<ComputeService> cs,
                                                                                double payload)
-            : ComputeServiceMessage("PILOT_JOB_EXPIRED", payload) {
+            : ComputeServiceMessage(payload) {
         if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(): Invalid arguments");
@@ -267,7 +267,7 @@ namespace wrench {
                                                                              std::shared_ptr<ComputeService> cs,
                                                                              std::shared_ptr<FailureCause> cause,
                                                                              double payload) : ComputeServiceMessage(
-            "PILOT_JOB_FAILED", payload) {
+            payload) {
         if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
@@ -289,7 +289,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<PilotJob> job,
             double payload) :
-            ComputeServiceMessage("TERMINATE_PILOT_JOB_REQUEST", payload) {
+            ComputeServiceMessage(payload) {
         if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
@@ -313,7 +313,7 @@ namespace wrench {
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
-            ComputeServiceMessage("TERMINATE_PILOT_JOB_ANSWER", payload) {
+            ComputeServiceMessage( payload) {
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
@@ -338,7 +338,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &key,
             double payload)
-            : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload), answer_mailbox(answer_mailbox), key(key) {
+            : ComputeServiceMessage(payload), answer_mailbox(answer_mailbox), key(key) {
         if ((answer_mailbox == nullptr) or key.empty()) {
             throw std::invalid_argument(
                     "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
@@ -355,7 +355,7 @@ namespace wrench {
      */
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
             std::map<std::string, double> info, double payload)
-            : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(std::move(info)) {}
+            : ComputeServiceMessage( payload), info(std::move(info)) {}
 
 
     /**
@@ -370,7 +370,7 @@ namespace wrench {
     */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram, double payload) : ComputeServiceMessage(
-            "DOES_AT_LEAST_ONE_HOST_HAVE_THIS_MANY_IDLE_CORES_REQUEST",
+
             payload) {
 
         if (not answer_mailbox) {
@@ -390,7 +390,6 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-            bool answer, double payload) : ComputeServiceMessage(
-            "DOES_AT_LEAST_ONE_HOST_HAVE_THIS_MANY_IDLE_CORES_ANSWER", payload), answer(answer) {}
+            bool answer, double payload) : ComputeServiceMessage(payload), answer(answer) {}
 
 };

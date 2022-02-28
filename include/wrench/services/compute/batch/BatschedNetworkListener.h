@@ -31,7 +31,7 @@ namespace wrench {
     public:
 
         BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
-                                std::string batch_service_mailbox, std::string sched_port,
+                                simgrid::s4u::Mailbox *batch_service_mailbox, std::string sched_port,
                                 std::string data_to_send,WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
@@ -40,7 +40,7 @@ namespace wrench {
 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                 };
 
-        BatschedNetworkListener(std::string, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox, std::string sched_port,
+        BatschedNetworkListener(std::string, std::shared_ptr<BatchComputeService> batch_service, simgrid::s4u::Mailbox *batch_service_mailbox, std::string sched_port,
                              std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list, std::string suffix);
 
 
@@ -50,11 +50,9 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         std::string data_to_send;
         std::string reply_received;
         std::shared_ptr<BatchComputeService> batch_service;
-        std::string batch_service_mailbox;
+        simgrid::s4u::Mailbox *batch_service_mailbox;
 
-
-
-        void sendExecuteMessageToBatchComputeService(std::string answer_mailbox, std::string execute_job_reply_data);
+        void sendExecuteMessageToBatchComputeService(simgrid::s4u::Mailbox *answer_mailbox, std::string execute_job_reply_data);
         void sendQueryAnswerMessageToBatchComputeService(double estimated_waiting_time);
         void send_receive();
     };

@@ -20,11 +20,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 find_package(Boost REQUIRED)
 find_package(SimGrid REQUIRED)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 # build the version number
-set(WRENCH_VERSION_MAJOR "1")
-set(WRENCH_VERSION_MINOR "11")
+set(WRENCH_VERSION_MAJOR "2")
+set(WRENCH_VERSION_MINOR "0")
 set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "dev")
 
@@ -40,7 +40,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/simgrid/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
 
 
 # For MacOS's MacPorts
@@ -360,7 +360,6 @@ set(TEST_FILES
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowParallelModelTest.cpp
-        test/workflow/WorkflowLoadFromDAXTest.cpp
         test/workflow/WorkflowLoadFromJSONTest.cpp
         test/services/memory_manager_service/MemoryManagerTest.cpp
         test/services/compute_services/bare_metal_compound_jobs/BareMetalComputeServiceOneActionTests.cpp
@@ -477,9 +476,9 @@ install(DIRECTORY include/ DESTINATION include)
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
 else ()
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchpegasusworkflowparser wrench -lpthread -lm)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
 endif ()
 
 
