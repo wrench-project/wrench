@@ -39,7 +39,7 @@
 #include "wrench/workflow/WorkflowTask.h"
 
 // Tools
-#include "wrench/tools/pegasus/PegasusWorkflowParser.h"
+#include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
 
 
 #endif //WRENCH_WRENCH_H

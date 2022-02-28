@@ -25,6 +25,11 @@ cat $1"/conf/cmake/FindSimGrid.cmake"
 echo "\"\"\""
 echo ""
 
+echo "FILE_CONTENT_FINDWRENCH_CMAKE = r\"\"\""
+cat $1"/FindWRENCH.cmake"
+echo "\"\"\""
+echo ""
+
 echo "FILE_CONTENT_CMAKELISTS_TXT = r\"\"\""
 cat $1"/tools/wrench/wrench-init/base_code/CMakeLists.txt"
 echo "\"\"\""

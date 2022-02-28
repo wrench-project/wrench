@@ -365,6 +365,7 @@ private:
             }
             auto first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
+            wrench::Simulation::sleep(1.0);
             auto batch_service = this->test->compute_service;
             std::string job_id = "my_tentative_job";
             unsigned int nodes = 2;
@@ -421,9 +422,10 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc = 1;
+    int argc = 2;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -445,6 +447,7 @@ void BatchServiceBatschedQueueWaitTimePredictionTest::do_BatchJobBasicEstimateWa
     ASSERT_NO_THROW(compute_service = simulation->add(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "", {
+                                                    {wrench::BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "false"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                                     {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}
                                             })));
@@ -535,6 +538,7 @@ private:
             }
             double first_job_running = wrench::Simulation::getCurrentSimulatedDate();
 
+            wrench::Simulation::sleep(1.0);
 
             auto batch_service = this->test->compute_service;
             std::string job_id = "my_job1";
@@ -567,7 +571,7 @@ private:
         {
 
             // Create a sequential task1 that lasts one min and requires 2 cores
-            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task1", 60, 2, 2, 0);
+            std::shared_ptr<wrench::WorkflowTask> task = this->test->workflow->addTask("task2", 60, 2, 2, 0);
             task->addInputFile(this->test->workflow->getFileByID("input_file"));
             task->addOutputFile(this->test->workflow->getFileByID("output_file"));
 
@@ -598,6 +602,8 @@ private:
                         "Got some exception"
                 );
             }
+
+            wrench::Simulation::sleep(1.0);
 
             auto batch_service = this->test->compute_service;
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs = {};
@@ -758,7 +764,7 @@ private:
 
 
             // Submit the second job for next 300 seconds and using 2 cores
-            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task2", 299, 1, 1, 0);
             task1->addInputFile(this->test->workflow->getFileByID("input_file"));
             task1->addOutputFile(this->test->workflow->getFileByID("output_file2"));
 
@@ -791,7 +797,7 @@ private:
             }
 
             // Submit the third job for next 300 seconds and using 4 cores
-            std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 299, 1, 1, 0);
+            std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task3", 299, 1, 1, 0);
             task2->addInputFile(this->test->workflow->getFileByID("input_file"));
             task2->addOutputFile(this->test->workflow->getFileByID("output_file3"));
 
@@ -822,6 +828,8 @@ private:
                 );
             }
 
+            wrench::Simulation::sleep(1.0);
+            
             auto batch_service = this->test->compute_service;
 
             /** Note that below we have extra seconds since when submitting

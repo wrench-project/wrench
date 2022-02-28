@@ -16,8 +16,8 @@ namespace wrench {
      *
      * @param name: the message name
      */
-    HostStateChangeDetectorMessage::HostStateChangeDetectorMessage(std::string name) :
-            SimulationMessage("HostStateChangeDetectorMessage::" + name, 0) {
+    HostStateChangeDetectorMessage::HostStateChangeDetectorMessage() :
+            SimulationMessage( 0) {
     }
 
 
@@ -27,7 +27,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned on
      */
     HostHasTurnedOnMessage::HostHasTurnedOnMessage(std::string hostname) :
-            HostStateChangeDetectorMessage("HostHasTurnedOnMessage") {
+            HostStateChangeDetectorMessage() {
         this->hostname = hostname;
     }
 
@@ -37,7 +37,7 @@ namespace wrench {
      * @param hostname: the name of the host that has turned off
      */
     HostHasTurnedOffMessage::HostHasTurnedOffMessage(std::string hostname) :
-            HostStateChangeDetectorMessage("HostHasTurnedOffMessage") {
+            HostStateChangeDetectorMessage() {
         this->hostname = hostname;
     }
 
@@ -48,7 +48,7 @@ namespace wrench {
      * @param speed: the host's new speed
      */
     HostHasChangedSpeedMessage::HostHasChangedSpeedMessage(std::string hostname, double speed) :
-            HostStateChangeDetectorMessage("HostHasChangedSpeedMessage") {
+            HostStateChangeDetectorMessage() {
         this->hostname = hostname;
         this->speed = speed;
     }

@@ -18,8 +18,8 @@ namespace wrench {
      *
      * @param name: the message name
      */
-    JobManagerMessage::JobManagerMessage(std::string name) :
-            SimulationMessage("JobManagerMessage::" + name, 0) {
+    JobManagerMessage::JobManagerMessage() :
+            SimulationMessage(0) {
     }
 
 
@@ -33,7 +33,7 @@ namespace wrench {
                                                                                  std::shared_ptr<ComputeService> compute_service,
                                                                                  std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes)
             :
-            JobManagerMessage("JobManagerStandardJobCompletedMessage") {
+            JobManagerMessage() {
         this->job = std::move(job);
         this->compute_service = std::move(compute_service);
         this->necessary_state_changes = std::move(necessary_state_changes);
@@ -52,7 +52,7 @@ namespace wrench {
                                                                            std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> necessary_state_changes,
                                                                            std::set<std::shared_ptr<WorkflowTask>> necessary_failure_count_increments,
                                                                            std::shared_ptr<FailureCause> cause) :
-            JobManagerMessage("JobManagerStandardJobFailedMessage") {
+            JobManagerMessage() {
         this->job = std::move(job);
         this->compute_service = std::move(compute_service);
         this->necessary_state_changes = std::move(necessary_state_changes);
@@ -69,7 +69,7 @@ namespace wrench {
     JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
                                                                            std::shared_ptr<ComputeService> compute_service,
                                                                            std::shared_ptr<FailureCause> cause) :
-            JobManagerMessage("JobManagerPilotJobFailedMessage") {
+            JobManagerMessage() {
         this->job = std::move(job);
         this->compute_service = std::move(compute_service);
         this->cause = std::move(cause);
@@ -83,7 +83,7 @@ namespace wrench {
      */
     JobManagerCompoundJobCompletedMessage::JobManagerCompoundJobCompletedMessage(std::shared_ptr<CompoundJob> job,
                                                                                  std::shared_ptr<ComputeService> compute_service) :
-                                                                       JobManagerMessage("JobManagerCompoundJobCompletedMessage") {
+                                                                       JobManagerMessage() {
         this->job = std::move(job);
         this->compute_service = std::move(compute_service);
     }
@@ -97,7 +97,7 @@ namespace wrench {
     JobManagerCompoundJobFailedMessage::JobManagerCompoundJobFailedMessage(std::shared_ptr<CompoundJob> job,
                                                                        std::shared_ptr<ComputeService> compute_service,
                                                                        std::shared_ptr<FailureCause> cause) :
-                                                                       JobManagerMessage("JobManagerCompoundJobFailedMessage") {
+                                                                       JobManagerMessage() {
         this->job = std::move(job);
         this->compute_service = std::move(compute_service);
         this->cause = std::move(cause);
@@ -107,6 +107,6 @@ namespace wrench {
      * @brief Message sent to the job manager to wake it up
      */
     JobManagerWakeupMessage::JobManagerWakeupMessage() :
-            JobManagerMessage("JobManagerWakeupMessage") {
+            JobManagerMessage() {
     }
 }

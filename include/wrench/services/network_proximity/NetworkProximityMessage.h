@@ -24,7 +24,7 @@ namespace wrench {
      */
     class NetworkProximityMessage : public ServiceMessage {
     protected:
-        NetworkProximityMessage(std::string name, double payload);
+        NetworkProximityMessage(double payload);
 
     };
 

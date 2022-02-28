@@ -17,8 +17,8 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    BatchComputeServiceMessage::BatchComputeServiceMessage(std::string name, double payload) :
-            ComputeServiceMessage("BatchComputeServiceMessage::" + name, payload) {
+    BatchComputeServiceMessage::BatchComputeServiceMessage( double payload) :
+            ComputeServiceMessage( payload) {
     }
 
 #if 0
@@ -76,7 +76,7 @@ namespace wrench {
     BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
-            : BatchComputeServiceMessage("BatchExecuteJobFromBatSchedMessage", payload), answer_mailbox(answer_mailbox), batsched_decision_reply(batsched_decision_reply) {
+            : BatchComputeServiceMessage( payload), answer_mailbox(answer_mailbox), batsched_decision_reply(batsched_decision_reply) {
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
@@ -95,7 +95,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
-            : BatchComputeServiceMessage("BatchQueryAnswerMessage", payload) {
+            : BatchComputeServiceMessage(payload) {
         this->estimated_start_time = estimated_job_start_time;
     }
 
@@ -154,7 +154,7 @@ namespace wrench {
      */
     BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<BatchJob> job, double payload)
-            : BatchComputeServiceMessage("BatchComputeServiceJobRequestMessage", payload), answer_mailbox(answer_mailbox), job(job) {
+            : BatchComputeServiceMessage(payload), answer_mailbox(answer_mailbox), job(job) {
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
@@ -173,7 +173,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload)
-            : ServiceMessage("AlarmJobTimeOutMessage", payload) {
+            : ServiceMessage(payload) {
         if (job == nullptr) {
             throw std::invalid_argument(
                     "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");

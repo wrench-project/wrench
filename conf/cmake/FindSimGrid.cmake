@@ -1,6 +1,6 @@
-# CMake find module to search for the SimGrid library. 
+# CMake find module to search for the SimGrid library.
 
-# Copyright (c) 2016-2021. The SimGrid Team.
+# Copyright (c) 2016-2022. The SimGrid Team.
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the license (GNU LGPL) which comes with this package.
@@ -48,7 +48,7 @@
 #  Since SimGrid header files require C++14, so we set CMAKE_CXX_STANDARD to 14.
 #    Change this variable in your own file if you need a later standard.
 
-# 
+#
 # IMPROVING THIS FILE
 # -------------------
 #  - Use automatic SimGridConfig.cmake creation via export/install(EXPORT in main CMakeLists.txt:
@@ -56,16 +56,10 @@
 #    https://cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
 #    https://github.com/boostcon/cppnow_presentations_2017/blob/master/05-19-2017_friday/effective_cmake__daniel_pfeifer__cppnow_05-19-2017.pdf
 
-cmake_minimum_required(VERSION 2.8...3.13)
+cmake_minimum_required(VERSION 2.8.12)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if (NOT "$ENV{SimGrid_PATH}" STREQUAL "")
-    set(SimGrid_PATH "$ENV{SimGrid_PATH}" CACHE INTERNAL "Copied from environment variable")
-endif()
-
-list(APPEND CMAKE_PREFIX_PATH ${SimGrid_PATH})
 
 find_path(SimGrid_INCLUDE_DIR
   NAMES simgrid/config.h
@@ -78,7 +72,7 @@ if (NOT SimGrid_INCLUDE_DIR)
     NAMES simgrid_config.h
     PATHS ${SimGrid_PATH}/include /opt/simgrid/include
   )
-endif()    
+endif()
 find_library(SimGrid_LIBRARY
   NAMES simgrid
   PATHS ${SimGrid_PATH}/lib /opt/simgrid/lib
@@ -106,7 +100,7 @@ if (SimGrid_INCLUDE_DIR)
     set(SimGrid_VERSION_${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
   endforeach()
   unset(SimGrid_VERSION_STRING)
-  unset(SimGrid_VERSION_REGEX)  
+  unset(SimGrid_VERSION_REGEX)
 endif ()
 
 include(FindPackageHandleStandardArgs)

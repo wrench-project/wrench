@@ -82,13 +82,13 @@ private:
             }
 
             // One send
-            auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo", 100));
+            auto pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100));
             pending_send->wait();
 
             // Two sends, no timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends;
-            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo1", 100)));
-            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo2", 100)));
+            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100)));
+            sends.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100)));
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
             sends.at(index)->wait();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends, -1);
@@ -96,8 +96,8 @@ private:
 
             // Two sends, timeout
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_timeout;
-            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo1", 100)));
-            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo2", 100)));
+            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100)));
+            sends_timeout.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100)));
             double now = wrench::Simulation::getCurrentSimulatedDate();
             index = wrench::S4U_PendingCommunication::waitForSomethingToHappen(sends_timeout, 10);
             if (index != ULONG_MAX) {
@@ -112,7 +112,7 @@ private:
             sends_timeout.at(index)->wait();
 
             // One send, network failure
-            pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo", 100));
+            pending_send = wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100));
             wrench::Simulation::sleep(10);
             wrench::Simulation::turnOffLink("1");
             try {
@@ -130,8 +130,8 @@ private:
 
             // Two asynchronous sends, network failure
             std::vector<std::shared_ptr<wrench::S4U_PendingCommunication>> sends_failure;
-            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo1", 100)));
-            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage("foo2", 100)));
+            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100)));
+            sends_failure.push_back(wrench::S4U_Mailbox::iputMessage(this->test->wms2->mailbox, new wrench::SimulationMessage(100)));
             wrench::Simulation::sleep(10);
             simgrid::s4u::Link::by_name("1")->turn_off();
 //            WRENCH_INFO("SIZE= %ld", sends_failure.size());
@@ -157,7 +157,7 @@ private:
             // One synchronous sends, network failure
             try {
                 wrench::S4U_Mailbox::putMessage(this->test->wms2->mailbox,
-                                                new wrench::SimulationMessage("foo", 100));
+                                                new wrench::SimulationMessage(100));
                 throw std::runtime_error("Should have gotten a NetworkError");
             } catch (std::shared_ptr<wrench::NetworkError> &e) {
                 e->toString();
