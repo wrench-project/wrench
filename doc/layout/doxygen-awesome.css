@@ -36,7 +36,7 @@ html {
     --primary-lightest-color: #e9f1f8;
 
     /* page base colors */
-    --page-background-color: white;
+    --page-background-color: #fafafa;
     --page-foreground-color: #2c3e50;
     --page-secondary-foreground-color: #67727e;
 
@@ -179,7 +179,7 @@ html {
 
         --menu-selected-background: rgba(0,0,0,.4);
 
-        --page-background-color: #1C1D1F;
+        --page-background-color: #23272D;
         --page-foreground-color: #d2dbde;
         --page-secondary-foreground-color: #859399;
         --separator-color: #000000;
@@ -223,7 +223,7 @@ html.dark-mode {
 
     --menu-selected-background: rgba(0,0,0,.4);
 
-    --page-background-color: #1C1D1F;
+    --page-background-color: #23272D;
     --page-foreground-color: #d2dbde;
     --page-secondary-foreground-color: #859399;
     --separator-color: #000000;
@@ -249,7 +249,7 @@ html.dark-mode {
     --bug-color-dark: #812a00;
     --bug-color-darker: #ffd3be;
 
-    --darkmode-toggle-button-icon: '🌛';
+    --darkmode-toggle-button-icon: '🌙';
 }
 
 body {
