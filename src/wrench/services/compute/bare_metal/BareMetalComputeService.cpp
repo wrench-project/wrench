@@ -579,7 +579,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
             std::map<std::string, std::string> &service_specific_arguments) {
-        WRENCH_INFO("Asked to run a compound job with %ld actions", job->getActions().size());
+        WRENCH_INFO("Asked to run compound job %s, which has %ld actions", job->getName().c_str(), job->getActions().size());
 
         // Can we run this job at all in terms of available resources?
         bool can_run = true;
