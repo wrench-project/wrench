@@ -23,10 +23,10 @@ find_package(SimGrid REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 
 # build the version number
-set(WRENCH_VERSION_MAJOR "1")
-set(WRENCH_VERSION_MINOR "11")
+set(WRENCH_VERSION_MAJOR "2")
+set(WRENCH_VERSION_MINOR "0")
 set(WRENCH_VERSION_PATCH "0")
-set(WRENCH_VERSION_EXTRA "")
+set(WRENCH_VERSION_EXTRA "dev")
 
 if (${WRENCH_VERSION_PATCH} EQUAL "0")
     set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}")
@@ -40,7 +40,7 @@ endif ()
 
 message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
-include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/simgrid/include)
+include_directories(src/wrench/ include/ ${SimGrid_INCLUDE_DIR} ${Boost_INCLUDE_DIR} /usr/include /usr/local/include /opt/local/include)
 
 
 # For MacOS's MacPorts

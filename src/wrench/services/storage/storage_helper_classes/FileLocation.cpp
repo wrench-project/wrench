@@ -13,8 +13,11 @@
 #include <wrench/services/storage/storage_helpers/FileLocation.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <filesystem>
 #include <iostream>
+
+#if (__cpluplus >= 201703L)
+#include <filesystem>
+#endif
 
 WRENCH_LOG_CATEGORY(wrench_core_file_location, "Log category for FileLocation");
 
@@ -199,7 +202,7 @@ namespace wrench {
             // Remove the extra space
             to_return.erase(0, 1);
             return to_return;
-#else /
+#else
         // Cannot have certain substring (why not)
 //        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
         char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
