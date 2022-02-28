@@ -120,7 +120,7 @@ class BogusMessageTestWMS : public wrench::ExecutionController {
     class BogusMessage : public wrench::SimulationMessage {
 
     public:
-        BogusMessage() : wrench::SimulationMessage("bogus", 1) {
+        BogusMessage() : wrench::SimulationMessage(1) {
         }
     };
 

@@ -18,7 +18,7 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    ExecutionControllerMessage::ExecutionControllerMessage(std::string name, double payload) : SimulationMessage("ExecutionControllerMessage::" + name, payload) {}
+    ExecutionControllerMessage::ExecutionControllerMessage(double payload) : SimulationMessage(payload) {}
 
 
     /**
@@ -29,8 +29,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) :
-            ExecutionControllerMessage("ALARM_GOING_OFF",
-                                       payload), message(message) {}
+            ExecutionControllerMessage(payload), message(message) {}
 
 
 };

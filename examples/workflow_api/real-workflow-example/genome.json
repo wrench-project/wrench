@@ -1,7 +1,7 @@
 {
   "name": "genome-dax-0",
   "workflow": {
-    "jobs": [
+    "tasks": [
       {
         "avgCPU": 4.4805,
         "files": [

@@ -177,6 +177,13 @@ namespace wrench {
 
         // Create a scheduler
 #ifdef ENABLE_BATSCHED
+        auto batch_scheduling_alg = this->getPropertyValueAsString(
+                BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM);
+        if (this->scheduling_algorithms.find(batch_scheduling_alg) == this->scheduling_algorithms.end()) {
+            throw std::invalid_argument(
+                    " BatchComputeService::BatchComputeService(): unsupported scheduling algorithm " +
+                    batch_scheduling_alg);
+        }
         this->scheduler = std::unique_ptr<BatchScheduler>(new BatschedBatchScheduler(this));
 #else
         auto batch_scheduling_alg = this->getPropertyValueAsString(
@@ -496,13 +503,15 @@ namespace wrench {
      */
     void BatchComputeService::sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id,
                                                                  std::shared_ptr<FailureCause> cause) {
-        WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
+        WRENCH_INFO("Sending compound job failure notification for job %s", job->getName().c_str());
 
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
-        this->scheduler->processJobFailure(batch_job);
+//        std::cerr << "IN sendCompoundJobFailureNotification \n";
+        // NO IDEA WHAT THIS WAS HERE - DEFINITELY A BUG!
+//        this->scheduler->processJobFailure(batch_job);
 
-        job->printCallbackMailboxStack();
+//        job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
                     job->popCallbackMailbox(),
@@ -980,9 +989,10 @@ namespace wrench {
         this->freeUpResources(batch_job->getResourcesAllocated());
         this->removeJobFromRunningList(batch_job);
 
-        WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
+        WRENCH_INFO("A compound job executor has failed to perform job %s", job->getName().c_str());
 
         // notify the scheduler of the failure
+//        std::cerr << "IN processCompoundJobFailure\n";
         this->scheduler->processJobFailure(batch_job);
 
         this->sendCompoundJobFailureNotification(job, std::to_string((batch_job->getJobID())), cause);

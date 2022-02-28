@@ -28,7 +28,7 @@ namespace wrench {
      */
     class ComputeThreadMessage : public SimulationMessage {
     protected:
-        explicit ComputeThreadMessage(std::string name);
+        explicit ComputeThreadMessage();
     };
 
     /**

@@ -639,7 +639,11 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(ScratchSpaceTest, PilotJobScratchSpaceTest) {
+#else
+TEST_F(ScratchSpaceTest, PilotJobScratchSpaceTest) {
+#endif
     DO_TEST_WITH_FORK(do_PilotJobScratchSpace_test);
 }
 

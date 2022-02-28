@@ -46,7 +46,7 @@ namespace wrench {
     * @param property_list: property list ({} means "use all defaults")
     */
     BatschedNetworkListener::BatschedNetworkListener(std::string hostname, std::shared_ptr<BatchComputeService> batch_service,
-                                                     std::string batch_service_mailbox,
+                                                     simgrid::s4u::Mailbox *batch_service_mailbox,
                                                      std::string sched_port,
                                                      std::string data_to_send,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list) :
@@ -66,11 +66,11 @@ namespace wrench {
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
-            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, std::string batch_service_mailbox,
+            std::string hostname, std::shared_ptr<BatchComputeService> batch_service, simgrid::s4u::Mailbox *batch_service_mailbox,
             std::string sched_port,
             std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             std::string suffix = "") :
-            Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
+            Service(hostname, "batch_network_listener" + suffix) {
 
       // Start the daemon on the same host
       this->sched_port = sched_port;
@@ -108,7 +108,7 @@ namespace wrench {
      * @param answer_mailbox: mailbox on which ack will be received
      * @param execute_job_reply_data: message to send
      */
-    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(std::string answer_mailbox,
+    void BatschedNetworkListener::sendExecuteMessageToBatchComputeService(simgrid::s4u::Mailbox *answer_mailbox,
                                                                    std::string execute_job_reply_data) {
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
