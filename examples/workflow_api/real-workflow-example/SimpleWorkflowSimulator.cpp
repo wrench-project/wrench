@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
      * In this example, this particular batch_standard_and_pilot_jobs service has no scratch storage space (mount point = "").
      * The next argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
-     * list. In this case, we use the  conservative_bf_core_level scheduling algorithm which implements
+     * list. In this case, we use the conservative_bf_core_level scheduling algorithm which implements
      * conservative backfilling at the core level (i.e., two jobs can shared a compute node by using different cores on it).
      * The last argument to the constructor makes it possible to specify various control message sizes.
      * In this example, one specifies that the message that will be send to the service to
@@ -108,10 +108,15 @@ int main(int argc, char **argv) {
      * configurable properties for each kind of service.
      */
     std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
+#ifndef ENABLE_BATSCHED
+    std::string scheduling_algorithm = "conservative_bf_core_level";
+#else
+    std::string scheduling_algorithm = "conservative_bf";
+#endif
     try {
         batch_compute_service = simulation->add(new wrench::BatchComputeService(
         {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
-                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf_core_level"}},
+                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, scheduling_algorithm}},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
     } catch (std::invalid_argument &e) {
         std::cerr << "Error: " << e.what() << std::endl;
