@@ -33,7 +33,6 @@ namespace wrench {
     protected:
         /**
          * @brief Constructor
-         * @param name: the message name
          * @param payload: the message payload
          */
         FileTransferThreadMessage(double payload) :

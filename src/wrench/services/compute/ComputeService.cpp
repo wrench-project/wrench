@@ -149,7 +149,6 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
-     * @param mailbox_name_prefix: the mailbox name prefix
      * @param scratch_space_mount_point: the service's scratch space's mount point ("" if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
@@ -180,7 +179,6 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
-     * @param mailbox_name_prefix: the mailbox name prefix
      * @param scratch_space: scratch storage space of the compute service (nullptr if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
