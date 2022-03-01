@@ -78,8 +78,9 @@ jobs:
           docker exec wrench mkdir wrench/build;
           # build and test wrench
           docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-          docker exec -w /home/wrench/wrench/build wrench make all unit_tests;
+          docker exec -w /home/wrench/wrench/build wrench make all unit_tests examples;
           docker exec -w /home/wrench/wrench/build wrench ./unit_tests;
+          docker exec -w /home/wrench/wrench/build/examples wrench ./run_all_examples.sh;
 
       - name: Documentation Build and Deployment
         env:
