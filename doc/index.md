@@ -71,7 +71,12 @@ simulators can involve as few as a 50-line of C++ code.
 **Developer:** This level targets _runtime system developers and researchers_ who work on developing
 novel runtime system designs and algorithms. In addition to documentation 
 for all simulation components provided at the _User_ level, the _Developer_ documentation includes
-detailed documentation for interacting with simulated Core Services.
+detailed documentation for interacting with simulated Core Services. There are **two Developer APIs**. 
+The most generic API is called the _Action API_, and allows developers to describe and execution
+application workloads that consist of arbitrary ``actions". The _Workflow API_ is specifically designed
+for those developers that implement workflow runtime systems (also known as Workflow Management Systems, or WMSs), 
+and as such is provides a Workflow abstraction that these developers will find convenient. All details
+are provided in the rest of the documentation.
 
 
 **Internal:** This level targets those users who want to contribute code to WRENCH. It 
