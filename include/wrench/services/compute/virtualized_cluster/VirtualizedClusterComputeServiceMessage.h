@@ -28,7 +28,7 @@ namespace wrench {
      */
     class VirtualizedClusterComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        VirtualizedClusterComputeServiceMessage(const std::string &name, double payload);
+        VirtualizedClusterComputeServiceMessage(double payload);
     };
 
 
