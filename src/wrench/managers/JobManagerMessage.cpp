@@ -15,8 +15,6 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     *
-     * @param name: the message name
      */
     JobManagerMessage::JobManagerMessage() :
             SimulationMessage(0) {

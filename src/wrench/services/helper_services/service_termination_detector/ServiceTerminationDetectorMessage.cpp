@@ -16,7 +16,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param name: the message name
      */
     ServiceTerminationDetectorMessage::ServiceTerminationDetectorMessage() :
             SimulationMessage( 0) {

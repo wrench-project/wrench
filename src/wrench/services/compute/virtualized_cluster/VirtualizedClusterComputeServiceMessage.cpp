@@ -15,11 +15,9 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param name: the message name
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(const std::string &name,
-                                                                                     double payload) :
+    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(double payload) :
             ComputeServiceMessage(payload) {
     }
 
@@ -38,7 +36,7 @@ namespace wrench {
             const std::string &vm_name,
             const std::string &dest_pm_hostname,
             double payload) :
-            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_REQUEST", payload) {
+            VirtualizedClusterComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || dest_pm_hostname.empty() || vm_name.empty()) {
             throw std::invalid_argument(
@@ -60,7 +58,7 @@ namespace wrench {
             bool success,
             std::shared_ptr<FailureCause> failure_cause,
             double payload) :
-            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_ANSWER", payload), success(success),
+            VirtualizedClusterComputeServiceMessage(payload), success(success),
             failure_cause(failure_cause) {}
 
 

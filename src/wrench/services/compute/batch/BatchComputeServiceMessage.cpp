@@ -14,10 +14,9 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param name: the message name
      * @param payload: the message size in bytes
      */
-    BatchComputeServiceMessage::BatchComputeServiceMessage( double payload) :
+    BatchComputeServiceMessage::BatchComputeServiceMessage(double payload) :
             ComputeServiceMessage( payload) {
     }
 

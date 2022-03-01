@@ -15,7 +15,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param name: the message name
      * @param payload: the message size in bytes
      */
     ExecutionControllerMessage::ExecutionControllerMessage(double payload) : SimulationMessage(payload) {}
