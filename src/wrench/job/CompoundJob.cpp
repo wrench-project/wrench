@@ -245,6 +245,8 @@ namespace wrench {
     /**
     * @brief Add a custom action to the job
     * @param name: the action's name (if empty, a unique name will be picked for you)
+    * @param ram: the action's RAM footprint
+    * @param num_cores: the action's allocated number of cores
     * @param lambda_execute: the action execution function
     * @param lambda_terminate: the action termination function
     * @return a custom action
