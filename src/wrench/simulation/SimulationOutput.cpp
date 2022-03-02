@@ -24,9 +24,9 @@
 #include <vector>
 #include <cmath>
 #include <unordered_set>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
-using namespace boost::posix_time;
+#include <time.h>
+
 
 #define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
 
@@ -788,7 +788,9 @@ namespace wrench {
         }
 
         nlohmann::json json_workflow;
-        json_workflow["executedAt"] = to_iso_extended_string(second_clock::universal_time());
+        time_t now;
+        time(&now);
+        json_workflow["executedAt"] = std::string(ctime(&now));
         json_workflow["makespan"] = workflow->getCompletionDate();
         json_workflow["tasks"] = tasks;
 
