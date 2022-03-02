@@ -24,9 +24,6 @@
 #include <vector>
 #include <cmath>
 #include <unordered_set>
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-using namespace boost::posix_time;
 
 #define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
 
@@ -715,6 +712,10 @@ namespace wrench {
      * @brief Writes a JSON graph representation of the Workflow to a file, in the WfFormat format
      *        which is defined at: https://wfcommons.org/format.
      *
+     *        Note that in the output JSON, the machines::cpu::speed is give as a GHz clock rate
+     *        while in WRENCH core speeds are in Flop/sec. The GHz clock rate is computed by dividing
+     *        the flop rate by 10^9 (so it's not really a clock rate).
+     *
      * @param workflow: a pointer to the workflow
      * @param file_path: the path to write the file
      * @param writing_file: whether or not the file is written, true by default but will be false when utilized as part
@@ -730,7 +731,8 @@ namespace wrench {
                     "SimulationOutput::dumpWorkflowGraphJSON() requires a valid workflow and file_path");
         }
 
-        // schema
+        std::set<std::string> used_machines;
+
         nlohmann::json tasks = nlohmann::json::array();
 
         // add the task vertices
@@ -769,6 +771,7 @@ namespace wrench {
                 runtime = task->getEndDate() - task->getStartDate();
                 num_cores = task->getNumCoresAllocated();
                 machine = task->getExecutionHost();
+                used_machines.insert(machine);
             } else {
                 runtime = -1;
                 num_cores = task->getMinNumCores();
@@ -787,15 +790,32 @@ namespace wrench {
                             });
         }
 
+
+        nlohmann::json machines = nlohmann::json::array();
+        for (auto const &m : used_machines) {
+            double memory = Simulation::getHostMemoryCapacity(m);
+            unsigned long num_cores = Simulation::getHostNumCores(m);
+            double flop_rate = Simulation::getHostMemoryCapacity(m);
+            double ghz_rate = flop_rate / (1000.0 * 1000.0 * 1000.0);
+            machines.push_back( {
+                                        {"nodeName",        m},
+                                        {"memory",          (unsigned long)memory},
+                                        {"cpu",  {
+                                                         {"count", num_cores},
+                                                         {"speed", (unsigned long)ghz_rate}
+                                        }}
+            });
+        }
+
+
         nlohmann::json json_workflow;
-        json_workflow["executedAt"] = to_iso_extended_string(second_clock::universal_time());
         json_workflow["makespan"] = workflow->getCompletionDate();
         json_workflow["tasks"] = tasks;
-
+        json_workflow["machines"] = machines;
 
         nlohmann::json json_object;
         json_object["name"] = "WRENCH-generated workflow";
-        json_object["schemaVersion"] = "1.2";
+        json_object["schemaVersion"] = "1.3";
         json_object["workflow"] = json_workflow;
         workflow_graph_json_part = json_workflow;
 
