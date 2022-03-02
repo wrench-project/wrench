@@ -14,10 +14,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: the message name
      * @param payload: message size in bytes
      */
-    ServiceMessage::ServiceMessage( double payload) :
+    ServiceMessage::ServiceMessage(double payload) :
             SimulationMessage( payload) {}
 
     /**

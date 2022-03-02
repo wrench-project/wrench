@@ -21,7 +21,6 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: the message name
      * @param payload: the message size in bytes
      */
     StorageServiceMessage::StorageServiceMessage(double payload) :
@@ -247,7 +246,7 @@ namespace wrench {
      * @param location: the file's location
      * @param success: whether the write operation succeeded
      * @param failure_cause: the cause of the failure (nullptr if success)
-     * @param data_write_mailbox_name: the mailbox to which file content should be sent
+     * @param data_write_mailbox: the mailbox to which file content should be sent
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument

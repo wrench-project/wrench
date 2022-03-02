@@ -27,7 +27,6 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: message name (a "human-readable type" really)
      * @param payload: message size in bytes
      */
     SimulationMessage::SimulationMessage(double payload) {
