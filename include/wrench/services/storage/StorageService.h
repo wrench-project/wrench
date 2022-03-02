@@ -44,9 +44,9 @@ namespace wrench {
 
         void stop() override;
 
-        virtual std::map<std::string, double> getFreeSpace();
+        std::map<std::string, double> getFreeSpace();
 
-        virtual std::map<std::string, double> getTotalSpace();
+        std::map<std::string, double> getTotalSpace();
 
         std::string getMountPoint();
         std::set<std::string> getMountPoints();
@@ -55,7 +55,7 @@ namespace wrench {
 
         static bool lookupFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location);
         static void deleteFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location,
-                std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
+                    std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
         static void readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location);
         static void readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location, double num_bytes);
         static void writeFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location);

@@ -12,10 +12,9 @@
 namespace wrench {
     /**
      * @brief Constructor
-     * @param name: the message name
      * @param payload: the message size in bytes
      */
-    NetworkProximityMessage::NetworkProximityMessage( double payload) :
+    NetworkProximityMessage::NetworkProximityMessage(double payload) :
             ServiceMessage(payload) {
     }
 

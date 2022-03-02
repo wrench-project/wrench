@@ -1022,7 +1022,7 @@ namespace wrench {
 
     /**
      * @brief Return resource information
-     * @param answer_mailbox: the mailbox to which the description message should be sent
+     * @param key: the information key
      * @return resource information
      */
     std::map<std::string, double> ActionExecutionService::getResourceInformation(const std::string &key) {
