@@ -73,7 +73,7 @@ namespace wrench {
      * @param date: the date at which the message should be sent (if date is in the past
      *              then the message will be sent immediately)
      * @param hostname: the name of the host on which to start the alarm service
-     * @param reply_mailbox_name: the mailbox to which the alarm service will send a message
+     * @param reply_mailbox: the mailbox to which the alarm service will send a message
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
      * @return a shared_ptr reference to the alarm service

@@ -17,7 +17,7 @@ And, one of the following:
 
 ## Required Dependencies ##                  {#install-prerequisites-dependencies}
 
-- [SimGrid](https://simgrid.org/) -- version 3.29
+- [SimGrid](https://simgrid.org/) -- version 3.30
 - [PugiXML](http://pugixml.org/) -- version 1.8 or higher
 - [JSON for Modern C++](https://github.com/nlohmann/json) -- version 3.9.0 or higher 
 
@@ -27,7 +27,8 @@ And, one of the following:
 
 - [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running tests)
 - [Doxygen](http://www.doxygen.org) -- version 1.8 or higher (only required for generating documentation)
-- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for realistic simulation of compute resources managed by production batch schedulers
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- version 1.4 - useful for expanded batch-scheduled resource simulation capabilities
+
 
 # Source Install #                  {#install-source}
 
@@ -40,12 +41,14 @@ installed dependencies (see above), you can install WRENCH as follows:
 <div class="fragment">
 <div class="line">tar xf @WRENCHRelease.tar.gz</div>
 <div class="line">cd @WRENCHRelease</div>
-<div class="line">cmake .</div>
+<div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">cmake ..</div>
 <div class="line">make -j8</div>
 <div class="line">make install # try "sudo make install" if you do not have write privileges</div>
 </div>
 
-If you want to see actual compiler and linker invocations, add VERBOSE=1 to the compilation command:
+If you want to see actual compiler and linker invocations, add `VERBOSE=1` to the compilation command:
 
 ~~~~~~~~~~~~~{.sh}
 make -j8 VERBOSE=1
@@ -67,9 +70,19 @@ git clone https://github.com/wrench-project/wrench
 Building and running the unit tests, which requires Google Test, is done as:
 
 ~~~~~~~~~~~~~{.sh}
-make -j8 unit_tests      
+make -j8 unit_tests
 ./unit_tests
 ~~~~~~~~~~~~~
+
+## Compiling and running examples ##  {#install-examples}
+
+Building the examples is done as:
+
+~~~~~~~~~~~~~{.sh}
+make -j8 examples
+~~~~~~~~~~~~~
+
+All binaries for the examples are then created in subdictories of `build/examples/`
  
 ## Installation Troubleshooting ##  {#install-troubleshooting}
 
@@ -100,7 +113,7 @@ docker pull wrenchproject/wrench
 docker run --rm -it wrenchproject/wrench /bin/bash
 ~~~~~~~~~~~~~
 
-The `unstable` tag provides a container with the current code in the GitHub's 
+The `unstable` tag provides a container with the (almost) current code in the GitHub's 
 `master` branch:
 
 ~~~~~~~~~~~~~{.sh}

@@ -59,6 +59,7 @@
         <route src="ComputeHost1" dst="ComputeHost2"> <link_ctn id="network_link"/> </route>
         <route src="ComputeHost1" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
         <route src="ComputeHost2" dst="CloudHeadHost"> <link_ctn id="network_link"/> </route>
+        <route src="ComputeHost1" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="ComputeHost2" dst="StorageHost2"> <link_ctn id="network_link"/> </route>
         <route src="CloudHeadHost" dst="CloudHost"> <link_ctn id="network_link"/> </route>
         <route src="StorageHost1" dst="CloudHost"> <link_ctn id="network_link"/> </route>
