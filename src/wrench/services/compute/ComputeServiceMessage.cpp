@@ -16,7 +16,6 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: message name
      * @param payload: message size in bytes
      */
     ComputeServiceMessage::ComputeServiceMessage(double payload) :

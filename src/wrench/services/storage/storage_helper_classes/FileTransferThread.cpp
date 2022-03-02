@@ -67,6 +67,7 @@ namespace wrench {
      * @param hostname: host on which to run
      * @param parent: the parent storage service
      * @param file: the file corresponding to the connection
+     * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
      * @param dst_mailbox: a mailbox to send data to
      * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
@@ -106,6 +107,7 @@ namespace wrench {
      * @param hostname: host on which to run
      * @param parent: the parent storage service
      * @param file: the file corresponding to the connection
+     * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
      * @param dst_location: a location to send data to
      * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read (nullptr if none). This
