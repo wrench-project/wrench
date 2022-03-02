@@ -26,11 +26,11 @@ namespace wrench {
      * Documentation in .h file
      */
     std::shared_ptr<Workflow> WfCommonsWorkflowParser::createWorkflowFromJSON(const std::string &filename,
-                                                            const std::string &reference_flop_rate,
-                                                            bool redundant_dependencies,
-                                                            unsigned long min_cores_per_task,
-                                                            unsigned long max_cores_per_task,
-                                                            bool enforce_num_cores) {
+                                                                              const std::string &reference_flop_rate,
+                                                                              bool redundant_dependencies,
+                                                                              unsigned long min_cores_per_task,
+                                                                              unsigned long max_cores_per_task,
+                                                                              bool enforce_num_cores) {
 
         std::ifstream file;
         nlohmann::json j;
@@ -65,6 +65,22 @@ namespace wrench {
 
         std::shared_ptr<wrench::WorkflowTask> task;
 
+        // Gather machine information if any
+        std::map<std::string, std::pair<unsigned long, double>> machines;
+        for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+            if (it.key() == "machines") {
+                std::vector<nlohmann::json> machine_specs = it.value();
+                for (auto &m : machine_specs) {
+                    std::string name = m.at("nodeName");
+                    nlohmann::json core_spec = m.at("cpu");
+                    unsigned long num_cores = core_spec.at("count");
+                    double ghz = core_spec.at("speed");
+                    machines[name] = std::make_pair(num_cores, ghz);
+                }
+            }
+        }
+
+        // Process the tasks
         for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
             if (it.key() == "tasks") {
                 std::vector<nlohmann::json> jobs = it.value();
@@ -98,7 +114,23 @@ namespace wrench {
                         throw std::invalid_argument("Workflow::createWorkflowFromJson(): Job " + name + " has unknown type " + type);
                     }
 
-                    task = workflow->addTask(name, runtime * flop_rate, min_num_cores, max_num_cores, 0.0);
+                    double flop_amount;
+                    std::string execution_machine = job.at("machine");
+                    if (execution_machine.empty()) {
+                        flop_amount = runtime * flop_rate;
+                    } else {
+                        if (machines.find(execution_machine) == machines.end()) {
+                            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJSON(): Task " + name +
+                                                        " is said to have been executed on machine " + execution_machine +
+                                                        "  but no description for that machine is found on the JSON file");
+                        }
+                        double core_ghz = (machines[execution_machine].second);
+                        double total_compute_power_used = core_ghz * (double)min_num_cores;
+                        double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
+                        flop_amount = runtime * actual_flop_rate;
+                    }
+
+                    task = workflow->addTask(name, flop_amount, min_num_cores, max_num_cores, 0.0);
 
                     // task priority
                     try {
@@ -191,10 +223,10 @@ namespace wrench {
      * Documentation in .h file
      */
     std::shared_ptr<Workflow> WfCommonsWorkflowParser::createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                                      bool redundant_dependencies,
-                                                                      unsigned long min_cores_per_task,
-                                                                      unsigned long max_cores_per_task,
-                                                                      bool enforce_num_cores) {
+                                                                                        bool redundant_dependencies,
+                                                                                        unsigned long min_cores_per_task,
+                                                                                        unsigned long max_cores_per_task,
+                                                                                        bool enforce_num_cores) {
         throw std::runtime_error("WfCommonsWorkflowParser::createExecutableWorkflowFromJSON(): not implemented yet");
     }
 

@@ -34,7 +34,9 @@ namespace wrench {
          *                             but the WRENCH simulation needs some notion of "amount of computation" to
          *                             apply reasonable scaling. (Because the XML platform description specifies host
          *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
-         *                             obtained on an machine with flop rate reference_flop_rate.
+         *                             obtained on an machine with flop rate reference_flop_rate. NOTE: This is only used
+         *                             if the JSON file does not provide information regarding the machine on which a task
+         *                             was executed. In this case, the machine speed information is used.
          * @param redundant_dependencies: Workflows provided by WfCommons
          *                             sometimes include control/data dependencies between tasks that are already induced by
          *                             other control/data dependencies (i.e., they correspond to transitive
