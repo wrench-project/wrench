@@ -59,7 +59,7 @@ echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job
 ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/wrench-example-batch-pilot-job ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/four_hosts_scratch.xml
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow${normal}"
-${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow ${INSTALL_DIR}/workflow_api/real-workflow-example/cloud_batch_platform.xml ${INSTALL_DIR}/workflow_api/real-workflow-example/genome.json 
+${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow ${INSTALL_DIR}/workflow_api/real-workflow-example/cloud_batch_platform.xml ${INSTALL_DIR}/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json 
 
 echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-universe${normal}"
 ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-universe ${INSTALL_DIR}/workflow_api/condor-grid-example/condor-grid-hosts.xml
