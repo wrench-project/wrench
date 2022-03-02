@@ -208,8 +208,7 @@ private:
             expected_makespan += a->getSleepTime();
         }
 
-        job->printTaskMap(); // coverage
-        job->printActionDependencies(); // coverage
+
 
         // Submit the job
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -239,6 +238,10 @@ private:
             throw std::runtime_error("Unexpected makespan");
         }
 
+        close(2);
+        job->printTaskMap(); // coverage
+        job->printActionDependencies(); // coverage
+        
         return 0;
     }
 };
