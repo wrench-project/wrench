@@ -32,7 +32,6 @@ namespace wrench {
      * @param hostname: the name of the host on which the service should run
      * @param mount_points: the mount points of each disk usable by the service
      * @param service_name: the name of the storage service
-     * @param mailbox_name_prefix: the mailbox name prefix
      *
      * @throw std::invalid_argument
      */
