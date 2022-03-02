@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     std::cerr << "Loading workflow->.." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
     if (ends_with(workflow_file,"json")) {
-        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
+        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
     } else {
         std::cerr << "Workflow file name must end with '.json'" << std::endl;
         exit(1);
@@ -175,6 +175,9 @@ int main(int argc, char **argv) {
             return 0;
         }
     }
+
+    /* Enable some output time stamps */
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
