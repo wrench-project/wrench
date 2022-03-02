@@ -24,11 +24,14 @@
 #include <vector>
 #include <cmath>
 #include <unordered_set>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+using namespace boost::posix_time;
 
 #define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_output,
-"Log category for Simulation Output");
+                    "Log category for Simulation Output");
 
 namespace wrench {
     /******************/
@@ -709,38 +712,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Writes a JSON graph representation of the Workflow to a file.
-     * 
-     * A node is added for each WorkflowTask and DataFile. A WorkflowTask will have the type "task" and
-     *  a DataFile will have the type "file". A directed link is added for each dependency in the Workflow.
-     *
-     * <pre>
-     * {
-     *      "workflow_graph": {
-     *          vertices: [
-     *              {
-     *                  type: <"task">,
-     *                  id: <string>,
-     *                  flops: <double>,
-     *                  min_cores: <unsigned_long>,
-     *                  max_cores: <unsigned_long>,
-     *                  memory_manager_service: <double>,
-     *              },
-     *              {
-     *                  type: <"file">,
-     *                  id: <string>,
-     *                  size: <double>
-     *              }, . . .
-     *          ],
-     *          edges: [
-     *              {
-     *                  source: <string>,
-     *                  target: <string>
-     *              }, . . .
-     *          ]
-     *      }
-     *  }
-     *  </pre>
+     * @brief Writes a JSON graph representation of the Workflow to a file, in the WfFormat format
+     *        which is defined at: https://wfcommons.org/format.
      *
      * @param workflow: a pointer to the workflow
      * @param file_path: the path to write the file
@@ -758,69 +731,77 @@ namespace wrench {
         }
 
         // schema
-        nlohmann::json vertices;
-        nlohmann::json edges;
+        nlohmann::json tasks = nlohmann::json::array();
 
         // add the task vertices
         for (const auto &task : workflow->getTasks()) {
-            vertices.push_back({
-                                       {"type",                   "task"},
-                                       {"id",                     task->getID()},
-                                       {"flops",                  task->getFlops()},
-                                       {"min_cores",              task->getMinNumCores()},
-                                       {"max_cores",              task->getMaxNumCores()},
-                                       {"memory_manager_service", task->getMemoryRequirement()}
-                               });
-        }
 
-        // add the file vertices
-        for (const auto &file : workflow->getFileMap()) {
-            vertices.push_back({
-                                       {"type", "file"},
-                                       {"id",   file.first},
-                                       {"size", file.second->getSize()}
-                               });
-        }
-
-        // add the edges
-        for (const auto &task : workflow->getTasks()) {
-            // create edges between input files (if any) and the current task
-            for (const auto &input_file : task->getInputFiles()) {
-                edges.push_back({
-                                        {"source", input_file->getID()},
-                                        {"target", task->getID()}
+            nlohmann::json files = nlohmann::json::array();
+            for (const auto &f : task->getInputFiles()) {
+                files.push_back({
+                                        {"link",            "input"},
+                                        {"name",            f->getID()},
+                                        {"size",            f->getSize()}
+                                });
+            }
+            for (const auto &f : task->getOutputFiles()) {
+                files.push_back({
+                                        {"link",            "output"},
+                                        {"name",            f->getID()},
+                                        {"size",            f->getSize()}
                                 });
             }
 
-            bool has_output_files = not task->getOutputFiles().empty();
-            bool has_children = task->getNumberOfChildren() > 0;
-
-            if (has_output_files) {
-                // create the edges between current task and its output files (if any)
-                for (const auto &output_file : task->getOutputFiles()) {
-                    edges.push_back({{"source", task->getID()},
-                                     {"target", output_file->getID()}});
-                }
-            } else if (has_children) {
-                // then create the edges from the current task to its children tasks (if it has not output files)
-                for (const auto &child : workflow->getTaskChildren(task)) {
-                    edges.push_back({
-                                            {"source", task->getID()},
-                                            {"target", child->getID()}});
-                }
+            nlohmann::json parents = nlohmann::json::array();
+            for (const auto &parent : task->getParents()) {
+                parents.push_back(parent->getID());
             }
+
+            nlohmann::json children = nlohmann::json::array();
+            for (const auto &child : task->getChildren()) {
+                children.push_back(child->getID());
+            }
+
+            double runtime;
+            unsigned long num_cores;
+            std::string machine;
+            if (task->getState() == WorkflowTask::State::COMPLETED) {
+                runtime = task->getEndDate() - task->getStartDate();
+                num_cores = task->getNumCoresAllocated();
+                machine = task->getExecutionHost();
+            } else {
+                runtime = -1;
+                num_cores = task->getMinNumCores();
+                machine = "";
+            }
+            tasks.push_back({
+                                    {"type",                   "compute"},
+                                    {"name",                   task->getID()},
+                                    {"runtime",                runtime},
+                                    {"cores",                  num_cores},
+                                    {"memory",                 task->getMemoryRequirement()},
+                                    {"parents",                parents},
+                                    {"children",               children},
+                                    {"files",                  files},
+                                    {"machine",                machine}
+                            });
         }
 
-        nlohmann::json workflow_task_graph;
-        workflow_task_graph["vertices"] = vertices;
-        workflow_task_graph["edges"] = edges;
-        nlohmann::json workflow_graph;
-        workflow_graph["workflow_graph"] = workflow_task_graph;
-        workflow_graph_json_part = workflow_task_graph;
+        nlohmann::json json_workflow;
+        json_workflow["executedAt"] = to_iso_extended_string(second_clock::universal_time());
+        json_workflow["makespan"] = workflow->getCompletionDate();
+        json_workflow["tasks"] = tasks;
+
+
+        nlohmann::json json_object;
+        json_object["name"] = "WRENCH-generated workflow";
+        json_object["schemaVersion"] = "1.2";
+        json_object["workflow"] = json_workflow;
+        workflow_graph_json_part = json_workflow;
 
         if (writing_file) {
             std::ofstream output(file_path);
-            output << std::setw(4) << nlohmann::json(workflow_graph) << std::endl;
+            output << std::setw(4) << nlohmann::json(json_object) << std::endl;
             output.close();
         }
     }
@@ -1282,7 +1263,7 @@ namespace wrench {
      *
      * @brief Writes a JSON file containing disk operation information as a JSON array.
      *
-     * >>>>>NOTE<<<<< The timestamps the JSON is generated from are disabled by default.
+     * >>>>NOTE<<<< The timestamps the JSON is generated from are disabled by default.
      * Enable them with SimulationOutput::enableDiskTimestamps() to use.
      *
      * The JSON array has the following format:
@@ -1538,7 +1519,7 @@ namespace wrench {
      * @brief Destructor
      */
     SimulationOutput::~SimulationOutput() {
-    for (auto t : this->traces) {
+        for (auto t : this->traces) {
             delete t.second;
         }
         this->traces.clear();
@@ -1549,7 +1530,7 @@ namespace wrench {
      */
     SimulationOutput::SimulationOutput() {
         // Disable everything by default!
-        
+
         // By default disable all task timestamps
         this->setEnabled<SimulationTimestampTaskStart>(false);
         this->setEnabled<SimulationTimestampTaskFailure>(false);
