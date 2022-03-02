@@ -85,7 +85,7 @@ namespace wrench {
         /* Let's create a set of "post" file copy operations to be performed
         * AFTER the task can run */
         std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation> , std::shared_ptr<FileLocation>  >> post_file_copies;
-        pre_file_copies.emplace_back(outfile_1, FileLocation::LOCATION(storage_service2), FileLocation::LOCATION(storage_service1));
+        post_file_copies.emplace_back(outfile_1, FileLocation::LOCATION(storage_service2), FileLocation::LOCATION(storage_service1));
 
         /* Let's create a set of file deletion operations to be performed
         * AFTER the "post" file copies have been performed */

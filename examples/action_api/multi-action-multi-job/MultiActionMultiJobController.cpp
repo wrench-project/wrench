@@ -127,9 +127,9 @@ namespace wrench {
         WRENCH_INFO("Submitting job %s to the bare-metal compute service", job2->getName().c_str());
         job_manager->submitJob(job2, bm_cs);
 
-        /* Submit job3 to the VM */
+        /* Submit job3 to the bare-metal service */
         WRENCH_INFO("Submitting job %s to the VM", job3->getName().c_str());
-        job_manager->submitJob(job3, my_vm_cs);
+        job_manager->submitJob(job3, bm_cs);
 
         /* Wait for an react fo execution events. We should be getting 3 "job completed" events */
         int num_events = 0;

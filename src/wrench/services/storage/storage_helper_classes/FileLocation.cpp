@@ -189,6 +189,7 @@ namespace wrench {
     std::string FileLocation::sanitizePath(std::string path) {
 
         if (path == "/") return "/";  // make the common case fast
+
         if (path.empty()) {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
