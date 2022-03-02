@@ -1543,161 +1543,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     t2->setNumCoresAllocated(20);
 
     nlohmann::json expected_json5 = R"(
-    {
-        "platform": {
-            "edges": [
-                {
-                    "source": {
-                        "id": "host1",
-                        "type": "host"
-                    },
-                    "target": {
-                        "id": "1",
-                        "type": "link"
-                    }
-                },
-                {
-                    "source": {
-                        "id": "1",
-                        "type": "link"
-                    },
-                    "target": {
-                        "id": "host2",
-                        "type": "host"
-                    }
-                }
-            ],
-            "routes": [
-                {
-                    "latency": 1e-06,
-                    "route": [
-                        "1"
-                    ],
-                    "source": "host1",
-                    "target": "host2"
-                }
-            ],
-            "vertices": [
-                {
-                    "cluster_id": "host1",
-                    "cores": 10,
-                    "flop_rate": 1.0,
-                    "id": "host1",
-                    "memory_manager_service": 10.0,
-                    "type": "host"
-                },
-                {
-                    "cluster_id": "host2",
-                    "cores": 20,
-                    "flop_rate": 1.0,
-                    "id": "host2",
-                    "memory_manager_service": 20.0,
-                    "type": "host"
-                },
-                {
-                    "bandwidth": 125000000.0,
-                    "id": "1",
-                    "latency": 1e-06,
-                    "type": "link"
-                }
-            ]
-        },
-        "workflow_execution": {
-            "tasks": [
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 20,
-                        "flop_rate": 1.0,
-                        "hostname": "host2",
-                        "memory_manager_service": 20.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 10,
-                    "read": null,
-                    "task_id": "task1",
-                    "color": "",
-                    "terminated": -1.0,
-                    "whole_task": {
-                        "end": 3.0,
-                        "start": 2.0
-                    },
-                    "write": null
-                },
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 10,
-                        "flop_rate": 1.0,
-                        "hostname": "host1",
-                        "memory_manager_service": 10.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 8,
-                    "read": null,
-                    "task_id": "task1",
-                    "color": "",
-                    "terminated": -1.0,
-                    "whole_task": {
-                        "end": 2.0,
-                        "start": 1.0
-                    },
-                    "write": null
-                },
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 20,
-                        "flop_rate": 1.0,
-                        "hostname": "host2",
-                        "memory_manager_service": 20.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 20,
-                    "read": null,
-                    "task_id": "task2",
-                    "color": "",
-                    "terminated": -1.0,
-                    "whole_task": {
-                        "end": 4.0,
-                        "start": 3.0
-                    },
-                    "write": null
-                }
-            ]
-        },
-        "workflow_graph": {
-            "edges": null,
-            "vertices": [
-                {
-                    "flops": 1.0,
-                    "id": "task1",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task2",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                }
-            ]
-        }
-    }
-    )"_json;
+    {"platform":{"edges":[{"source":{"id":"host1","type":"host"},"target":{"id":"1","type":"link"}},{"source":{"id":"1","type":"link"},"target":{"id":"host2","type":"host"}}],"routes":[{"latency":1e-06,"route":["1"],"source":"host1","target":"host2"}],"vertices":[{"bandwidth":125000000.0,"id":"1","latency":1e-06,"type":"link"},{"cluster_id":"host1","cores":10,"flop_rate":1.0,"id":"host1","memory_manager_service":10.0,"type":"host"},{"cluster_id":"host2","cores":20,"flop_rate":1.0,"id":"host2","memory_manager_service":20.0,"type":"host"}]},"workflow_execution":{"tasks":[{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":10,"flop_rate":1.0,"hostname":"host1","memory_manager_service":10.0},"failed":-1.0,"num_cores_allocated":8,"read":null,"task_id":"task1","terminated":-1.0,"whole_task":{"end":2.0,"start":1.0},"write":null},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":10,"read":null,"task_id":"task1","terminated":-1.0,"whole_task":{"end":3.0,"start":2.0},"write":null},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":20,"read":null,"task_id":"task2","terminated":-1.0,"whole_task":{"end":4.0,"start":3.0},"write":null}]},"workflow_graph":{"executedAt":"2022-03-02T06:58:45","makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}})"_json;
 
     EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow, unified_json_file_path, true, true, true, false, false));
 
@@ -1716,12 +1562,15 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     std::sort(result_json["workflow_execution"]["tasks"].begin(), result_json["workflow_execution"]["tasks"].end(), compareStartTimes);
     std::sort(expected_json5["workflow_execution"]["tasks"].begin(), expected_json5["workflow_execution"]["tasks"].end(), compareStartTimes);
+//
+//    std::sort(result_json["workflow_graph"]["edges"].begin(), result_json["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(result_json["workflow_graph"]["vertices"].begin(), result_json["workflow_graph"]["vertices"].end(), compareNodes);
+//
+//    std::sort(expected_json5["workflow_graph"]["edges"].begin(), expected_json5["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(expected_json5["workflow_graph"]["vertices"].begin(), expected_json5["workflow_graph"]["vertices"].end(), compareNodes);
 
-    std::sort(result_json["workflow_graph"]["edges"].begin(), result_json["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(result_json["workflow_graph"]["vertices"].begin(), result_json["workflow_graph"]["vertices"].end(), compareNodes);
-
-    std::sort(expected_json5["workflow_graph"]["edges"].begin(), expected_json5["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(expected_json5["workflow_graph"]["vertices"].begin(), expected_json5["workflow_graph"]["vertices"].end(), compareNodes);
+    expected_json5["workflow_graph"]["executedAt"] = "now";
+    result_json["workflow_graph"]["executedAt"] = "now";
 
     EXPECT_TRUE(result_json == expected_json5);
 
