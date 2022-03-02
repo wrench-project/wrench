@@ -17,7 +17,7 @@ if (ENABLE_MESSAGE_MANAGER)
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS date_time)
 find_package(SimGrid REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
