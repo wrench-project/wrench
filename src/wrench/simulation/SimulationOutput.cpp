@@ -768,7 +768,7 @@ namespace wrench {
             unsigned long num_cores;
             std::string machine;
             if (task->getState() == WorkflowTask::State::COMPLETED) {
-                runtime = task->getEndDate() - task->getStartDate();
+                runtime = task->getComputationEndDate() - task->getComputationStartDate();
                 num_cores = task->getNumCoresAllocated();
                 machine = task->getExecutionHost();
                 used_machines.insert(machine);
@@ -795,7 +795,7 @@ namespace wrench {
         for (auto const &m : used_machines) {
             double memory = Simulation::getHostMemoryCapacity(m);
             unsigned long num_cores = Simulation::getHostNumCores(m);
-            double flop_rate = Simulation::getHostMemoryCapacity(m);
+            double flop_rate = Simulation::getHostFlopRate(m);
             double ghz_rate = flop_rate / (1000.0 * 1000.0 * 1000.0);
             machines.push_back( {
                                         {"nodeName",        m},
