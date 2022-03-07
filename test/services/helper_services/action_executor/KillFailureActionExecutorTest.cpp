@@ -313,7 +313,7 @@ TEST_F(KillFailActionExecutorTest, FailFileCopy) {
 }
 
 TEST_F(KillFailActionExecutorTest, KillFileDelete) {
-loopThroughTestCases({0.0, 0.02242927216494845083}, true, "file_delete");
+    loopThroughTestCases({0.0, 0.02242927216494845083}, true, "file_delete");
 }
 
 TEST_F(KillFailActionExecutorTest, FailFileDelete) {
