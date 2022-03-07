@@ -145,6 +145,31 @@ namespace wrench {
 
 //        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
 
+
+        unsigned long num_threads = work_per_thread.size();
+        double max_work = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
+        double min_work = *(std::min_element(work_per_thread.begin(), work_per_thread.end()));
+
+        try {
+            // Overhead
+            S4U_Simulation::sleep(num_threads * this->thread_creation_overhead);
+            if (num_threads == 1) {
+                simgrid::s4u::this_actor::execute(max_work);
+            } else {
+                // Launch compute-heavy thread
+                auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(max_work);
+                // Launch all other threads
+                simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), max_work - min_work,
+                                                         num_threads - 1);
+                // Wait for the compute-heavy thread
+                bottleneck_thread->wait();
+            }
+        } catch (std::exception &e) {
+            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
+        }
+        WRENCH_INFO("All compute threads have completed successfully");
+
+#if 0
         this->compute_threads.clear();
         WRENCH_INFO("Launching %ld compute threads", work_per_thread.size());
         // Create a compute thread to run the computation on each core
@@ -203,9 +228,11 @@ namespace wrench {
         this->compute_threads.clear();
 
         if (!success) {
-            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
+                        throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
         }
-        WRENCH_INFO("All compute threads have completed successfully");
+                WRENCH_INFO("All compute threads have completed successfully");
+
+#endif
     }
 
 }
