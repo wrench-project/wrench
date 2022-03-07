@@ -113,12 +113,14 @@ namespace wrench {
      * @param action_executor:  the executor that executes this action
      */
     void ComputeAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+#if 0
         action_executor->acquireDaemonLock();
         for (auto const &ct : this->compute_threads) {
             // Should work even if already dead
             ct->kill();
         }
         action_executor->releaseDaemonLock();
+#endif
     }
 
     /**
@@ -146,7 +148,7 @@ namespace wrench {
 //        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
 
 
-        unsigned long num_threads = work_per_thread.size();
+        int num_threads = (int)work_per_thread.size();
         double max_work = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
         double min_work = *(std::min_element(work_per_thread.begin(), work_per_thread.end()));
 
@@ -159,11 +161,14 @@ namespace wrench {
                 // Launch compute-heavy thread
                 auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(max_work);
                 // Launch all other threads
-                simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), max_work - min_work,
+                simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), min_work,
                                                          num_threads - 1);
                 // Wait for the compute-heavy thread
                 bottleneck_thread->wait();
             }
+        } catch (simgrid::CancelException &e) {
+            // I was killed
+            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
         } catch (std::exception &e) {
             throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
         }
