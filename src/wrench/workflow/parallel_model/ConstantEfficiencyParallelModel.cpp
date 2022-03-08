@@ -36,19 +36,35 @@ namespace wrench {
         return this->efficiency;
     }
 
-    /**
-     * @brief Returns the amount of work each thread much perform
-     * @param total_work: total amount of work
-     * @param num_threads: the number of threads
-     * @return a vector of work amounts
-     */
-    std::vector<double> ConstantEfficiencyParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+//    /**
+//     * @brief Returns the amount of work each thread much perform
+//     * @param total_work: total amount of work
+//     * @param num_threads: the number of threads
+//     * @return a vector of work amounts
+//     */
+//    std::vector<double> ConstantEfficiencyParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+//
+//        double thread_work = (total_work) / ((double)num_threads * this->efficiency);
+//        std::vector<double> work_per_threads;
+//        for (unsigned int i=0; i < num_threads; i++) {
+//            work_per_threads.push_back(thread_work);
+//        }
+//        return work_per_threads;
+//    }
 
-        double thread_work = (total_work) / ((double)num_threads * this->efficiency);
-        std::vector<double> work_per_threads;
-        for (unsigned int i=0; i < num_threads; i++) {
-            work_per_threads.push_back(thread_work);
-        }
-        return work_per_threads;
+
+    /**
+     * @brief Returns the purely sequential amount of work
+     * @param total_work: total amount of work (in flops)
+     * @param num_threads: number of threads
+     * @return an amount of work (in flops)
+     */
+    double ConstantEfficiencyParallelModel::getPurelySequentialWork(double total_work, unsigned long num_threads) {
+        return 0;
     }
+
+    double ConstantEfficiencyParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
+        return (total_work) / ((double)num_threads * this->efficiency);
+    }
+
 }
