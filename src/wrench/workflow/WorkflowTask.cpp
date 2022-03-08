@@ -128,6 +128,18 @@ namespace wrench {
     }
 
     /**
+     * @brief Set the number of flops of the task (to be used only in very specific
+     * cases in which it is guaranteed that changing a task's work after that task
+     * has been created is a valid thing to do)
+     *
+     * @param flops: the number of flops
+     */
+    void WorkflowTask::setFlops(double flops) {
+        this->flops = flops;
+    }
+
+
+    /**
      * @brief Get the minimum number of cores required for running the task
      *
      * @return a number of cores

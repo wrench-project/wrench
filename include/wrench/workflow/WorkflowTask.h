@@ -37,6 +37,8 @@ namespace wrench {
 
         double getFlops() const;
 
+        void setFlops(double flops);
+
         unsigned long getMinNumCores() const;
 
         unsigned long getMaxNumCores() const;
