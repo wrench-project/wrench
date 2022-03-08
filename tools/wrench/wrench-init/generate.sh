@@ -5,9 +5,9 @@ if [ $# -ne 2 ]; then
         exit 0
 fi
 
-mkdir $2"/tools/" || true
-mkdir $2"/tools/wrench/" || true
-mkdir $2"/tools/wrench/wrench-init/" || true
+mkdir -p $2"/tools/" || true
+mkdir -p $2"/tools/wrench/" || true
+mkdir -p $2"/tools/wrench/wrench-init/" || true
 
 # Redirect output
 exec 1> $2"/tools/wrench/wrench-init/wrench-init"
