@@ -13,6 +13,7 @@
 #include <wrench/action/FileReadAction.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/exceptions/ExecutionException.h>
 
 #include <utility>
@@ -58,7 +59,7 @@ namespace wrench {
      */
     void FileReadAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread overhead
-        Simulation::sleep(this->thread_creation_overhead);
+        Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File read
         for (unsigned long i=0; i < this->file_locations.size(); i++) {
             try {
