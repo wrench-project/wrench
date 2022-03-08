@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/REST_API_generated_code.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND mkdir -p ${CMAKE_CURRENT_SOURCE_DIR}/doc/
         COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_REST_API.py ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/doc/index.html
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         COMMENT "Generating REST API code and documentation"
