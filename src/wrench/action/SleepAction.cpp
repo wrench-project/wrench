@@ -10,6 +10,7 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench/action/Action.h>
 #include <wrench/action/SleepAction.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
 
 #include <utility>
@@ -40,7 +41,7 @@ namespace wrench {
      */
     void SleepAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread creation overhead
-        Simulation::sleep(this->thread_creation_overhead);
+        Simulation::sleep(action_executor->getThreadCreationOverhead());
         // Sleeping
         S4U_Simulation::sleep(this->sleep_time);
     }
