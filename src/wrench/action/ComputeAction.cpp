@@ -101,7 +101,7 @@ namespace wrench {
 
         double sequential_work = this->getParallelModel()->getPurelySequentialWork(this->getFlops(), num_threads);
         double parallel_per_thread_work = this->getParallelModel()->getParallelPerThreadWork(this->getFlops(), num_threads);
-        if (this->simulate_computation_as_sleep) {
+        if (action_executor->getSimulateComputationAsSleep()) {
             this->simulateComputationAsSleep(action_executor, num_threads, sequential_work, parallel_per_thread_work);
         } else {
             this->simulateComputationWithComputeThreads(action_executor, num_threads, sequential_work, parallel_per_thread_work);
@@ -130,7 +130,7 @@ namespace wrench {
   */
     void ComputeAction::simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
-        S4U_Simulation::sleep((double)(num_threads) * this->thread_creation_overhead);
+        S4U_Simulation::sleep((double)(num_threads) * action_executor->getThreadCreationOverhead());
         // Then sleep for the computation duration
         double sleep_time = (sequential_work + parallel_per_thread_work) / Simulation::getFlopRate();
         Simulation::sleep(sleep_time);
@@ -146,7 +146,7 @@ namespace wrench {
 
         try {
             // Overhead
-            S4U_Simulation::sleep((int)num_threads * this->thread_creation_overhead);
+            S4U_Simulation::sleep((int)num_threads * action_executor->getThreadCreationOverhead());
             if (num_threads == 1) {
                 simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
             } else {
