@@ -99,12 +99,12 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("Invalid resource specs for Action Executor")));
         }
 
-        std::vector<double> work_per_thread = this->getParallelModel()->getWorkPerThread(
-                this->getFlops(), num_threads);
+        double sequential_work = this->getParallelModel()->getPurelySequentialWork(this->getFlops(), num_threads);
+        double parallel_per_thread_work = this->getParallelModel()->getParallelPerThreadWork(this->getFlops(), num_threads);
         if (this->simulate_computation_as_sleep) {
-            this->simulateComputationAsSleep(action_executor, work_per_thread);
+            this->simulateComputationAsSleep(action_executor, num_threads, sequential_work, parallel_per_thread_work);
         } else {
-            this->simulateComputationWithComputeThreads(action_executor, work_per_thread);
+            this->simulateComputationWithComputeThreads(action_executor, num_threads, sequential_work, parallel_per_thread_work);
         }
     }
 
@@ -128,12 +128,11 @@ namespace wrench {
   * @param action_executor:  the executor that executes this action
   * @param work_per_thread: amount of work (in flop) that each thread should do
   */
-    void ComputeAction::simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, std::vector<double> &work_per_thread) {
-        double max_work_per_thread = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
+    void ComputeAction::simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
-        S4U_Simulation::sleep((double) (work_per_thread.size()) * this->thread_creation_overhead);
+        S4U_Simulation::sleep((double)(num_threads) * this->thread_creation_overhead);
         // Then sleep for the computation duration
-        double sleep_time = max_work_per_thread / Simulation::getFlopRate();
+        double sleep_time = (sequential_work + parallel_per_thread_work) / Simulation::getFlopRate();
         Simulation::sleep(sleep_time);
     }
 
@@ -143,26 +142,18 @@ namespace wrench {
      *
      * @param work_per_thread: amount of work (in flop) that each thread should do
      */
-    void ComputeAction::simulateComputationWithComputeThreads(std::shared_ptr<ActionExecutor> action_executor, vector<double> &work_per_thread) {
-
-//        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
-
-
-        int num_threads = (int)work_per_thread.size();
-        double max_work = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
-        double min_work = *(std::min_element(work_per_thread.begin(), work_per_thread.end()));
+    void ComputeAction::simulateComputationWithComputeThreads(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
 
         try {
             // Overhead
-            S4U_Simulation::sleep(num_threads * this->thread_creation_overhead);
+            S4U_Simulation::sleep((int)num_threads * this->thread_creation_overhead);
             if (num_threads == 1) {
-                simgrid::s4u::this_actor::execute(max_work);
+                simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
             } else {
                 // Launch compute-heavy thread
-                auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(max_work);
+                auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
                 // Launch all other threads
-                simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), min_work,
-                                                         num_threads - 1);
+                simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work,(int)num_threads - 1);
                 // Wait for the compute-heavy thread
                 bottleneck_thread->wait();
             }
