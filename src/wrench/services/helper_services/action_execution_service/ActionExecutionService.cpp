@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2021. The WRENCH Team.
+ * Copyright (c) 2017-2022. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,13 +100,11 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Submit an action to the action execution service service
      * @param action: an action
      */
     void ActionExecutionService::submitAction(const std::shared_ptr<Action> &action) {
-
         assertServiceIsUp();
 
         if (action->getState() != Action::State::READY) {
@@ -278,9 +276,7 @@ namespace wrench {
         }
 
         this->parent_service = parent_service;
-
     }
-
 
     /**
      * @brief Main method of the daemon
@@ -288,7 +284,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int ActionExecutionService::main() {
-
         if (this->parent_service == nullptr) {
             throw std::runtime_error("ActionExecutionService::main(): parent service not set - please call setParentService before starting this service");
         }
@@ -690,7 +685,6 @@ namespace wrench {
 
     /**
      * @brief Terminate the daemon, dealing with pending/running actions
-     *
      */
     void ActionExecutionService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
         this->setStateToDown();
@@ -718,7 +712,6 @@ namespace wrench {
         if (send_failure_notifications) {
             throw std::runtime_error("ActionExecutionService::terminate(): NEED TO IMPLEMENT FAILURE NOTIFICATIONS???");
         }
-
     }
 
     /**
@@ -789,12 +782,10 @@ namespace wrench {
     }
 
     /**
-    * @brief Process an action executor failure
-    * @param executor: the action executor
-    */
+     * @brief Process an action executor failure
+     * @param executor: the action executor
+     */
     void ActionExecutionService::processActionExecutorFailure(std::shared_ptr<ActionExecutor> executor) {
-
-
         auto action = executor->getAction();
         auto cause = action->getFailureCause();
 
@@ -827,7 +818,6 @@ namespace wrench {
     void ActionExecutionService::processActionTerminationRequest(std::shared_ptr<Action> action,
                                                                  simgrid::s4u::Mailbox *answer_mailbox,
                                                                  ComputeService::TerminationCause termination_cause) {
-
         // If the action doesn't exit, we reply right away
         if (this->all_actions.find(action) == this->all_actions.end()) {
             WRENCH_INFO(
@@ -888,7 +878,6 @@ namespace wrench {
      * @return true if the action can run
      */
     bool ActionExecutionService::actionCanRun(std::shared_ptr<Action> action) {
-
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
 
         // No service-specific argument
@@ -980,15 +969,13 @@ namespace wrench {
                 new ActionExecutionServiceSubmitActionAnswerMessage(true, nullptr, 0.0));
     }
 
-
-
-/**
- * @brief Determine whether there is at least one host with (currently) available resources
- * @param num_cores: the desired number of cores
- * @param ram: the desired RAM
- *
- * @return true or false
- */
+    /**
+     * @brief Determine whether there is at least one host with (currently) available resources
+     * @param num_cores: the desired number of cores
+     * @param ram: the desired RAM
+     *
+     * @return true or false
+     */
     bool ActionExecutionService::IsThereAtLeastOneHostWithAvailableResources(unsigned long num_cores,
                                                                              double ram) {
         bool enough_ram = false;
@@ -1089,11 +1076,11 @@ namespace wrench {
         }
     }
 
-/**
- * @brief Method to make sure that property specs are valid
- *
- * @throw std::invalid_argument
- */
+    /**
+     * @brief Method to make sure that property specs are valid
+     *
+     * @throw std::invalid_argument
+     */
     void ActionExecutionService::validateProperties() {
         bool success = true;
 
@@ -1102,7 +1089,6 @@ namespace wrench {
             throw std::invalid_argument("ActionExecutionService: Invalid properties");
         }
     }
-
 
     /**
      * @brief Process a crash of an ActionExecutor (although some work may has been done, we'll just
@@ -1144,10 +1130,10 @@ namespace wrench {
         }
     }
 
-/**
- * @brief A helper method to checks if all compute resources are down
- * @return true or false
- */
+    /**
+     * @brief A helper method to checks if all compute resources are down
+     * @return true or false
+     */
     bool ActionExecutionService::areAllComputeResourcesDownWithNoActionExecutorRunning() {
         bool all_resources_down = true;
         for (auto const &h : this->compute_resources) {
@@ -1183,6 +1169,4 @@ namespace wrench {
     std::shared_ptr<Service> ActionExecutionService::getParentService() const {
         return this->parent_service;
     }
-
-
 }
