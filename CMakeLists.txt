@@ -182,6 +182,8 @@ set(HEADER_FILES
         include/wrench/execution_controller/ExecutionController.h
         include/wrench/execution_controller/ExecutionControllerMessage.h
         include/wrench/data_file/DataFile.h
+        include/wrench/services/storage/xrootd/XRootD.h
+        include/wrench/services/storage/xrootd/Node.h
         )
 
 # source files
@@ -347,6 +349,8 @@ set(SOURCE_FILES
         src/wrench/execution_controller/ExecutionController.cpp
         src/wrench/execution_controller/ExecutionControllerMessage.cpp
         src/wrench/data_file/DataFile.cpp
+        src/wrench/services/storage/xrootd/XRootD.cpp
+        src/wrench/services/storage/xrootd/Node.cpp
         )
 
 # test files
