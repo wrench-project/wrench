@@ -17,20 +17,24 @@
 #include "wrench/data_file/DataFile.h"
 namespace wrench {
     namespace XRootD{
-        class StorageServer;
-        class Supervisor;
+        //class StorageServer;
+        //class Supervisor;
         class Node;
 
         class XRootD{
         public:
-            std::shared_ptr<Node> createStorageServer(const std::string& hostname,const std::string& mount_points);
+            std::shared_ptr<Node> createStorageServer(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
-            std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,const std::string& mount_points);
+            std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
         private:
+            friend Node;
+            std::vector<std::shared_ptr<Node>> getFileNodes(std::shared_ptr<DataFile> file);
+            std::shared_ptr<Node> createNode(const std::string& hostname);
+
             std::vector<std::shared_ptr<Node>> nodes;
-            std::vector<std::shared_ptr<StorageServer>> dataservers;
-            std::vector<std::shared_ptr<Supervisor>> supervisors;
+            std::vector<std::shared_ptr<Node>> dataservers;
+            std::vector<std::shared_ptr<Node>> supervisors;
             std::unordered_map<std::shared_ptr<DataFile> ,std::vector<std::shared_ptr<Node>>> files;
         };
     }
