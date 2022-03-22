@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#include <pugixml.hpp>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 #include <wrench/simulation/Simulation.h>

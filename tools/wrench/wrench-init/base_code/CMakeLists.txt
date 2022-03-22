@@ -27,9 +27,6 @@ set(SOURCE_FILES
 # generating the executable
 add_executable(my-wrench-simulator ${SOURCE_FILES})
 
-# PugiXML, needed if using the WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY
-#find_library(PUGIXML_LIBRARY NAMES pugixml)
-
 # Specify libraries to link
 if (ENABLE_BATSCHED)
     target_link_libraries(my-wrench-simulator
@@ -37,7 +34,6 @@ if (ENABLE_BATSCHED)
             ${SimGrid_LIBRARY}
             ${Boost_LIBRARIES}
 #            ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
-#            ${PUGIXML_LIBRARY}
             -lzmq)
 else()
     target_link_libraries(my-wrench-simulator
@@ -45,7 +41,6 @@ else()
             ${SimGrid_LIBRARY}
             ${Boost_LIBRARIES}
 #            ${WRENCH_WFCOMMONS_WORKFLOW_PARSER_LIBRARY}
-#            ${PUGIXML_LIBRARY}
             )
 endif()
 
