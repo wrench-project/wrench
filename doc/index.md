@@ -3,7 +3,7 @@ Overview                        {#mainpage}
 
 [TOC]
 
-[WRENCH](http://wrench-project.org) is an open-source framework design to
+[WRENCH](http://wrench-project.org) is an open-source framework designed to
 make it easy for users to develop accurate and scalable simulators of
 distributed computing applications, systems, and platforms. It has been
 used for research, development, and education.  WRENCH capitalizes on
