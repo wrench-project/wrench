@@ -35,12 +35,17 @@ namespace wrench {
      *        provides access to their resources.
      *
      *        One can think of this as a simple service that allows the user to
-     *        run tasks and to specify for each task on which host it should run
+     *        run jobs and to specify for each job on which host it should run
      *        and with how many cores. If no host is specified, the service will pick
      *        the least loaded host. If no number of cores is specified, the service
      *        will use as many cores as possible.  The service
      *        will make sure that the RAM capacity of a host is not exceeded by possibly
-     *        delaying task executions until enough RAM is available.
+     *        delaying job executions until enough RAM is available. Note that if the submitted
+     *        jobs require a total number of cores larger than available, say, on a particular
+     *        host, then these jobs will simply time-share the cores. In other words, this
+     *        service does not provide space-sharing of hosts/cores
+     *        (unlike, for instance, a wrench::BatchComputeService).
+     *
      */
     class BareMetalComputeService : public ComputeService {
 
