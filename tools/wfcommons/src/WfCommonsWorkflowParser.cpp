@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <pugixml.hpp>
 #include <nlohmann/json.hpp>
 
 WRENCH_LOG_CATEGORY(wfcommons_workflow_parser, "Log category for WfCommonsWorkflowParser");

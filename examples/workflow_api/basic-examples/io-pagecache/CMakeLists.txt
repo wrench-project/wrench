@@ -28,9 +28,9 @@ add_dependencies(wrench-example-io-pagecache-single wrench-example-io-pagecache-
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-single wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-single wrench ${SimGrid_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-single wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-single wrench ${SimGrid_LIBRARY})
 endif()
 
 #install(TARGETS wrench-example-io-pagecache-single DESTINATION bin)
@@ -52,9 +52,9 @@ add_dependencies(wrench-example-io-pagecache-multi wrench-example-io-pagecache-f
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-multi wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-multi wrench ${SimGrid_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-multi wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-multi wrench ${SimGrid_LIBRARY})
 endif()
 
 #install(TARGETS wrench-example-io-pagecache-multi DESTINATION bin)
@@ -76,9 +76,9 @@ add_dependencies(wrench-example-io-pagecache-nfs wrench-example-io-pagecache-fil
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-nfs wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nfs wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-nfs wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nfs wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY})
 endif()
 
 #install(TARGETS wrench-example-io-pagecache-nfs DESTINATION bin)
@@ -100,9 +100,9 @@ add_dependencies(wrench-example-io-pagecache-nighres wrench-example-io-pagecache
 
 if (ENABLE_BATSCHED)
     find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(wrench-example-io-pagecache-nighres wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY} ${ZMQ_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nighres wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${ZMQ_LIBRARY})
 else()
-    target_link_libraries(wrench-example-io-pagecache-nighres wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+    target_link_libraries(wrench-example-io-pagecache-nighres wrenchwfcommonsworkflowparser wrench ${SimGrid_LIBRARY})
 endif()
 
 #install(TARGETS wrench-example-io-pagecache-nighres DESTINATION bin)
