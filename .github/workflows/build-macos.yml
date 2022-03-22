@@ -19,7 +19,7 @@ jobs:
         run: |
           clang -v
           brew update
-          brew install pugixml nlohmann-json googletest boost
+          brew install nlohmann-json googletest boost
       
       - name: Install Simgrid
         run: |
