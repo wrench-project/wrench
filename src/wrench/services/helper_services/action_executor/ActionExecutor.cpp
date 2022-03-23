@@ -28,6 +28,8 @@ namespace wrench {
      * @param hostname: the name of the host on which the action executor will run
      * @param num_cores: the number of cores
      * @param ram_footprint: the RAM footprint
+     * @param thread_creation_overhead: the thread creation overhead in seconds
+     * @param simulate_computation_as_sleep: whether to simulate computation as sleep
      * @param callback_mailbox: the callback mailbox to which a "action done" or "action failed" message will be sent
      * @param action: the action to perform
      * @param action_execution_service: the parent action execution service
@@ -36,6 +38,8 @@ namespace wrench {
             std::string hostname,
             unsigned long num_cores,
             double ram_footprint,
+            double thread_creation_overhead,
+            bool simulate_computation_as_sleep,
             simgrid::s4u::Mailbox *callback_mailbox,
             std::shared_ptr <Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) :
@@ -50,12 +54,32 @@ namespace wrench {
         this->action_execution_service = action_execution_service;
         this->num_cores = num_cores;
         this->ram_footprint = ram_footprint;
+        this->thread_creation_overhead = thread_creation_overhead;
+        this->simulation_compute_as_sleep = simulate_computation_as_sleep;
+
         this->killed_on_purpose = false;
 
         this->action->setNumCoresAllocated(this->num_cores);
         this->action->setRAMAllocated(this->ram_footprint);
         this->action->setExecutionHost(this->hostname);
     }
+
+    /**
+     * @brief Return the executor's thread creation overhead
+     * @return an overhead (in seconds)
+     */
+    double ActionExecutor::getThreadCreationOverhead() {
+        return this->thread_creation_overhead;
+    }
+
+    /**
+     * @brief Returns whether computation should be simulated as sleep
+     * @return true or false
+     */
+    bool ActionExecutor::getSimulateComputationAsSleep() {
+        return this->simulation_compute_as_sleep;
+    }
+
 
     /**
      * @brief Returns the executor's action

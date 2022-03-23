@@ -39,21 +39,29 @@ namespace wrench {
         return this->alpha;
     }
 
-    /**
-     * @brief Returns the amount of work each thread much perform
-     * @param total_work: total amount of work
-     * @param num_threads: the number of threads
-     * @return a vector of work amounts
-     */
-    std::vector<double> AmdahlParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+//    /**
+//     * @brief Returns the amount of work each thread much perform
+//     * @param total_work: total amount of work
+//     * @param num_threads: the number of threads
+//     * @return a vector of work amounts
+//     */
+//    std::vector<double> AmdahlParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+//
+//        double sequential_work = (1 - this->alpha) * total_work;
+//        double per_thread_parallel_work = (total_work - sequential_work) / (double)num_threads;
+//        std::vector<double> work_per_threads;
+//        for (unsigned int i=0; i < num_threads; i++) {
+//            double work = per_thread_parallel_work + (i == 0 ? sequential_work : 0.0);
+//            work_per_threads.push_back(work);
+//        }
+//        return work_per_threads;
+//    }
 
-        double sequential_work = (1 - this->alpha) * total_work;
-        double per_thread_parallel_work = (total_work - sequential_work) / (double)num_threads;
-        std::vector<double> work_per_threads;
-        for (unsigned int i=0; i < num_threads; i++) {
-            double work = per_thread_parallel_work + (i == 0 ? sequential_work : 0.0);
-            work_per_threads.push_back(work);
-        }
-        return work_per_threads;
+    double AmdahlParallelModel::getPurelySequentialWork(double total_work, unsigned long num_threads) {
+        return (1 - this->alpha) * total_work;
+    }
+
+    double AmdahlParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
+        return (total_work * this->alpha) / (double)num_threads;
     }
 }

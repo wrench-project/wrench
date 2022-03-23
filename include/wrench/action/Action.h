@@ -68,9 +68,6 @@ namespace wrench {
         void setPriority(double priority);
         double getPriority() const;
 
-        void setSimulateComputationAsSleep(bool simulate_computation_as_sleep);
-        void setThreadCreationOverhead(double overhead_in_seconds);
-
         static std::string getActionTypeAsString(const std::shared_ptr<Action>& action);
 
         /**
@@ -137,11 +134,6 @@ namespace wrench {
         virtual void terminate(std::shared_ptr<ActionExecutor> action_executor) = 0;
 
         void updateState();
-
-        /** @brief The thread creation overhead in seconds */
-        double thread_creation_overhead;
-        /** @brief Whether to simulate the computation as sleep */
-        bool simulate_computation_as_sleep;
 
     private:
 

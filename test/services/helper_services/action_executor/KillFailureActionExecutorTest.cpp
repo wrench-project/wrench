@@ -217,7 +217,6 @@ private:
             auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) { };
 
             action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
-            action->setThreadCreationOverhead(0.0);
             thread_overhead = 0.0;
             expected_completion_date = 20.84743174020618639020;
             num_cores = 0;
@@ -227,12 +226,13 @@ private:
             throw std::runtime_error("Unknown action type");
         }
 
-        action->setThreadCreationOverhead(thread_overhead);
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2",
                                            num_cores,
                                            ram,
+                                           thread_overhead,
+                                           false,
                                            this->mailbox,
                                            action, nullptr));
 
@@ -313,7 +313,7 @@ TEST_F(KillFailActionExecutorTest, FailFileCopy) {
 }
 
 TEST_F(KillFailActionExecutorTest, KillFileDelete) {
-loopThroughTestCases({0.0, 0.02242927216494845083}, true, "file_delete");
+    loopThroughTestCases({0.0, 0.02242927216494845083}, true, "file_delete");
 }
 
 TEST_F(KillFailActionExecutorTest, FailFileDelete) {

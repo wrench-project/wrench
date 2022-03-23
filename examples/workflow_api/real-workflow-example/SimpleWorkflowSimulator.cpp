@@ -55,10 +55,10 @@ int main(int argc, char **argv) {
 
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
-    std::cerr << "Loading workflow->.." << std::endl;
+    std::cerr << "Loading workflow..." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
     if (ends_with(workflow_file,"json")) {
-        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
+        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
     } else {
         std::cerr << "Workflow file name must end with '.json'" << std::endl;
         exit(1);
@@ -176,6 +176,9 @@ int main(int argc, char **argv) {
         }
     }
 
+    /* Enable some output time stamps */
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
+
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
@@ -185,6 +188,9 @@ int main(int argc, char **argv) {
         return 0;
     }
     std::cerr << "Simulation done!" << std::endl;
+    std::cerr << "Workflow completed at time: " << workflow->getCompletionDate() << std::endl;
+
+    simulation->getOutput().dumpWorkflowGraphJSON(workflow, "/tmp/workflow.json", true);
 
     /* Simulation results can be examined via simulation->getOutput(), which provides access to traces
      * of events. In the code below, go through some time-stamps and compute some statistics.

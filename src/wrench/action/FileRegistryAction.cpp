@@ -15,6 +15,8 @@
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
+
 
 #include <utility>
 
@@ -73,7 +75,7 @@ namespace wrench {
      */
     void FileRegistryAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread overhead
-        Simulation::sleep(this->thread_creation_overhead);
+        Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
         if (this->type == FileRegistryAction::ADD) {
             this->file_registry_service->addEntry(this->file, this->file_location);

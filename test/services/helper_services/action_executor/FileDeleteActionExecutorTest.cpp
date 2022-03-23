@@ -138,7 +138,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
         auto file_delete_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox, file_delete_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_delete_action, nullptr));
         // Start it
         file_delete_action_executor->setSimulation(this->simulation);
         file_delete_action_executor->start(file_delete_action_executor, true, false);
