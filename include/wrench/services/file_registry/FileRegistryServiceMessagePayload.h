@@ -18,7 +18,7 @@ namespace wrench {
     /**
      * @brief Configurable message payload for a FileRegistryService
      */
-    class FileRegistryServiceMessagePayload: public ServiceMessagePayload {
+    class FileRegistryServiceMessagePayload : public ServiceMessagePayload {
 
     public:
         /** @brief The number of bytes in a request control message sent to the daemon to request a list of file locations **/
@@ -35,10 +35,9 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to answer an entry removal request **/
         DECLARE_MESSAGEPAYLOAD_NAME(REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD);
-
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FILEREGISTRYMESSAGEPAYLOAD_H
+#endif//WRENCH_FILEREGISTRYMESSAGEPAYLOAD_H

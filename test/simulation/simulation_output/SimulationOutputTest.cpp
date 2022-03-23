@@ -17,7 +17,7 @@ class SimulationOutputTest : public ::testing::Test {
 
 public:
     std::shared_ptr<wrench::Workflow> workflow;
-/*    std::shared_ptr<wrench::DataFile> input_file;
+    /*    std::shared_ptr<wrench::DataFile> input_file;
     std::shared_ptr<wrench::DataFile> output_file1;
     std::shared_ptr<wrench::DataFile> output_file2;
     std::shared_ptr<wrench::DataFile> output_file3;
@@ -34,7 +34,6 @@ public:
     void do_emptyTrace_test();
 
 protected:
-
     ~SimulationOutputTest() {
         workflow->clear();
     }
@@ -43,42 +42,42 @@ protected:
         // Create the simplest workflow
         workflow = wrench::Workflow::createWorkflow();
 
-//      // Create the files
-//      input_file = workflow->addFile("input_file", 10.0);
-//      output_file1 = workflow->addFile("output_file1", 10.0);
-//      output_file2 = workflow->addFile("output_file2", 10.0);
-//      output_file3 = workflow->addFile("output_file3", 10.0);
-//      output_file4 = workflow->addFile("output_file4", 10.0);
-//
-//      // Create the tasks
-//      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0.0);
-//      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0.0);
-//      task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 0.0);
-//      task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 0.0);
-//      task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0.0);
-//      task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0.0);
-//      task1->setClusterID("ID1");
-//      task2->setClusterID("ID1");
-//      task3->setClusterID("ID1");
-//      task4->setClusterID("ID2");
-//      task5->setClusterID("ID2");
-//
-//      // Add file-task1 dependencies
-//      task1->addInputFile(input_file);
-//      task2->addInputFile(input_file);
-//      task3->addInputFile(input_file);
-//      task4->addInputFile(input_file);
-//      task5->addInputFile(input_file);
-//      task6->addInputFile(input_file);
-//
-//      task1->addOutputFile(output_file1);
-//      task2->addOutputFile(output_file2);
-//      task3->addOutputFile(output_file3);
-//      task4->addOutputFile(output_file4);
-//      task5->addOutputFile(output_file3);
-//      task6->addOutputFile(output_file4);
-//
-//      workflow->addControlDependency(task4, task5);
+        //      // Create the files
+        //      input_file = workflow->addFile("input_file", 10.0);
+        //      output_file1 = workflow->addFile("output_file1", 10.0);
+        //      output_file2 = workflow->addFile("output_file2", 10.0);
+        //      output_file3 = workflow->addFile("output_file3", 10.0);
+        //      output_file4 = workflow->addFile("output_file4", 10.0);
+        //
+        //      // Create the tasks
+        //      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0.0);
+        //      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0.0);
+        //      task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 0.0);
+        //      task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 0.0);
+        //      task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0.0);
+        //      task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0.0);
+        //      task1->setClusterID("ID1");
+        //      task2->setClusterID("ID1");
+        //      task3->setClusterID("ID1");
+        //      task4->setClusterID("ID2");
+        //      task5->setClusterID("ID2");
+        //
+        //      // Add file-task1 dependencies
+        //      task1->addInputFile(input_file);
+        //      task2->addInputFile(input_file);
+        //      task3->addInputFile(input_file);
+        //      task4->addInputFile(input_file);
+        //      task5->addInputFile(input_file);
+        //      task6->addInputFile(input_file);
+        //
+        //      task1->addOutputFile(output_file1);
+        //      task2->addOutputFile(output_file2);
+        //      task3->addOutputFile(output_file3);
+        //      task4->addOutputFile(output_file4);
+        //      task5->addOutputFile(output_file3);
+        //      task6->addOutputFile(output_file4);
+        //
+        //      workflow->addControlDependency(task4, task5);
 
         // Create a platform file
         std::string xml = "<?xml version='1.0'?>"
@@ -107,12 +106,10 @@ class EmptySimulationOutputWMS : public wrench::ExecutionController {
 
 public:
     EmptySimulationOutputWMS(SimulationOutputTest *test,
-                             std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                             std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     SimulationOutputTest *test;
 
     int main() {
@@ -124,7 +121,6 @@ private:
             this->simulation->getOutput().addTimestampTaskFailure(0.0, nullptr);
             throw std::runtime_error("Should have caught exception!");
         } catch (std::exception &ignore) {
-
         }
 
         // do nothing
@@ -155,9 +151,10 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new EmptySimulationOutputWMS(this, hostname)));
+                            new EmptySimulationOutputWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -167,7 +164,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
     ASSERT_EQ(0, trace.size());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

@@ -19,7 +19,6 @@
 #include "wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.h"
 
 
-
 namespace wrench {
 
     class Simulation;
@@ -35,12 +34,17 @@ namespace wrench {
      *        provides access to their resources.
      *
      *        One can think of this as a simple service that allows the user to
-     *        run tasks and to specify for each task on which host it should run
+     *        run jobs and to specify for each job on which host it should run
      *        and with how many cores. If no host is specified, the service will pick
      *        the least loaded host. If no number of cores is specified, the service
      *        will use as many cores as possible.  The service
      *        will make sure that the RAM capacity of a host is not exceeded by possibly
-     *        delaying task executions until enough RAM is available.
+     *        delaying job executions until enough RAM is available. Note that if the submitted
+     *        jobs require a total number of cores larger than available, say, on a particular
+     *        host, then these jobs will simply time-share the cores. In other words, this
+     *        service does not provide space-sharing of hosts/cores
+     *        (unlike, for instance, a wrench::BatchComputeService).
+     *
      */
     class BareMetalComputeService : public ComputeService {
 
@@ -48,60 +52,56 @@ namespace wrench {
         friend class BatchComputeService;
 
     private:
-
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"},
-                {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
-                {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
+                {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0.0"},
+                {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
+                {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "false"},
         };
 
-WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
-                {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    1024},
-                {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 1024},
-                {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         1024},
-                {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,               1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,              1024},
-                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {BareMetalComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
                 {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,       1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        1024},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,              1024},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,              1024},
-                {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD,              1024},
-                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
                 {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     1024},
-                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      1024},
+                {BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
 
     public:
-
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                 std::string scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
-        );
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::vector<std::string> compute_hosts,
                                 std::string scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
-        );
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         virtual bool supportsStandardJobs() override;
         virtual bool supportsCompoundJobs() override;
@@ -122,7 +122,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         friend class JobManager;
 
         void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
-                                                      std::map<std::string, std::string> &service_specific_args) override;
+                                              std::map<std::string, std::string> &service_specific_args) override;
 
 
         BareMetalComputeService(const std::string &hostname,
@@ -131,7 +131,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 double ttl,
                                 std::shared_ptr<PilotJob> pj, std::string suffix,
-                                std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
+                                std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         BareMetalComputeService(const std::string &hostname,
                                 std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
@@ -152,12 +152,11 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
 
 
     protected:
-
         std::shared_ptr<Alarm> death_alarm = nullptr;
-        std::shared_ptr<PilotJob> containing_pilot_job; // In case this service is in fact a pilot job
+        std::shared_ptr<PilotJob> containing_pilot_job;// In case this service is in fact a pilot job
 
 
-        std::unordered_map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
+        std::unordered_map<std::shared_ptr<StandardJob>, std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
@@ -172,7 +171,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
 
 
         // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
-//        void storeFilesStoredInScratch(std::set<std::shared_ptr<DataFile>> scratch_files);
+        //        void storeFilesStoredInScratch(std::set<std::shared_ptr<DataFile>> scratch_files);
 
         // Cleanup the scratch if I am a pilot job
         void cleanUpScratch();
@@ -196,7 +195,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
 
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
-//        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
+        //        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
 
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
@@ -204,17 +203,17 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         void processIsThereAtLeastOneHostWithAvailableResources(
                 simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
-//        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<WorkflowTask>task,
-//                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
-//                                                              std::set<std::string> &hosts_to_avoid);
+        //        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<WorkflowTask>task,
+        //                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
+        //                                                              std::set<std::string> &hosts_to_avoid);
 
-//        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
-//
-//        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
+        //        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
+        //
+        //        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
 
-//        bool areAllComputeResourcesDownWithNoWUERunning();
+        //        bool areAllComputeResourcesDownWithNoWUERunning();
 
         static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 
@@ -228,9 +227,8 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         /***********************/
         /** \endcond           */
         /***********************/
-
     };
-};
+};// namespace wrench
 
 
-#endif //WRENCH_BAREMETALCOMPUTESERVICE_H
+#endif//WRENCH_BAREMETALCOMPUTESERVICE_H

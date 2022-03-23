@@ -29,7 +29,6 @@ namespace wrench {
     /** @brief This is a simple wrapper class around S4U asynchronous communication checking methods */
     class S4U_PendingCommunication {
     public:
-
         /**
          * @brief The communication operation's type
          */
@@ -54,10 +53,10 @@ namespace wrench {
                 double timeout);
 
         static unsigned long waitForSomethingToHappen(
-                std::vector<S4U_PendingCommunication*> pending_comms,
+                std::vector<S4U_PendingCommunication *> pending_comms,
                 double timeout);
 
-//        ~S4U_PendingCommunication() default;
+        //        ~S4U_PendingCommunication() default;
 
         /** @brief The SimGrid communication handle */
         simgrid::s4u::CommPtr comm_ptr;
@@ -73,7 +72,7 @@ namespace wrench {
     /** \endcond */
     /*******************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_S4U_PENDINGCOMMUNICATION_H
+#endif//WRENCH_S4U_PENDINGCOMMUNICATION_H

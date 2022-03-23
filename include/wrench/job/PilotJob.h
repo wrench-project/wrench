@@ -28,7 +28,6 @@ namespace wrench {
     class PilotJob : public Job {
 
     public:
-
         /** @brief Pilot job states */
         enum State {
             /** @brief Not submitted yet */
@@ -61,7 +60,6 @@ namespace wrench {
         /***********************/
 
     private:
-
         std::shared_ptr<CompoundJob> compound_job;
 
         friend class JobManager;
@@ -69,14 +67,14 @@ namespace wrench {
         PilotJob(std::shared_ptr<JobManager> job_manager);
 
         State state;
-        std::shared_ptr<BareMetalComputeService> compute_service; // Associated compute service, i.e., the running pilot job
+        std::shared_ptr<BareMetalComputeService> compute_service;// Associated compute service, i.e., the running pilot job
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_PILOTJOB_H
+#endif//WRENCH_PILOTJOB_H

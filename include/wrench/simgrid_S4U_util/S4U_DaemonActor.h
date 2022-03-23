@@ -21,7 +21,6 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
-
 /***********************/
 /** \cond INTERNAL     */
 /***********************/
@@ -36,7 +35,6 @@ namespace wrench {
     class S4U_DaemonActor {
 
     public:
-
         /**
          * @brief Constructor
          * @param d: a daemon instance
@@ -51,19 +49,16 @@ namespace wrench {
         void operator()() {
 
             this->daemon->runMainMethod();
-
         }
 
     private:
-
         S4U_Daemon *daemon;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
+#endif//WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H

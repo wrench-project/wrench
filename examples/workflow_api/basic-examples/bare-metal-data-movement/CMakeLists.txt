@@ -21,7 +21,6 @@ if (ENABLE_BATSCHED)
     target_link_libraries(wrench-example-bare-metal-data-movement
             wrench
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
             )
@@ -29,7 +28,6 @@ else()
     target_link_libraries(wrench-example-bare-metal-data-movement
             wrench
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             )
 endif()

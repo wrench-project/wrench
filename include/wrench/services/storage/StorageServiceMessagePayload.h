@@ -22,7 +22,6 @@ namespace wrench {
     class StorageServiceMessagePayload : public ServiceMessagePayload {
 
     public:
-
         /** @brief The number of bytes in the control message sent to the daemon to request its free space information **/
         DECLARE_MESSAGEPAYLOAD_NAME(FREE_SPACE_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to answer free space information request **/
@@ -58,10 +57,9 @@ namespace wrench {
 
         /** @brief The number of bytes in the control message sent by the daemon to say "not enough space" **/
         DECLARE_MESSAGEPAYLOAD_NAME(NOT_ENOUGH_STORAGE_SPACE_MESSAGE_PAYLOAD);
-
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_STORAGESERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_STORAGESERVICEMESSAGEPAYLOAD_H

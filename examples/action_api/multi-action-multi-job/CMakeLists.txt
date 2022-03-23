@@ -20,7 +20,6 @@ if (ENABLE_BATSCHED)
     target_link_libraries(wrench-example-multi-action-multi-job
             wrench
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
             )
@@ -28,7 +27,6 @@ else()
     target_link_libraries(wrench-example-multi-action-multi-job
             wrench
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             )
 endif()

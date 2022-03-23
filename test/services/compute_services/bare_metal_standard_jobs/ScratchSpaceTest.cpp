@@ -48,7 +48,6 @@ public:
     void do_JobForgettingAndScratchSpaceCleanup_test();
 
 protected:
-
     ~ScratchSpaceTest() {
         workflow->clear();
     }
@@ -63,48 +62,46 @@ protected:
                           "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> ";
-        for (int i=1; i <= 4; i++) {
-            xml +=  "       <host id=\"Host" + std::to_string(i) + "\" speed=\"1f\" core=\"10\" > "
-                                                                   "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                   "             <prop id=\"size\" value=\"10000000000000B\"/>"
-                                                                   "             <prop id=\"mount\" value=\"/disk1\"/>"
-                                                                   "          </disk>"
-                                                                   "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                   "             <prop id=\"size\" value=\"1000000000000B\"/>"
-                                                                   "             <prop id=\"mount\" value=\"/disk2\"/>"
-                                                                   "          </disk>"
-                                                                   "          <disk id=\"disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                   "             <prop id=\"size\" value=\"3000B\"/>"
-                                                                   "             <prop id=\"mount\" value=\"/scratch3000\"/>"
-                                                                   "          </disk>"
-                                                                   "          <disk id=\"disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                   "             <prop id=\"size\" value=\"10000B\"/>"
-                                                                   "             <prop id=\"mount\" value=\"/scratch10000\"/>"
-                                                                   "          </disk>"
-                                                                   "          <disk id=\"disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                   "             <prop id=\"size\" value=\"100B\"/>"
-                                                                   "             <prop id=\"mount\" value=\"/scratch100\"/>"
-                                                                   "          </disk>"
-                                                                   "       </host>";
+        for (int i = 1; i <= 4; i++) {
+            xml += "       <host id=\"Host" + std::to_string(i) + "\" speed=\"1f\" core=\"10\" > "
+                                                                  "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                  "             <prop id=\"size\" value=\"10000000000000B\"/>"
+                                                                  "             <prop id=\"mount\" value=\"/disk1\"/>"
+                                                                  "          </disk>"
+                                                                  "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                  "             <prop id=\"size\" value=\"1000000000000B\"/>"
+                                                                  "             <prop id=\"mount\" value=\"/disk2\"/>"
+                                                                  "          </disk>"
+                                                                  "          <disk id=\"disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                  "             <prop id=\"size\" value=\"3000B\"/>"
+                                                                  "             <prop id=\"mount\" value=\"/scratch3000\"/>"
+                                                                  "          </disk>"
+                                                                  "          <disk id=\"disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                  "             <prop id=\"size\" value=\"10000B\"/>"
+                                                                  "             <prop id=\"mount\" value=\"/scratch10000\"/>"
+                                                                  "          </disk>"
+                                                                  "          <disk id=\"disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                  "             <prop id=\"size\" value=\"100B\"/>"
+                                                                  "             <prop id=\"mount\" value=\"/scratch100\"/>"
+                                                                  "          </disk>"
+                                                                  "       </host>";
         }
-        xml +=  "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
-                "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-                "       <link id=\"3\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-                "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
-                "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
-                "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
-                "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
-                "/> </route>"
-                "   </zone> "
-                "</platform>";
+        xml += "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
+               "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
+               "       <link id=\"3\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
+               "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+               "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"1\"/> </route>"
+               "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
+               "/> </route>"
+               "   </zone> "
+               "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -135,16 +132,15 @@ void ScratchSpaceTest::do_BogusScratchSpace_test() {
 
     // Create a Compute Service
     ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname,
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                "/scratch_bogus", {})),
+                         new wrench::BareMetalComputeService(hostname,
+                                                             {std::make_pair(hostname,
+                                                                             std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                             wrench::ComputeService::ALL_RAM))},
+                                                             "/scratch_bogus", {})),
                  std::invalid_argument);
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -157,12 +153,10 @@ class SimpleScratchSpaceTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleScratchSpaceTestWMS(ScratchSpaceTest *test,
-                              std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                              std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ScratchSpaceTest *test;
 
     int main() {
@@ -178,7 +172,7 @@ private:
             // Create a StandardJob with some pre-copies
             auto job = job_manager->createStandardJob(
                     {task},
-                    (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                    (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(this->test->workflow->getFileByID("input_file"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
                                      wrench::FileLocation::SCRATCH)},
@@ -236,28 +230,29 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                "/scratch3000",
-                                                {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch3000",
+                                                                {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleScratchSpaceTestWMS(
-                    this, hostname)));
+                            new SimpleScratchSpaceTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 1000.0);
@@ -272,8 +267,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -287,12 +281,10 @@ class SimpleScratchSpaceFailureTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleScratchSpaceFailureTestWMS(ScratchSpaceTest *test,
-                                     std::string hostname) :
-            wrench::ExecutionController(hostname,"test"), test(test) {
+                                     std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ScratchSpaceTest *test;
 
     int main() {
@@ -311,7 +303,7 @@ private:
             // Create a StandardJob with SOME pre-copies from public storage to scratch
             auto job1 = job_manager->createStandardJob(
                     {task1},
-                    (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                    (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
                                      wrench::FileLocation::SCRATCH)},
@@ -322,7 +314,7 @@ private:
             // Create a StandardJob with NO pre-copies from public storage to scratch
             auto job2 = job_manager->createStandardJob(
                     {task2},
-                    (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                    (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(this->test->workflow->getFileByID("input_file2"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
                                      wrench::FileLocation::SCRATCH)},
@@ -339,7 +331,7 @@ private:
             // Submit the job for execution to the compute service which has some scratch, but not enough space, thus expecting an exception
             job1 = job_manager->createStandardJob(
                     {task1},
-                    (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                    (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
                                      wrench::FileLocation::SCRATCH)},
@@ -369,7 +361,7 @@ private:
             // one should succeed and the second one should fail
             job1 = job_manager->createStandardJob(
                     {task1},
-                    (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                    (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                     {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
                                      wrench::FileLocation::LOCATION(this->test->storage_service1),
                                      wrench::FileLocation::SCRATCH)},
@@ -432,7 +424,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -444,41 +436,42 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
     // Create a Storage Service3
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service that does not have scratch space
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                "")));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                                "")));
 
     // Create a Compute Service that has smaller scratch space than the files to be stored
     ASSERT_NO_THROW(compute_service1 = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                "/scratch100")));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch100")));
 
     // Create a Compute Service that has enough scratch space to store the files
     ASSERT_NO_THROW(compute_service2 = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                          wrench::ComputeService::ALL_RAM))},
-                                                "/scratch10000")));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                          wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch10000")));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleScratchSpaceFailureTestWMS(
-                    this, hostname)));
+                            new SimpleScratchSpaceFailureTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file1 = this->workflow->addFile("input_file1", 10000.0);
@@ -494,8 +487,7 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -509,12 +501,10 @@ class PilotJobScratchSpaceTestWMS : public wrench::ExecutionController {
 
 public:
     PilotJobScratchSpaceTestWMS(ScratchSpaceTest *test,
-                                std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ScratchSpaceTest *test;
 
     int main() {
@@ -527,7 +517,7 @@ private:
 
         // Submit a pilot job
         try {
-            job_manager->submitJob(pilot_job, this->test->compute_service, {{"-N","1"}, {"-c","1"}, {"-t","60"}});
+            job_manager->submitJob(pilot_job, this->test->compute_service, {{"-N", "1"}, {"-c", "1"}, {"-t", "60"}});
         } catch (wrench::ExecutionException &e) {
             throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
         }
@@ -560,7 +550,7 @@ private:
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         auto job1 = job_manager->createStandardJob(
                 {task1},
-                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->workflow->getFileByID("input_file1"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -570,7 +560,7 @@ private:
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         auto job2 = job_manager->createStandardJob(
                 {task2},
-                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->workflow->getFileByID("input_file2"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -580,7 +570,7 @@ private:
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         auto job3 = job_manager->createStandardJob(
                 {task3},
-                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->workflow->getFileByID("input_file3"),
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -625,7 +615,7 @@ private:
 
         if (std::dynamic_pointer_cast<wrench::PilotJobExpiredEvent>(event)) {
             // success, check if the scratch space size is full again or not, it should be full
-            wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
+            wrench::S4U_Simulation::sleep(10);//sleep for some time to ensure everything is deleted
             double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
             if (free_space_size != 3000.0) {
                 throw std::runtime_error(
@@ -656,7 +646,7 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//  argv[1] = strdup("--wrench-full-log");
+    //  argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -668,25 +658,26 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service that does not have scratch space
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname,
-                                            {hostname}, "/scratch3000", {})));
+                            new wrench::BatchComputeService(hostname,
+                                                            {hostname}, "/scratch3000", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new PilotJobScratchSpaceTestWMS(
-                    this, hostname)));
+                            new PilotJobScratchSpaceTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file1 = this->workflow->addFile("input_file1", 1000.0);
@@ -704,12 +695,10 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -720,12 +709,10 @@ class ScratchSpaceRaceConditionTestWMS : public wrench::ExecutionController {
 
 public:
     ScratchSpaceRaceConditionTestWMS(ScratchSpaceTest *test,
-                                     std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                     std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ScratchSpaceTest *test;
 
     int main() {
@@ -739,12 +726,12 @@ private:
         std::shared_ptr<wrench::DataFile> file = this->test->workflow->getFileByID("input");
 
         // Create three tasks
-        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10, 1, 1, 0); // 10 seconds
-        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 10, 1, 1, 0); // 10 seconds
-        this->test->workflow->addControlDependency(task1, task2); // task1 1 depends on task2
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10, 1, 1, 0);// 10 seconds
+        std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask("task2", 10, 1, 1, 0);// 10 seconds
+        this->test->workflow->addControlDependency(task1, task2);                                         // task1 1 depends on task2
         task2->addInputFile(file);
 
-        std::shared_ptr<wrench::WorkflowTask> task3 = this->test->workflow->addTask("task3", 1, 1, 1, 0);  // 1 second
+        std::shared_ptr<wrench::WorkflowTask> task3 = this->test->workflow->addTask("task3", 1, 1, 1, 0);// 1 second
 
 
         // Create a first job that:
@@ -752,7 +739,7 @@ private:
         //   - runs task1 and then task2 (10 second each)
         //   - (task 2 needs "input")
         auto job1 = job_manager->createStandardJob(
-                {task1, task2}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                {task1, task2}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -762,7 +749,7 @@ private:
         //    - copies file "input" to the scratch space
         //    - runs task3 (1 second)
         auto job2 = job_manager->createStandardJob(
-                {task3}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                {task3}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -773,9 +760,8 @@ private:
         job_manager->submitJob(job2, this->test->compute_service);
 
 
-
         // Wait for workflow execution events
-        for (auto job : {job1, job2}) {
+        for (auto job: {job1, job2}) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -813,18 +799,19 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"},
-                                             {},
-                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"},
+                                                             {},
+                                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
+                            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ScratchSpaceRaceConditionTestWMS(this, hostname)));
+                            new ScratchSpaceRaceConditionTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -839,7 +826,7 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -853,12 +840,10 @@ class ScratchNonScratchPartitionsTestWMS : public wrench::ExecutionController {
 
 public:
     ScratchNonScratchPartitionsTestWMS(ScratchSpaceTest *test,
-                                       std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                       std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ScratchSpaceTest *test;
 
     int main() {
@@ -879,30 +864,28 @@ private:
 
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFile(
-                file1,
-                wrench::FileLocation::LOCATION(test->storage_service1))) {
+                    file1,
+                    wrench::FileLocation::LOCATION(test->storage_service1))) {
             throw std::runtime_error(
-                    "The file1 was supposed to be staged at the mount point but is not"
-            );
+                    "The file1 was supposed to be staged at the mount point but is not");
         }
         //check if this file is staged at mount point of non-scratch
         if (not wrench::StorageService::lookupFile(
-                file2,
-                wrench::FileLocation::LOCATION(test->storage_service2))) {
+                    file2,
+                    wrench::FileLocation::LOCATION(test->storage_service2))) {
             throw std::runtime_error(
-                    "The file2 was supposed to be staged in / partition but is not"
-            );
+                    "The file2 was supposed to be staged in / partition but is not");
         }
 
         // Create a task
-        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10, 1, 1, 0); // 10 seconds
+        std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask("task1", 10, 1, 1, 0);// 10 seconds
         task1->addInputFile(file1);
 
         // Create a first job that:
         //   - copies file "input" to the scratch space
         //   - runs task1
         auto job1 = job_manager->createStandardJob(
-                {task1}, (std::map<std::shared_ptr<wrench::DataFile> ,std::shared_ptr<wrench::FileLocation>>){},
+                {task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(file1,
                                  wrench::FileLocation::LOCATION(this->test->storage_service1),
                                  wrench::FileLocation::SCRATCH)},
@@ -912,7 +895,7 @@ private:
         job_manager->submitJob(job1, this->test->compute_service);
 
         // Wait for workflow execution events
-        for (auto job : {job1}) {
+        for (auto job: {job1}) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -927,11 +910,10 @@ private:
         //the file1 should still be non-scratch space, the job should only delete file from it's scratch job's partition
         //check if this file is staged in mount point of non-scratch
         if (not wrench::StorageService::lookupFile(
-                file1,
-                wrench::FileLocation::LOCATION(test->storage_service1))) {
+                    file1,
+                    wrench::FileLocation::LOCATION(test->storage_service1))) {
             throw std::runtime_error(
-                    "The file1 again was supposed to be staged in / partition but is not"
-            );
+                    "The file1 again was supposed to be staged in / partition but is not");
         }
 
         //try to copy file1 from job1's partition of storage service1 into storage service2 in / partition, this should fail
@@ -941,9 +923,8 @@ private:
                                                                             this->test->storage_service1->getMountPoint() + job1->getName()),
                                              wrench::FileLocation::LOCATION(this->test->storage_service2));
             throw std::runtime_error(
-                    "Non-scratch space have / partition unless created by copying something into a new partition name"
-            );
-        } catch(wrench::ExecutionException &e) {
+                    "Non-scratch space have / partition unless created by copying something into a new partition name");
+        } catch (wrench::ExecutionException &e) {
         }
 
         //try to copy file1 from / partition of storage service1 into storage service2 in job1's partition, this should succeed
@@ -953,10 +934,9 @@ private:
                                              wrench::FileLocation::LOCATION(this->test->storage_service2,
                                                                             this->test->storage_service2->getMountPoint() + job1->getName()));
 
-        } catch(wrench::ExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
-                    "We should have been able to copy from / partition of non-scratch to a new partition into another non-scratch space"
-            );
+                    "We should have been able to copy from / partition of non-scratch to a new partition into another non-scratch space");
         }
 
         //try to copy file2 from / partition of storage service2 into storage service1 at mount point, it should succeed
@@ -965,10 +945,9 @@ private:
                                              wrench::FileLocation::LOCATION(this->test->storage_service2),
                                              wrench::FileLocation::LOCATION(this->test->storage_service1));
 
-        } catch(wrench::ExecutionException &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
-                    "We should have been able to copy from / of one non-scratch space to / of another non-scratch space"
-            );
+                    "We should have been able to copy from / of one non-scratch space to / of another non-scratch space");
         }
 
         //try to copy file2 from / partition of storage service2 into storage service2 in /test directory, it should succeed
@@ -978,21 +957,19 @@ private:
                                              wrench::FileLocation::LOCATION(this->test->storage_service2,
                                                                             this->test->storage_service2->getMountPoint() + "/test"));
 
-        } catch(wrench::ExecutionException  &e) {
+        } catch (wrench::ExecutionException &e) {
             throw std::runtime_error(
-                    "We should have been able to copy from one partition to another partition of the same storage service"
-            );
+                    "We should have been able to copy from one partition to another partition of the same storage service");
         }
 
         //we just copied file to /test partition of storage service2, so it must be there
         if (not wrench::StorageService::lookupFile(
-                file2,
-                wrench::FileLocation::LOCATION(this->test->storage_service2,
-                                               this->test->storage_service2->getMountPoint() + "/test"))) {
+                    file2,
+                    wrench::FileLocation::LOCATION(this->test->storage_service2,
+                                                   this->test->storage_service2->getMountPoint() + "/test"))) {
 
             throw std::runtime_error(
-                    "The file2 was supposed to be stored in /test partition but is not"
-            );
+                    "The file2 was supposed to be stored in /test partition but is not");
         }
 
 
@@ -1022,24 +999,25 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"},
-                                             {},
-                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"},
+                                                             {},
+                                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1.0}})));
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"},
-                                             {},
-                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"},
+                                                             {},
+                                                             {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 3.0}})));
 
     // Create a Cloud Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
+                            new wrench::BareMetalComputeService(hostname, {"Host1"}, "/scratch3000", {}, {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ScratchNonScratchPartitionsTestWMS(this, hostname)));
+                            new ScratchNonScratchPartitionsTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1058,7 +1036,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

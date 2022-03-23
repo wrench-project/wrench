@@ -44,14 +44,12 @@ namespace wrench {
     public:
         static double parse_size(std::string string);
         static double parse_compute_speed(std::string string);
-
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_UNITPARSER_H
+#endif//WRENCH_UNITPARSER_H

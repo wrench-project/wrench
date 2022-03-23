@@ -32,7 +32,6 @@ namespace wrench {
         friend class S4U_Daemon;
 
     public:
-
         static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname,
                                                           simgrid::s4u::Mailbox *reply_mailbox_name,
                                                           SimulationMessage *msg, std::string suffix);
@@ -44,18 +43,17 @@ namespace wrench {
               SimulationMessage *msg, std::string suffix);
 
         double date;
-//        std::string reply_mailbox_name;
+        //        std::string reply_mailbox_name;
         simgrid::s4u::Mailbox *reply_mailbox;
         SimulationMessage *msg;
 
         int main() override;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-}
+}// namespace wrench
 
-#endif //WRENCH_ALARM_H
+#endif//WRENCH_ALARM_H

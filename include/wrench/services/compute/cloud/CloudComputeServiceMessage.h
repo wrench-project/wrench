@@ -29,7 +29,7 @@ namespace wrench {
      */
     class CloudComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        CloudComputeServiceMessage( double payload);
+        CloudComputeServiceMessage(double payload);
     };
 
     /**
@@ -268,6 +268,6 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_CLOUDSERVICEMESSAGE_H
+#endif//WRENCH_CLOUDSERVICEMESSAGE_H

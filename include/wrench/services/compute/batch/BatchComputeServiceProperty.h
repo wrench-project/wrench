@@ -18,7 +18,7 @@ namespace wrench {
     /**
      * @brief Configurable properties for a BatchComputeService
      */
-    class BatchComputeServiceProperty: public ComputeServiceProperty {
+    class BatchComputeServiceProperty : public ComputeServiceProperty {
 
     public:
         /**
@@ -159,18 +159,17 @@ namespace wrench {
         */
         DECLARE_PROPERTY_NAME(BATSCHED_CONTIGUOUS_ALLOCATION);
 
-//        /** @brief Overhead delay in seconds between condor and slurm for the start of execution
-//         *      - defaults to calibrated figure
-//         *      - property is set on first receiving grid universe job.
-//         */
-//        DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
-//
-//        /** @brief Overhead delay in seconds between condor and slurm for the completion of execution
-//         *      - defaults to calibrated figure
-//         *      - property is set on first receiving grid universe job.
-//         */
-//        DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
-
+        //        /** @brief Overhead delay in seconds between condor and slurm for the start of execution
+        //         *      - defaults to calibrated figure
+        //         *      - property is set on first receiving grid universe job.
+        //         */
+        //        DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
+        //
+        //        /** @brief Overhead delay in seconds between condor and slurm for the completion of execution
+        //         *      - defaults to calibrated figure
+        //         *      - property is set on first receiving grid universe job.
+        //         */
+        //        DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
 
 
         /***********************/
@@ -181,10 +180,8 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
-
-
     };
-}
+}// namespace wrench
 
 
-#endif //WRENCH_BATCHSERVICEPROPERTY_H
+#endif//WRENCH_BATCHSERVICEPROPERTY_H

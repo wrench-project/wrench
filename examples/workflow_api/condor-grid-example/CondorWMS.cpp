@@ -29,12 +29,12 @@ namespace wrench {
             const std::shared_ptr<wrench::BatchComputeService> &batch_compute_service,
             const std::shared_ptr<wrench::CloudComputeService> &cloud_compute_service,
             const std::shared_ptr<wrench::StorageService> &storage_service,
-            std::string hostname) : ExecutionController(hostname,"condor-grid"),
-            workflow(workflow),
-            htcondor_compute_service(htcondor_compute_service),
-            batch_compute_service(batch_compute_service),
-            cloud_compute_service(cloud_compute_service),
-            storage_service(storage_service){}
+            std::string hostname) : ExecutionController(hostname, "condor-grid"),
+                                    workflow(workflow),
+                                    htcondor_compute_service(htcondor_compute_service),
+                                    batch_compute_service(batch_compute_service),
+                                    cloud_compute_service(cloud_compute_service),
+                                    storage_service(storage_service) {}
 
     /**
      * Main method of the WMS
@@ -52,7 +52,7 @@ namespace wrench {
 
         // Create and start a 5-core VM with 32GB of RAM on the Cloud compute service */
         WRENCH_INFO("Creating a 5-core VM instance on the cloud service");
-        cloud_compute_service->createVM(5, 32.0*1000*1000*1000, "my_vm", {}, {});
+        cloud_compute_service->createVM(5, 32.0 * 1000 * 1000 * 1000, "my_vm", {}, {});
         WRENCH_INFO("Starting the VM instance, which exposes a usable bare-metal compute service");
         auto vm_cs = cloud_compute_service->startVM("my_vm");
 
@@ -64,11 +64,11 @@ namespace wrench {
 
         // Create a map of files, which are all supposed to be on the local SS
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-        for (auto const &t : this->workflow->getTasks()) {
-            for (auto const &f : t->getInputFiles()) {
+        for (auto const &t: this->workflow->getTasks()) {
+            for (auto const &f: t->getInputFiles()) {
                 file_locations[f] = wrench::FileLocation::LOCATION(storage_service);
             }
-            for (auto const &f : t->getOutputFiles()) {
+            for (auto const &f: t->getOutputFiles()) {
                 file_locations[f] = wrench::FileLocation::LOCATION(storage_service);
             }
         }
@@ -78,7 +78,7 @@ namespace wrench {
         std::vector<std::shared_ptr<wrench::WorkflowTask>> last_tasks;
         unsigned long task_count = 0;
         unsigned long num_tasks = this->workflow->getTasks().size();
-        for (auto const &t : this->workflow->getTasks()) {
+        for (auto const &t: this->workflow->getTasks()) {
             if (task_count < num_tasks / 2) {
                 first_tasks.push_back(t);
             } else {
@@ -102,7 +102,7 @@ namespace wrench {
         WRENCH_INFO("Job submitted!");
 
         /* Submit the last tasks as individual non "grid universe" jobs to HTCondor */
-        for (auto const &task : last_tasks) {
+        for (auto const &task: last_tasks) {
             WRENCH_INFO("Creating and submitting a single-task job (for task %s) as a non-grid-universe job to HTCondor (will run on the VM)",
                         task->getID().c_str());
             auto job = job_manager->createStandardJob(task, file_locations);
@@ -128,7 +128,7 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         WRENCH_INFO("Notified that a standard job has completed: ");
-        for (auto const &task : job->getTasks()) {
+        for (auto const &task: job->getTasks()) {
             WRENCH_INFO("    - Task %s ran on host %s (started at time %.2lf and finished at time %.2lf)",
                         task->getID().c_str(),
                         task->getPhysicalExecutionHost().c_str(),
@@ -138,5 +138,4 @@ namespace wrench {
     }
 
 
-
-}
+}// namespace wrench

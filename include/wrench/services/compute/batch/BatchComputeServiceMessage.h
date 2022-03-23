@@ -14,7 +14,7 @@
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "BatchJob.h"
 
-namespace wrench{
+namespace wrench {
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
@@ -24,7 +24,7 @@ namespace wrench{
      */
     class BatchComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        BatchComputeServiceMessage( double payload);
+        BatchComputeServiceMessage(double payload);
     };
 
     /**
@@ -32,7 +32,7 @@ namespace wrench{
      */
     class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
-        BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<BatchJob> job , double payload);
+        BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<BatchJob> job, double payload);
 
         /** @brief The mailbox to answer to */
         simgrid::s4u::Mailbox *answer_mailbox;
@@ -46,12 +46,12 @@ namespace wrench{
      */
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
-        AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job,double payload);
+        AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload);
         /** @brief The batch_standard_and_pilot_jobs job */
         std::shared_ptr<BatchJob> job;
     };
 
-    #if 0
+#if 0
     /**
      * @brief AlarmNotifyBatschedMessage class
      */
@@ -61,7 +61,7 @@ namespace wrench{
         /** @brief the batch_standard_and_pilot_jobs job's id */
         std::string job_id;
     };
-    #endif
+#endif
 
 #if 0
     /**
@@ -78,7 +78,7 @@ namespace wrench{
     };
 #endif
 
-    #if 0
+#if 0
     /**
      * @brief BatchSchedReadyMessage class
      */
@@ -89,7 +89,7 @@ namespace wrench{
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
     };
-    #endif
+#endif
 
 
     /**
@@ -120,7 +120,7 @@ namespace wrench{
         double estimated_start_time;
     };
 
-    #if 0
+#if 0
 //    /**
 //     * @brief BatchFakeReplyMessage class
 //     */
@@ -131,10 +131,10 @@ namespace wrench{
 //        /** @brief The resources info in json data string */
 //        std::string json_data_string;
 //    };
-    #endif
+#endif
 
 
-    #if 0
+#if 0
     /**
      * @brief BatchJobSubmissionToSchedulerMessage class
      */
@@ -149,9 +149,9 @@ namespace wrench{
         /** @brief JSON data arguments to the scheduler */
         std::string job_args_to_scheduler;
     };
-    #endif
+#endif
 
-    #if 0
+#if 0
     /**
      * @brief BatchJobReplyFromSchedulerMessage class
      */
@@ -162,13 +162,13 @@ namespace wrench{
         /** @brief The message replied by the scheduler */
         std::string reply;
     };
-    #endif
+#endif
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-}
+}// namespace wrench
 
 
-#endif //WRENCH_BATCHSERVICEMESSAGE_H
+#endif//WRENCH_BATCHSERVICEMESSAGE_H

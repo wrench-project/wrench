@@ -19,21 +19,18 @@ WRENCH_LOG_CATEGORY(bad_platform_test, "Log category for BadPlatform test");
 class BadPlatformTest : public ::testing::Test {
 
 public:
-
     void do_badPlatformFileTest_test();
     void do_badPlatformTest_test(std::string xml);
 
 protected:
-
-
     std::string bad_format_xml = "<?xml version='1.0'?>"
-                               "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                               "<platform version=\"4.1\"> "
-                               " < "
-                               "   <zone id=\"AS0\" routing=\"Full\"> "
-                               "       <host id=\"Host\" speed=\"1f\" core=\"2\" /> "
-                               "   </zone> "
-                               "</platform>";
+                                 "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+                                 "<platform version=\"4.1\"> "
+                                 " < "
+                                 "   <zone id=\"AS0\" routing=\"Full\"> "
+                                 "       <host id=\"Host\" speed=\"1f\" core=\"2\" /> "
+                                 "   </zone> "
+                                 "</platform>";
 
     std::string bad_ram1_xml = "<?xml version='1.0'?>"
                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
@@ -104,23 +101,22 @@ protected:
                                 "</platform>";
 
     std::string zero_bandwidth_link = "<?xml version='1.0'?>"
+                                      "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
+                                      "<platform version=\"4.1\"> "
+                                      "   <zone id=\"AS01\" routing=\"Full\"> "
+                                      "       <link id=\"link\" bandwidth=\"0Mbps\" latency=\"0us\" > "
+                                      "       </link>  "
+                                      "   </zone> "
+                                      "</platform>";
+
+    std::string zero_speed_host = "<?xml version='1.0'?>"
                                   "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
                                   "<platform version=\"4.1\"> "
                                   "   <zone id=\"AS01\" routing=\"Full\"> "
-                                  "       <link id=\"link\" bandwidth=\"0Mbps\" latency=\"0us\" > "
-                                  "       </link>  "
+                                  "       <host id=\"Host\" speed=\"0f\" core=\"2\" > "
+                                  "       </host>  "
                                   "   </zone> "
                                   "</platform>";
-
-    std::string zero_speed_host = "<?xml version='1.0'?>"
-                                "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                                "<platform version=\"4.1\"> "
-                                "   <zone id=\"AS01\" routing=\"Full\"> "
-                                "       <host id=\"Host\" speed=\"0f\" core=\"2\" > "
-                                "       </host>  "
-                                "   </zone> "
-                                "</platform>";
-
 
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -132,7 +128,7 @@ protected:
 
 
 TEST_F(BadPlatformTest, BadPlatformFile) {
-        DO_TEST_WITH_FORK(do_badPlatformFileTest_test);
+    DO_TEST_WITH_FORK(do_badPlatformFileTest_test);
 }
 
 void BadPlatformTest::do_badPlatformFileTest_test() {
@@ -148,7 +144,7 @@ void BadPlatformTest::do_badPlatformFileTest_test() {
     ASSERT_THROW(simulation->instantiatePlatform("/bogus"), std::invalid_argument);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -164,12 +160,11 @@ TEST_F(BadPlatformTest, BadPlatform) {
             this->bad_format_xml,
             this->bad_ram1_xml,
             this->bad_ram2_xml,
-//            this->bad_disk1_xml,  // "white spaces are ok!"
+            //            this->bad_disk1_xml,  // "white spaces are ok!"
             this->bad_disk2_xml,
             this->bad_disk3_xml,
-            this->zero_bandwidth_link
-    };
-    for (auto const &xml : bad_xmls) {
+            this->zero_bandwidth_link};
+    for (auto const &xml: bad_xmls) {
         DO_TEST_WITH_FORK_ONE_ARG(do_badPlatformTest_test, xml);
     }
 }
@@ -191,9 +186,7 @@ void BadPlatformTest::do_badPlatformTest_test(std::string xml) {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-

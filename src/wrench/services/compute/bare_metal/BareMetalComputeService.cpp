@@ -65,7 +65,7 @@ namespace wrench {
         std::vector<std::string> tokens;
         boost::algorithm::split(tokens, spec, boost::is_any_of(":"));
         switch (tokens.size()) {
-            case 1: // "num_cores" or "hostname"
+            case 1:// "num_cores" or "hostname"
             {
                 unsigned long num_threads;
                 if (sscanf(tokens[0].c_str(), "%lu", &num_threads) != 1) {
@@ -74,7 +74,7 @@ namespace wrench {
                     return std::make_tuple(std::string(""), num_threads);
                 }
             }
-            case 2: // "hostname:num_cores"
+            case 2:// "hostname:num_cores"
             {
                 unsigned long num_threads;
                 if (sscanf(tokens[1].c_str(), "%lu", &num_threads) != 1) {
@@ -101,13 +101,13 @@ namespace wrench {
         // Check that each action can run w.r.t. the resource I have
         unsigned long max_cores = 0;
         double max_ram = 0;
-        for (auto const &cr : compute_resources) {
+        for (auto const &cr: compute_resources) {
             max_cores = (std::get<0>(cr.second) > max_cores ? std::get<0>(cr.second) : max_cores);
             max_ram = (std::get<1>(cr.second) > max_ram ? std::get<1>(cr.second) : max_ram);
         }
 
         // Check that args are specified for existing tasks
-        for (auto const &arg : service_specific_args) {
+        for (auto const &arg: service_specific_args) {
             if (not job->hasAction(arg.first)) {
                 throw std::invalid_argument("BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '{" +
                                             arg.first + "," + arg.second + "}: no action named " + arg.first);
@@ -115,7 +115,7 @@ namespace wrench {
         }
 
         // Validate that there are enough resources for each task
-        for (auto const &action : cjob->getActions()) {
+        for (auto const &action: cjob->getActions()) {
             if ((action->getMinRAMFootprint() > max_ram) or
                 (action->getMinNumCores() > max_cores)) {
                 throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<BareMetalComputeService>()));
@@ -123,7 +123,7 @@ namespace wrench {
         }
 
         // Check that service-specific args make sense w.r.t to the resources I have
-        for (auto const &action : cjob->getActions()) {
+        for (auto const &action: cjob->getActions()) {
             if ((service_specific_args.find(action->getName()) != service_specific_args.end()) and
                 (not service_specific_args.at(action->getName()).empty())) {
                 std::tuple<std::string, unsigned long> parsed_spec;
@@ -252,10 +252,9 @@ namespace wrench {
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::string scratch_space_mount_point,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
-    ) : ComputeService(hostname,
-                       "bare_metal",
-                       scratch_space_mount_point) {
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
+                                                                                        "bare_metal",
+                                                                                        scratch_space_mount_point) {
         initiateInstance(hostname,
                          std::move(compute_resources),
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
@@ -275,12 +274,11 @@ namespace wrench {
                                                      const std::vector<std::string> compute_hosts,
                                                      std::string scratch_space_mount_point,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
-    ) : ComputeService(hostname,
-                       "bare_metal",
-                       scratch_space_mount_point) {
+                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
+                                                                                                                                 "bare_metal",
+                                                                                                                                 scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
-        for (auto h : compute_hosts) {
+        for (auto h: compute_hosts) {
             specified_compute_resources.insert(
                     std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
         }
@@ -312,10 +310,9 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
-            std::string suffix, std::shared_ptr<StorageService> scratch_space
-    ) : ComputeService(hostname,
-                       "bare_metal" + suffix,
-                       scratch_space) {
+            std::string suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
+                                                                                                "bare_metal" + suffix,
+                                                                                                scratch_space) {
         initiateInstance(hostname,
                          std::move(compute_resources),
                          std::move(property_list),
@@ -339,10 +336,9 @@ namespace wrench {
             const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            std::shared_ptr<StorageService> scratch_space) :
-            ComputeService(hostname,
-                           "bare_metal",
-                           scratch_space) {
+            std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
+                                                                            "bare_metal",
+                                                                            scratch_space) {
         initiateInstance(hostname,
                          compute_resources,
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
@@ -389,11 +385,11 @@ namespace wrench {
                     std::move(compute_resources),
                     nullptr,
                     {
+                            {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
                             {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)},
                             {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)},
                     },
-                    {}
-            ));
+                    {}));
             this->action_execution_service->setSimulation(this->simulation);
         } catch (std::invalid_argument &e) {
             throw;
@@ -428,9 +424,8 @@ namespace wrench {
                     new ServiceTerminationDetector(this->hostname, this->action_execution_service,
                                                    this->mailbox, false, true));
             termination_detector->setSimulation(this->simulation);
-            termination_detector->start(termination_detector, true, false); // Daemonized, no auto-restart
+            termination_detector->start(termination_detector, true, false);// Daemonized, no auto-restart
         }
-
 
 
         // Set an alarm for my timely death, if necessary
@@ -446,7 +441,6 @@ namespace wrench {
         WRENCH_INFO("BareMetalService terminating cleanly!");
         return this->exit_code;
     }
-
 
 
     /**
@@ -470,7 +464,7 @@ namespace wrench {
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-//        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+        //        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->terminate(msg->send_failure_notifications, (ComputeService::TerminationCause)(msg->termination_cause));
@@ -541,8 +535,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox,
                                     new ComputeServiceTerminateCompoundJobRequestMessage(
-                                            answer_mailbox, job, this->getMessagePayloadValue(
-                                                    BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                            answer_mailbox, job, this->getMessagePayloadValue(BareMetalComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -583,7 +576,7 @@ namespace wrench {
 
         // Can we run this job at all in terms of available resources?
         bool can_run = true;
-        for (auto const &action : job->getActions()) {
+        for (auto const &action: job->getActions()) {
             if (not this->action_execution_service->actionCanRun(action)) {
                 can_run = false;
                 break;
@@ -607,7 +600,7 @@ namespace wrench {
         this->current_jobs.insert(job);
 
         // Add all action to the list of actions to run
-        for (auto const &action : job->getActions()) {
+        for (auto const &action: job->getActions()) {
             if (action->getState() == Action::State::READY) {
                 this->ready_actions.push_back(action);
             } else {
@@ -634,7 +627,7 @@ namespace wrench {
         this->setStateToDown();
 
         // Terminate all jobs
-        for (auto const &job : this->current_jobs) {
+        for (auto const &job: this->current_jobs) {
             try {
                 this->terminateCurrentCompoundJob(job, termination_cause);
             } catch (ExecutionException &e) {
@@ -655,7 +648,7 @@ namespace wrench {
                                     this->getMessagePayloadValue(
                                             BareMetalComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
                 } catch (std::shared_ptr<NetworkError> &cause) {
-                    return; // ignore
+                    return;// ignore
                 }
             }
         }
@@ -665,7 +658,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Process a compound job termination request
  *
  * @param job: the job to terminate
@@ -701,7 +694,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Process a host available resource request
  * @param answer_mailbox: the answer mailbox
  * @param num_cores: the desired number of cores
@@ -713,12 +706,12 @@ namespace wrench {
         bool answer = this->action_execution_service->IsThereAtLeastOneHostWithAvailableResources(num_cores, ram);
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage(
-                        answer,
-                        this->getMessagePayloadValue(
-                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
+                                        answer,
+                                        this->getMessagePayloadValue(
+                                                BareMetalComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD)));
     }
 
-/**
+    /**
  * @brief Process a "get resource description message"
  * @param answer_mailbox: the mailbox to which the description message should be sent
  * @param key: the desired resource information (i.e., dictionary key) that's needed)
@@ -742,18 +735,18 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
     }
 
-/**
+    /**
  * @brief Cleans up the scratch as I am a pilot job and I to need clean the files stored by the standard jobs
  *        executed inside me
  */
     void BareMetalComputeService::cleanUpScratch() {
-        for (auto const &j : this->files_in_scratch) {
-            for (auto const &f : j.second) {
+        for (auto const &j: this->files_in_scratch) {
+            for (auto const &f: j.second) {
                 try {
                     StorageService::deleteFile(f, FileLocation::LOCATION(
-                            this->getScratch(),
-                            this->getScratch()->getMountPoint() +
-                            j.first->getName()));
+                                                          this->getScratch(),
+                                                          this->getScratch()->getMountPoint() +
+                                                                  j.first->getName()));
                 } catch (ExecutionException &e) {
                     throw;
                 }
@@ -761,7 +754,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Method to make sure that property specs are valid
  *
  * @throw std::invalid_argument
@@ -783,17 +776,15 @@ namespace wrench {
                                         this->getPropertyValueAsString(
                                                 BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD));
         }
-
     }
 
 
-/**
+    /**
  * @brief Helper method to dispatch actions
  */
     void BareMetalComputeService::dispatchReadyActions() {
 
-//        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
-
+        //        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
 
 
         // Sort all the actions in the ready queue by (job.priority, action.priority, action.name)
@@ -814,7 +805,7 @@ namespace wrench {
                           } else if (a->getName() < b->getName()) {
                               return false;
                           } else {
-                              return (unsigned long)(a->getJob().get()) > (unsigned long)(b->getJob().get());
+                              return (unsigned long) (a->getJob().get()) > (unsigned long) (b->getJob().get());
                           }
                       } else {
                           if (a->getPriority() > b->getPriority()) {
@@ -826,12 +817,12 @@ namespace wrench {
                           } else if (a->getName() > b->getName()) {
                               return false;
                           } else {
-                              return (unsigned long)(a.get()) > (unsigned long)(b.get());
+                              return (unsigned long) (a.get()) > (unsigned long) (b.get());
                           }
                       }
                   });
 
-        for (auto const &action : this->ready_actions) {
+        for (auto const &action: this->ready_actions) {
             this->action_execution_service->submitAction(action);
             this->num_dispatched_actions_for_cjob[action->getJob()]++;
             this->dispatched_actions.insert(action);
@@ -840,15 +831,15 @@ namespace wrench {
         this->ready_actions.clear();
     }
 
-/**
+    /**
  * @brief Process an action completion
  * @param action
  */
     void BareMetalComputeService::processActionDone(std::shared_ptr<Action> action) {
 
-//        for (auto const &a : this->dispatched_actions) {
-//            WRENCH_INFO("DISPATCHED LIST: %s", a->getName().c_str());
-//        }
+        //        for (auto const &a : this->dispatched_actions) {
+        //            WRENCH_INFO("DISPATCHED LIST: %s", a->getName().c_str());
+        //        }
         if (this->dispatched_actions.find(action) == this->dispatched_actions.end()) {
             WRENCH_INFO("Received a notification about action %s being done, but I don't know anything about this action - ignoring",
                         action->getName().c_str());
@@ -859,7 +850,7 @@ namespace wrench {
         this->num_dispatched_actions_for_cjob[action->getJob()]--;
 
         // Deal with action's ready children, if any
-        for (auto const &child : action->getChildren()) {
+        for (auto const &child: action->getChildren()) {
             if (child->getState() == Action::State::READY) {
                 this->not_ready_actions.erase(child);
                 this->ready_actions.push_back(child);
@@ -893,9 +884,8 @@ namespace wrench {
                 // job is not one
             }
         } catch (std::shared_ptr<NetworkError> &cause) {
-            return; // ignore
+            return;// ignore
         }
-
     }
 
     /**
@@ -906,7 +896,7 @@ namespace wrench {
     void BareMetalComputeService::terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job,
                                                               ComputeService::TerminationCause termination_cause) {
 
-        for (auto const &action : job->getActions()) {
+        for (auto const &action: job->getActions()) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 this->action_execution_service->terminateAction(action, termination_cause);
             } else if (this->not_ready_actions.find(action) != this->not_ready_actions.end()) {
@@ -949,7 +939,7 @@ namespace wrench {
                 // The action is already finished
             }
         }
-//        this->current_jobs.erase(job);
+        //        this->current_jobs.erase(job);
     }
 
     /**
@@ -976,4 +966,4 @@ namespace wrench {
         return false;
     }
 
-}
+}// namespace wrench

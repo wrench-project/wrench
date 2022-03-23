@@ -28,7 +28,7 @@
 #define DBL_EQUAL(x, y) (std::abs<double>((x) - (y)) < 0.1)
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_output,
-"Log category for Simulation Output");
+                    "Log category for Simulation Output");
 
 namespace wrench {
     /******************/
@@ -62,9 +62,9 @@ namespace wrench {
         std::pair<double, double> write;
 
         /* @brief file read operations */
-        std::vector <std::tuple<double, double, std::string>> reads;
+        std::vector<std::tuple<double, double, std::string>> reads;
         /* @brief file write operations */
-        std::vector <std::tuple<double, double, std::string>> writes;
+        std::vector<std::tuple<double, double, std::string>> writes;
 
         /* @brief whether the task has failed */
         double failed;
@@ -86,11 +86,9 @@ namespace wrench {
          * @return a date
          */
         double getTaskEndTime() {
-            return std::max({
-                                    this->whole_task.second,
-                                    this->failed,
-                                    this->terminated
-                            });
+            return std::max({this->whole_task.second,
+                             this->failed,
+                             this->terminated});
         }
     } WorkflowTaskExecutionInstance;
 
@@ -99,10 +97,10 @@ namespace wrench {
      */
     static std::vector<simgrid::s4u::Host *> get_all_physical_hosts() {
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-        std::vector < simgrid::s4u::Host * > hosts = simgrid_engine->get_all_hosts();
-        std::vector < simgrid::s4u::Host * > to_return;
+        std::vector<simgrid::s4u::Host *> hosts = simgrid_engine->get_all_hosts();
+        std::vector<simgrid::s4u::Host *> to_return;
 
-        for (auto const &h : hosts) {
+        for (auto const &h: hosts) {
             // Ignore VMs
             if (S4U_VirtualMachine::vm_to_pm_map.find(h->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
                 continue;
@@ -223,11 +221,10 @@ namespace wrench {
         j["task_id"] = w.task_id;
 
         j["execution_host"] = {
-                {"hostname",               w.hostname},
-                {"flop_rate",              w.host_flop_rate},
+                {"hostname", w.hostname},
+                {"flop_rate", w.host_flop_rate},
                 {"memory_manager_service", w.host_memory},
-                {"cores",                  w.host_num_cores}
-        };
+                {"cores", w.host_num_cores}};
 
         j["num_cores_allocated"] = w.num_cores_allocated;
 
@@ -235,14 +232,13 @@ namespace wrench {
 
         j["whole_task"] = {
                 {"start", w.whole_task.first},
-                {"end",   w.whole_task.second}
-        };
+                {"end", w.whole_task.second}};
 
         nlohmann::json file_reads;
-        for (auto const &r : w.reads) {
-            nlohmann::json file_read = nlohmann::json::object({{"end",   std::get<1>(r)},
+        for (auto const &r: w.reads) {
+            nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
                                                                {"start", std::get<0>(r)},
-                                                               {"id",    std::get<2>(r)}});
+                                                               {"id", std::get<2>(r)}});
             file_reads.push_back(file_read);
         }
 
@@ -250,14 +246,13 @@ namespace wrench {
 
         j["compute"] = {
                 {"start", w.compute.first},
-                {"end",   w.compute.second}
-        };
+                {"end", w.compute.second}};
 
         nlohmann::json file_writes;
-        for (auto const &r : w.writes) {
-            nlohmann::json file_write = nlohmann::json::object({{"end",   std::get<1>(r)},
+        for (auto const &r: w.writes) {
+            nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
                                                                 {"start", std::get<0>(r)},
-                                                                {"id",    std::get<2>(r)}});
+                                                                {"id", std::get<2>(r)}});
             file_writes.push_back(file_write);
         }
 
@@ -339,25 +334,24 @@ namespace wrench {
      * @param index: the index of the workflow execution data up to where we would like to check for a valid layout
      * @return bool
      */
-    bool searchForLayout(std::vector <WorkflowTaskExecutionInstance> &data, std::size_t index) {
+    bool searchForLayout(std::vector<WorkflowTaskExecutionInstance> &data, std::size_t index) {
         const unsigned long long PRECISION = 1000 * 1000 * 1000;
 
         WorkflowTaskExecutionInstance &current_execution_instance = data.at(index);
 
         auto current_rect_x_range = std::pair<unsigned long long, unsigned long long>(
                 current_execution_instance.whole_task.first * PRECISION,
-                current_execution_instance.getTaskEndTime() * PRECISION
-        );
+                current_execution_instance.getTaskEndTime() * PRECISION);
 
         unsigned long long num_cores_allocated = current_execution_instance.num_cores_allocated;
         unsigned long long execution_host_num_cores = current_execution_instance.host_num_cores;
         auto num_vertical_positions = execution_host_num_cores - num_cores_allocated + 1;
 
-//      std::string spaces = "";
-//      for (int i=0; i < index; i++) {
-//        spaces += "  ";
-//      }
-//      std::cout << spaces + "task = " << index <<"\n";
+        //      std::string spaces = "";
+        //      for (int i=0; i < index; i++) {
+        //        spaces += "  ";
+        //      }
+        //      std::cout << spaces + "task = " << index <<"\n";
 
         /*
          * For each possible vertical position that an event can be in, we perform a check to see that its vertical
@@ -372,10 +366,9 @@ namespace wrench {
 
             auto current_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                     vertical_position,
-                    vertical_position + num_cores_allocated
-            );
+                    vertical_position + num_cores_allocated);
 
-//              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
+            //              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
             /*
              * We check this current event's position against all other events that were added
              * before it to make sure it doesn't overlap with any of those events.
@@ -388,13 +381,11 @@ namespace wrench {
                 if (current_execution_instance.hostname == other_execution_instance.hostname) {
                     auto other_rect_x_range = std::pair<unsigned long long, unsigned long long>(
                             other_execution_instance.whole_task.first * PRECISION,
-                            other_execution_instance.getTaskEndTime() * PRECISION
-                    );
+                            other_execution_instance.getTaskEndTime() * PRECISION);
 
                     auto other_rect_y_range = std::pair<unsigned long long, unsigned long long>(
                             other_execution_instance.vertical_position,
-                            other_execution_instance.vertical_position + other_execution_instance.num_cores_allocated
-                    );
+                            other_execution_instance.vertical_position + other_execution_instance.num_cores_allocated);
 
                     /*
                      * Check overlap for the x_ranges first. If there is no overlap, we can guarantee that the rectangles
@@ -437,7 +428,7 @@ namespace wrench {
      *
      * @throws std::runtime_error
      */
-    void generateHostUtilizationGraphLayout(std::vector <WorkflowTaskExecutionInstance> &data) {
+    void generateHostUtilizationGraphLayout(std::vector<WorkflowTaskExecutionInstance> &data) {
         if (not searchForLayout(data, 0)) {
             throw std::runtime_error(
                     "SimulationOutput::generateHostUtilizationGraphLayout() could not find a valid layout.");
@@ -544,9 +535,9 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampFileWriteFailure>();
 
-        std::vector <WorkflowTaskExecutionInstance> data;
+        std::vector<WorkflowTaskExecutionInstance> data;
 
-        for (auto const &task : tasks) {
+        for (auto const &task: tasks) {
             auto execution_history = task->getExecutionHistory();
             while (not execution_history.empty()) {
                 auto current_task_execution = execution_history.top();
@@ -555,7 +546,7 @@ namespace wrench {
                 current_execution_instance.task_id = task->getID();
 
                 if (!read_start_timestamps.empty()) {
-                    for (auto &read_start_timestamp : read_start_timestamps) {
+                    for (auto &read_start_timestamp: read_start_timestamps) {
                         if (read_start_timestamp->getContent()->getTask()->getID() ==
                             current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(
@@ -567,7 +558,7 @@ namespace wrench {
                 }
 
                 if (!write_start_timestamps.empty()) {
-                    for (auto &write_start_timestamp : write_start_timestamps) {
+                    for (auto &write_start_timestamp: write_start_timestamps) {
                         if (write_start_timestamp->getContent()->getTask()->getID() ==
                             current_execution_instance.task_id) {
                             current_execution_instance.writes.emplace_back(
@@ -579,53 +570,37 @@ namespace wrench {
                 }
 
                 nlohmann::json file_reads;
-                for (auto const &r : current_execution_instance.reads) {
-                    nlohmann::json file_read = nlohmann::json::object({{"end",   std::get<1>(r)},
+                for (auto const &r: current_execution_instance.reads) {
+                    nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
                                                                        {"start", std::get<0>(r)},
-                                                                       {"id",    std::get<2>(r)}});
+                                                                       {"id", std::get<2>(r)}});
                     file_reads.push_back(file_read);
                 }
 
                 nlohmann::json file_writes;
-                for (auto const &r : current_execution_instance.writes) {
-                    nlohmann::json file_write = nlohmann::json::object({{"end",   std::get<1>(r)},
+                for (auto const &r: current_execution_instance.writes) {
+                    nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
                                                                         {"start", std::get<0>(r)},
-                                                                        {"id",    std::get<2>(r)}});
+                                                                        {"id", std::get<2>(r)}});
                     file_writes.push_back(file_write);
                 }
                 task_json.push_back(
-                        {
-                                {"task_id",             task->getID()},
-                                {"color",               task->getColor()},
-                                {"execution_host",      {
-                                                                {"hostname", current_task_execution.physical_execution_host},
-                                                                {"flop_rate", Simulation::getHostFlopRate(
-                                                                        current_task_execution.physical_execution_host)},
-                                                                {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                                                        current_task_execution.physical_execution_host)},
-                                                                {"cores", Simulation::getHostNumCores(
-                                                                        current_task_execution.physical_execution_host)}
-                                                        }},
-                                {"num_cores_allocated", current_task_execution.num_cores_allocated},
-                                {"whole_task",          {
-                                                                {"start",    current_task_execution.task_start},
-                                                                {"end",       current_task_execution.task_end}
-                                                        }},
-                                {"read",                file_reads},
-                                {"compute",             {
-                                                                {"start",    current_task_execution.computation_start},
-                                                                {"end",       current_task_execution.computation_end}
-                                                        }},
-                                {"write",               file_writes},
-                                {"failed",              current_task_execution.task_failed},
-                                {"terminated",          current_task_execution.task_terminated}
-                        });
+                        {{"task_id", task->getID()},
+                         {"color", task->getColor()},
+                         {"execution_host", {{"hostname", current_task_execution.physical_execution_host}, {"flop_rate", Simulation::getHostFlopRate(current_task_execution.physical_execution_host)}, {"memory_manager_service", Simulation::getHostMemoryCapacity(current_task_execution.physical_execution_host)}, {"cores", Simulation::getHostNumCores(current_task_execution.physical_execution_host)}}},
+                         {"num_cores_allocated", current_task_execution.num_cores_allocated},
+                         {"whole_task", {{"start", current_task_execution.task_start}, {"end", current_task_execution.task_end}}},
+                         {"read", file_reads},
+                         {"compute", {{"start", current_task_execution.computation_start}, {"end", current_task_execution.computation_end}}},
+                         {"write", file_writes},
+                         {"failed", current_task_execution.task_failed},
+                         {"terminated", current_task_execution.task_terminated}});
                 execution_history.pop();
             }
         }
 
         // For each attempted execution of a task, add a WorkflowTaskExecutionInstance to the list.
-        for (auto const &task : tasks) {
+        for (auto const &task: tasks) {
             auto execution_history = task->getExecutionHistory();
 
             while (not execution_history.empty()) {
@@ -636,7 +611,7 @@ namespace wrench {
                 current_execution_instance.task_id = task->getID();
 
                 if (!read_start_timestamps.empty()) {
-                    for (auto &read_start_timestamp : read_start_timestamps) {
+                    for (auto &read_start_timestamp: read_start_timestamps) {
                         if (read_start_timestamp->getContent()->getTask()->getID() ==
                             current_execution_instance.task_id) {
                             current_execution_instance.reads.emplace_back(
@@ -648,7 +623,7 @@ namespace wrench {
                 }
 
                 if (!write_start_timestamps.empty()) {
-                    for (auto &write_start_timestamp : write_start_timestamps) {
+                    for (auto &write_start_timestamp: write_start_timestamps) {
                         if (write_start_timestamp->getContent()->getTask()->getID() ==
                             current_execution_instance.task_id) {
                             current_execution_instance.writes.emplace_back(
@@ -709,38 +684,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Writes a JSON graph representation of the Workflow to a file.
-     * 
-     * A node is added for each WorkflowTask and DataFile. A WorkflowTask will have the type "task" and
-     *  a DataFile will have the type "file". A directed link is added for each dependency in the Workflow.
+     * @brief Writes a JSON graph representation of the Workflow to a file, in the WfFormat format
+     *        which is defined at: https://wfcommons.org/format.
      *
-     * <pre>
-     * {
-     *      "workflow_graph": {
-     *          vertices: [
-     *              {
-     *                  type: <"task">,
-     *                  id: <string>,
-     *                  flops: <double>,
-     *                  min_cores: <unsigned_long>,
-     *                  max_cores: <unsigned_long>,
-     *                  memory_manager_service: <double>,
-     *              },
-     *              {
-     *                  type: <"file">,
-     *                  id: <string>,
-     *                  size: <double>
-     *              }, . . .
-     *          ],
-     *          edges: [
-     *              {
-     *                  source: <string>,
-     *                  target: <string>
-     *              }, . . .
-     *          ]
-     *      }
-     *  }
-     *  </pre>
+     *        Note that in the output JSON, the machines::cpu::speed is give as a GHz clock rate
+     *        while in WRENCH core speeds are in Flop/sec. The GHz clock rate is computed by dividing
+     *        the flop rate by 10^9 (so it's not really a clock rate).
      *
      * @param workflow: a pointer to the workflow
      * @param file_path: the path to write the file
@@ -757,70 +706,86 @@ namespace wrench {
                     "SimulationOutput::dumpWorkflowGraphJSON() requires a valid workflow and file_path");
         }
 
-        // schema
-        nlohmann::json vertices;
-        nlohmann::json edges;
+        std::set<std::string> used_machines;
+
+        nlohmann::json tasks = nlohmann::json::array();
 
         // add the task vertices
-        for (const auto &task : workflow->getTasks()) {
-            vertices.push_back({
-                                       {"type",                   "task"},
-                                       {"id",                     task->getID()},
-                                       {"flops",                  task->getFlops()},
-                                       {"min_cores",              task->getMinNumCores()},
-                                       {"max_cores",              task->getMaxNumCores()},
-                                       {"memory_manager_service", task->getMemoryRequirement()}
-                               });
-        }
+        for (const auto &task: workflow->getTasks()) {
 
-        // add the file vertices
-        for (const auto &file : workflow->getFileMap()) {
-            vertices.push_back({
-                                       {"type", "file"},
-                                       {"id",   file.first},
-                                       {"size", file.second->getSize()}
-                               });
-        }
-
-        // add the edges
-        for (const auto &task : workflow->getTasks()) {
-            // create edges between input files (if any) and the current task
-            for (const auto &input_file : task->getInputFiles()) {
-                edges.push_back({
-                                        {"source", input_file->getID()},
-                                        {"target", task->getID()}
-                                });
+            nlohmann::json files = nlohmann::json::array();
+            for (const auto &f: task->getInputFiles()) {
+                files.push_back({{"link", "input"},
+                                 {"name", f->getID()},
+                                 {"size", f->getSize()}});
+            }
+            for (const auto &f: task->getOutputFiles()) {
+                files.push_back({{"link", "output"},
+                                 {"name", f->getID()},
+                                 {"size", f->getSize()}});
             }
 
-            bool has_output_files = not task->getOutputFiles().empty();
-            bool has_children = task->getNumberOfChildren() > 0;
-
-            if (has_output_files) {
-                // create the edges between current task and its output files (if any)
-                for (const auto &output_file : task->getOutputFiles()) {
-                    edges.push_back({{"source", task->getID()},
-                                     {"target", output_file->getID()}});
-                }
-            } else if (has_children) {
-                // then create the edges from the current task to its children tasks (if it has not output files)
-                for (const auto &child : workflow->getTaskChildren(task)) {
-                    edges.push_back({
-                                            {"source", task->getID()},
-                                            {"target", child->getID()}});
-                }
+            nlohmann::json parents = nlohmann::json::array();
+            for (const auto &parent: task->getParents()) {
+                parents.push_back(parent->getID());
             }
+
+            nlohmann::json children = nlohmann::json::array();
+            for (const auto &child: task->getChildren()) {
+                children.push_back(child->getID());
+            }
+
+            double runtime;
+            unsigned long num_cores;
+            std::string machine;
+            if (task->getState() == WorkflowTask::State::COMPLETED) {
+                runtime = task->getComputationEndDate() - task->getComputationStartDate();
+                num_cores = task->getNumCoresAllocated();
+                machine = task->getExecutionHost();
+                used_machines.insert(machine);
+            } else {
+                runtime = -1;
+                num_cores = task->getMinNumCores();
+                machine = "";
+            }
+            tasks.push_back({{"type", "compute"},
+                             {"name", task->getID()},
+                             {"runtime", runtime},
+                             {"cores", num_cores},
+                             {"memory", task->getMemoryRequirement()},
+                             {"parents", parents},
+                             {"children", children},
+                             {"files", files},
+                             {"machine", machine}});
         }
 
-        nlohmann::json workflow_task_graph;
-        workflow_task_graph["vertices"] = vertices;
-        workflow_task_graph["edges"] = edges;
-        nlohmann::json workflow_graph;
-        workflow_graph["workflow_graph"] = workflow_task_graph;
-        workflow_graph_json_part = workflow_task_graph;
+
+        nlohmann::json machines = nlohmann::json::array();
+        for (auto const &m: used_machines) {
+            double memory = Simulation::getHostMemoryCapacity(m);
+            unsigned long num_cores = Simulation::getHostNumCores(m);
+            double flop_rate = Simulation::getHostFlopRate(m);
+            double ghz_rate = flop_rate / (1000.0 * 1000.0 * 1000.0);
+            machines.push_back({{"nodeName", m},
+                                {"memory", (unsigned long) memory},
+                                {"cpu", {{"count", num_cores}, {"speed", (unsigned long) ghz_rate}}}});
+        }
+
+
+        nlohmann::json json_workflow;
+        json_workflow["makespan"] = workflow->getCompletionDate();
+        json_workflow["tasks"] = tasks;
+        json_workflow["machines"] = machines;
+
+        nlohmann::json json_object;
+        json_object["name"] = "WRENCH-generated workflow";
+        json_object["schemaVersion"] = "1.3";
+        json_object["workflow"] = json_workflow;
+        workflow_graph_json_part = json_workflow;
 
         if (writing_file) {
             std::ofstream output(file_path);
-            output << std::setw(4) << nlohmann::json(workflow_graph) << std::endl;
+            output << std::setw(4) << nlohmann::json(json_object) << std::endl;
             output.close();
         }
     }
@@ -881,10 +846,10 @@ namespace wrench {
         }
 
         try {
-            std::vector < simgrid::s4u::Host * > hosts = get_all_physical_hosts();
+            std::vector<simgrid::s4u::Host *> hosts = get_all_physical_hosts();
 
             nlohmann::json hosts_energy_consumption_information;
-            for (const auto &host : hosts) {
+            for (const auto &host: hosts) {
                 nlohmann::json datum;
 
                 datum["hostname"] = host->get_name();
@@ -895,29 +860,25 @@ namespace wrench {
                                              " does not have a wattage_per_state property!");
                 }
                 std::string watts_per_state_property_string = std::string(property_string);
-                std::vector <std::string> watts_per_state;
+                std::vector<std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
                 for (size_t pstate = 0; pstate < watts_per_state.size(); ++pstate) {
-                    std::vector <std::string> current_state_watts;
+                    std::vector<std::string> current_state_watts;
                     boost::split(current_state_watts, watts_per_state.at(pstate), boost::is_any_of(":"));
 
                     if (current_state_watts.size() == 2) {
-                        datum["pstates"].push_back({
-                                                           {"pstate",    pstate},
-                                                           {"speed",     host->get_pstate_speed((int) pstate)},
-                                                           {"idle",      current_state_watts.at(0)},
-                                                           {"epsilon",   current_state_watts.at(0)},
-                                                           {"all_cores", current_state_watts.at(1)}
-                                                   });
+                        datum["pstates"].push_back({{"pstate", pstate},
+                                                    {"speed", host->get_pstate_speed((int) pstate)},
+                                                    {"idle", current_state_watts.at(0)},
+                                                    {"epsilon", current_state_watts.at(0)},
+                                                    {"all_cores", current_state_watts.at(1)}});
                     } else if (current_state_watts.size() == 3) {
-                        datum["pstates"].push_back({
-                                                           {"pstate",    pstate},
-                                                           {"speed",     host->get_pstate_speed((int) pstate)},
-                                                           {"idle",      current_state_watts.at(0)},
-                                                           {"epsilon",   current_state_watts.at(1)},
-                                                           {"all_cores", current_state_watts.at(2)}
-                                                   });
+                        datum["pstates"].push_back({{"pstate", pstate},
+                                                    {"speed", host->get_pstate_speed((int) pstate)},
+                                                    {"idle", current_state_watts.at(0)},
+                                                    {"epsilon", current_state_watts.at(1)},
+                                                    {"all_cores", current_state_watts.at(2)}});
                     } else {
                         throw std::runtime_error("Host " + std::string(host->get_name()) +
                                                  "'s wattage_per_state property is invalid (should have 2 or 3 " +
@@ -935,23 +896,19 @@ namespace wrench {
                     datum["wattage_off"] = std::string(wattage_off_value);
                 }
 
-                for (const auto &pstate_timestamp : this->getTrace<SimulationTimestampPstateSet>()) {
+                for (const auto &pstate_timestamp: this->getTrace<SimulationTimestampPstateSet>()) {
                     if (host->get_name() == pstate_timestamp->getContent()->getHostname()) {
                         datum["pstate_trace"].push_back(
-                                {
-                                        {"time",   pstate_timestamp->getDate()},
-                                        {"pstate", pstate_timestamp->getContent()->getPstate()}
-                                });
+                                {{"time", pstate_timestamp->getDate()},
+                                 {"pstate", pstate_timestamp->getContent()->getPstate()}});
                     }
                 }
 
-                for (const auto &energy_consumption_timestamp : this->getTrace<SimulationTimestampEnergyConsumption>()) {
+                for (const auto &energy_consumption_timestamp: this->getTrace<SimulationTimestampEnergyConsumption>()) {
                     if (host->get_name() == energy_consumption_timestamp->getContent()->getHostname()) {
                         datum["consumed_energy_trace"].push_back(
-                                {
-                                        {"time",   energy_consumption_timestamp->getDate()},
-                                        {"joules", energy_consumption_timestamp->getContent()->getConsumption()}
-                                });
+                                {{"time", energy_consumption_timestamp->getDate()},
+                                 {"joules", energy_consumption_timestamp->getContent()->getConsumption()}});
                     }
                 }
 
@@ -1037,58 +994,54 @@ namespace wrench {
 
         nlohmann::json platform_graph_json;
 
-//        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
+        //        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
 
         // Get all the hosts
         auto hosts = get_all_physical_hosts();
 
         // get the by-cluster host information
-        std::map <std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
+        std::map<std::string, std::vector<std::string>> cluster_to_hosts = S4U_Simulation::getAllHostnamesByCluster();
 
         // Build a host-to-cluster map initialized with hostnames as cluster_ids
-        std::map <std::string, std::string> host_to_cluster;
-        for (auto const &h : hosts) {
+        std::map<std::string, std::string> host_to_cluster;
+        for (auto const &h: hosts) {
             host_to_cluster[h->get_name()] = h->get_name();
         }
         // Update cluster_id value for those hosts that are in an actual cluster
-        for (auto const &c : cluster_to_hosts) {
+        for (auto const &c: cluster_to_hosts) {
             std::string cluster_id = c.first;
-            for (auto const &h : c.second) {
+            for (auto const &h: c.second) {
                 host_to_cluster[h] = cluster_id;
             }
         }
 
         // add all hosts to the list of vertices
-        for (const auto &host : hosts) {
+        for (const auto &host: hosts) {
             platform_graph_json["vertices"].push_back(
-                    {
-                            {"type",                   "host"},
-                            {"id",                     host->get_name()},
-                            {"cluster_id",             host_to_cluster[host->get_name()]},
-                            {"flop_rate",              host->get_speed()},
-                            {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                    host->get_name())},
-                            {"cores",                  host->get_core_count()}
-                    });
+                    {{"type", "host"},
+                     {"id", host->get_name()},
+                     {"cluster_id", host_to_cluster[host->get_name()]},
+                     {"flop_rate", host->get_speed()},
+                     {"memory_manager_service", Simulation::getHostMemoryCapacity(
+                                                        host->get_name())},
+                     {"cores", host->get_core_count()}});
         }
 
         // add all network links to the list of vertices
-        std::vector < simgrid::s4u::Link * > links = get_all_links();
-        for (const auto &link : links) {
-            if (not(link->get_name() == "__loopback__")) { // Ignore loopback link
+        std::vector<simgrid::s4u::Link *> links = get_all_links();
+        for (const auto &link: links) {
+            if (not(link->get_name() == "__loopback__")) {// Ignore loopback link
                 platform_graph_json["vertices"].push_back(
-                        {
-                                {"type",      "link"},
-                                {"id",        link->get_name()},
-                                {"bandwidth", link->get_bandwidth()},
-                                {"latency",   link->get_latency()}
-                        });
+                        {{"type", "link"},
+                         {"id", link->get_name()},
+                         {"bandwidth", link->get_bandwidth()},
+                         {"latency", link->get_latency()}});
             }
         }
 
         // add each route to the list of routes
-        std::vector < simgrid::s4u::Link * > route_forward;
-        std::vector < simgrid::s4u::Link * > route_backward;
+        std::vector<simgrid::s4u::Link *> route_forward;
+        std::vector<simgrid::s4u::Link *> route_backward;
         double route_forward_latency = 0;
         double route_backward_latency = 0;
 
@@ -1106,7 +1059,7 @@ namespace wrench {
                 route_forward_json["target"] = (*target)->get_name();
                 route_forward_json["latency"] = route_forward_latency;
 
-                for (const auto &link : route_forward) {
+                for (const auto &link: route_forward) {
                     route_forward_json["route"].push_back(link->get_name());
                 }
 
@@ -1145,7 +1098,7 @@ namespace wrench {
                     route_backward_json["target"] = (*source)->get_name();
                     route_backward_json["latency"] = route_backward_latency;
 
-                    for (const auto &link : route_backward) {
+                    for (const auto &link: route_backward) {
                         route_backward_json["route"].push_back(link->get_name());
                     }
 
@@ -1164,7 +1117,7 @@ namespace wrench {
 
         // maintain a unique list of edges where edges are represented using the following string format:
         // <source_type>:<source_id>-<target_type>:<target_id> where type could be 'host' or 'link'
-        std::unordered_set <std::string> edges;
+        std::unordered_set<std::string> edges;
         const std::string HOST("host");
         const std::string LINK("link");
 
@@ -1190,18 +1143,8 @@ namespace wrench {
 
                 // add a graph link from the source host to the first network link
                 platform_graph_json["edges"].push_back(
-                        {
-                                {"source", {
-                                                   {"type", HOST},
-                                                   {"id", source_id}
-                                           }
-                                },
-                                {"target", {
-                                                   {"type", LINK},
-                                                   {"id", target_id}
-                                           }
-                                }
-                        });
+                        {{"source", {{"type", HOST}, {"id", source_id}}},
+                         {"target", {{"type", LINK}, {"id", target_id}}}});
             }
 
             // add graph edges comprising only network links
@@ -1222,18 +1165,8 @@ namespace wrench {
                         edges.insert(source_string + "-" + target_string);
 
                         platform_graph_json["edges"].push_back(
-                                {
-                                        {"source", {
-                                                           {"type", LINK},
-                                                           {"id", source_id}
-                                                   }
-                                        },
-                                        {"target", {
-                                                           {"type", LINK},
-                                                           {"id", target_id}
-                                                   }
-                                        }
-                                });
+                                {{"source", {{"type", LINK}, {"id", source_id}}},
+                                 {"target", {{"type", LINK}, {"id", target_id}}}});
                     }
                 }
             }
@@ -1251,18 +1184,8 @@ namespace wrench {
 
                 // add a graph link from the last link to the target host
                 platform_graph_json["edges"].push_back(
-                        {
-                                {"source", {
-                                                   {"type", "link"},
-                                                   {"id", source_id}
-                                           }
-                                },
-                                {"target", {
-                                                   {"type", "host"},
-                                                   {"id", target_id}
-                                           }
-                                }
-                        });
+                        {{"source", {{"type", "link"}, {"id", source_id}}},
+                         {"target", {{"type", "host"}, {"id", target_id}}}});
             }
         }
 
@@ -1282,7 +1205,7 @@ namespace wrench {
      *
      * @brief Writes a JSON file containing disk operation information as a JSON array.
      *
-     * >>>>>NOTE<<<<< The timestamps the JSON is generated from are disabled by default.
+     * >>>>NOTE<<<< The timestamps the JSON is generated from are disabled by default.
      * Enable them with SimulationOutput::enableDiskTimestamps() to use.
      *
      * The JSON array has the following format:
@@ -1340,44 +1263,44 @@ namespace wrench {
         auto write_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteCompletion>();
         auto write_failure_timestamps = this->getTrace<wrench::SimulationTimestampDiskWriteFailure>();
 
-        std::set <std::string> hostnames;
+        std::set<std::string> hostnames;
 
         //std::tuple<string, string, std::tuple<double, double, double>> disk_operation;
         std::tuple<double, double, double> disk_operation;
 
         if (!read_start_timestamps.empty()) {
-            for (auto &timestamp : read_start_timestamps) {
+            for (auto &timestamp: read_start_timestamps) {
                 hostnames.insert(timestamp->getContent()->getHostname());
             }
         }
         if (!write_start_timestamps.empty()) {
-            for (auto &timestamp : write_start_timestamps) {
+            for (auto &timestamp: write_start_timestamps) {
                 hostnames.insert(timestamp->getContent()->getHostname());
             }
         }
 
-        for (auto &host : hostnames) {
-            std::set <std::string> mounts;
+        for (auto &host: hostnames) {
+            std::set<std::string> mounts;
             if (!read_start_timestamps.empty()) {
-                for (auto &timestamp : read_start_timestamps) {
+                for (auto &timestamp: read_start_timestamps) {
                     if (timestamp->getContent()->getHostname().compare(host) == 0) {
                         mounts.insert(timestamp->getContent()->getMount());
                     }
                 }
             }
             if (!write_start_timestamps.empty()) {
-                for (auto &timestamp : write_start_timestamps) {
+                for (auto &timestamp: write_start_timestamps) {
                     if (timestamp->getContent()->getHostname().compare(host) == 0) {
                         mounts.insert(timestamp->getContent()->getMount());
                     }
                 }
             }
-            for (auto &mount : mounts) {
-                std::vector <std::tuple<double, double, double>> reads;
-                std::vector <std::tuple<double, double, double>> writes;
+            for (auto &mount: mounts) {
+                std::vector<std::tuple<double, double, double>> reads;
+                std::vector<std::tuple<double, double, double>> writes;
 
                 if (!read_start_timestamps.empty()) {
-                    for (auto &read_start_timestamp : read_start_timestamps) {
+                    for (auto &read_start_timestamp: read_start_timestamps) {
                         if (read_start_timestamp->getContent()->getHostname().compare(host) == 0 &&
                             read_start_timestamp->getContent()->getMount().compare(mount) == 0) {
                             disk_operation = std::make_tuple(read_start_timestamp->getContent()->getDate(),
@@ -1385,11 +1308,10 @@ namespace wrench {
                                                              read_start_timestamp->getContent()->getBytes());
                             reads.emplace_back(disk_operation);
                         }
-
                     }
                 }
                 if (!write_start_timestamps.empty()) {
-                    for (auto &write_start_timestamp : write_start_timestamps) {
+                    for (auto &write_start_timestamp: write_start_timestamps) {
                         if (write_start_timestamp->getContent()->getHostname().compare(host) == 0 &&
                             write_start_timestamp->getContent()->getMount().compare(mount) == 0) {
                             disk_operation = std::make_tuple(write_start_timestamp->getContent()->getDate(),
@@ -1397,21 +1319,20 @@ namespace wrench {
                                                              write_start_timestamp->getContent()->getBytes());
                             writes.emplace_back(disk_operation);
                         }
-
                     }
                 }
 
                 nlohmann::json disk_reads;
-                for (auto const &r : reads) {
-                    nlohmann::json disk_read = nlohmann::json::object({{"start",  std::get<0>(r)},
-                                                                       {"end",    std::get<1>(r)},
-                                                                       {"bytes",  std::get<2>(r)},
+                for (auto const &r: reads) {
+                    nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
+                                                                       {"end", std::get<1>(r)},
+                                                                       {"bytes", std::get<2>(r)},
                                                                        {"failed", "-1"}});
                     disk_reads.push_back(disk_read);
                 }
                 if (!read_failure_timestamps.empty()) {
-                    for (auto &timestamp : read_failure_timestamps) {
-                        for (auto &disk_read : disk_reads) {
+                    for (auto &timestamp: read_failure_timestamps) {
+                        for (auto &disk_read: disk_reads) {
                             if (timestamp->getContent()->getDate() == disk_read["end"] &&
                                 timestamp->getContent()->getEndpoint()->getDate() == disk_read["start"]) {
                                 disk_read["failed"] = "1";
@@ -1421,16 +1342,16 @@ namespace wrench {
                 }
 
                 nlohmann::json disk_writes;
-                for (auto const &w : writes) {
-                    nlohmann::json disk_write = nlohmann::json::object({{"start",  std::get<0>(w)},
-                                                                        {"end",    std::get<1>(w)},
-                                                                        {"bytes",  std::get<2>(w)},
+                for (auto const &w: writes) {
+                    nlohmann::json disk_write = nlohmann::json::object({{"start", std::get<0>(w)},
+                                                                        {"end", std::get<1>(w)},
+                                                                        {"bytes", std::get<2>(w)},
                                                                         {"failed", "-1"}});
                     disk_writes.push_back(disk_write);
                 }
                 if (!write_failure_timestamps.empty()) {
-                    for (auto &timestamp : write_failure_timestamps) {
-                        for (auto &disk_write : disk_writes) {
+                    for (auto &timestamp: write_failure_timestamps) {
+                        for (auto &disk_write: disk_writes) {
                             if (timestamp->getContent()->getDate() == disk_write["end"] &&
                                 timestamp->getContent()->getEndpoint()->getDate() == disk_write["start"]) {
                                 disk_write["failed"] = "1";
@@ -1499,19 +1420,17 @@ namespace wrench {
 
         try {
             auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-            std::vector < simgrid::s4u::Link * > links = get_all_links();
+            std::vector<simgrid::s4u::Link *> links = get_all_links();
 
             for (const auto &link: links) {
                 nlohmann::json datum;
                 datum["linkname"] = link->get_name();
 
-                for (const auto &link_usage_timestamp : this->getTrace<SimulationTimestampLinkUsage>()) {
+                for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
                     if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
                         datum["link_usage_trace"].push_back(
-                                {
-                                        {"time",             link_usage_timestamp->getDate()},
-                                        {"bytes per second", link_usage_timestamp->getContent()->getUsage()}
-                                });
+                                {{"time", link_usage_timestamp->getDate()},
+                                 {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
                     }
                 }
 
@@ -1538,7 +1457,7 @@ namespace wrench {
      * @brief Destructor
      */
     SimulationOutput::~SimulationOutput() {
-    for (auto t : this->traces) {
+        for (auto t: this->traces) {
             delete t.second;
         }
         this->traces.clear();
@@ -1549,7 +1468,7 @@ namespace wrench {
      */
     SimulationOutput::SimulationOutput() {
         // Disable everything by default!
-        
+
         // By default disable all task timestamps
         this->setEnabled<SimulationTimestampTaskStart>(false);
         this->setEnabled<SimulationTimestampTaskFailure>(false);
@@ -1594,7 +1513,7 @@ namespace wrench {
      * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask>task) {
+    void SimulationOutput::addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampTaskStart>()) {
             this->addTimestamp<SimulationTimestampTaskStart>(new SimulationTimestampTaskStart(date, task));
         }
@@ -1605,7 +1524,7 @@ namespace wrench {
      * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask>task) {
+    void SimulationOutput::addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampTaskFailure>()) {
             this->addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(date, task));
         }
@@ -1616,7 +1535,7 @@ namespace wrench {
      * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask>task) {
+    void SimulationOutput::addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampTaskCompletion>()) {
             this->addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(date, task));
         }
@@ -1627,7 +1546,7 @@ namespace wrench {
     * @param date: the date
     * @param task: a workflow task
     */
-    void SimulationOutput::addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask>task) {
+    void SimulationOutput::addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampTaskTermination>()) {
             this->addTimestamp<SimulationTimestampTaskTermination>(new SimulationTimestampTaskTermination(date, task));
         }
@@ -1642,10 +1561,10 @@ namespace wrench {
      * @param task: the workflow task for which this read is done (or nullptr);
      */
     void SimulationOutput::addTimestampFileReadStart(double date,
-                                                     std::shared_ptr<DataFile>file,
+                                                     std::shared_ptr<DataFile> file,
                                                      std::shared_ptr<FileLocation> src,
                                                      std::shared_ptr<StorageService> service,
-                                                     std::shared_ptr<WorkflowTask>task) {
+                                                     std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadStart>()) {
             this->addTimestamp<SimulationTimestampFileReadStart>(
                     new SimulationTimestampFileReadStart(date, file, src, service, task));
@@ -1681,10 +1600,10 @@ namespace wrench {
     */
     void
     SimulationOutput::addTimestampFileReadCompletion(double date,
-                                                     std::shared_ptr<DataFile>file,
-                                                     std::shared_ptr<FileLocation>  src,
-                                                     std::shared_ptr<StorageService>  service,
-                                                     std::shared_ptr<WorkflowTask>task) {
+                                                     std::shared_ptr<DataFile> file,
+                                                     std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<StorageService> service,
+                                                     std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
 
             this->addTimestamp<SimulationTimestampFileReadCompletion>(
@@ -1701,10 +1620,10 @@ namespace wrench {
      * @param task: the workflow task for which this write is done (or nullptr);
      */
     void SimulationOutput::addTimestampFileWriteStart(double date,
-                                                      std::shared_ptr<DataFile>file,
-                                                      std::shared_ptr<FileLocation>  src,
-                                                      std::shared_ptr<StorageService>  service,
-                                                      std::shared_ptr<WorkflowTask>task) {
+                                                      std::shared_ptr<DataFile> file,
+                                                      std::shared_ptr<FileLocation> src,
+                                                      std::shared_ptr<StorageService> service,
+                                                      std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
             this->addTimestamp<SimulationTimestampFileWriteStart>(
                     new SimulationTimestampFileWriteStart(date, file, src, service, task));
@@ -1720,10 +1639,10 @@ namespace wrench {
     * @param task: the workflow task for which this write is done (or nullptr);
     */
     void SimulationOutput::addTimestampFileWriteFailure(double date,
-                                                        std::shared_ptr<DataFile>file,
-                                                        std::shared_ptr<FileLocation>  src,
-                                                        std::shared_ptr<StorageService>  service,
-                                                        std::shared_ptr<WorkflowTask>task) {
+                                                        std::shared_ptr<DataFile> file,
+                                                        std::shared_ptr<FileLocation> src,
+                                                        std::shared_ptr<StorageService> service,
+                                                        std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteFailure>()) {
             this->addTimestamp<SimulationTimestampFileWriteFailure>(
                     new SimulationTimestampFileWriteFailure(date, file, src, service, task));
@@ -1740,10 +1659,10 @@ namespace wrench {
     */
     void
     SimulationOutput::addTimestampFileWriteCompletion(double date,
-                                                      std::shared_ptr<DataFile>file,
-                                                      std::shared_ptr<FileLocation>  src,
-                                                      std::shared_ptr<StorageService>  service,
-                                                      std::shared_ptr<WorkflowTask>task) {
+                                                      std::shared_ptr<DataFile> file,
+                                                      std::shared_ptr<FileLocation> src,
+                                                      std::shared_ptr<StorageService> service,
+                                                      std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampFileWriteCompletion>(
                     new SimulationTimestampFileWriteCompletion(date, file, src, service, task));
@@ -1758,9 +1677,9 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyStart(double date,
-                                                     std::shared_ptr<DataFile>file,
-                                                     std::shared_ptr <FileLocation> src,
-                                                     std::shared_ptr <FileLocation> dst) {
+                                                     std::shared_ptr<DataFile> file,
+                                                     std::shared_ptr<FileLocation> src,
+                                                     std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
             this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(date, file, src, dst));
         }
@@ -1774,9 +1693,9 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyFailure(double date,
-                                                       std::shared_ptr<DataFile>file,
-                                                       std::shared_ptr <FileLocation> src,
-                                                       std::shared_ptr <FileLocation> dst) {
+                                                       std::shared_ptr<DataFile> file,
+                                                       std::shared_ptr<FileLocation> src,
+                                                       std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
             this->addTimestamp<SimulationTimestampFileCopyFailure>(
                     new SimulationTimestampFileCopyFailure(date, file, src, dst));
@@ -1792,8 +1711,8 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampFileCopyCompletion(double date,
                                                           std::shared_ptr<DataFile> file,
-                                                          std::shared_ptr <FileLocation> src,
-                                                          std::shared_ptr <FileLocation> dst) {
+                                                          std::shared_ptr<FileLocation> src,
+                                                          std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(
                     new SimulationTimestampFileCopyCompletion(date, file, src, dst));
@@ -1930,7 +1849,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampEnergyConsumption(double date, std::string hostname,
                                                          double joules) {
-        static std::unordered_map <std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
+        static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
 
         if (not this->isEnabled<SimulationTimestampEnergyConsumption>()) {
             return;
@@ -1968,7 +1887,7 @@ namespace wrench {
      */
     void SimulationOutput::addTimestampLinkUsage(double date, std::string linkname,
                                                  double bytes_per_second) {
-        static std::unordered_map <std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
+        static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
 
         if (not this->isEnabled<SimulationTimestampLinkUsage>()) {
             return;
@@ -2059,4 +1978,4 @@ namespace wrench {
         this->setEnabled<SimulationTimestampLinkUsage>(true);
     }
 
-}
+}// namespace wrench

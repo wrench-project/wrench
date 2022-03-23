@@ -36,7 +36,6 @@ public:
     void do_UnsupportedPilotJobs_test();
 
 protected:
-
     ~BareMetalComputeServiceTestPilotJobs() {
         workflow->clear();
     }
@@ -75,7 +74,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -91,12 +89,10 @@ class BareMetalComputeServiceUnsupportedPilotJobsTestWMS : public wrench::Execut
 
 public:
     BareMetalComputeServiceUnsupportedPilotJobsTestWMS(BareMetalComputeServiceTestPilotJobs *test,
-                                                       std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     BareMetalComputeServiceTestPilotJobs *test;
 
     int main() {
@@ -144,24 +140,23 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
     // Create A Storage Services
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "",
-                                                {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "",
+                                                                {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BareMetalComputeServiceUnsupportedPilotJobsTestWMS(
-                    this, hostname)));
+                            new BareMetalComputeServiceUnsupportedPilotJobsTestWMS(
+                                    this, hostname)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService(hostname));
-
 
 
     // Staging the input file on the storage service
@@ -171,8 +166,7 @@ void BareMetalComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
