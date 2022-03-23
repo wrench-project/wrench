@@ -11,6 +11,8 @@
 
 namespace wrench {
 
+    SET_PROPERTY_NAME(ActionExecutionServiceProperty, THREAD_CREATION_OVERHEAD);
+    SET_PROPERTY_NAME(ActionExecutionServiceProperty, SIMULATE_COMPUTATION_AS_SLEEP);
     SET_PROPERTY_NAME(ActionExecutionServiceProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
     SET_PROPERTY_NAME(ActionExecutionServiceProperty, FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
 

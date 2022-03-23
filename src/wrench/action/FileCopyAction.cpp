@@ -14,6 +14,7 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
 #include <utility>
 
@@ -70,7 +71,7 @@ namespace wrench {
      */
     void FileCopyAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread overhead
-        Simulation::sleep(this->thread_creation_overhead);
+        Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File copy
         StorageService::copyFile(
                 this->file, this->src_file_location, this->dst_file_location);

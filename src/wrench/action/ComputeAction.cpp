@@ -12,8 +12,7 @@
 #include <wrench/action/Action.h>
 #include <wrench/action/ComputeAction.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
-#include <wrench/services/helper_services/compute_thread//ComputeThread.h>
-#include <wrench/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/failure_causes/ComputationHasDied.h>
 #include <wrench/failure_causes/FatalFailure.h>
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/exceptions/ExecutionException.h>
@@ -99,12 +98,13 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("Invalid resource specs for Action Executor")));
         }
 
-        std::vector<double> work_per_thread = this->getParallelModel()->getWorkPerThread(
-                this->getFlops(), num_threads);
-        if (this->simulate_computation_as_sleep) {
-            this->simulateComputationAsSleep(action_executor, work_per_thread);
+        double sequential_work = this->getParallelModel()->getPurelySequentialWork(this->getFlops(), num_threads);
+        double parallel_per_thread_work = this->getParallelModel()->getParallelPerThreadWork(this->getFlops(), num_threads);
+        if (action_executor->getSimulateComputationAsSleep()) {
+            this->simulateComputationAsSleep(action_executor, num_threads, sequential_work, parallel_per_thread_work);
         } else {
-            this->simulateComputationWithComputeThreads(action_executor, work_per_thread);
+            this->simulateComputationAsComputation(action_executor, num_threads, sequential_work,
+                                                   parallel_per_thread_work);
         }
     }
 
@@ -113,12 +113,14 @@ namespace wrench {
      * @param action_executor:  the executor that executes this action
      */
     void ComputeAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+#if 0
         action_executor->acquireDaemonLock();
         for (auto const &ct : this->compute_threads) {
             // Should work even if already dead
             ct->kill();
         }
         action_executor->releaseDaemonLock();
+#endif
     }
 
     /**
@@ -126,12 +128,11 @@ namespace wrench {
   * @param action_executor:  the executor that executes this action
   * @param work_per_thread: amount of work (in flop) that each thread should do
   */
-    void ComputeAction::simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, std::vector<double> &work_per_thread) {
-        double max_work_per_thread = *(std::max_element(work_per_thread.begin(), work_per_thread.end()));
+    void ComputeAction::simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
-        S4U_Simulation::sleep((double) (work_per_thread.size()) * this->thread_creation_overhead);
+        S4U_Simulation::sleep((double)(num_threads) * action_executor->getThreadCreationOverhead());
         // Then sleep for the computation duration
-        double sleep_time = max_work_per_thread / Simulation::getFlopRate();
+        double sleep_time = (sequential_work + parallel_per_thread_work) / Simulation::getFlopRate();
         Simulation::sleep(sleep_time);
     }
 
@@ -141,71 +142,18 @@ namespace wrench {
      *
      * @param work_per_thread: amount of work (in flop) that each thread should do
      */
-    void ComputeAction::simulateComputationWithComputeThreads(std::shared_ptr<ActionExecutor> action_executor, vector<double> &work_per_thread) {
+    void ComputeAction::simulateComputationAsComputation(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
 
-//        std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("compute_action_executor");
-
-        this->compute_threads.clear();
-        WRENCH_INFO("Launching %ld compute threads", work_per_thread.size());
-        // Create a compute thread to run the computation on each core
-        bool success = true;
-        for (auto const &work : work_per_thread) {
-            try {
-                S4U_Simulation::sleep(this->thread_creation_overhead);
-            } catch (std::exception &e) {
-                WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
-                throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("")));
-            }
-            std::shared_ptr <ComputeThread> compute_thread;
-            try {
-                // Nobody kills me while I am starting a compute threads!
-                action_executor->acquireDaemonLock();
-                compute_thread = std::shared_ptr<ComputeThread>(
-                        new ComputeThread(S4U_Simulation::getHostName(), work, nullptr));
-                compute_thread->setSimulation(action_executor->getSimulation());
-                compute_thread->start(compute_thread, true, false); // Daemonized, no auto-restart
-                action_executor->releaseDaemonLock();
-            } catch (std::exception &e) {
-                WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
-                success = false;
-                action_executor->releaseDaemonLock();
-                break;
-            }
-            this->compute_threads.push_back(compute_thread);
-        }
-
-        if (not success) {
-            WRENCH_INFO("Failed to create some compute threads...");
-            // TODO: Dangerous to kill these now?? (this was commented out before, but seems legit, so Henri uncommented it)
-            for (auto const &ct : this->compute_threads) {
-                ct->kill();
-            }
-            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
-        }
-
-        success = true;
-        // Wait for all compute threads to complete using a JOIN
-        for (const auto & compute_thread : this->compute_threads) {
-            std::pair<bool, int> thread_status;
-            try {
-                thread_status = compute_thread->join();
-            } catch (std::shared_ptr<FatalFailure> &e) {
-                success = false;
-                continue;
-            }
-            bool has_returned_from_main = std::get<0>(thread_status);
-            if (not has_returned_from_main) {
-                success = false;
-            } else {
-            }
-        }
-
-        this->compute_threads.clear();
-
-        if (!success) {
-            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
+        try {
+            S4U_Simulation::compute_multi_threaded(num_threads,
+                                                   action_executor->getThreadCreationOverhead(),
+                                                   sequential_work,
+                                                   parallel_per_thread_work);
+        } catch (std::exception &e) {
+            throw ExecutionException(std::shared_ptr<FailureCause>(new ComputationHasDied()));
         }
         WRENCH_INFO("All compute threads have completed successfully");
+
     }
 
 }

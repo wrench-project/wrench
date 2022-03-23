@@ -251,12 +251,10 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
             [] (double work, unsigned long num_threads) {
-                std::vector<double> works;
-                for (unsigned int i=0; i < num_threads; i++) {
-                    double thread_work = (i+1) * 10.0;
-                    works.push_back(thread_work);
-                }
-                return works;
+                return 0.1*work;
+            },
+            [] (double work, unsigned long num_threads) {
+                return 0.9*work / num_threads;
             }
             ));
 
@@ -267,7 +265,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
-    double expected_makespan = 40.0;
+    double expected_makespan = 0.1 * work + 0.9 * work / 4;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
         throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +

@@ -141,7 +141,7 @@ set(HEADER_FILES
         include/wrench/execution_events/FileCopyCompletedEvent.h
         include/wrench/execution_events/FileCopyFailedEvent.h
         include/wrench/execution_events/TimerEvent.h
-        include/wrench/failure_causes/ComputeThreadHasDied.h
+        include/wrench/failure_causes/ComputationHasDied.h
         include/wrench/failure_causes/FailureCause.h
         include/wrench/failure_causes/SomeActionsHaveFailed.h
         include/wrench/failure_causes/FatalFailure.h
@@ -199,10 +199,6 @@ set(SOURCE_FILES
         src/wrench/services/helper_services/action_execution_service/ActionExecutionService.cpp
         src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.cpp
         src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.cpp
-        src/wrench/services/helper_services/compute_thread/ComputeThread.cpp
-        src/wrench/services/helper_services/compute_thread/ComputeThreadMessage.cpp
-        include/wrench/services/helper_services/compute_thread/ComputeThread.h
-        include/wrench/services/helper_services/compute_thread/ComputeThreadMessage.h
         src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
         src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
         src/wrench/logging/TerminalOutput.cpp
@@ -313,7 +309,7 @@ set(SOURCE_FILES
         src/wrench/workflow/parallel_model/ConstantEfficiencyParallelModel.cpp
         src/wrench/workflow/parallel_model/CustomParallelModel.cpp
         src/wrench/execution_events/ExecutionEvent.cpp
-        src/wrench/failure_causes/ComputeThreadHasDied.cpp
+        src/wrench/failure_causes/ComputationHasDied.cpp
         src/wrench/failure_causes/FailureCause.cpp
         src/wrench/failure_causes/SomeActionsHaveFailed.cpp
         src/wrench/failure_causes/FatalFailure.cpp
@@ -386,7 +382,6 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
-        test/services/helper_services/ComputeThreadTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
         test/services/compute_services/batch_compound_jobs/BatchComputeServiceOneActionTests.cpp
         test/services/compute_services/batch_standard_and_pilot_jobs/HomeGrownTimeLineTest.cpp
@@ -445,7 +440,6 @@ set(TEST_FILES
         test/simulated_failures/link_failures/StorageServiceLinkFailuresTest.cpp
         test/simulated_failures/link_failures/AlarmLinkFailuresTest.cpp
         test/simulated_failures/link_failures/BareMetalComputeServiceLinkFailuresTest.cpp
-        test/simulated_failures/link_failures/ComputeThreadLinkFailuresTest.cpp
         test/simulated_failures/link_failures/NetworkProximityLinkFailuresTest.cpp
         test/simulated_failures/failure_test_util/ResourceSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceSwitcher.h
@@ -458,12 +452,11 @@ set(TEST_FILES
         test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
         )
 
-find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SimGrid_LIBRARY} ${PUGIXML_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
