@@ -164,7 +164,7 @@ namespace wrench {
         }
 
 
-#if 0   // OLD IMPLEMENTATION THAT RECONSTRUCTS THE SCHEDULE FROM SCRATCH \
+#if 0// OLD IMPLEMENTATION THAT RECONSTRUCTS THE SCHEDULE FROM SCRATCH \
         // Clear the schedule
         this->schedule->clear();
 
