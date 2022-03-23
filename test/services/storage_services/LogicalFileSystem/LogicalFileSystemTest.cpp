@@ -10,7 +10,6 @@ WRENCH_LOG_CATEGORY(logical_file_system_test, "Log category for LogicalFileSyste
 class LogicalFileSystemTest : public ::testing::Test {
 
 public:
-
     void do_BasicTests();
 
 protected:
@@ -58,7 +57,7 @@ void LogicalFileSystemTest::do_BasicTests() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
     auto workflow = wrench::Workflow::createWorkflow();
@@ -66,14 +65,14 @@ void LogicalFileSystemTest::do_BasicTests() {
     // set up the platform
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    ASSERT_THROW(new  wrench::LogicalFileSystem("Host", nullptr, "/"), std::invalid_argument);
+    ASSERT_THROW(new wrench::LogicalFileSystem("Host", nullptr, "/"), std::invalid_argument);
 
     // Create two Storage Services
     std::shared_ptr<wrench::SimpleStorageService> storage_service1, storage_service2;
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host", {"/"})));
+                            new wrench::SimpleStorageService("Host", {"/"})));
     ASSERT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService("Host", {"/"})));
+                            new wrench::SimpleStorageService("Host", {"/"})));
 
     // Create a Logical File System
     auto fs1 = new wrench::LogicalFileSystem("Host", storage_service1.get(), "/");
@@ -101,7 +100,7 @@ void LogicalFileSystemTest::do_BasicTests() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

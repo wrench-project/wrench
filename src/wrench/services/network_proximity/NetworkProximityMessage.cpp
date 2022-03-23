@@ -14,8 +14,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    NetworkProximityMessage::NetworkProximityMessage(double payload) :
-            ServiceMessage(payload) {
+    NetworkProximityMessage::NetworkProximityMessage(double payload) : ServiceMessage(payload) {
     }
 
 
@@ -27,8 +26,7 @@ namespace wrench {
      */
     NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::pair<std::string, std::string> hosts,
-                                                                               double payload) :
-            NetworkProximityMessage( payload), answer_mailbox(answer_mailbox), hosts(hosts) {
+                                                                               double payload) : NetworkProximityMessage(payload), answer_mailbox(answer_mailbox), hosts(hosts) {
 
         if ((answer_mailbox == nullptr) || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
             throw std::invalid_argument(
@@ -46,8 +44,7 @@ namespace wrench {
      */
     NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts,
                                                                              double proximity_value, double timestamp,
-                                                                             double payload) :
-            NetworkProximityMessage(payload) {
+                                                                             double payload) : NetworkProximityMessage(payload) {
         if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
             throw std::invalid_argument(
                     "NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(): Invalid argument");
@@ -64,8 +61,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(
-            std::pair<std::string, std::string> hosts, double proximity_value, double payload) :
-            NetworkProximityMessage(payload) {
+            std::pair<std::string, std::string> hosts, double proximity_value, double payload) : NetworkProximityMessage(payload) {
         if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
             throw std::invalid_argument(
                     "NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(): Invalid argument");
@@ -81,8 +77,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::shared_ptr<NetworkProximityDaemon> daemon,
-                                                                     double payload) :
-            NetworkProximityMessage(payload) {
+                                                                     double payload) : NetworkProximityMessage(payload) {
         if (daemon == nullptr) {
             throw std::invalid_argument(
                     "NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(): Invalid argument");
@@ -99,8 +94,7 @@ namespace wrench {
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
                                                                    std::shared_ptr<NetworkProximityDaemon> next_daemon_to_send,
-                                                                   simgrid::s4u::Mailbox *next_mailbox_to_send, double payload) :
-            NetworkProximityMessage(payload) {
+                                                                   simgrid::s4u::Mailbox *next_mailbox_to_send, double payload) : NetworkProximityMessage(payload) {
         this->next_host_to_send = next_host_to_send;
         this->next_daemon_to_send = next_daemon_to_send;
         this->next_mailbox_to_send = next_mailbox_to_send;
@@ -111,8 +105,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: the message size in bytes
      */
-    NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) :
-            NetworkProximityMessage(payload) {
+    NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) : NetworkProximityMessage(payload) {
     }
 
     /**
@@ -122,8 +115,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                                   std::string requested_host, double payload) :
-            NetworkProximityMessage(payload), answer_mailbox(answer_mailbox), requested_host(requested_host) {
+                                                                   std::string requested_host, double payload) : NetworkProximityMessage(payload), answer_mailbox(answer_mailbox), requested_host(requested_host) {
         if (answer_mailbox == nullptr || requested_host == "") {
             throw std::invalid_argument(
                     "CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
@@ -142,8 +134,7 @@ namespace wrench {
                                                                  bool success,
                                                                  std::pair<double, double> xy_coordinate,
                                                                  double timestamp,
-                                                                 double payload) :
-            NetworkProximityMessage(payload) {
+                                                                 double payload) : NetworkProximityMessage(payload) {
         if (requested_host == "") {
             throw std::invalid_argument(
                     "CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(): Invalid argument");
@@ -153,4 +144,4 @@ namespace wrench {
         this->xy_coordinate = xy_coordinate;
         this->timestamp = timestamp;
     }
-}
+}// namespace wrench

@@ -26,23 +26,21 @@ namespace wrench {
     /**
      * @brief A daemon used by a NetworkProximityService to run network measurements (proximity is computed between two such running daemons)
      */
-    class NetworkProximityDaemon: public Service {
+    class NetworkProximityDaemon : public Service {
     public:
-
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                simgrid::s4u::Mailbox *network_proximity_service_mailbox,
-                               double message_size,double measurement_period,
+                               double message_size, double measurement_period,
                                double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
     private:
-
         friend class Simulation;
 
         std::default_random_engine rng;
 
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                                simgrid::s4u::Mailbox *network_proximity_service_mailbox,
-                               double message_size,double measurement_period,
+                               double message_size, double measurement_period,
                                double noise, int noise_seed, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list, std::string suffix);
 
 
@@ -68,7 +66,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
 
-#endif //WRENCH_NETWORKDAEMONS_H
+#endif//WRENCH_NETWORKDAEMONS_H

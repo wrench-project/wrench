@@ -18,10 +18,9 @@ namespace wrench {
      *
      * @param workflow: a workflow
      */
-    PilotJob::PilotJob(std::shared_ptr<JobManager> job_manager) :
-            Job("", std::move(job_manager)), state(PilotJob::State::NOT_SUBMITTED) {
+    PilotJob::PilotJob(std::shared_ptr<JobManager> job_manager) : Job("", std::move(job_manager)), state(PilotJob::State::NOT_SUBMITTED) {
 
-      this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
+        this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
     }
 
     /**
@@ -29,7 +28,7 @@ namespace wrench {
      * @return the state
      */
     PilotJob::State PilotJob::getState() {
-      return this->state;
+        return this->state;
     }
 
     /**
@@ -37,7 +36,7 @@ namespace wrench {
      * @return a compute service
      */
     std::shared_ptr<BareMetalComputeService> PilotJob::getComputeService() {
-      return this->compute_service;
+        return this->compute_service;
     }
 
     /**
@@ -45,8 +44,8 @@ namespace wrench {
      * @param cs: a compute service
      */
     void PilotJob::setComputeService(std::shared_ptr<BareMetalComputeService> cs) {
-      this->compute_service = std::move(cs);
+        this->compute_service = std::move(cs);
     }
 
 
-}
+}// namespace wrench

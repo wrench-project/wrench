@@ -32,7 +32,7 @@
 #include <iostream>
 #include <wrench.h>
 #include <wrench/services/memory/MemoryManager.h>
-#include "ConcurrentPipelineWMS.h" // WMS implementation
+#include "ConcurrentPipelineWMS.h"// WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -43,7 +43,7 @@
  */
 
 std::shared_ptr<wrench::Workflow> generate_workflow(int num_pipes, int num_tasks, int core_per_task,
-                                    long flops, long file_size, long mem_required) {
+                                                    long flops, long file_size, long mem_required) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     for (int i = 0; i < num_pipes; i++) {
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 
     /* Declare a workflow */
     auto workflow = generate_workflow(1, num_tasks, 1, cpu_time_sec * 1000000000,
-                                                   file_size_gb * 1000000000, mem_req_gb * 1000000000);
+                                      file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
     simulation->add(file_registry_service);
 
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 

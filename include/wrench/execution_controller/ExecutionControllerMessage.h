@@ -41,6 +41,6 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_EXECUTIONCONTROLLERMESSAGE_H
+#endif//WRENCH_EXECUTIONCONTROLLERMESSAGE_H

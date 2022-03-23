@@ -32,14 +32,13 @@ namespace wrench {
     void MessageManager::manageMessage(const std::string &mailbox, SimulationMessage *msg) {
         if (msg == nullptr) {
             throw std::runtime_error(
-                    "MessageManager::manageMessage()::Null Message cannot be managed by MessageManager"
-            );
+                    "MessageManager::manageMessage()::Null Message cannot be managed by MessageManager");
         }
         if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
             mailbox_messages.insert({mailbox, {}});
         }
         mailbox_messages[mailbox].insert(msg);
-//      WRENCH_INFO("MESSAGE_MANAGER: INSERTING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
+        //      WRENCH_INFO("MESSAGE_MANAGER: INSERTING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
     }
 
     /**
@@ -48,7 +47,7 @@ namespace wrench {
      */
     void MessageManager::cleanUpMessages(const std::string &mailbox) {
         if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
-            for (auto msg : mailbox_messages[mailbox]) {
+            for (auto msg: mailbox_messages[mailbox]) {
                 delete msg;
             }
             mailbox_messages[mailbox].clear();
@@ -60,7 +59,7 @@ namespace wrench {
      * @brief Clean up all the messages that MessageManager has stored (so as to free up memory_manager_service)
      */
     void MessageManager::cleanUpAllMessages() {
-        for (auto m : mailbox_messages) {
+        for (auto m: mailbox_messages) {
             cleanUpMessages(m.first);
         }
     }
@@ -70,7 +69,7 @@ namespace wrench {
      */
     void MessageManager::print() {
         WRENCH_INFO("MessageManager DB:");
-        for (auto const &x : mailbox_messages) {
+        for (auto const &x: mailbox_messages) {
             WRENCH_INFO("   ==> [%s]:%lu", x.first.c_str(), x.second.size());
         }
     }
@@ -81,15 +80,15 @@ namespace wrench {
      * @param msg: the message
      */
     void MessageManager::removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg) {
-//      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
-//        if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
-//            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
+        //      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
+        //        if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
+        //            WRENCH_INFO("MESSAGE_MANAGER: REMOVING [%s]:%s (%lu)", mailbox.c_str(), msg->getName().c_str(), (unsigned long)msg);
         mailbox_messages[mailbox].erase(msg);
-//          if (mailbox_messages[mailbox].empty()) {
-//              mailbox_messages.erase(mailbox);
-//          }
-//        }
-//      }
+        //          if (mailbox_messages[mailbox].empty()) {
+        //              mailbox_messages.erase(mailbox);
+        //          }
+        //        }
+        //      }
 
 #if 0
         std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
@@ -106,6 +105,6 @@ namespace wrench {
         }
 #endif
     }
-}
+}// namespace wrench
 
-#endif //MESSAGE_MANAGER
+#endif//MESSAGE_MANAGER

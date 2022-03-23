@@ -18,7 +18,6 @@
 #include "BareMetalComputeServiceMessagePayload.h"
 
 
-
 namespace wrench {
 
     class Simulation;
@@ -37,11 +36,8 @@ namespace wrench {
         friend class BatchComputeService;
 
     public:
-
     protected:
-
     private:
-
         friend class Simulation;
         friend class BatchComputeService;
 
@@ -53,14 +49,13 @@ namespace wrench {
                                        double ttl,
                                        std::shared_ptr<PilotJob> pj,
                                        std::string suffix,
-                                       std::shared_ptr<StorageService> scratch_space); // reference to upper level scratch space
+                                       std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         int main() override;
 
         std::shared_ptr<CompoundJob> job;
-
     };
-};
+};// namespace wrench
 
 
-#endif //WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H
+#endif//WRENCH_BAREMETALCOMPUTESERVICEONESHOT_H

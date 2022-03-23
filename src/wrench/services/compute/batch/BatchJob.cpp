@@ -28,8 +28,7 @@ namespace wrench {
                        unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
-                    "BatchJob::BatchJob(): job cannot be null"
-            );
+                    "BatchJob::BatchJob(): job cannot be null");
         }
         this->compound_job = job;
         if (job_id <= 0 || num_nodes == 0 || cores_per_node == 0) {
@@ -37,8 +36,7 @@ namespace wrench {
                     "BatchJob::BatchJob(): either jobid (" + std::to_string(job_id) +
                     "), num_nodes (" + std::to_string(num_nodes) +
                     "), cores_per_node (" + std::to_string(cores_per_node) +
-                    ") is less than or equal to zero"
-            );
+                    ") is less than or equal to zero");
         }
         this->job_id = job_id;
         this->requested_time = time_in_minutes * 60;
@@ -141,7 +139,7 @@ namespace wrench {
         return this->begin_time_stamp;
     }
 
-/**
+    /**
      * @brief Get the BatchComputeService job's end timestamp
      * @return a date
      */
@@ -156,8 +154,7 @@ namespace wrench {
     void BatchJob::setEndingTimestamp(double time_stamp) {
         if (this->ending_time_stamp > 0) {
             throw std::runtime_error(
-                    "BatchJob::setEndingTimestamp(): Cannot set time stamp again for the same job"
-            );
+                    "BatchJob::setEndingTimestamp(): Cannot set time stamp again for the same job");
         }
         this->ending_time_stamp = time_stamp;
     }
@@ -177,11 +174,10 @@ namespace wrench {
     void BatchJob::setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {
         if (resources.empty()) {
             throw std::invalid_argument(
-                    "BatchJob::setAllocatedResources(): Empty Resources allocated"
-            );
+                    "BatchJob::setAllocatedResources(): Empty Resources allocated");
         }
         this->resources_allocated = resources;
     }
 
 
-}
+}// namespace wrench

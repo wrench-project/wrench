@@ -33,24 +33,24 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileNotFound(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  location);
+        FileNotFound(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<DataFile>getFile();
-        std::shared_ptr<FileLocation>  getLocation();
+        std::shared_ptr<DataFile> getFile();
+        std::shared_ptr<FileLocation> getLocation();
         std::string toString() override;
 
     private:
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> location;
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FILENOTFOUND_H
+#endif//WRENCH_FILENOTFOUND_H

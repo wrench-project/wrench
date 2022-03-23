@@ -26,8 +26,7 @@ namespace wrench {
      */
     class ServiceMessage : public SimulationMessage {
     protected:
-        ServiceMessage( double payload);
-
+        ServiceMessage(double payload);
     };
 
     /**
@@ -35,7 +34,7 @@ namespace wrench {
      */
     class ServiceStopDaemonMessage : public ServiceMessage {
     public:
-//        ~ServiceStopDaemonMessage(){};
+        //        ~ServiceStopDaemonMessage(){};
 
         ServiceStopDaemonMessage(simgrid::s4u::Mailbox *ack_mailbox, bool send_failure_notifications, ComputeService::TerminationCause termination_cause, double payload);
 
@@ -66,12 +65,10 @@ namespace wrench {
     };
 
 
-
-
     /***********************/
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_SERVICEMESSAGE_H
+#endif//WRENCH_SERVICEMESSAGE_H

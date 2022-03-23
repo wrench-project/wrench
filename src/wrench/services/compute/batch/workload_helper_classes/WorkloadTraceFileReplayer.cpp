@@ -30,15 +30,12 @@ namespace wrench {
                                                          std::shared_ptr<BatchComputeService> batch_service,
                                                          unsigned long num_cores_per_node,
                                                          bool use_actual_runtimes_as_requested_runtimes,
-                                                         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace
-    ) :
-            ExecutionController(
-                hostname,
-                "workload_tracefile_replayer"),
-            workload_trace(workload_trace),
-            batch_service(batch_service),
-            num_cores_per_node(num_cores_per_node),
-            use_actual_runtimes_as_requested_runtimes(use_actual_runtimes_as_requested_runtimes) {}
+                                                         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> &workload_trace) : ExecutionController(hostname,
+                                                                                                                                                                                                "workload_tracefile_replayer"),
+                                                                                                                                                                            workload_trace(workload_trace),
+                                                                                                                                                                            batch_service(batch_service),
+                                                                                                                                                                            num_cores_per_node(num_cores_per_node),
+                                                                                                                                                                            use_actual_runtimes_as_requested_runtimes(use_actual_runtimes_as_requested_runtimes) {}
 
 
     int WorkloadTraceFileReplayer::main() {
@@ -52,7 +49,7 @@ namespace wrench {
 
         // Start the WorkloadTraceFileReplayerEventReceiver
         event_receiver->setSimulation(this->simulation);
-        event_receiver->start(event_receiver, true, false); // Daemonized, no auto-restart
+        event_receiver->start(event_receiver, true, false);// Daemonized, no auto-restart
 
         double core_flop_rate = (*(this->batch_service->getCoreFlopRate().begin())).second;
 
@@ -62,7 +59,7 @@ namespace wrench {
         double real_start_time = S4U_Simulation::getClock();
 
         unsigned long counter = 0;
-        for (auto job : this->workload_trace) {
+        for (auto job: this->workload_trace) {
 
             // Sleep until the submission time
             double sub_time = real_start_time + std::get<1>(job);
@@ -84,8 +81,8 @@ namespace wrench {
             // Create a job
             auto cjob = job_manager->createCompoundJob(this->getName() + "_job_" + std::to_string(job_count));
             // Add its compute actions
-            for (int i=0; i < num_nodes; i++) {
-                double time_fudge = 1; // 1 second seems to make it all work!
+            for (int i = 0; i < num_nodes; i++) {
+                double time_fudge = 1;// 1 second seems to make it all work!
                 double task_flops = num_cores_per_node * (core_flop_rate * std::max<double>(0, time - time_fudge));
                 cjob->addComputeAction(
                         this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
@@ -98,10 +95,10 @@ namespace wrench {
 
             // Create the BatchComputeService-specific argument
             std::map<std::string, std::string> batch_job_args;
-            batch_job_args["-N"] = std::to_string(num_nodes); // Number of nodes/taks
-            batch_job_args["-t"] = std::to_string(1 + requested_time / 60); // Time in minutes (note the +1)
-            batch_job_args["-c"] = std::to_string(num_cores_per_node); //number of cores per task
-            batch_job_args["-u"] = username; // username
+            batch_job_args["-N"] = std::to_string(num_nodes);              // Number of nodes/taks
+            batch_job_args["-t"] = std::to_string(1 + requested_time / 60);// Time in minutes (note the +1)
+            batch_job_args["-c"] = std::to_string(num_cores_per_node);     //number of cores per task
+            batch_job_args["-u"] = username;                               // username
             batch_job_args["-color"] = "green";
 
             // Submit this job to the BatchComputeService service
@@ -116,7 +113,6 @@ namespace wrench {
             } catch (ExecutionException &e) {
                 WRENCH_INFO("Couldn't submit a replayed job: %s (ignoring)", e.getCause()->toString().c_str());
             }
-
         }
 
         // Memory leak: workflow
@@ -127,4 +123,4 @@ namespace wrench {
         return 0;
     }
 
-};
+};// namespace wrench

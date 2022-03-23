@@ -42,8 +42,7 @@ namespace wrench {
     HTCondorComputeService::HTCondorComputeService(const std::string &hostname,
                                                    std::set<std::shared_ptr<ComputeService>> compute_services,
                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
-            ComputeService(hostname, "htcondor_service", "") {
+                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -51,10 +50,10 @@ namespace wrench {
         // Set default and specified message payloads
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
-//        // Check that there are child services
-//        if (compute_services.empty()) {
-//            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): at least one 'child' compute service should be provided");
-//        }
+        //        // Check that there are child services
+        //        if (compute_services.empty()) {
+        //            throw std::invalid_argument("HTCondorComputeService::HTCondorComputeService(): at least one 'child' compute service should be provided");
+        //        }
 
         // Check that all services are of allowed types
         for (auto const &cs: compute_services) {
@@ -190,13 +189,14 @@ namespace wrench {
      */
     int HTCondorComputeService::main() {
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+        WRENCH_INFO(
                 "HTCondor Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
                 this->mailbox->get_cname());
 
         // start the central manager service
         this->central_manager->setSimulation(this->simulation);
-        this->central_manager->start(this->central_manager, true, false); // Daemonized, no auto-restart
+        this->central_manager->start(this->central_manager, true, false);// Daemonized, no auto-restart
 
 
         // main loop
@@ -247,7 +247,7 @@ namespace wrench {
         } else if (auto msg = dynamic_cast<ComputeServiceSubmitCompoundJobRequestMessage *>(message.get())) {
             processSubmitCompoundJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
             return true;
-            
+
         } else {
             throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
@@ -273,8 +273,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
+                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
@@ -295,8 +294,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new NotAllowed(this->getSharedPtr<HTCondorComputeService>(), error_message)),
+                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<HTCondorComputeService>(), error_message)),
                             this->getMessagePayloadValue(
                                     HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
@@ -307,54 +305,50 @@ namespace wrench {
         // send positive answer
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
-                new
-                        ComputeServiceSubmitCompoundJobAnswerMessage(
+                new ComputeServiceSubmitCompoundJobAnswerMessage(
                         job,
                         this->getSharedPtr<HTCondorComputeService>(),
-                        true, nullptr, this->
-                                getMessagePayloadValue(
-                                HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)
-                ));
+                        true, nullptr, this->getMessagePayloadValue(HTCondorComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD)));
         return;
     }
 
-///**
-// * @brief Process a submit pilot job request
-// *
-// * @param answer_mailbox: the mailbox to which the answer message should be sent
-// * @param job: the job
-// * @param service_specific_args: service specific arguments
-// *
-// * @throw std::runtime_error
-// */
-//    void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
-//                                                       const std::map<std::string, std::string> &service_specific_args) {
-//
-//        WRENCH_INFO("Asked to run a pilot job");
-//
-//        // Check that the job can run on some child service
-//        if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
-//            S4U_Mailbox::dputMessage(
-//                    answer_mailbox,
-//                    new ComputeServiceSubmitPilotJobAnswerMessage(
-//                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
-//                                    new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
-//                            this->getMessagePayloadValue(
-//                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-//            return;
-//        }
-//
-//        // Submit the job to the central manager
-//        this->central_manager->submitPilotJob(job, service_specific_args);
-//
-//        // send positive answer
-//        S4U_Mailbox::dputMessage(
-//                answer_mailbox,
-//                new ComputeServiceSubmitPilotJobAnswerMessage(
-//                        job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
-//                                HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-//        return;
-//    }
+    ///**
+    // * @brief Process a submit pilot job request
+    // *
+    // * @param answer_mailbox: the mailbox to which the answer message should be sent
+    // * @param job: the job
+    // * @param service_specific_args: service specific arguments
+    // *
+    // * @throw std::runtime_error
+    // */
+    //    void HTCondorComputeService::processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
+    //                                                       const std::map<std::string, std::string> &service_specific_args) {
+    //
+    //        WRENCH_INFO("Asked to run a pilot job");
+    //
+    //        // Check that the job can run on some child service
+    //        if (not this->central_manager->jobCanRunSomewhere(job, service_specific_args)) {
+    //            S4U_Mailbox::dputMessage(
+    //                    answer_mailbox,
+    //                    new ComputeServiceSubmitPilotJobAnswerMessage(
+    //                            job, this->getSharedPtr<HTCondorComputeService>(), false, std::shared_ptr<FailureCause>(
+    //                                    new NotEnoughResources(job, this->getSharedPtr<HTCondorComputeService>())),
+    //                            this->getMessagePayloadValue(
+    //                                    HTCondorComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+    //            return;
+    //        }
+    //
+    //        // Submit the job to the central manager
+    //        this->central_manager->submitPilotJob(job, service_specific_args);
+    //
+    //        // send positive answer
+    //        S4U_Mailbox::dputMessage(
+    //                answer_mailbox,
+    //                new ComputeServiceSubmitPilotJobAnswerMessage(
+    //                        job, this->getSharedPtr<HTCondorComputeService>(), true, nullptr, this->getMessagePayloadValue(
+    //                                HTCondorComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+    //        return;
+    //    }
 
 
     /**
@@ -416,13 +410,13 @@ namespace wrench {
         // Determine the target BatchComputeService compute service
         std::set<std::shared_ptr<BatchComputeService>> batch_cses;
         std::shared_ptr<BatchComputeService> target_cs = nullptr;
-        for (auto const &cs : this->central_manager->compute_services) {
+        for (auto const &cs: this->central_manager->compute_services) {
             if (auto batch_cs = std::dynamic_pointer_cast<BatchComputeService>(cs)) {
                 batch_cses.insert(batch_cs);
             }
         }
         if (service_specific_args.find("-service") != service_specific_args.end()) {
-            for (auto const &cs : batch_cses) {
+            for (auto const &cs: batch_cses) {
                 if (cs->getName() == service_specific_args.at("-service")) {
                     target_cs = cs;
                 }
@@ -441,7 +435,7 @@ namespace wrench {
         // Now, invoke the BatchComputeService compute service with the arguments (sort of) to validate them
         auto stripped_service_specific_args = service_specific_args;
         stripped_service_specific_args.erase("-universe");
-        stripped_service_specific_args.erase("-service"); // which may not be there, but whatever
+        stripped_service_specific_args.erase("-service");// which may not be there, but whatever
         try {
             target_cs->validateServiceSpecificArguments(job, stripped_service_specific_args);
         } catch (ExecutionException &e) {
@@ -449,7 +443,6 @@ namespace wrench {
         } catch (std::invalid_argument &e) {
             throw;
         }
-
     }
 
     /**
@@ -477,4 +470,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

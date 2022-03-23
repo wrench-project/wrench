@@ -16,11 +16,9 @@
 class InvalidXMLTest : public ::testing::Test {
 
 public:
-
     void do_InvalidXML_test();
 
 protected:
-
     InvalidXMLTest() {
 
         // Create a platform file
@@ -64,9 +62,7 @@ void InvalidXMLTest::do_InvalidXML_test() {
     ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::invalid_argument);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-

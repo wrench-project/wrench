@@ -15,16 +15,14 @@
 
 namespace wrench {
 
-   /**
+    /**
     * @brief Configurable message payloads for a SimpleStorageService
     */
     class SimpleStorageServiceMessagePayload : public StorageServiceMessagePayload {
     public:
-
-
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_SIMPLESTORAGESERVICEMESSAGEPAYLOAD_H

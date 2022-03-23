@@ -25,10 +25,10 @@ namespace wrench {
     public:
         // Constructor
         JobActionFailureController(std::shared_ptr<BareMetalComputeService> bm_cs,
-                                      std::shared_ptr<CloudComputeService> cloud_cs,
-                                      std::shared_ptr<StorageService> ss_1,
-                                      std::shared_ptr<StorageService> ss_2,
-                                      const std::string &hostname);
+                                   std::shared_ptr<CloudComputeService> cloud_cs,
+                                   std::shared_ptr<StorageService> ss_1,
+                                   std::shared_ptr<StorageService> ss_2,
+                                   const std::string &hostname);
 
     private:
         // main() method of the Controller
@@ -38,7 +38,6 @@ namespace wrench {
         std::shared_ptr<CloudComputeService> cloud_cs;
         std::shared_ptr<StorageService> ss_1;
         std::shared_ptr<StorageService> ss_2;
-
     };
-}
-#endif //WRENCH_EXAMPLE_JOB_ACTION_FAILURE_CONTROLLER_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_JOB_ACTION_FAILURE_CONTROLLER_H

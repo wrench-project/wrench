@@ -36,7 +36,6 @@ public:
     void do_getReadyTasksTest_test();
 
 protected:
-
     ~SimpleSimulationTest() {
         workflow->clear();
     }
@@ -133,12 +132,10 @@ class SimpleSimulationReadyTasksTestWMS : public wrench::ExecutionController {
 
 public:
     SimpleSimulationReadyTasksTestWMS(SimpleSimulationTest *test,
-                                      std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                      std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     SimpleSimulationTest *test;
 
     int main() {
@@ -148,12 +145,12 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks = this->test->workflow->getReadyTasks();
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
         if (tasks.size() != 5) {
             throw std::runtime_error("Should have five tasks ready to run, due to dependencies");
         }
 
-        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask> >> clustered_tasks = this->test->workflow->getReadyClusters();
+        std::map<std::string, std::vector<std::shared_ptr<wrench::WorkflowTask>>> clustered_tasks = this->test->workflow->getReadyClusters();
         if (clustered_tasks.size() != 3) {
             throw std::runtime_error("Should have exactly three clusters");
         }
@@ -171,7 +168,7 @@ private:
 
         // Create a bogus VM
         try {
-            cs->createVM(1000,10000000);
+            cs->createVM(1000, 10000000);
             throw std::runtime_error("Should not be able to create a VM that exceeds the capacity of all hosts on the service");
         } catch (wrench::ExecutionException &e) {
             auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
@@ -200,10 +197,9 @@ private:
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
-        for (const auto &task : tasks) {
+        for (const auto &task: tasks) {
             try {
-                one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file,
-                                                                                    wrench::FileLocation::LOCATION(this->test->storage_service)}},
+                one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}},
                                                                           {}, {}, {});
 
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
@@ -252,7 +248,7 @@ private:
         }
 
         // Wait for workflow execution events
-        for (auto const & task : tasks) {
+        for (auto const &task: tasks) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -267,10 +263,10 @@ private:
         // Coverage
         one_task_jobs[0]->getEndDate();
 
-        for (auto & one_task_job : one_task_jobs) {
+        for (auto &one_task_job: one_task_jobs) {
             if (one_task_job->getNumCompletedTasks() != 1) {
                 throw std::runtime_error("A job with one completed task1 should say it has one completed task1 (instead of " +
-                std::to_string(one_task_job->getNumCompletedTasks()) + ")");
+                                         std::to_string(one_task_job->getNumCompletedTasks()) + ")");
             }
         }
 
@@ -328,18 +324,22 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
     ASSERT_THROW(simulation->add(
-            new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")), std::runtime_error);
+                         new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
+                 std::runtime_error);
     ASSERT_THROW(simulation->add(
-            new wrench::SimpleStorageService("DualCoreHost", {"/"})), std::runtime_error);
+                         new wrench::SimpleStorageService("DualCoreHost", {"/"})),
+                 std::runtime_error);
     ASSERT_THROW(simulation->add(
-            new wrench::NetworkProximityService("DualCoreHost", hosts)), std::runtime_error);
+                         new wrench::NetworkProximityService("DualCoreHost", hosts)),
+                 std::runtime_error);
     ASSERT_THROW(simulation->add(
-            new wrench::FileRegistryService("DualCoreHost")), std::runtime_error);
+                         new wrench::FileRegistryService("DualCoreHost")),
+                 std::runtime_error);
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -351,8 +351,9 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})), std::invalid_argument);
+                         new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
+                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
+                 std::invalid_argument);
     storage_service = simulation->add(
             new wrench::SimpleStorageService(hostname, {"/disk2"}, {},
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
@@ -366,16 +367,14 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     ASSERT_THROW(storage_service->getMessagePayloadValue(-1), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
-            wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
+                           wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
 
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                            {
-                                              {wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}
-                                              })));
+                            new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
+                                                            {{wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}})));
 
     // Try to get the property in bogus ways, for coverage
     ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD), std::invalid_argument);
@@ -387,7 +386,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
+                            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
     ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);
@@ -413,9 +412,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-

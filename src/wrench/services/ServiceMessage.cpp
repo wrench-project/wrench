@@ -16,8 +16,7 @@ namespace wrench {
      * @brief Constructor
      * @param payload: message size in bytes
      */
-    ServiceMessage::ServiceMessage(double payload) :
-            SimulationMessage( payload) {}
+    ServiceMessage::ServiceMessage(double payload) : SimulationMessage(payload) {}
 
     /**
      * @brief Constructor
@@ -31,7 +30,7 @@ namespace wrench {
     ServiceStopDaemonMessage::ServiceStopDaemonMessage(simgrid::s4u::Mailbox *ack_mailbox, bool send_failure_notifications,
                                                        ComputeService::TerminationCause termination_cause,
                                                        double payload)
-            : ServiceMessage(payload), ack_mailbox(ack_mailbox), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}
+        : ServiceMessage(payload), ack_mailbox(ack_mailbox), send_failure_notifications(send_failure_notifications), termination_cause(termination_cause) {}
 
     /**
      * @brief Constructor
@@ -40,7 +39,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(double payload)
-            : ServiceMessage( payload) {}
+        : ServiceMessage(payload) {}
 
 
     /**
@@ -50,7 +49,7 @@ namespace wrench {
       * @throw std::invalid_arguments
       */
     ServiceTTLExpiredMessage::ServiceTTLExpiredMessage(double payload)
-            : ServiceMessage( payload) {}
+        : ServiceMessage(payload) {}
 
 
-};
+};// namespace wrench
