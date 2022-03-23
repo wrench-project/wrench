@@ -40,10 +40,10 @@ And, one of the following:
 
 - [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.30
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
-- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 
 ### Optional Dependencies
 
+- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - version 1.4 - useful for expanded batch-scheduled resource simulation capabilities
 
