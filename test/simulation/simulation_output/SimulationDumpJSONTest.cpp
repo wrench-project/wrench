@@ -670,76 +670,18 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     graph_json_file >> result_json1;
 
     auto expected_json1 = R"(
-    {
-        "workflow_graph": {
-            "edges": [
-                {
-                    "source": "task1_input",
-                    "target": "task1"
-                },
-                {
-                    "source": "task1",
-                    "target": "task1_output"
-                },
-                {
-                    "source": "task2_input",
-                    "target": "task2"
-                },
-                {
-                    "source": "task2",
-                    "target": "task2_output"
-                }
-            ],
-            "vertices": [
-                {
-                    "flops": 1.0,
-                    "id": "task1",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task2",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "id": "task1_input",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task1_output",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task2_input",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task2_output",
-                    "size": 1.0,
-                    "type": "file"
-                }
-            ]
-        }
-    })"_json;
+    {"name":"WRENCH-generated workflow","schemaVersion":"1.3","workflow":{"machines":[],"makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[{"link":"input","name":"task1_input","size":1.0},{"link":"output","name":"task1_output","size":1.0}],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[{"link":"input","name":"task2_input","size":1.0},{"link":"output","name":"task2_output","size":1.0}],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}}
+)"_json;
 
     /*
      * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
      * comparing results with expected values, we sort the json lists so the test is deterministic.
      */
-    std::sort(result_json1["workflow_graph"]["edges"].begin(), result_json1["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(result_json1["workflow_graph"]["vertices"].begin(), result_json1["workflow_graph"]["vertices"].end(), compareNodes);
-
-    std::sort(expected_json1["workflow_graph"]["edges"].begin(), expected_json1["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(expected_json1["workflow_graph"]["vertices"].begin(), expected_json1["workflow_graph"]["vertices"].end(), compareNodes);
+//    std::sort(result_json1["workflow_graph"]["edges"].begin(), result_json1["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(result_json1["workflow_graph"]["vertices"].begin(), result_json1["workflow_graph"]["vertices"].end(), compareNodes);
+//
+//    std::sort(expected_json1["workflow_graph"]["edges"].begin(), expected_json1["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(expected_json1["workflow_graph"]["vertices"].begin(), expected_json1["workflow_graph"]["vertices"].end(), compareNodes);
 
     EXPECT_TRUE(result_json1 == expected_json1);
 
@@ -769,102 +711,18 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     graph_json_file >> result_json2;
 
     auto expected_json2 = R"(
-    {
-        "workflow_graph": {
-            "edges": [
-                {
-                    "source": "input_file1",
-                    "target": "task1"
-                },
-                {
-                    "source": "input_file2",
-                    "target": "task1"
-                },
-                {
-                    "source": "task1",
-                    "target": "output_file1"
-                },
-                {
-                    "source": "task1",
-                    "target": "output_file2"
-                },
-                {
-                    "source": "input_file1",
-                    "target": "task2"
-                },
-                {
-                    "source": "input_file2",
-                    "target": "task2"
-                },
-                {
-                    "source": "task2",
-                    "target": "output_file3"
-                },
-                {
-                    "source": "task2",
-                    "target": "output_file4"
-                }
-            ],
-            "vertices": [
-                {
-                    "flops": 1.0,
-                    "id": "task1",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task2",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "id": "input_file1",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "input_file2",
-                    "size": 2.0,
-                    "type": "file"
-                },
-                {
-                    "id": "output_file1",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "output_file2",
-                    "size": 2.0,
-                    "type": "file"
-                },
-                {
-                    "id": "output_file3",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "output_file4",
-                    "size": 1.0,
-                    "type": "file"
-                }
-            ]
-        }
-    })"_json;
+{"name":"WRENCH-generated workflow","schemaVersion":"1.3","workflow":{"machines":[],"makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[{"link":"input","name":"input_file1","size":1.0},{"link":"input","name":"input_file2","size":2.0},{"link":"output","name":"output_file1","size":1.0},{"link":"output","name":"output_file2","size":2.0}],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[{"link":"input","name":"input_file1","size":1.0},{"link":"input","name":"input_file2","size":2.0},{"link":"output","name":"output_file3","size":1.0},{"link":"output","name":"output_file4","size":1.0}],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}}
+)"_json;
 
     /*
      * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
      * comparing results with expected values, we sort the json lists so the test is deterministic.
      */
-    std::sort(result_json2["workflow_graph"]["edges"].begin(), result_json2["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(result_json2["workflow_graph"]["vertices"].begin(), result_json2["workflow_graph"]["vertices"].end(), compareNodes);
-
-    std::sort(expected_json2["workflow_graph"]["edges"].begin(), expected_json2["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(expected_json2["workflow_graph"]["vertices"].begin(), expected_json2["workflow_graph"]["vertices"].end(), compareNodes);
+//    std::sort(result_json2["workflow_graph"]["edges"].begin(), result_json2["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(result_json2["workflow_graph"]["vertices"].begin(), result_json2["workflow_graph"]["vertices"].end(), compareNodes);
+//
+//    std::sort(expected_json2["workflow_graph"]["edges"].begin(), expected_json2["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(expected_json2["workflow_graph"]["vertices"].begin(), expected_json2["workflow_graph"]["vertices"].end(), compareNodes);
 
     EXPECT_TRUE(result_json2 == expected_json2);
 
@@ -903,126 +761,18 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
     graph_json_file >> result_json3;
 
     auto expected_json3 = R"(
-    {
-        "workflow_graph": {
-            "edges": [
-                {
-                    "source": "task1_input",
-                    "target": "task1"
-                },
-                {
-                    "source": "task1",
-                    "target": "task1_output1"
-                },
-                {
-                    "source": "task1",
-                    "target": "task1_output2"
-                },
-                {
-                    "source": "task1_output1",
-                    "target": "task2"
-                },
-                {
-                    "source": "task2",
-                    "target": "task2_output1"
-                },
-                {
-                    "source": "task1_output2",
-                    "target": "task3"
-                },
-                {
-                    "source": "task3",
-                    "target": "task3_output1"
-                },
-                {
-                    "source": "task2_output1",
-                    "target": "task4"
-                },
-                {
-                    "source": "task3_output1",
-                    "target": "task4"
-                },
-                {
-                    "source": "task4",
-                    "target": "task4_output1"
-                }
-            ],
-            "vertices": [
-                {
-                    "flops": 1.0,
-                    "id": "task1",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task2",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task3",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task4",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "id": "task1_input",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task1_output1",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task1_output2",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task2_output1",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task3_output1",
-                    "size": 1.0,
-                    "type": "file"
-                },
-                {
-                    "id": "task4_output1",
-                    "size": 1.0,
-                    "type": "file"
-                }
-            ]
-        }
-    })"_json;
+{"name":"WRENCH-generated workflow","schemaVersion":"1.3","workflow":{"machines":[],"makespan":-1.0,"tasks":[{"children":["task2","task3"],"cores":1,"files":[{"link":"input","name":"task1_input","size":1.0},{"link":"output","name":"task1_output1","size":1.0},{"link":"output","name":"task1_output2","size":1.0}],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":["task4"],"cores":1,"files":[{"link":"input","name":"task1_output1","size":1.0},{"link":"output","name":"task2_output1","size":1.0}],"machine":"","memory":0.0,"name":"task2","parents":["task1"],"runtime":-1.0,"type":"compute"},{"children":["task4"],"cores":1,"files":[{"link":"input","name":"task1_output2","size":1.0},{"link":"output","name":"task3_output1","size":1.0}],"machine":"","memory":0.0,"name":"task3","parents":["task1"],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[{"link":"input","name":"task2_output1","size":1.0},{"link":"input","name":"task3_output1","size":1.0},{"link":"output","name":"task4_output1","size":1.0}],"machine":"","memory":0.0,"name":"task4","parents":["task2","task3"],"runtime":-1.0,"type":"compute"}]}}
+)"_json;
 
     /*
      * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
      * comparing results with expected values, we sort the json lists so the test is deterministic.
      */
-    std::sort(result_json3["workflow_graph"]["edges"].begin(), result_json3["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(result_json3["workflow_graph"]["vertices"].begin(), result_json3["workflow_graph"]["vertices"].end(), compareNodes);
-
-    std::sort(expected_json3["workflow_graph"]["edges"].begin(), expected_json3["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(expected_json3["workflow_graph"]["vertices"].begin(), expected_json3["workflow_graph"]["vertices"].end(), compareNodes);
+//    std::sort(result_json3["workflow_graph"]["edges"].begin(), result_json3["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(result_json3["workflow_graph"]["vertices"].begin(), result_json3["workflow_graph"]["vertices"].end(), compareNodes);
+//
+//    std::sort(expected_json3["workflow_graph"]["edges"].begin(), expected_json3["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(expected_json3["workflow_graph"]["vertices"].begin(), expected_json3["workflow_graph"]["vertices"].end(), compareNodes);
 
     EXPECT_TRUE(result_json3 == expected_json3);
 
@@ -1787,161 +1537,8 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     t2->setNumCoresAllocated(20);
 
     nlohmann::json expected_json5 = R"(
-    {
-        "platform": {
-            "edges": [
-                {
-                    "source": {
-                        "id": "host1",
-                        "type": "host"
-                    },
-                    "target": {
-                        "id": "1",
-                        "type": "link"
-                    }
-                },
-                {
-                    "source": {
-                        "id": "1",
-                        "type": "link"
-                    },
-                    "target": {
-                        "id": "host2",
-                        "type": "host"
-                    }
-                }
-            ],
-            "routes": [
-                {
-                    "latency": 1e-06,
-                    "route": [
-                        "1"
-                    ],
-                    "source": "host1",
-                    "target": "host2"
-                }
-            ],
-            "vertices": [
-                {
-                    "cluster_id": "host1",
-                    "cores": 10,
-                    "flop_rate": 1.0,
-                    "id": "host1",
-                    "memory_manager_service": 10.0,
-                    "type": "host"
-                },
-                {
-                    "cluster_id": "host2",
-                    "cores": 20,
-                    "flop_rate": 1.0,
-                    "id": "host2",
-                    "memory_manager_service": 20.0,
-                    "type": "host"
-                },
-                {
-                    "bandwidth": 125000000.0,
-                    "id": "1",
-                    "latency": 1e-06,
-                    "type": "link"
-                }
-            ]
-        },
-        "workflow_execution": {
-            "tasks": [
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 20,
-                        "flop_rate": 1.0,
-                        "hostname": "host2",
-                        "memory_manager_service": 20.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 10,
-                    "read": null,
-                    "task_id": "task1",
-                    "color": "",
-                    "terminated": -1.0,
-                    "whole_task": {
-                        "end": 3.0,
-                        "start": 2.0
-                    },
-                    "write": null
-                },
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 10,
-                        "flop_rate": 1.0,
-                        "hostname": "host1",
-                        "memory_manager_service": 10.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 8,
-                    "read": null,
-                    "task_id": "task1",
-                    "color": "",
-                    "terminated": -1.0,
-                    "whole_task": {
-                        "end": 2.0,
-                        "start": 1.0
-                    },
-                    "write": null
-                },
-                {
-                    "compute": {
-                        "end": -1.0,
-                        "start": -1.0
-                    },
-                    "execution_host": {
-                        "cores": 20,
-                        "flop_rate": 1.0,
-                        "hostname": "host2",
-                        "memory_manager_service": 20.0
-                    },
-                    "failed": -1.0,
-                    "num_cores_allocated": 20,
-                    "read": null,
-                    "task_id": "task2",
-                    "color": "",
-                    "terminated": -1.0,
-                    "whole_task": {
-                        "end": 4.0,
-                        "start": 3.0
-                    },
-                    "write": null
-                }
-            ]
-        },
-        "workflow_graph": {
-            "edges": null,
-            "vertices": [
-                {
-                    "flops": 1.0,
-                    "id": "task1",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                },
-                {
-                    "flops": 1.0,
-                    "id": "task2",
-                    "max_cores": 1,
-                    "memory_manager_service": 0.0,
-                    "min_cores": 1,
-                    "type": "task"
-                }
-            ]
-        }
-    }
-    )"_json;
+{"platform":{"edges":[{"source":{"id":"host1","type":"host"},"target":{"id":"1","type":"link"}},{"source":{"id":"1","type":"link"},"target":{"id":"host2","type":"host"}}],"routes":[{"latency":1e-06,"route":["1"],"source":"host1","target":"host2"}],"vertices":[{"bandwidth":125000000.0,"id":"1","latency":1e-06,"type":"link"},{"cluster_id":"host1","cores":10,"flop_rate":1.0,"id":"host1","memory_manager_service":10.0,"type":"host"},{"cluster_id":"host2","cores":20,"flop_rate":1.0,"id":"host2","memory_manager_service":20.0,"type":"host"}]},"workflow_execution":{"tasks":[{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":10,"flop_rate":1.0,"hostname":"host1","memory_manager_service":10.0},"failed":-1.0,"num_cores_allocated":8,"read":null,"task_id":"task1","terminated":-1.0,"whole_task":{"end":2.0,"start":1.0},"write":null},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":10,"read":null,"task_id":"task1","terminated":-1.0,"whole_task":{"end":3.0,"start":2.0},"write":null},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":20,"read":null,"task_id":"task2","terminated":-1.0,"whole_task":{"end":4.0,"start":3.0},"write":null}]},"workflow_graph":{"machines":[],"makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}}
+)"_json;
 
     EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow, unified_json_file_path, true, true, true, false, false));
 
@@ -1960,158 +1557,15 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     std::sort(result_json["workflow_execution"]["tasks"].begin(), result_json["workflow_execution"]["tasks"].end(), compareStartTimes);
     std::sort(expected_json5["workflow_execution"]["tasks"].begin(), expected_json5["workflow_execution"]["tasks"].end(), compareStartTimes);
+//
+//    std::sort(result_json["workflow_graph"]["edges"].begin(), result_json["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(result_json["workflow_graph"]["vertices"].begin(), result_json["workflow_graph"]["vertices"].end(), compareNodes);
+//
+//    std::sort(expected_json5["workflow_graph"]["edges"].begin(), expected_json5["workflow_graph"]["edges"].end(), compareLinks);
+//    std::sort(expected_json5["workflow_graph"]["vertices"].begin(), expected_json5["workflow_graph"]["vertices"].end(), compareNodes);
 
-    std::sort(result_json["workflow_graph"]["edges"].begin(), result_json["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(result_json["workflow_graph"]["vertices"].begin(), result_json["workflow_graph"]["vertices"].end(), compareNodes);
-
-    std::sort(expected_json5["workflow_graph"]["edges"].begin(), expected_json5["workflow_graph"]["edges"].end(), compareLinks);
-    std::sort(expected_json5["workflow_graph"]["vertices"].begin(), expected_json5["workflow_graph"]["vertices"].end(), compareNodes);
 
     EXPECT_TRUE(result_json == expected_json5);
-
-
-    /*
-    workflow = wrench::Workflow::createWorkflow();
-
-
-    std::string host = wrench::Simulation::getHostnameList()[0];
-
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
-    EXPECT_NO_THROW(wms = simulation->add(
-            new SimulationOutputDumpEnergyConsumptionTestWMS(
-                    this, workflow, host
-            )
-    ));
-
-    EXPECT_NO_THROW(simulation->launch());
-
-    EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow, unified_json_file_path, false, false, false, true, false));
-
-    nlohmann::json expected_json6 = R"(
-    {
-        "energy_consumption": [
-            {
-                "consumed_energy_trace": [
-                    {
-                        "time": 0.0,
-                        "joules": 0.0
-                    },
-                    {
-                        "time": 2.0,
-                        "joules": 400.0
-                    },
-                    {
-                        "time": 4.0,
-                        "joules": 800.0
-                    },
-                    {
-                        "time": 6.0,
-                        "joules": 1200.0
-                    }
-                ],
-                "hostname": "host1",
-                "pstate_trace": [
-                    {
-                        "pstate": 0,
-                        "time": 0.0
-                    }
-                ],
-                "pstates": [
-                    {
-                        "idle": "100.0",
-                        "epsilon": "100.0",
-                        "pstate": 0,
-                        "all_cores": "200.0",
-                        "speed": 100000000.0
-                    },
-                    {
-                        "idle": " 93.0",
-                        "epsilon": " 93.0",
-                        "pstate": 1,
-                        "all_cores": "170.0",
-                        "speed": 50000000.0
-                    },
-                    {
-                        "idle": " 90.0",
-                        "epsilon": " 90.0",
-                        "pstate": 2,
-                        "all_cores": "150.0",
-                        "speed": 20000000.0
-                    }
-                ],
-                "wattage_off": "10"
-            },
-            {
-                "consumed_energy_trace": [
-                    {
-                        "time": 0.0,
-                        "joules": 0.0
-                    },
-                    {
-                        "time": 2.0,
-                        "joules": 200.0
-                    },
-                    {
-                        "time": 4.0,
-                        "joules": 400.0
-                    }
-                ],
-                "hostname": "host2",
-                "pstate_trace": [
-                    {
-                        "pstate": 0,
-                        "time": 0.0
-                    }
-                ],
-                "pstates": [
-                    {
-                        "idle": "100.0",
-                        "epsilon": "100.0",
-                        "pstate": 0,
-                        "all_cores": "200.0",
-                        "speed": 100000000.0
-                    },
-                    {
-                        "idle": " 93.0",
-                        "epsilon": " 93.0",
-                        "pstate": 1,
-                        "all_cores": "170.0",
-                        "speed": 50000000.0
-                    },
-                    {
-                        "idle": " 90.0",
-                        "epsilon": " 90.0",
-                        "pstate": 2,
-                        "all_cores": "150.0",
-                        "speed": 20000000.0
-                    }
-                ],
-                "wattage_off": "10"
-            }
-        ]
-    })"_json;
-
-    std::sort(expected_json6["energy_consumption"].begin(), expected_json6["energy_consumption"].end(), compareHostname);
-    for (size_t i = 0; i < expected_json6["energy_consumption"].size(); ++i) {
-        std::sort(expected_json6["energy_consumption"][i]["consumed_energy_trace"].begin(), expected_json6["energy_consumption"][i]["consumed_energy_trace"].end(), compareTime);
-        std::sort(expected_json6["energy_consumption"][i]["pstates"].begin(), expected_json6["energy_consumption"][i]["pstates"].end(), comparePstate);
-        std::sort(expected_json6["energy_consumption"][i]["pstate_trace"].begin(), expected_json6["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
-    }
-
-    std::ifstream json1_file(unified_json_file_path);
-    nlohmann::json result_json2;
-    json1_file >> result_json2;
-
-
-    std::sort(result_json2["energy_consumption"].begin(), result_json2["energy_consumption"].end(), compareHostname);
-    for (size_t i = 0; i < expected_json6["energy_consumption"].size(); ++i) {
-        std::sort(result_json2["energy_consumption"][i]["consumed_energy_trace"].begin(), result_json2["energy_consumption"][i]["consumed_energy_trace"].end(), compareTime);
-        std::sort(result_json2["energy_consumption"][i]["pstates"].begin(), result_json2["energy_consumption"][i]["pstates"].end(), comparePstate);
-        std::sort(result_json2["energy_consumption"][i]["pstate_trace"].begin(), result_json2["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
-    }
-
-    EXPECT_TRUE(expected_json6 == result_json2);
-    */
 
 
     for (int i=0; i < argc; i++)

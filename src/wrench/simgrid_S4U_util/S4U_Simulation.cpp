@@ -409,6 +409,32 @@ namespace wrench {
         simgrid::s4u::this_actor::execute(flops);
     }
 
+
+    /**
+     * @brief Simulates a multi-threaded computation
+     * @param num_threads: the number of threads
+     * @param thread_creation_overhead: the thread creation overhead in seconds
+     * @param sequential_work: the sequential work (in flops)
+     * @param parallel_per_thread_work: the parallel per thread work (in flops)
+     */
+    void S4U_Simulation::compute_multi_threaded(unsigned long num_threads,
+                                                double thread_creation_overhead,
+                                                double sequential_work,
+                                                double parallel_per_thread_work) {
+        // Overhead
+        S4U_Simulation::sleep((int)num_threads * thread_creation_overhead);
+        if (num_threads == 1) {
+            simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
+        } else {
+            // Launch compute-heavy thread
+            auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
+            // Launch all other threads
+            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work,(int)num_threads - 1);
+            // Wait for the compute-heavy thread
+            bottleneck_thread->wait();
+        }
+    }
+
 /**
  * @brief Simulates a disk write
  *

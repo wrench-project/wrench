@@ -33,7 +33,7 @@
                                         ASSERT_NE(WEXITSTATUS(exit_code), 255); \
                                         ASSERT_NE(WEXITSTATUS(exit_code), 0); \
                                         if (not no_stderr) { \
-                                             std::cerr << "[ ** Observed a fatal failure (exit code: " + std::to_string(WEXITSTATUS(exit_code)) + "), as expected **]\n"; \
+                                             std::cerr << "[ ** Observed a fatal failure (exit code: " + std::to_string(WEXITSTATUS(exit_code)) + "), AS EXPECTED **]\n"; \
                                           } \
                                       } else { \
                                         if (no_stderr) { close(2); } \
@@ -50,7 +50,7 @@
                                         ASSERT_NE(WEXITSTATUS(exit_code), 255); \
                                         ASSERT_NE(WEXITSTATUS(exit_code), 0); \
                                         if (not no_stderr) { \
-                                             std::cerr << "[ ** Observed a fatal failure (exit code: " + std::to_string(WEXITSTATUS(exit_code)) + "), as expected **]\n"; \
+                                             std::cerr << "[ ** Observed a fatal failure (exit code: " + std::to_string(WEXITSTATUS(exit_code)) + "), AS EXPECTED **]\n"; \
                                           } \
                                       } else { \
                                         if (no_stderr) { close(2); } \

@@ -54,6 +54,10 @@ namespace wrench {
         static double getHostMemoryCapacity(std::string hostname);
         static double getMemoryCapacity();
         static void compute(double);
+        static void compute_multi_threaded(unsigned long num_threads,
+                                                    double thread_creation_overhead,
+                                                    double sequential_work,
+                                                    double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
         static void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);

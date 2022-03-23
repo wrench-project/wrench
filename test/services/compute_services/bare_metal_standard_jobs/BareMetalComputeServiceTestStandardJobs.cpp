@@ -519,7 +519,7 @@ private:
                                                                             wrench::FileLocation::SCRATCH)},
                                                            {}, {});
 
-        // Submit the 2-task1 job for execution
+        // Submit the 2-task job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
 
         // Wait for the job completion
@@ -545,7 +545,7 @@ private:
         double delta_task3 = std::abs(task3_end_date - 10.0);
         double delta_task4 = std::abs(task4_end_date - 10.0);
         if ((delta_task3 > EPSILON) || (delta_task4 > EPSILON)) {
-            throw std::runtime_error("Unexpected task1 completion times " + std::to_string(task3_end_date) + " and " +
+            throw std::runtime_error("Unexpected task3 and task4 completion times " + std::to_string(task3_end_date) + " and " +
                                      std::to_string(task4_end_date) + ".");
         }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017-2021. The WRENCH Team.
+ * Copyright (c) 2017-2022. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -408,8 +408,6 @@ namespace wrench {
         }
     }
 
-
-
     /**
      * @brief Helper function called by terminateStandardJob() and terminatePilotJob() to process a job submission
      * @param job
@@ -453,8 +451,6 @@ namespace wrench {
             throw ExecutionException(msg->failure_cause);
         }
     }
-
-
 
     /**
      * @brief Main method of the daemon
@@ -559,13 +555,11 @@ namespace wrench {
         this->all_jobs.erase(batch_job->getCompoundJob());
     }
 
-
     /**
      *
      * @param job
      */
     void BatchComputeService::processCompoundJobTimeout(std::shared_ptr<CompoundJob> compound_job) {
-
         if (this->running_bare_metal_one_shot_compute_services.find(compound_job) ==
             this->running_bare_metal_one_shot_compute_services.end()) {
             throw std::runtime_error("BatchComputeService::processCompoundJobTimeout(): Unknown compound job");
@@ -580,8 +574,8 @@ namespace wrench {
     * @brief terminate a running standard job
     * @param job: the job
     */
-    void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause) {
-
+    void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, 
+                                                          ComputeService::TerminationCause termination_cause) {
         if (this->running_bare_metal_one_shot_compute_services.find(job) ==
             this->running_bare_metal_one_shot_compute_services.end()) {
             throw std::runtime_error("BatchComputeService::terminateRunningCompoundJob(): Unknown compound job");
@@ -597,8 +591,8 @@ namespace wrench {
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
     * or has timed out (because it's in fact a pilot job))
     */
-    void BatchComputeService::terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
-
+    void BatchComputeService::terminate(bool send_failure_notifications, 
+                                        ComputeService::TerminationCause termination_cause) {
         // LOCK
         this->acquireDaemonLock();
 
@@ -621,7 +615,6 @@ namespace wrench {
             }
             this->running_jobs.erase(compound_job);
         }
-
 
         while (not this->batch_queue.empty()) {
             auto batch_job = (*(this->batch_queue.begin()));
@@ -653,7 +646,6 @@ namespace wrench {
             }
             this->batch_queue.pop_front();
         }
-
 
         while (not this->waiting_jobs.empty()) {
             auto batch_job = (*(this->waiting_jobs.begin()));
@@ -828,9 +820,9 @@ namespace wrench {
      * @param job: the BatchComputeService job object
      * @param answer_mailbox: the mailbox to which answer messages should be sent
      */
-    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, simgrid::s4u::Mailbox *answer_mailbox) {
+    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, 
+                                                   simgrid::s4u::Mailbox *answer_mailbox) {
         WRENCH_INFO("Asked to run a BatchComputeService job with id %ld", job->getJobID());
-
 
         // Check that the job can be admitted in terms of resources:
         //      - number of nodes,
@@ -863,7 +855,6 @@ namespace wrench {
             }
         }
 
-
         // SUCCESS!
         S4U_Mailbox::dputMessage(answer_mailbox,
                                  new ComputeServiceSubmitCompoundJobAnswerMessage(
@@ -884,7 +875,6 @@ namespace wrench {
         this->scheduler->processJobSubmission(job);
     }
 
-
     /**
      * @brief Process a standard job completion
      * @param executor: the standard job executor
@@ -895,7 +885,6 @@ namespace wrench {
     void BatchComputeService::processCompoundJobCompletion(
             std::shared_ptr<BareMetalComputeServiceOneShot> executor,
             std::shared_ptr<CompoundJob> job) {
-
         if (this->running_bare_metal_one_shot_compute_services.find(job) ==
             this->running_bare_metal_one_shot_compute_services.end()) {
             // warning
@@ -965,8 +954,6 @@ namespace wrench {
     void BatchComputeService::processCompoundJobFailure(std::shared_ptr<BareMetalComputeServiceOneShot> executor,
                                                         std::shared_ptr<CompoundJob> job,
                                                         std::shared_ptr<FailureCause> cause) {
-
-
         if (this->running_bare_metal_one_shot_compute_services.find(job) ==
             this->running_bare_metal_one_shot_compute_services.end()) {
             throw std::runtime_error(
@@ -1031,8 +1018,8 @@ namespace wrench {
                 num_nodes_allocated, cores_per_node_asked_for);
 
         compound_job->pushCallbackMailbox(this->mailbox);
-        auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(new
-                                                                                BareMetalComputeServiceOneShot(
+        auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(
+            new BareMetalComputeServiceOneShot(
                 compound_job,
                 this->hostname,
                 resources,
@@ -1066,7 +1053,6 @@ namespace wrench {
                                                                       this->mailbox, msg,
                                                                       "batch_standard");
         compound_job_alarms[compound_job] = alarm_ptr;
-
     }
 
     /**
@@ -1074,44 +1060,39 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which the description message should be sent
     * @param key: the desired resource information (i.e., dictionary key) that's needed)
     */
-    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key) {
+    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, 
+                                                            const std::string &key) {
         // Build a dictionary
         std::map<std::string, double> dict;
 
         if (key == "num_hosts") {
-
             // Num hosts
             dict.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
 
         } else if (key == "num_cores") {
-
             for (auto h : this->nodes_to_cores_map) {
                 dict.insert(std::make_pair(h.first, (double) (h.second)));
             }
 
         } else if (key == "num_idle_cores") {
-
             // Num idle cores per hosts
             for (auto h : this->available_nodes_to_cores) {
                 dict.insert(std::make_pair(h.first, (double) (h.second)));
             }
 
         } else if (key == "flop_rates") {
-
             // Flop rate per host
             for (auto h : this->nodes_to_cores_map) {
                 dict.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
             }
 
         } else if (key == "ram_capacities") {
-
             // RAM capacity per host
             for (auto h : this->nodes_to_cores_map) {
                 dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
             }
 
         } else if (key == "ram_availabilities") {
-
             // RAM availability per host  (0 if something is running, full otherwise)
             for (auto h : this->available_nodes_to_cores) {
                 if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
@@ -1120,15 +1101,10 @@ namespace wrench {
                     dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
                 }
             }
-
         } else if (key == "ttl") {
-
             dict.insert(std::make_pair(this->getName(), DBL_MAX));
-
         } else {
-
             throw std::runtime_error("BatchComputeService::processGetResourceInformation(): unknown key");
-
         }
 
         // Send the reply
@@ -1190,7 +1166,6 @@ namespace wrench {
         }
 
         if (not is_running) {
-
             if (batch_job == nullptr) {
                 // Is it pending?
                 for (auto it1 = this->batch_queue.begin(); it1 != this->batch_queue.end(); it1++) {
@@ -1219,7 +1194,6 @@ namespace wrench {
         }
 
 //        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
-
         if (!is_pending && !is_running && !is_waiting) {
             std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
@@ -1261,13 +1235,11 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
     }
 
-
     /**
      * @brief Process a Batch bach_job timeout
      * @param bach_job: the BatchComputeService bach_job
      */
     void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> batch_job) {
-
         std::shared_ptr<CompoundJob> compound_job = nullptr;
 
         for (auto const &j : this->running_jobs) {
@@ -1360,7 +1332,6 @@ namespace wrench {
                  cores_per_node_asked_for);
     }
 
-
     /**
      * @brief Process a host available resource request
      * @param answer_mailbox: the answer mailbox
@@ -1372,7 +1343,6 @@ namespace wrench {
         throw std::runtime_error(
                 "BatchComputeService::processIsThereAtLeastOneHostWithAvailableResources(): A BatchComputeService compute service does not support this operation");
     }
-
 
     /**
      * @brief Method to validate a job's service-specific arguments
@@ -1419,9 +1389,7 @@ namespace wrench {
                 if (job->getMinimumRequiredNumCores() > num_cores) {
                     throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
                 }
-            } else if (key == "-u") {
-                // nothing
-            } else if (key == "-color") {
+            } else if (key == "-u" || key == "-color") {
                 // nothing
             } else {
                 // It has to be an action
@@ -1454,7 +1422,6 @@ namespace wrench {
         if (job->getMinimumRequiredMemory() > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first)) {
             throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
         }
-
     }
 
     /**

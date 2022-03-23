@@ -9,16 +9,16 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
-#include <wrench/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/failure_causes/ComputationHasDied.h>
 
-WRENCH_LOG_CATEGORY(wrench_core_compute_thread_has_died, "Log category for ComputeThreadHasDied");
+WRENCH_LOG_CATEGORY(wrench_core_computation_has_died, "Log category for ComputationHasDied");
 
 namespace wrench {
 
     /** @brief Constructor
      *
      */
-    ComputeThreadHasDied::ComputeThreadHasDied() {
+    ComputationHasDied::ComputationHasDied() {
     }
 
 
@@ -26,8 +26,8 @@ namespace wrench {
      * @brief Get the human-readable failure message
      * @return the message
      */
-    std::string ComputeThreadHasDied::toString() {
-        return std::string("A compute thread has died");
+    std::string ComputationHasDied::toString() {
+        return std::string("A computation has died (failed or killed)");
     }
 
 }

@@ -42,8 +42,6 @@ namespace wrench {
         this->job = std::move(job);
 
         this->execution_history.push(Action::ActionExecution());
-        this->simulate_computation_as_sleep = false;
-        this->thread_creation_overhead = 0.0;
         this->priority = 0.0;
     }
 
@@ -206,14 +204,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set whether simulation should be simulated as sleep (default = false)
-     * @param simulate_computation_as_sleep: true or false
-     */
-    void Action::setSimulateComputationAsSleep(bool simulate_computation_as_sleep) {
-        this->simulate_computation_as_sleep = simulate_computation_as_sleep;
-    }
-
-    /**
      * @brief Create a new execution data structure (e.g., after a restart)
      * @param state: the action state
      */
@@ -227,14 +217,6 @@ namespace wrench {
         this->execution_history.push(Action::ActionExecution());
         this->execution_history.top().state = old_state;
         this->setState(state);
-    }
-
-    /**
-     * @brief Set the thread creation overhead (default = zero)
-     * @param overhead_in_seconds: overhead in seconds
-     */
-    void Action::setThreadCreationOverhead(double overhead_in_seconds) {
-        this->thread_creation_overhead = overhead_in_seconds;
     }
 
     /**

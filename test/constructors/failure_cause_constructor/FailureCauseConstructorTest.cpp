@@ -13,7 +13,7 @@
 
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/failure_causes/NetworkError.h>
-#include <wrench/failure_causes/ComputeThreadHasDied.h>
+#include <wrench/failure_causes/ComputationHasDied.h>
 #include <wrench/failure_causes/FatalFailure.h>
 
 class FailureCauseConstructorTest : public ::testing::Test {
@@ -47,8 +47,8 @@ TEST_F(FailureCauseConstructorTest, NetworkError) {
 
 TEST_F(FailureCauseConstructorTest, ComputeThreadHasDied) {
 
-    wrench::ComputeThreadHasDied *cause = nullptr;
-    ASSERT_NO_THROW(cause = new wrench::ComputeThreadHasDied());
+    wrench::ComputationHasDied *cause = nullptr;
+    ASSERT_NO_THROW(cause = new wrench::ComputationHasDied());
     if (cause) {
       cause->toString(); // Coverage
     }
