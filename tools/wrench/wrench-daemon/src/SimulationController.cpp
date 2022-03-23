@@ -29,8 +29,7 @@ namespace wrench {
      */
     SimulationController::SimulationController(
             std::shared_ptr<Workflow> workflow,
-            const std::string &hostname, int sleep_us) :
-            ExecutionController(hostname, "SimulationController"), workflow(workflow), sleep_us(sleep_us)  {}
+            const std::string &hostname, int sleep_us) : ExecutionController(hostname, "SimulationController"), workflow(workflow), sleep_us(sleep_us) {}
 
     /**
      * @brief Simulation execution_controller's main method
@@ -66,7 +65,7 @@ namespace wrench {
                     auto new_service_shared_ptr = this->simulation->startNewService(new_storage_service);
                     // Add the new service to the registry of existing services, so that later we can look it up by name
                     this->storage_service_registry.insert(new_service_shared_ptr->getName(), new_service_shared_ptr);
-                
+
                 } else if (this->file_service_to_start.tryPop(new_file_service)) {
                     // start file registry service
                     WRENCH_INFO("Starting a new file registry service...");
@@ -100,8 +99,9 @@ namespace wrench {
             // Moves time forward if needed (because the client has done a sleep),
             // And then add all events that occurred to the event queue
             double time_to_sleep = std::max<double>(0, time_horizon_to_reach -
-                                                       wrench::Simulation::getCurrentSimulatedDate());
-            if (time_to_sleep > 0.0) { WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
+                                                               wrench::Simulation::getCurrentSimulatedDate());
+            if (time_to_sleep > 0.0) {
+                WRENCH_INFO("Sleeping %.2lf seconds", time_to_sleep);
                 S4U_Simulation::sleep(time_to_sleep);
                 while (auto event = this->waitForNextEvent(10 * JOB_MANAGER_COMMUNICATION_TIMEOUT_VALUE)) {
                     // Add job onto the event queue
@@ -333,7 +333,7 @@ namespace wrench {
         }
         json answer;
         std::vector<std::string> task_names;
-        for (const auto &t : job->getTasks()) {
+        for (const auto &t: job->getTasks()) {
             task_names.push_back(t->getID());
         }
         answer["tasks"] = task_names;
@@ -513,7 +513,7 @@ namespace wrench {
     json SimulationController::createStandardJob(json data) {
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
 
-        for (auto const &name : data["tasks"]) {
+        for (auto const &name: data["tasks"]) {
             tasks.push_back(this->workflow->getTaskByID(name));
         }
 
@@ -588,10 +588,10 @@ namespace wrench {
     json SimulationController::createTask(json data) {
 
         this->workflow->addTask(data["name"],
-                                     data["flops"],
-                                     data["min_num_cores"],
-                                     data["max_num_cores"],
-                                     data["memory"]);
+                                data["flops"],
+                                data["min_num_cores"],
+                                data["max_num_cores"],
+                                data["memory"]);
         return json({});
     }
 
@@ -830,7 +830,7 @@ namespace wrench {
         auto files = task->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
-        for (const auto &f : files) {
+        for (const auto &f: files) {
             file_names.push_back(f->getID());
         }
         answer["files"] = file_names;
@@ -860,7 +860,7 @@ namespace wrench {
         auto files = this->workflow->getInputFiles();
         json answer;
         std::vector<std::string> file_names;
-        for (const auto &f : files) {
+        for (const auto &f: files) {
             file_names.push_back(f->getID());
         }
         answer["files"] = file_names;
@@ -893,10 +893,10 @@ namespace wrench {
             throw std::runtime_error("Unknown storage service " + service_name);
         }
 
-        for (auto const &f : this->workflow->getInputFiles()) {
+        for (auto const &f: this->workflow->getInputFiles()) {
             this->simulation->stageFile(f, storage_service);
         }
         return {};
     }
 
-}
+}// namespace wrench

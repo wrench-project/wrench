@@ -33,7 +33,7 @@ class SimulationDaemon {
 
 public:
     SimulationDaemon(bool daemon_logging, int simulation_port_number,
-                     std::shared_ptr <wrench::SimulationController> simulation_controller,
+                     std::shared_ptr<wrench::SimulationController> simulation_controller,
                      std::thread &simulation_thread);
 
     void run();
@@ -43,7 +43,7 @@ private:
 
     bool daemon_logging;
     int simulation_port_number;
-    std::shared_ptr <wrench::SimulationController> simulation_controller;
+    std::shared_ptr<wrench::SimulationController> simulation_controller;
     std::thread &simulation_thread;
 
     void displayRequest(const Request &req) const;
@@ -51,8 +51,7 @@ private:
     void terminateSimulation(const Request &req, Response &res);
 
     void alive(const Request &req, Response &res);
-
 };
 
 
-#endif // SIMULATION_DAEMON_H
+#endif// SIMULATION_DAEMON_H
