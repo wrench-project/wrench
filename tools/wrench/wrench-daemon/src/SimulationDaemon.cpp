@@ -32,9 +32,10 @@ void SimulationDaemon::run() {
                       [this](const Request &req, Response &res) { terminateSimulation(req, res); });
 
     // Set up ALL POST request handlers for API calls
-    REST_API rest_api(this->server,
-                      [this](const Request &req) { this->displayRequest(req); },
-                      this->simulation_controller);
+    REST_API rest_api(
+            this->server,
+            [this](const Request &req) { this->displayRequest(req); },
+            this->simulation_controller);
 
     if (daemon_logging) {
         std::cerr << " PID " << getpid() << " listening on port " << simulation_port_number << "\n";
@@ -45,7 +46,7 @@ void SimulationDaemon::run() {
         // server returns from the listen() call below, not sure why...
         server.listen("0.0.0.0", simulation_port_number);
     }
-//    exit(0);
+    //    exit(0);
 }
 
 /**
@@ -59,12 +60,11 @@ void SimulationDaemon::run() {
 SimulationDaemon::SimulationDaemon(
         bool daemon_logging,
         int simulation_port_number,
-        std::shared_ptr <wrench::SimulationController> simulation_controller,
-        std::thread &simulation_thread) :
-        daemon_logging(daemon_logging),
-        simulation_port_number(simulation_port_number),
-        simulation_controller(std::move(std::move(std::move(simulation_controller)))),
-        simulation_thread(simulation_thread) {
+        std::shared_ptr<wrench::SimulationController> simulation_controller,
+        std::thread &simulation_thread) : daemon_logging(daemon_logging),
+                                          simulation_port_number(simulation_port_number),
+                                          simulation_controller(std::move(std::move(std::move(simulation_controller)))),
+                                          simulation_thread(simulation_thread) {
 }
 
 /**

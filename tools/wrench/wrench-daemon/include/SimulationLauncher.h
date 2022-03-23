@@ -33,14 +33,13 @@ public:
 
     std::string launchErrorMessage() const { return this->launch_error_message; }
 
-    std::shared_ptr <wrench::SimulationController> getController() const { return this->controller; }
+    std::shared_ptr<wrench::SimulationController> getController() const { return this->controller; }
 
 private:
     std::shared_ptr<wrench::Simulation> simulation;
-    std::shared_ptr <wrench::SimulationController> controller;
+    std::shared_ptr<wrench::SimulationController> controller;
     bool launch_error = false;
     std::string launch_error_message;
-
 };
 
-#endif // WRENCH_SIMULATION_LAUNCHER_H
+#endif// WRENCH_SIMULATION_LAUNCHER_H
