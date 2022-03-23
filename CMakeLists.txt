@@ -452,7 +452,6 @@ set(TEST_FILES
         test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
         )
 
-find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
@@ -465,19 +464,25 @@ install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
 
-# generate unit tests
-add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
-if (ENABLE_BATSCHED)
-    find_library(ZMQ_LIBRARY NAMES zmq)
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
-else ()
-    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
-endif ()
+# generate unit tests if Google Test is found
+find_library(GTEST_LIBRARY NAMES gtest)
+if(GTEST_LIBRARY)
+    add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
+    if (ENABLE_BATSCHED)
+        find_library(ZMQ_LIBRARY NAMES zmq)
+        target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
+    else ()
+        target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
+    endif ()
+    set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
+    set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
+    add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
+else()
+        add_custom_target(unit_tests echo "ERROR: Cannot build unit_tests because Google Test (libgtest) was not found by cmake." COMMAND echo "       If you have installed Google Test, re-run cmake." VERBATIM)
+endif()
 
 
-set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
-set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
-add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
+
 
 
 # additional packages
