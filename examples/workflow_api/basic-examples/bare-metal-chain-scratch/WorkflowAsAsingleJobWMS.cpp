@@ -36,9 +36,8 @@ namespace wrench {
     WorkflowAsAsingleJobWMS::WorkflowAsAsingleJobWMS(const std::shared_ptr<Workflow> &workflow,
                                                      const std::shared_ptr<BareMetalComputeService> &compute_service,
                                                      const std::shared_ptr<SimpleStorageService> &storage_service,
-                                                     const std::string &hostname) :
-            ExecutionController(hostname, "one-task-at-a-time"),
-            workflow(workflow), bare_metal_compute_service(compute_service), storage_service(storage_service) {}
+                                                     const std::string &hostname) : ExecutionController(hostname, "one-task-at-a-time"),
+                                                                                    workflow(workflow), bare_metal_compute_service(compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the OneTaskAtATimeWMS daemon
@@ -69,15 +68,15 @@ namespace wrench {
          * where is should be read/written */
         std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
         // Set each file's location to the compute service's scratch space
-        for (auto const &file : this->workflow->getFileMap()) {
+        for (auto const &file: this->workflow->getFileMap()) {
             file_locations[file.second] = FileLocation::SCRATCH;
         }
         // For the workflow input files, in fact, set the location to the storage service
-        for (auto const &f  : this->workflow->getInputFiles()) {
+        for (auto const &f: this->workflow->getInputFiles()) {
             file_locations[f] = FileLocation::LOCATION(storage_service);
         }
         // For the workflow output files, in fact, set the location to the storage service
-        for (auto const &f  : this->workflow->getOutputFiles()) {
+        for (auto const &f: this->workflow->getOutputFiles()) {
             file_locations[f] = FileLocation::LOCATION(storage_service);
         }
 
@@ -108,7 +107,7 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
-        for (auto const &task : job->getTasks()) {
+        for (auto const &task: job->getTasks()) {
             WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
         }
     }
@@ -131,4 +130,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

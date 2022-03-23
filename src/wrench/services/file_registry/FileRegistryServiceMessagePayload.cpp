@@ -20,5 +20,4 @@ namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(FileRegistryServiceMessagePayload, ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(FileRegistryServiceMessagePayload, ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD);
 
-};
-
+};// namespace wrench

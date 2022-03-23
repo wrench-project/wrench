@@ -103,12 +103,10 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 /**********************************************************************/
@@ -126,13 +124,11 @@ class BogusMessageTestWMS : public wrench::ExecutionController {
 
 public:
     BogusMessageTestWMS(BogusMessageTest *test,
-                        std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                        std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BogusMessageTest *test;
 
     int main() {
@@ -149,21 +145,18 @@ private:
 class NoopWMS : public wrench::ExecutionController {
 
 public:
-    NoopWMS(BogusMessageTest *test, std::string hostname, bool create_data_movement_manager) :
-            wrench::ExecutionController(hostname, "test") {
+    NoopWMS(BogusMessageTest *test, std::string hostname, bool create_data_movement_manager) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->create_data_movement_manager = create_data_movement_manager;
     }
 
 private:
-
     BogusMessageTest *test;
     bool create_data_movement_manager;
 
     int main() {
 
-        if (this->create_data_movement_manager)
-        {
+        if (this->create_data_movement_manager) {
             auto dmm = this->createDataMovementManager();
             this->test->dst_mailbox = dmm->mailbox;
         }
@@ -226,19 +219,19 @@ void BogusMessageTest::do_BogusMessage_Test(std::string service_type) {
     } else if (service_type == "data_movement_manager") {
         auto wms = new NoopWMS(this, hostname, true);
         this->service = simulation->add(wms);
-        this->dst_mailbox = nullptr; // Will be set by the WMS on DMM is created
+        this->dst_mailbox = nullptr;// Will be set by the WMS on DMM is created
     }
 
     // Create the Bogus Message WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new BogusMessageTestWMS(this, hostname)));
+                            new BogusMessageTestWMS(this, hostname)));
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

@@ -27,15 +27,15 @@ namespace wrench {
         this->lambda_per_thread = lambda_per_thread;
     }
 
-//    /**
-//     * @brief Returns the amount of work each thread much perform
-//     * @param total_work: total amount of work
-//     * @param num_threads: the number of threads
-//     * @return a vector of work amounts
-//     */
-//    std::vector<double> CustomParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
-//        return this->lambda(total_work, num_threads);
-//    }
+    //    /**
+    //     * @brief Returns the amount of work each thread much perform
+    //     * @param total_work: total amount of work
+    //     * @param num_threads: the number of threads
+    //     * @return a vector of work amounts
+    //     */
+    //    std::vector<double> CustomParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+    //        return this->lambda(total_work, num_threads);
+    //    }
 
     /**
      * @brief Returns the purely sequential amount of work
@@ -51,4 +51,4 @@ namespace wrench {
         return this->lambda_per_thread(total_work, num_threads);
     }
 
-}
+}// namespace wrench

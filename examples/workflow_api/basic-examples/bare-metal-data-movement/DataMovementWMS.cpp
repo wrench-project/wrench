@@ -38,10 +38,9 @@ namespace wrench {
                                      const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                                      const std::shared_ptr<StorageService> &storage_service1,
                                      const std::shared_ptr<StorageService> &storage_service2,
-                                 const std::string &hostname) :
-                                 ExecutionController(hostname,"data-movement"),
-                                 workflow(workflow), bare_metal_compute_service(bare_metal_compute_service),
-                                 storage_service1(storage_service1), storage_service2(storage_service2) {}
+                                     const std::string &hostname) : ExecutionController(hostname, "data-movement"),
+                                                                    workflow(workflow), bare_metal_compute_service(bare_metal_compute_service),
+                                                                    storage_service1(storage_service1), storage_service2(storage_service2) {}
 
     /**
      * @brief main method of the DataMovementWMS daemon
@@ -74,8 +73,8 @@ namespace wrench {
         /* Synchronously copy infile_1 from storage_service1 to storage_service2 */
         WRENCH_INFO("Synchronously copying file infile_1 from storage_service1 to storage_service2");
         data_movement_manager->doSynchronousFileCopy(infile_1,
-                FileLocation::LOCATION(storage_service1),
-                FileLocation::LOCATION(storage_service2));
+                                                     FileLocation::LOCATION(storage_service1),
+                                                     FileLocation::LOCATION(storage_service2));
         WRENCH_INFO("File copy complete");
 
 
@@ -106,8 +105,8 @@ namespace wrench {
          * do it asynchronously for kicks */
         WRENCH_INFO("Asynchronously copying outfile_1 from storage_service2 to storage_service1")
         data_movement_manager->initiateAsynchronousFileCopy(outfile_1,
-                FileLocation::LOCATION(storage_service2),
-                FileLocation::LOCATION(storage_service1));
+                                                            FileLocation::LOCATION(storage_service2),
+                                                            FileLocation::LOCATION(storage_service1));
 
         /* Just for kicks again, let's wait for the next event using  the low-level
          * waitForNextEvent() instead of waitForAndProcessNextEvent() */
@@ -116,9 +115,9 @@ namespace wrench {
             auto event = this->waitForNextEvent();
             // Check that it is the expected event, just in  case
             if (auto file_copy_completion_event = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(
-                    event)) {
-                WRENCH_INFO("Notified of the file copy completion for file %s, as expected", 
-                        file_copy_completion_event->file->getID().c_str());
+                        event)) {
+                WRENCH_INFO("Notified of the file copy completion for file %s, as expected",
+                            file_copy_completion_event->file->getID().c_str());
             } else {
                 throw std::runtime_error("Unexpected event (" + event->toString() + ")");
             }
@@ -167,4 +166,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

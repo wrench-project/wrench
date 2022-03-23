@@ -16,7 +16,7 @@ WRENCH_LOG_CATEGORY(sleeper_victom, "Log category for Sleeper");
 
 
 wrench::SleeperVictim::SleeperVictim(std::string host_on_which_to_run, double seconds_of_life, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify)
-        : Service(host_on_which_to_run, "victim") {
+    : Service(host_on_which_to_run, "victim") {
     this->seconds_of_life = seconds_of_life;
     this->msg = msg;
     this->mailbox_to_notify = mailbox_to_notify;
@@ -30,7 +30,6 @@ int wrench::SleeperVictim::main() {
     wrench::Simulation::sleep(this->seconds_of_life);
     S4U_Mailbox::putMessage(this->mailbox_to_notify, this->msg);
     return 0;
-
 }
 
 void wrench::SleeperVictim::cleanup(bool has_terminated_cleanly, int return_value) {

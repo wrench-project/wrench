@@ -15,7 +15,6 @@ public:
     void do_ReadZeroSizeFileTest();
 
 protected:
-
     ~SimpleStorageServiceZeroSizeFileTest() {
         workflow->clear();
     }
@@ -61,9 +60,8 @@ public:
     SimpleStorageServiceZeroSizeFileTestWMS(SimpleStorageServiceZeroSizeFileTest *test,
                                             std::shared_ptr<wrench::StorageService> &storage_service,
                                             std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                            std::string hostname) :
-            wrench::ExecutionController(hostname, "test"),
-            storage_service(storage_service), file_registry_service(file_registry_service) {
+                                            std::string hostname) : wrench::ExecutionController(hostname, "test"),
+                                                                    storage_service(storage_service), file_registry_service(file_registry_service) {
         this->test = test;
     }
 
@@ -102,7 +100,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", {"/"})));
+                            new wrench::SimpleStorageService("StorageHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -111,7 +109,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceZeroSizeFileTestWMS(
-            this, storage_service, file_registry_service, "WMSHost")));
+                            this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the file on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file, storage_service));
@@ -119,7 +117,7 @@ void SimpleStorageServiceZeroSizeFileTest::do_ReadZeroSizeFileTest() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

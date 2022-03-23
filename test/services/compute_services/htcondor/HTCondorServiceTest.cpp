@@ -55,10 +55,9 @@ public:
     void do_NotEnoughResourcesTest_test();
 
 protected:
-
     ~HTCondorServiceTest() {
-      this->workflow->clear();
-      this->grid_workflow->clear();
+        this->workflow->clear();
+        this->grid_workflow->clear();
     }
 
     HTCondorServiceTest() {
@@ -226,7 +225,6 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::string platform_file_path1 = UNIQUE_TMP_PATH_PREFIX + "platform1.xml";
-
 };
 
 /**********************************************************************/
@@ -237,13 +235,11 @@ class HTCondorStandardJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorStandardJobTestWMS(HTCondorServiceTest *test,
-                               std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                               std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -254,7 +250,7 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a job
-        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
         auto two_task_job = job_manager->createStandardJob(
@@ -306,7 +302,7 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -318,19 +314,19 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a BareMetalComputeService
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_compute_service;
     ASSERT_NO_THROW(baremetal_compute_service = simulation->add(
-            new wrench::BareMetalComputeService(
-                    execution_host,
-                    {std::make_pair(
-                            execution_host,
-                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
-                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
-                    "/scratch")));
+                            new wrench::BareMetalComputeService(
+                                    execution_host,
+                                    {std::make_pair(
+                                            execution_host,
+                                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+                                    "/scratch")));
 
     // Create a set of compute services for the HTCondorComputeService to use
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -338,14 +334,15 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
 
     // Create a HTCondor Service
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, std::move(compute_services),
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorStandardJobTestWMS(this, hostname)));
+                            new HTCondorStandardJobTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -357,11 +354,10 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -373,13 +369,11 @@ class HTCondorStandardJobAddComputeServiceTestWMS : public wrench::ExecutionCont
 
 public:
     HTCondorStandardJobAddComputeServiceTestWMS(HTCondorServiceTest *test,
-                                                std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -397,7 +391,7 @@ private:
         htcondor_cs->addComputeService(bm_cs);
 
         // Create a job
-        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
         file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
         auto two_task_job = job_manager->createStandardJob(
@@ -451,31 +445,31 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a BareMetalComputeService
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_compute_service;
     ASSERT_NO_THROW(baremetal_compute_service = simulation->add(
-            new wrench::BareMetalComputeService(
-                    execution_host,
-                    {std::make_pair(
-                            execution_host,
-                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
-                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
-                    "/scratch")));
+                            new wrench::BareMetalComputeService(
+                                    execution_host,
+                                    {std::make_pair(
+                                            execution_host,
+                                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+                                    "/scratch")));
 
     // Create a HTCondor Service
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, {baremetal_compute_service},
-                    {
-                    })));
+                            new wrench::HTCondorComputeService(
+                                    hostname, {baremetal_compute_service},
+                                    {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorStandardJobAddComputeServiceTestWMS(this, hostname)));
+                            new HTCondorStandardJobAddComputeServiceTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -487,7 +481,7 @@ void HTCondorServiceTest::do_StandardJobTaskAddComputeServiceTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -500,13 +494,11 @@ class HTCondorPilotJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorPilotJobTestWMS(HTCondorServiceTest *test,
-                            std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                            std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -538,7 +530,7 @@ private:
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
                 {this->test->task1},
-                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
@@ -578,7 +570,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -590,7 +582,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a bare-metal compute service
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
@@ -613,13 +605,14 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     compute_services.insert(batch_compute_service);
 
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(hostname, compute_services,
-                                               {})));
+                            new wrench::HTCondorComputeService(hostname, compute_services,
+                                                               {})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorPilotJobTestWMS(this, hostname)));
+                            new HTCondorPilotJobTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -631,7 +624,7 @@ void HTCondorServiceTest::do_PilotJobTaskTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -644,13 +637,11 @@ class HTCondorSimpleServiceTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorSimpleServiceTestWMS(HTCondorServiceTest *test,
-                                 std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                 std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -663,7 +654,7 @@ private:
         auto htcondor_cs = this->test->htcondor_service;
         // Create a job
         auto two_task_job = job_manager->createStandardJob(
-                {this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                {this->test->task1}, (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -704,7 +695,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -729,13 +720,13 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
         invalid_compute_services.insert(cloud_compute_service);
 
         ASSERT_THROW(htcondor_service = simulation->add(
-                new wrench::HTCondorComputeService(hostname, std::move(invalid_compute_services),
-                                                   {})),
+                             new wrench::HTCondorComputeService(hostname, std::move(invalid_compute_services),
+                                                                {})),
                      std::invalid_argument);
     }
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -749,13 +740,11 @@ class HTCondorGridUniverseTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorGridUniverseTestWMS(HTCondorServiceTest *test,
-                                std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -767,9 +756,9 @@ private:
 
 
         auto htcondor_cs = this->test->htcondor_service;
-        std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
+        std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
         file_locations[this->test->input_file2] = wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService());
-        std::shared_ptr<wrench::StandardJob>grid_job = job_manager->createStandardJob(
+        std::shared_ptr<wrench::StandardJob> grid_job = job_manager->createStandardJob(
                 {this->test->task7},
                 file_locations,
                 {std::make_tuple(this->test->input_file2,
@@ -820,7 +809,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -833,7 +822,7 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     //ASSERT_NO_THROW(storage_service2 = simulation->add(
     //       new wrench::SimpleStorageService(batchhostname, {"/"})));
@@ -853,18 +842,19 @@ void HTCondorServiceTest::do_GridUniverseTest_test() {
 
     // Create a HTCondor Service with BatchComputeService service
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname,  std::move(compute_services),
-                    {},
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {},
+                                    {})));
 
 
     htcondor_service->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorGridUniverseTestWMS(this, hostname)));
+                            new HTCondorGridUniverseTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -891,13 +881,11 @@ class HTCondorNoGridUniverseJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNoGridUniverseJobTestWMS(HTCondorServiceTest *test,
-                                     std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                     std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -912,7 +900,7 @@ private:
 
         auto grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -958,7 +946,7 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -975,17 +963,18 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
             "/scratch")));
 
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, std::move(compute_services),
-                    {},
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {},
+                                    {})));
 
     htcondor_service->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNoGridUniverseJobTestWMS(this, hostname)));
+                            new HTCondorNoGridUniverseJobTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1004,7 +993,6 @@ void HTCondorServiceTest::do_NoGridUniverseSupportTest_test() {
 }
 
 
-
 /************************************************************************************************/
 /**          GRID UNIVERSE JOB SUBMISSION TEST WHERE NON-GRID UNIVERSE JOBS NOT SUPPORTED          **/
 /************************************************************************************************/
@@ -1013,13 +1001,11 @@ class HTCondorNoNonGridUniverseJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNoNonGridUniverseJobTestWMS(HTCondorServiceTest *test,
-                                        std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                        std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -1034,7 +1020,7 @@ private:
 
         auto grid_job = job_manager->createStandardJob(
                 {this->test->task7},
-                (std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>>){},
+                (std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>>){},
                 {std::make_tuple(this->test->input_file2,
                                  wrench::FileLocation::LOCATION(htcondor_cs->getLocalStorageService()),
                                  wrench::FileLocation::SCRATCH)},
@@ -1077,7 +1063,7 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -1087,23 +1073,23 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
                     "BatchHost1",
                     {"BatchHost1", "BatchHost2"},
                     "/scratch",
-                    {
-                    }));
+                    {}));
     compute_services.insert(batch_service);
 
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, std::move(compute_services),
-                    {},
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {},
+                                    {})));
 
 
     htcondor_service->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNoNonGridUniverseJobTestWMS(this, hostname)));
+                            new HTCondorNoNonGridUniverseJobTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1122,8 +1108,6 @@ void HTCondorServiceTest::do_NoNonGridUniverseSupportTest_test() {
 }
 
 
-
-
 /************************************************************************************************/
 /**          PILOT JOB SUBMISSION TEST WHERE GRID  JOBS NOT SUPPORTED                          **/
 /************************************************************************************************/
@@ -1132,13 +1116,11 @@ class HTCondorNoGridJobTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNoGridJobTestWMS(HTCondorServiceTest *test,
-                             std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                             std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -1150,7 +1132,7 @@ private:
 
 
         auto htcondor_cs = this->test->htcondor_service;
-        std::shared_ptr<wrench::PilotJob>grid_job = job_manager->createPilotJob();
+        std::shared_ptr<wrench::PilotJob> grid_job = job_manager->createPilotJob();
 
 
         std::map<std::string, std::string> test_service_specs;
@@ -1166,7 +1148,6 @@ private:
         } catch (std::invalid_argument &ignore) {
             return 0;
         }
-
     }
 };
 
@@ -1192,7 +1173,7 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -1209,18 +1190,19 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
             "/scratch")));
 
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, std::move(compute_services),
-                    {},
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {},
+                                    {})));
 
 
     htcondor_service->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNoGridJobTestWMS(this, hostname)));
+                            new HTCondorNoGridJobTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1239,8 +1221,6 @@ void HTCondorServiceTest::do_NoGridJobSupportTest_test() {
 }
 
 
-
-
 /************************************************************************************************/
 /**          STANDARD JOB SUBMISSION TEST WHERE NOT ENOUGH RESOURCES                          **/
 /************************************************************************************************/
@@ -1249,13 +1229,11 @@ class HTCondorNotEnoughResourcesTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorNotEnoughResourcesTestWMS(HTCondorServiceTest *test,
-                                      std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                      std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     HTCondorServiceTest *test;
 
     int main() {
@@ -1269,7 +1247,7 @@ private:
 
         {
             // Submit a grid universe job that asks for too much
-            std::map<std::shared_ptr<wrench::DataFile> , std::shared_ptr<wrench::FileLocation>> file_locations;
+            std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
             file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
             file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
             auto grid_job = job_manager->createStandardJob(
@@ -1302,7 +1280,7 @@ private:
             // Submit the job for execution
             try {
                 job_manager->submitJob(ngrid_job, this->test->htcondor_service, {});
-//                throw std::runtime_error("Should not have been able to submit job successfully");
+                //                throw std::runtime_error("Should not have been able to submit job successfully");
             } catch (wrench::ExecutionException &e) {
                 auto real_cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                 if (not real_cause) {
@@ -1351,7 +1329,7 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create list of compute services
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -1374,17 +1352,18 @@ void HTCondorServiceTest::do_NotEnoughResourcesTest_test() {
     compute_services.insert(batch_service);
 
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, std::move(compute_services),
-                    {},
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {},
+                                    {})));
 
     htcondor_service->setLocalStorageService(storage_service);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorNotEnoughResourcesTestWMS(this, hostname)));
+                            new HTCondorNotEnoughResourcesTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));

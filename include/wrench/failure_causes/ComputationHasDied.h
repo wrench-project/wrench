@@ -45,7 +45,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_COMPUTE_THREAD_HAS_DIED_H
+#endif//WRENCH_COMPUTE_THREAD_HAS_DIED_H

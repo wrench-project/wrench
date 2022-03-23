@@ -79,11 +79,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -95,18 +93,16 @@ class NetworkProxLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     NetworkProxLinkFailuresTestWMS(NetworkProximityLinkFailuresTest *test,
-                                   std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                   std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     NetworkProximityLinkFailuresTest *test;
 
     int main() {
 
-        for (int i=1; i <= 6; i++) {
+        for (int i = 1; i <= 6; i++) {
             // Starting a link murderer!!
             auto switcher = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", 666,
@@ -117,16 +113,15 @@ private:
 
 
             switcher->setSimulation(this->simulation);
-            switcher->start(switcher, true, false); // Daemonized, no auto-restart
-
+            switcher->start(switcher, true, false);// Daemonized, no auto-restart
         }
 
         std::vector<std::string> hosts = {"Host1", "Host2", "Host3"};
 
-        for (int trial=0; trial < 1000; trial++) {
+        for (int trial = 0; trial < 1000; trial++) {
             WRENCH_INFO("TRIAL = %d", trial);
-            std::string host1 = hosts[trial%3];
-            std::string host2 = hosts[(37*trial+11)%3];
+            std::string host1 = hosts[trial % 3];
+            std::string host2 = hosts[(37 * trial + 11) % 3];
 
             auto first_pair_to_compute_proximity = std::make_pair(host1, host2);
 
@@ -141,7 +136,7 @@ private:
 };
 
 TEST_F(NetworkProximityLinkFailuresTest, RandomLinkFailuress) {
-DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
+    DO_TEST_WITH_FORK(do_NetworkProximityLinkFailures_Test);
 }
 
 void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
@@ -164,22 +159,22 @@ void NetworkProximityLinkFailuresTest::do_NetworkProximityLinkFailures_Test() {
 
 
     ASSERT_NO_THROW(network_proximity_service = simulation->add(new wrench::NetworkProximityService(stable_hostname, hosts_in_network,
-                                                                                                    {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"100"},
+                                                                                                    {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "100"},
                                                                                                      {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1"},
-                                                                                                     {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE,"10"}},
+                                                                                                     {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}},
                                                                                                     {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, 0}})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new NetworkProxLinkFailuresTestWMS(this,
-                                               stable_hostname)));
+                            new NetworkProxLinkFailuresTestWMS(this,
+                                                               stable_hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-

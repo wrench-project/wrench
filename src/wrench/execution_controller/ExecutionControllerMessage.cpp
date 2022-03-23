@@ -27,8 +27,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) :
-            ExecutionControllerMessage(payload), message(message) {}
+    ExecutionControllerAlarmTimerMessage::ExecutionControllerAlarmTimerMessage(std::string message, double payload) : ExecutionControllerMessage(payload), message(message) {}
 
 
-};
+};// namespace wrench

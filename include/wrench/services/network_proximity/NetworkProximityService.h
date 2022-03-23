@@ -27,24 +27,23 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                                "0.0"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,                 "ALLTOALL"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE,                 "1024"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,           "60"},
+                {NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "0.0"},
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "1024"},
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "60"},
                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED,"0"},
-                {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,          "1.0"},
-                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED,             "1"}
-        };
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED, "0"},
+                {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"},
+                {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED, "1"}};
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
-                {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
+                {NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD, 1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,       1024},
-                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,        1024},
+                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD, 1024},
+                {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, 1024},
         };
 
     public:
@@ -67,8 +66,7 @@ namespace wrench {
         NetworkProximityService(std::string db_hostname,
                                 std::vector<std::string> hosts_in_network,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
-        );
+                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -111,6 +109,6 @@ namespace wrench {
 
         void validateProperties();
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_NETWORKPROXIMITYSERVICE_H
+#endif//WRENCH_NETWORKPROXIMITYSERVICE_H

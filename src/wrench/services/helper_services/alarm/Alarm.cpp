@@ -33,10 +33,10 @@ namespace wrench {
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
 
         this->date = date;
-//      if (this->date <= S4U_Simulation::getClock()) {
-//        WRENCH_INFO(
-//                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
-//      }
+        //      if (this->date <= S4U_Simulation::getClock()) {
+        //        WRENCH_INFO(
+        //                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
+        //      }
         this->reply_mailbox = reply_mailbox;
         this->msg = msg;
     }
@@ -89,7 +89,7 @@ namespace wrench {
                 new Alarm(date, hostname, reply_mailbox, msg, suffix));
         alarm_ptr->simulation = simulation;
         try {
-            alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart
+            alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
         } catch (std::shared_ptr<HostError> &e) {
             throw;
         }
@@ -103,4 +103,4 @@ namespace wrench {
         this->killActor();
     }
 
-};
+};// namespace wrench

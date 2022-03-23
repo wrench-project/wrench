@@ -39,22 +39,21 @@ namespace wrench {
     StandardJob::StandardJob(std::shared_ptr<JobManager> job_manager,
                              std::vector<std::shared_ptr<WorkflowTask>> tasks,
                              std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> &file_locations,
-                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &pre_file_copies,
-                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>  >> &post_file_copies,
-                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>  >> &cleanup_file_deletions)
-            :
-            Job("", std::move(job_manager)),
-            file_locations(file_locations),
-            pre_file_copies(pre_file_copies),
-            post_file_copies(post_file_copies),
-            cleanup_file_deletions(cleanup_file_deletions),
-            state(StandardJob::State::NOT_SUBMITTED) {
+                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &pre_file_copies,
+                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> &post_file_copies,
+                             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> &cleanup_file_deletions)
+        : Job("", std::move(job_manager)),
+          file_locations(file_locations),
+          pre_file_copies(pre_file_copies),
+          post_file_copies(post_file_copies),
+          cleanup_file_deletions(cleanup_file_deletions),
+          state(StandardJob::State::NOT_SUBMITTED) {
 
         // Check that this is a ready sub-graph
-        for (auto t : tasks) {
+        for (auto t: tasks) {
             if (t->getState() != WorkflowTask::State::READY) {
                 std::vector<std::shared_ptr<WorkflowTask>> parents = t->getWorkflow()->getTaskParents(t);
-                for (auto parent : parents) {
+                for (auto parent: parents) {
                     if (parent->getState() != WorkflowTask::State::COMPLETED) {
                         if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
                             throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
@@ -65,14 +64,13 @@ namespace wrench {
             }
         }
 
-        for (auto t : tasks) {
+        for (auto t: tasks) {
             this->tasks.push_back(t);
             t->setJob(this);
             this->total_flops += t->getFlops();
         }
-//        this->workflow = workflow;
+        //        this->workflow = workflow;
         this->name = "standard_job_" + std::to_string(Job::getNewUniqueNumber());
-
     }
 
     /**
@@ -82,7 +80,7 @@ namespace wrench {
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() const {
         unsigned long max_min_num_cores = 1;
-        for (auto t : tasks) {
+        for (auto t: tasks) {
             max_min_num_cores = std::max<unsigned long>(max_min_num_cores, t->getMinNumCores());
         }
         return max_min_num_cores;
@@ -95,7 +93,7 @@ namespace wrench {
      */
     unsigned long StandardJob::getMinimumRequiredMemory() const {
         unsigned long max_ram = 0;
-        for (auto t : tasks) {
+        for (auto t: tasks) {
             max_ram = std::max<unsigned long>(max_ram, t->getMemoryRequirement());
         }
         return max_ram;
@@ -118,7 +116,7 @@ namespace wrench {
      */
     unsigned long StandardJob::getNumCompletedTasks() const {
         unsigned long count = 0;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             if (t->getState() == WorkflowTask::State::COMPLETED) {
                 count++;
             }
@@ -187,7 +185,7 @@ namespace wrench {
     /**
      * @brief Instantiate a compound job
      */
-    void StandardJob::createUnderlyingCompoundJob(const std::shared_ptr<ComputeService>& compute_service) {
+    void StandardJob::createUnderlyingCompoundJob(const std::shared_ptr<ComputeService> &compute_service) {
 
         this->compound_job = nullptr;
         this->pre_overhead_action = nullptr;
@@ -212,7 +210,7 @@ namespace wrench {
         }
 
         // Create the pre- file copy actions
-        for (auto const &pfc : this->pre_file_copies) {
+        for (auto const &pfc: this->pre_file_copies) {
             auto src_location = std::get<1>(pfc);
             auto dst_location = std::get<2>(pfc);
             if (src_location == FileLocation::SCRATCH) {
@@ -226,7 +224,7 @@ namespace wrench {
         }
 
         // Create the post- file copy actions
-        for (auto const &pfc : this->post_file_copies) {
+        for (auto const &pfc: this->post_file_copies) {
             auto src_location = std::get<1>(pfc);
             auto dst_location = std::get<2>(pfc);
             if (src_location == FileLocation::SCRATCH) {
@@ -249,16 +247,16 @@ namespace wrench {
         }
 
         // Create the task actions
-        for (auto const &task : this->tasks) {
+        for (auto const &task: this->tasks) {
             auto compute_action = cjob->addComputeAction("task_" + task->getID(), task->getFlops(), task->getMemoryRequirement(),
                                                          task->getMinNumCores(), task->getMaxNumCores(), task->getParallelModel());
             task_compute_actions[task] = compute_action;
             task_file_read_actions[task] = {};
-            for (auto const &f : task->getInputFiles()) {
+            for (auto const &f: task->getInputFiles()) {
                 std::shared_ptr<Action> fread_action;
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations;
-                    for (auto const &loc : this->file_locations[f]) {
+                    for (auto const &loc: this->file_locations[f]) {
                         if (loc == FileLocation::SCRATCH) {
                             fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
                         } else {
@@ -273,11 +271,11 @@ namespace wrench {
                 cjob->addActionDependency(fread_action, compute_action);
             }
             task_file_write_actions[task] = {};
-            for (auto const &f : task->getOutputFiles()) {
+            for (auto const &f: task->getOutputFiles()) {
                 std::shared_ptr<Action> fwrite_action;
                 if (this->file_locations.find(f) != this->file_locations.end()) {
                     std::vector<std::shared_ptr<FileLocation>> fixed_locations;
-                    for (auto const &loc : this->file_locations[f]) {
+                    for (auto const &loc: this->file_locations[f]) {
                         if (loc == FileLocation::SCRATCH) {
                             fixed_locations.push_back(FileLocation::LOCATION(compute_service->getScratch()));
                         } else {
@@ -299,8 +297,8 @@ namespace wrench {
 
         // Determine whether the scratch space needs to be cleaned
         bool need_scratch_clean = false;
-        for (auto const &task : this->tasks) {
-            for (auto const &f : task->getInputFiles()) {
+        for (auto const &task: this->tasks) {
+            for (auto const &f: task->getInputFiles()) {
                 if (this->file_locations.find(f) == this->file_locations.end()) {
                     need_scratch_clean = true;
                     break;
@@ -309,7 +307,7 @@ namespace wrench {
             if (need_scratch_clean) {
                 break;
             }
-            for (auto const &f : task->getOutputFiles()) {
+            for (auto const &f: task->getOutputFiles()) {
                 if (this->file_locations.find(f) == this->file_locations.end()) {
                     need_scratch_clean = true;
                     break;
@@ -324,8 +322,8 @@ namespace wrench {
         if (need_scratch_clean) {
             // Does the lambda capture of cjob_file_locations work?
             auto lambda_execute = [this](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
-                for (auto const &task : this->tasks) {
-                    for (auto const &f : task->getInputFiles()) {
+                for (auto const &task: this->tasks) {
+                    for (auto const &f: task->getInputFiles()) {
                         if (this->file_locations.find(f) == this->file_locations.end()) {
                             try {
                                 auto scratch = this->getParentComputeService()->getScratch();
@@ -335,7 +333,7 @@ namespace wrench {
                             }
                         }
                     }
-                    for (auto const &f : task->getOutputFiles()) {
+                    for (auto const &f: task->getOutputFiles()) {
                         if (this->file_locations.find(f) == this->file_locations.end()) {
                             try {
                                 auto scratch = this->getParentComputeService()->getScratch();
@@ -349,12 +347,11 @@ namespace wrench {
             };
             auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
             scratch_cleanup = cjob->addCustomAction("", 0, 0, lambda_execute, lambda_terminate);
-
         }
 
         // Add all inter-task dependencies
-        for (auto const &parent_task : this->tasks) {
-            for (auto const &child_task : parent_task->getChildren()) {
+        for (auto const &parent_task: this->tasks) {
+            for (auto const &child_task: parent_task->getChildren()) {
                 if (task_compute_actions.find(child_task) == task_compute_actions.end()) {
                     continue;
                 }
@@ -370,7 +367,7 @@ namespace wrench {
                 } else {
                     child_actions = {task_compute_actions[child_task]};
                 }
-                for (auto const &parent_action : parent_actions) {
+                for (auto const &parent_action: parent_actions) {
                     for (auto const &child_action: child_actions) {
                         cjob->addActionDependency(parent_action, child_action);
                     }
@@ -384,7 +381,7 @@ namespace wrench {
         std::shared_ptr<Action> tasks_to_post_file_copies = cjob->addSleepAction("", 0);
         std::shared_ptr<Action> tasks_post_file_copies_to_cleanup = cjob->addSleepAction("", 0);
         std::shared_ptr<Action> cleanup_to_post_overhead = cjob->addSleepAction("", 0);
-        cjob->addActionDependency(pre_overhead_to_pre_file_copies,pre_file_copies_to_tasks);
+        cjob->addActionDependency(pre_overhead_to_pre_file_copies, pre_file_copies_to_tasks);
         cjob->addActionDependency(pre_file_copies_to_tasks, tasks_to_post_file_copies);
         cjob->addActionDependency(tasks_to_post_file_copies, tasks_post_file_copies_to_cleanup);
         cjob->addActionDependency(tasks_post_file_copies_to_cleanup, cleanup_to_post_overhead);
@@ -394,24 +391,24 @@ namespace wrench {
             cjob->addActionDependency(pre_overhead_action, pre_overhead_to_pre_file_copies);
         }
         if (not pre_file_copy_actions.empty()) {
-            for (auto const &pfca : pre_file_copy_actions) {
+            for (auto const &pfca: pre_file_copy_actions) {
                 cjob->addActionDependency(pre_overhead_to_pre_file_copies, pfca);
                 cjob->addActionDependency(pfca, pre_file_copies_to_tasks);
             }
         }
 
         if (not task_compute_actions.empty()) {
-            for (auto const &tca : task_compute_actions) {
+            for (auto const &tca: task_compute_actions) {
                 auto task = tca.first;
                 if (not task_file_read_actions[task].empty()) {
-                    for (auto const &tfra : task_file_read_actions[task]) {
+                    for (auto const &tfra: task_file_read_actions[task]) {
                         cjob->addActionDependency(pre_file_copies_to_tasks, tfra);
                     }
                 } else {
                     cjob->addActionDependency(pre_file_copies_to_tasks, tca.second);
                 }
                 if (not task_file_write_actions[task].empty()) {
-                    for (auto const &tfwa : task_file_write_actions[task]) {
+                    for (auto const &tfwa: task_file_write_actions[task]) {
                         cjob->addActionDependency(tfwa, tasks_to_post_file_copies);
                     }
                 } else {
@@ -421,14 +418,14 @@ namespace wrench {
         }
 
         if (not post_file_copy_actions.empty()) {
-            for (auto const &pfca : post_file_copy_actions) {
+            for (auto const &pfca: post_file_copy_actions) {
                 cjob->addActionDependency(tasks_to_post_file_copies, pfca);
                 cjob->addActionDependency(pfca, tasks_post_file_copies_to_cleanup);
             }
         }
 
         if (not cleanup_actions.empty()) {
-            for (auto const &ca : cleanup_actions) {
+            for (auto const &ca: cleanup_actions) {
                 cjob->addActionDependency(tasks_post_file_copies_to_cleanup, ca);
                 cjob->addActionDependency(ca, cleanup_to_post_overhead);
             }
@@ -447,10 +444,10 @@ namespace wrench {
 
         // Use the dummy tasks for "easy" dependencies and remove the dummies
         std::vector<std::shared_ptr<Action>> dummies = {pre_overhead_to_pre_file_copies, pre_file_copies_to_tasks, tasks_to_post_file_copies, tasks_post_file_copies_to_cleanup, cleanup_to_post_overhead};
-        for (auto &dummy : dummies) {
+        for (auto &dummy: dummies) {
             // propagate dependencies
-            for (auto const &parent_action : dummy->getParents()) {
-                for (auto const &child_action : dummy->getChildren()) {
+            for (auto const &parent_action: dummy->getParents()) {
+                for (auto const &child_action: dummy->getChildren()) {
                     cjob->addActionDependency(parent_action, child_action);
                 }
             }
@@ -458,7 +455,7 @@ namespace wrench {
             cjob->removeAction(dummy);
         }
 
-//            cjob->printActionDependencies();
+        //            cjob->printActionDependencies();
         this->compound_job = cjob;
     }
 
@@ -477,8 +474,8 @@ namespace wrench {
         *latest_end_date = -1.0;
         *earliest_failure_date = -1.0;
 
-        for (const auto &action : actions) {
-//            std::cerr << "   ANALYSING ACTION " << action->getName() << "    END DATE " << action->getEndDate() << "\n";
+        for (const auto &action: actions) {
+            //            std::cerr << "   ANALYSING ACTION " << action->getName() << "    END DATE " << action->getEndDate() << "\n";
 
             // Set the dates
             if ((*earliest_start_date == -1.0) or ((action->getStartDate() < *earliest_start_date) and (action->getStartDate() != -1.0))) {
@@ -512,7 +509,7 @@ namespace wrench {
                                                 std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments,
                                                 std::shared_ptr<FailureCause> &job_failure_cause,
                                                 Simulation *simulation) {
-        switch(this->state) {
+        switch (this->state) {
             case StandardJob::State::PENDING:
             case StandardJob::State::RUNNING:
                 throw std::runtime_error("StandardJob::processCompoundJobOutcome(): Cannot be called on a RUNNING/PENDING job");
@@ -523,20 +520,20 @@ namespace wrench {
         // At this point all tasks are pending, so no matter what we need to change all states
         // So we provisionally make them all NOT_READY right now, which we may overwrite with
         // COMPLETED, and then and the level above may turn some of the NOT_READY into READY.
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             state_changes[t] = WorkflowTask::State::NOT_READY;
         }
 
         job_failure_cause = nullptr;
 
-//        for (auto const &a: this->compound_job->getActions()) {
-//            std::cerr << "ACTION " << a->getName() << ": STATE=" << Action::stateToString(a->getState()) << "\n";
-//            if (a->getFailureCause()) {
-//                std::cerr << "ACTION " << a->getName() << ": " << a->getFailureCause()->toString() << "\n";
-//            } else {
-//                std::cerr << "ACTION " << a->getName() << ": NO FAILURE CAUSE\n";
-//            }
-//        }
+        //        for (auto const &a: this->compound_job->getActions()) {
+        //            std::cerr << "ACTION " << a->getName() << ": STATE=" << Action::stateToString(a->getState()) << "\n";
+        //            if (a->getFailureCause()) {
+        //                std::cerr << "ACTION " << a->getName() << ": " << a->getFailureCause()->toString() << "\n";
+        //            } else {
+        //                std::cerr << "ACTION " << a->getName() << ": NO FAILURE CAUSE\n";
+        //            }
+        //        }
 
         /*
          * Look at Overhead action
@@ -544,13 +541,13 @@ namespace wrench {
         if (this->pre_overhead_action) {
             if (this->pre_overhead_action->getState() == Action::State::KILLED) {
                 job_failure_cause = std::make_shared<JobKilled>(this->getSharedPtr());
-                for (auto const &t : this->tasks) {
+                for (auto const &t: this->tasks) {
                     failure_count_increments.insert(t);
                 }
                 return;
             } else if (this->pre_overhead_action->getState() == Action::State::FAILED) {
                 job_failure_cause = this->pre_overhead_action->getFailureCause();
-                for (auto const &t : this->tasks) {
+                for (auto const &t: this->tasks) {
                     failure_count_increments.insert(t);
                 }
                 return;
@@ -573,18 +570,17 @@ namespace wrench {
                                  &earliest_failure_date);
             if (at_least_one_killed) {
                 job_failure_cause = std::make_shared<JobKilled>(this->getSharedPtr());
-                for (auto const &t : this->tasks) {
+                for (auto const &t: this->tasks) {
                     failure_count_increments.insert(t);
                 }
                 return;
             } else if (at_least_one_failed) {
                 job_failure_cause = failure_cause;
-                for (auto const &t : this->tasks) {
+                for (auto const &t: this->tasks) {
                     failure_count_increments.insert(t);
                 }
                 return;
             }
-
         }
 
         /*
@@ -599,7 +595,7 @@ namespace wrench {
             std::string execution_host = this->task_compute_actions[t]->getExecutionHistory().top().execution_host;
 
             if (execution_host.empty()) {
-                for (const auto &a : this->task_file_read_actions[t]) {
+                for (const auto &a: this->task_file_read_actions[t]) {
                     if (!a->getExecutionHistory().top().execution_host.empty()) {
                         execution_host = a->getExecutionHistory().top().execution_host;
                         break;
@@ -614,7 +610,7 @@ namespace wrench {
              */
 
             // Create fileread time stamps
-            for (auto const &a : this->task_file_read_actions[t]) {
+            for (auto const &a: this->task_file_read_actions[t]) {
                 auto fra = std::dynamic_pointer_cast<FileReadAction>(a);
                 switch (a->getState()) {
                     case Action::NOT_READY:
@@ -652,7 +648,7 @@ namespace wrench {
                 t->setFailureDate(earliest_failure_date);
                 t->setReadInputStartDate(earliest_start_date);
                 failure_count_increments.insert(t);
-                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
+                state_changes[t] = WorkflowTask::State::READY;// This may be changed to NOT_READY later based on other tasks
                 simulation->getOutput().addTimestampTaskStart(earliest_start_date, t);
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>(this->getSharedPtr());
@@ -666,7 +662,7 @@ namespace wrench {
                 continue;
             }
 
-            t->updateStartDate(earliest_start_date); // could be -1.0 if there were no input, but will be updated below
+            t->updateStartDate(earliest_start_date);// could be -1.0 if there were no input, but will be updated below
             t->setReadInputStartDate(earliest_start_date);
             t->setReadInputEndDate(latest_end_date);
 
@@ -694,18 +690,18 @@ namespace wrench {
                     t->setFailureDate(compute_action->getEndDate());
                 }
                 failure_count_increments.insert(t);
-                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later
+                state_changes[t] = WorkflowTask::State::READY;// This may be changed to NOT_READY later
                 continue;
             }
 
-            t->setComputationEndDate(compute_action->getEndDate());      // could be -1.0
+            t->setComputationEndDate(compute_action->getEndDate());// could be -1.0
 
             /*
              * Look at the file write actions
              */
 
             // Create filewrite time stamps
-            for (auto const &a : this->task_file_write_actions[t]) {
+            for (auto const &a: this->task_file_write_actions[t]) {
                 auto fwa = std::dynamic_pointer_cast<FileWriteAction>(a);
                 switch (a->getState()) {
                     case Action::NOT_READY:
@@ -736,7 +732,7 @@ namespace wrench {
 
             if (at_least_one_failed or at_least_one_killed) {
                 t->setWriteOutputStartDate(earliest_start_date);
-                state_changes[t] = WorkflowTask::State::READY; // This may be changed to NOT_READY later based on other tasks
+                state_changes[t] = WorkflowTask::State::READY;// This may be changed to NOT_READY later based on other tasks
 
                 if (at_least_one_killed) {
                     job_failure_cause = std::make_shared<JobKilled>(this->getSharedPtr());
@@ -805,7 +801,6 @@ namespace wrench {
                 job_failure_cause = failure_cause;
                 return;
             }
-
         }
 
         /** Let's not care about the SCRATCH cleanup action. If it failed, oh well **/
@@ -821,27 +816,26 @@ namespace wrench {
                                        set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
 
         // Update task states
-        for (auto &state_update : state_changes) {
-            std::shared_ptr<WorkflowTask>task = state_update.first;
+        for (auto &state_update: state_changes) {
+            std::shared_ptr<WorkflowTask> task = state_update.first;
             task->setState(state_update.second);
         }
 
         // Update task readiness-es
-        for (auto &state_update : state_changes) {
-            std::shared_ptr<WorkflowTask>task = state_update.first;
+        for (auto &state_update: state_changes) {
+            std::shared_ptr<WorkflowTask> task = state_update.first;
             task->updateReadiness();
             if (task->getState() == WorkflowTask::State::COMPLETED) {
-                for (auto const &child : task->getChildren()) {
+                for (auto const &child: task->getChildren()) {
                     child->updateReadiness();
                 }
             }
         }
 
         // Update task failure counts if any
-        for (auto task : failure_count_increments) {
+        for (auto task: failure_count_increments) {
             task->incrementFailureCount();
         }
-
     }
 
     /**
@@ -850,34 +844,34 @@ namespace wrench {
      */
     bool StandardJob::usesScratch() {
 
-        for (const auto &fl : this->file_locations) {
-            for (auto const &fl_l : fl.second) {
+        for (const auto &fl: this->file_locations) {
+            for (auto const &fl_l: fl.second) {
                 if (fl_l == FileLocation::SCRATCH) {
                     return true;
                 }
             }
         }
 
-        for (auto const &task : this->tasks) {
-            for (auto const &f : task->getInputFiles()) {
+        for (auto const &task: this->tasks) {
+            for (auto const &f: task->getInputFiles()) {
                 if (this->file_locations.find(f) == this->file_locations.end()) {
                     return true;
                 }
             }
-            for (auto const &f : task->getOutputFiles()) {
+            for (auto const &f: task->getOutputFiles()) {
                 if (this->file_locations.find(f) == this->file_locations.end()) {
                     return true;
                 }
             }
         }
 
-        for (auto const &pfc : this->pre_file_copies) {
+        for (auto const &pfc: this->pre_file_copies) {
             if ((std::get<1>(pfc) == FileLocation::SCRATCH) or (std::get<2>(pfc) == FileLocation::SCRATCH)) {
                 return true;
             }
         }
 
-        for (auto const &pfc : this->post_file_copies) {
+        for (auto const &pfc: this->post_file_copies) {
             if ((std::get<1>(pfc) == FileLocation::SCRATCH) or (std::get<2>(pfc) == FileLocation::SCRATCH)) {
                 return true;
             }
@@ -885,4 +879,4 @@ namespace wrench {
         return false;
     }
 
-}
+}// namespace wrench

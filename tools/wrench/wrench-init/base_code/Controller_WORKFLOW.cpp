@@ -30,9 +30,8 @@ namespace wrench {
     Controller::Controller(std::shared_ptr<Workflow> workflow,
                            const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                            const std::shared_ptr<SimpleStorageService> &storage_service,
-                           const std::string &hostname) :
-            ExecutionController(hostname,"controller"),
-            workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
+                           const std::string &hostname) : ExecutionController(hostname, "controller"),
+                                                          workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the Controller
@@ -58,17 +57,17 @@ namespace wrench {
             /* Submit each ready task as a single job */
             int num_job_submitted = 0;
             auto ready_tasks = this->workflow->getReadyTasks();
-            for (auto const &ready_task : ready_tasks) {
+            for (auto const &ready_task: ready_tasks) {
                 /* Create a standard job for the task */
                 WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
 
                 /* Create a map of file locations, stating for each file (could be none)
                  * where is should be read/written */
                 std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-                for (auto const &f : ready_task->getInputFiles()) {
+                for (auto const &f: ready_task->getInputFiles()) {
                     file_locations[f] = FileLocation::LOCATION(storage_service);
                 }
-                for (auto const &f : ready_task->getOutputFiles()) {
+                for (auto const &f: ready_task->getOutputFiles()) {
                     file_locations[f] = FileLocation::LOCATION(storage_service);
                 }
 
@@ -100,4 +99,4 @@ namespace wrench {
         auto task = job->getTasks().at(0);
         WRENCH_INFO("Notified that a standard job has completed task %s", task->getID().c_str());
     }
-}
+}// namespace wrench

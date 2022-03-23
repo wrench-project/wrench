@@ -25,7 +25,7 @@ namespace wrench {
      * @param file: the file that could not be written
      * @param storage_service:  the storage service that ran out of spacee
      */
-    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(std::shared_ptr<DataFile>file,
+    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(std::shared_ptr<DataFile> file,
                                                                std::shared_ptr<StorageService> storage_service) {
         this->file = file;
         this->storage_service = storage_service;
@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Getter
      * @return the file
      */
-    std::shared_ptr<DataFile>StorageServiceNotEnoughSpace::getFile() {
+    std::shared_ptr<DataFile> StorageServiceNotEnoughSpace::getFile() {
         return this->file;
     }
 
@@ -56,4 +56,4 @@ namespace wrench {
                this->storage_service->getName() + " due to lack of storage space";
     }
 
-}
+}// namespace wrench

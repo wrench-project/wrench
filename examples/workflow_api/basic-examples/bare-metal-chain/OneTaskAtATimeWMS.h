@@ -26,13 +26,12 @@ namespace wrench {
     public:
         // Constructor
         OneTaskAtATimeWMS(
-                  std::shared_ptr<Workflow> workflow,
-                  const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                  const std::shared_ptr<SimpleStorageService> &storage_services,
-                  const std::string &hostname);
+                std::shared_ptr<Workflow> workflow,
+                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                const std::shared_ptr<SimpleStorageService> &storage_services,
+                const std::string &hostname);
 
     protected:
-
         // Overridden method
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
         void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
@@ -44,7 +43,6 @@ namespace wrench {
         std::shared_ptr<Workflow> workflow;
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
-
     };
-}
-#endif //WRENCH_EXAMPLE_ONE_TASK_AT_A_TIME_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_ONE_TASK_AT_A_TIME_H

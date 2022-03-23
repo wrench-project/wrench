@@ -18,7 +18,7 @@ namespace wrench {
      * @brief Configurable message payloads for a NetworkProximityService
      */
 
-    class NetworkProximityServiceMessagePayload:public ServiceMessagePayload {
+    class NetworkProximityServiceMessagePayload : public ServiceMessagePayload {
     public:
         /** @brief The number of bytes in the message sent to the service to request a proximity value lookup **/
         DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
@@ -39,9 +39,8 @@ namespace wrench {
         /** @brief The number of bytes in the message sent by a network proximity daemon to the network proximity
          *  service to report on an  RTT measurement experiment  **/
         DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD);
-
     };
-}
+}// namespace wrench
 
 
-#endif //WRENCH_NETWORKPROXIMITYSERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_NETWORKPROXIMITYSERVICEMESSAGEPAYLOAD_H

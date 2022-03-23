@@ -23,7 +23,6 @@ public:
     void do_SimulationTimestampDiskReadWriteBasic_test();
 
 protected:
-
     ~SimulationTimestampDiskReadWriteTest() {
         workflow->clear();
     }
@@ -65,12 +64,10 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
         file_1 = workflow->addFile("file_1", 100.0);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 /**********************************************************************/
@@ -86,8 +83,7 @@ protected:
 class SimulationTimestampDiskReadWriteBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampDiskReadWriteBasicTestWMS(SimulationTimestampDiskReadWriteTest *test,
-                                             std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                 std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -97,16 +93,14 @@ private:
     int main() {
 
 
-
         wrench::StorageService::readFile(this->test->file_1,
-                                              wrench::FileLocation::LOCATION(this->test->storage_service_1));
+                                         wrench::FileLocation::LOCATION(this->test->storage_service_1));
 
         wrench::StorageService::writeFile(this->test->file_1,
-                                         wrench::FileLocation::LOCATION(this->test->storage_service_2));
+                                          wrench::FileLocation::LOCATION(this->test->storage_service_2));
 
 
         return 0;
-
     }
 };
 
@@ -114,7 +108,7 @@ TEST_F(SimulationTimestampDiskReadWriteTest, SimulationTimestampDiskReadWriteBas
     DO_TEST_WITH_FORK(do_SimulationTimestampDiskReadWriteBasic_test);
 }
 
-void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBasic_test(){
+void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBasic_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -128,7 +122,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     std::string host2 = "Host2";
 
     ASSERT_NO_THROW(storage_service_1 = simulation->add(new wrench::SimpleStorageService(host1, {"/"},
-                                                                                       {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"}})));
+                                                                                         {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"}})));
 
     ASSERT_NO_THROW(storage_service_2 = simulation->add(new wrench::SimpleStorageService(host2, {"/"},
                                                                                          {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "20"}})));
@@ -137,14 +131,15 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(host1)));
 
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampDiskReadWriteBasicTestWMS(
-            this, host1)));
+                            this, host1)));
 
     //stage files
-    std::set<std::shared_ptr<wrench::DataFile> > files_to_stage = {file_1};
+    std::set<std::shared_ptr<wrench::DataFile>> files_to_stage = {file_1};
 
-    for (auto const &f  : files_to_stage) {
+    for (auto const &f: files_to_stage) {
         ASSERT_NO_THROW(simulation->stageFile(f, storage_service_1));
     }
 
@@ -173,7 +168,7 @@ void SimulationTimestampDiskReadWriteTest::do_SimulationTimestampDiskReadWriteBa
     diskwrite_timestamps.front()->getContent()->getHostname();
     diskwrite_timestamps.front()->getContent()->getMount();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

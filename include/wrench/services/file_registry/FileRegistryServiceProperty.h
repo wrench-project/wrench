@@ -18,10 +18,9 @@ namespace wrench {
     /**
      * @brief Configurable properties for a FileRegistryService
      */
-    class FileRegistryServiceProperty: public ServiceProperty {
+    class FileRegistryServiceProperty : public ServiceProperty {
 
     public:
-
         /** 
          * @brief The computational cost, in flops, of looking entries for a file
          */
@@ -38,10 +37,9 @@ namespace wrench {
          * removing an entry for a file
          */
         DECLARE_PROPERTY_NAME(REMOVE_ENTRY_COMPUTE_COST);
-        
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FILEREGISTRYPROPERTY_H
+#endif//WRENCH_FILEREGISTRYPROPERTY_H

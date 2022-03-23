@@ -21,65 +21,63 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		/**
+    /**
 		 * @brief An generic exception that is thrown whenever something
 		 * unexpected (but simulation-valid) occurs during the simulated
 		 * execution of a WMS
 		 */
-		class ExecutionException: public std::exception {
+    class ExecutionException : public std::exception {
 
-		private:
-				std::shared_ptr<FailureCause> cause;
+    private:
+        std::shared_ptr<FailureCause> cause;
 
-		public:
-
-				/**
+    public:
+        /**
 				 * @brief Get the exception's error message
 				 * @return the exception's message, as a C-style string
 				 */
-				virtual const char* what() const throw()
-				{
-          // Without the strdup() below, we get some valgrind warnings...
-					return strdup(cause->toString().c_str());
-				}
+        virtual const char *what() const throw() {
+            // Without the strdup() below, we get some valgrind warnings...
+            return strdup(cause->toString().c_str());
+        }
 
         /**
          * @brief Get the failure cause
          * @return the failure cause
          */
         std::shared_ptr<FailureCause> getCause() {
-          return this->cause;
+            return this->cause;
         }
 
 
-				/***********************/
-				/** \cond INTERNAL    */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
 
-				/**
+        /**
 				 * @brief Constructor
 				 * @param cause: the cause of the failure
 				 */
-				explicit ExecutionException(std::shared_ptr<FailureCause> cause) {
-					this->cause = std::move(cause);
-				}
+        explicit ExecutionException(std::shared_ptr<FailureCause> cause) {
+            this->cause = std::move(cause);
+        }
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
-		};
-
-
-		/***********************/
-		/** \endcond          */
-		/***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
 
 
-}
+    /***********************/
+    /** \endcond          */
+    /***********************/
 
 
-#endif //WRENCH_EXECUTION_EXCEPTION_H
+}// namespace wrench
+
+
+#endif//WRENCH_EXECUTION_EXCEPTION_H

@@ -19,16 +19,16 @@
 namespace wrench {
 
 
-//    /**
-//     * @brief A helper nested class to facilitate unit conversion
-//     * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
-//     */
-//    class unit_scale : public WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE {
-//    public:
-//        using std::unordered_map<std::string, double>::unordered_map;
-//        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
-//        explicit unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
-//    };
+    //    /**
+    //     * @brief A helper nested class to facilitate unit conversion
+    //     * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
+    //     */
+    //    class unit_scale : public WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE {
+    //    public:
+    //        using std::unordered_map<std::string, double>::unordered_map;
+    //        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
+    //        explicit unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
+    //    };
 
     /**
      * @brief Constructor
@@ -36,7 +36,7 @@ namespace wrench {
      */
     UnitParser::unit_scale::unit_scale(
             std::initializer_list<std::tuple<const std::string, double, int, bool>> generators) {
-        for (const auto &gen : generators) {
+        for (const auto &gen: generators) {
             const std::string &unit = std::get<0>(gen);
             double value = std::get<1>(gen);
             const int base = std::get<2>(gen);
@@ -60,7 +60,7 @@ namespace wrench {
                     throw std::runtime_error("UnitParser::unit_scale::unit_scale(): The impossible has happened");
             }
             emplace(unit, value);
-            for (const auto &prefix : prefixes) {
+            for (const auto &prefix: prefixes) {
                 value *= mult;
                 emplace(prefix + unit, value);
             }
@@ -80,7 +80,7 @@ namespace wrench {
             throw std::runtime_error("Cannot parse value " + string);
         if (ptr[0] == '\0') {
             if (res == 0)
-                return res; // Ok, 0 can be unit-less
+                return res;// Ok, 0 can be unit-less
             ptr = (char *) default_unit;
         }
         auto u = units.find(ptr);
@@ -104,7 +104,7 @@ namespace wrench {
                                                   std::make_tuple("B", 1.0, 10, true)};
         double size;
         try {
-            size = parseValueWithUnit(string, units, "B");  // default: bytes
+            size = parseValueWithUnit(string, units, "B");// default: bytes
         } catch (std::runtime_error &e) {
             throw std::invalid_argument(e.what());
         }
@@ -123,7 +123,7 @@ namespace wrench {
         static const UnitParser::unit_scale units{std::make_tuple("f", 1.0, 10, true)};
         double compute_speed;
         try {
-            compute_speed = parseValueWithUnit(string, units, "f");  // default: bytes
+            compute_speed = parseValueWithUnit(string, units, "f");// default: bytes
         } catch (std::runtime_error &e) {
             throw std::invalid_argument(e.what());
         }
@@ -131,4 +131,4 @@ namespace wrench {
     }
 
 
-};
+};// namespace wrench
