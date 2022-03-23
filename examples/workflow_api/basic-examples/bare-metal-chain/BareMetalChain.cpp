@@ -32,7 +32,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "OneTaskAtATimeWMS.h" // WMS implementation
+#include "OneTaskAtATimeWMS.h"// WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -79,20 +79,20 @@ int main(int argc, char **argv) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     /* Add workflow tasks */
-    for (int i=0; i < num_tasks; i++) {
+    for (int i = 0; i < num_tasks; i++) {
         /* Create a task: 10GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow->addTask("task_" + std::to_string(i), 10000000000.0, 1, 10, 10000000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     }
 
     /* Add workflow files */
-    for (int i=0; i < num_tasks+1; i++) {
+    for (int i = 0; i < num_tasks + 1; i++) {
         /* Create a 100MB file */
         workflow->addFile("file_" + std::to_string(i), 100000000);
     }
 
     /* Set input/output files for each task */
-    for (int i=0; i < num_tasks; i++) {
+    for (int i = 0; i < num_tasks; i++) {
         auto task = workflow->getTaskByID("task_" + std::to_string(i));
         task->addInputFile(workflow->getFileByID("file_" + std::to_string(i)));
         task->addOutputFile(workflow->getFileByID("file_" + std::to_string(i + 1)));
@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -165,8 +165,8 @@ int main(int argc, char **argv) {
      * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
-    for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
+    for (auto const &item: trace) {
+        std::cerr << "Task " << item->getContent()->getTask()->getID() << " completed at time " << item->getDate() << std::endl;
     }
 
     return 0;

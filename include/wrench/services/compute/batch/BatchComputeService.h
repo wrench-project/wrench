@@ -52,54 +52,52 @@ namespace wrench {
          * @brief A Batch Service
          */
     private:
-
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,                     "0"},
-                {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM,                    "maximum_flops"},
+                {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"},
+                {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "FIRSTFIT"},
+                {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
 #ifdef ENABLE_BATSCHED
-                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "conservative_bf"},
-//                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
-//                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
+                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                //                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf_fast"},
 
-                {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
+                {BatchComputeServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"},
 #else
-                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "fcfs"},
+                {BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"},
 #endif
                 {BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "5"},
-                {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
-                {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE,     "false"},
-                {BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE,     "false"},
-                {BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE,                          "-1"},
-                {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
-                {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,               "false"},
-                {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED,                      "true"},
-                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,              "false"}
-        };
+                {BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, ""},
+                {BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE, "false"},
+                {BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE, "false"},
+                {BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE, "-1"},
+                {BatchComputeServiceProperty::OUTPUT_CSV_JOB_LOG, ""},
+                {BatchComputeServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
+                {BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED, "true"},
+                {BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}};
 
-WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
-                {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 1024},
-                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,1024},
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,              1024},
-                {BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           1024},
+                {BatchComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {BatchComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         1024},
-                {BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           1024},
-                {BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,     1024},
-                {BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD,              1024},
-                {BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD,            1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::SUBMIT_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD, 1024},
+                {BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD,  1024},
+                {BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {BatchComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
@@ -109,8 +107,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                             std::vector<std::string> compute_hosts,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
-        );
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         bool supportsStandardJobs() override;
         bool supportsCompoundJobs() override;
@@ -119,7 +116,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned long,unsigned long, double>> resources);
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> resources);
 
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> getQueue();
 
@@ -156,8 +153,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                            std::string suffix
-        );
+                            std::string suffix);
 
         //submits a standard job
         void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &batch_job_args) override;
@@ -171,7 +167,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         bool clean_exit = false;
 
         //create alarms for compound jobs
-        std::map<std::shared_ptr<CompoundJob>,std::shared_ptr<Alarm>> compound_job_alarms;
+        std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<Alarm>> compound_job_alarms;
 
         /* Resources information in batch_standard_and_pilot_jobs */
         unsigned long total_num_of_nodes;
@@ -212,20 +208,17 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                                                        "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
                                                        "energy_watcher", "fcfs_fast", "fast_conservative_bf",
                                                        "filler", "killer", "killer2", "random", "rejecter",
-                                                       "sequencer", "sleeper", "submitter", "waiting_time_estimator"
-        };
+                                                       "sequencer", "sleeper", "submitter", "waiting_time_estimator"};
 
         std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
                                                         "asc_size", "desc_size", "asc_walltime", "desc_walltime"
 
         };
 #else
-        std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf", "conservative_bf_core_level"
-        };
+        std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf", "conservative_bf_core_level"};
 
         //Batch queue ordering options
-        std::set<std::string> queue_ordering_options = {
-        };
+        std::set<std::string> queue_ordering_options = {};
 
 #endif
 
@@ -267,7 +260,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, simgrid::s4u::Mailbox *answer_mailbox);
 
         // process a batch_standard_and_pilot_jobs bach_job tiemout event
-        void processAlarmJobTimeout(std::shared_ptr<BatchJob>bach_job);
+        void processAlarmJobTimeout(std::shared_ptr<BatchJob> bach_job);
 
         //free up resources
         void freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
@@ -279,19 +272,18 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         void sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // process a job submission
-        void processJobSubmission(std::shared_ptr<BatchJob>job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processJobSubmission(std::shared_ptr<BatchJob> job, simgrid::s4u::Mailbox *answer_mailbox);
 
         //start a job
-        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<CompoundJob> ,
+        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<CompoundJob>,
                       std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
 
 
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
         void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
-
     };
-}
+}// namespace wrench
 
 
-#endif //WRENCH_BATCH_SERVICE_H
+#endif//WRENCH_BATCH_SERVICE_H

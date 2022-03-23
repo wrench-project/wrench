@@ -17,10 +17,9 @@
 namespace wrench {
 
     class ComputerVictim
-            : public Service {
+        : public Service {
 
     public:
-
         explicit ComputerVictim(std::string host_on_which_to_run, double flops, SimulationMessage *msg, simgrid::s4u::Mailbox *mailbox_to_notify);
 
         void cleanup(bool has_terminated_cleanly, int return_value) override;
@@ -30,11 +29,10 @@ namespace wrench {
         SimulationMessage *msg;
         simgrid::s4u::Mailbox *mailbox_to_notify;
         int main() override;
-
     };
 
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_COMPUTER_H
+#endif//WRENCH_COMPUTER_H

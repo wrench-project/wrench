@@ -29,13 +29,13 @@ namespace wrench {
         //Type of random number distribution
         const char charset[] =
                 "aabccdeeefghijklmnooopqrstttuuvwxyzz";
-        std::uniform_int_distribution<int> dist(0, sizeof(charset)-2);
+        std::uniform_int_distribution<int> dist(0, sizeof(charset) - 2);
         //Mersenne Twister: Good quality random number generator
         std::mt19937 rng;
-        rng.seed(userid);  // Consistent for the same userid
+        rng.seed(userid);// Consistent for the same userid
         std::string username = "";
         int username_length = 3 + dist(rng) % 5;
-        while(username_length--) {
+        while (username_length--) {
             username += charset[dist(rng)];
         }
         return username;
@@ -142,12 +142,12 @@ namespace wrench {
                                 "'");
                     }
 
-                    for (auto const &item : tokens) {
+                    for (auto const &item: tokens) {
                         switch (itemnum) {
-                            case 0: // Job ID
+                            case 0:// Job ID
                                 id = item;
                                 break;
-                            case 1: // Submit time
+                            case 1:// Submit time
                                 if (sscanf(item.c_str(), "%lf", &sub_time) != 1) {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid submission time '" +
@@ -161,9 +161,9 @@ namespace wrench {
                                     sub_time += (desired_submit_time_of_first_job - original_submit_time_of_first_job);
                                 }
                                 break;
-                            case 2: // Wait time
+                            case 2:// Wait time
                                 break;
-                            case 3: // Run time
+                            case 3:// Run time
                                 //assuming flops and runtime are the same (in seconds)
                                 if (sscanf(item.c_str(), "%lf", &time) != 1) {
                                     throw std::invalid_argument(
@@ -171,7 +171,7 @@ namespace wrench {
                                             "' in BatchComputeService workload trace file");
                                 }
                                 break;
-                            case 4: // Number of Allocated Processors
+                            case 4:// Number of Allocated Processors
                                 if (sscanf(item.c_str(), "%d", &num_nodes) != 1) {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid number of processors '" +
@@ -181,9 +181,9 @@ namespace wrench {
                                 break;
                             case 5:// Average CPU time Used
                                 break;
-                            case 6: // Used Memory
+                            case 6:// Used Memory
                                 break;
-                            case 7: // Requested Number of Processors
+                            case 7:// Requested Number of Processors
                                 if (sscanf(item.c_str(), "%d", &requested_num_nodes) != 1) {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid requested number of processors '" +
@@ -191,7 +191,7 @@ namespace wrench {
                                             "' in BatchComputeService workload trace file");
                                 }
                                 break;
-                            case 8: // Requested time
+                            case 8:// Requested time
                                 //assuming flops and runtime are the same (in seconds)
                                 if (sscanf(item.c_str(), "%lf", &requested_time) != 1) {
                                     throw std::invalid_argument(
@@ -200,7 +200,7 @@ namespace wrench {
                                             "' in BatchComputeService workload trace file");
                                 }
                                 break;
-                            case 9: // Requested memory_manager_service
+                            case 9:// Requested memory_manager_service
                                 // In KiB
                                 if (sscanf(item.c_str(), "%lf", &requested_ram) != 1) {
                                     throw std::invalid_argument(
@@ -210,9 +210,9 @@ namespace wrench {
                                 }
                                 requested_ram *= 1024.0;
                                 break;
-                            case 10: // Status
+                            case 10:// Status
                                 break;
-                            case 11: // User ID
+                            case 11:// User ID
                                 if (sscanf(item.c_str(), "%lu", &userid) != 1) {
                                     throw std::invalid_argument(
                                             "TraceFileLoader::loadFromTraceFileSWF(): Invalid userid '" +
@@ -220,22 +220,21 @@ namespace wrench {
                                             "' in BatchComputeService workload trace file");
                                 }
                                 break;
-                            case 12: // Group ID
+                            case 12:// Group ID
                                 break;
-                            case 13: // Executable number
+                            case 13:// Executable number
                                 break;
-                            case 14: // Queue number
+                            case 14:// Queue number
                                 break;
-                            case 15: // Partition number
+                            case 15:// Partition number
                                 break;
-                            case 16: // Preceding job number
+                            case 16:// Preceding job number
                                 break;
-                            case 17: // Think time
+                            case 17:// Think time
                                 break;
                             default:
                                 throw std::invalid_argument(
-                                        "TraceFileLoader::loadFromTraceFileSWF(): Unknown BatchComputeService workload trace file column, maybe there are more than 18 columns?"
-                                );
+                                        "TraceFileLoader::loadFromTraceFileSWF(): Unknown BatchComputeService workload trace file column, maybe there are more than 18 columns?");
                         }
                         itemnum++;
                     }
@@ -249,7 +248,7 @@ namespace wrench {
                     if ((requested_time < 0) or (time < 0)) {
                         throw std::invalid_argument(
                                 "TraceFileLoader::loadFromTraceFileSWF(): invalid job with negative flops (" +
-                                std::to_string(time) + ") and negative requested flops ("+ std::to_string(requested_time) + ") in BatchComputeService workload trace file");
+                                std::to_string(time) + ") and negative requested flops (" + std::to_string(requested_time) + ") in BatchComputeService workload trace file");
                     }
                     if (requested_time < time) {
                         WRENCH_WARN(
@@ -282,7 +281,7 @@ namespace wrench {
                         WRENCH_WARN("%s (in BatchComputeService workload file %s) IGNORING", e.what(), filename.c_str());
                         continue;
                     } else {
-                        throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " +  e.what());
+                        throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " + e.what());
                     }
                 }
 
@@ -349,7 +348,7 @@ namespace wrench {
                     "TraceFileLoader::loadFromTraceFileJSON(): Could not find 'jobs' in JSON BatchComputeService workload trace file");
         }
 
-                double original_submit_time_of_first_job = -1;
+        double original_submit_time_of_first_job = -1;
 
         for (nlohmann::json::iterator it = jobs.begin(); it != jobs.end(); ++it) {
             nlohmann::json json_job = it.value();
@@ -398,11 +397,11 @@ namespace wrench {
                     WRENCH_WARN("%s (in BatchComputeService workload file %s)", e.what(), filename.c_str());
                     continue;
                 } else {
-                    throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " +  e.what());
+                    throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " + e.what());
                 }
             }
 
-//      // Add the job to the list
+            //      // Add the job to the list
             std::tuple<std::string, double, double, double, double, unsigned int, std::string> job =
                     std::tuple<std::string, double, double, double, double, unsigned int, std::string>(
                             std::to_string(id), subtime, walltime, requested_time, 0.0, (unsigned int) res, "user");
@@ -411,4 +410,4 @@ namespace wrench {
 
         return trace_file_jobs;
     }
-}
+}// namespace wrench

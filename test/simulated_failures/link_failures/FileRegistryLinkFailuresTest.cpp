@@ -53,8 +53,9 @@ protected:
         for (int i = 0; i < NUM_STORAGE_SERVICES; i++) {
             xml += "          <disk id=\"large_disk_" + std::to_string(i) + "\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                                                                             "             <prop id=\"size\" value=\"100B\"/>"
-                                                                            "             <prop id=\"mount\" value=\"/disk_" + std::to_string(i) + "\"/>"
-                                                                                                                                                   "          </disk>";
+                                                                            "             <prop id=\"mount\" value=\"/disk_" +
+                   std::to_string(i) + "\"/>"
+                                       "          </disk>";
         }
         xml += "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                "             <prop id=\"size\" value=\"101B\"/>"
@@ -80,11 +81,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -95,21 +94,19 @@ class FileRegistryLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     FileRegistryLinkFailuresTestWMS(FileRegistryLinkFailuresTest *test,
-                                    std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                    std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     FileRegistryLinkFailuresTest *test;
 
     int main() {
 
         // Create a bunch of files
-        std::vector<std::shared_ptr<wrench::DataFile> > files;
-        for (unsigned int i=0; i < NUM_FILES; i++) {
-            files.push_back(this->test->workflow->addFile("file_" + std::to_string(i) , 100.0));
+        std::vector<std::shared_ptr<wrench::DataFile>> files;
+        for (unsigned int i = 0; i < NUM_FILES; i++) {
+            files.push_back(this->test->workflow->addFile("file_" + std::to_string(i), 100.0));
         }
 
         // Create a link switcher on/off er
@@ -117,14 +114,14 @@ private:
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 15, 1, 5,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
         switcher->setSimulation(this->simulation);
-        switcher->start(switcher, true, false); // Daemonized, no auto-restart
+        switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
         std::mt19937 rng(666);
         std::uniform_int_distribution<unsigned long> dist_files(0, files.size() - 1);
         std::uniform_int_distribution<unsigned long> dist_storage(0, this->test->storage_services.size() - 1);
 
         // Do a bunch of file registry operations
-        for (unsigned int i=0; i < 10000; i++) {
+        for (unsigned int i = 0; i < 10000; i++) {
             try {
                 // Do a random add
                 wrench::Simulation::sleep(1.0);
@@ -184,12 +181,10 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
                     {wrench::FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
                     {wrench::FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
                     {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, message_payload},
-                    {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, message_payload}
-            };
+                    {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, message_payload}};
     wrench::WRENCH_PROPERTY_COLLECTION_TYPE props =
             {
-                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"}
-            };
+                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"}};
 
     file_registry_service = simulation->add(
             new wrench::FileRegistryService("Host2",
@@ -197,17 +192,17 @@ void FileRegistryLinkFailuresTest::do_FileRegistryLinkFailureSimpleRandom_Test()
                                             payloads));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileRegistryLinkFailuresTestWMS(
-                    this, "Host1")));
+                            new FileRegistryLinkFailuresTestWMS(
+                                    this, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

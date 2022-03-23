@@ -49,8 +49,8 @@ namespace wrench {
         std::shared_ptr<BandwidthMeterService> createBandwidthMeter(const std::vector<std::string> &linknames, double measurement_period);
 
 
-        std::shared_ptr<ExecutionEvent>  waitForNextEvent();
-        std::shared_ptr<ExecutionEvent>  waitForNextEvent(double timeout);
+        std::shared_ptr<ExecutionEvent> waitForNextEvent();
+        std::shared_ptr<ExecutionEvent> waitForNextEvent(double timeout);
 
         void waitForAndProcessNextEvent();
         bool waitForAndProcessNextEvent(double timeout);
@@ -71,7 +71,6 @@ namespace wrench {
         virtual void processEventTimer(std::shared_ptr<TimerEvent>);
 
     protected:
-
         ExecutionController(
                 const std::string &hostname,
                 const std::string suffix);
@@ -98,10 +97,9 @@ namespace wrench {
 
     private:
         virtual int main() = 0;
-
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_EXECUTIONCONTROLLER_H
+#endif//WRENCH_EXECUTIONCONTROLLER_H

@@ -28,7 +28,6 @@ namespace wrench {
     class PointerUtil {
 
     public:
-
         /**
          * @brief A helper method to move a unique_ptr from a set to another
          * @tparam template class
@@ -39,14 +38,12 @@ namespace wrench {
         template<class T>
         static void moveUniquePtrFromSetToSet(
                 typename std::set<std::unique_ptr<T>>::iterator it,
-                                                 std::set<std::unique_ptr<T>> *from,
-                                                 std::set<std::unique_ptr<T>> *to)
-        {
+                std::set<std::unique_ptr<T>> *from,
+                std::set<std::unique_ptr<T>> *to) {
 
-          auto tmp = const_cast<std::unique_ptr<T>&&>(*it);
-          (*from).erase(it);
-          (*to).insert(std::move(tmp));
-
+            auto tmp = const_cast<std::unique_ptr<T> &&>(*it);
+            (*from).erase(it);
+            (*to).insert(std::move(tmp));
         };
 
         /**
@@ -60,13 +57,11 @@ namespace wrench {
         static void moveSharedPtrFromSetToSet(
                 typename std::set<std::shared_ptr<T>>::iterator it,
                 std::set<std::shared_ptr<T>> *from,
-                std::set<std::shared_ptr<T>> *to)
-        {
+                std::set<std::shared_ptr<T>> *to) {
 
-            auto tmp = const_cast<std::shared_ptr<T>&&>(*it);
+            auto tmp = const_cast<std::shared_ptr<T> &&>(*it);
             (*from).erase(it);
             (*to).insert(tmp);
-
         };
 
 #if 0
@@ -104,7 +99,6 @@ namespace wrench {
                                                            std::set<std::unique_ptr<T1>> *to);
 
 #endif
-
     };
 
     /***********************/
@@ -112,7 +106,7 @@ namespace wrench {
     /***********************/
 
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_POINTERUTIL_H
+#endif//WRENCH_POINTERUTIL_H

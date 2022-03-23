@@ -25,7 +25,6 @@ namespace wrench {
     class FCFSBatchScheduler : public HomegrownBatchScheduler {
 
     public:
-
         /**
          * @brief Constructor
          *
@@ -42,17 +41,16 @@ namespace wrench {
 
         std::shared_ptr<BatchJob> pickNextJobToSchedule();
 
-        std::map <std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
+        std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
 
-        std::map<std::string, double> getStartTimeEstimates(std::set <std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
+        std::map<std::string, double> getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
     };
 
-}
+}// namespace wrench
 
 /***********************/
 /** \endcond           */
 /***********************/
 
 
-
-#endif //WRENCH_FCFSBATCHSCHEDULER_H
+#endif//WRENCH_FCFSBATCHSCHEDULER_H

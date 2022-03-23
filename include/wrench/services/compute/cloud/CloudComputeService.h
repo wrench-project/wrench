@@ -36,33 +36,32 @@ namespace wrench {
     class CloudComputeService : public ComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS,      "0.0"},
-                {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}
-        };
+                {CloudComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"},
+                {CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-ram-first"}};
 
-WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
-                {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
-                {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
                 {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   1024},
-                {CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            1024},
-                {CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             1024},
-                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD,          1024},
-                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,           1024},
-                {CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD,             1024},
-                {CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD,              1024},
-                {CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD,           1024},
-                {CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD,            1024},
-                {CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD,            1024},
-                {CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD,             1024},
-                {CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD,           1024},
-                {CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD,            1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
-                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      1024},
+                {CloudComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::DESTROY_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::DESTROY_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {CloudComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {CloudComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
@@ -127,9 +126,9 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         /***********************/
 
         void submitCompoundJob(std::shared_ptr<CompoundJob> job,
-                               const std::map<std::string, std::string> &service_specific_args) override {};
+                               const std::map<std::string, std::string> &service_specific_args) override{};
 
-        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override {};
+        void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override{};
 
         void validateProperties();
 
@@ -162,8 +161,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
                                      double requested_ram,
                                      std::string desired_vm_name,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
-        );
+                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
         virtual void
         processStartVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name, const std::string &pm_name);
@@ -179,11 +177,11 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
 
         virtual void processDestroyVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name);
 
-//        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
-//                                              std::map<std::string, std::string> &service_specific_args);
-//
-//        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
-//                                           std::map<std::string, std::string> &service_specific_args);
+        //        virtual void processSubmitStandardJob(const std::string &answer_mailbox, std::shared_ptr<StandardJob> job,
+        //                                              std::map<std::string, std::string> &service_specific_args);
+        //
+        //        virtual void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job,
+        //                                           std::map<std::string, std::string> &service_specific_args);
 
         virtual void
         processBareMetalComputeServiceTermination(std::shared_ptr<BareMetalComputeService> cs, int exit_code);
@@ -216,8 +214,7 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
 
     private:
         std::string findHost(unsigned long desired_num_cores, double desired_ram, std::string desired_host);
-
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_CLOUDSERVICE_H
+#endif//WRENCH_CLOUDSERVICE_H

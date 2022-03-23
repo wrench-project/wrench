@@ -36,20 +36,20 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(std::shared_ptr<DataFile>file,
+        FileAlreadyBeingCopied(std::shared_ptr<DataFile> file,
                                std::shared_ptr<FileLocation> src,
                                std::shared_ptr<FileLocation> dst);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<DataFile>getFile();
+        std::shared_ptr<DataFile> getFile();
         std::shared_ptr<FileLocation> getSourceLocation();
         std::shared_ptr<FileLocation> getDestinationLocation();
         std::string toString() override;
 
     private:
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> src_location;
         std::shared_ptr<FileLocation> dst_location;
     };
@@ -58,7 +58,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FILE_ALREADY_BEING_COPIED_H
+#endif//WRENCH_FILE_ALREADY_BEING_COPIED_H

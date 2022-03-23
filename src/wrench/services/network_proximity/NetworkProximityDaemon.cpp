@@ -40,9 +40,8 @@ namespace wrench {
                                                    double message_size, double measurement_period,
                                                    double noise,
                                                    int noise_seed,
-                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
-            NetworkProximityDaemon(simulation, std::move(hostname), network_proximity_service_mailbox,
-                                   message_size, measurement_period, noise, noise_seed,messagepayload_list, "") {
+                                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : NetworkProximityDaemon(simulation, std::move(hostname), network_proximity_service_mailbox,
+                                                                                                                                       message_size, measurement_period, noise, noise_seed, messagepayload_list, "") {
     }
 
 
@@ -68,8 +67,7 @@ namespace wrench {
             double noise,
             int noise_seed,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            std::string suffix = "") :
-            Service(std::move(hostname), "network_daemon" + suffix) {
+            std::string suffix = "") : Service(std::move(hostname), "network_daemon" + suffix) {
 
         // Set the message payloads
         setMessagePayloads(messagepayload_list, {});
@@ -84,7 +82,6 @@ namespace wrench {
         this->next_daemon_to_send = nullptr;
         this->next_host_to_send = "";
         this->network_proximity_service_mailbox = network_proximity_service_mailbox;
-
     }
 
     /**
@@ -188,9 +185,7 @@ namespace wrench {
                         // Couldn't find out who to talk to next... will try again soon
                     }
                 }
-
             }
-
         }
 
 
@@ -209,14 +204,14 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &cause) {
             if (not cause->isTimeout()) {
                 WRENCH_INFO("Got a network error... oh well (%s)",
-                                                  cause->toString().c_str());
+                            cause->toString().c_str());
             }
             return true;
         }
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -227,7 +222,7 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<NextContactDaemonAnswerMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<NextContactDaemonAnswerMessage *>(message.get())) {
 
             this->next_host_to_send = msg->next_host_to_send;
             this->next_daemon_to_send = msg->next_daemon_to_send;
@@ -235,7 +230,7 @@ namespace wrench {
 
             return true;
 
-        } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
 
             return true;
 
@@ -245,4 +240,4 @@ namespace wrench {
         }
     }
 
-}
+}// namespace wrench

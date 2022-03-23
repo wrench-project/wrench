@@ -36,9 +36,8 @@ namespace wrench {
     ConcurrentPipelineWMS::ConcurrentPipelineWMS(const std::shared_ptr<Workflow> &workflow,
                                                  const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                                                  const std::shared_ptr<StorageService> &storage_service,
-                                                 const std::string &hostname) :
-            ExecutionController (hostname,"concurrent-pipeline-wms"),
-            workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
+                                                 const std::string &hostname) : ExecutionController(hostname, "concurrent-pipeline-wms"),
+                                                                                workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the ConcurrentPipelineWMS daemon
@@ -63,7 +62,7 @@ namespace wrench {
 
             std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
-            for (auto ready_task : ready_tasks) {
+            for (auto ready_task: ready_tasks) {
 
                 /* Create a standard job for the task */
                 WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
@@ -72,10 +71,10 @@ namespace wrench {
                  * where is should be read/written */
                 std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
 
-                for (auto input_file : ready_task->getInputFiles()) {
+                for (auto input_file: ready_task->getInputFiles()) {
                     file_locations[input_file] = FileLocation::LOCATION(storage_service);
                 }
-                for (auto output_file : ready_task->getOutputFiles()) {
+                for (auto output_file: ready_task->getOutputFiles()) {
                     file_locations[output_file] = FileLocation::LOCATION(storage_service);
                 }
 
@@ -91,7 +90,7 @@ namespace wrench {
                  * the event will be a StandardJobCompletionEvent, which is processed by the method
                  * processEventStandardJobCompletion() that this class overrides. */
 
-//            printf("Wait for events\n\n");
+            //            printf("Wait for events\n\n");
             this->waitForAndProcessNextEvent();
         }
 
@@ -130,4 +129,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

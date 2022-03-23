@@ -31,11 +31,10 @@ namespace wrench {
      * @param bare_metal_compute_service: a bare-metal compute services available to run tasks
      * @param hostname: the name of the host on which to start the WMS
      */
-    OneTaskAtATimeWMS::OneTaskAtATimeWMS(const std::shared_ptr<Workflow>& workflow,
+    OneTaskAtATimeWMS::OneTaskAtATimeWMS(const std::shared_ptr<Workflow> &workflow,
                                          const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                                         const std::string &hostname) :
-                                         ExecutionController(hostname,"one-task-at-a-time"),
-                                         workflow(workflow), bare_metal_compute_service(bare_metal_compute_service) {}
+                                         const std::string &hostname) : ExecutionController(hostname, "one-task-at-a-time"),
+                                                                        workflow(workflow), bare_metal_compute_service(bare_metal_compute_service) {}
 
     /**
      * @brief main method of the OneTaskAtATimeWMS daemon
@@ -95,7 +94,7 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's tasks */
-        for (auto const &task : job->getTasks()) {
+        for (auto const &task: job->getTasks()) {
             WRENCH_INFO("Notified that a standard job has completed task %s",
                         task->getID().c_str());
         }
@@ -113,11 +112,11 @@ namespace wrench {
                     event->failure_cause->toString().c_str());
         /* Retrieve the job's tasks */
         WRENCH_INFO("As a result, the following tasks have failed:");
-        for (auto const &task : job->getTasks()) {
+        for (auto const &task: job->getTasks()) {
             WRENCH_INFO(" - %s", task->getID().c_str());
         }
         throw std::runtime_error("This should not happen in this example");
     }
 
 
-}
+}// namespace wrench

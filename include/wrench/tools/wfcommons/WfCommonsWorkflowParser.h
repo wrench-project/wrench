@@ -24,7 +24,6 @@ namespace wrench {
     class WfCommonsWorkflowParser {
 
     public:
-
         /**
          * @brief Create an abstract workflow based on a JSON file
          *
@@ -56,10 +55,10 @@ namespace wrench {
          */
 
         static std::shared_ptr<Workflow> createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                bool redundant_dependencies = false,
-                                                unsigned long min_cores_per_task = 1,
-                                                unsigned long max_cores_per_task = 1,
-                                                bool enforce_num_cores = false);
+                                                                bool redundant_dependencies = false,
+                                                                unsigned long min_cores_per_task = 1,
+                                                                unsigned long max_cores_per_task = 1,
+                                                                bool enforce_num_cores = false);
 
         /**
           * @brief Create an NON-abstract workflow based on a JSON file
@@ -89,14 +88,13 @@ namespace wrench {
           * @throw std::invalid_argument
           */
         static std::shared_ptr<Workflow> createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                          bool redundant_dependencies = false,
-                                                          unsigned long min_cores_per_task = 1,
-                                                          unsigned long max_cores_per_task = 1,
-                                                          bool enforce_num_cores = false);
-
+                                                                          bool redundant_dependencies = false,
+                                                                          unsigned long min_cores_per_task = 1,
+                                                                          unsigned long max_cores_per_task = 1,
+                                                                          bool enforce_num_cores = false);
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_WFCOMMONSWORKFLOWPARSER_H
+#endif//WRENCH_WFCOMMONSWORKFLOWPARSER_H

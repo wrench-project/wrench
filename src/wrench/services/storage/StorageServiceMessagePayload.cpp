@@ -8,7 +8,6 @@
  */
 
 
-
 #include <wrench/services/storage/StorageServiceMessagePayload.h>
 
 
@@ -36,5 +35,4 @@ namespace wrench {
 
     SET_MESSAGEPAYLOAD_NAME(StorageServiceMessagePayload, NOT_ENOUGH_STORAGE_SPACE_MESSAGE_PAYLOAD);
 
-};
-
+};// namespace wrench

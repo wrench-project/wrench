@@ -32,6 +32,6 @@ namespace wrench {
          **/
         DECLARE_PROPERTY_NAME(VM_RESOURCE_ALLOCATION_ALGORITHM);
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_CLOUDSERVICEPROPERTY_H
+#endif//WRENCH_CLOUDSERVICEPROPERTY_H

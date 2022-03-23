@@ -47,7 +47,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_JOB_TIMEOUT_H
+#endif//WRENCH_JOB_TIMEOUT_H

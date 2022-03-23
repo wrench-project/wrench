@@ -15,9 +15,9 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL    **/
-/***********************/
+    /***********************/
+    /** \cond INTERNAL    **/
+    /***********************/
 
     class BatchComputeService;
 
@@ -27,7 +27,6 @@ namespace wrench {
     class BatchScheduler {
 
     public:
-
         /**
          * @brief Destructor
          */
@@ -37,7 +36,7 @@ namespace wrench {
          * @brief Constructor
          * @param cs: the batch_standard_and_pilot_jobs compute service to which this scheduler is associated
          */
-        explicit BatchScheduler(BatchComputeService *cs) : cs(cs) {};
+        explicit BatchScheduler(BatchComputeService *cs) : cs(cs){};
 
         /**
          * Virtual methods to override
@@ -111,13 +110,12 @@ namespace wrench {
          * @brief Compute service for which this scheduler is operating
          */
         BatchComputeService *cs;
-
     };
 
-/***********************/
-/** \endcond          **/
-/***********************/
-}
+    /***********************/
+    /** \endcond          **/
+    /***********************/
+}// namespace wrench
 
 
-#endif //WRENCH_BATCHSCHEDULER_H
+#endif//WRENCH_BATCHSCHEDULER_H

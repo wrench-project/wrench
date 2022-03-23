@@ -71,11 +71,11 @@ int main(int argc, char **argv) {
     int num_actions = 0;
     try {
         num_actions = std::atoi(argv[1]);
-        if (num_actions  %  2)  {
+        if (num_actions % 2) {
             throw std::invalid_argument("Number of actions should be even");
         }
     } catch (std::invalid_argument &e) {
-        std::cerr << "Invalid number of actions ("  << e.what() << ")\n";
+        std::cerr << "Invalid number of actions (" << e.what() << ")\n";
         exit(1);
     }
 

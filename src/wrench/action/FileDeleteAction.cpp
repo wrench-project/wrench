@@ -31,18 +31,17 @@ namespace wrench {
     * @param file: the file
     * @param file_location: the location where the file should be deleted
     */
-    FileDeleteAction::FileDeleteAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                     std::shared_ptr<DataFile>file,
-                                     std::shared_ptr<FileLocation> file_location) :
-            Action(name, "file_delete_", job),
-            file(std::move(file)), file_location(std::move(file_location)) {
+    FileDeleteAction::FileDeleteAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+                                       std::shared_ptr<DataFile> file,
+                                       std::shared_ptr<FileLocation> file_location) : Action(name, "file_delete_", job),
+                                                                                      file(std::move(file)), file_location(std::move(file_location)) {
     }
 
     /**
      * @brief Returns the action's file
      * @return the file
      */
-    std::shared_ptr<DataFile>FileDeleteAction::getFile() const {
+    std::shared_ptr<DataFile> FileDeleteAction::getFile() const {
         return this->file;
     }
 
@@ -82,4 +81,4 @@ namespace wrench {
         return (this->file_location == FileLocation::SCRATCH);
     }
 
-}
+}// namespace wrench

@@ -32,4 +32,4 @@ namespace wrench {
         return error;
     }
 
-}
+}// namespace wrench

@@ -34,7 +34,6 @@ public:
 
 
 protected:
-
     ~VirtualizedClusterServiceResourceAllocationTest() {
         workflow->clear();
     }
@@ -127,12 +126,10 @@ class VMResourceAllocationTestWMS : public wrench::ExecutionController {
 
 public:
     VMResourceAllocationTestWMS(VirtualizedClusterServiceResourceAllocationTest *test,
-                                std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     VirtualizedClusterServiceResourceAllocationTest *test;
 
     int main() override {
@@ -254,14 +251,14 @@ void VirtualizedClusterServiceResourceAllocationTest::do_VMResourceAllocationAlg
                                             {{wrench::CloudComputeServiceProperty::VM_RESOURCE_ALLOCATION_ALGORITHM, "best-fit-cores-first"}}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new VMResourceAllocationTestWMS(this, hostname));
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-

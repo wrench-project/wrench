@@ -43,7 +43,6 @@ namespace wrench {
     class FileCopyFailedEvent : public ExecutionEvent {
 
     private:
-
         friend class ExecutionEvent;
         /**
          * @brief Constructor
@@ -52,18 +51,16 @@ namespace wrench {
          * @param src: destination location
          * @param failure_cause: a failure cause
          */
-        FileCopyFailedEvent(std::shared_ptr<DataFile>file,
+        FileCopyFailedEvent(std::shared_ptr<DataFile> file,
                             std::shared_ptr<FileLocation> src,
                             std::shared_ptr<FileLocation> dst,
-                            std::shared_ptr<FailureCause> failure_cause
-        )
-                : file(file), src(src), dst(dst),
-                  failure_cause(failure_cause) {}
+                            std::shared_ptr<FailureCause> failure_cause)
+            : file(file), src(src), dst(dst),
+              failure_cause(failure_cause) {}
 
     public:
-
         /** @brief The workflow file that has failed to be copied */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
@@ -79,17 +76,16 @@ namespace wrench {
             return "FileCopyFailedEvent (file: " + this->file->getID() +
                    "; src = " + this->src->toString() +
                    "; dst = " + this->dst->toString() +
-                   "; cause: " + this->failure_cause->toString() + ")";}
-
+                   "; cause: " + this->failure_cause->toString() + ")";
+        }
     };
 
 
-};
+};// namespace wrench
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
-
-#endif //WRENCH_FILE_COPY_FAILED_EVENT_H
+#endif//WRENCH_FILE_COPY_FAILED_EVENT_H

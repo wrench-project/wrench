@@ -98,7 +98,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -106,7 +105,6 @@ protected:
 public:
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
-
 };
 
 
@@ -118,12 +116,10 @@ class FileDeleteActionExecutorSuccessTestWMS : public wrench::ExecutionControlle
 
 public:
     FileDeleteActionExecutorSuccessTestWMS(FileDeleteActionExecutorTest *test,
-                                         std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                           std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     FileDeleteActionExecutorTest *test;
 
     int main() {
@@ -135,7 +131,7 @@ private:
         auto job = job_manager->createCompoundJob("");
         // Add a file_delete_action
         auto file_delete_action = job->addFileDeleteAction("", this->test->file,
-                                                       wrench::FileLocation::LOCATION(this->test->ss));
+                                                           wrench::FileLocation::LOCATION(this->test->ss));
         // Create a file read action executor
         auto file_delete_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_delete_action, nullptr));
@@ -188,7 +184,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -199,7 +195,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
 
     // Create a file
-    this->file =wrench::Simulation::addFile("some_file", 1000000.0);
+    this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
     ss->createFile(file, wrench::FileLocation::LOCATION(ss));
 
@@ -209,9 +205,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
 
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
-

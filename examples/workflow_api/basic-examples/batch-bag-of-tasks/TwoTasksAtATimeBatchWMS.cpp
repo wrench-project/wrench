@@ -38,9 +38,8 @@ namespace wrench {
     TwoTasksAtATimeBatchWMS::TwoTasksAtATimeBatchWMS(std::shared_ptr<Workflow> workflow,
                                                      const std::shared_ptr<BatchComputeService> &batch_compute_service,
                                                      const std::shared_ptr<StorageService> &storage_service,
-                                                     const std::string &hostname) :
-                                                     ExecutionController(hostname,"two-tasks-at-a-time-batch_standard_and_pilot_jobs"),
-                                                     workflow(workflow), batch_compute_service(batch_compute_service), storage_service(storage_service) {}
+                                                     const std::string &hostname) : ExecutionController(hostname, "two-tasks-at-a-time-batch_standard_and_pilot_jobs"),
+                                                                                    workflow(workflow), batch_compute_service(batch_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the TwoTasksAtATimeBatchWMS daemon
@@ -54,7 +53,8 @@ namespace wrench {
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());WRENCH_INFO(
+        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
+        WRENCH_INFO(
                 "About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
@@ -67,10 +67,10 @@ namespace wrench {
 
         /* For each task, estimate its execution time in minutes */
         std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_minutes;
-        for (auto  const &t : this->workflow->getTasks())  {
+        for (auto const &t: this->workflow->getTasks()) {
             double parallel_efficiency =
                     std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
-            double in_seconds = (t->getFlops() / core_flop_rate) /  (10 * parallel_efficiency);
+            double in_seconds = (t->getFlops() / core_flop_rate) / (10 * parallel_efficiency);
             execution_times_in_minutes[t] = 1 + std::lround(in_seconds / 60.0);
             // The +1 above is just  so that we don't cut it too tight
         }
@@ -97,12 +97,14 @@ namespace wrench {
                 ready_task2 = tmp;
             }
 
-            if (ready_task2) { WRENCH_INFO(
+            if (ready_task2) {
+                WRENCH_INFO(
                         "Creating a job to execute tasks %s (%.1lf Gflops) and task %s (%.1lf Gflops)",
                         ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0,
                         ready_task2->getID().c_str(), ready_task2->getFlops() / 1000000000.0);
-            } else { WRENCH_INFO("Creating a job to execute task %s (%.1lf Gflops)",
-                                 ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0);
+            } else {
+                WRENCH_INFO("Creating a job to execute task %s (%.1lf Gflops)",
+                            ready_task->getID().c_str(), ready_task->getFlops() / 1000000000.0);
             }
 
             /* Create a map of file locations, stating for each file
@@ -156,15 +158,17 @@ namespace wrench {
              * method, but instead calls the lower-level waitForNextExecutionEvent() method and
              * then process the event manually */
             WRENCH_INFO("Waiting for the next event");
-            
+
             try {
                 auto event = this->waitForNextEvent();
                 // Check that it is the expected event, just in  case
                 if (auto job_failed_event = std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(
-                        event)) { WRENCH_INFO("Notified of a job failure event (%s)",
-                                              job_failed_event->failure_cause->toString().c_str());
+                            event)) {
+                    WRENCH_INFO("Notified of a job failure event (%s)",
+                                job_failed_event->failure_cause->toString().c_str());
                 } else if (auto job_completed_event = std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(
-                        event)) { WRENCH_INFO("Notified of a job completion event!");
+                                   event)) {
+                    WRENCH_INFO("Notified of a job completion event!");
                 } else {
                     throw std::runtime_error("Unexpected event (" + event->toString() + ")");
                 }
@@ -177,13 +181,15 @@ namespace wrench {
              * if any, should have failed. Let's check and print some logging info */
             if (ready_task->getState() != WorkflowTask::COMPLETED) {
                 throw std::runtime_error("Task " + ready_task->getID() + "should have completed successfully!");
-            } else { WRENCH_INFO("Task %s has completed successfully :)", ready_task->getID().c_str());
+            } else {
+                WRENCH_INFO("Task %s has completed successfully :)", ready_task->getID().c_str());
             }
             if (ready_task2) {
                 if (ready_task2->getState() != WorkflowTask::READY) {
                     throw std::runtime_error("Task " + ready_task2->getID() + "should have failed");
-                } else { WRENCH_INFO("Task %s has not completed successfully :(",
-                                     ready_task2->getID().c_str());
+                } else {
+                    WRENCH_INFO("Task %s has not completed successfully :(",
+                                ready_task2->getID().c_str());
                 }
             }
         }
@@ -192,4 +198,4 @@ namespace wrench {
         return 0;
     }
 
-}
+}// namespace wrench

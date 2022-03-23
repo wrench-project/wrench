@@ -10,7 +10,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "CondorWMS.h" // WMS implementation
+#include "CondorWMS.h"// WMS implementation
 #include "wrench/tools/wfcommons/WfCommonsWorkflowParser.h"
 
 
@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
     // Create a "workflow" of independent 5-core tasks, each with some input file and an output file
     long num_tasks = 10;
     auto workflow = wrench::Workflow::createWorkflow();
-    for (int i=0; i < num_tasks; i++) {
-        auto task   = workflow->addTask("task_" + std::to_string(i), 1000.0 *1000.0*1000.00*1000.00, 5, 5, 0);
-        auto input  = workflow->addFile("task_" + std::to_string(i) + ".in", 100.0*1000*1000);
-        auto output = workflow->addFile("task_" + std::to_string(i) + ".out", 100.0*1000*1000);
+    for (int i = 0; i < num_tasks; i++) {
+        auto task = workflow->addTask("task_" + std::to_string(i), 1000.0 * 1000.0 * 1000.00 * 1000.00, 5, 5, 0);
+        auto input = workflow->addFile("task_" + std::to_string(i) + ".in", 100.0 * 1000 * 1000);
+        auto output = workflow->addFile("task_" + std::to_string(i) + ".out", 100.0 * 1000 * 1000);
         task->addInputFile(input);
         task->addOutputFile(output);
     }
@@ -75,13 +75,11 @@ int main(int argc, char **argv) {
             new wrench::HTCondorComputeService(
                     "BatchHeadNode",
                     {batch_cs},
-                    {
-                            {wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "1.0"},
-                            {wrench::HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "10.0"},
-                            {wrench::HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "10.0"},
-                            {wrench::HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "5.0"},
-                            {wrench::HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "5.0"}
-                    },
+                    {{wrench::HTCondorComputeServiceProperty::NEGOTIATOR_OVERHEAD, "1.0"},
+                     {wrench::HTCondorComputeServiceProperty::GRID_PRE_EXECUTION_DELAY, "10.0"},
+                     {wrench::HTCondorComputeServiceProperty::GRID_POST_EXECUTION_DELAY, "10.0"},
+                     {wrench::HTCondorComputeServiceProperty::NON_GRID_PRE_EXECUTION_DELAY, "5.0"},
+                     {wrench::HTCondorComputeServiceProperty::NON_GRID_POST_EXECUTION_DELAY, "5.0"}},
                     {}));
 
     // Set the default local storage service
@@ -95,7 +93,7 @@ int main(int argc, char **argv) {
     simulation->add(new wrench::FileRegistryService("WMSHost"));
 
     // Stage the input_file on the storage service
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, local_ss);
     }
 
@@ -105,7 +103,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation execution finished at time " << workflow->getCompletionDate() << "\n";
     std::cerr << "(run with --log=custom_wms.threshold=info to see WMS log)\n";
 
-//    delete simulation;
+    //    delete simulation;
 
     return 0;
 }

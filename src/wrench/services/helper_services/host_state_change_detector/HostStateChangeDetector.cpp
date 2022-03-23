@@ -30,7 +30,6 @@ void wrench::HostStateChangeDetector::cleanup(bool has_returned_from_main, int r
     // Unregister the callback!
     simgrid::s4u::Host::on_state_change.disconnect(this->on_state_change_call_back_id);
     simgrid::s4u::Host::on_speed_change.disconnect(this->on_speed_change_call_back_id);
-
 }
 
 
@@ -51,8 +50,7 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
                                                          bool notify_when_turned_on, bool notify_when_turned_off, bool notify_when_speed_change,
                                                          std::shared_ptr<S4U_Daemon> creator,
                                                          simgrid::s4u::Mailbox *mailbox_to_notify,
-                                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list) :
-        Service(host_on_which_to_run, "host_state_change_detector") {
+                                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list) : Service(host_on_which_to_run, "host_state_change_detector") {
     this->hosts_to_monitor = hosts_to_monitor;
     this->notify_when_turned_on = notify_when_turned_on;
     this->notify_when_turned_off = notify_when_turned_off;
@@ -74,7 +72,6 @@ wrench::HostStateChangeDetector::HostStateChangeDetector(std::string host_on_whi
             [this](simgrid::s4u::Host const &h) {
                 this->hostSpeedChangeCallback(h.get_name());
             });
-
 }
 
 void wrench::HostStateChangeDetector::hostStateChangeCallback(std::string const &hostname) {
@@ -148,8 +145,6 @@ int wrench::HostStateChangeDetector::main() {
                         hostname.c_str());
             S4U_Mailbox::dputMessage(this->mailbox_to_notify, msg);
         }
-
-
     }
     return 0;
 }

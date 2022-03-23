@@ -26,7 +26,6 @@ namespace wrench {
     class ExecutionEvent {
 
     public:
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -47,15 +46,13 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
-
     };
 
-};
+};// namespace wrench
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
-
-#endif //WRENCH_EXECUTIONEVENT_H
+#endif//WRENCH_EXECUTIONEVENT_H

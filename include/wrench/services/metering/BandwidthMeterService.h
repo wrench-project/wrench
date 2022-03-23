@@ -41,6 +41,6 @@ namespace wrench {
         std::map<std::string, double> measurement_periods;
         std::map<std::string, double> time_to_next_measurement;
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_BANDWIDTHMETERSERVICE_H
+#endif//WRENCH_BANDWIDTHMETERSERVICE_H
