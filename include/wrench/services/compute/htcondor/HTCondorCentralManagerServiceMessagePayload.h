@@ -30,6 +30,6 @@ namespace wrench {
     /***********************/
     /** \endcond INTERNAL  */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGEPAYLOAD_H

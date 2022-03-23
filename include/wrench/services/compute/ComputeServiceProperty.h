@@ -21,6 +21,6 @@ namespace wrench {
     class ComputeServiceProperty : public ServiceProperty {
     public:
     };
-};
+};// namespace wrench
 
-#endif //WRENCH_COMPUTESERVICEPROPERTY_H
+#endif//WRENCH_COMPUTESERVICEPROPERTY_H

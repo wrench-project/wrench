@@ -34,24 +34,22 @@ namespace wrench {
 
     class MessageManager {
 
-        static std::unordered_map<std::string,std::unordered_set<SimulationMessage*>> mailbox_messages;
+        static std::unordered_map<std::string, std::unordered_set<SimulationMessage *>> mailbox_messages;
 
     public:
-
-        static void manageMessage(const std::string &mailbox, SimulationMessage* msg);
+        static void manageMessage(const std::string &mailbox, SimulationMessage *msg);
         static void cleanUpMessages(const std::string &mailbox);
         static void removeReceivedMessage(const std::string &mailbox, SimulationMessage *msg);
         static void cleanUpAllMessages();
         static void print();
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
 
-#endif //WRENCH_MESSAGEMANAGER_H
+#endif//WRENCH_MESSAGEMANAGER_H
 
-#endif //MESSAGE_MANAGER
+#endif//MESSAGE_MANAGER

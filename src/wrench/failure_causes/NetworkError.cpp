@@ -19,7 +19,6 @@ WRENCH_LOG_CATEGORY(wrench_core_network_error, "Log category for NetworkError");
 namespace wrench {
 
 
-
     /**
      * @brief Constructor
      *
@@ -92,5 +91,4 @@ namespace wrench {
     }
 
 
-
-}
+}// namespace wrench

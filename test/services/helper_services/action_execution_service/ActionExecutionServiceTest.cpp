@@ -116,7 +116,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -129,12 +128,10 @@ class ActionExecutionServiceOneActionSuccessTestWMS : public wrench::ExecutionCo
 
 public:
     ActionExecutionServiceOneActionSuccessTestWMS(ActionExecutionServiceTest *test,
-                                                  std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -209,7 +206,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -229,16 +226,15 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionSuccessTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 /**********************************************************************/
@@ -250,13 +246,11 @@ class ActionExecutionServiceOneActionTerminateTestWMS : public wrench::Execution
 
 public:
     ActionExecutionServiceOneActionTerminateTestWMS(ActionExecutionServiceTest *test,
-                                                    std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                    std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -330,7 +324,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -350,16 +344,15 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionTerminateTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 
@@ -373,12 +366,10 @@ class ActionExecutionServiceOneActionCrashRestartTestWMS : public wrench::Execut
 public:
     ActionExecutionServiceOneActionCrashRestartTestWMS(ActionExecutionServiceTest *test,
                                                        std::shared_ptr<wrench::Workflow> workflow,
-                                                       std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -499,7 +490,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -519,16 +510,15 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, this->workflow, "Host1")));
+                            new ActionExecutionServiceOneActionCrashRestartTestWMS(this, this->workflow, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 
@@ -541,12 +531,10 @@ class ActionExecutionServiceOneActionCrashNoRestartTestWMS : public wrench::Exec
 
 public:
     ActionExecutionServiceOneActionCrashNoRestartTestWMS(ActionExecutionServiceTest *test,
-                                                         std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -627,7 +615,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -647,16 +635,15 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionCrashNoRestartTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 
@@ -669,12 +656,10 @@ class ActionExecutionServiceOneActionFailureTestWMS : public wrench::ExecutionCo
 
 public:
     ActionExecutionServiceOneActionFailureTestWMS(ActionExecutionServiceTest *test,
-                                                  std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                  std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -739,7 +724,7 @@ private:
         }
 
         // Is the failure cause sensible?
-        if (not (std::dynamic_pointer_cast<wrench::NetworkError>(action->getFailureCause()))) {
+        if (not(std::dynamic_pointer_cast<wrench::NetworkError>(action->getFailureCause()))) {
             throw std::runtime_error("Unexpected failure cause");
         }
 
@@ -759,7 +744,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -779,16 +764,15 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 
@@ -801,12 +785,10 @@ class ActionExecutionServiceOneActionNotEnoughResourcesTestWMS : public wrench::
 
 public:
     ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(ActionExecutionServiceTest *test,
-                                                             std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -830,15 +812,15 @@ private:
         auto job = job_manager->createCompoundJob("my_job");
 
         // Add two compute actions with too high requirements to it
-        auto action1 = job->addComputeAction("my_compute_1", 100.0, 200.0, 1,1, wrench::ParallelModel::AMDAHL(1.0));
-        auto action2 = job->addComputeAction("my_compute_2", 100.0, 80.0, 5,5, wrench::ParallelModel::AMDAHL(1.0));
+        auto action1 = job->addComputeAction("my_compute_1", 100.0, 200.0, 1, 1, wrench::ParallelModel::AMDAHL(1.0));
+        auto action2 = job->addComputeAction("my_compute_2", 100.0, 80.0, 5, 5, wrench::ParallelModel::AMDAHL(1.0));
 
         // Submit the actions to the action executor
         try {
             action_execution_service->submitAction(action1);
             throw std::runtime_error("Should not have been able to submit action 1");
         } catch (wrench::ExecutionException &e) {
-            if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
+            if (not(std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
                 throw std::runtime_error("Unexpected failure cause");
             }
         }
@@ -846,7 +828,7 @@ private:
             action_execution_service->submitAction(action2);
             throw std::runtime_error("Should not have been able to submit action 2");
         } catch (wrench::ExecutionException &e) {
-            if (not (std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
+            if (not(std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause()))) {
                 throw std::runtime_error("Unexpected failure cause");
             }
         }
@@ -867,7 +849,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -887,16 +869,15 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
+                            new ActionExecutionServiceOneActionNotEnoughResourcesTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 /**********************************************************************/
@@ -908,12 +889,10 @@ class ActionExecutionServiceThreeActionsInSequenceTestWMS : public wrench::Execu
 
 public:
     ActionExecutionServiceThreeActionsInSequenceTestWMS(ActionExecutionServiceTest *test,
-                                                        std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     ActionExecutionServiceTest *test;
 
     int main() {
@@ -1003,7 +982,7 @@ private:
         }
 
         // Are the dates sensible?
-        if (action1->getStartDate() > EPSILON )
+        if (action1->getStartDate() > EPSILON)
             throw std::runtime_error("Unexpected action1 start date " + std::to_string(action1->getStartDate()));
         if ((action1->getEndDate() < 10.0 - EPSILON) or (action1->getEndDate() > 10.0 + EPSILON))
             throw std::runtime_error("Unexpected action1 end date " + std::to_string(action1->getEndDate()));
@@ -1033,7 +1012,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -1053,14 +1032,13 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
+                            new ActionExecutionServiceThreeActionsInSequenceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }

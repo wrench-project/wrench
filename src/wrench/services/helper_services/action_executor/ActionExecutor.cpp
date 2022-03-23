@@ -41,9 +41,8 @@ namespace wrench {
             double thread_creation_overhead,
             bool simulate_computation_as_sleep,
             simgrid::s4u::Mailbox *callback_mailbox,
-            std::shared_ptr <Action> action,
-            std::shared_ptr<ActionExecutionService> action_execution_service) :
-            ExecutionController(hostname, "action_executor") {
+            std::shared_ptr<Action> action,
+            std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
 
         if (action == nullptr) {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");
@@ -126,7 +125,7 @@ namespace wrench {
      */
     int ActionExecutor::main() {
 
-        S4U_Simulation::computeZeroFlop(); // to block in case pstate speed is 0
+        S4U_Simulation::computeZeroFlop();// to block in case pstate speed is 0
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
         WRENCH_INFO("New Action Executor started to do action %s", this->action->getName().c_str());
@@ -141,7 +140,7 @@ namespace wrench {
             this->action->setState(Action::State::FAILED);
             this->action->setFailureCause(e.getCause());
         }
-        for (auto const &child : this->action->getChildren()) {
+        for (auto const &child: this->action->getChildren()) {
             child->updateState();
         }
         this->action->setEndDate(S4U_Simulation::getClock());
@@ -150,7 +149,7 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
-        } catch (std::shared_ptr <NetworkError> &cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_INFO("Action executor can't report back due to network error.. oh well!");
         }
         WRENCH_INFO("Action executor for action %s terminating!", this->action->getName().c_str());
@@ -198,4 +197,4 @@ namespace wrench {
     std::shared_ptr<ActionExecutionService> ActionExecutor::getActionExecutionService() const {
         return this->action_execution_service;
     }
-}
+}// namespace wrench

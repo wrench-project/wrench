@@ -32,7 +32,6 @@ namespace wrench {
     class ActionExecutor : public ExecutionController {
 
     public:
-
         ActionExecutor(
                 std::string hostname,
                 unsigned long num_cores,
@@ -57,7 +56,6 @@ namespace wrench {
         bool getSimulateComputationAsSleep();
 
     private:
-
         std::shared_ptr<Action> action;
         std::shared_ptr<ActionExecutionService> action_execution_service;
         simgrid::s4u::Mailbox *callback_mailbox;
@@ -68,13 +66,12 @@ namespace wrench {
 
         unsigned long num_cores;
         double ram_footprint;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_ACTION_EXECUTOR_H
+#endif//WRENCH_ACTION_EXECUTOR_H

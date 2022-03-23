@@ -34,17 +34,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FunctionalityNotAvailable(std::shared_ptr<Service>  service, std::string functionality_name);
+        FunctionalityNotAvailable(std::shared_ptr<Service> service, std::string functionality_name);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<Service>  getService();
+        std::shared_ptr<Service> getService();
         std::string getFunctionalityName();
         std::string toString() override;
 
     private:
-        std::shared_ptr<Service>  service;
+        std::shared_ptr<Service> service;
         std::string functionality_name;
     };
 
@@ -52,7 +52,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FUNCTIONALITY_NOT_AVAILABLE_H
+#endif//WRENCH_FUNCTIONALITY_NOT_AVAILABLE_H

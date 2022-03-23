@@ -20,8 +20,8 @@
 WRENCH_LOG_CATEGORY(simple_storage_service_performance_test, "Log category for SimpleStorageServicePerformanceTest");
 
 
-#define FILE_SIZE (10*1000*1000*1000.00) // 10 GB
-#define MBPS_BANDWIDTH 100               // 100 MB
+#define FILE_SIZE (10 * 1000 * 1000 * 1000.00)// 10 GB
+#define MBPS_BANDWIDTH 100                    // 100 MB
 #define STORAGE_SIZE (100.0 * FILE_SIZE)
 
 class SimpleStorageServicePerformanceTest : public ::testing::Test {
@@ -75,7 +75,6 @@ public:
 
 
 protected:
-
     ~SimpleStorageServicePerformanceTest() {
         workflow->clear();
     }
@@ -96,25 +95,30 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SrcHost\" speed=\"1f\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
+                          "          <disk id=\"large_disk\" read_bw=\"" +
+                          std::to_string(MBPS_BANDWIDTH) +
                           "MBps\" write_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
                           "MBps\">"
-                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +
+                          "             <prop id=\"size\" value=\"" +
+                          std::to_string(STORAGE_SIZE) +
                           "B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"DstHost\" speed=\"1f\"> "
-                          "          <disk id=\"large_disk\" read_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
+                          "          <disk id=\"large_disk\" read_bw=\"" +
+                          std::to_string(MBPS_BANDWIDTH) +
                           "MBps\" write_bw=\"" + std::to_string(MBPS_BANDWIDTH) +
                           "MBps\">"
-                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) +
+                          "             <prop id=\"size\" value=\"" +
+                          std::to_string(STORAGE_SIZE) +
                           "B\"/>"
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host>"
                           "       <host id=\"WMSHost\" speed=\"1f\"/> "
-                          "       <link id=\"link\" bandwidth=\"" + std::to_string(MBPS_BANDWIDTH) +
+                          "       <link id=\"link\" bandwidth=\"" +
+                          std::to_string(MBPS_BANDWIDTH) +
                           "MBps\" latency=\"1us\"/>"
                           "       <route src=\"SrcHost\" dst=\"DstHost\">"
                           "         <link_ctn id=\"link\"/>"
@@ -131,7 +135,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -148,12 +151,10 @@ class SimpleStorageServiceConcurrentFileCopiesTestWMS : public wrench::Execution
 public:
     SimpleStorageServiceConcurrentFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
                                                     std::string hostname,
-                                                    double buffer_size) :
-            wrench::ExecutionController(hostname, "test"), test(test), buffer_size(buffer_size) {
+                                                    double buffer_size) : wrench::ExecutionController(hostname, "test"), test(test), buffer_size(buffer_size) {
     }
 
 private:
-
     SimpleStorageServicePerformanceTest *test;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
     double buffer_size;
@@ -215,8 +216,7 @@ private:
                         MBPS_BANDWIDTH * 1000 * 1000,
                         0.92 * MBPS_BANDWIDTH * 1000 * 1000,
                         MBPS_BANDWIDTH * 1000 * 1000,
-                        FILE_SIZE, buffer_size
-                );
+                        FILE_SIZE, buffer_size);
 
         if (std::abs(transfer_time_1 - expected_transfer_time_1) > 1.0) {
             throw std::runtime_error("Unexpected transfer time #1 " + std::to_string(transfer_time_1) +
@@ -229,8 +229,7 @@ private:
                         MBPS_BANDWIDTH * 1000 * 1000 / 2,
                         0.92 * MBPS_BANDWIDTH * 1000 * 1000 / 2,
                         MBPS_BANDWIDTH * 1000 * 1000 / 2,
-                        FILE_SIZE, buffer_size
-                );
+                        FILE_SIZE, buffer_size);
 
         if (std::abs(transfer_time_2 - expected_transfer_time_2) > 1.0) {
             throw std::runtime_error("Unexpected transfer time #2 " + std::to_string(transfer_time_2) +
@@ -243,12 +242,12 @@ private:
 
 TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
     DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, DBL_MAX)
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/2);
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/10);
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/10 + FILE_SIZE / 3);
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/20);
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/50);
-    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE/100);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 2);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 10);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 10 + FILE_SIZE / 3);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 20);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 50);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ConcurrentFileCopies_test, FILE_SIZE / 100);
 }
 
 void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double buffer_size) {
@@ -266,22 +265,22 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
 
     // Create a (unused) Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("WMSHost",
-                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, {})));
+                            new wrench::BareMetalComputeService("WMSHost",
+                                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))}, {})));
 
     // Create Two Storage Services
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("SrcHost", {"/"},
-                                             {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
+                            new wrench::SimpleStorageService("SrcHost", {"/"},
+                                                             {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-            new wrench::SimpleStorageService("DstHost", {"/"},
-                                             {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
+                            new wrench::SimpleStorageService("DstHost", {"/"},
+                                                             {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleStorageServiceConcurrentFileCopiesTestWMS(
-                    this, "WMSHost", buffer_size)));
+                            new SimpleStorageServiceConcurrentFileCopiesTestWMS(
+                                    this, "WMSHost", buffer_size)));
 
     // Create a file registry
     simulation->add(new wrench::FileRegistryService("WMSHost"));
@@ -295,11 +294,10 @@ void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test(double bu
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -311,12 +309,10 @@ class SimpleStorageServiceFileReadTestWMS : public wrench::ExecutionController {
 public:
     SimpleStorageServiceFileReadTestWMS(SimpleStorageServicePerformanceTest *test,
                                         std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                        std::string hostname, double buffer_size) :
-            wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service), buffer_size(buffer_size) {
+                                        std::string hostname, double buffer_size) : wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service), buffer_size(buffer_size) {
     }
 
 private:
-
     SimpleStorageServicePerformanceTest *test;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service;
     double buffer_size;
@@ -355,13 +351,13 @@ private:
 
 TEST_F(SimpleStorageServicePerformanceTest, FileRead) {
     DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, DBL_MAX);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/2);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/10);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/10 + FILE_SIZE / 3);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/20);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/50);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/100);
-    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE/200);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 2);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 10);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 10 + FILE_SIZE / 3);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 20);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 50);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 100);
+    DO_TEST_WITH_FORK_ONE_ARG(do_FileRead_test, FILE_SIZE / 200);
 }
 
 
@@ -380,17 +376,15 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
 
     // Create A Storage Service
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("SrcHost", {"/"}, {
-                    {wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}
-            })));
+                            new wrench::SimpleStorageService("SrcHost", {"/"}, {{wrench::StorageServiceProperty::BUFFER_SIZE, std::to_string(buffer_size)}})));
 
     auto file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost"));
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SimpleStorageServiceFileReadTestWMS(
-                    this, file_registry_service,
-                    "WMSHost", buffer_size)));
+                            new SimpleStorageServiceFileReadTestWMS(
+                                    this, file_registry_service,
+                                    "WMSHost", buffer_size)));
 
     // Create a file registry
 
@@ -403,7 +397,7 @@ void SimpleStorageServicePerformanceTest::do_FileRead_test(double buffer_size) {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

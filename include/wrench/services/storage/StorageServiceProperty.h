@@ -22,7 +22,6 @@ namespace wrench {
     class StorageServiceProperty : public ServiceProperty {
 
     public:
-
         /** @brief Buffer size used when copying/communicating data:
          *  - "infinity": full buffering (read/write and forward model)
          *  - "0": an ideal fluid model
@@ -32,7 +31,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(BUFFER_SIZE);
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_STORAGESERVICEPROPERTY_H
+#endif//WRENCH_STORAGESERVICEPROPERTY_H

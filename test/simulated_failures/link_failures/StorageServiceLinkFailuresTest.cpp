@@ -31,7 +31,7 @@ class StorageServiceLinkFailuresTest : public ::testing::Test {
 public:
     std::shared_ptr<wrench::Workflow> workflow;
 
-    std::vector<std::shared_ptr<wrench::DataFile> > files;
+    std::vector<std::shared_ptr<wrench::DataFile>> files;
     std::vector<std::shared_ptr<wrench::StorageService>> storage_services;
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
 
@@ -49,17 +49,19 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> ";
 
-        for (int host=0; host < 4; host++) {
+        for (int host = 0; host < 4; host++) {
             xml +=
                     "       <host id=\"Host" + std::to_string(host) + "\" speed=\"1f\" core=\"10\"> ";
             for (int i = 0; i < NUM_STORAGE_SERVICES; i++) {
                 xml +=
                         "          <disk id=\"large_disk" + std::to_string(i) +
                         "\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                        "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SERVICE_CAPACITY) +
+                        "             <prop id=\"size\" value=\"" +
+                        std::to_string(STORAGE_SERVICE_CAPACITY) +
                         "B\"/>"
-                        "             <prop id=\"mount\" value=\"/disk" + std::to_string(i) + "/\"/>"
-                                                                                              "          </disk>";
+                        "             <prop id=\"mount\" value=\"/disk" +
+                        std::to_string(i) + "/\"/>"
+                                            "          </disk>";
             }
 
             xml +=
@@ -88,7 +90,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -99,14 +100,12 @@ class StorageServiceLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceLinkFailuresTestWMS(StorageServiceLinkFailuresTest *test,
-                                      std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                      std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->rng.seed(666);
     }
 
 private:
-
     std::mt19937 rng;
 
     StorageServiceLinkFailuresTest *test;
@@ -114,7 +113,7 @@ private:
     std::shared_ptr<wrench::DataMovementManager> data_movement_manager;
 
     std::shared_ptr<wrench::DataFile> findRandomFileOnStorageService(std::shared_ptr<wrench::StorageService> ss) {
-        std::uniform_int_distribution<unsigned long> dist_files(0, this->test->files.size()-1);
+        std::uniform_int_distribution<unsigned long> dist_files(0, this->test->files.size() - 1);
 
         for (int trial = 0; trial < NUM_FILES; trial++) {
             auto potential_file = this->test->files.at(dist_files(rng));
@@ -128,7 +127,7 @@ private:
     void doRandomSynchronousFileCopy() {
 
         std::uniform_int_distribution<unsigned long> dist_storage(
-                0, this->test->storage_services.size()-1);
+                0, this->test->storage_services.size() - 1);
 
         auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         auto destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
@@ -146,7 +145,7 @@ private:
     void doRandomAsynchronousFileCopy() {
 
         std::uniform_int_distribution<unsigned long> dist_storage(
-                0, this->test->storage_services.size()-1);
+                0, this->test->storage_services.size() - 1);
 
         auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         auto destination = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
@@ -178,13 +177,12 @@ private:
         if (auto real_event = std::dynamic_pointer_cast<wrench::FileCopyFailedEvent>(event)) {
             throw wrench::ExecutionException(real_event->failure_cause);
         }
-
     }
 
     void doRandomFileDelete() {
 
         std::uniform_int_distribution<unsigned long> dist_storage(
-                0, this->test->storage_services.size()-1);
+                0, this->test->storage_services.size() - 1);
 
         auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         auto file = findRandomFileOnStorageService(source->getStorageService());
@@ -196,14 +194,14 @@ private:
             throw std::runtime_error("There should be a single disk!");
         }
         if (space.begin()->second < STORAGE_SERVICE_CAPACITY * .25) {
-            wrench::StorageService::deleteFile(file, source,  this->test->file_registry_service);
+            wrench::StorageService::deleteFile(file, source, this->test->file_registry_service);
         }
     }
 
     void doRandomFileRead() {
 
         std::uniform_int_distribution<unsigned long> dist_storage(
-                0, this->test->storage_services.size()-1);
+                0, this->test->storage_services.size() - 1);
 
         auto source = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         auto file = findRandomFileOnStorageService(source->getStorageService());
@@ -215,10 +213,10 @@ private:
     }
 
     void doRandomFileWrite() {
-        static unsigned int count=0;
+        static unsigned int count = 0;
 
         std::uniform_int_distribution<unsigned long> dist_storage(
-                0, this->test->storage_services.size()-1);
+                0, this->test->storage_services.size() - 1);
 
         auto dest = wrench::FileLocation::LOCATION(this->test->storage_services.at(dist_storage(rng)));
         auto file = this->test->workflow->addFile("written_file_" + std::to_string(count++), FILE_SIZE);
@@ -226,7 +224,6 @@ private:
         wrench::StorageService::deleteFile(file, dest);
     }
 
-    
 
     int main() {
 
@@ -235,14 +232,14 @@ private:
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 1045, 1, 5,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
         switcher1->setSimulation(this->simulation);
-        switcher1->start(switcher1, true, false); // Daemonized, no auto-restart
+        switcher1->start(switcher1, true, false);// Daemonized, no auto-restart
 
         // Create a link switcher on/off er for link2
         auto switcher2 = std::shared_ptr<wrench::ResourceRandomRepeatSwitcher>(
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 234, 1, 15, 1, 5,
                                                          "link2", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
         switcher2->setSimulation(this->simulation);
-        switcher2->start(switcher2, true, false); // Daemonized, no auto-restart
+        switcher2->start(switcher2, true, false);// Daemonized, no auto-restart
 
 
         this->data_movement_manager = this->createDataMovementManager();
@@ -254,7 +251,7 @@ private:
 
         // Do a bunch of operations
         unsigned long NUM_TRIALS = 5000;
-        for (unsigned long i=0; i < NUM_TRIALS; i++) {
+        for (unsigned long i = 0; i < NUM_TRIALS; i++) {
 
             // Do a random synchronous file copy
             try {
@@ -330,10 +327,10 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc =1;
+    int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -376,44 +373,41 @@ void StorageServiceLinkFailuresTest::do_StorageServiceLinkFailureSimpleRandom_Te
 
     file_registry_service = simulation->add(
             new wrench::FileRegistryService("Host1",
-                                            {
-                                                    {wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"},
-                                                    {wrench::FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST, "0"},
-                                                    {wrench::FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0"}
-                                            },
-                                            {
-                                                    {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
-                                                    {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
-                                                    {wrench::FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
-                                                    {wrench::FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
-                                                    {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, message_payload},
-                                                    {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, message_payload}
-                                            }));
+                                            {{wrench::FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0"},
+                                             {wrench::FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST, "0"},
+                                             {wrench::FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0"}},
+                                            {{wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
+                                             {wrench::FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
+                                             {wrench::FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD, message_payload},
+                                             {wrench::FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD, message_payload},
+                                             {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, message_payload},
+                                             {wrench::FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, message_payload}}));
 
     // Create a bunch of file
-    for (unsigned int i=0; i < NUM_FILES; i++) {
-        files.push_back(workflow->addFile("file_" + std::to_string(i) , FILE_SIZE));
+    for (unsigned int i = 0; i < NUM_FILES; i++) {
+        files.push_back(workflow->addFile("file_" + std::to_string(i), FILE_SIZE));
     }
 
     // Stage some files randomly on storage services
-    std::uniform_int_distribution<int> dist_stage(0,4);
+    std::uniform_int_distribution<int> dist_stage(0, 4);
     std::mt19937 rng(666);
-    for (auto const &ss : storage_services) {
-        for (auto const &f : files) {
+    for (auto const &ss: storage_services) {
+        for (auto const &f: files) {
             if (not dist_stage(rng)) {
                 simulation->stageFile(f, ss);
             }
         }
     }
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(
             new StorageServiceLinkFailuresTestWMS(
                     this, "Host1"));
 
     simulation->launch();
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

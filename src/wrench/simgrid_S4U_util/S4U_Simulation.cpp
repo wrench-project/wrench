@@ -84,7 +84,7 @@ namespace wrench {
      */
     void S4U_Simulation::checkLinkBandwidths() {
         auto links = this->engine->get_all_links();
-        for (auto const &l : links) {
+        for (auto const &l: links) {
             if (l->get_bandwidth() <= 0) {
                 throw std::invalid_argument("XML Platform error: link " +
                                             l->get_name() + " has zero bandwidth");
@@ -120,7 +120,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void S4U_Simulation::setupPlatform(const std::function<void()>& creation_function) {
+    void S4U_Simulation::setupPlatform(const std::function<void()> &creation_function) {
         try {
             creation_function();
         } catch (std::exception &e) {
@@ -148,7 +148,7 @@ namespace wrench {
     std::vector<std::string> S4U_Simulation::getAllHostnames() {
         std::vector<simgrid::s4u::Host *> host_list = simgrid::s4u::Engine::get_instance()->get_all_hosts();
         std::vector<std::string> hostname_list;
-        for (auto h : host_list) {
+        for (auto h: host_list) {
             // Ignore VMs!
             if (S4U_VirtualMachine::vm_to_pm_map.find(h->get_name()) != S4U_VirtualMachine::vm_to_pm_map.end()) {
                 continue;
@@ -167,7 +167,7 @@ namespace wrench {
         std::vector<simgrid::s4u::Link *> link_list = simgrid::s4u::Engine::get_instance()->get_all_links();
         std::vector<std::string> linkname_list;
         linkname_list.reserve(link_list.size());
-        for (auto h : link_list) {
+        for (auto h: link_list) {
             linkname_list.push_back(h->get_name());
         }
         return linkname_list;
@@ -181,8 +181,7 @@ namespace wrench {
      */
     double S4U_Simulation::getLinkBandwidth(std::string name) {
         auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
-                [name](simgrid::s4u::Link *l) { return (l->get_name() == name);}
-        );
+                [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
         if (links.empty()) {
             throw std::invalid_argument("S4U_Simulation::getLinkBandwidth(): unknown link " + name);
         }
@@ -197,8 +196,7 @@ namespace wrench {
      */
     double S4U_Simulation::getLinkUsage(std::string name) {
         auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
-                [name](simgrid::s4u::Link *l) { return (l->get_name() == name);}
-        );
+                [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
         if (links.empty()) {
             throw std::invalid_argument("S4U_Simulation::getLinkUsage(): unknown link " + name);
         }
@@ -206,8 +204,7 @@ namespace wrench {
     }
 
 
-
-/**
+    /**
  * @brief Get the by-cluster structure of the platform
  * @return a map of all cluster names and their associated hostname list
  */
@@ -218,11 +215,11 @@ namespace wrench {
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
 
         clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
-        for (auto c : clusters) {
+        for (auto c: clusters) {
             std::vector<simgrid::s4u::Host *> host_list = c->get_all_hosts();
             std::vector<std::string> hostname_list;
             hostname_list.reserve(host_list.size());
-            for (auto h : host_list) {
+            for (auto h: host_list) {
                 hostname_list.push_back(std::string(h->get_cname()));
             }
             result.insert({c->get_name(), hostname_list});
@@ -231,7 +228,7 @@ namespace wrench {
         return result;
     }
 
-/**
+    /**
  * @brief Determines whether a host exists for a given hostname
  * @param hostname: the name of the host
  * @return true or false
@@ -240,7 +237,7 @@ namespace wrench {
         return (simgrid::s4u::Host::by_name_or_null(hostname) != nullptr);
     }
 
-/**
+    /**
  * @brief Determines whether a link exists for a given linkname
  * @param linkname: the name of the link
  * @return true or false
@@ -249,7 +246,7 @@ namespace wrench {
         return (simgrid::s4u::Link::by_name_or_null(linkname) != nullptr);
     }
 
-/**
+    /**
  * @brief Get the number of cores of a host
  *
  * @param hostname: the name of the host
@@ -265,7 +262,7 @@ namespace wrench {
         return (unsigned int) host->get_core_count();
     }
 
-/**
+    /**
  * @brief Get the number of cores of the current host
  * @return a number of cores
  */
@@ -273,7 +270,7 @@ namespace wrench {
         return simgrid::s4u::Host::current()->get_core_count();
     }
 
-/**
+    /**
  * @brief Get the flop rate of a host
  *
  * @param hostname: the name of the host
@@ -289,7 +286,7 @@ namespace wrench {
         return host->get_speed();
     }
 
-/**
+    /**
  * @brief Returns whether a host is on or not
  *
  * @param hostname: the name of the host
@@ -305,7 +302,7 @@ namespace wrench {
         return host->is_on();
     }
 
-/**
+    /**
  * @brief Turn off a host
  *
  * @param hostname: the name of the host to turn off
@@ -320,7 +317,7 @@ namespace wrench {
         host->turn_off();
     }
 
-/**
+    /**
  * @brief Turn on a host
  *
  * @param hostname: the name of the host to turn on
@@ -335,7 +332,7 @@ namespace wrench {
         host->turn_on();
     }
 
-/**
+    /**
 * @brief Returns whether a link is on or not
 *
 * @param linkname: the name of the link
@@ -351,7 +348,7 @@ namespace wrench {
         return link->is_on();
     }
 
-/**
+    /**
  * @brief Turn off a link
  *
  * @param linkname: the name of the link to turn off
@@ -366,7 +363,7 @@ namespace wrench {
         link->turn_off();
     }
 
-/**
+    /**
  * @brief Turn on a link
  *
  * @param linkname: the name of the link to turn on
@@ -381,7 +378,7 @@ namespace wrench {
         link->turn_on();
     }
 
-/**
+    /**
  * @brief Get the flop rate of the current host
  *
  * @return the flop rate in floating point operations per second
@@ -389,10 +386,10 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     double S4U_Simulation::getFlopRate() {
-        return simgrid::s4u::Host::current()->get_speed(); // changed it to speed of the current pstate
+        return simgrid::s4u::Host::current()->get_speed();// changed it to speed of the current pstate
     }
 
-/**
+    /**
  * @brief Get the current simulation date
  *
  * @return the simulation clock
@@ -401,7 +398,7 @@ namespace wrench {
         return simgrid::s4u::Engine::get_clock();
     }
 
-/**
+    /**
  * @brief Simulates a computation on host on which the calling actor is running
  * @param flops: the number of flops
  */
@@ -422,20 +419,20 @@ namespace wrench {
                                                 double sequential_work,
                                                 double parallel_per_thread_work) {
         // Overhead
-        S4U_Simulation::sleep((int)num_threads * thread_creation_overhead);
+        S4U_Simulation::sleep((int) num_threads * thread_creation_overhead);
         if (num_threads == 1) {
             simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
         } else {
             // Launch compute-heavy thread
             auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
             // Launch all other threads
-            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work,(int)num_threads - 1);
+            simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, (int) num_threads - 1);
             // Wait for the compute-heavy thread
             bottleneck_thread->wait();
         }
     }
 
-/**
+    /**
  * @brief Simulates a disk write
  *
  * @param num_bytes: number of bytes to write
@@ -443,7 +440,7 @@ namespace wrench {
  * @param mount_point: mount point
  */
     void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
-        mount_point  = FileLocation::sanitizePath(mount_point);
+        mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
@@ -452,7 +449,7 @@ namespace wrench {
         }
 
         auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
-        for (auto disk : disk_list) {
+        for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
             if (disk_mountpoint == mount_point) {
@@ -465,7 +462,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Read from a local disk and write to a local disk concurrently
  *
  * @param num_bytes_to_read: number of bytes to read
@@ -488,7 +485,7 @@ namespace wrench {
         simgrid::s4u::Disk *write_disk = nullptr;
 
         auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
-        for (auto disk : disk_list) {
+        for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
             if (disk_mountpoint == read_mount_point) {
@@ -506,12 +503,10 @@ namespace wrench {
         write_disk->write(num_bytes_to_write);
         // Wait for asychronous read to be done
         read_activity->wait();
-
-
     }
 
 
-/**
+    /**
  * @brief Simulates a disk read
  *
  * @param num_bytes: number of bytes to read
@@ -519,7 +514,7 @@ namespace wrench {
  * @param mount_point: mount point
  */
     void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
-        mount_point  = FileLocation::sanitizePath(mount_point);
+        mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
@@ -529,7 +524,7 @@ namespace wrench {
         }
 
         auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
-        for (auto disk : disk_list) {
+        for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
 
@@ -543,8 +538,7 @@ namespace wrench {
     }
 
 
-
-/**
+    /**
  * @brief Simulates a sleep
  * @param duration: the number of seconds to sleep
  */
@@ -552,14 +546,14 @@ namespace wrench {
         simgrid::s4u::this_actor::sleep_for(duration);
     }
 
-/**
+    /**
  * @brief Simulates a yield
  */
     void S4U_Simulation::yield() {
         simgrid::s4u::this_actor::yield();
     }
 
-/**
+    /**
  * @brief Get the memory_manager_service capacity of a host given a hostname
  * @param hostname: the name of the host
  * @return a memory_manager_service capacity in bytes
@@ -572,7 +566,7 @@ namespace wrench {
         return getHostMemoryCapacity(host);
     }
 
-/**
+    /**
  * @brief Get the memory_manager_service capacity of the current host
  * @return a memory_manager_service capacity in bytes
  */
@@ -580,7 +574,7 @@ namespace wrench {
         return getHostMemoryCapacity(simgrid::s4u::Host::current());
     }
 
-/**
+    /**
  * @brief Get the memory_manager_service capacity of a S4U host
  * @param host: the host
  * @return a memory_manager_service capacity in bytes
@@ -595,7 +589,7 @@ namespace wrench {
         std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory_manager_service", "Memory", "MEMORY"};
         double capacity_value = S4U_Simulation::DEFAULT_RAM;
 
-        for (auto const &tag : tags) {
+        for (auto const &tag: tags) {
             const char *capacity_string = host->get_property(tag);
             if (capacity_string) {
                 if (capacity_value != S4U_Simulation::DEFAULT_RAM) {
@@ -617,7 +611,7 @@ namespace wrench {
         return capacity_value;
     }
 
-/**
+    /**
  * @brief Get the property associated to the host specified in the platform file
  * @param hostname: the host name
  * @param property_name: the property name
@@ -634,7 +628,7 @@ namespace wrench {
         return host->get_property(property_name);
     }
 
-/**
+    /**
  * @brief Set a property associated to a host specified in the platform file
  * @param hostname: the host name
  * @param property_name: the property name
@@ -648,7 +642,7 @@ namespace wrench {
         host->set_property(property_name, property_value);
     }
 
-/**
+    /**
  * @brief Get the energy consumed by the host up to now
  * @param hostname: the host name
  * @return the energy consumed by the host in Joules
@@ -666,8 +660,7 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the "
-                    "energy consumed by the host. Make sure the energy plugin is enabled (--wrench-energy-simulation)"
-            );
+                    "energy consumed by the host. Make sure the energy plugin is enabled (--wrench-energy-simulation)");
         }
         return energy_consumed;
     }
@@ -695,7 +688,7 @@ namespace wrench {
     }
 #endif
 
-/**
+    /**
  * @brief Set the power state of the host
  *
  * @param hostname: the host name
@@ -709,7 +702,7 @@ namespace wrench {
             throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
         }
         if (host->get_pstate_count() < pstate) {
-            throw std::invalid_argument("S4U_Simulation::setPstate(): Invalid pstate index (host " + hostname + " only has "  +
+            throw std::invalid_argument("S4U_Simulation::setPstate(): Invalid pstate index (host " + hostname + " only has " +
                                         std::to_string(host->get_pstate_count()) + " pstates)");
         }
         try {
@@ -718,12 +711,11 @@ namespace wrench {
             throw std::runtime_error(
                     "S4U_Simulation::setPstate(): Was not able to set the pstate of the host. "
                     "Make sure the energy is plugin is enabled (--wrench-energy-simulation) and "
-                    "the pstate is within range of pstates available to the host"
-            );
+                    "the pstate is within range of pstates available to the host");
         }
     }
 
-/**
+    /**
  * @brief Get the total number of power states of a host
  * @param hostname: the host name
  * @return The number of power states available for the host (as specified in the platform xml description file)
@@ -740,12 +732,11 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
-                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
-            );
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
         }
     }
 
-/**
+    /**
  * @brief Get the current power state of a host
  * @param hostname: the host name
  * @return The index of the current pstate of the host (as specified in the platform xml description file)
@@ -761,12 +752,11 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
-                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
-            );
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
         }
     }
 
-/**
+    /**
  * @brief Get the minimum power consumption (i.e., idling) for a host at its current pstate
  * @param hostname: the host name
  * @return The power consumption for this host if idle (as specified in the platform xml description file)
@@ -783,12 +773,11 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
-                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
-            );
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
         }
     }
 
-/**
+    /**
  * @brief Get the maximum power consumption (i.e., 100% load) for a host at its current pstate
  * @param hostname: the host name
  * @return The power consumption for this host if 100% used (as specified in the platform xml description file)
@@ -812,7 +801,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Get the list of power states available for a host
  * @param hostname: the host name
  * @return a list of power states available for the host (as specified in the platform xml description file)
@@ -835,13 +824,12 @@ namespace wrench {
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. "
-                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) "
-            );
+                    "Make sure the energy plugin is enabled (--wrench-energy-simulation) ");
         }
         return list;
     }
 
-/**
+    /**
  * @brief Compute zero flop, which take zero time but will block if the host's pstate
  *        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
  *        non-zero flop/sec speed.
@@ -853,7 +841,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Gets set of disks, i.e., mount points, available at a host
  * @param hostname: the host's name
  * @return a vector of mount points
@@ -870,7 +858,7 @@ namespace wrench {
         }
 
         std::vector<std::string> mount_points;
-        for (auto const &d : host->get_disks()) {
+        for (auto const &d: host->get_disks()) {
             // Get the disk's mount point
             const char *p = d->get_property("mount");
             if (!p) {
@@ -883,7 +871,7 @@ namespace wrench {
         return mount_points;
     }
 
-/**
+    /**
  * @brief Determines whether a mount point is defined at a host
  * @param hostname: the host's name
  * @param mount_point: the mount point
@@ -900,7 +888,7 @@ namespace wrench {
 
 
         std::set<std::string> mount_points;
-        for (auto const &d : host->get_disks()) {
+        for (auto const &d: host->get_disks()) {
             // Get the disk's mount point
             const char *p = d->get_property("mount");
             if (!p) {
@@ -936,7 +924,7 @@ namespace wrench {
         std::vector<simgrid::s4u::Link *> links;
         src->route_to(dst, links, nullptr);
         std::vector<std::string> to_return;
-        for (auto const &l : links) {
+        for (auto const &l: links) {
             to_return.push_back(l->get_name());
         }
         return to_return;
@@ -953,7 +941,7 @@ namespace wrench {
  */
     double S4U_Simulation::getDiskCapacity(std::string hostname, std::string mount_point) {
 
-//        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
+        //        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
         simgrid::s4u::Host *host;
         try {
             host = simgrid::s4u::Host::by_name(hostname);
@@ -963,7 +951,7 @@ namespace wrench {
 
         mount_point = FileLocation::sanitizePath(mount_point + "/");
 
-        for (auto const &d : host->get_disks()) {
+        for (auto const &d: host->get_disks()) {
 
 
             // Get the disk's mount point
@@ -990,7 +978,7 @@ namespace wrench {
                                                 " at host " + hostname + " has invalid size");
                 }
             } else {
-                capacity = DBL_MAX; // Default size if no size property specified
+                capacity = DBL_MAX;// Default size if no size property specified
             }
 
             return capacity;
@@ -1001,5 +989,4 @@ namespace wrench {
     }
 
 
-
-};
+};// namespace wrench

@@ -35,12 +35,11 @@ namespace wrench {
     * @param file_location: the location where the file should be deleted
     */
     FileRegistryAction::FileRegistryAction(FileRegistryAction::Type type,
-                                           const std::string& name, std::shared_ptr<CompoundJob> job,
-                                     std::shared_ptr<FileRegistryService> file_registry_service,
-                                     std::shared_ptr<DataFile>file,
-                                     std::shared_ptr<FileLocation> file_location) :
-            Action(name, "file_registry", job),
-            type(type), file_registry_service(std::move(file_registry_service)), file(std::move(file)), file_location(std::move(file_location)) {
+                                           const std::string &name, std::shared_ptr<CompoundJob> job,
+                                           std::shared_ptr<FileRegistryService> file_registry_service,
+                                           std::shared_ptr<DataFile> file,
+                                           std::shared_ptr<FileLocation> file_location) : Action(name, "file_registry", job),
+                                                                                          type(type), file_registry_service(std::move(file_registry_service)), file(std::move(file)), file_location(std::move(file_location)) {
     }
 
     /**
@@ -56,7 +55,7 @@ namespace wrench {
      * @brief Returns the action's file
      * @return the file
      */
-    std::shared_ptr<DataFile>FileRegistryAction::getFile() const {
+    std::shared_ptr<DataFile> FileRegistryAction::getFile() const {
         return this->file;
     }
 
@@ -92,4 +91,4 @@ namespace wrench {
         // Nothing to do
     }
 
-}
+}// namespace wrench

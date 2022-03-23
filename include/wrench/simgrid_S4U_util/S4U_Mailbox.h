@@ -55,15 +55,13 @@ namespace wrench {
         static std::deque<simgrid::s4u::Mailbox *> free_mailboxes;
         static std::set<simgrid::s4u::Mailbox *> used_mailboxes;
         static std::deque<simgrid::s4u::Mailbox *> mailboxes_to_drain;
-
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_S4U_MAILBOX_H
+#endif//WRENCH_S4U_MAILBOX_H

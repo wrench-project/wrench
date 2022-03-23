@@ -35,8 +35,7 @@ namespace wrench {
          * @brief Constructor
          * @param payload: the message payload
          */
-        FileTransferThreadMessage(double payload) :
-                ServiceMessage(payload) {}
+        FileTransferThreadMessage(double payload) : ServiceMessage(payload) {}
     };
 
 
@@ -61,7 +60,7 @@ namespace wrench {
          * @param failure_cause: the failure cause (nullptr if success)
          */
         FileTransferThreadNotificationMessage(std::shared_ptr<FileTransferThread> file_transfer_thread,
-                                              std::shared_ptr<DataFile>file,
+                                              std::shared_ptr<DataFile> file,
                                               simgrid::s4u::Mailbox *src_mailbox,
                                               std::shared_ptr<FileLocation> src_location,
                                               simgrid::s4u::Mailbox *dst_mailbox,
@@ -69,22 +68,21 @@ namespace wrench {
                                               simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                               simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                               simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                              bool success, std::shared_ptr<FailureCause> failure_cause) :
-                FileTransferThreadMessage(0),
-                file_transfer_thread(file_transfer_thread),
-                file(file),
-                src_mailbox(src_mailbox), src_location(src_location),
-                dst_mailbox(dst_mailbox), dst_location(dst_location),
-                answer_mailbox_if_read(answer_mailbox_if_read),
-                answer_mailbox_if_write(answer_mailbox_if_write),
-                answer_mailbox_if_copy(answer_mailbox_if_copy),
-                success(success),
-                failure_cause(failure_cause) {}
+                                              bool success, std::shared_ptr<FailureCause> failure_cause) : FileTransferThreadMessage(0),
+                                                                                                           file_transfer_thread(file_transfer_thread),
+                                                                                                           file(file),
+                                                                                                           src_mailbox(src_mailbox), src_location(src_location),
+                                                                                                           dst_mailbox(dst_mailbox), dst_location(dst_location),
+                                                                                                           answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                                                           answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                                                           answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                                                           success(success),
+                                                                                                           failure_cause(failure_cause) {}
 
         /** @brief File transfer thread that sent this message */
         std::shared_ptr<FileTransferThread> file_transfer_thread;
         /** @brief File that was being communicated */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
 
         /** @brief Source mailbox (or "" if source wasn't a mailbox) */
         simgrid::s4u::Mailbox *src_mailbox;
@@ -113,7 +111,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FILETRANSFERTHREADMESSAGE_H
+#endif//WRENCH_FILETRANSFERTHREADMESSAGE_H

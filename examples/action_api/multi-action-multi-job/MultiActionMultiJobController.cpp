@@ -36,8 +36,8 @@ namespace wrench {
             std::shared_ptr<CloudComputeService> cloud_cs,
             std::shared_ptr<StorageService> ss_1,
             std::shared_ptr<StorageService> ss_2,
-            const std::string &hostname) : ExecutionController(hostname,"mamj"),
-            bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
+            const std::string &hostname) : ExecutionController(hostname, "mamj"),
+                                           bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
 
     /**
      * @brief main method of the MultiActionMultiJobController daemon
@@ -86,29 +86,30 @@ namespace wrench {
         std::map<std::string, std::shared_ptr<StorageService>> ss_to_use = {{"ComputeHost1", ss_1}, {"ComputeHost2", ss_2}};
 
         // Create the custom action with two lambdas
-        job3->addCustomAction("file_copy",
-                              0, 0,
-                              [ss_to_use, input_file](std::shared_ptr<ActionExecutor> action_executor) {
-                                  WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
+        job3->addCustomAction(
+                "file_copy",
+                0, 0,
+                [ss_to_use, input_file](std::shared_ptr<ActionExecutor> action_executor) {
+                    WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
 
-                                  // Which host I am running on?
-                                  auto execution_host = action_executor->getPhysicalHostname();
-                                  // Based on where I am running, pick a storage service
-                                  auto target_ss = ss_to_use.at(execution_host);
-                                  WRENCH_INFO("Custom action about to read file from storage service on host %s",
-                                              target_ss->getHostname().c_str());
-                                  // Read a input_file from the target storage service (which takes some time)
-                                  target_ss->readFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
-                                  // Sleep for 5 seconds
-                                  WRENCH_INFO("Custom action got the file and now is sleeping for 5 seconds");
-                                  Simulation::sleep(5.0);
-                                  WRENCH_INFO("Custom action deleting the file!");
-                                  // Deleted the input file from the target storage service!
-                                  target_ss->deleteFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
-                              },
-                              [](std::shared_ptr<ActionExecutor> action_executor) {
-                                  WRENCH_INFO("Custom action terminating");
-                              });
+                    // Which host I am running on?
+                    auto execution_host = action_executor->getPhysicalHostname();
+                    // Based on where I am running, pick a storage service
+                    auto target_ss = ss_to_use.at(execution_host);
+                    WRENCH_INFO("Custom action about to read file from storage service on host %s",
+                                target_ss->getHostname().c_str());
+                    // Read a input_file from the target storage service (which takes some time)
+                    target_ss->readFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
+                    // Sleep for 5 seconds
+                    WRENCH_INFO("Custom action got the file and now is sleeping for 5 seconds");
+                    Simulation::sleep(5.0);
+                    WRENCH_INFO("Custom action deleting the file!");
+                    // Deleted the input file from the target storage service!
+                    target_ss->deleteFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
+                },
+                [](std::shared_ptr<ActionExecutor> action_executor) {
+                    WRENCH_INFO("Custom action terminating");
+                });
 
         /* Making job3 depend on job1 */
         job3->addParentJob(job1);
@@ -139,7 +140,7 @@ namespace wrench {
                 auto completed_job = job_completion_event->job;
                 WRENCH_INFO("Job %s has completed!", completed_job->getName().c_str());
                 WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
-                for (auto const &action : completed_job->getActions()) {
+                for (auto const &action: completed_job->getActions()) {
                     WRENCH_INFO("  - Action %s ran on host %s (physical: %s)",
                                 action->getName().c_str(),
                                 action->getExecutionHistory().top().execution_host.c_str(),
@@ -161,4 +162,4 @@ namespace wrench {
         return 0;
     }
 
-}
+}// namespace wrench

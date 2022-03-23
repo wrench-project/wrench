@@ -38,26 +38,22 @@ namespace wrench {
     class ActionExecutionService : public Service {
 
     private:
-
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD,                       "0.0"},
-                {ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,                  "false"},
-                {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN,      "false"},
-                {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH,        "true"},
+                {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, "0.0"},
+                {ActionExecutionServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
+                {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "false"},
+                {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
         };
 
-        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-        };
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {};
 
     public:
-
         // Public Constructor
         ActionExecutionService(const std::string &hostname,
-                        std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
-                        std::shared_ptr<Service> parent_service,
-                        WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
-        );
+                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                               std::shared_ptr<Service> parent_service,
+                               WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
+                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /***********************/
         /** \cond INTERNAL     */
@@ -86,7 +82,6 @@ namespace wrench {
         /***********************/
 
     private:
-
         friend class Simulation;
 
         void validateProperties();
@@ -100,19 +95,19 @@ namespace wrench {
 
         std::shared_ptr<Service> parent_service = nullptr;
 
-        std::unordered_map<std::shared_ptr<StandardJob> , std::set<std::shared_ptr<DataFile>>> files_in_scratch;
+        std::unordered_map<std::shared_ptr<StandardJob>, std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
         // Set of running jobs
-        std::set<std::shared_ptr<Action> > running_actions;
+        std::set<std::shared_ptr<Action>> running_actions;
 
         // Action execution specs
-        std::unordered_map<std::shared_ptr<Action> , std::tuple<std::string, unsigned long>> action_run_specs;
+        std::unordered_map<std::shared_ptr<Action>, std::tuple<std::string, unsigned long>> action_run_specs;
 
         std::set<std::shared_ptr<Action>> all_actions;
         std::deque<std::shared_ptr<Action>> ready_actions;
 
         // Set of running ActionExecutors
-        std::unordered_map<std::shared_ptr<Action> , std::shared_ptr<ActionExecutor>> action_executors;
+        std::unordered_map<std::shared_ptr<Action>, std::shared_ptr<ActionExecutor>> action_executors;
 
         int main() override;
 
@@ -134,8 +129,8 @@ namespace wrench {
 
         void dispatchReadyActions();
 
-//        void someHostIsBackOn(simgrid::s4u::Host const &h);
-//        bool host_back_on = false;
+        //        void someHostIsBackOn(simgrid::s4u::Host const &h);
+        //        bool host_back_on = false;
 
 
         /** @brief Reasons why a standard job could be terminated */
@@ -169,9 +164,8 @@ namespace wrench {
         int exit_code = 0;
 
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
-
     };
-};
+};// namespace wrench
 
 
-#endif //WRENCH_ACTION_SCHEDULER_H
+#endif//WRENCH_ACTION_SCHEDULER_H

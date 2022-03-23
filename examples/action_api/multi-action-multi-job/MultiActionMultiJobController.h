@@ -38,7 +38,6 @@ namespace wrench {
         std::shared_ptr<CloudComputeService> cloud_cs;
         std::shared_ptr<StorageService> ss_1;
         std::shared_ptr<StorageService> ss_2;
-
     };
-}
-#endif //WRENCH_EXAMPLE_MULTI_ACTION_MULTI_JOB_CONTROLLER_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_MULTI_ACTION_MULTI_JOB_CONTROLLER_H

@@ -18,9 +18,8 @@ namespace wrench {
      * @brief Configurable properties for a NetworkProximityService
      */
 
-    class NetworkProximityServiceProperty:public ServiceProperty {
+    class NetworkProximityServiceProperty : public ServiceProperty {
     public:
-
         /** @brief The overhead, in seconds, of looking up entries for a file (default: 0) **/
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
 
@@ -49,7 +48,7 @@ namespace wrench {
         /** @brief The random (integer) number generator seed used by the service to pick RTT measurement peers (default: 1) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
     };
-}
+}// namespace wrench
 
 
-#endif //WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
+#endif//WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H

@@ -37,8 +37,8 @@ namespace wrench {
     TwoTasksAtATimeWMS::TwoTasksAtATimeWMS(std::shared_ptr<Workflow> workflow,
                                            std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                                            std::shared_ptr<SimpleStorageService> &storage_service,
-                                           const std::string &hostname) : ExecutionController (hostname, "two-tasks-at-a-time"),
-                                           workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {
+                                           const std::string &hostname) : ExecutionController(hostname, "two-tasks-at-a-time"),
+                                                                          workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {
     }
 
     /**
@@ -70,8 +70,7 @@ namespace wrench {
 
             /* Sort them by increasing flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const std::shared_ptr<WorkflowTask>t1, const std::shared_ptr<WorkflowTask> t2) -> bool {
-
+                      [](const std::shared_ptr<WorkflowTask> t1, const std::shared_ptr<WorkflowTask> t2) -> bool {
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1.get() > (uintptr_t) t2.get());
                           } else {
@@ -88,7 +87,7 @@ namespace wrench {
                 WRENCH_INFO("Creating a job for tasks %s and %s",
                             cheap_ready_task->getID().c_str(),
                             expensive_ready_task->getID().c_str());
-            } else  {
+            } else {
                 WRENCH_INFO("Creating a job for task %s",
                             cheap_ready_task->getID().c_str());
             }
@@ -108,8 +107,8 @@ namespace wrench {
             /* Then, we create the "service-specific arguments" that make it possible to configure
              * the way in which tasks in a job can run on the compute service */
             std::map<std::string, std::string> service_specific_args;
-            service_specific_args[cheap_ready_task->getID()] = "4"; // 4 cores, run on any host
-            service_specific_args[expensive_ready_task->getID()] = "6"; // 6 cores, run on any host
+            service_specific_args[cheap_ready_task->getID()] = "4";    // 4 cores, run on any host
+            service_specific_args[expensive_ready_task->getID()] = "6";// 6 cores, run on any host
 
             WRENCH_INFO("Submitting the job, asking for %s cores for task %s, and "
                         "%s cores for task %s",
@@ -141,7 +140,7 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's tasks */
-        for (auto const &task : job->getTasks()) {
+        for (auto const &task: job->getTasks()) {
             WRENCH_INFO("Notified that a standard job has completed task %s",
                         task->getID().c_str());
         }
@@ -159,11 +158,11 @@ namespace wrench {
                     event->failure_cause->toString().c_str());
         /* Retrieve the job's tasks */
         WRENCH_INFO("As a result, the following tasks have failed:");
-        for (auto const &task : job->getTasks()) {
+        for (auto const &task: job->getTasks()) {
             WRENCH_INFO(" - %s", task->getID().c_str());
         }
         throw std::runtime_error("This should not happen in this example");
     }
 
 
-}
+}// namespace wrench

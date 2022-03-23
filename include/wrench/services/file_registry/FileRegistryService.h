@@ -36,42 +36,41 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,       "0.0"},
-                {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST,    "0.0"},
+                {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST, "0.0"},
+                {FileRegistryServiceProperty::ADD_ENTRY_COMPUTE_COST, "0.0"},
                 {FileRegistryServiceProperty::REMOVE_ENTRY_COMPUTE_COST, "0.0"},
         };
 
         WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
-                {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          1024},
-                {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       1024},
-                {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,   1024},
+                {FileRegistryServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
+                {FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD,    1024},
-                {FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD,     1024},
+                {FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
 
     public:
         // Public Constructor
         FileRegistryService(std::string hostname,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
-                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {}
-        );
+                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         /****************************/
         /** \cond DEVELOPER         */
         /****************************/
 
-        std::set<std::shared_ptr<FileLocation>> lookupEntry(std::shared_ptr<DataFile>file);
+        std::set<std::shared_ptr<FileLocation>> lookupEntry(std::shared_ptr<DataFile> file);
 
         std::map<double, std::shared_ptr<FileLocation>> lookupEntry(
-                std::shared_ptr<DataFile>file, std::string reference_host,
-                std::shared_ptr <NetworkProximityService> network_proximity_service);
+                std::shared_ptr<DataFile> file, std::string reference_host,
+                std::shared_ptr<NetworkProximityService> network_proximity_service);
 
-        void addEntry(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
+        void addEntry(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
 
-        void removeEntry(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
+        void removeEntry(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
 
         /****************************/
         /** \endcond                */
@@ -90,18 +89,18 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        void addEntryToDatabase(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
+        void addEntryToDatabase(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
 
-        bool removeEntryFromDatabase(std::shared_ptr<DataFile>file, std::shared_ptr <FileLocation> location);
+        bool removeEntryFromDatabase(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
 
         int main() override;
 
         bool processNextMessage();
 
-        std::map<std::shared_ptr<DataFile>, std::set < std::shared_ptr < FileLocation>>>
+        std::map<std::shared_ptr<DataFile>, std::set<std::shared_ptr<FileLocation>>>
                 entries;
     };
 
-};
+};// namespace wrench
 
-#endif //WRENCH_FILEREGISTRYSERVICE_H
+#endif//WRENCH_FILEREGISTRYSERVICE_H

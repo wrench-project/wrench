@@ -24,9 +24,9 @@ namespace wrench {
      *         by these tasks
      */
     void Workflow::clear() {
-       this->tasks.clear();
-        for (auto const &f : this->data_files) {
-//            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
+        this->tasks.clear();
+        for (auto const &f: this->data_files) {
+            //            std::cerr << "SIMULATION REMOVING FILE " << f->getID() << "\n";
             Simulation::removeFile(f);
         }
         this->data_files.clear();
@@ -46,10 +46,10 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string id,
-                                    double flops,
-                                    unsigned long min_num_cores,
-                                    unsigned long max_num_cores,
-                                    double memory_requirement) {
+                                                    double flops,
+                                                    unsigned long min_num_cores,
+                                                    unsigned long max_num_cores,
+                                                    double memory_requirement) {
 
 
         if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) || (memory_requirement < 0)) {
@@ -63,17 +63,17 @@ namespace wrench {
 
         // Create the WorkflowTask object
         auto task = std::shared_ptr<WorkflowTask>(new WorkflowTask(id, flops, min_num_cores, max_num_cores,
-                                     memory_requirement));
+                                                                   memory_requirement));
         this->ready_tasks.insert(task);
         // Associate the workflow to the task
         task->workflow = this->getSharedPtr();
 
-        task->toplevel = 0; // upon creation, a task is an exit task
+        task->toplevel = 0;// upon creation, a task is an exit task
 
         // Create a DAG node for it
         this->dag.addVertex(task.get());
 
-        tasks[task->id] = task; // owner
+        tasks[task->id] = task;// owner
 
         return task;
     }
@@ -86,7 +86,7 @@ namespace wrench {
      */
     void Workflow::removeFile(std::shared_ptr<DataFile> file) {
 
-//        std::cerr << "REMOVING FILE " << file->getID() << "\n";
+        //        std::cerr << "REMOVING FILE " << file->getID() << "\n";
 
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
@@ -95,7 +95,7 @@ namespace wrench {
         }
 
         if (this->task_input_files.find(file) != this->task_input_files.end() and
-                (not this->task_input_files[file].empty())) {
+            (not this->task_input_files[file].empty())) {
             throw std::invalid_argument("Workflow::removeFile(): File " +
                                         file->getID() + " cannot be removed because it is input to " +
                                         std::to_string(this->task_input_files[file].size()) + " tasks");
@@ -114,7 +114,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Workflow::removeTask(std::shared_ptr<WorkflowTask>task) {
+    void Workflow::removeTask(std::shared_ptr<WorkflowTask> task) {
 
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::removeTask(): Invalid arguments");
@@ -126,13 +126,13 @@ namespace wrench {
         }
 
         // Fix all files
-        for (auto &f : task->getInputFiles()) {
+        for (auto &f: task->getInputFiles()) {
             this->task_input_files[f].erase(task);
             if (this->task_input_files[f].empty()) {
                 this->task_input_files.erase(f);
             }
         }
-        for (auto &f : task->getOutputFiles()) {
+        for (auto &f: task->getOutputFiles()) {
             this->task_output_files.erase(f);
         }
 
@@ -146,10 +146,9 @@ namespace wrench {
         tasks.erase(tasks.find(task->id));
 
         // Brute-force update of the top-level of all the children of the removed task
-        for (auto const &child : children) {
+        for (auto const &child: children) {
             child->updateTopLevel();
         }
-
     }
 
     /**
@@ -161,7 +160,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<WorkflowTask>Workflow::getTaskByID(const std::string &id) {
+    std::shared_ptr<WorkflowTask> Workflow::getTaskByID(const std::string &id) {
         if (tasks.find(id) == tasks.end()) {
             throw std::invalid_argument("Workflow::getTaskByID(): Unknown WorkflowTask ID " + id);
         }
@@ -186,7 +185,7 @@ namespace wrench {
 
         if (this->dag.doesPathExist(dst.get(), src.get())) {
             throw std::runtime_error("Workflow::addControlDependency(): Adding dependency between task " + src->getID() +
-            " and " + dst->getID() + " would create a cycle in the workflow graph");
+                                     " and " + dst->getID() + " would create a cycle in the workflow graph");
         }
 
         if (redundant_dependencies || not this->dag.doesPathExist(src.get(), dst.get())) {
@@ -208,13 +207,13 @@ namespace wrench {
      * @param src: the source task
      * @param dst: the destination task
      */
-    void  Workflow::removeControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst) {
+    void Workflow::removeControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst) {
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("Workflow::removeControlDependency(): Invalid arguments");
         }
 
         /*  Check that the two tasks don't have a data dependency; if so, just return */
-        for (auto const &f : dst->getInputFiles()) {
+        for (auto const &f: dst->getInputFiles()) {
             if (this->task_output_files[f] == src) {
                 return;
             }
@@ -229,7 +228,7 @@ namespace wrench {
             /* Update state */
             if ((dst->getState() == WorkflowTask::State::NOT_READY) and (dst->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
                 bool ready = true;
-                for (auto const &p :  dst->getParents()) {
+                for (auto const &p: dst->getParents()) {
                     if (p->getState() != WorkflowTask::State::COMPLETED) {
                         ready = false;
                         break;
@@ -272,7 +271,7 @@ namespace wrench {
      * @return true if there is a path from src to dst, false otherwise
      */
     bool Workflow::pathExists(const std::shared_ptr<WorkflowTask> src, const std::shared_ptr<WorkflowTask> dst) {
-        return  this->dag.doesPathExist(src.get(), dst.get());
+        return this->dag.doesPathExist(src.get(), dst.get());
     }
 
     /**
@@ -301,7 +300,7 @@ namespace wrench {
 
         std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> task_map;
 
-        for (auto &it : this->tasks) {
+        for (auto &it: this->tasks) {
             std::shared_ptr<WorkflowTask> task = it.second;
 
             if (task->getState() == WorkflowTask::State::READY) {
@@ -332,7 +331,7 @@ namespace wrench {
      * @return true or false
      */
     bool Workflow::isDone() {
-        for (auto &it : this->tasks) {
+        for (auto &it: this->tasks) {
             auto task = it.second;
             if (task->getState() != WorkflowTask::State::COMPLETED) {
                 return false;
@@ -357,7 +356,7 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasks() {
         std::vector<std::shared_ptr<WorkflowTask>> all_tasks;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             all_tasks.push_back(t.second);
         }
         return all_tasks;
@@ -378,7 +377,7 @@ namespace wrench {
         auto raw_ptrs = this->dag.getChildren(task.get());
         std::vector<std::shared_ptr<WorkflowTask>> shared_ptrs;
         shared_ptrs.reserve(raw_ptrs.size());
-        for (const auto &raw_ptr : raw_ptrs) {
+        for (const auto &raw_ptr: raw_ptrs) {
             shared_ptrs.push_back(raw_ptr->getSharedPtr());
         }
 
@@ -406,14 +405,14 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTaskParents(const std::shared_ptr<WorkflowTask>task) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTaskParents(const std::shared_ptr<WorkflowTask> task) {
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::getTaskParents(): Invalid arguments");
         }
         auto raw_ptrs = this->dag.getParents(task.get());
         std::vector<std::shared_ptr<WorkflowTask>> shared_ptrs;
         shared_ptrs.reserve(raw_ptrs.size());
-        for (auto const &raw_ptr : raw_ptrs) {
+        for (auto const &raw_ptr: raw_ptrs) {
             shared_ptrs.push_back(raw_ptr->getSharedPtr());
         }
         return shared_ptrs;
@@ -426,7 +425,7 @@ namespace wrench {
      *
      * @return a number of parents
      */
-    long Workflow::getTaskNumberOfParents(const std::shared_ptr<WorkflowTask>task) {
+    long Workflow::getTaskNumberOfParents(const std::shared_ptr<WorkflowTask> task) {
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::getTaskNumberOfParents(): Invalid arguments");
         }
@@ -441,14 +440,14 @@ namespace wrench {
      */
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getInputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> input_files;
-        for (auto const &f : Simulation::getFileMap()) {
+        for (auto const &f: Simulation::getFileMap()) {
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
                 continue;
             }
             // If the file is output to a task, then it can't be what we want
             if (this->task_output_files.find(f.second) != this->task_output_files.end()) {
-              continue;
+                continue;
             }
             input_files[f.second->getID()] = f.second;
         }
@@ -463,7 +462,7 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> Workflow::getInputFiles() const {
         std::vector<std::shared_ptr<DataFile>> input_files;
-        for (auto const &f : Simulation::getFileMap()) {
+        for (auto const &f: Simulation::getFileMap()) {
             // If the file is not input to any task, then it can't be what we want
             if (this->task_input_files.find(f.second) == this->task_input_files.end()) {
                 continue;
@@ -485,7 +484,7 @@ namespace wrench {
     */
     std::map<std::string, std::shared_ptr<DataFile>> Workflow::getOutputFileMap() const {
         std::map<std::string, std::shared_ptr<DataFile>> output_files;
-        for (auto const &f : Simulation::getFileMap()) {
+        for (auto const &f: Simulation::getFileMap()) {
             // If the file is not output to any task, then it can't be what we want
             if (this->task_output_files.find(f.second) == this->task_output_files.end()) {
                 continue;
@@ -507,7 +506,7 @@ namespace wrench {
    */
     std::vector<std::shared_ptr<DataFile>> Workflow::getOutputFiles() const {
         std::vector<std::shared_ptr<DataFile>> output_files;
-        for (auto const &f : Simulation::getFileMap()) {
+        for (auto const &f: Simulation::getFileMap()) {
             // If the file is not output to any task, then it can't be what we want
             if (this->task_output_files.find(f.second) == this->task_output_files.end()) {
                 continue;
@@ -530,7 +529,7 @@ namespace wrench {
      */
     double Workflow::getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> tasks) {
         double total_flops = 0;
-        for (auto const &task : tasks) {
+        for (auto const &task: tasks) {
             total_flops += task->getFlops();
         }
         return total_flops;
@@ -544,7 +543,7 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
         std::vector<std::shared_ptr<WorkflowTask>> to_return;
-        for (auto const &task : this->getTasks()) {
+        for (auto const &task: this->getTasks()) {
             if ((task->getTopLevel() >= min) and (task->getTopLevel() <= max)) {
                 to_return.push_back(task);
             }
@@ -560,7 +559,7 @@ namespace wrench {
     std::map<std::string, std::shared_ptr<WorkflowTask>> Workflow::getEntryTaskMap() const {
         // TODO: This could be done more efficiently at the DAG level
         std::map<std::string, std::shared_ptr<WorkflowTask>> entry_tasks;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             auto task = t.second;
             if (task->getNumberOfParents() == 0) {
                 entry_tasks[task->getID()] = task;
@@ -577,7 +576,7 @@ namespace wrench {
     std::vector<std::shared_ptr<WorkflowTask>> Workflow::getEntryTasks() const {
         // TODO: This could be done more efficiently at the DAG level
         std::vector<std::shared_ptr<WorkflowTask>> entry_tasks;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             auto task = t.second;
             if (task->getNumberOfParents() == 0) {
                 entry_tasks.push_back(task);
@@ -594,7 +593,7 @@ namespace wrench {
     std::map<std::string, std::shared_ptr<WorkflowTask>> Workflow::getExitTaskMap() const {
         // TODO: This could be done more efficiently at the DAG level
         std::map<std::string, std::shared_ptr<WorkflowTask>> exit_tasks;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             auto task = t.second;
             if (task->getNumberOfChildren() == 0) {
                 exit_tasks[task->getID()] = task;
@@ -611,7 +610,7 @@ namespace wrench {
     std::vector<std::shared_ptr<WorkflowTask>> Workflow::getExitTasks() const {
         // TODO: This could be done more efficiently at the DAG level
         std::vector<std::shared_ptr<WorkflowTask>> exit_tasks;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             auto task = t.second;
             if (task->getNumberOfChildren() == 0) {
                 exit_tasks.push_back(task);
@@ -627,7 +626,7 @@ namespace wrench {
      */
     unsigned long Workflow::getNumLevels() {
         unsigned long max_top_level = 0;
-        for (auto const &t : this->tasks) {
+        for (auto const &t: this->tasks) {
             auto task = t.second.get();
             if (task->getNumberOfChildren() == 0) {
                 if (1 + task->getTopLevel() > max_top_level) {
@@ -645,7 +644,7 @@ namespace wrench {
      */
     double Workflow::getCompletionDate() {
         double makespan = -1.0;
-        for (auto const &task : this->tasks) {
+        for (auto const &task: this->tasks) {
             if (task.second->getState() != WorkflowTask::State::COMPLETED) {
                 makespan = -1.0;
                 break;
@@ -699,7 +698,7 @@ namespace wrench {
      * @return a file
      */
     std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
-//        std::cerr << "CREATING DATA FILE " << id << "\n";
+        //        std::cerr << "CREATING DATA FILE " << id << "\n";
         auto data_file = Simulation::addFile(id, size);
         this->data_files.insert(data_file);
         return data_file;
@@ -728,12 +727,11 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<Workflow> Workflow::createWorkflow() {
-//        if (not Simulation::isInitialized()) {
-//            throw std::runtime_error("Cannot create a workflow before the simulation is initialized");
-//        }
+        //        if (not Simulation::isInitialized()) {
+        //            throw std::runtime_error("Cannot create a workflow before the simulation is initialized");
+        //        }
         return std::shared_ptr<Workflow>(new Workflow());
-
     }
 
 
-}
+}// namespace wrench

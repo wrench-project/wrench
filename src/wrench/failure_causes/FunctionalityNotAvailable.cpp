@@ -56,5 +56,4 @@ namespace wrench {
     }
 
 
-
-}
+}// namespace wrench

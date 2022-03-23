@@ -17,7 +17,7 @@
 #include <wrench/failure_causes/HostError.h>
 #include <wrench/exceptions/ExecutionException.h>
 
-WRENCH_LOG_CATEGORY(wrench_compute_action,"Log category for Compute Action");
+WRENCH_LOG_CATEGORY(wrench_compute_action, "Log category for Compute Action");
 
 namespace wrench {
 
@@ -37,7 +37,7 @@ namespace wrench {
                                  double ram,
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
-                                 std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_",job) {
+                                 std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_", job) {
         if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
             throw std::invalid_argument("ComputeAction::ComputeAction(): invalid arguments");
         }
@@ -130,7 +130,7 @@ namespace wrench {
   */
     void ComputeAction::simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
-        S4U_Simulation::sleep((double)(num_threads) * action_executor->getThreadCreationOverhead());
+        S4U_Simulation::sleep((double) (num_threads) *action_executor->getThreadCreationOverhead());
         // Then sleep for the computation duration
         double sleep_time = (sequential_work + parallel_per_thread_work) / Simulation::getFlopRate();
         Simulation::sleep(sleep_time);
@@ -153,7 +153,6 @@ namespace wrench {
             throw ExecutionException(std::shared_ptr<FailureCause>(new ComputationHasDied()));
         }
         WRENCH_INFO("All compute threads have completed successfully");
-
     }
 
-}
+}// namespace wrench

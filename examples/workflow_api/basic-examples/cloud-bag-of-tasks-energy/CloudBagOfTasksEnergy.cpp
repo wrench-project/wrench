@@ -40,7 +40,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoTasksAtATimeCloudWMS.h" // WMS implementation
+#include "TwoTasksAtATimeCloudWMS.h"// WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -75,11 +75,11 @@ int main(int argc, char **argv) {
     int num_tasks = 0;
     try {
         num_tasks = std::atoi(argv[1]);
-        if  (num_tasks % 2) {
+        if (num_tasks % 2) {
             throw std::invalid_argument("Number of tasks should be even");
         }
     } catch (std::invalid_argument &e) {
-        std::cerr << "Invalid number of tasks ("  << e.what() << ")\n";
+        std::cerr << "Invalid number of tasks (" << e.what() << ")\n";
         exit(1);
     }
 
@@ -87,11 +87,11 @@ int main(int argc, char **argv) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     /* Initialize and seed a RNG */
-    std::uniform_real_distribution<double> dist(1000000000000.0,100000000000000.0);
+    std::uniform_real_distribution<double> dist(1000000000000.0, 100000000000000.0);
     std::mt19937 rng(42);
 
     /* Add workflow tasks and files */
-    for (int i=0; i < num_tasks; i++) {
+    for (int i = 0; i < num_tasks; i++) {
         /* Create a task: random GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow->addTask("task_" + std::to_string(i), dist(rng), 1, 10, 1000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -163,8 +163,8 @@ int main(int argc, char **argv) {
      * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
-    for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
+    for (auto const &item: trace) {
+        std::cerr << "Task " << item->getContent()->getTask()->getID() << " completed at time " << item->getDate() << std::endl;
     }
 
     /* The total energy consumed by hosts is readily available */
@@ -174,10 +174,10 @@ int main(int argc, char **argv) {
     std::cerr << "Total energy consumed at host CloudHost2: " << simulation->getEnergyConsumed("CloudHost2") << "\n";
 
     /* The EnergyMeter service has generated energy consumption timestamps! */
-    auto energy_trace  = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();
+    auto energy_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampEnergyConsumption>();
     std::cerr << "Timeline of the energy consumption at host CloudHost1 (as measured by the EnergyMeter service):\n";
-    for (auto const &item : energy_trace) {
-       std::cerr << "  - " << item->getDate() << ": " << std::round(item->getContent()->getConsumption()) << " Joules\n";
+    for (auto const &item: energy_trace) {
+        std::cerr << "  - " << item->getDate() << ": " << std::round(item->getContent()->getConsumption()) << " Joules\n";
     }
 
     /* Dump it all to a JSON file */

@@ -25,7 +25,6 @@ namespace wrench {
     class ActionExecutionServiceProperty {
 
     public:
-
         /** @brief The ActionExecutionService's overhead for creating a thread, in seconds **/
         DECLARE_PROPERTY_NAME(THREAD_CREATION_OVERHEAD);
 
@@ -43,7 +42,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
+#endif//WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H

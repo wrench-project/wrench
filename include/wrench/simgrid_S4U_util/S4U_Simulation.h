@@ -29,12 +29,12 @@ namespace wrench {
 
     public:
         /** @brief The ram capacity of a physical host whenever not specified in the platform description file */
-        static constexpr double DEFAULT_RAM = (1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0); // 1 PiB
+        static constexpr double DEFAULT_RAM = (1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0);// 1 PiB
 
     public:
         void initialize(int *argc, char **argv);
-        void setupPlatform(std::string&);
-        void setupPlatform(const std::function<void()>& creation_function);
+        void setupPlatform(std::string &);
+        void setupPlatform(const std::function<void()> &creation_function);
         void runSimulation();
         static double getClock();
         static std::string getHostName();
@@ -55,9 +55,9 @@ namespace wrench {
         static double getMemoryCapacity();
         static void compute(double);
         static void compute_multi_threaded(unsigned long num_threads,
-                                                    double thread_creation_overhead,
-                                                    double sequential_work,
-                                                    double parallel_per_thread_work);
+                                           double thread_creation_overhead,
+                                           double sequential_work,
+                                           double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
         static void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
@@ -79,7 +79,7 @@ namespace wrench {
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);
-//		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
+        //		static double getTotalEnergyConsumed(const std::vector<std::string> &hostnames);
         static void setPstate(const std::string &hostname, unsigned long pstate);
         static int getNumberofPstates(const std::string &hostname);
         static unsigned long getCurrentPstate(const std::string &hostname);
@@ -102,12 +102,11 @@ namespace wrench {
         simgrid::s4u::Engine *engine;
         bool initialized = false;
         bool platform_setup = false;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
-#endif //WRENCH_S4U_SIMULATION_H
+#endif//WRENCH_S4U_SIMULATION_H

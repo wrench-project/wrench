@@ -18,18 +18,17 @@ namespace wrench {
     class ResourceRandomRepeatSwitcher : public Service {
 
     public:
-
         enum ResourceType {
-           HOST,
-           LINK
+            HOST,
+            LINK
         };
 
 
         explicit ResourceRandomRepeatSwitcher(std::string host_on_which_to_run, double seed,
-                                          double min_sleep_before_off_time, double max_sleep_before_off_time,
-                                          double min_sleep_before_on_time, double max_sleep_before_on_time,
-                                          std::string resource_to_switch,
-                                          ResourceType resource_type);
+                                              double min_sleep_before_off_time, double max_sleep_before_off_time,
+                                              double min_sleep_before_on_time, double max_sleep_before_on_time,
+                                              std::string resource_to_switch,
+                                              ResourceType resource_type);
 
         void kill();
 
@@ -38,7 +37,6 @@ namespace wrench {
         /***********************/
 
     private:
-
         double seed;
         double min_sleep_before_off_time;
         double max_sleep_before_off_time;
@@ -47,7 +45,6 @@ namespace wrench {
         std::string resource_to_switch;
         ResourceType resource_type;
         int main();
-
     };
 
     /***********************/
@@ -55,7 +52,7 @@ namespace wrench {
     /***********************/
 
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_RESOURCERANDOMREPEATSWITCHER_H
+#endif//WRENCH_RESOURCERANDOMREPEATSWITCHER_H

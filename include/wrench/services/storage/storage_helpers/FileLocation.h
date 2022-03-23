@@ -29,7 +29,6 @@ namespace wrench {
     class FileLocation {
 
     public:
-
         ~FileLocation();
 
         /**
@@ -40,7 +39,7 @@ namespace wrench {
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
-                std::shared_ptr<StorageService> server_ss);
+                                                      std::shared_ptr<StorageService> server_ss);
 
         static std::shared_ptr<FileLocation> LOCATION(std::shared_ptr<StorageService> ss,
                                                       std::string absolute_path);
@@ -63,9 +62,9 @@ namespace wrench {
          *
          */
         static bool equal(const std::shared_ptr<FileLocation> &lhs,
-            const std::shared_ptr<FileLocation> &rhs) {
-          return ((lhs->getStorageService() == rhs->getStorageService()) and
-                  (lhs->getFullAbsolutePath() == rhs->getFullAbsolutePath()));
+                          const std::shared_ptr<FileLocation> &rhs) {
+            return ((lhs->getStorageService() == rhs->getStorageService()) and
+                    (lhs->getFullAbsolutePath() == rhs->getFullAbsolutePath()));
         }
 
 
@@ -73,7 +72,6 @@ namespace wrench {
         static bool properPathPrefix(std::string path1, std::string path2);
 
     private:
-
         friend class LogicalFileSystem;
 
         /**
@@ -81,15 +79,12 @@ namespace wrench {
          * @param ss: the storage service
          * @param ap: the absolute path
          */
-        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp) :
-                storage_service(ss), mount_point(mp), absolute_path_at_mount_point(apamp) { }
+        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp) : storage_service(ss), mount_point(mp), absolute_path_at_mount_point(apamp) {}
 
         std::shared_ptr<StorageService> storage_service;
         std::shared_ptr<StorageService> server_storage_service;
         std::string mount_point;
         std::string absolute_path_at_mount_point;
-
-
     };
 
     /***********************/
@@ -97,7 +92,7 @@ namespace wrench {
     /***********************/
 
 
-}
+}// namespace wrench
 
 
-#endif //WRENCH_FILELOCATION_H
+#endif//WRENCH_FILELOCATION_H
