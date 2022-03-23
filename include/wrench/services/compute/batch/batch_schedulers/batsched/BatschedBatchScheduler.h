@@ -14,9 +14,9 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
     /**
      * @brief A class that defines a batsched batch_standard_and_pilot_jobs scheduler
@@ -24,7 +24,6 @@ namespace wrench {
     class BatschedBatchScheduler : public BatchScheduler {
 
     public:
-
         /**
          * @brief Constructor
          * @param cs: The computer service for which this scheduler is operating
@@ -108,14 +107,13 @@ namespace wrench {
 
 
 #endif
-
     };
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
-}
+}// namespace wrench
 
 
-#endif //WRENCH_BATSCHEDBATCHSCHEDULER_H
+#endif//WRENCH_BATSCHEDBATCHSCHEDULER_H

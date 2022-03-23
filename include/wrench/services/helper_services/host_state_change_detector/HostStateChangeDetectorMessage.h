@@ -66,6 +66,6 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_HOSTSTATECHANGEDETECTORMESSAGE_H
+#endif//WRENCH_HOSTSTATECHANGEDETECTORMESSAGE_H

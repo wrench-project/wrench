@@ -22,18 +22,16 @@ namespace wrench {
      * @brief Configurable properties for a HostStateChangeDetector
      */
 
-    class HostStateChangeDetectorProperty:public ServiceProperty {
+    class HostStateChangeDetectorProperty : public ServiceProperty {
     public:
-
         /** @brief The monitoring period in seconds (default: 1.0) **/
         DECLARE_PROPERTY_NAME(MONITORING_PERIOD);
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
 
-#endif //WRENCH_HOSTSTATECHANGEDETECTORPROPERTY_H
+#endif//WRENCH_HOSTSTATECHANGEDETECTORPROPERTY_H

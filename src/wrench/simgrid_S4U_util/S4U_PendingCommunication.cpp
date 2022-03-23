@@ -96,7 +96,7 @@ namespace wrench {
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<std::shared_ptr<S4U_PendingCommunication>> pending_comms, double timeout) {
         std::vector<S4U_PendingCommunication *> raw_pointer_comms;
-        for (auto const &pc : pending_comms) {
+        for (auto const &pc: pending_comms) {
             raw_pointer_comms.push_back(pc.get());
         }
         return S4U_PendingCommunication::waitForSomethingToHappen(raw_pointer_comms, timeout);
@@ -128,7 +128,7 @@ namespace wrench {
         ssize_t index = 0;
         bool one_comm_failed = false;
         try {
-            index =  simgrid::s4u::Comm::wait_any_for(pending_s4u_comms, timeout);
+            index = simgrid::s4u::Comm::wait_any_for(pending_s4u_comms, timeout);
 #ifdef MESSAGE_MANAGER
             MessageManager::removeReceivedMessage(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
 #endif
@@ -144,14 +144,14 @@ namespace wrench {
         }
 
         if (one_comm_failed) {
-            for (auto & pending_s4u_comm : pending_s4u_comms) {
+            for (auto &pending_s4u_comm: pending_s4u_comms) {
                 if (pending_s4u_comm->get_state() == simgrid::s4u::Activity::State::FAILED) {
                     break;
                 }
             }
         }
 
-        return (unsigned long)index;
+        return (unsigned long) index;
     }
 
-};
+};// namespace wrench

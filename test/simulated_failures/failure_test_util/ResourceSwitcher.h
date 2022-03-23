@@ -35,13 +35,11 @@ namespace wrench {
         /***********************/
 
     private:
-
         double sleep_time;
         std::string resource_to_switch;
         Action action;
         ResourceType resource_type;
         int main();
-
     };
 
     /***********************/
@@ -49,11 +47,7 @@ namespace wrench {
     /***********************/
 
 
-};
+};// namespace wrench
 
 
-
-
-
-
-#endif //WRENCH_RESOURCESWITCHER_H
+#endif//WRENCH_RESOURCESWITCHER_H

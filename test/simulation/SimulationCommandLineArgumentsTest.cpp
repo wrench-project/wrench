@@ -35,7 +35,6 @@ public:
     void do_ActivateEnergyArgument_test();
 
 protected:
-
     ~SimulationCommandLineArgumentsTest() {
         workflow->clear();
     }
@@ -65,8 +64,7 @@ class SimulationCommandLineArgumentsWMS : public wrench::ExecutionController {
 
 public:
     SimulationCommandLineArgumentsWMS(SimulationCommandLineArgumentsTest *test,
-                                      std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                      std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -104,7 +102,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
 
     pid_t pid = fork();
 
-    if (pid == 0) { // Child
+    if (pid == 0) {// Child
         close(1);
         FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "w");
         ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -128,11 +126,13 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
         linecount++;
         if (linecount == 1) {
             ASSERT_EQ(strncmp(line, "This program was linked against WRENCH version ",
-                              strlen("This program was linked against WRENCH version ")), 0);
+                              strlen("This program was linked against WRENCH version ")),
+                      0);
         }
         if (linecount == 17) {
             ASSERT_EQ(strncmp(line, "This program was linked against SimGrid version ",
-                              strlen("This program was linked against SimGrid version ")), 0);
+                              strlen("This program was linked against SimGrid version ")),
+                      0);
         }
         free(line);
         line = nullptr;
@@ -143,7 +143,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     ASSERT_GE(linecount, 2);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -168,7 +168,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
 
     pid_t pid = fork();
 
-    if (pid == 0) { // Child
+    if (pid == 0) {// Child
         close(1);
         FILE *stdout_file = fopen((UNIQUE_TMP_PATH_PREFIX + "unit_tests.stdout").c_str(), "w");
         ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -198,7 +198,7 @@ void SimulationCommandLineArgumentsTest::do_HelpWrenchArgument_test() {
     ASSERT_LE(linecount, 15);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -221,7 +221,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
 
     pid_t pid = fork();
 
-    if (pid == 0) { // Child
+    if (pid == 0) {// Child
         // Create and initialize a simulation
 
         close(1);
@@ -254,7 +254,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     ASSERT_LE(linecount, 300);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -284,7 +284,7 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     ASSERT_EQ(!strcmp(argv[1], "--help"), 1);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -315,7 +315,8 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
@@ -349,8 +350,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
     ASSERT_EQ(found_color, false);
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -387,7 +387,8 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
@@ -414,7 +415,7 @@ void SimulationCommandLineArgumentsTest::do_FullLogArgument_test(std::string arg
     xbt_log_control_set("root.thresh:critical");
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -443,13 +444,14 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
     simulation->instantiatePlatform(platform_file_path);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     std::string hostname = "DualCoreHost";
     wms = simulation->add(new SimulationCommandLineArgumentsWMS(this, hostname));
 
     simulation->launch();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

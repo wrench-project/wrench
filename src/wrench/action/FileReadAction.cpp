@@ -30,17 +30,17 @@ namespace wrench {
     * @param file: the file
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     */
-    FileReadAction::FileReadAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                std::shared_ptr<DataFile>file,
+    FileReadAction::FileReadAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+                                   std::shared_ptr<DataFile> file,
                                    std::vector<std::shared_ptr<FileLocation>> file_locations) : Action(name, "file_read_", job),
-                                file(std::move(file)), file_locations(std::move(file_locations)) {
+                                                                                                file(std::move(file)), file_locations(std::move(file_locations)) {
     }
 
     /**
      * @brief Returns the action's file
      * @return the file
      */
-    std::shared_ptr<DataFile>FileReadAction::getFile() const {
+    std::shared_ptr<DataFile> FileReadAction::getFile() const {
         return this->file;
     }
 
@@ -61,13 +61,13 @@ namespace wrench {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File read
-        for (unsigned long i=0; i < this->file_locations.size(); i++) {
+        for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
                 StorageService::readFile(this->getFile(), this->file_locations[i]);
                 continue;
             } catch (ExecutionException &e) {
-                if (i == this->file_locations.size() -1) {
+                if (i == this->file_locations.size() - 1) {
                     throw e;
                 } else {
                     continue;
@@ -98,7 +98,7 @@ namespace wrench {
       * @return true if the action uses scratch, false otherwise
       */
     bool FileReadAction::usesScratch() const {
-        for (auto const &fl : this->file_locations) {
+        for (auto const &fl: this->file_locations) {
             if (fl == FileLocation::SCRATCH) {
                 return true;
             }
@@ -106,4 +106,4 @@ namespace wrench {
         return false;
     }
 
-}
+}// namespace wrench

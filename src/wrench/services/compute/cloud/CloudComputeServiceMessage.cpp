@@ -18,8 +18,7 @@ namespace wrench {
      *
      * @param payload: the message size in bytes
      */
-    CloudComputeServiceMessage::CloudComputeServiceMessage(double payload) :
-            ComputeServiceMessage( payload) {
+    CloudComputeServiceMessage::CloudComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
     }
 
     /**
@@ -33,7 +32,7 @@ namespace wrench {
     CloudComputeServiceGetExecutionHostsRequestMessage::CloudComputeServiceGetExecutionHostsRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox, double payload) : CloudComputeServiceMessage(
 
-            payload) {
+                                                                             payload) {
 
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
@@ -50,8 +49,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     CloudComputeServiceGetExecutionHostsAnswerMessage::CloudComputeServiceGetExecutionHostsAnswerMessage(
-            std::vector<std::string> &execution_hosts, double payload) : CloudComputeServiceMessage(
-             payload), execution_hosts(execution_hosts) {}
+            std::vector<std::string> &execution_hosts, double payload) : CloudComputeServiceMessage(payload), execution_hosts(execution_hosts) {}
 
     /**
      * @brief Constructor
@@ -75,13 +73,12 @@ namespace wrench {
             std::string desired_vm_name,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            double payload) :
-            CloudComputeServiceMessage( payload),
-            num_cores(num_cores), ram_memory(ram_memory), desired_vm_name(desired_vm_name), property_list(property_list),
-            messagepayload_list(messagepayload_list) {
+            double payload) : CloudComputeServiceMessage(payload),
+                              num_cores(num_cores), ram_memory(ram_memory), desired_vm_name(desired_vm_name), property_list(property_list),
+                              messagepayload_list(messagepayload_list) {
 
         if ((answer_mailbox == nullptr) || (ram_memory < 0.0)) {
-//        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_name << std::endl;
+            //        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_name << std::endl;
             throw std::invalid_argument(
                     "CloudComputeServiceCreateVMRequestMessage::CloudComputeServiceCreateVMRequestMessage(): Invalid arguments");
         }
@@ -99,9 +96,8 @@ namespace wrench {
     CloudComputeServiceCreateVMAnswerMessage::CloudComputeServiceCreateVMAnswerMessage(bool success,
                                                                                        std::string &vm_name,
                                                                                        std::shared_ptr<FailureCause> failure_cause,
-                                                                                       double payload) :
-            CloudComputeServiceMessage( payload), success(success), vm_name(vm_name),
-            failure_cause(failure_cause) {}
+                                                                                       double payload) : CloudComputeServiceMessage(payload), success(success), vm_name(vm_name),
+                                                                                                         failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -119,8 +115,7 @@ namespace wrench {
             const std::string &vm_name,
             bool send_failure_notifications,
             ComputeService::TerminationCause termination_cause,
-            double payload) :
-            CloudComputeServiceMessage( payload) {
+            double payload) : CloudComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -141,8 +136,7 @@ namespace wrench {
      */
     CloudComputeServiceShutdownVMAnswerMessage::CloudComputeServiceShutdownVMAnswerMessage(bool success,
                                                                                            std::shared_ptr<FailureCause> failure_cause,
-                                                                                           double payload) :
-            CloudComputeServiceMessage( payload), success(success), failure_cause(failure_cause) {}
+                                                                                           double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -158,8 +152,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             const std::string &pm_name,
-            double payload) :
-            CloudComputeServiceMessage( payload) {
+            double payload) : CloudComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -181,9 +174,8 @@ namespace wrench {
     CloudComputeServiceStartVMAnswerMessage::CloudComputeServiceStartVMAnswerMessage(bool success,
                                                                                      std::shared_ptr<BareMetalComputeService> cs,
                                                                                      std::shared_ptr<FailureCause> failure_cause,
-                                                                                     double payload) :
-            CloudComputeServiceMessage( payload), success(success), cs(cs),
-            failure_cause(failure_cause) {}
+                                                                                     double payload) : CloudComputeServiceMessage(payload), success(success), cs(cs),
+                                                                                                       failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -197,8 +189,7 @@ namespace wrench {
     CloudComputeServiceSuspendVMRequestMessage::CloudComputeServiceSuspendVMRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
-            double payload) :
-            CloudComputeServiceMessage( payload) {
+            double payload) : CloudComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -217,8 +208,7 @@ namespace wrench {
      */
     CloudComputeServiceSuspendVMAnswerMessage::CloudComputeServiceSuspendVMAnswerMessage(bool success,
                                                                                          std::shared_ptr<FailureCause> failure_cause,
-                                                                                         double payload) :
-            CloudComputeServiceMessage(payload), success(success), failure_cause(failure_cause) {}
+                                                                                         double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(failure_cause) {}
 
     /**
      * @brief Constructor
@@ -232,8 +222,7 @@ namespace wrench {
     CloudComputeServiceResumeVMRequestMessage::CloudComputeServiceResumeVMRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
-            double payload) :
-            CloudComputeServiceMessage(payload) {
+            double payload) : CloudComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -252,8 +241,7 @@ namespace wrench {
      */
     CloudComputeServiceResumeVMAnswerMessage::CloudComputeServiceResumeVMAnswerMessage(bool success,
                                                                                        std::shared_ptr<FailureCause> failure_cause,
-                                                                                       double payload) :
-            CloudComputeServiceMessage( payload), success(success), failure_cause(failure_cause) {}
+                                                                                       double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(failure_cause) {}
 
 
     /**
@@ -268,8 +256,7 @@ namespace wrench {
     CloudComputeServiceDestroyVMRequestMessage::CloudComputeServiceDestroyVMRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
-            double payload) :
-            CloudComputeServiceMessage(payload) {
+            double payload) : CloudComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || vm_name.empty()) {
             throw std::invalid_argument(
@@ -288,8 +275,7 @@ namespace wrench {
      */
     CloudComputeServiceDestroyVMAnswerMessage::CloudComputeServiceDestroyVMAnswerMessage(bool success,
                                                                                          std::shared_ptr<FailureCause> failure_cause,
-                                                                                         double payload) :
-            CloudComputeServiceMessage(payload), success(success), failure_cause(failure_cause) {}
+                                                                                         double payload) : CloudComputeServiceMessage(payload), success(success), failure_cause(failure_cause) {}
 
 
-}
+}// namespace wrench

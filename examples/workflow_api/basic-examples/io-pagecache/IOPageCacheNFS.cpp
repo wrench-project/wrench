@@ -32,10 +32,10 @@
 #include <iostream>
 #include <wrench.h>
 #include <wrench/services/memory/MemoryManager.h>
-#include "NFSPipelineWMS.h" // WMS implementation
+#include "NFSPipelineWMS.h"// WMS implementation
 
 std::shared_ptr<wrench::Workflow> workflow_multithread(int num_pipes, int num_tasks, int core_per_task,
-                                       long flops, long file_size, long mem_required) {
+                                                       long flops, long file_size, long mem_required) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     for (int i = 0; i < num_pipes; i++) {
@@ -102,7 +102,8 @@ int main(int argc, char **argv) {
 
     int num_task = 3;
 
-    auto simulation = wrench::Simulation::createSimulation();;
+    auto simulation = wrench::Simulation::createSimulation();
+    ;
     simulation->init(&argc, argv);
 
     if (argc < 5) {
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
 
     /* Declare a workflow */
     auto workflow = workflow_multithread(no_pipelines, num_task, 1, cpu_time_sec * 1000000000,
-                                                   file_size_gb * 1000000000, mem_req_gb * 1000000000);
+                                         file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on storage_host..." << std::endl;
     auto server_storage_service = simulation->add(new wrench::SimpleStorageService(
@@ -157,14 +158,14 @@ int main(int argc, char **argv) {
 
     auto wms = simulation->add(
             new wrench::NFSPipelineWMS(workflow, {baremetal_service}, client_storage_service, server_storage_service,
-                    "compute_host"));
+                                       "compute_host"));
 
     std::cerr << "Instantiating a FileRegistryService on compute_host ..." << std::endl;
     auto file_registry_service = new wrench::FileRegistryService("compute_host");
     simulation->add(file_registry_service);
 
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, server_storage_service);
     }
 
@@ -185,13 +186,13 @@ int main(int argc, char **argv) {
     }
 
     double end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    std::string timelog_filename =  "nfs/run_time_" + sub_dir + ".csv";
+    std::string timelog_filename = "nfs/run_time_" + sub_dir + ".csv";
     FILE *time_log_file = fopen(timelog_filename.c_str(), "a");
-    fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start)/ 1000);
+    fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start) / 1000);
     fclose(time_log_file);
 
-//    simulation->getOutput().dumpUnifiedJSON(workflow,
-//                                           "nfs/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
+    //    simulation->getOutput().dumpUnifiedJSON(workflow,
+    //                                           "nfs/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
 
     return 0;
 }

@@ -63,32 +63,32 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto m = dynamic_cast<JobManagerCompoundJobCompletedMessage*>(message.get())) {
+        if (auto m = dynamic_cast<JobManagerCompoundJobCompletedMessage *>(message.get())) {
             return std::shared_ptr<CompoundJobCompletedEvent>(
                     new CompoundJobCompletedEvent(m->job, m->compute_service));
 
-        } else if (auto m = dynamic_cast<JobManagerCompoundJobFailedMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<JobManagerCompoundJobFailedMessage *>(message.get())) {
             return std::shared_ptr<CompoundJobFailedEvent>(
                     new CompoundJobFailedEvent(m->job, m->compute_service, m->cause));
 
-        } else if (auto m = dynamic_cast<JobManagerStandardJobCompletedMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<JobManagerStandardJobCompletedMessage *>(message.get())) {
             std::set<std::shared_ptr<WorkflowTask>> failure_count_increments;
             m->job->applyTaskUpdates(m->necessary_state_changes, failure_count_increments);
             return std::shared_ptr<StandardJobCompletedEvent>(
                     new StandardJobCompletedEvent(m->job, m->compute_service));
 
-        } else if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage *>(message.get())) {
             m->job->applyTaskUpdates(m->necessary_state_changes, m->necessary_failure_count_increments);
             return std::shared_ptr<StandardJobFailedEvent>(
                     new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
 
-        } else if (auto m = dynamic_cast<ComputeServicePilotJobStartedMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
             return std::shared_ptr<PilotJobStartedEvent>(new PilotJobStartedEvent(m->job, m->compute_service));
 
-        } else if (auto m = dynamic_cast<ComputeServicePilotJobExpiredMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
             return std::shared_ptr<PilotJobExpiredEvent>(new PilotJobExpiredEvent(m->job, m->compute_service));
 
-        } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
             if (m->success) {
                 return std::shared_ptr<FileCopyCompletedEvent>(new FileCopyCompletedEvent(
                         m->file, m->src, m->dst, m->file_registry_service, m->file_registry_service_updated));
@@ -97,13 +97,13 @@ namespace wrench {
                 return std::shared_ptr<FileCopyFailedEvent>(
                         new FileCopyFailedEvent(m->file, m->src, m->dst, m->failure_cause));
             }
-        } else if (auto m = dynamic_cast<ExecutionControllerAlarmTimerMessage*>(message.get())) {
+        } else if (auto m = dynamic_cast<ExecutionControllerAlarmTimerMessage *>(message.get())) {
             return std::shared_ptr<TimerEvent>(new TimerEvent(m->message));
         } else {
             throw std::runtime_error(
                     "ExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event (" +
-                    message->getName() +")");
+                    message->getName() + ")");
         }
     }
 
-};
+};// namespace wrench

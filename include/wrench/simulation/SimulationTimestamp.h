@@ -26,14 +26,13 @@ namespace wrench {
     class SimulationTimestamp {
 
     public:
-
         /**
          * Retrieve the timestamp's content
          *
          * @return a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
-        T * const getContent() {
-          return this->content.get();
+        T *const getContent() {
+            return this->content.get();
         }
 
         /**
@@ -41,7 +40,7 @@ namespace wrench {
          *
          * @return the recorded time of the timestamp
          */
-        double getDate()  {
+        double getDate() {
             return this->getContent()->getDate();
         }
         /***********************/
@@ -61,9 +60,9 @@ namespace wrench {
         /***********************/
 
     private:
-        std::unique_ptr<T>content;
+        std::unique_ptr<T> content;
     };
 
-};
+};// namespace wrench
 
-#endif //WRENCH_SIMULATIONTIMESTAMP_H
+#endif//WRENCH_SIMULATIONTIMESTAMP_H

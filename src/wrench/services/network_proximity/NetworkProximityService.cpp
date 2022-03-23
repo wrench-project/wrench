@@ -34,7 +34,7 @@ namespace wrench {
      * @brief Destructor
      */
     NetworkProximityService::~NetworkProximityService() {
-        this->default_property_values.clear(); // To avoid memory_manager_service leaks
+        this->default_property_values.clear();// To avoid memory_manager_service leaks
         this->network_daemons.clear();
     }
 
@@ -48,8 +48,7 @@ namespace wrench {
     NetworkProximityService::NetworkProximityService(std::string hostname,
                                                      std::vector<std::string> hosts_in_network,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
-    ) : Service(hostname, "network_proximity") {
+                                                     WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname, "network_proximity") {
         this->hosts_in_network = std::move(hosts_in_network);
 
         if (this->hosts_in_network.size() < 2) {
@@ -81,8 +80,8 @@ namespace wrench {
         assertServiceIsUp();
 
         if (boost::iequals(
-                this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                "alltoall")) {
+                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                    "alltoall")) {
             throw std::runtime_error(
                     "NetworkProximityService::getCoordinate() cannot be called with NETWORK_PROXIMITY_SERVICE_TYPE of ALLTOALL");
         }
@@ -134,10 +133,12 @@ namespace wrench {
         std::string network_service_type = this->getPropertyValueAsString(
                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
 
-        if (boost::iequals(network_service_type, "alltoall")) { WRENCH_INFO(
+        if (boost::iequals(network_service_type, "alltoall")) {
+            WRENCH_INFO(
                     "Obtaining the proximity value between %s and %s", hosts.first.c_str(), hosts.second.c_str());
-        } else { WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first.c_str(),
-                             hosts.second.c_str());
+        } else {
+            WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first.c_str(),
+                        hosts.second.c_str());
         }
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
@@ -199,7 +200,7 @@ namespace wrench {
         WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
         // Create  and start network daemons
-        for (auto h : this->hosts_in_network) {
+        for (auto h: this->hosts_in_network) {
             std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
                     new NetworkProximityDaemon(
                             this->simulation, h, this->mailbox,
@@ -216,8 +217,8 @@ namespace wrench {
 
             // if this network service type is 'vivaldi', setup the coordinate lookup table
             if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "vivaldi")) {
+                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                        "vivaldi")) {
                 this->coordinate_lookup_table.insert(
                         std::make_pair(h, std::make_pair((0.0), Simulation::getCurrentSimulatedDate())));
             }
@@ -225,8 +226,8 @@ namespace wrench {
 
         // Start all network daemons
         try {
-            for (auto &network_daemon : this->network_daemons) {
-                network_daemon->start(network_daemon, true, true); // Daemonized, AUTO RESTART
+            for (auto &network_daemon: this->network_daemons) {
+                network_daemon->start(network_daemon, true, true);// Daemonized, AUTO RESTART
             }
         } catch (std::runtime_error &e) {
             throw;
@@ -255,7 +256,8 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) { WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+        if (message == nullptr) {
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
             return false;
         }
 
@@ -300,7 +302,7 @@ namespace wrench {
                         proximity_value = std::sqrt(norm(host2->second.first - host1->second.first));
                         timestamp = std::min(host1->second.second, host2->second.second);
                     }
-                } else { // alltoall
+                } else {// alltoall
                     if (this->entries.find(msg->hosts) != this->entries.end()) {
                         proximity_value = std::get<0>(this->entries[msg->hosts]);
                         timestamp = std::get<1>(this->entries[msg->hosts]);
@@ -320,8 +322,8 @@ namespace wrench {
             this->addEntryToDatabase(msg->hosts, msg->proximity_value);
 
             if (boost::iequals(
-                    this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                    "vivaldi")) {
+                        this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                        "vivaldi")) {
                 vivaldiUpdate(msg->proximity_value, msg->hosts.first, msg->hosts.second);
             }
             return true;
@@ -408,7 +410,7 @@ namespace wrench {
         }
 
         // set the seed unique to the sending daemon
-//        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
+        //        sender_rng.seed((unsigned long) hash_func(sender_daemon->mailbox_name));
         sender_rng.seed(0);
 
         std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);
@@ -506,9 +508,7 @@ namespace wrench {
 
         if (boost::iequals(network_service_type, "alltoall")) {
             if (coverage != 1.0) {
-                throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_COMMUNICATION_COVERAGE value "
-                                            + this->getPropertyValueAsString(
-                        NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE) +
+                throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_COMMUNICATION_COVERAGE value " + this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE) +
                                             " for NETWORK_PROXIMITY_SERVICE_TYPE: " + network_service_type);
             }
         } else if (boost::iequals(network_service_type, "vivaldi")) {
@@ -540,7 +540,7 @@ namespace wrench {
         }
 
         if (this->getPropertyValueAsDouble(
-                NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
+                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE) < 0) {
             throw std::invalid_argument(error_prefix + "Invalid NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE value " +
                                         this->getPropertyValueAsString(
                                                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE));
@@ -554,4 +554,4 @@ namespace wrench {
     std::vector<std::string> NetworkProximityService::getHostnameList() {
         return this->hosts_in_network;
     }
-}
+}// namespace wrench

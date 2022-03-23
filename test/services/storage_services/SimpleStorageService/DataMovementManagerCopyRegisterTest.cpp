@@ -31,7 +31,6 @@ public:
     void do_CopyRegister_test();
 
 protected:
-
     ~DataMovementManagerCopyRegisterTest() {
         workflow->clear();
     }
@@ -57,38 +56,40 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"SrcHost\" speed=\"1f\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
-                                                                                                     "             <prop id=\"mount\" value=\"/\"/>"
-                                                                                                     "          </disk>"
-                                                                                                     "       </host>"
-                                                                                                     "       <host id=\"DstHost\" speed=\"1f\"> "
-                                                                                                     "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                                                     "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
-                                                                                                                                                                                "             <prop id=\"mount\" value=\"/\"/>"
-                                                                                                                                                                                "          </disk>"
-                                                                                                                                                                                "       </host>"
-                                                                                                                                                                                "       <host id=\"WMSHost\" speed=\"1f\"> "
-                                                                                                                                                                                "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                                                                                                                                "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
-                                                                                                                                                                                                                                                           "             <prop id=\"mount\" value=\"/\"/>"
-                                                                                                                                                                                                                                                           "          </disk>"
-                                                                                                                                                                                                                                                           "       </host>"
-                                                                                                                                                                                                                                                           "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
-                                                                                                                                                                                                                                                           "       <route src=\"SrcHost\" dst=\"DstHost\">"
-                                                                                                                                                                                                                                                           "         <link_ctn id=\"link\"/>"
-                                                                                                                                                                                                                                                           "       </route>"
-                                                                                                                                                                                                                                                           "       <route src=\"WMSHost\" dst=\"SrcHost\">"
-                                                                                                                                                                                                                                                           "         <link_ctn id=\"link\"/>"
-                                                                                                                                                                                                                                                           "       </route>"
-                                                                                                                                                                                                                                                           "       <route src=\"WMSHost\" dst=\"DstHost\">"
-                                                                                                                                                                                                                                                           "         <link_ctn id=\"link\"/>"
-                                                                                                                                                                                                                                                           "       </route>"
-                                                                                                                                                                                                                                                           "   </zone> "
-                                                                                                                                                                                                                                                           "</platform>";
+                          "             <prop id=\"size\" value=\"" +
+                          std::to_string(STORAGE_SIZE) + "B\"/>"
+                                                         "             <prop id=\"mount\" value=\"/\"/>"
+                                                         "          </disk>"
+                                                         "       </host>"
+                                                         "       <host id=\"DstHost\" speed=\"1f\"> "
+                                                         "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                         "             <prop id=\"size\" value=\"" +
+                          std::to_string(STORAGE_SIZE) + "B\"/>"
+                                                         "             <prop id=\"mount\" value=\"/\"/>"
+                                                         "          </disk>"
+                                                         "       </host>"
+                                                         "       <host id=\"WMSHost\" speed=\"1f\"> "
+                                                         "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                         "             <prop id=\"size\" value=\"" +
+                          std::to_string(STORAGE_SIZE) + "B\"/>"
+                                                         "             <prop id=\"mount\" value=\"/\"/>"
+                                                         "          </disk>"
+                                                         "       </host>"
+                                                         "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
+                                                         "       <route src=\"SrcHost\" dst=\"DstHost\">"
+                                                         "         <link_ctn id=\"link\"/>"
+                                                         "       </route>"
+                                                         "       <route src=\"WMSHost\" dst=\"SrcHost\">"
+                                                         "         <link_ctn id=\"link\"/>"
+                                                         "       </route>"
+                                                         "       <route src=\"WMSHost\" dst=\"DstHost\">"
+                                                         "         <link_ctn id=\"link\"/>"
+                                                         "       </route>"
+                                                         "   </zone> "
+                                                         "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -104,8 +105,7 @@ class DataMovementManagerCopyRegisterTestWMS : public wrench::ExecutionControlle
 public:
     DataMovementManagerCopyRegisterTestWMS(DataMovementManagerCopyRegisterTest *test,
                                            std::shared_ptr<wrench::FileRegistryService> file_registry_service,
-                                           std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service)  {
+                                           std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), file_registry_service(file_registry_service) {
     }
 
 private:
@@ -125,13 +125,13 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->dst_storage_service),
                                                          file_registry_service);
 
-        } catch (wrench::ExecutionEvent &e)  {
+        } catch (wrench::ExecutionEvent &e) {
             throw std::runtime_error("Synchronous file copy failed");
         }
 
         auto src_file_1_locations = file_registry_service->lookupEntry(this->test->src_file_1);
         bool found = false;
-        for (auto const &l : src_file_1_locations) {
+        for (auto const &l: src_file_1_locations) {
             if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
                 found = true;
             }
@@ -154,7 +154,7 @@ private:
                                                          file_registry_service);
 
             throw std::runtime_error("Synchronous file copy failed");
-        } catch (wrench::ExecutionException &e)  {
+        } catch (wrench::ExecutionException &e) {
         }
 
         // Create a new file registry service to resume normal testing
@@ -189,7 +189,7 @@ private:
         auto src2_file_1_locations = file_registry_service->lookupEntry(this->test->src2_file_1);
 
         found = false;
-        for (auto const &l : src2_file_1_locations) {
+        for (auto const &l: src2_file_1_locations) {
             if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
                 found = true;
             }
@@ -222,7 +222,7 @@ private:
         auto src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
 
         found = false;
-        for (auto const &l : src_file_2_locations) {
+        for (auto const &l: src_file_2_locations) {
             if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
                 found = true;
             }
@@ -266,7 +266,7 @@ private:
 
         auto async_dual_copy_event2_real = std::dynamic_pointer_cast<wrench::FileCopyCompletedEvent>(async_dual_copy_event2);
 
-        if (not async_dual_copy_event2_real)  {
+        if (not async_dual_copy_event2_real) {
             throw std::runtime_error(std::string("Unexpected workflow execution event: " + async_dual_copy_event2->toString()));
         }
 
@@ -282,7 +282,7 @@ private:
         auto src_file_3_locations = file_registry_service->lookupEntry(this->test->src_file_3);
 
         found = false;
-        for (auto const &l : src_file_3_locations) {
+        for (auto const &l: src_file_3_locations) {
             if (wrench::FileLocation::equal(l, wrench::FileLocation::LOCATION(this->test->dst_storage_service))) {
                 found = true;
             }
@@ -345,20 +345,20 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
     // Create a (unused) Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("WMSHost",
-                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                           wrench::ComputeService::ALL_RAM))}, {})));
+                            new wrench::BareMetalComputeService("WMSHost",
+                                                                {std::make_pair("WMSHost", std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                           wrench::ComputeService::ALL_RAM))},
+                                                                {})));
 
     // Create src and dst storage services
     ASSERT_NO_THROW(src_storage_service = simulation->add(
-            new wrench::SimpleStorageService("SrcHost", {"/"})));
+                            new wrench::SimpleStorageService("SrcHost", {"/"})));
 
     ASSERT_NO_THROW(src2_storage_service = simulation->add(
-            new wrench::SimpleStorageService("WMSHost", {"/"})
-    ));
+                            new wrench::SimpleStorageService("WMSHost", {"/"})));
 
     ASSERT_NO_THROW(dst_storage_service = simulation->add(
-            new wrench::SimpleStorageService("DstHost", {"/"})));
+                            new wrench::SimpleStorageService("DstHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -367,7 +367,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
-            this, file_registry_service, "WMSHost")));
+                            this, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(src_file_1, src_storage_service));
@@ -381,7 +381,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

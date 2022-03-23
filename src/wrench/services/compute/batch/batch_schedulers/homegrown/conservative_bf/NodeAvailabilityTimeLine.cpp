@@ -75,10 +75,10 @@ namespace wrench {
      */
     void NodeAvailabilityTimeLine::print() {
         std::cerr << "------ SCHEDULE -----\n";
-        for (auto &availability_timeslot : this->availability_timeslots) {
-            std::cerr << availability_timeslot.first <<  "(" << availability_timeslot.second.num_nodes_utilized << ") | ";
-            for (auto const &j  : availability_timeslot.second.jobs) {
-                std::cerr << j->getJobID() << "("<< j->getRequestedNumNodes() << ") ";
+        for (auto &availability_timeslot: this->availability_timeslots) {
+            std::cerr << availability_timeslot.first << "(" << availability_timeslot.second.num_nodes_utilized << ") | ";
+            for (auto const &j: availability_timeslot.second.jobs) {
+                std::cerr << j->getJobID() << "(" << j->getRequestedNumNodes() << ") ";
             }
             std::cerr << "\n";
         }
@@ -117,7 +117,7 @@ namespace wrench {
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
-        for (auto &availability_timeslot : this->availability_timeslots) {
+        for (auto &availability_timeslot: this->availability_timeslots) {
             unsigned long available_nodes = this->max_num_nodes - availability_timeslot.second.num_nodes_utilized;
 
             // Nope!
@@ -150,10 +150,10 @@ namespace wrench {
      */
     std::set<std::shared_ptr<BatchJob>> NodeAvailabilityTimeLine::getJobsInFirstSlot() {
         std::set<std::shared_ptr<BatchJob>> to_return;
-        for (auto const &j : (*(this->availability_timeslots.begin())).second.jobs) {
+        for (auto const &j: (*(this->availability_timeslots.begin())).second.jobs) {
             to_return.insert(j);
         }
         return to_return;
     }
 
-}
+}// namespace wrench

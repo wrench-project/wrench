@@ -23,7 +23,7 @@ namespace wrench {
     ConstantEfficiencyParallelModel::ConstantEfficiencyParallelModel(double efficiency) {
         if (efficiency < 0.0 or efficiency > 1.0) {
             throw std::invalid_argument("ConstantEfficiencyParallelModel::ConstantEfficiencyParallelModel(): "
-                                     "Invalid efficiency argument (must be between 0.0 and 1.0)");
+                                        "Invalid efficiency argument (must be between 0.0 and 1.0)");
         }
         this->efficiency = efficiency;
     }
@@ -36,21 +36,21 @@ namespace wrench {
         return this->efficiency;
     }
 
-//    /**
-//     * @brief Returns the amount of work each thread much perform
-//     * @param total_work: total amount of work
-//     * @param num_threads: the number of threads
-//     * @return a vector of work amounts
-//     */
-//    std::vector<double> ConstantEfficiencyParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
-//
-//        double thread_work = (total_work) / ((double)num_threads * this->efficiency);
-//        std::vector<double> work_per_threads;
-//        for (unsigned int i=0; i < num_threads; i++) {
-//            work_per_threads.push_back(thread_work);
-//        }
-//        return work_per_threads;
-//    }
+    //    /**
+    //     * @brief Returns the amount of work each thread much perform
+    //     * @param total_work: total amount of work
+    //     * @param num_threads: the number of threads
+    //     * @return a vector of work amounts
+    //     */
+    //    std::vector<double> ConstantEfficiencyParallelModel::getWorkPerThread(double total_work, unsigned long num_threads) {
+    //
+    //        double thread_work = (total_work) / ((double)num_threads * this->efficiency);
+    //        std::vector<double> work_per_threads;
+    //        for (unsigned int i=0; i < num_threads; i++) {
+    //            work_per_threads.push_back(thread_work);
+    //        }
+    //        return work_per_threads;
+    //    }
 
 
     /**
@@ -64,7 +64,7 @@ namespace wrench {
     }
 
     double ConstantEfficiencyParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
-        return (total_work) / ((double)num_threads * this->efficiency);
+        return (total_work) / ((double) num_threads * this->efficiency);
     }
 
-}
+}// namespace wrench

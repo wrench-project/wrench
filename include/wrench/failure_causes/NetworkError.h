@@ -67,7 +67,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_NETWORK_ERROR_H
+#endif//WRENCH_NETWORK_ERROR_H

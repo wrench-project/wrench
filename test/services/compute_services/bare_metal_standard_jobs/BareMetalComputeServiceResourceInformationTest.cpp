@@ -32,7 +32,6 @@ public:
     void do_ResourceInformation_test();
 
 protected:
-
     ~BareMetalComputeServiceTestResourceInformation() {
         workflow->clear();
     }
@@ -67,7 +66,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -82,13 +80,11 @@ class ResourceInformationTestWMS : public wrench::ExecutionController {
 
 public:
     ResourceInformationTestWMS(BareMetalComputeServiceTestResourceInformation *test,
-                               std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                               std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BareMetalComputeServiceTestResourceInformation *test;
 
     int main() {
@@ -150,7 +146,7 @@ private:
 
         ram_capacities = this->test->compute_service1->getMemoryCapacity();
         std::vector<double> sorted_ram_capacities;
-        for (auto const &r : ram_capacities) {
+        for (auto const &r: ram_capacities) {
             sorted_ram_capacities.push_back(r.second);
         }
         std::sort(sorted_ram_capacities.begin(), sorted_ram_capacities.end());
@@ -163,7 +159,7 @@ private:
         // Get Core flop rates
         std::map<std::string, double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
         std::vector<double> sorted_core_flop_rates;
-        for (auto const &f : core_flop_rates) {
+        for (auto const &f: core_flop_rates) {
             sorted_core_flop_rates.push_back(f.second);
         }
         std::sort(sorted_core_flop_rates.begin(), sorted_core_flop_rates.end());
@@ -171,7 +167,6 @@ private:
             (std::abs(sorted_core_flop_rates.at(0) - 1.0) > EPSILON) or
             (std::abs(sorted_core_flop_rates.at(1) - 1e+10) > EPSILON)) {
             throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
-
         }
 
         // Get the TTL
@@ -183,20 +178,19 @@ private:
         std::shared_ptr<wrench::WorkflowTask> t1 = this->test->workflow->addTask("task1", 60.0000, 3, 3, 0);
         std::shared_ptr<wrench::WorkflowTask> t2 = this->test->workflow->addTask("task2", 60000000000.0001, 2, 2, 0);
 
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
         tasks.push_back(t1);
         tasks.push_back(t2);
         auto job = job_manager->createStandardJob(tasks);
 
-        job_manager->submitJob(job, this->test->compute_service1, {{"task1", "Host1:3"},
-                                                                   {"task2", "Host2:2"}});
+        job_manager->submitJob(job, this->test->compute_service1, {{"task1", "Host1:3"}, {"task2", "Host2:2"}});
 
         wrench::Simulation::sleep(1.0);
 
         // Get number of idle cores
         std::map<std::string, unsigned long> num_idle_cores = this->test->compute_service1->getPerHostNumIdleCores();
         std::vector<unsigned long> idle_core_counts;
-        for (auto const &c : num_idle_cores) {
+        for (auto const &c: num_idle_cores) {
             idle_core_counts.push_back(c.second);
         }
         std::sort(idle_core_counts.begin(), idle_core_counts.end());
@@ -211,7 +205,7 @@ private:
             throw std::runtime_error("getTotalNumIdleCores() should return 3 for compute service #1");
         }
 
-        this->test->compute_service1->getPerHostAvailableMemoryCapacity(); // coverage
+        this->test->compute_service1->getPerHostAvailableMemoryCapacity();// coverage
 
         // Wait for the workflow execution event
         auto event = this->waitForNextEvent();
@@ -239,7 +233,7 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -248,38 +242,38 @@ void BareMetalComputeServiceTestResourceInformation::do_ResourceInformation_test
 
     // Create 1 Compute Service that manages Host1 and Host2
     ASSERT_NO_THROW(compute_service1 = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                {{std::make_pair("Host1",
-                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
-                                                 {std::make_pair("Host2",
-                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))}}, "",
-                                                {}
-            )));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                {{std::make_pair("Host1",
+                                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))},
+                                                                 {std::make_pair("Host2",
+                                                                                 std::make_tuple(4, wrench::ComputeService::ALL_RAM))}},
+                                                                "",
+                                                                {})));
 
     // Create 1 Compute Service that manages Host3 and Host4
     ASSERT_NO_THROW(compute_service2 = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                {{std::make_pair("Host3",
-                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
-                                                 {std::make_pair("Host4",
-                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))}}, "",
-                                                {}
-            )));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                {{std::make_pair("Host3",
+                                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))},
+                                                                 {std::make_pair("Host4",
+                                                                                 std::make_tuple(8, wrench::ComputeService::ALL_RAM))}},
+                                                                "",
+                                                                {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(compute_service1);
     compute_services.insert(compute_service2);
 
     // Create the WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ResourceInformationTestWMS(
-                    this, "Host1")));
+                            new ResourceInformationTestWMS(
+                                    this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

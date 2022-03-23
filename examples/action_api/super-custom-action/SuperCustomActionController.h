@@ -25,9 +25,9 @@ namespace wrench {
     public:
         // Constructor
         SuperCustomActionController(std::shared_ptr<BareMetalComputeService> bm_cs,
-                                      std::shared_ptr<CloudComputeService> cloud_cs,
-                                      std::shared_ptr<StorageService> ss_1,
-                                      const std::string &hostname);
+                                    std::shared_ptr<CloudComputeService> cloud_cs,
+                                    std::shared_ptr<StorageService> ss_1,
+                                    const std::string &hostname);
 
     private:
         // main() method of the Controller
@@ -36,7 +36,6 @@ namespace wrench {
         std::shared_ptr<BareMetalComputeService> bm_cs;
         std::shared_ptr<CloudComputeService> cloud_cs;
         std::shared_ptr<StorageService> ss_1;
-
     };
-}
-#endif //WRENCH_EXAMPLE_SUPER_CUSTOM_ACTION_CONTROLLER_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_SUPER_CUSTOM_ACTION_CONTROLLER_H

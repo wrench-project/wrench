@@ -30,7 +30,6 @@ public:
     void do_FailureDetectorForComputerTest_test();
 
 protected:
-
     ~FailureDetectorHostFailuresTest() {
         workflow->clear();
     }
@@ -46,7 +45,7 @@ protected:
                                          " 100 0";
 
         std::string trace_file_name = "host.trace";
-        std::string trace_file_path = "/tmp/"+trace_file_name;
+        std::string trace_file_path = "/tmp/" + trace_file_name;
 
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
         fprintf(trace_file, "%s", trace_file_content.c_str());
@@ -58,17 +57,18 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\""+trace_file_name+"\"  core=\"1\"/> "
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
-                          "       <route src=\"FailedHost\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "   </zone> "
-                          "</platform>";
+                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" +
+                          trace_file_name + "\"  core=\"1\"/> "
+                                            "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                                            "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
+                                            "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                                            "           <link_ctn id=\"link1\"/>"
+                                            "       </route>"
+                                            "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
+                                            "           <link_ctn id=\"link1\"/>"
+                                            "       </route>"
+                                            "   </zone> "
+                                            "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -76,7 +76,6 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
-
 
 
 /**********************************************************************/
@@ -87,13 +86,11 @@ class FailureDetectorForSleeperTestWMS : public wrench::ExecutionController {
 
 public:
     FailureDetectorForSleeperTestWMS(FailureDetectorHostFailuresTest *test,
-                                      std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                     std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     FailureDetectorHostFailuresTest *test;
 
     int main() override {
@@ -102,28 +99,28 @@ private:
         // Starting a victim on the FailedHost, which should fail at time 50
         auto victim1 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim1->setSimulation(this->simulation);
-        victim1->start(victim1, true, false); // Daemonized, no auto-restart
+        victim1->start(victim1, true, false);// Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
-                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox, true, false));
         failure_detector1->setSimulation(this->simulation);
-        failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
+        failure_detector1->start(failure_detector1, true, false);// Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
         auto victim2 = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim2->setSimulation(this->simulation);
-        victim2->start(victim2, true, false); // Daemonized, no auto-restart
+        victim2->start(victim2, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox, true, false));
         failure_detector2->setSimulation(this->simulation);
-        failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
+        failure_detector2->start(failure_detector2, true, false);// Daemonized, no auto-restart
 
 
         // Waiting for a message
@@ -189,16 +186,17 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForSleeperTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorForSleeperTestWMS(this, hostname)));
+                            new FailureDetectorForSleeperTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
 
@@ -211,13 +209,11 @@ class FailureDetectorForComputerTestWMS : public wrench::ExecutionController {
 
 public:
     FailureDetectorForComputerTestWMS(FailureDetectorHostFailuresTest *test,
-                                     std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                      std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     FailureDetectorHostFailuresTest *test;
 
     int main() override {
@@ -225,28 +221,28 @@ private:
         // Starting a victim on the FailedHost, which should fail at time 50
         auto victim1 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHost", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim1->setSimulation(this->simulation);
-        victim1->start(victim1, true, false); // Daemonized, no auto-restart
+        victim1->start(victim1, true, false);// Daemonized, no auto-restart
 
         // Starting its nemesis!
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 50, "FailedHost",
-                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                               wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector1 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim1, this->mailbox, true, false));
         failure_detector1->setSimulation(this->simulation);
-        failure_detector1->start(failure_detector1, true, false); // Daemonized, no auto-restart
+        failure_detector1->start(failure_detector1, true, false);// Daemonized, no auto-restart
 
         // Starting a victim on the FailedHostTrace, which should fail at time 100
         auto victim2 = std::shared_ptr<wrench::ComputerVictim>(new wrench::ComputerVictim("FailedHostTrace", 200, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         victim2->setSimulation(this->simulation);
-        victim2->start(victim2, true, false); // Daemonized, no auto-restart
+        victim2->start(victim2, true, false);// Daemonized, no auto-restart
 
         // Starting the failure detector!
         auto failure_detector2 = std::shared_ptr<wrench::ServiceTerminationDetector>(new wrench::ServiceTerminationDetector("StableHost", victim2, this->mailbox, true, false));
         failure_detector2->setSimulation(this->simulation);
-        failure_detector2->start(failure_detector2, true, false); // Daemonized, no auto-restart
+        failure_detector2->start(failure_detector2, true, false);// Daemonized, no auto-restart
 
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -309,15 +305,16 @@ void FailureDetectorHostFailuresTest::do_FailureDetectorForComputerTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FailureDetectorForComputerTestWMS(this, hostname)));
+                            new FailureDetectorForComputerTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

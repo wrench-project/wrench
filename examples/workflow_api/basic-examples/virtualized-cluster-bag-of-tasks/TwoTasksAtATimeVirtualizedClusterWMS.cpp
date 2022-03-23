@@ -24,7 +24,7 @@
 
 #include "TwoTasksAtATimeVirtualizedClusterWMS.h"
 
-constexpr double GB=1000000000.0;
+constexpr double GB = 1000000000.0;
 
 WRENCH_LOG_CATEGORY(custom_wms, "Log category for TwoTasksAtATimeVirtualizedClusterWMS");
 
@@ -42,9 +42,8 @@ namespace wrench {
             const std::shared_ptr<Workflow> &workflow,
             const std::shared_ptr<VirtualizedClusterComputeService> &virtualized_cluster_compute_service,
             const std::shared_ptr<StorageService> &storage_service,
-            const std::string &hostname) :
-            ExecutionController(hostname,"two-tasks-at-a-time-virtualized-cluster"),
-            workflow(workflow), virtualized_cluster_compute_service(virtualized_cluster_compute_service), storage_service(storage_service){}
+            const std::string &hostname) : ExecutionController(hostname, "two-tasks-at-a-time-virtualized-cluster"),
+                                           workflow(workflow), virtualized_cluster_compute_service(virtualized_cluster_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the TwoTasksAtATimeVirtualizedClusterWMS daemon
@@ -83,8 +82,7 @@ namespace wrench {
 
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
-                      [](const std::shared_ptr<WorkflowTask> &t1, const std::shared_ptr<WorkflowTask>  &t2) -> bool {
-
+                      [](const std::shared_ptr<WorkflowTask> &t1, const std::shared_ptr<WorkflowTask> &t2) -> bool {
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1.get() > (uintptr_t) t2.get());
                           } else {
@@ -105,7 +103,7 @@ namespace wrench {
 
             /* Create the job  */
             WRENCH_INFO("Creating a job to run task %s (%.2lf)",
-                        cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
+                        cheap_ready_task->getID().c_str(), cheap_ready_task->getFlops());
 
             auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
 
@@ -122,7 +120,7 @@ namespace wrench {
 
             /* Create the job  */
             WRENCH_INFO("Creating a job to run task %s (%.2lf)",
-                        expensive_ready_task->getID().c_str(),  expensive_ready_task->getFlops());
+                        expensive_ready_task->getID().c_str(), expensive_ready_task->getFlops());
 
             auto standard_job2 = job_manager->createStandardJob(expensive_ready_task, file_locations2);
 
@@ -184,4 +182,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

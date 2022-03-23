@@ -30,4 +30,4 @@ namespace wrench {
         return std::string("A computation has died (failed or killed)");
     }
 
-}
+}// namespace wrench

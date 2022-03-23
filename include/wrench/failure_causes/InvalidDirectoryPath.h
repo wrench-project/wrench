@@ -41,20 +41,20 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<StorageService>  getStorageService();
-        std::string  getInvalidPath();
+        std::shared_ptr<StorageService> getStorageService();
+        std::string getInvalidPath();
         std::string toString() override;
 
     private:
-        std::shared_ptr<StorageService>  storage_service;
-        std::string  invalid_path;
+        std::shared_ptr<StorageService> storage_service;
+        std::string invalid_path;
     };
 
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_INVALIDDIRECTORYPATH_H
+#endif//WRENCH_INVALIDDIRECTORYPATH_H

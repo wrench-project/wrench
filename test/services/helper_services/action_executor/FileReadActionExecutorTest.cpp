@@ -102,7 +102,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -111,7 +110,6 @@ protected:
 public:
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
-
 };
 
 
@@ -124,12 +122,10 @@ class FileReadActionExecutorSuccessTestWMS : public wrench::ExecutionController 
 public:
     FileReadActionExecutorSuccessTestWMS(FileReadActionExecutorTest *test,
                                          std::shared_ptr<wrench::Workflow> workflow,
-                                         std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
+                                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
-
     FileReadActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
@@ -195,7 +191,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -221,10 +217,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorSuccessTest_test() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 
@@ -237,12 +232,10 @@ class FileReadActionExecutorMultipleAttemptsSuccessTestWMS : public wrench::Exec
 public:
     FileReadActionExecutorMultipleAttemptsSuccessTestWMS(FileReadActionExecutorTest *test,
                                                          std::shared_ptr<wrench::Workflow> workflow,
-                                                         std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
+                                                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
-
     FileReadActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
@@ -256,7 +249,7 @@ private:
         // Add a file_read_action
         auto file_read_action = job->addFileReadAction("", this->test->file,
                                                        {wrench::FileLocation::LOCATION(this->test->ss, "/bogus/"),
-                                                        wrench::FileLocation::LOCATION(this->test->ss) });
+                                                        wrench::FileLocation::LOCATION(this->test->ss)});
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_read_action, nullptr));
@@ -299,7 +292,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -325,10 +318,9 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMultipleAttemptsSucces
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
 
 
@@ -341,13 +333,11 @@ class FileReadActionExecutorMissingFileTestWMS : public wrench::ExecutionControl
 
 public:
     FileReadActionExecutorMissingFileTestWMS(FileReadActionExecutorTest *test,
-                                             std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
-
     FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
@@ -414,7 +404,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -433,18 +423,16 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorMissingFileTest_test()
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
+                            new FileReadActionExecutorMissingFileTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
-
 
 
 /**********************************************************************/
@@ -456,13 +444,11 @@ class FileReadActionExecutorKillingStorageServiceTestWMS : public wrench::Execut
 
 public:
     FileReadActionExecutorKillingStorageServiceTestWMS(FileReadActionExecutorTest *test,
-                                                       std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
-
     FileReadActionExecutorTest *test;
     double sleep_before_fail;
 
@@ -535,7 +521,7 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -556,14 +542,13 @@ void FileReadActionExecutorTest::do_FileReadActionExecutorKillingStorageServiceT
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
+                            new FileReadActionExecutorKillingStorageServiceTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }

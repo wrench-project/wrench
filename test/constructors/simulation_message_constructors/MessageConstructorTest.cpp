@@ -8,8 +8,6 @@
  */
 
 
-
-
 #include <gtest/gtest.h>
 #include <map>
 #include <wrench/services/compute/batch/BatchComputeServiceMessage.h>
@@ -31,25 +29,25 @@
 #include "../../include/TestWithFork.h"
 #include "../../include/UniqueTmpPathPrefix.h"
 
-#define CUSTOM_THROW(x, y)  try { \
-            x ; \
-            throw std::runtime_error(std::string("Throwing at ") + __FILE__ + ":" + std::to_string(__LINE__)); \
-        } catch (std::invalid_argument &ignore) {}
+#define CUSTOM_THROW(x, y)                                                                                 \
+    try {                                                                                                  \
+        x;                                                                                                 \
+        throw std::runtime_error(std::string("Throwing at ") + __FILE__ + ":" + std::to_string(__LINE__)); \
+    } catch (std::invalid_argument & ignore) {}
 
-#define CUSTOM_NO_THROW(x)  try { \
-            x ; \
-        } catch (std::invalid_argument &e) { \
-            throw std::runtime_error(std::string("Throwing at ") + __FILE__ + ":" + std::to_string(__LINE__) + ": " + e.what()); \
-        }
+#define CUSTOM_NO_THROW(x)                                                                                                   \
+    try {                                                                                                                    \
+        x;                                                                                                                   \
+    } catch (std::invalid_argument & e) {                                                                                    \
+        throw std::runtime_error(std::string("Throwing at ") + __FILE__ + ":" + std::to_string(__LINE__) + ": " + e.what()); \
+    }
 
 class MessageConstructorTest : public ::testing::Test {
 
 public:
-
     void do_MessageConstruction_test();
 
 protected:
-
     ~MessageConstructorTest() {
     }
 
@@ -82,7 +80,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 
@@ -94,8 +91,6 @@ public:
     std::shared_ptr<wrench::FailureCause> failure_cause;
     std::shared_ptr<wrench::BatchJob> batch_job;
     std::shared_ptr<wrench::NetworkProximityDaemon> network_proximity_daemon;
-
-
 };
 
 class MessageConstructorTestWMS : public wrench::ExecutionController {
@@ -103,13 +98,11 @@ class MessageConstructorTestWMS : public wrench::ExecutionController {
 public:
     MessageConstructorTestWMS(MessageConstructorTest *test,
                               std::shared_ptr<wrench::Workflow> workflow,
-                              std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
+                              std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 
 private:
-
     MessageConstructorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
@@ -344,18 +337,18 @@ private:
         CUSTOM_NO_THROW(new wrench::StorageServiceFileContentChunkMessage(file, 666, true));
         CUSTOM_THROW(new wrench::StorageServiceFileContentChunkMessage(nullptr, 666, true), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), std::make_pair("a","b"), 666));
-        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(nullptr, std::make_pair("a","b"), 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), std::make_pair("","b"), 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), std::make_pair("a",""), 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), std::make_pair("a", "b"), 666));
+        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(nullptr, std::make_pair("a", "b"), 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), std::make_pair("", "b"), 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), std::make_pair("a", ""), 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a","b"), 1.0, 1.0, 666));
-        CUSTOM_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("","b"), 1.0, 1.0, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a",""), 1.0, 1.0, 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a", "b"), 1.0, 1.0, 666));
+        CUSTOM_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("", "b"), 1.0, 1.0, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a", ""), 1.0, 1.0, 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a","b"), 1.0, 666));
-        CUSTOM_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
-        CUSTOM_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a",""), 1.0, 666), std::invalid_argument);
+        CUSTOM_NO_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a", "b"), 1.0, 666));
+        CUSTOM_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("", "b"), 1.0, 666), std::invalid_argument);
+        CUSTOM_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a", ""), 1.0, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::NextContactDaemonRequestMessage(network_proximity_daemon, 666));
         CUSTOM_THROW(new wrench::NextContactDaemonRequestMessage(nullptr, 666), std::invalid_argument);
@@ -364,7 +357,7 @@ private:
         CUSTOM_THROW(new wrench::CoordinateLookupRequestMessage(nullptr, "requested_host", 666), std::invalid_argument);
         CUSTOM_THROW(new wrench::CoordinateLookupRequestMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "", 666), std::invalid_argument);
 
-        CUSTOM_NO_THROW(new wrench::CoordinateLookupAnswerMessage("requested_host", true, std::make_pair(1.0,1.0), 1.0, 666));
+        CUSTOM_NO_THROW(new wrench::CoordinateLookupAnswerMessage("requested_host", true, std::make_pair(1.0, 1.0), 1.0, 666));
         CUSTOM_THROW(new wrench::CoordinateLookupAnswerMessage("", true, std::make_pair(1.0, 1.0), 1.0, 666), std::invalid_argument);
 
         CUSTOM_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox::by_name("mailbox"), "string", 666));
@@ -395,7 +388,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
@@ -419,10 +412,7 @@ void MessageConstructorTest::do_MessageConstruction_test() {
 
     simulation->launch();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
-
 }
-

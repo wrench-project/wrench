@@ -25,7 +25,6 @@ class BareMetalComputeServiceTestScheduling : public ::testing::Test {
 
 
 public:
-
     std::shared_ptr<wrench::Workflow> workflow;
 
     // Default
@@ -52,7 +51,6 @@ public:
     }
 
 protected:
-
     ~BareMetalComputeServiceTestScheduling() {
         workflow->clear();
     }
@@ -85,7 +83,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -99,12 +96,10 @@ class RAMPressureTestWMS : public wrench::ExecutionController {
 
 public:
     RAMPressureTestWMS(BareMetalComputeServiceTestScheduling *test,
-                       std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                       std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     BareMetalComputeServiceTestScheduling *test;
 
     int main() {
@@ -113,14 +108,14 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a few tasks
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
         tasks.push_back(this->test->workflow->addTask("task1", 60, 1, 1, 500));
         tasks.push_back(this->test->workflow->addTask("task2", 60, 1, 1, 600));
         tasks.push_back(this->test->workflow->addTask("task3", 60, 1, 1, 500));
         tasks.push_back(this->test->workflow->addTask("task4", 60, 1, 1, 000));
 
         // Submit them in order
-        for (auto const & t : tasks) {
+        for (auto const &t: tasks) {
             auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), "Host1:1"));
@@ -128,15 +123,15 @@ private:
         }
 
         auto ram_availabilities = this->test->cs->getPerHostAvailableMemoryCapacity();
-        if ((not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host1"],  500)) ||
+        if ((not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host1"], 500)) ||
             (not BareMetalComputeServiceTestScheduling::isAboutTheSame(ram_availabilities["Host2"], 1000))) {
             throw std::runtime_error("Unexpected memory_manager_service availabilities");
         }
 
 
         // Wait for completions
-        std::map<std::shared_ptr<wrench::WorkflowTask>, std::tuple<double,double>> times;
-        for (int i=0; i < 4; i++) {
+        std::map<std::shared_ptr<wrench::WorkflowTask>, std::tuple<double, double>> times;
+        for (int i = 0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -159,35 +154,33 @@ private:
         if (std::get<0>(times[tasks.at(0)]) > 1.0) {
             throw std::runtime_error("Unexpected start time for task1: " + std::to_string(std::get<0>(times[tasks.at(0)])));
         }
-        if ((std::get<1>(times[tasks.at(0)]) < 60.0) || (std::get<1>(times[tasks.at(0)])  > 61.0)) {
+        if ((std::get<1>(times[tasks.at(0)]) < 60.0) || (std::get<1>(times[tasks.at(0)]) > 61.0)) {
             throw std::runtime_error("Unexpected end time for task1: " + std::to_string(std::get<1>(times[tasks.at(0)])));
         }
         // TASK #4
         if (std::get<0>(times[tasks.at(3)]) > 1.0) {
             throw std::runtime_error("Unexpected start time for task4: " + std::to_string(std::get<0>(times[tasks.at(3)])));
         }
-        if ((std::get<1>(times[tasks.at(3)]) < 60.0) || (std::get<1>(times[tasks.at(3)])  > 61.0)) {
+        if ((std::get<1>(times[tasks.at(3)]) < 60.0) || (std::get<1>(times[tasks.at(3)]) > 61.0)) {
             throw std::runtime_error("Unexpected end time for task4: " + std::to_string(std::get<1>(times[tasks.at(3)])));
         }
         // TASK #2
         if ((std::get<0>(times[tasks.at(1)]) < 60.0) || (std::get<0>(times[tasks.at(1)]) > 61.0)) {
             throw std::runtime_error("Unexpected start time for task2: " + std::to_string(std::get<0>(times[tasks.at(1)])));
         }
-        if ((std::get<1>(times[tasks.at(1)]) < 120.0) || (std::get<1>(times[tasks.at(1)])  > 121.0)) {
+        if ((std::get<1>(times[tasks.at(1)]) < 120.0) || (std::get<1>(times[tasks.at(1)]) > 121.0)) {
             throw std::runtime_error("Unexpected end time for task2: " + std::to_string(std::get<1>(times[tasks.at(1)])));
         }
         // TASK #3
         if ((std::get<0>(times[tasks.at(2)]) < 120.0) || (std::get<0>(times[tasks.at(2)]) > 121.0)) {
             throw std::runtime_error("Unexpected start time for task3: " + std::to_string(std::get<0>(times[tasks.at(2)])));
         }
-        if ((std::get<1>(times[tasks.at(2)]) < 180.0) || (std::get<1>(times[tasks.at(2)])  > 181.0)) {
+        if ((std::get<1>(times[tasks.at(2)]) < 180.0) || (std::get<1>(times[tasks.at(2)]) > 181.0)) {
             throw std::runtime_error("Unexpected end time for task3: " + std::to_string(std::get<1>(times[tasks.at(2)])));
         }
 
         return 0;
     }
-
-
 };
 
 TEST_F(BareMetalComputeServiceTestScheduling, RAMPressure) {
@@ -201,7 +194,7 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
     int argc = 1;
     auto **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -210,28 +203,26 @@ void BareMetalComputeServiceTestScheduling::do_RAMPressure_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                (std::vector<std::string>){"Host1", "Host2"}, "",
-                                                {}, {})));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                (std::vector<std::string>){"Host1", "Host2"}, "",
+                                                                {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new RAMPressureTestWMS(this, "Host1")));
+                            new RAMPressureTestWMS(this, "Host1")));
 
     workflow->clear();
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-
 
 
 /**********************************************************************/
@@ -242,13 +233,11 @@ class LoadBalancing1TestWMS : public wrench::ExecutionController {
 
 public:
     LoadBalancing1TestWMS(BareMetalComputeServiceTestScheduling *test,
-                          std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                          std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
-
     BareMetalComputeServiceTestScheduling *test;
 
     int main() {
@@ -257,14 +246,14 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a few tasks
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
         tasks.push_back(this->test->workflow->addTask("task1", 100, 4, 4, 500));
         tasks.push_back(this->test->workflow->addTask("task2", 100, 4, 4, 500));
         tasks.push_back(this->test->workflow->addTask("task3", 100, 4, 4, 500));
         tasks.push_back(this->test->workflow->addTask("task4", 100, 4, 4, 500));
 
         // Submit them in order
-        for (auto const & t : tasks) {
+        for (auto const &t: tasks) {
             auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), ""));
@@ -272,8 +261,8 @@ private:
         }
 
         // Wait for completions
-        std::map<std::shared_ptr<wrench::WorkflowTask> , std::tuple<double,double>> times;
-        for (int i=0; i < 4; i++) {
+        std::map<std::shared_ptr<wrench::WorkflowTask>, std::tuple<double, double>> times;
+        for (int i = 0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -302,7 +291,7 @@ private:
 
         int host1_count = 0;
         int host2_count = 0;
-        for (auto const &h : hosts) {
+        for (auto const &h: hosts) {
             if (h == "Host1") {
                 host1_count++;
             }
@@ -317,8 +306,6 @@ private:
 
         return 0;
     }
-
-
 };
 
 TEST_F(BareMetalComputeServiceTestScheduling, LoadBalancing1) {
@@ -340,30 +327,27 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing1_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                (std::vector<std::string>){"Host1", "Host2"}, "",
-                                                {}, {})));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                (std::vector<std::string>){"Host1", "Host2"}, "",
+                                                                {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new LoadBalancing1TestWMS(
-                    this, "Host1")));
+                            new LoadBalancing1TestWMS(
+                                    this, "Host1")));
 
     workflow->clear();
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-
 
 
 /**********************************************************************/
@@ -374,14 +358,12 @@ class LoadBalancing2TestWMS : public wrench::ExecutionController {
 
 public:
     LoadBalancing2TestWMS(BareMetalComputeServiceTestScheduling *test,
-                          std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                          std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 
 private:
-
     BareMetalComputeServiceTestScheduling *test;
 
     int main() {
@@ -390,14 +372,14 @@ private:
         auto job_manager = this->createJobManager();
 
         // Create a few tasks
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks;
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks;
         tasks.push_back(this->test->workflow->addTask("task1", 100, 4, 4, 100));
         tasks.push_back(this->test->workflow->addTask("task2", 100, 4, 4, 100));
         tasks.push_back(this->test->workflow->addTask("task3", 100, 4, 4, 100));
         tasks.push_back(this->test->workflow->addTask("task4", 100, 4, 4, 100));
 
         // Submit them in order
-        for (auto const & t : tasks) {
+        for (auto const &t: tasks) {
             auto j = job_manager->createStandardJob(t);
             std::map<std::string, std::string> cs_specific_args;
             cs_specific_args.insert(std::make_pair(t->getID(), ""));
@@ -405,8 +387,8 @@ private:
         }
 
         // Wait for completions
-        std::map<std::shared_ptr<wrench::WorkflowTask> , std::tuple<double,double>> times;
-        for (int i=0; i < 4; i++) {
+        std::map<std::shared_ptr<wrench::WorkflowTask>, std::tuple<double, double>> times;
+        for (int i = 0; i < 4; i++) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -435,7 +417,7 @@ private:
 
         int host1_count = 0;
         int host3_count = 0;
-        for (auto const &h : hosts) {
+        for (auto const &h: hosts) {
             if (h == "Host1") {
                 host1_count++;
             }
@@ -450,8 +432,6 @@ private:
 
         return 0;
     }
-
-
 };
 
 TEST_F(BareMetalComputeServiceTestScheduling, LoadBalancing2) {
@@ -473,23 +453,23 @@ void BareMetalComputeServiceTestScheduling::do_LoadBalancing2_test() {
 
     // Create a Compute Service
     ASSERT_NO_THROW(cs = simulation->add(
-            new wrench::BareMetalComputeService("Host1",
-                                                (std::vector<std::string>){"Host1", "Host3"}, "",
-                                                {}, {})));
+                            new wrench::BareMetalComputeService("Host1",
+                                                                (std::vector<std::string>){"Host1", "Host3"}, "",
+                                                                {}, {})));
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
     compute_services.insert(cs);
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new LoadBalancing2TestWMS(
-                    this, "Host1")));
+                            new LoadBalancing2TestWMS(
+                                    this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

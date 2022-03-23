@@ -23,12 +23,11 @@ namespace wrench {
     public:
         // Constructor
         Controller(
-                  const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
-                  const std::shared_ptr<SimpleStorageService> &storage_service,
-                  const std::string &hostname);
+                const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
+                const std::shared_ptr<SimpleStorageService> &storage_service,
+                const std::string &hostname);
 
     protected:
-
         // Overridden method
         void processEventCompoundJobCompletion(std::shared_ptr<CompoundJobCompletedEvent>) override;
 
@@ -38,7 +37,6 @@ namespace wrench {
 
         const std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
         const std::shared_ptr<SimpleStorageService> storage_service;
-
     };
-}
-#endif //CONTROLLER_H
+}// namespace wrench
+#endif//CONTROLLER_H

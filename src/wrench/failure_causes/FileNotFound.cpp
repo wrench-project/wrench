@@ -22,7 +22,7 @@ namespace wrench {
      * @param file: the file that could not be found
      * @param location: the location at which it could not be found (could be nullptr)
      */
-    FileNotFound::FileNotFound(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    FileNotFound::FileNotFound(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         this->file = file;
         this->location = location;
     }
@@ -31,7 +31,7 @@ namespace wrench {
      * @brief Getter
      * @return the file
      */
-    std::shared_ptr<DataFile>FileNotFound::getFile() {
+    std::shared_ptr<DataFile> FileNotFound::getFile() {
         return this->file;
     }
 
@@ -55,4 +55,4 @@ namespace wrench {
         return msg;
     }
 
-}
+}// namespace wrench

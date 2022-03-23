@@ -21,7 +21,7 @@ namespace wrench {
 
 
     SimulationMessage::~SimulationMessage() {
-//        WRENCH_INFO("DELETE: %s (%lu)", name.c_str(), (unsigned long)(this));
+        //        WRENCH_INFO("DELETE: %s (%lu)", name.c_str(), (unsigned long)(this));
     }
 
 
@@ -41,9 +41,9 @@ namespace wrench {
      * @return the name
      */
     std::string SimulationMessage::getName() {
-        char const * name = typeid( *this).name();
-        return boost::core::demangle( name );
+        char const *name = typeid(*this).name();
+        return boost::core::demangle(name);
     }
 
 
-};
+};// namespace wrench

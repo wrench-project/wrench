@@ -31,11 +31,9 @@ namespace wrench {
     /**
      * @brief A workflow (to be executed by a WMS)
      */
-    class Workflow : public std::enable_shared_from_this<Workflow>  {
+    class Workflow : public std::enable_shared_from_this<Workflow> {
 
     public:
-
-
         static std::shared_ptr<Workflow> createWorkflow();
         void clear();
 
@@ -47,13 +45,13 @@ namespace wrench {
 
 
         std::shared_ptr<WorkflowTask> addTask(std::string, double flops,
-                              unsigned long min_num_cores,
-                              unsigned long max_num_cores,
-                              double memory_requirement);
+                                              unsigned long min_num_cores,
+                                              unsigned long max_num_cores,
+                                              double memory_requirement);
 
-        void removeTask(std::shared_ptr<WorkflowTask>task);
+        void removeTask(std::shared_ptr<WorkflowTask> task);
 
-        void removeFile(std::shared_ptr<DataFile>file);
+        void removeFile(std::shared_ptr<DataFile> file);
         std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         std::shared_ptr<DataFile> addFile(std::string id, double size);
         std::shared_ptr<DataFile> getFileByID(const std::string &id);
@@ -62,8 +60,8 @@ namespace wrench {
 
         static double getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> tasks);
 
-        void addControlDependency(std::shared_ptr<WorkflowTask>src, std::shared_ptr<WorkflowTask>dest, bool redundant_dependencies = false);
-        void removeControlDependency(std::shared_ptr<WorkflowTask>src, std::shared_ptr<WorkflowTask>dest);
+        void addControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dest, bool redundant_dependencies = false);
+        void removeControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dest);
 
         unsigned long getNumberOfTasks();
 
@@ -85,12 +83,12 @@ namespace wrench {
         std::map<std::string, std::shared_ptr<WorkflowTask>> getExitTaskMap() const;
         std::vector<std::shared_ptr<WorkflowTask>> getExitTasks() const;
 
-        std::vector<std::shared_ptr<WorkflowTask>> getTaskParents(const std::shared_ptr<WorkflowTask>task);
-        long getTaskNumberOfParents(const  std::shared_ptr<WorkflowTask>task);
-        std::vector<std::shared_ptr<WorkflowTask>> getTaskChildren(const std::shared_ptr<WorkflowTask>task);
-        long getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask>task);
+        std::vector<std::shared_ptr<WorkflowTask>> getTaskParents(const std::shared_ptr<WorkflowTask> task);
+        long getTaskNumberOfParents(const std::shared_ptr<WorkflowTask> task);
+        std::vector<std::shared_ptr<WorkflowTask>> getTaskChildren(const std::shared_ptr<WorkflowTask> task);
+        long getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask> task);
 
-        bool pathExists(const std::shared_ptr<WorkflowTask>src, const std::shared_ptr<WorkflowTask>dst);
+        bool pathExists(const std::shared_ptr<WorkflowTask> src, const std::shared_ptr<WorkflowTask> dst);
 
         std::shared_ptr<WorkflowTask> getTaskThatOutputs(std::shared_ptr<DataFile> file);
         bool isFileOutputOfSomeTask(std::shared_ptr<DataFile> file);
@@ -119,7 +117,9 @@ namespace wrench {
 
         Workflow();
 
-        struct Vertex{ std::shared_ptr<WorkflowTask>task;};
+        struct Vertex {
+            std::shared_ptr<WorkflowTask> task;
+        };
         typedef boost::adjacency_list<boost::listS, boost::vecS, boost::directedS, Vertex> DAG;
         typedef boost::graph_traits<DAG>::vertex_descriptor vertex_t;
 
@@ -137,8 +137,7 @@ namespace wrench {
 
         /* Set of files (also kept track by the simulation!) */
         std::set<std::shared_ptr<DataFile>> data_files;
-
     };
-};
+};// namespace wrench
 
-#endif //WRENCH_WORKFLOW_H
+#endif//WRENCH_WORKFLOW_H

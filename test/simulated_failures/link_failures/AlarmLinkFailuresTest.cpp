@@ -24,12 +24,10 @@ WRENCH_LOG_CATEGORY(alarm_link_failures_test, "Log category for AlarmLinkFailure
 class AlarmLinkFailuresTest : public ::testing::Test {
 
 public:
-
     void do_AlarmLinkFailure_Test();
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-
     ~AlarmLinkFailuresTest() {
         workflow->clear();
     }
@@ -55,11 +53,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -70,20 +66,18 @@ class AlarmLinkFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmLinkFailuresTestWMS(AlarmLinkFailuresTest *test,
-                            std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                             std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     AlarmLinkFailuresTest *test;
 
     int main() {
 
         // Create an Alarm service that will go of in 10 seconds
         auto mailbox = this->mailbox;
-        wrench::Alarm::createAndStartAlarm(this->simulation, 10,"Host2", mailbox,
+        wrench::Alarm::createAndStartAlarm(this->simulation, 10, "Host2", mailbox,
                                            new wrench::ExecutionControllerAlarmTimerMessage("hello", 10000), "wms_timer");
 
         // Start the link killer that will turn off link1 in 20 seconds
@@ -91,7 +85,7 @@ private:
                 new wrench::ResourceSwitcher("Host1", 20, "link1",
                                              wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::LINK));
         switcher->setSimulation(this->simulation);
-        switcher->start(switcher, true, false); // Daemonized, no auto-restart
+        switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
         // Wait for the message
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -125,17 +119,17 @@ void AlarmLinkFailuresTest::do_AlarmLinkFailure_Test() {
     ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new AlarmLinkFailuresTestWMS(
-                    this, "Host1")));
+                            new AlarmLinkFailuresTestWMS(
+                                    this, "Host1")));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

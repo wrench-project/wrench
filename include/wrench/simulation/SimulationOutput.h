@@ -45,7 +45,7 @@ namespace wrench {
 
             std::vector<SimulationTimestamp<T> *> non_generic_vector;
             auto trace = (SimulationTrace<T> *) (this->traces[type_index]);
-            for (auto ts : trace->getTrace()) {
+            for (auto ts: trace->getTrace()) {
                 non_generic_vector.push_back((SimulationTimestamp<T> *) ts);
             }
             return non_generic_vector;
@@ -87,39 +87,39 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask>task);
+        void addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask> task);
 
-        void addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask>task);
+        void addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask> task);
 
-        void addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask>task);
+        void addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask> task);
 
-        void addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask>task);
+        void addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask> task);
 
-        void addTimestampFileReadStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
-                                       std::shared_ptr<WorkflowTask>task = nullptr);
+        void addTimestampFileReadStart(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+                                       std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileReadFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
-                                         std::shared_ptr<WorkflowTask>task = nullptr);
+        void addTimestampFileReadFailure(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+                                         std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileReadCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
-                                            std::shared_ptr<WorkflowTask>task = nullptr);
+        void addTimestampFileReadCompletion(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+                                            std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileWriteStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
-                                        std::shared_ptr<WorkflowTask>task = nullptr);
+        void addTimestampFileWriteStart(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+                                        std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileWriteFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
-                                          std::shared_ptr<WorkflowTask>task = nullptr);
+        void addTimestampFileWriteFailure(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+                                          std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation>  src, std::shared_ptr<StorageService>  service,
-                                             std::shared_ptr<WorkflowTask>task = nullptr);
+        void addTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+                                             std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileCopyStart(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyStart(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src,
                                        std::shared_ptr<FileLocation> dst);
 
-        void addTimestampFileCopyFailure(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyFailure(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src,
                                          std::shared_ptr<FileLocation> dst);
 
-        void addTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src,
+        void addTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src,
                                             std::shared_ptr<FileLocation> dst);
 
         void
@@ -210,6 +210,6 @@ namespace wrench {
             this->enabledStatus[type_index] = enabled;
         }
     };
-};
+};// namespace wrench
 
-#endif //WRENCH_SIMULATIONOUTPUT_H
+#endif//WRENCH_SIMULATIONOUTPUT_H

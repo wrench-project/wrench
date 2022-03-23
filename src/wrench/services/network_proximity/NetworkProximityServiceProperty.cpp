@@ -28,4 +28,4 @@ namespace wrench {
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
-};
+};// namespace wrench
