@@ -115,6 +115,6 @@ namespace wrench {
 
         static json eventToJSON(double date, const std::shared_ptr<wrench::ExecutionEvent> &event);
     };
-}
+}// namespace wrench
 
-#endif // WRENCH_SIMULATION_CONTROLLER_H
+#endif// WRENCH_SIMULATION_CONTROLLER_H

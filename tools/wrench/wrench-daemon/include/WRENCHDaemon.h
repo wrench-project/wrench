@@ -51,7 +51,6 @@ private:
     static bool isPortTaken(int port);
 
     static void error_handling(const Request &req, Response &res);
-
 };
 
-#endif // WRENCH_DAEMON_H
+#endif// WRENCH_DAEMON_H

@@ -17,14 +17,13 @@ class REST_API {
 public:
     REST_API(httplib::Server &server,
              std::function<void(const Request &req)> display_request_function,
-             std::shared_ptr <wrench::SimulationController> &sc) :
-            display_request_function(std::move(display_request_function)) {
+             std::shared_ptr<wrench::SimulationController> &sc) : display_request_function(std::move(display_request_function)) {
 
         // Set up all request handlers (automatically generated code!)
 #include "./REST_API_generated_code.h"
 
         // Set up all post request handlers
-        for (auto const &spec : request_handlers) {
+        for (auto const &spec: request_handlers) {
             server.Post(("/api/" + spec.first).c_str(),
                         [this](const Request &req, Response &res) {
                             this->genericRequestHandler(req, res);
@@ -50,9 +49,8 @@ public:
     }
 
 private:
-    std::map <std::string, std::function<json(json)>> request_handlers;
+    std::map<std::string, std::function<json(json)>> request_handlers;
     std::function<void(const Request &req)> display_request_function;
-
 };
 
-#endif //WRENCH_REST_API_H
+#endif//WRENCH_REST_API_H
