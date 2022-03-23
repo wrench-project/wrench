@@ -41,7 +41,6 @@ public:
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-
     ~BatchComputeServiceOneActionTest() {
         workflow->clear();
     }
@@ -119,11 +118,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -133,8 +130,7 @@ protected:
 class BatchBadSetupTestWMS : public wrench::ExecutionController {
 public:
     BatchBadSetupTestWMS(BatchComputeServiceOneActionTest *test,
-                         std::string &hostname) :
-            wrench::ExecutionController( hostname, "test"), test(test) {
+                         std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -169,7 +165,7 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
     argc = 1;
     argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -178,45 +174,46 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
 
     // Empty resource list
     ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host1",
-                                            {},
-                                            {})), std::invalid_argument);
+                         new wrench::BatchComputeService("Host1",
+                                                         {},
+                                                         {})),
+                 std::invalid_argument);
 
     // Bad hostname
     ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("bogus",
-                                            {""},
-                                            {})), std::invalid_argument);
+                         new wrench::BatchComputeService("bogus",
+                                                         {""},
+                                                         {})),
+                 std::invalid_argument);
 
     // Get a hostname
     std::string hostname = "Host1";
 
     // Bad resource hostname
     ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname,
-                                            {"bogus"}, "",
-                                            {})), std::invalid_argument);
+                         new wrench::BatchComputeService(hostname,
+                                                         {"bogus"}, "",
+                                                         {})),
+                 std::invalid_argument);
 
     // Bad PROPERTIES
     ASSERT_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService(hostname,
-                                            {"RAMHost"},
-                                            "",
-                                            {
-                                                    std::make_pair(
-                                                            wrench::BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,
-                                                            "-1.0")
-                                            },
-                                            {})), std::invalid_argument);
+                         new wrench::BatchComputeService(hostname,
+                                                         {"RAMHost"},
+                                                         "",
+                                                         {std::make_pair(
+                                                                 wrench::BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                                                                 "-1.0")},
+                                                         {})),
+                 std::invalid_argument);
 
     // Create a WMS
     auto wms = simulation->add(new BatchBadSetupTestWMS(this, hostname));
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -227,8 +224,7 @@ class BatchOneSleepActionTestWMS : public wrench::ExecutionController {
 public:
     BatchOneSleepActionTestWMS(BatchComputeServiceOneActionTest *test,
                                std::shared_ptr<wrench::BatchComputeService> batch_compute_service,
-                               std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(batch_compute_service) {
+                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), batch_compute_service(batch_compute_service) {
     }
 
 private:
@@ -280,7 +276,7 @@ private:
         if (real_event->job != job) {
             throw std::runtime_error("Event's job isn't the right job!");
         }
-        if (real_event->compute_service != this->test->compute_service)  {
+        if (real_event->compute_service != this->test->compute_service) {
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
 
@@ -298,8 +294,8 @@ private:
             throw std::runtime_error("Unexpected action stard/end dates");
         }
 
-//        std::cerr << action->getStartDate() << "\n";
-//        std::cerr << action->getEndDate() << "\n";
+        //        std::cerr << action->getStartDate() << "\n";
+        //        std::cerr << action->getEndDate() << "\n";
 
         // Stop the Job Manager manually, just for kicks
         job_manager->stop();
@@ -327,7 +323,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -341,24 +337,24 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchOneSleepActionTestWMS(
-                    this, compute_service,
-                     hostname)));
+                            new BatchOneSleepActionTestWMS(
+                                    this, compute_service,
+                                    hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -373,8 +369,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -387,8 +382,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepAction_test() {
 class BatchOneComputeActionNotEnoughResourcesTestWMS : public wrench::ExecutionController {
 public:
     BatchOneComputeActionNotEnoughResourcesTestWMS(BatchComputeServiceOneActionTest *test,
-                                                   std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                   std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -489,7 +483,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -503,23 +497,23 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchOneComputeActionNotEnoughResourcesTestWMS(
-                    this, hostname)));
+                            new BatchOneComputeActionNotEnoughResourcesTestWMS(
+                                    this, hostname)));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -535,12 +529,10 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -550,8 +542,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionNotEnoughResources_tes
 class BatchOneComputeActionBogusServiceSpecificArgsTestWMS : public wrench::ExecutionController {
 public:
     BatchOneComputeActionBogusServiceSpecificArgsTestWMS(BatchComputeServiceOneActionTest *test,
-                                                         std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                                         std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -582,14 +573,13 @@ private:
         bogus_args.push_back({{"my_computation", "12"}});
         bogus_args.push_back({{"my_computation", "20"}});
 
-        for (auto const &args : bogus_args) {
+        for (auto const &args: bogus_args) {
             try {
                 job_manager->submitJob(job, this->test->compute_service, args);
                 throw std::runtime_error("Shouldn't have been able to submit job (" + args.begin()->first + ":" + args.begin()->second + ")");
             } catch (std::invalid_argument &ignore) {
-//                std::cerr << "Expected exception: " << e.what() << "\n";
+                //                std::cerr << "Expected exception: " << e.what() << "\n";
             } catch (wrench::ExecutionException &ignore) {
-
             }
         }
 
@@ -619,7 +609,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -633,23 +623,23 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchOneComputeActionBogusServiceSpecificArgsTestWMS(
-                    this, hostname)));
+                            new BatchOneComputeActionBogusServiceSpecificArgsTestWMS(
+                                    this, hostname)));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -665,12 +655,10 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -680,8 +668,7 @@ void BatchComputeServiceOneActionTest::do_OneComputeActionBogusServiceSpecificAr
 class BatchServiceCrashedTestWMS : public wrench::ExecutionController {
 public:
     BatchServiceCrashedTestWMS(BatchComputeServiceOneActionTest *test,
-                               std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -722,7 +709,7 @@ private:
         if (real_event->job != job) {
             throw std::runtime_error("Event's job isn't the right job!");
         }
-        if (real_event->compute_service != this->test->compute_service)  {
+        if (real_event->compute_service != this->test->compute_service) {
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
 
@@ -775,7 +762,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -789,23 +776,23 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchServiceCrashedTestWMS(
-                    this, hostname)));
+                            new BatchServiceCrashedTestWMS(
+                                    this, hostname)));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -821,8 +808,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -835,8 +821,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceCrashed_test() {
 class BatchJobTerminationTestWMS : public wrench::ExecutionController {
 public:
     BatchJobTerminationTestWMS(BatchComputeServiceOneActionTest *test,
-                               std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                               std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -903,8 +888,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -918,23 +903,23 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchJobTerminationTestWMS(
-                    this, hostname)));
+                            new BatchJobTerminationTestWMS(
+                                    this, hostname)));
 
 
     simulation->add(new wrench::FileRegistryService(hostname));
@@ -950,8 +935,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -964,8 +948,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobTermination_test() {
 class BatchJobExpirationTestWMS : public wrench::ExecutionController {
 public:
     BatchJobExpirationTestWMS(BatchComputeServiceOneActionTest *test,
-                              std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                              std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1009,7 +992,7 @@ private:
         if (real_event->job != job) {
             throw std::runtime_error("Event's job isn't the right job!");
         }
-        if (real_event->compute_service != this->test->compute_service)  {
+        if (real_event->compute_service != this->test->compute_service) {
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
 
@@ -1045,8 +1028,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1060,23 +1043,23 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchJobExpirationTestWMS(
-                    this, hostname)));
+                            new BatchJobExpirationTestWMS(
+                                    this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -1091,8 +1074,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1104,8 +1086,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepJobExpiration_test() {
 class BatchServiceFileNotThereTestWMS : public wrench::ExecutionController {
 public:
     BatchServiceFileNotThereTestWMS(BatchComputeServiceOneActionTest *test,
-                                    std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                    std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1142,7 +1123,7 @@ private:
         if (real_event->job != job) {
             throw std::runtime_error("Event's job isn't the right job!");
         }
-        if (real_event->compute_service != this->test->compute_service)  {
+        if (real_event->compute_service != this->test->compute_service) {
             throw std::runtime_error("Event's compute service isn't the right compute service!");
         }
         if (not std::dynamic_pointer_cast<wrench::SomeActionsHaveFailed>(real_event->failure_cause)) {
@@ -1200,7 +1181,7 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1214,30 +1195,29 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchServiceFileNotThereTestWMS(
-                    this, hostname)));
+                            new BatchServiceFileNotThereTestWMS(
+                                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1250,8 +1230,7 @@ void BatchComputeServiceOneActionTest::do_OneFileReadActionFileNotThere_test() {
 class BatchServiceServiceDownTestWMS : public wrench::ExecutionController {
 public:
     BatchServiceServiceDownTestWMS(BatchComputeServiceOneActionTest *test,
-                                   std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                   std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1306,8 +1285,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1321,30 +1300,29 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchServiceServiceDownTestWMS(
-                    this, hostname)));
+                            new BatchServiceServiceDownTestWMS(
+                                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1357,8 +1335,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceDown_test() {
 class BatchServiceServiceSuspendedTestWMS : public wrench::ExecutionController {
 public:
     BatchServiceServiceSuspendedTestWMS(BatchComputeServiceOneActionTest *test,
-                                        std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                        std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1413,8 +1390,8 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1428,30 +1405,29 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {"/scratch"},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {"/scratch"},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchServiceServiceSuspendedTestWMS(
-                    this, hostname)));
+                            new BatchServiceServiceSuspendedTestWMS(
+                                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -1464,8 +1440,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionServiceSuspended_test() 
 class BatchServiceBadScratchTestWMS : public wrench::ExecutionController {
 public:
     BatchServiceBadScratchTestWMS(BatchComputeServiceOneActionTest *test,
-                                  std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                  std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -1481,7 +1456,7 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("my_job");
-        auto action = job->addFileCopyAction("my_file_copy",this->test->input_file,
+        auto action = job->addFileCopyAction("my_file_copy", this->test->input_file,
                                              wrench::FileLocation::LOCATION(this->test->storage_service1),
                                              wrench::FileLocation::SCRATCH);
 
@@ -1507,7 +1482,7 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("one_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1521,28 +1496,28 @@ void BatchComputeServiceOneActionTest::do_OneSleepActionBadScratch_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BatchComputeService("Host3",
-                                            {"Host4"},
-                                            {""},
-                                            {}, {})));
+                            new wrench::BatchComputeService("Host3",
+                                                            {"Host4"},
+                                                            {""},
+                                                            {}, {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new BatchServiceBadScratchTestWMS(
-                    this, hostname)));
+                            new BatchServiceBadScratchTestWMS(
+                                    this, hostname)));
 
     // Running a "do nothing" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

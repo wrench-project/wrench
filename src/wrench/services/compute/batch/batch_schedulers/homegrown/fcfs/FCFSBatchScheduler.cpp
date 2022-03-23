@@ -89,7 +89,7 @@ namespace wrench {
                 std::string target_host = "";
                 unsigned long target_num_cores = 0;
 
-                for (auto h : cs->available_nodes_to_cores) {
+                for (auto h: cs->available_nodes_to_cores) {
                     std::string hostname = std::get<0>(h);
                     unsigned long num_available_cores = std::get<1>(h);
                     if (num_available_cores < cores_per_node) {
@@ -152,8 +152,7 @@ namespace wrench {
         } else {
             throw std::invalid_argument(
                     "FCFSBatchScheduler::findNextJobToSchedule(): We don't support " + host_selection_algorithm +
-                    " as host selection algorithm"
-            );
+                    " as host selection algorithm");
         }
 
         return resources;
@@ -173,7 +172,7 @@ namespace wrench {
         // (invariant: for each host, core availabilities are sorted by
         //             non-decreasing available time)
         std::map<std::string, std::vector<double>> core_available_times;
-        for (auto h : cs->nodes_to_cores_map) {
+        for (auto h: cs->nodes_to_cores_map) {
             std::string hostname = h.first;
             unsigned long num_cores = h.second;
             std::vector<double> zeros;
@@ -185,12 +184,12 @@ namespace wrench {
 
 
         // Update core availabilities for jobs that are currently running
-        for (auto job : cs->running_jobs) {
+        for (auto job: cs->running_jobs) {
             auto batch_job = job.second;
             double time_to_finish = std::max<double>(0, batch_job->getBeginTimestamp() +
-                                                        batch_job->getRequestedTime() -
-                                                        cs->simulation->getCurrentSimulatedDate());
-            for (auto resource : batch_job->getResourcesAllocated()) {
+                                                                batch_job->getRequestedTime() -
+                                                                cs->simulation->getCurrentSimulatedDate());
+            for (auto resource: batch_job->getResourcesAllocated()) {
                 std::string hostname = resource.first;
                 unsigned long num_cores = std::get<0>(resource.second);
                 double ram = std::get<1>(resource.second);
@@ -216,7 +215,7 @@ namespace wrench {
 #endif
 
         // Go through the pending jobs and update core availabilities
-        for (auto job : this->cs->batch_queue) {
+        for (auto job: this->cs->batch_queue) {
             double duration = job->getRequestedTime();
             unsigned long num_hosts = job->getRequestedNumNodes();
             unsigned long num_cores_per_host = job->getRequestedCoresPerNode();
@@ -228,7 +227,7 @@ namespace wrench {
 
             // Compute the  earliest start times on all hosts
             std::vector<std::pair<std::string, double>> earliest_start_times;
-            for (auto h : core_available_times) {
+            for (auto h: core_available_times) {
                 double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
                 earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
             }
@@ -253,7 +252,7 @@ namespace wrench {
 
             // Go through all hosts and make sure that no core is available before earliest_job_start_time
             // since this is a simple fcfs algorithm with no "jumping ahead" of any kind
-            for (auto h : cs->nodes_to_cores_map) {
+            for (auto h: cs->nodes_to_cores_map) {
                 std::string hostname = h.first;
                 unsigned long num_cores = h.second;
                 for (unsigned int i = 0; i < num_cores; i++) {
@@ -274,14 +273,13 @@ namespace wrench {
         }
         std::cerr << "----------------------------------------\n";
 #endif
-
         }
 
         // We now have the predicted available times for each cores given
         // everything that's running and pending. We can compute predictions.
         std::map<std::string, double> predictions;
 
-        for (auto job : set_of_jobs) {
+        for (auto job: set_of_jobs) {
             std::string id = std::get<0>(job);
             unsigned int num_hosts = std::get<1>(job);
             unsigned int num_cores_per_host = std::get<2>(job);
@@ -303,7 +301,7 @@ namespace wrench {
 
                 // Compute the earliest start times on all hosts
                 std::vector<std::pair<std::string, double>> earliest_start_times;
-                for (auto h : core_available_times) {
+                for (auto h: core_available_times) {
                     double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
                     earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
                 }
@@ -324,7 +322,6 @@ namespace wrench {
                 earliest_job_start_time = cs->simulation->getCurrentSimulatedDate() + earliest_job_start_time;
             }
             predictions.insert(std::make_pair(id, earliest_job_start_time));
-
         }
 
         return predictions;
@@ -353,14 +350,14 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long requested_time = batch_job->getRequestedTime();
 
-//      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
-//                  (unsigned long)batch_job,
-//                  workflow_job->getName().c_str());
-//        std::map<std::string, std::tuple<unsigned long, double>> resources;
+            //      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
+            //                  (unsigned long)batch_job,
+            //                  workflow_job->getName().c_str());
+            //        std::map<std::string, std::tuple<unsigned long, double>> resources;
 
             auto resources = this->scheduleOnHosts(num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
             if (resources.empty()) {
-//                WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
+                //                WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
                 break;
             }
 
@@ -370,13 +367,11 @@ namespace wrench {
             this->cs->removeJobFromBatchQueue(batch_job);
 
             // Add it to the running list
-            this->cs->running_jobs[batch_job->getCompoundJob()]  = batch_job;
+            this->cs->running_jobs[batch_job->getCompoundJob()] = batch_job;
 
             // Start it!
             this->cs->startJob(resources, compound_job, batch_job, num_nodes_asked_for, requested_time,
                                cores_per_node_asked_for);
-
-
         }
     }
 
@@ -421,4 +416,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

@@ -44,10 +44,9 @@ namespace wrench {
     /**
      * @brief A compound job
      */
-class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob> {
+    class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob> {
 
     public:
-
         /** @brief Compound job states */
         enum State {
             /** @brief Job hasn't been submitted yet **/
@@ -77,33 +76,33 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          std::shared_ptr<DataFile>file,
+                                                          std::shared_ptr<DataFile> file,
                                                           std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          std::shared_ptr<DataFile>file,
+                                                          std::shared_ptr<DataFile> file,
                                                           std::vector<std::shared_ptr<FileLocation>> file_locations);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(std::string name,
-                                                            std::shared_ptr<DataFile>file,
+                                                            std::shared_ptr<DataFile> file,
                                                             std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileCopyAction> addFileCopyAction(std::string name,
-                                                            std::shared_ptr<DataFile>file,
-                                                            std::shared_ptr<FileLocation> src_file_location,
-                                                            std::shared_ptr<FileLocation> dst_file_location);
+                                                          std::shared_ptr<DataFile> file,
+                                                          std::shared_ptr<FileLocation> src_file_location,
+                                                          std::shared_ptr<FileLocation> dst_file_location);
 
         std::shared_ptr<FileDeleteAction> addFileDeleteAction(std::string name,
-                                                          std::shared_ptr<DataFile>file,
-                                                          std::shared_ptr<FileLocation> file_location);
+                                                              std::shared_ptr<DataFile> file,
+                                                              std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::string name,
                                                                                   std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
-                                                                                std::shared_ptr<FileLocation> file_location);
+                                                                                  std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::string name,
                                                                                         std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
-                                                                                   std::shared_ptr<FileLocation> file_location);
+                                                                                        std::shared_ptr<FileLocation> file_location);
 
         std::shared_ptr<ComputeAction> addComputeAction(std::string name,
                                                         double flops,
@@ -115,21 +114,21 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         std::shared_ptr<CustomAction> addCustomAction(std::string name,
                                                       double ram,
                                                       unsigned long num_cores,
-                                                      const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
-                                                      const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
+                                                      const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
+                                                      const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
 
         void removeAction(std::shared_ptr<Action> &action);
 
-        void addActionDependency(const std::shared_ptr<Action>& parent, const std::shared_ptr<Action>& child);
+        void addActionDependency(const std::shared_ptr<Action> &parent, const std::shared_ptr<Action> &child);
 
-        void addParentJob(const std::shared_ptr<CompoundJob>& parent);
-        void addChildJob(const std::shared_ptr<CompoundJob>& child);
+        void addParentJob(const std::shared_ptr<CompoundJob> &parent);
+        void addChildJob(const std::shared_ptr<CompoundJob> &child);
 
         std::set<std::shared_ptr<CompoundJob>> getParentJobs();
         std::set<std::shared_ptr<CompoundJob>> getChildrenJobs();
 
-//        void setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args);
-//        const std::map<std::string, std::string> & getServiceSpecificArgs();
+        //        void setServiceSpecificArgs(std::map<std::string, std::string> service_specific_args);
+        //        const std::map<std::string, std::string> & getServiceSpecificArgs();
 
         bool hasSuccessfullyCompleted();
         bool hasFailed();
@@ -153,7 +152,6 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         /***********************/
 
     protected:
-
         friend class BareMetalComputeService;
         friend class JobManager;
         friend class Action;
@@ -162,16 +160,16 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
 
         bool isReady();
 
-//        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
+        //        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
         std::set<std::shared_ptr<Action>> actions;
         std::map<std::string, std::shared_ptr<Action>> name_map;
 
         State state;
         double priority;
 
-        void updateStateActionMap(const std::shared_ptr<Action>& action, Action::State old_state, Action::State new_state);
+        void updateStateActionMap(const std::shared_ptr<Action> &action, Action::State old_state, Action::State new_state);
 
-        void setAllActionsFailed(const std::shared_ptr<FailureCause>& cause);
+        void setAllActionsFailed(const std::shared_ptr<FailureCause> &cause);
 
         bool hasAction(const std::string &name);
 
@@ -179,17 +177,16 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
-
         double pre_job_overhead;
         double post_job_overhead;
 
         void assertJobNotSubmitted();
         void assertActionNameDoesNotAlreadyExist(const std::string &name);
 
-        void addAction(const std::shared_ptr<Action>& action);
+        void addAction(const std::shared_ptr<Action> &action);
 
-        bool pathExists(const std::shared_ptr<Action>& a, const std::shared_ptr<Action> &b);
-        bool pathExists(const std::shared_ptr<CompoundJob>& a, const std::shared_ptr<CompoundJob> &b);
+        bool pathExists(const std::shared_ptr<Action> &a, const std::shared_ptr<Action> &b);
+        bool pathExists(const std::shared_ptr<CompoundJob> &a, const std::shared_ptr<CompoundJob> &b);
 
         std::set<std::shared_ptr<CompoundJob>> parents;
         std::set<std::shared_ptr<CompoundJob>> children;
@@ -197,7 +194,6 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
         std::map<std::string, std::string> service_specific_args;
 
         std::unordered_map<Action::State, std::set<std::shared_ptr<Action>>> state_task_map;
-
     };
 
 
@@ -205,6 +201,6 @@ class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob>
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_COMPOUNDJOB_H
+#endif//WRENCH_COMPOUNDJOB_H

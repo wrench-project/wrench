@@ -49,12 +49,12 @@ namespace wrench {
         // The "mod by 1500" below is totally ad-hoc, but not modding seemed
         // to lead to weird zmq "address already in use" errors...
         this->batsched_port = 28000 + (getpid() % 1500) +
-                                  S4U_Mailbox::generateUniqueSequenceNumber();
+                              S4U_Mailbox::generateUniqueSequenceNumber();
         this->pid = getpid();
 
         int top_pid = fork();
 
-        if (top_pid == 0) { // Child process that will exec batsched
+        if (top_pid == 0) {// Child process that will exec batsched
 
             std::string algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM);
             bool is_supported = this->cs->scheduling_algorithms.find(algorithm) != this->cs->scheduling_algorithms.end();
@@ -76,25 +76,36 @@ namespace wrench {
             char **args = NULL;
             unsigned int num_args = 0;
 
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("batsched"); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("-v"); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup(algorithm.c_str()); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("-o"); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup(queue_ordering.c_str()); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("-s"); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup(socket_endpoint.c_str()); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup("--rjms_delay"); num_args++;
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = strdup(rjms_delay.c_str()); num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup("batsched");
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup("-v");
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup(algorithm.c_str());
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup("-o");
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup(queue_ordering.c_str());
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup("-s");
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup(socket_endpoint.c_str());
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup("--rjms_delay");
+            num_args++;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = strdup(rjms_delay.c_str());
+            num_args++;
 
             if (this->cs->getPropertyValueAsBoolean(BatchComputeServiceProperty::BATSCHED_LOGGING_MUTED)) {
                 (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
-                        strdup("--verbosity=silent"); num_args++;
+                        strdup("--verbosity=silent");
+                num_args++;
             }
             if (this->cs->getPropertyValueAsBoolean(BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION)) {
                 (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] =
-                        strdup("--policy=contiguous"); num_args++;
+                        strdup("--policy=contiguous");
+                num_args++;
             }
-            (args = (char **)realloc(args, (num_args+1)*sizeof(char*)))[num_args] = nullptr;
+            (args = (char **) realloc(args, (num_args + 1) * sizeof(char *)))[num_args] = nullptr;
 
             if (execvp(args[0], args) == -1) {
                 exit(3);
@@ -103,7 +114,7 @@ namespace wrench {
 
         } else if (top_pid > 0) {
             // parent process
-            sleep(1); // Wait one second to let batsched the time to start
+            sleep(1);// Wait one second to let batsched the time to start
             // (this is pretty ugly)
             int exit_code = 0;
             int status = waitpid(top_pid, &exit_code, WNOHANG);
@@ -115,9 +126,9 @@ namespace wrench {
             switch (exit_code) {
                 case 0: {
                     // Establish a tether so that if the main process dies, then batsched is brutally killed
-                    int tether[2]; // this is a local variable, only defined in this scope
-                    if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
-                        kill(top_pid, SIGKILL); //kill the other child (that has fork-exec'd batsched)
+                    int tether[2];             // this is a local variable, only defined in this scope
+                    if (pipe(tether) != 0) {   // the pipe however is opened during the whole duration of both processes
+                        kill(top_pid, SIGKILL);//kill the other child (that has fork-exec'd batsched)
                         throw std::runtime_error("startBatsched(): tether pipe creation failed!");
                     }
                     //now fork a process that sleeps until its parent is dead
@@ -127,16 +138,15 @@ namespace wrench {
                         //I am the parent, whose child has fork-exec'd batsched
                     } else if (nested_pid == 0) {
                         char foo;
-                        close(tether[1]); // closing write end
-                        auto num_bytes_read = read(tether[0], &foo, 1); // blocking read which returns when the parent dies
+                        close(tether[1]);                              // closing write end
+                        auto num_bytes_read = read(tether[0], &foo, 1);// blocking read which returns when the parent dies
                         //check if the child that forked batsched is still running
                         if (getpgid(top_pid)) {
-                            kill(top_pid, SIGKILL); //kill the other child that has fork-exec'd batsched
+                            kill(top_pid, SIGKILL);//kill the other child that has fork-exec'd batsched
                         }
                         //my parent has died so, I will kill myself instead of exiting and becoming a zombie
                         kill(getpid(), SIGKILL);
                         //exit(is_sent); //if exit myself and become a zombie :D
-
                     }
                     break;
                 }
@@ -172,8 +182,7 @@ namespace wrench {
         } else {
             // fork failed
             throw std::runtime_error(
-                    "Error while fork-exec of batsched"
-            );
+                    "Error while fork-exec of batsched");
         }
 
 #else
@@ -214,7 +223,7 @@ namespace wrench {
 
         int idx = 0;
         batch_submission_data["events"] = nlohmann::json::array();
-        for (auto job : set_of_jobs) {
+        for (auto job: set_of_jobs) {
             batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
             batch_submission_data["events"][idx]["type"] = "QUERY";
             batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
@@ -236,11 +245,11 @@ namespace wrench {
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
-        network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
-        network_listener = nullptr; // detached mode
+        network_listener->start(network_listener, true, false);// Daemonized, no auto-restart
+        network_listener = nullptr;                            // detached mode
 
         std::map<std::string, double> job_estimated_start_times = {};
-        for (auto job : set_of_jobs) {
+        for (auto job: set_of_jobs) {
             // Get the answer
             std::unique_ptr<SimulationMessage> message = nullptr;
             try {
@@ -249,7 +258,7 @@ namespace wrench {
                 throw ExecutionException(cause);
             }
 
-            if (auto msg = dynamic_cast<BatchQueryAnswerMessage*>(message.get())) {
+            if (auto msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
                 job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
             } else {
                 throw std::runtime_error(
@@ -309,9 +318,7 @@ namespace wrench {
 #else
         throw std::runtime_error("BatschedBatchScheduler::shutdown(): BATSCHED_ENABLE should be set to 'on'");
 #endif
-
     }
-
 
 
     void BatschedBatchScheduler::processQueuedJobs() {
@@ -352,7 +359,6 @@ namespace wrench {
 
             this->cs->batch_queue.erase(it);
             this->cs->waiting_jobs.insert(batch_job);
-
         }
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
@@ -361,13 +367,12 @@ namespace wrench {
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
-        network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
-        network_listener = nullptr; // detached mode
+        network_listener->start(network_listener, true, false);// Daemonized, no auto-restart
+        network_listener = nullptr;                            // detached mode
 #else
         throw std::runtime_error("BatschedBatchScheduler::processQueuesJobs(): BATSCHED_ENABLE should be set to 'on'");
 #endif
     }
-
 
 
     void BatschedBatchScheduler::processJobFailure(std::shared_ptr<BatchJob> batch_job) {
@@ -381,7 +386,7 @@ namespace wrench {
     }
 
 
-    void BatschedBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob>batch_job) {
+    void BatschedBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
@@ -392,8 +397,7 @@ namespace wrench {
     }
 
 
-
-    void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob>batch_job) {
+    void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
 
 #ifdef ENABLE_BATSCHED
         // Fake it as a success
@@ -416,7 +420,7 @@ namespace wrench {
 #endif
     }
 
-    void BatschedBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob>batch_job) {
+    void BatschedBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
         // Do nothing
     }
 
@@ -455,8 +459,8 @@ namespace wrench {
                                                     std::to_string(this->batsched_port),
                                                     data));
         network_listener->setSimulation(this->cs->getSimulation());
-        network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
-        network_listener = nullptr; // detached mode
+        network_listener->start(network_listener, true, false);// Daemonized, no auto-restart
+        network_listener = nullptr;                            // detached mode
     }
 
 
@@ -566,15 +570,12 @@ namespace wrench {
                                                         std::to_string(this->batsched_port),
                                                         data));
             network_listener->setSimulation(this->cs->getSimulation());
-            network_listener->start(network_listener, true, false); // Daemonized, no auto-restart
-            network_listener = nullptr; // detached mode
+            network_listener->start(network_listener, true, false);// Daemonized, no auto-restart
+            network_listener = nullptr;                            // detached mode
         } catch (std::runtime_error &e) {
             throw;
         }
-
     }
 #endif
 
-}
-
-
+}// namespace wrench

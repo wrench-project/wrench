@@ -26,7 +26,6 @@ namespace wrench {
     class FileRegistryDeleteEntryAction : public FileRegistryAction {
 
     public:
-
     protected:
         friend class CompoundJob;
 
@@ -38,21 +37,19 @@ namespace wrench {
         * @param file: the file
         * @param file_location: the file location
         */
-        FileRegistryDeleteEntryAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                std::shared_ptr<FileRegistryService> file_registry_service,
-                                std::shared_ptr<DataFile>file,
-                                std::shared_ptr<FileLocation> file_location) :
-                                FileRegistryAction(FileRegistryAction::DELETE, name, std::move(job), std::move(file_registry_service), file, std::move(file_location)) {}
+        FileRegistryDeleteEntryAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+                                      std::shared_ptr<FileRegistryService> file_registry_service,
+                                      std::shared_ptr<DataFile> file,
+                                      std::shared_ptr<FileLocation> file_location) : FileRegistryAction(FileRegistryAction::DELETE, name, std::move(job), std::move(file_registry_service), file, std::move(file_location)) {}
 
-//        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
-//        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        //        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
+        //        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
 
     private:
         std::shared_ptr<FileRegistryService> file_registry_service;
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
-
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_FILE_REGISTRY_DELETE_ENTRY_ACTION_H
+#endif//WRENCH_FILE_REGISTRY_DELETE_ENTRY_ACTION_H

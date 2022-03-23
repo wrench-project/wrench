@@ -48,7 +48,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_JOB_FILLED_H
+#endif//WRENCH_JOB_FILLED_H

@@ -5,6 +5,11 @@ on:
     paths-ignore:
       - 'doc/**'
       - '**.md'
+  workflow_run:
+    workflows: ["clang-format"]
+    branches: [master]
+    types: 
+      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

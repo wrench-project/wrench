@@ -22,4 +22,4 @@ namespace wrench {
 
     SET_MESSAGEPAYLOAD_NAME(NetworkProximityServiceMessagePayload, NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD);
 
-};
+};// namespace wrench

@@ -36,7 +36,6 @@ namespace wrench {
         std::shared_ptr<Workflow> workflow;
         const std::shared_ptr<BatchComputeService> batch_compute_service;
         const std::shared_ptr<StorageService> storage_service;
-
     };
-}
-#endif //WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_BATCH_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_TWO_TASKS_AT_A_TIME_BATCH_H

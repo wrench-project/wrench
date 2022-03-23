@@ -18,7 +18,7 @@
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 #define MB (1000.0 * 1000.0)
 
-        WRENCH_LOG_CATEGORY(custom_controller, "Log category for SuperCustomActionController");
+WRENCH_LOG_CATEGORY(custom_controller, "Log category for SuperCustomActionController");
 
 namespace wrench {
 
@@ -35,8 +35,8 @@ namespace wrench {
             std::shared_ptr<BareMetalComputeService> bm_cs,
             std::shared_ptr<CloudComputeService> cloud_cs,
             std::shared_ptr<StorageService> ss_1,
-            const std::string &hostname) : ExecutionController(hostname,"mamj"),
-            bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1) {}
+            const std::string &hostname) : ExecutionController(hostname, "mamj"),
+                                           bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1) {}
 
     /**
      * @brief main method of the SuperCustomActionController daemon
@@ -70,43 +70,43 @@ namespace wrench {
 
         std::map<std::string, unsigned long> num_cores_to_use_for_vm = {{"ComputeHost1", 2}, {"ComputeHost2", 4}};
         auto cloud_service = this->cloud_cs;
-        job->addCustomAction("powerful",
-                             0, 0,
-                             [num_cores_to_use_for_vm, cloud_service](std::shared_ptr<ActionExecutor> action_executor) {
+        job->addCustomAction(
+                "powerful",
+                0, 0,
+                [num_cores_to_use_for_vm, cloud_service](std::shared_ptr<ActionExecutor> action_executor) {
+                    TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-                                 TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
-
-                                 WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
-                                 // Which host I am running on?
-                                 auto execution_host = action_executor->getPhysicalHostname();
-                                 // Based on where I am running, pick the number of cores
-                                 auto num_cores = num_cores_to_use_for_vm.at(execution_host);
-                                 WRENCH_INFO("Custom action creating a %lu-core VM", num_cores);
-                                 auto my_vm = cloud_service->createVM(num_cores, 100 * MB);
-                                 auto my_vm_cs = cloud_service->startVM(my_vm);
-                                 WRENCH_INFO("Custom action creating a job manager");
-                                 auto job_manager = action_executor->createJobManager();
-                                 WRENCH_INFO("Custom action create a job and submitting it to the VM");
-                                 auto job = job_manager->createCompoundJob("custom_job");
-                                 job->addSleepAction("custom_sleep", 10);
-                                 job_manager->submitJob(job, my_vm_cs);
-                                 WRENCH_INFO("Custom action is waiting for its job's completion");
-                                 auto event = action_executor->waitForNextEvent();
-                                 auto job_completion_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event);
-                                 if (not job_completion_event) {
-                                     throw std::runtime_error("Custom action: unexpected event!");
-                                 } else {
-                                     WRENCH_INFO("Custom action: job has completed!");
-                                 }
-                             },
-                             [](std::shared_ptr<ActionExecutor> action_executor) {
-                                 WRENCH_INFO("Custom action terminating");
-                             });
+                    WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
+                    // Which host I am running on?
+                    auto execution_host = action_executor->getPhysicalHostname();
+                    // Based on where I am running, pick the number of cores
+                    auto num_cores = num_cores_to_use_for_vm.at(execution_host);
+                    WRENCH_INFO("Custom action creating a %lu-core VM", num_cores);
+                    auto my_vm = cloud_service->createVM(num_cores, 100 * MB);
+                    auto my_vm_cs = cloud_service->startVM(my_vm);
+                    WRENCH_INFO("Custom action creating a job manager");
+                    auto job_manager = action_executor->createJobManager();
+                    WRENCH_INFO("Custom action create a job and submitting it to the VM");
+                    auto job = job_manager->createCompoundJob("custom_job");
+                    job->addSleepAction("custom_sleep", 10);
+                    job_manager->submitJob(job, my_vm_cs);
+                    WRENCH_INFO("Custom action is waiting for its job's completion");
+                    auto event = action_executor->waitForNextEvent();
+                    auto job_completion_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(event);
+                    if (not job_completion_event) {
+                        throw std::runtime_error("Custom action: unexpected event!");
+                    } else {
+                        WRENCH_INFO("Custom action: job has completed!");
+                    }
+                },
+                [](std::shared_ptr<ActionExecutor> action_executor) {
+                    WRENCH_INFO("Custom action terminating");
+                });
 
         /* Submit the job to the bare-metal service compute service, and forcing the action "powerful"
          * to run on ComputeHost2 by passing (optional) service-specific arguments */
         WRENCH_INFO("Submitting the job %s to the bare-metal service", job->getName().c_str());
-        job_manager->submitJob(job, bm_cs, {{"powerful","ComputeHost2"}});
+        job_manager->submitJob(job, bm_cs, {{"powerful", "ComputeHost2"}});
 
         /* Wait for an execution event */
         auto event = this->waitForNextEvent();
@@ -114,7 +114,7 @@ namespace wrench {
             auto completed_job = job_completion_event->job;
             WRENCH_INFO("Job %s has completed!", completed_job->getName().c_str());
             WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
-            for (auto const &action : completed_job->getActions()) {
+            for (auto const &action: completed_job->getActions()) {
                 WRENCH_INFO("  - Action %s ran on host %s (physical: %s)",
                             action->getName().c_str(),
                             action->getExecutionHistory().top().execution_host.c_str(),
@@ -134,4 +134,4 @@ namespace wrench {
         return 0;
     }
 
-}
+}// namespace wrench

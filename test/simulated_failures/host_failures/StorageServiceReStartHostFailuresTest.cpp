@@ -29,7 +29,6 @@ public:
     void do_StorageServiceRestartTest_test();
 
 protected:
-
     ~StorageServiceReStartHostFailuresTest() {
         workflow->clear();
     }
@@ -45,7 +44,7 @@ protected:
                                          " 100 0";
 
         std::string trace_file_name = "host.trace";
-        std::string trace_file_path = "/tmp/"+trace_file_name;
+        std::string trace_file_path = "/tmp/" + trace_file_name;
 
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
         fprintf(trace_file, "%s", trace_file_content.c_str());
@@ -62,27 +61,28 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "       </host>"
-                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" + trace_file_name + "\"  core=\"1\" > "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"10000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <host id=\"StableHost\" speed=\"1f\" core=\"1\" > "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"10000000B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "       </host>"
-                          "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
-                          "       <route src=\"FailedHost\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
-                          "           <link_ctn id=\"link1\"/>"
-                          "       </route>"
-                          "   </zone> "
-                          "</platform>";
+                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" +
+                          trace_file_name + "\"  core=\"1\" > "
+                                            "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                            "             <prop id=\"size\" value=\"10000000B\"/>"
+                                            "             <prop id=\"mount\" value=\"/\"/>"
+                                            "          </disk>"
+                                            "       </host>"
+                                            "       <host id=\"StableHost\" speed=\"1f\" core=\"1\" > "
+                                            "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                            "             <prop id=\"size\" value=\"10000000B\"/>"
+                                            "             <prop id=\"mount\" value=\"/\"/>"
+                                            "          </disk>"
+                                            "       </host>"
+                                            "       <link id=\"link1\" bandwidth=\"1kBps\" latency=\"0\"/>"
+                                            "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                                            "           <link_ctn id=\"link1\"/>"
+                                            "       </route>"
+                                            "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
+                                            "           <link_ctn id=\"link1\"/>"
+                                            "       </route>"
+                                            "   </zone> "
+                                            "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -100,13 +100,11 @@ class StorageServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     StorageServiceRestartTestWMS(StorageServiceReStartHostFailuresTest *test,
-                                 std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                 std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     StorageServiceReStartHostFailuresTest *test;
 
     int main() override {
@@ -115,13 +113,13 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->setSimulation(this->simulation);
-        resurector->start(murderer, true, false); // Daemonized, no auto-restart
+        resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
         auto file = this->test->workflow->getFileByID("file");
         auto storage_service = this->test->storage_service;
@@ -142,13 +140,13 @@ private:
         murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost",
                                                                                           wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost resurector!!
         resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 500, "FailedHost",
                                                                                             wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->setSimulation(this->simulation);
-        resurector->start(murderer, true, false); // Daemonized, no auto-restart
+        resurector->start(murderer, true, false);// Daemonized, no auto-restart
 
         try {
             wrench::StorageService::readFile(file, wrench::FileLocation::LOCATION(storage_service));
@@ -192,9 +190,10 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
 
     // Create a WMS
     std::string stable_host = "StableHost";
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new StorageServiceRestartTestWMS(this, stable_host)));
+                            new StorageServiceRestartTestWMS(this, stable_host)));
 
     auto file = workflow->addFile("file", 10000000);
 
@@ -206,11 +205,7 @@ void StorageServiceReStartHostFailuresTest::do_StorageServiceRestartTest_test() 
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-
-
-

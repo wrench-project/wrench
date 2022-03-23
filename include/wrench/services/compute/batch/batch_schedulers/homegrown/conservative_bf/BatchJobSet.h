@@ -24,7 +24,6 @@ namespace wrench {
     class BatchJobSet {
 
     public:
-
         BatchJobSet() = default;
 
         /** @brief The job set **/
@@ -37,9 +36,8 @@ namespace wrench {
          * @param right: right-hand side
          * @return
          */
-        BatchJobSet& operator += (const BatchJobSet& right)
-        {
-            for (const auto &j : right.jobs) {
+        BatchJobSet &operator+=(const BatchJobSet &right) {
+            for (const auto &j: right.jobs) {
                 add(j);
             }
             return *this;
@@ -50,9 +48,8 @@ namespace wrench {
          * @param right: right-hand side
          * @return
          */
-        BatchJobSet& operator -= (const BatchJobSet& right)
-        {
-            for (const auto &j : right.jobs) {
+        BatchJobSet &operator-=(const BatchJobSet &right) {
+            for (const auto &j: right.jobs) {
                 remove(j);
             }
             return *this;
@@ -74,18 +71,17 @@ namespace wrench {
          * @param job: the batch_standard_and_pilot_jobs job
          */
         void inline remove(std::shared_ptr<BatchJob> job) {
-            if  (this->jobs.find(job) != this->jobs.end()) {
+            if (this->jobs.find(job) != this->jobs.end()) {
                 num_nodes_utilized -= job->getRequestedNumNodes();
                 this->jobs.erase(job);
             }
         }
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-}
+}// namespace wrench
 
-#endif //WRENCH_BATCHJOBSET_H
+#endif//WRENCH_BATCHJOBSET_H

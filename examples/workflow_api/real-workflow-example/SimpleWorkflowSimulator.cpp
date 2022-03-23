@@ -13,8 +13,8 @@
 #include "SimpleWMS.h"
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
-static bool ends_with(const std::string& str, const std::string& suffix) {
-    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+static bool ends_with(const std::string &str, const std::string &suffix) {
+    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
 }
 
 /**
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
     std::cerr << "Loading workflow..." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
-    if (ends_with(workflow_file,"json")) {
+    if (ends_with(workflow_file, "json")) {
         workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
     } else {
         std::cerr << "Workflow file name must end with '.json'" << std::endl;
@@ -115,12 +115,13 @@ int main(int argc, char **argv) {
 #endif
     try {
         batch_compute_service = simulation->add(new wrench::BatchComputeService(
-        {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
+                {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
                 {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, scheduling_algorithm}},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
     } catch (std::invalid_argument &e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        std::exit(1);}
+        std::exit(1);
+    }
 
     /* Instantiate and add to the simulation a cloud service, to be started on some host in the simulation platform.
      * A cloud service is an abstraction of a compute service that corresponds to a
@@ -167,7 +168,7 @@ int main(int argc, char **argv) {
      * These files are then staged on the storage service.
      */
     std::cerr << "Staging input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         try {
             simulation->stageFile(f, storage_service);
         } catch (std::runtime_error &e) {
@@ -200,7 +201,7 @@ int main(int argc, char **argv) {
     std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
     unsigned long num_failed_tasks = 0;
     double computation_communication_ratio_average = 0.0;
-    for (const auto &item : trace) {
+    for (const auto &item: trace) {
         auto task = item->getContent()->getTask();
         if (task->getExecutionHistory().size() > 1) {
             num_failed_tasks++;
@@ -210,7 +211,7 @@ int main(int argc, char **argv) {
         double compute_time = task->getExecutionHistory().top().computation_end - task->getExecutionHistory().top().computation_start;
         computation_communication_ratio_average += compute_time / io_time;
     }
-    computation_communication_ratio_average /= (double)(trace.size());
+    computation_communication_ratio_average /= (double) (trace.size());
 
     std::cerr << "Number of tasks that failed at least once: " << num_failed_tasks << "\n";
     std::cerr << "Average computation time / communication+IO time ratio over all tasks: " << computation_communication_ratio_average << "\n";

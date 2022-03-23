@@ -16,5 +16,4 @@ namespace wrench {
     SET_PROPERTY_NAME(ActionExecutionServiceProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
     SET_PROPERTY_NAME(ActionExecutionServiceProperty, FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
 
-};
-
+};// namespace wrench

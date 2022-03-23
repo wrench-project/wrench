@@ -48,7 +48,6 @@ namespace wrench {
     class Simulation {
 
     public:
-
         static std::shared_ptr<Simulation> createSimulation();
 
         ~Simulation();
@@ -58,7 +57,7 @@ namespace wrench {
         static bool isInitialized();
 
         void instantiatePlatform(std::string);
-        void instantiatePlatform(const std::function<void()>&);
+        void instantiatePlatform(const std::function<void()> &);
 
         static std::vector<std::string> getHostnameList();
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
@@ -67,10 +66,9 @@ namespace wrench {
         static double getHostFlopRate(std::string hostname);
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
-        static void removeFile(std::shared_ptr<DataFile>file);
+        static void removeFile(std::shared_ptr<DataFile> file);
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
         static std::shared_ptr<DataFile> addFile(std::string, double);
-
 
 
         void launch();
@@ -81,7 +79,7 @@ namespace wrench {
          * @param t: the service object
          * @return a shared_ptr to the service object
          */
-        template <class T>
+        template<class T>
         std::shared_ptr<T> add(T *t) {
             auto s = std::shared_ptr<T>(t);
             this->addService(s);
@@ -93,7 +91,7 @@ namespace wrench {
         //start energy related calls
         double getEnergyConsumed(const std::string &hostname);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames);
-//        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
+        //        double getEnergyTimestamp(const std::string &hostname, bool can_record = false);
 
         // pstate related calls
         static int getNumberofPstates(const std::string &hostname);
@@ -101,8 +99,8 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> ss);
-        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
+        void stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> ss);
+        void stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -111,7 +109,7 @@ namespace wrench {
 
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
 
-        double getLinkUsage(const std::string &link_name, bool  record_as_time_stamp);
+        double getLinkUsage(const std::string &link_name, bool record_as_time_stamp);
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
         static bool doesHostExist(std::string hostname);
@@ -151,10 +149,10 @@ namespace wrench {
                                                     std::string write_mount_point);
         void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
 
-        void readWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location);
-        void writebackWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
-        void writeThroughWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location);
-        MemoryManager* getMemoryManagerByHost(std::string hostname);
+        void readWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void writebackWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void writeThroughWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location);
+        MemoryManager *getMemoryManagerByHost(std::string hostname);
 
         static double getMemoryCapacity();
         static unsigned long getNumCores();
@@ -174,7 +172,6 @@ namespace wrench {
         /***********************/
 
     private:
-
         Simulation();
 
         SimulationOutput output;
@@ -199,7 +196,7 @@ namespace wrench {
 
         static int unique_disk_sequence_number;
 
-        void stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location);
+        void stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
 
         void platformSanityCheck();
         void checkSimulationSetup();
@@ -233,11 +230,9 @@ namespace wrench {
     private:
         /* Map of files */
         static std::map<std::string, std::shared_ptr<DataFile>> data_files;
-
     };
 
 
+};// namespace wrench
 
-};
-
-#endif //WRENCH_SIMULATION_H
+#endif//WRENCH_SIMULATION_H

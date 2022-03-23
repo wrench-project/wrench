@@ -33,7 +33,7 @@ namespace wrench {
     class WorkflowTask : public std::enable_shared_from_this<WorkflowTask> {
 
     public:
-        const std::string& getID() const;
+        const std::string &getID() const;
 
         double getFlops() const;
 
@@ -57,9 +57,9 @@ namespace wrench {
 
         std::vector<std::shared_ptr<WorkflowTask>> getParents();
 
-        void addInputFile(std::shared_ptr<DataFile>file);
+        void addInputFile(std::shared_ptr<DataFile> file);
 
-        void addOutputFile(std::shared_ptr<DataFile>file);
+        void addOutputFile(std::shared_ptr<DataFile> file);
 
         unsigned int getFailureCount();
 
@@ -144,7 +144,7 @@ namespace wrench {
 
         std::string getExecutionHost() const;
 
-        std::string getPhysicalExecutionHost()const ;
+        std::string getPhysicalExecutionHost() const;
 
         WorkflowTask::State getState() const;
 
@@ -182,9 +182,9 @@ namespace wrench {
 
         void setState(WorkflowTask::State);
 
-//        void setUpcomingState(WorkflowTask::State);
-//
-//        WorkflowTask::State getUpcomingState() const;
+        //        void setUpcomingState(WorkflowTask::State);
+        //
+        //        WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
 
@@ -256,8 +256,6 @@ namespace wrench {
              * @param task_start: Task start time
              */
             WorkflowTaskExecution(double task_start) : task_start(task_start) {}
-
-
         };
 
 
@@ -268,29 +266,29 @@ namespace wrench {
     private:
         friend class Workflow;
 
-        std::string id;                    // Task ID
-        std::string cluster_id;            // ID for clustered task
-        std::string color;                 // A RGB color formatted as "#rrggbb"
-        double flops;                      // Number of flops
-        double average_cpu = -1;           // Average CPU utilization
-        unsigned long bytes_read = -1;     // Total bytes read in KB
-        unsigned long bytes_written = -1;  // Total bytes written in KB
+        std::string id;                  // Task ID
+        std::string cluster_id;          // ID for clustered task
+        std::string color;               // A RGB color formatted as "#rrggbb"
+        double flops;                    // Number of flops
+        double average_cpu = -1;         // Average CPU utilization
+        unsigned long bytes_read = -1;   // Total bytes read in KB
+        unsigned long bytes_written = -1;// Total bytes written in KB
         unsigned long min_num_cores;
         unsigned long max_num_cores;
         std::shared_ptr<ParallelModel> parallel_model;
         double memory_requirement;
-        unsigned long priority = 0;        // Task priority
-        unsigned long toplevel;            // 0 if entry task
-        unsigned int failure_count = 0;    // Number of times the tasks has failed
-        std::string execution_host;        // Host on which the task executed ("" if not executed successfully - yet)
-        State visible_state;               // To be exposed to developer level
-        State upcoming_visible_state;      // A visible state that will become active once a WMS has process a previously sent workflow execution event
-        InternalState internal_state;      // Not to be exposed to developer level
+        unsigned long priority = 0;    // Task priority
+        unsigned long toplevel;        // 0 if entry task
+        unsigned int failure_count = 0;// Number of times the tasks has failed
+        std::string execution_host;    // Host on which the task executed ("" if not executed successfully - yet)
+        State visible_state;           // To be exposed to developer level
+        State upcoming_visible_state;  // A visible state that will become active once a WMS has process a previously sent workflow execution event
+        InternalState internal_state;  // Not to be exposed to developer level
 
-        std::shared_ptr<Workflow> workflow;                // Containing workflow
+        std::shared_ptr<Workflow> workflow;// Containing workflow
 
-        std::map<std::string, std::shared_ptr<DataFile>> output_files;   // List of output files
-        std::map<std::string, std::shared_ptr<DataFile>> input_files;    // List of input files
+        std::map<std::string, std::shared_ptr<DataFile>> output_files;// List of output files
+        std::map<std::string, std::shared_ptr<DataFile>> input_files; // List of input files
 
         // Private constructor (called by Workflow)
         WorkflowTask(std::string id,
@@ -306,6 +304,6 @@ namespace wrench {
 
         friend class DagOfTasks;
     };
-};
+};// namespace wrench
 
-#endif //WRENCH_WORKFLOWTASK_H
+#endif//WRENCH_WORKFLOWTASK_H

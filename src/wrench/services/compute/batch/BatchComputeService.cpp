@@ -59,10 +59,9 @@ namespace wrench {
                                              std::vector<std::string> compute_hosts,
                                              std::string scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list
-    ) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
-                            ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
-                            std::move(messagepayload_list), "") {}
+                                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : BatchComputeService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
+                                                                                                                              ComputeService::ALL_RAM, scratch_space_mount_point, std::move(property_list),
+                                                                                                                              std::move(messagepayload_list), "") {}
 
     /**
      * @brief Constructor
@@ -87,10 +86,9 @@ namespace wrench {
                                              std::string scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                                             std::string suffix) :
-            ComputeService(hostname,
-                           "BatchComputeService" + suffix,
-                           scratch_space_mount_point) {
+                                             std::string suffix) : ComputeService(hostname,
+                                                                                  "BatchComputeService" + suffix,
+                                                                                  scratch_space_mount_point) {
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -108,7 +106,7 @@ namespace wrench {
         double speed = Simulation::getHostFlopRate(*(compute_hosts.begin()));
         double ram_available = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
 
-        for (auto const &h : compute_hosts) {
+        for (auto const &h: compute_hosts) {
             // Compute speed
             if (std::abs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
                 throw std::invalid_argument(
@@ -131,7 +129,7 @@ namespace wrench {
 
         //create a map for host to cores
         int i = 0;
-        for (auto h : compute_hosts) {
+        for (auto h: compute_hosts) {
             this->nodes_to_cores_map.insert({h, num_cores_available});
             this->available_nodes_to_cores.insert({h, num_cores_available});
             this->host_id_to_names[i++] = h;
@@ -156,7 +154,7 @@ namespace wrench {
                 throw;
             }
             // Fix value
-            for (auto &j : this->workload_trace) {
+            for (auto &j: this->workload_trace) {
                 std::string id = std::get<0>(j);
                 double submit_time = std::get<1>(j);
                 double flops = std::get<2>(j);
@@ -249,7 +247,7 @@ namespace wrench {
     std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> BatchComputeService::getQueue() {
         // Go through the currently running jobs
         std::vector<std::tuple<std::string, std::string, int, int, int, double, double>> queue_state;
-        for (auto const &j : this->running_jobs) {
+        for (auto const &j: this->running_jobs) {
             auto batch_job = j.second;
             auto tuple = std::make_tuple(
                     batch_job->getUsername(),
@@ -258,13 +256,12 @@ namespace wrench {
                     batch_job->getRequestedCoresPerNode(),
                     batch_job->getRequestedTime(),
                     batch_job->getArrivalTimestamp(),
-                    batch_job->getBeginTimestamp()
-            );
+                    batch_job->getBeginTimestamp());
             queue_state.push_back(tuple);
         }
 
         //  Go through the waiting jobs (BATSCHED only)
-        for (auto const &j : this->waiting_jobs) {
+        for (auto const &j: this->waiting_jobs) {
             auto tuple = std::make_tuple(
                     j->getUsername(),
                     j->getCompoundJob()->getName(),
@@ -272,13 +269,12 @@ namespace wrench {
                     j->getRequestedCoresPerNode(),
                     j->getRequestedTime(),
                     j->getArrivalTimestamp(),
-                    -1.0
-            );
+                    -1.0);
             queue_state.push_back(tuple);
         }
 
         // Go through the pending jobs
-        for (auto const &j : this->batch_queue) {
+        for (auto const &j: this->batch_queue) {
             auto tuple = std::make_tuple(
                     j->getUsername(),
                     j->getCompoundJob()->getName(),
@@ -286,8 +282,7 @@ namespace wrench {
                     j->getRequestedCoresPerNode(),
                     j->getRequestedTime(),
                     j->getArrivalTimestamp(),
-                    -1.0
-            );
+                    -1.0);
             queue_state.push_back(tuple);
         }
 
@@ -326,8 +321,7 @@ namespace wrench {
         } else {
             throw std::invalid_argument(
                     "BatchComputeService::parseUnsignedLongServiceSpecificArgument(): Batch Service requires " + key +
-                    " argument to be specified for job submission"
-            );
+                    " argument to be specified for job submission");
         }
         return value;
     }
@@ -503,11 +497,11 @@ namespace wrench {
 
         std::shared_ptr<BatchJob> batch_job = this->all_jobs[job];
 
-//        std::cerr << "IN sendCompoundJobFailureNotification \n";
+        //        std::cerr << "IN sendCompoundJobFailureNotification \n";
         // NO IDEA WHAT THIS WAS HERE - DEFINITELY A BUG!
-//        this->scheduler->processJobFailure(batch_job);
+        //        this->scheduler->processJobFailure(batch_job);
 
-//        job->printCallbackMailboxStack();
+        //        job->printCallbackMailboxStack();
         try {
             S4U_Mailbox::putMessage(
                     job->popCallbackMailbox(),
@@ -516,7 +510,7 @@ namespace wrench {
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
-            return; // ignore
+            return;// ignore
         }
     }
 
@@ -528,7 +522,7 @@ namespace wrench {
      *              - bytes of RAM (double)
      */
     void BatchComputeService::freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources) {
-        for (auto r : resources) {
+        for (auto r: resources) {
             this->available_nodes_to_cores[r.first] += std::get<0>(r.second);
         }
     }
@@ -574,7 +568,7 @@ namespace wrench {
     * @brief terminate a running standard job
     * @param job: the job
     */
-    void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, 
+    void BatchComputeService::terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job,
                                                           ComputeService::TerminationCause termination_cause) {
         if (this->running_bare_metal_one_shot_compute_services.find(job) ==
             this->running_bare_metal_one_shot_compute_services.end()) {
@@ -584,14 +578,14 @@ namespace wrench {
         auto executor = this->running_bare_metal_one_shot_compute_services[job];
 
         WRENCH_INFO("Terminating a one-shot bare-metal service");
-        executor->stop(false, termination_cause); // failure notifications sent by me later, if needed
+        executor->stop(false, termination_cause);// failure notifications sent by me later, if needed
     }
 
     /**
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
     * or has timed out (because it's in fact a pilot job))
     */
-    void BatchComputeService::terminate(bool send_failure_notifications, 
+    void BatchComputeService::terminate(bool send_failure_notifications,
                                         ComputeService::TerminationCause termination_cause) {
         // LOCK
         this->acquireDaemonLock();
@@ -619,7 +613,7 @@ namespace wrench {
         while (not this->batch_queue.empty()) {
             auto batch_job = (*(this->batch_queue.begin()));
             auto compound_job = batch_job->getCompoundJob();
-//            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM PENDING LIST", compound_job->getName().c_str());
+            //            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM PENDING LIST", compound_job->getName().c_str());
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
                 case ComputeService::TerminationCause::TERMINATION_JOB_KILLED:
@@ -635,7 +629,7 @@ namespace wrench {
                     failure_cause = std::make_shared<JobKilled>(compound_job);
                     break;
             }
-            for (auto const &action : compound_job->getActions()) {
+            for (auto const &action: compound_job->getActions()) {
                 action->setFailureCause(failure_cause);
             }
             if (send_failure_notifications) {
@@ -650,7 +644,7 @@ namespace wrench {
         while (not this->waiting_jobs.empty()) {
             auto batch_job = (*(this->waiting_jobs.begin()));
             auto compound_job = batch_job->getCompoundJob();
-//            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM WAITING LIST", compound_job->getName().c_str());
+            //            WRENCH_INFO("SIMPLY REMOVING COMPOUND JOB %s FROM WAITING LIST", compound_job->getName().c_str());
 
             std::shared_ptr<FailureCause> failure_cause;
             switch (termination_cause) {
@@ -667,7 +661,7 @@ namespace wrench {
                     failure_cause = std::make_shared<JobKilled>(compound_job);
                     break;
             }
-            for (auto const &action : compound_job->getActions()) {
+            for (auto const &action: compound_job->getActions()) {
                 action->setFailureCause(failure_cause);
             }
 
@@ -698,45 +692,45 @@ namespace wrench {
         Service::cleanup(has_returned_from_main, return_value);
     }
 
-//    /**
-//     * @brief Terminate all running pilot jobs
-//     */
-//    void BatchComputeService::terminateRunningPilotJobs() {
-//        if (getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
-//            WRENCH_INFO(
-//                    "Failing running pilot jobs");
-//            std::vector<std::shared_ptr<BatchJob>> to_erase;
-//
-//            // LOCK
-//            this->acquireDaemonLock();
-//
-//            // Stopping services
-//            for (auto &job : this->running_jobs) {
-//                if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job->getCompoundJob())) {
-//                    auto cs = pjob->getComputeService();
-//                    if (cs == nullptr) {
-//                        throw std::runtime_error(
-//                                "BatchComputeService::terminate(): can't find compute service associated to pilot job");
-//                    }
-//                    try {
-//                        cs->stop(false);
-//                    } catch (wrench::ExecutionException &e) {
-//                        // ignore
-//                    }
-//                    to_erase.push_back(job);
-//                }
-//            }
-//
-//            // Cleaning up data structures
-//            for (auto &job : to_erase) {
-//                this->running_jobs.erase(job);
-//                this->removeBatchJobFromJobsList(job);
-//            }
-//
-//            // UNLOCK
-//            this->releaseDaemonLock();
-//        }
-//    }
+    //    /**
+    //     * @brief Terminate all running pilot jobs
+    //     */
+    //    void BatchComputeService::terminateRunningPilotJobs() {
+    //        if (getPropertyValueAsBoolean(BatchComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
+    //            WRENCH_INFO(
+    //                    "Failing running pilot jobs");
+    //            std::vector<std::shared_ptr<BatchJob>> to_erase;
+    //
+    //            // LOCK
+    //            this->acquireDaemonLock();
+    //
+    //            // Stopping services
+    //            for (auto &job : this->running_jobs) {
+    //                if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job->getCompoundJob())) {
+    //                    auto cs = pjob->getComputeService();
+    //                    if (cs == nullptr) {
+    //                        throw std::runtime_error(
+    //                                "BatchComputeService::terminate(): can't find compute service associated to pilot job");
+    //                    }
+    //                    try {
+    //                        cs->stop(false);
+    //                    } catch (wrench::ExecutionException &e) {
+    //                        // ignore
+    //                    }
+    //                    to_erase.push_back(job);
+    //                }
+    //            }
+    //
+    //            // Cleaning up data structures
+    //            for (auto &job : to_erase) {
+    //                this->running_jobs.erase(job);
+    //                this->removeBatchJobFromJobsList(job);
+    //            }
+    //
+    //            // UNLOCK
+    //            this->releaseDaemonLock();
+    //        }
+    //    }
 
     /**
      * @brief Wait for and procress the next message
@@ -754,7 +748,8 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) { WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+        if (message == nullptr) {
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
             return false;
         }
 
@@ -763,7 +758,7 @@ namespace wrench {
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             this->setStateToDown();
             this->terminate(msg->send_failure_notifications, msg->termination_cause);
-//            this->terminateRunningPilotJobs();
+            //            this->terminateRunningPilotJobs();
 
             // Send back a synchronous reply!
             try {
@@ -820,7 +815,7 @@ namespace wrench {
      * @param job: the BatchComputeService job object
      * @param answer_mailbox: the mailbox to which answer messages should be sent
      */
-    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job, 
+    void BatchComputeService::processJobSubmission(std::shared_ptr<BatchJob> job,
                                                    simgrid::s4u::Mailbox *answer_mailbox) {
         WRENCH_INFO("Asked to run a BatchComputeService job with id %ld", job->getJobID());
 
@@ -979,7 +974,7 @@ namespace wrench {
         WRENCH_INFO("A compound job executor has failed to perform job %s", job->getName().c_str());
 
         // notify the scheduler of the failure
-//        std::cerr << "IN processCompoundJobFailure\n";
+        //        std::cerr << "IN processCompoundJobFailure\n";
         this->scheduler->processJobFailure(batch_job);
 
         this->sendCompoundJobFailureNotification(job, std::to_string((batch_job->getJobID())), cause);
@@ -1019,28 +1014,26 @@ namespace wrench {
 
         compound_job->pushCallbackMailbox(this->mailbox);
         auto executor = std::shared_ptr<BareMetalComputeServiceOneShot>(
-            new BareMetalComputeServiceOneShot(
-                compound_job,
-                this->hostname,
-                resources,
-                {{BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
-                         this->getPropertyValueAsString(
-                                 BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}
-                },
-                {},
-                DBL_MAX,
-                nullptr,
-                "_one_shot_bm_",
-                this->getScratch()
-        ));
+                new BareMetalComputeServiceOneShot(
+                        compound_job,
+                        this->hostname,
+                        resources,
+                        {{BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                          this->getPropertyValueAsString(
+                                  BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}},
+                        {},
+                        DBL_MAX,
+                        nullptr,
+                        "_one_shot_bm_",
+                        this->getScratch()));
 
         executor->simulation = this->simulation;
-        executor->start(executor, true, false); // Daemonized, no auto-restart
+        executor->start(executor, true, false);// Daemonized, no auto-restart
         batch_job->setBeginTimestamp(S4U_Simulation::getClock());
         batch_job->setEndingTimestamp(S4U_Simulation::getClock() + allocated_time);
         this->running_bare_metal_one_shot_compute_services[compound_job] = executor;
 
-//          this->running_jobs.insert(std::move(batch_job_ptr));
+        //          this->running_jobs.insert(std::move(batch_job_ptr));
         this->timeslots.push_back(batch_job->getEndingTimestamp());
         //remember the allocated resources for the job
         batch_job->setAllocatedResources(resources);
@@ -1060,7 +1053,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which the description message should be sent
     * @param key: the desired resource information (i.e., dictionary key) that's needed)
     */
-    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, 
+    void BatchComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                             const std::string &key) {
         // Build a dictionary
         std::map<std::string, double> dict;
@@ -1070,31 +1063,31 @@ namespace wrench {
             dict.insert(std::make_pair(this->getName(), (double) (this->nodes_to_cores_map.size())));
 
         } else if (key == "num_cores") {
-            for (auto h : this->nodes_to_cores_map) {
+            for (auto h: this->nodes_to_cores_map) {
                 dict.insert(std::make_pair(h.first, (double) (h.second)));
             }
 
         } else if (key == "num_idle_cores") {
             // Num idle cores per hosts
-            for (auto h : this->available_nodes_to_cores) {
+            for (auto h: this->available_nodes_to_cores) {
                 dict.insert(std::make_pair(h.first, (double) (h.second)));
             }
 
         } else if (key == "flop_rates") {
             // Flop rate per host
-            for (auto h : this->nodes_to_cores_map) {
+            for (auto h: this->nodes_to_cores_map) {
                 dict.insert(std::make_pair(h.first, S4U_Simulation::getHostFlopRate(h.first)));
             }
 
         } else if (key == "ram_capacities") {
             // RAM capacity per host
-            for (auto h : this->nodes_to_cores_map) {
+            for (auto h: this->nodes_to_cores_map) {
                 dict.insert(std::make_pair(h.first, S4U_Simulation::getHostMemoryCapacity(h.first)));
             }
 
         } else if (key == "ram_availabilities") {
             // RAM availability per host  (0 if something is running, full otherwise)
-            for (auto h : this->available_nodes_to_cores) {
+            for (auto h: this->available_nodes_to_cores) {
                 if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
                     dict.insert(std::make_pair(h.first, 0.0));
                 } else {
@@ -1134,12 +1127,11 @@ namespace wrench {
                         this->num_cores_per_node,
                         this->getPropertyValueAsBoolean(
                                 BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
-                        this->workload_trace)
-        );
+                        this->workload_trace));
         try {
             this->workload_trace_replayer->setSimulation(this->simulation);
             this->workload_trace_replayer->start(this->workload_trace_replayer, true,
-                                                 false); // Daemonized, no auto-restart
+                                                 false);// Daemonized, no auto-restart
         } catch (std::runtime_error &e) {
             throw;
         }
@@ -1181,7 +1173,7 @@ namespace wrench {
             if (not is_pending) {
                 if (batch_job == nullptr && batch_pending_it == this->batch_queue.end()) {
                     // Is it waiting?
-                    for (auto const &j : this->waiting_jobs) {
+                    for (auto const &j: this->waiting_jobs) {
                         auto compound_job = j->getCompoundJob();
                         if (compound_job == job) {
                             batch_job = j;
@@ -1193,15 +1185,13 @@ namespace wrench {
             }
         }
 
-//        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
+        //        WRENCH_INFO("pending: %d   running: %d   waiting: %d", is_pending, is_running, is_waiting);
         if (!is_pending && !is_running && !is_waiting) {
             std::string msg = "Job cannot be terminated because it is neither pending, not running, not waiting";
             // Send a failure reply
             auto answer_message =
                     new ComputeServiceTerminateCompoundJobAnswerMessage(
-                            job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(
-                                    new NotAllowed(this->getSharedPtr<BatchComputeService>(),
-                                                   msg)),
+                            job, this->getSharedPtr<BatchComputeService>(), false, std::shared_ptr<FailureCause>(new NotAllowed(this->getSharedPtr<BatchComputeService>(), msg)),
                             this->getMessagePayloadValue(
                                     BatchComputeServiceMessagePayload::TERMINATE_COMPOUND_JOB_ANSWER_MESSAGE_PAYLOAD));
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
@@ -1242,7 +1232,7 @@ namespace wrench {
     void BatchComputeService::processAlarmJobTimeout(std::shared_ptr<BatchJob> batch_job) {
         std::shared_ptr<CompoundJob> compound_job = nullptr;
 
-        for (auto const &j : this->running_jobs) {
+        for (auto const &j: this->running_jobs) {
             if (j.second == batch_job) {
                 compound_job = j.first;
                 break;
@@ -1257,7 +1247,6 @@ namespace wrench {
             return;
         }
         this->processCompoundJobTimeout(compound_job);
-
     }
 
     /**
@@ -1278,7 +1267,8 @@ namespace wrench {
                 break;
             }
         }
-        if (compound_job == nullptr) { WRENCH_WARN(
+        if (compound_job == nullptr) {
+            WRENCH_WARN(
                     "BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not "
                     "belong to the list of known jobs... just telling Batsched that the job completed (Batsched seems "
                     "to send this back even when a job has been actively terminated)");
@@ -1292,7 +1282,7 @@ namespace wrench {
         std::vector<std::string> allocations;
         boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
         std::vector<unsigned long> node_resources;
-        for (auto alloc:allocations) {
+        for (auto alloc: allocations) {
             std::vector<std::string> each_allocations;
             boost::split(each_allocations, alloc, boost::is_any_of("-"));
             if (each_allocations.size() < 2) {
@@ -1320,12 +1310,12 @@ namespace wrench {
         std::vector<std::string> hosts_assigned = {};
         std::map<std::string, unsigned long>::iterator it;
 
-        for (auto node:node_resources) {
+        for (auto node: node_resources) {
             double ram_capacity = S4U_Simulation::getHostMemoryCapacity(
-                    this->host_id_to_names[node]); // Use the whole RAM
+                    this->host_id_to_names[node]);// Use the whole RAM
             this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
             resources.insert(std::make_pair(this->host_id_to_names[node], std::make_tuple(
-                    cores_per_node_asked_for, ram_capacity)));
+                                                                                  cores_per_node_asked_for, ram_capacity)));
         }
 
         startJob(resources, compound_job, batch_job, num_nodes_allocated, time_in_seconds,
@@ -1358,15 +1348,15 @@ namespace wrench {
         bool found_dash_t = false;
         bool found_dash_c = false;
 
-        for (auto const &arg : service_specific_args) {
+        for (auto const &arg: service_specific_args) {
             auto key = arg.first;
             auto value = arg.second;
 
             if (key == "-N") {
                 found_dash_N = true;
                 unsigned long num_nodes;
-                if (sscanf(value.c_str(),"%lu", &num_nodes) != 1) {
-                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
+                if (sscanf(value.c_str(), "%lu", &num_nodes) != 1) {
+                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->compute_hosts.size() < num_nodes) {
                     throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
@@ -1374,14 +1364,14 @@ namespace wrench {
             } else if (key == "-t") {
                 found_dash_t = true;
                 unsigned long requested_time;
-                if (sscanf(value.c_str(),"%lu", &requested_time) != 1) {
-                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
+                if (sscanf(value.c_str(), "%lu", &requested_time) != 1) {
+                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
             } else if (key == "-c") {
                 found_dash_c = true;
                 unsigned long num_cores;
-                if (sscanf(value.c_str(),"%lu", &num_cores) != 1) {
-                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value +"\"}");
+                if (sscanf(value.c_str(), "%lu", &num_cores) != 1) {
+                    throw std::invalid_argument("Invalid service-specific argument {\"" + key + "\",\"" + value + "\"}");
                 }
                 if (this->num_cores_per_node < num_cores) {
                     throw ExecutionException(std::make_shared<NotEnoughResources>(job, this->getSharedPtr<ComputeService>()));
@@ -1396,7 +1386,7 @@ namespace wrench {
                 bool found_task = false;
                 if (job != nullptr) {
                     // TODO: Should we have an ID/Action map in the job instead of just a set of actions?
-                    for (auto const &action : job->getActions()) {
+                    for (auto const &action: job->getActions()) {
                         if (action->getName() == key) {
                             found_task = true;
                             break;
@@ -1404,7 +1394,7 @@ namespace wrench {
                     }
                 }
                 if (not found_task) {
-                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value +"}: Job does not have any task with name " + key);
+                    throw std::invalid_argument("Invalid service-specific argument {" + key + "," + value + "}: Job does not have any task with name " + key);
                 }
             }
         }
@@ -1448,4 +1438,4 @@ namespace wrench {
         return true;
     }
 
-}
+}// namespace wrench

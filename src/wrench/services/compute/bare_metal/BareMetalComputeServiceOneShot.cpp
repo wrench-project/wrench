@@ -33,7 +33,6 @@ WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service_one_shot, "Log catego
 namespace wrench {
 
 
-
     /**
      * @brief Internal constructor
      *
@@ -56,9 +55,7 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
-            std::string suffix, std::shared_ptr<StorageService> scratch_space
-    ) : BareMetalComputeService(hostname, compute_resources, property_list, messagepayload_list, ttl, pj, suffix, scratch_space), job(job) {
-
+            std::string suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, compute_resources, property_list, messagepayload_list, ttl, pj, suffix, scratch_space), job(job) {
     }
 
     /**
@@ -92,7 +89,7 @@ namespace wrench {
         this->current_jobs.insert(this->job);
 
         // Add all action to the list of actions to run
-        for (auto const &action : this->job->getActions()) {
+        for (auto const &action: this->job->getActions()) {
             if (action->getState() == Action::State::READY) {
                 this->ready_actions.push_back(action);
             } else {
@@ -110,4 +107,4 @@ namespace wrench {
         return this->exit_code;
     }
 
-}
+}// namespace wrench

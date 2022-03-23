@@ -17,8 +17,8 @@
 
 WRENCH_LOG_CATEGORY(memory_manager_test, "Log category for MemoryManager test");
 
-#define GB (1000.0*1000.0*1000.0)
-#define PAGE_CACHE_RAM_SIZE  32
+#define GB (1000.0 * 1000.0 * 1000.0)
+#define PAGE_CACHE_RAM_SIZE 32
 #define FILE_SIZE 20
 
 class MemoryManagerTest : public ::testing::Test {
@@ -31,7 +31,6 @@ public:
     void do_MemoryManagerChainOfTasksTest_test();
 
 protected:
-
     ~MemoryManagerTest() {
         workflow->clear();
     }
@@ -78,34 +77,34 @@ protected:
                           "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                          "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
-                                                                                                            "             <prop id=\"mount\" value=\"/memory\"/>"
-                                                                                                            "          </disk>"
-                                                                                                            "       </host> "
-                                                                                                            "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
-                                                                                                            "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
-                                                                                                            "             <prop id=\"size\" value=\"" + std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
-                                                                                                                                                                                              "             <prop id=\"mount\" value=\"/memory\"/>"
-                                                                                                                                                                                              "          </disk>"
-                                                                                                                                                                                              "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                                                                                                                                                                                              "             <prop id=\"size\" value=\"30000GB\"/>"
-                                                                                                                                                                                              "             <prop id=\"mount\" value=\"/\"/>"
-                                                                                                                                                                                              "          </disk>"
-                                                                                                                                                                                              "       </host> "
-                                                                                                                                                                                              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                                                                                                                                                                                              "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                                                                                                                                                                                              "   </zone> "
-                                                                                                                                                                                              "</platform>";
+                          "             <prop id=\"size\" value=\"" +
+                          std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
+                                                                "             <prop id=\"mount\" value=\"/memory\"/>"
+                                                                "          </disk>"
+                                                                "       </host> "
+                                                                "       <host id=\"OneCoreHost\" speed=\"100f\" core=\"1\"> "
+                                                                "          <disk id=\"memory\" read_bw=\"1000MBps\" write_bw=\"1000MBps\">"
+                                                                "             <prop id=\"size\" value=\"" +
+                          std::to_string(PAGE_CACHE_RAM_SIZE) + "GB\"/>"
+                                                                "             <prop id=\"mount\" value=\"/memory\"/>"
+                                                                "          </disk>"
+                                                                "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
+                                                                "             <prop id=\"size\" value=\"30000GB\"/>"
+                                                                "             <prop id=\"mount\" value=\"/\"/>"
+                                                                "          </disk>"
+                                                                "       </host> "
+                                                                "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                                                                "       <route src=\"TwoCoreHost\" dst=\"OneCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                                                                "   </zone> "
+                                                                "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string bad_platform_file_path = UNIQUE_TMP_PATH_PREFIX + "bas_platform.xml";
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 
@@ -124,14 +123,14 @@ void MemoryManagerTest::do_MemoryManagerBadSetupTest_test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-pagecache-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
     // Setting up the platform
     ASSERT_THROW(simulation->instantiatePlatform(bad_platform_file_path), std::invalid_argument);
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -146,9 +145,8 @@ public:
     MemoryManagerChainOfTasksTestWMS(
             MemoryManagerTest *test,
             std::shared_ptr<wrench::Workflow> workflow,
-            std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"),
-            test(test), workflow(workflow){
+            std::string &hostname) : wrench::ExecutionController(hostname, "test"),
+                                     test(test), workflow(workflow) {
     }
 
 private:
@@ -193,7 +191,7 @@ TEST_F(MemoryManagerTest, MemoryManagerChainOfTask) {
 void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     // Create and initialize a simulation
     auto simulation = wrench::Simulation::createSimulation();
-    int argc =2;
+    int argc = 2;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-pagecache-simulation");
@@ -211,23 +209,23 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"},
-                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
-                                             {})));
+                            new wrench::SimpleStorageService(hostname, {"/"},
+                                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "100000000.0"}},
+                                                             {})));
 
     // Create a Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname,
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                "", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname,
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                "", {})));
 
     // Create a Workflow
     auto workflow = wrench::Workflow::createWorkflow();
     auto previous_output_file = workflow->addFile("task0_input", FILE_SIZE * GB);
     int num_tasks = 10;
-    for (int i=0; i < num_tasks; i++) {
+    for (int i = 0; i < num_tasks; i++) {
         auto task = workflow->addTask("task1" + std::to_string(i), 100.0, 1, 1, 0.0);
         auto output_file = workflow->addFile("task1" + std::to_string(i) + "_output", FILE_SIZE * GB);
         task->addOutputFile(output_file);
@@ -236,9 +234,10 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
     }
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new MemoryManagerChainOfTasksTestWMS(this, workflow, hostname)));
+                            new MemoryManagerChainOfTasksTestWMS(this, workflow, hostname)));
     // Create a File Registry Service
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
@@ -250,9 +249,7 @@ void MemoryManagerTest::do_MemoryManagerChainOfTasksTest_test() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-

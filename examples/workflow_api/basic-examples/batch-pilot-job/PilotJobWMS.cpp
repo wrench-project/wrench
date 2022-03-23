@@ -37,9 +37,8 @@ namespace wrench {
     PilotJobWMS::PilotJobWMS(std::shared_ptr<Workflow> workflow,
                              const std::shared_ptr<BatchComputeService> &batch_compute_service,
                              const std::shared_ptr<StorageService> &storage_service,
-                             const std::string &hostname) :
-                             ExecutionController(hostname,"two-tasks-at-a-time-batch_standard_and_pilot_jobs"),
-                             workflow(workflow), batch_compute_service(batch_compute_service), storage_service(storage_service) {}
+                             const std::string &hostname) : ExecutionController(hostname, "two-tasks-at-a-time-batch_standard_and_pilot_jobs"),
+                                                            workflow(workflow), batch_compute_service(batch_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the PilotJobWMS daemon
@@ -53,7 +52,8 @@ namespace wrench {
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());WRENCH_INFO(
+        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
+        WRENCH_INFO(
                 "About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
@@ -72,14 +72,14 @@ namespace wrench {
 
         /* For each task, estimate its execution time in minutes */
         std::map<std::shared_ptr<WorkflowTask>, long> execution_times_in_minutes;
-        for (auto  const &t : this->workflow->getTasks())  {
+        for (auto const &t: this->workflow->getTasks()) {
             double parallel_efficiency =
                     std::dynamic_pointer_cast<wrench::ConstantEfficiencyParallelModel>(t->getParallelModel())->getEfficiency();
-            double in_seconds = (t->getFlops() / core_flop_rate) /  (10 * parallel_efficiency);
+            double in_seconds = (t->getFlops() / core_flop_rate) / (10 * parallel_efficiency);
             execution_times_in_minutes[t] = 1 + std::lround(in_seconds / 60.0);
             // The +1 above is just  so that we don't cut it too tight
             WRENCH_INFO("Task %s should run in under %ld minutes",
-                    t->getID().c_str(), execution_times_in_minutes[t]);
+                        t->getID().c_str(), execution_times_in_minutes[t]);
         }
 
         /* Create a Pilot job */
@@ -172,4 +172,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

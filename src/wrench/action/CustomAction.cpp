@@ -24,12 +24,11 @@ namespace wrench {
     * @param lambda_execute: a lambda that implements the action's execution
     * @param lambda_terminate: a lambda that implements the action's termination (typically a no-op)
     */
-    CustomAction::CustomAction(const std::string& name, std::shared_ptr<CompoundJob> job,
+    CustomAction::CustomAction(const std::string &name, std::shared_ptr<CompoundJob> job,
                                double ram,
                                unsigned long num_cores,
-                               const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
-                               const std::function<void (std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate) :
-            Action(name, "custom_", std::move(job)), ram(ram), num_cores(num_cores), lambda_execute(lambda_execute), lambda_terminate(lambda_terminate) {
+                               const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
+                               const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate) : Action(name, "custom_", std::move(job)), ram(ram), num_cores(num_cores), lambda_execute(lambda_execute), lambda_terminate(lambda_terminate) {
     }
 
     /**
@@ -72,4 +71,4 @@ namespace wrench {
         return this->ram;
     }
 
-}
+}// namespace wrench

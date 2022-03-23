@@ -27,7 +27,6 @@ namespace wrench {
                   const std::string &hostname);
 
     protected:
-
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent> event) override;
         void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent> event) override;
         void processEventPilotJobStart(std::shared_ptr<PilotJobStartedEvent> event) override;
@@ -54,7 +53,6 @@ namespace wrench {
         std::shared_ptr<StorageService> storage_service;
 
         std::map<std::shared_ptr<ComputeService>, unsigned long> core_utilization_map;
-
     };
-}
-#endif //WRENCH_EXAMPLE_SIMPLEWMS_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_SIMPLEWMS_H

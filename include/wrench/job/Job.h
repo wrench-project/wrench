@@ -34,7 +34,6 @@ namespace wrench {
     class Job {
 
     public:
-
         std::string getName();
 
         double getSubmitDate();
@@ -68,7 +67,6 @@ namespace wrench {
         std::map<std::string, std::string> &getServiceSpecificArguments();
 
     protected:
-
         friend class JobManager;
 
         Job(std::string name, std::shared_ptr<JobManager> job_manager);
@@ -87,8 +85,8 @@ namespace wrench {
         /** @brief The originator's mailbox */
         simgrid::s4u::Mailbox *originator_mailbox;
 
-//        /** @brief The workflow this job belong to */
-//        Workflow *workflow;
+        //        /** @brief The workflow this job belong to */
+        //        Workflow *workflow;
         /** @brief The job's name */
         std::string name;
         /** @brief The date at which the job was last submitted */
@@ -105,7 +103,7 @@ namespace wrench {
         double priority = 0.0;
 
     private:
-//        bool forward_notification_to_original_source;
+        //        bool forward_notification_to_original_source;
 
 
         /***********************/
@@ -117,7 +115,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_JOB_H
+#endif//WRENCH_JOB_H
