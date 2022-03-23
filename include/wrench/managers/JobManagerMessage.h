@@ -68,8 +68,8 @@ namespace wrench {
         /** @brief The failure cause */
         std::shared_ptr<FailureCause> cause;
     };
-    
-    
+
+
     /**
      * @brief A message sent by the JobManager to notify some submitter that a StandardJob has completed
      */
@@ -116,8 +116,8 @@ namespace wrench {
     class JobManagerPilotJobFailedMessage : public JobManagerMessage {
     public:
         JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
-                                           std::shared_ptr<ComputeService> compute_service,
-                                           std::shared_ptr<FailureCause> cause);
+                                        std::shared_ptr<ComputeService> compute_service,
+                                        std::shared_ptr<FailureCause> cause);
 
 
         /** @brief The job that has failed */
@@ -132,6 +132,6 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_JOBMANAGERMESSAGE_H
+#endif//WRENCH_JOBMANAGERMESSAGE_H

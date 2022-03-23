@@ -22,9 +22,9 @@ namespace wrench {
     class FileLocation;
 
     class CondorGridStartTimestamp : public SimulationTimestampPair {
-        public:
-        protected:
-        private:
+    public:
+    protected:
+    private:
     };
 
     class CondorGridEndTimestamp : public SimulationTimestampPair {
@@ -34,7 +34,6 @@ namespace wrench {
     };
 
 
+}// namespace wrench
 
-}
-
-#endif //WRENCH_CONDORTIMESTAMP_H
+#endif//WRENCH_CONDORTIMESTAMP_H

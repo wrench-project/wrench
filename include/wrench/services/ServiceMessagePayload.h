@@ -12,15 +12,15 @@
 #define WRENCH_SERVICEMESSAGEPAYLOAD_H
 
 #include <string>
-namespace wrench{
+namespace wrench {
     typedef int WRENCH_MESSAGEPAYLOAD_TYPE;
     extern WRENCH_MESSAGEPAYLOAD_TYPE WRENCH_MESSAGEPAYLOAD_COUNT;
 
-}
+}// namespace wrench
 #define DECLARE_MESSAGEPAYLOAD_NAME(name) static const WRENCH_MESSAGEPAYLOAD_TYPE name
 
 
-#define SET_MESSAGEPAYLOAD_NAME(classname, name) const WRENCH_MESSAGEPAYLOAD_TYPE classname::name=++WRENCH_MESSAGEPAYLOAD_COUNT
+#define SET_MESSAGEPAYLOAD_NAME(classname, name) const WRENCH_MESSAGEPAYLOAD_TYPE classname::name = ++WRENCH_MESSAGEPAYLOAD_COUNT
 //#name
 //++WRENCH_MESSAGEPAYLOAD_COUNT
 namespace wrench {
@@ -35,10 +35,9 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(STOP_DAEMON_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to confirm it has terminated **/
         DECLARE_MESSAGEPAYLOAD_NAME(DAEMON_STOPPED_MESSAGE_PAYLOAD);
-
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_SERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_SERVICEMESSAGEPAYLOAD_H

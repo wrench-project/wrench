@@ -20,7 +20,6 @@ public:
     void do_DeleteRegisterTest();
 
 protected:
-
     ~SimpleStorageServiceDeleteRegisterTest() {
         workflow->clear();
     }
@@ -42,17 +41,18 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"StorageHost\" speed=\"1f\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"" + std::to_string(STORAGE_SIZE) + "B\"/>"
-                                                                                                     "             <prop id=\"mount\" value=\"/\"/>"
-                                                                                                     "          </disk>"
-                                                                                                     "       </host>"
-                                                                                                     "       <host id=\"WMSHost\" speed=\"1f\"/> "
-                                                                                                     "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
-                                                                                                     "       <route src=\"WMSHost\" dst=\"StorageHost\">"
-                                                                                                     "         <link_ctn id=\"link\"/>"
-                                                                                                     "       </route>"
-                                                                                                     "   </zone> "
-                                                                                                     "</platform>";
+                          "             <prop id=\"size\" value=\"" +
+                          std::to_string(STORAGE_SIZE) + "B\"/>"
+                                                         "             <prop id=\"mount\" value=\"/\"/>"
+                                                         "          </disk>"
+                                                         "       </host>"
+                                                         "       <host id=\"WMSHost\" speed=\"1f\"/> "
+                                                         "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
+                                                         "       <route src=\"WMSHost\" dst=\"StorageHost\">"
+                                                         "         <link_ctn id=\"link\"/>"
+                                                         "       </route>"
+                                                         "   </zone> "
+                                                         "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -67,9 +67,8 @@ public:
     SimpleStorageServiceDeleteRegisterTestWMS(SimpleStorageServiceDeleteRegisterTest *test,
                                               const std::shared_ptr<wrench::StorageService> &storage_service,
                                               const std::shared_ptr<wrench::FileRegistryService> &file_registry_service,
-                                              std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), storage_service(storage_service),
-            file_registry_service(file_registry_service) {
+                                              std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), storage_service(storage_service),
+                                                                      file_registry_service(file_registry_service) {
         this->test = test;
     }
 
@@ -108,7 +107,6 @@ private:
         }
 
 
-
         return 0;
     }
 };
@@ -133,14 +131,15 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
     // Create a (unused) Compute Service
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("WMSHost",
-                                                {std::make_pair("WMSHost",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))}, {})));
+                            new wrench::BareMetalComputeService("WMSHost",
+                                                                {std::make_pair("WMSHost",
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                {})));
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", {"/"})));
+                            new wrench::SimpleStorageService("StorageHost", {"/"})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -149,7 +148,7 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceDeleteRegisterTestWMS(
-            this, storage_service, file_registry_service, "WMSHost")));
+                            this, storage_service, file_registry_service, "WMSHost")));
 
     // Stage the 2 files on the StorageHost
     ASSERT_NO_THROW(simulation->stageFile(file_1, storage_service));
@@ -159,7 +158,7 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

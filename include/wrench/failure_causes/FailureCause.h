@@ -31,7 +31,6 @@ namespace wrench {
     class FailureCause {
 
     public:
-
         FailureCause() = default;
 
         /***********************/
@@ -48,13 +47,12 @@ namespace wrench {
          * @return an error message
          */
         virtual std::string toString() = 0;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FAILURECAUSE_H
+#endif//WRENCH_FAILURECAUSE_H

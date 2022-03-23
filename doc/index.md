@@ -3,7 +3,7 @@ Overview                        {#mainpage}
 
 [TOC]
 
-[WRENCH](http://wrench-project.org) is an open-source framework design to
+[WRENCH](http://wrench-project.org) is an open-source framework designed to
 make it easy for users to develop accurate and scalable simulators of
 distributed computing applications, systems, and platforms. It has been
 used for research, development, and education.  WRENCH capitalizes on
@@ -43,9 +43,9 @@ WRENCH comprises four distinct layers:
 - **Simulated Core Services:** Abstractions for simulated cyberinfrastructure (CI) components that can be used by the runtime system  to execute application workloads (compute services, storage services, network proximity services, data location services, etc.).
 - **Simulation Core:**  All necessary simulation models and base abstractions (computing, communicating, storing), provided by [SimGrid](https://simgrid.org).
 
-
+<div class="arch-img" style="text-align: center">
 ![](images/wrench-architecture.png)
-
+</div>
 
 # Three Classes of Users #                       {#overview-users}
 

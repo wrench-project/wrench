@@ -15,7 +15,7 @@
 // Exceptions and Failure Causes
 #include "wrench/exceptions/ExecutionException.h"
 #include "wrench/failure_causes/FailureCause.h"
-#include "wrench/failure_causes/ComputeThreadHasDied.h"
+#include "wrench/failure_causes/ComputationHasDied.h"
 #include "wrench/failure_causes/FatalFailure.h"
 #include "wrench/failure_causes/SomeActionsHaveFailed.h"
 #include "wrench/failure_causes/FileAlreadyBeingCopied.h"
@@ -84,4 +84,4 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
-#endif //WRENCH_WRENCH_DEV_H
+#endif//WRENCH_WRENCH_DEV_H

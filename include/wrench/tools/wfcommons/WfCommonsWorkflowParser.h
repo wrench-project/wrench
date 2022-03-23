@@ -24,7 +24,6 @@ namespace wrench {
     class WfCommonsWorkflowParser {
 
     public:
-
         /**
          * @brief Create an abstract workflow based on a JSON file
          *
@@ -34,7 +33,9 @@ namespace wrench {
          *                             but the WRENCH simulation needs some notion of "amount of computation" to
          *                             apply reasonable scaling. (Because the XML platform description specifies host
          *                             compute speeds in flops/sec). The times in the JSON file are thus assumed to be
-         *                             obtained on an machine with flop rate reference_flop_rate.
+         *                             obtained on an machine with flop rate reference_flop_rate. NOTE: This is only used
+         *                             if the JSON file does not provide information regarding the machine on which a task
+         *                             was executed. In this case, the machine speed information is used.
          * @param redundant_dependencies: Workflows provided by WfCommons
          *                             sometimes include control/data dependencies between tasks that are already induced by
          *                             other control/data dependencies (i.e., they correspond to transitive
@@ -54,10 +55,10 @@ namespace wrench {
          */
 
         static std::shared_ptr<Workflow> createWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                bool redundant_dependencies = false,
-                                                unsigned long min_cores_per_task = 1,
-                                                unsigned long max_cores_per_task = 1,
-                                                bool enforce_num_cores = false);
+                                                                bool redundant_dependencies = false,
+                                                                unsigned long min_cores_per_task = 1,
+                                                                unsigned long max_cores_per_task = 1,
+                                                                bool enforce_num_cores = false);
 
         /**
           * @brief Create an NON-abstract workflow based on a JSON file
@@ -87,14 +88,13 @@ namespace wrench {
           * @throw std::invalid_argument
           */
         static std::shared_ptr<Workflow> createExecutableWorkflowFromJSON(const std::string &filename, const std::string &reference_flop_rate,
-                                                          bool redundant_dependencies = false,
-                                                          unsigned long min_cores_per_task = 1,
-                                                          unsigned long max_cores_per_task = 1,
-                                                          bool enforce_num_cores = false);
-
+                                                                          bool redundant_dependencies = false,
+                                                                          unsigned long min_cores_per_task = 1,
+                                                                          unsigned long max_cores_per_task = 1,
+                                                                          bool enforce_num_cores = false);
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_WFCOMMONSWORKFLOWPARSER_H
+#endif//WRENCH_WFCOMMONSWORKFLOWPARSER_H

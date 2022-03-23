@@ -41,7 +41,6 @@ namespace wrench {
         std::shared_ptr<PilotJob> pilot_job;
 
         int num_actions;
-
     };
-}
-#endif //WRENCH_EXAMPLE_GREEDY_EXECUTION_CONTROLLER_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_GREEDY_EXECUTION_CONTROLLER_H

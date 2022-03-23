@@ -38,7 +38,6 @@ public:
     void do_CloudServiceRandomFailures_test();
 
 protected:
-
     ~CloudServiceHostFailuresTest() {
         workflow->clear();
     }
@@ -110,10 +109,6 @@ protected:
 };
 
 
-
-
-
-
 /**********************************************************************/
 /**                    FAILURE WITH RUNNING JOB                      **/
 /**********************************************************************/
@@ -122,13 +117,11 @@ class CloudServiceFailureOfAVMTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceFailureOfAVMTestWMS(CloudServiceHostFailuresTest *test,
-                                    std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                    std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     CloudServiceHostFailuresTest *test;
 
     int main() override {
@@ -137,12 +130,12 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
-        auto cloud_service =  this->test->compute_service;
+        auto cloud_service = this->test->compute_service;
         auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
         auto vm_cs = cloud_service->startVM(vm_name);
 
@@ -198,7 +191,6 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
-
     simulation->init(&argc, argv);
 
     // Setting up the platform
@@ -220,7 +212,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new CloudServiceFailureOfAVMTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -232,14 +225,10 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJob_tes
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-
-
-
 
 
 /**********************************************************************/
@@ -250,13 +239,11 @@ class CloudServiceFailureOfAVMAndRestartTestWMS : public wrench::ExecutionContro
 
 public:
     CloudServiceFailureOfAVMAndRestartTestWMS(CloudServiceHostFailuresTest *test,
-                                              std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                              std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     CloudServiceHostFailuresTest *test;
 
     int main() override {
@@ -265,18 +252,18 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->setSimulation(this->simulation);
-        resurector->start(resurector, true, false); // Daemonized, no auto-restart
+        resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
         wrench::Simulation::sleep(10);
 
         // Create a VM on the Cloud Service
-        auto cloud_service =  this->test->compute_service;
+        auto cloud_service = this->test->compute_service;
         auto vm_name = cloud_service->createVM(1, this->test->task->getMemoryRequirement());
         auto vm_cs = cloud_service->startVM(vm_name);
 
@@ -332,7 +319,6 @@ private:
         }
 
 
-
         return 0;
     }
 };
@@ -371,7 +357,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new CloudServiceFailureOfAVMAndRestartTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -383,14 +370,10 @@ void CloudServiceHostFailuresTest::do_CloudServiceFailureOfAVMWithRunningJobFoll
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-
-
-
 
 
 /**********************************************************************/
@@ -401,13 +384,11 @@ class CloudServiceRandomFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     CloudServiceRandomFailuresTestWMS(CloudServiceHostFailuresTest *test,
-                                      std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                      std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     CloudServiceHostFailuresTest *test;
 
     int main() override {
@@ -419,7 +400,7 @@ private:
 
         auto cloud_service = this->test->compute_service;
 
-        for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
+        for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) {
 
             WRENCH_INFO("*** Trial %ld", trial);
 
@@ -429,7 +410,7 @@ private:
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
                                                              "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch1->setSimulation(this->simulation);
-            switch1->start(switch1, true, false); // Daemonized, no auto-restart
+            switch1->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 17 + 42;
@@ -437,7 +418,7 @@ private:
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
                                                              "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch2->setSimulation(this->simulation);
-            switch2->start(switch1, true, false); // Daemonized, no auto-restart
+            switch2->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 50, 1, 1, 0);
@@ -458,13 +439,13 @@ private:
 
                 // Create a standard job
                 auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                                               wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                  wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                  {output_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
                 // Start the VM (sleep 10 and retry if unsuccessful)
                 std::shared_ptr<wrench::BareMetalComputeService> vm_cs;
                 try {
-//                    WRENCH_INFO("Trying to start the VM");
+                    //                    WRENCH_INFO("Trying to start the VM");
                     num_vm_start_attempts++;
                     total_num_vm_start_attempts++;
                     vm_cs = cloud_service->startVM(vm_name);
@@ -472,7 +453,7 @@ private:
                     wrench::Simulation::sleep(10);
                     continue;
                 }
-//                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
+                //                WRENCH_INFO("*** WAS ABLE TO START THE VM AFTER %lu attempts", num_vm_start_attempts);
                 num_vm_start_attempts = 0;
 
                 // Submit the standard job to the compute service, making it sure it runs on FailedHost1
@@ -533,7 +514,8 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new CloudServiceRandomFailuresTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -545,10 +527,7 @@ void CloudServiceHostFailuresTest::do_CloudServiceRandomFailures_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-
-

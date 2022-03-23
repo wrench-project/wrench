@@ -25,7 +25,6 @@ namespace wrench {
     class NetworkProximityMessage : public ServiceMessage {
     protected:
         NetworkProximityMessage(double payload);
-
     };
 
 
@@ -81,7 +80,6 @@ namespace wrench {
     class NetworkProximityTransferMessage : public NetworkProximityMessage {
     public:
         NetworkProximityTransferMessage(double payload);
-
     };
 
     /**
@@ -151,7 +149,7 @@ namespace wrench {
     /***********************/
     /** \endcond          **/
     /***********************/
-}
+}// namespace wrench
 
 
-#endif //WRENCH_NETWORKPROXIMITYMESSAGE_H
+#endif//WRENCH_NETWORKPROXIMITYMESSAGE_H

@@ -27,12 +27,12 @@ namespace wrench {
     /**
    * @brief A "compute thread has died" failure cause
    */
-    class ComputeThreadHasDied : public FailureCause {
+    class ComputationHasDied : public FailureCause {
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        ComputeThreadHasDied();
+        ComputationHasDied();
         /***********************/
         /** \endcond           */
         /***********************/
@@ -45,7 +45,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_COMPUTE_THREAD_HAS_DIED_H
+#endif//WRENCH_COMPUTE_THREAD_HAS_DIED_H

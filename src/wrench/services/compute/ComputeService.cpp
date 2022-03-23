@@ -45,7 +45,7 @@ namespace wrench {
         if ((this->state == Service::DOWN) or (this->shutting_down)) {
             return;
         }
-        this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
+        this->shutting_down = true;// This is to avoid another process calling stop() and being stuck
 
         WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
 
@@ -74,7 +74,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
             this->state = Service::DOWN;
         } else {
             throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
@@ -153,8 +153,7 @@ namespace wrench {
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
-                                   std::string scratch_space_mount_point) :
-            Service(hostname, service_name) {
+                                   std::string scratch_space_mount_point) : Service(hostname, service_name) {
 
         this->state = ComputeService::UP;
 
@@ -183,8 +182,7 @@ namespace wrench {
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
-                                   std::shared_ptr<StorageService> scratch_space) :
-            Service(hostname, service_name) {
+                                   std::shared_ptr<StorageService> scratch_space) : Service(hostname, service_name) {
 
         this->state = ComputeService::UP;
         this->scratch_space_storage_service = scratch_space;
@@ -206,7 +204,8 @@ namespace wrench {
             throw;
         }
 
-        return (unsigned long) (*(dict.begin())).second;;
+        return (unsigned long) (*(dict.begin())).second;
+        ;
     }
 
     /**
@@ -227,13 +226,12 @@ namespace wrench {
 
         std::vector<std::string> to_return;
 
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             to_return.emplace_back(x.first);
         }
 
         return to_return;
     }
-
 
 
     /**
@@ -254,7 +252,7 @@ namespace wrench {
 
         std::map<std::string, unsigned long> to_return;
 
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
 
@@ -278,7 +276,7 @@ namespace wrench {
         }
 
         unsigned long count = 0;
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             count += (unsigned long) x.second;
         }
         return count;
@@ -306,7 +304,7 @@ namespace wrench {
 
         std::map<std::string, unsigned long> to_return;
 
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             to_return.insert(std::make_pair(x.first, (unsigned long) x.second));
         }
 
@@ -331,7 +329,7 @@ namespace wrench {
 
         std::map<std::string, double> to_return;
 
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             to_return.insert(std::make_pair(x.first, (double) x.second));
         }
 
@@ -359,7 +357,7 @@ namespace wrench {
 
 
         unsigned long count = 0;
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             count += (unsigned long) x.second;
         }
         return count;
@@ -383,11 +381,11 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(
-                    answer_mailbox,
-                    num_cores,
-                    ram,
-                    this->getMessagePayloadValue(
-                            ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
+                                                           answer_mailbox,
+                                                           num_cores,
+                                                           ram,
+                                                           this->getMessagePayloadValue(
+                                                                   ComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -400,7 +398,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesAnswerMessage *>(message.get())) {
             return msg->answer;
 
         } else {
@@ -426,7 +424,7 @@ namespace wrench {
         }
 
         std::map<std::string, double> to_return;
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             to_return.insert(std::make_pair(x.first, x.second));
         }
 
@@ -450,7 +448,7 @@ namespace wrench {
 
         std::map<std::string, double> to_return;
 
-        for (auto const &x : dict) {
+        for (auto const &x: dict) {
             to_return.insert(std::make_pair(x.first, x.second));
         }
 
@@ -492,10 +490,10 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->mailbox, new ComputeServiceResourceInformationRequestMessage(
-                    answer_mailbox,
-                    key,
-                    this->getMessagePayloadValue(
-                            ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                                                           answer_mailbox,
+                                                           key,
+                                                           this->getMessagePayloadValue(
+                                                                   ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -508,7 +506,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
             return msg->info;
 
         } else {
@@ -566,7 +564,7 @@ namespace wrench {
      * @param service_specific_args: the service-specific arguments
      */
     void ComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
-                                                          map<std::string, std::string> &service_specific_args)  {
+                                                          map<std::string, std::string> &service_specific_args) {
         throw std::runtime_error("ComputeService::validateServiceSpecificArguments(): should be overridden in compute service implementation");
     }
 
@@ -582,4 +580,4 @@ namespace wrench {
     }
 
 
-};
+};// namespace wrench

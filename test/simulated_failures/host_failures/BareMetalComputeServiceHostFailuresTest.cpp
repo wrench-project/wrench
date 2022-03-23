@@ -38,7 +38,6 @@ public:
     void do_BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDown_test();
 
 protected:
-
     ~BareMetalComputeServiceHostFailuresTest() {
         workflow->clear();
     }
@@ -110,9 +109,6 @@ protected:
 };
 
 
-
-
-
 /**********************************************************************/
 /**                FAIL OVER TO SECOND HOST  TEST                    **/
 /**********************************************************************/
@@ -121,13 +117,11 @@ class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWM
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                                                std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                                                std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
@@ -136,13 +130,13 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->setSimulation(this->simulation);
-        resurector->start(resurector, true, false); // Daemonized, no auto-restart
+        resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
 
         // Create a job manager
@@ -186,7 +180,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -201,17 +195,16 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
             new wrench::BareMetalComputeService(stable_host,
                                                 (std::map<std::string, std::tuple<unsigned long, double>>){
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
-                                                        std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))
-                                                },
+                                                        std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
                                                 "/scratch",
-                                                {
-                                                 {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnAnotherHostTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -223,11 +216,10 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -238,13 +230,11 @@ class BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS :
 
 public:
     BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                                             std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                                             std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
@@ -253,13 +243,13 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 1000, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->setSimulation(this->simulation);
-        resurector->start(resurector, true, false); // Daemonized, no auto-restart
+        resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
 
         // Create a job manager
@@ -285,7 +275,6 @@ private:
         }
 
 
-
         return 0;
     }
 };
@@ -304,7 +293,6 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     argv[1] = strdup("--wrench-host-shutdown-simulation");
 
 
-
     simulation->init(&argc, argv);
 
     // Setting up the platform
@@ -320,14 +308,16 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
                                                         std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
                                                 "/scratch",
-                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"},
-                                                 }));
+                                                {
+                                                        {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"},
+                                                }));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new BareMetalComputeServiceOneFailureCausingWorkUnitRestartOnSameHostTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -339,7 +329,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceOneFailu
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -353,13 +343,11 @@ class BareMetalComputeServiceRandomFailuresTestWMS : public wrench::ExecutionCon
 
 public:
     BareMetalComputeServiceRandomFailuresTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                 std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                 std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
@@ -369,7 +357,7 @@ private:
 
         unsigned long NUM_TRIALS = 500;
 
-        for (unsigned long trial=0; trial < NUM_TRIALS; trial++) {
+        for (unsigned long trial = 0; trial < NUM_TRIALS; trial++) {
 
             WRENCH_INFO("*** Trial %ld", trial);
 
@@ -379,7 +367,7 @@ private:
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed1, 10, 100, 10, 100,
                                                              "FailedHost1", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch1->setSimulation(this->simulation);
-            switch1->start(switch1, true, false); // Daemonized, no auto-restart
+            switch1->start(switch1, true, false);// Daemonized, no auto-restart
 
             // Starting a FailedHost2 random repeat switch!!
             unsigned long seed2 = trial * 7 + 417;
@@ -387,7 +375,7 @@ private:
                     new wrench::ResourceRandomRepeatSwitcher("StableHost", seed2, 10, 100, 10, 100,
                                                              "FailedHost2", wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
             switch2->setSimulation(this->simulation);
-            switch2->start(switch2, true, false); // Daemonized, no auto-restart
+            switch2->start(switch2, true, false);// Daemonized, no auto-restart
 
             // Add a task1 to the workflow
             auto task = this->test->workflow->addTask("task_" + std::to_string(trial), 80, 1, 1, 0);
@@ -397,9 +385,9 @@ private:
 
             // Create a standard job
             auto job = job_manager->createStandardJob(task, {{this->test->input_file,
-                                                                     wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                              wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                              {output_file,
-                                                                     wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                              wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
             // Submit the standard job to the compute service, making it sure it runs on FailedHost1
             job_manager->submitJob(job, this->test->compute_service, {});
@@ -416,7 +404,6 @@ private:
             wrench::Simulation::sleep(10.0);
             this->test->workflow->removeTask(task);
             this->test->workflow->removeFile(output_file);
-
         }
 
         return 0;
@@ -435,7 +422,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-logs");
+    //    argv[2] = strdup("--wrench-full-logs");
 
 
     simulation->init(&argc, argv);
@@ -454,14 +441,14 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
                                                         std::make_pair("FailedHost2", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                                                 },
                                                 "/scratch",
-                                                {
-                                                 {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
+                                                {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new BareMetalComputeServiceRandomFailuresTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -473,11 +460,10 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceRandomFa
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -488,13 +474,11 @@ class BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAr
 
 public:
     BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(BareMetalComputeServiceHostFailuresTest *test,
-                                                                                           std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                                                           std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BareMetalComputeServiceHostFailuresTest *test;
 
     int main() override {
@@ -503,7 +487,7 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
 
         // Create a job manager
@@ -511,9 +495,9 @@ private:
 
         // Create a standard job
         auto job = job_manager->createStandardJob(this->test->task, {{this->test->input_file,
-                                                                             wrench::FileLocation::LOCATION(this->test->storage_service)},
+                                                                      wrench::FileLocation::LOCATION(this->test->storage_service)},
                                                                      {this->test->output_file,
-                                                                             wrench::FileLocation::LOCATION(this->test->storage_service)}});
+                                                                      wrench::FileLocation::LOCATION(this->test->storage_service)}});
 
         // Submit the standard job to the compute service, making it sure it runs on FailedHost1
         job_manager->submitJob(job, this->test->compute_service, {});
@@ -540,7 +524,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -558,15 +542,14 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
                             std::make_pair("FailedHost1", std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)),
                     },
                     "/scratch",
-                    {
-                            {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}
-                    }));
+                    {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"}}));
 
     // Create a Storage Service
     storage_service = simulation->add(new wrench::SimpleStorageService(stable_host, {"/"}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     wms = simulation->add(new BareMetalComputeServiceFailureOnServiceThatTerminatesWhenAllItsResourcesAreDownTestWMS(this, stable_host));
 
     // Staging the input_file on the storage service
@@ -578,7 +561,7 @@ void BareMetalComputeServiceHostFailuresTest::do_BareMetalComputeServiceFailureO
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

@@ -33,25 +33,25 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        StorageServiceNotEnoughSpace(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService>  storage_service);
+        StorageServiceNotEnoughSpace(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> storage_service);
         /***********************/
         /** \endcond           */
         /***********************/
 
-        std::shared_ptr<DataFile>getFile();
-        std::shared_ptr<StorageService>  getStorageService();
+        std::shared_ptr<DataFile> getFile();
+        std::shared_ptr<StorageService> getStorageService();
         std::string toString() override;
 
 
     private:
-        std::shared_ptr<DataFile>file;
-        std::shared_ptr<StorageService>  storage_service;
+        std::shared_ptr<DataFile> file;
+        std::shared_ptr<StorageService> storage_service;
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_STORAGE_SERVICE_NOT_ENOUGH_SPACE_H
+#endif//WRENCH_STORAGE_SERVICE_NOT_ENOUGH_SPACE_H

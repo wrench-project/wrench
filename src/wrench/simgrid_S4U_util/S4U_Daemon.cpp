@@ -28,7 +28,7 @@ std::map<std::string, unsigned long> num_actors;
 
 namespace wrench {
 
-    std::unordered_map<aid_t, simgrid::s4u::Mailbox*> S4U_Daemon::map_actor_to_recv_mailbox;
+    std::unordered_map<aid_t, simgrid::s4u::Mailbox *> S4U_Daemon::map_actor_to_recv_mailbox;
 
     /**
      * @brief Constructor (daemon with a mailbox)
@@ -48,24 +48,24 @@ namespace wrench {
 
 #ifdef ACTOR_TRACKING_OUTPUT
         this->process_name_prefix = "";
-      std::vector<std::string> tokens;
-      boost::split(tokens, process_name_prefix, boost::is_any_of("_"));
-      for (auto t : tokens) {
-        if (t.at(0) < '0' or t.at(0) > '9') {
-          this->process_name_prefix += t + "_";
+        std::vector<std::string> tokens;
+        boost::split(tokens, process_name_prefix, boost::is_any_of("_"));
+        for (auto t: tokens) {
+            if (t.at(0) < '0' or t.at(0) > '9') {
+                this->process_name_prefix += t + "_";
+            }
         }
-      }
 
-      if (num_actors.find(this->process_name_prefix) == num_actors.end()) {
-        num_actors.insert(std::make_pair(this->process_name_prefix, 1));
-      } else {
-        num_actors[this->process_name_prefix]++;
-      }
+        if (num_actors.find(this->process_name_prefix) == num_actors.end()) {
+            num_actors.insert(std::make_pair(this->process_name_prefix, 1));
+        } else {
+            num_actors[this->process_name_prefix]++;
+        }
 
-      for (auto a : num_actors) {
-        std::cerr << a.first << ":" << a.second << "\n";
-      }
-      std::cerr << "---------------\n";
+        for (auto a: num_actors) {
+            std::cerr << a.first << ":" << a.second << "\n";
+        }
+        std::cerr << "---------------\n";
 #endif
 
 
@@ -73,8 +73,8 @@ namespace wrench {
         this->hostname = hostname;
         this->simulation = nullptr;
         unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
-//        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
-//        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+        //        this->initial_mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+        //        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         this->mailbox = S4U_Mailbox::generateUniqueMailbox("mb");
         this->recv_mailbox = S4U_Mailbox::generateUniqueMailbox("rmb");
         this->process_name = process_name_prefix + "_" + std::to_string(seq);
@@ -87,7 +87,6 @@ namespace wrench {
 #ifdef ACTOR_TRACKING_OUTPUT
         num_actors[this->process_name_prefix]--;
 #endif
-
     }
 
     /**
@@ -151,7 +150,7 @@ namespace wrench {
         this->daemonized = daemonized;
         this->auto_restart = auto_restart;
         this->has_returned_from_main = false;
-//        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
+        //        this->mailbox_name = this->initial_mailbox_name + "_#" + std::to_string(this->num_starts);
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
@@ -181,15 +180,12 @@ namespace wrench {
             if (this->auto_restart) {
                 this->s4u_actor->set_auto_restart(true);
             }
-
         }
 
         // Set the mailbox receiver
         // Causes Mailbox::put() to no longer implement a rendez-vous communication.
         this->mailbox->set_receiver(this->s4u_actor);
-//        this->recv_mailbox->set_receiver(this->s4u_actor);
-
-
+        //        this->recv_mailbox->set_receiver(this->s4u_actor);
     }
 
     /**
@@ -217,7 +213,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Return the auto-restart status of the daemon
  * @return true or false
  */
@@ -225,7 +221,7 @@ namespace wrench {
         return this->auto_restart;
     }
 
-/**
+    /**
  * @brief Return the daemonized status of the daemon
  * @return true or false
  */
@@ -233,7 +229,7 @@ namespace wrench {
         return this->daemonized;
     }
 
-/**
+    /**
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
@@ -250,11 +246,11 @@ namespace wrench {
         this->state = State::DOWN;
         S4U_Daemon::map_actor_to_recv_mailbox.erase(simgrid::s4u::this_actor::get_pid());
         this->mailbox->set_receiver(nullptr);
-//        this->recv_mailbox->set_receiver(nullptr);
+        //        this->recv_mailbox->set_receiver(nullptr);
     }
 
 
-/**
+    /**
  * @brief Kill the daemon/actor (does nothing if already dead)
  *
  * @return true if actor was killed, false if not (e.g., daemon was already dead)
@@ -278,7 +274,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Suspend the daemon/actor.
  */
     void S4U_Daemon::suspendActor() {
@@ -287,7 +283,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Resume the daemon/actor.
  */
     void S4U_Daemon::resumeActor() {
@@ -296,7 +292,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Join (i.e., wait for) the daemon.
  *
  * @return a pair <A,B> where A is boolean (true if the daemon terminated cleanly (i.e., main() returned), or false otherwise)
@@ -309,11 +305,11 @@ namespace wrench {
         } else {
             throw std::runtime_error("S4U_Daemon::join(): Fatal error: this->s4u_actor shouldn't be nullptr");
         }
-//        WRENCH_INFO("JOIN ON '%s' HAS RETURNED: %d %d", this->getName().c_str(), this->hasReturnedFromMain(), this->getReturnValue());
+        //        WRENCH_INFO("JOIN ON '%s' HAS RETURNED: %d %d", this->getName().c_str(), this->hasReturnedFromMain(), this->getReturnValue());
         return std::make_pair(this->hasReturnedFromMain(), this->getReturnValue());
     }
 
-/**
+    /**
  * @brief Returns true if the daemon has returned from main() (i.e., not brutally killed)
  * @return The true or false
  */
@@ -321,7 +317,7 @@ namespace wrench {
         return this->has_returned_from_main;
     }
 
-/**
+    /**
  * @brief Returns the value returned by main() (if the daemon has returned from main)
  * @return The return value
  */
@@ -329,7 +325,7 @@ namespace wrench {
         return this->return_value;
     }
 
-/**
+    /**
  * @brief Retrieve the process name
  * @return the name
  */
@@ -337,7 +333,7 @@ namespace wrench {
         return this->process_name;
     }
 
-/**
+    /**
  * @brief Create a life saver for the daemon
  * @param reference
  */
@@ -348,14 +344,14 @@ namespace wrench {
         this->life_saver = new S4U_Daemon::LifeSaver(reference);
     }
 
-/**
+    /**
  * @brief Lock the daemon's lock
  */
     void S4U_Daemon::acquireDaemonLock() {
         this->daemon_lock->lock();
     }
 
-/**
+    /**
  * @brief Unlock the daemon's lock
  */
     void S4U_Daemon::releaseDaemonLock() {
@@ -386,4 +382,4 @@ namespace wrench {
         return S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()];
     }
 
-};
+};// namespace wrench

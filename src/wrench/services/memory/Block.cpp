@@ -22,9 +22,8 @@ namespace wrench {
      * @param dirty_time: dirty time
      */
     Block::Block(std::string fid, std::shared_ptr<FileLocation> location, double sz,
-            double last_access, bool is_dirty, double dirty_time) :
-            file_id(fid), location(location), size(sz),
-            last_access(last_access), dirty(is_dirty), dirty_time(dirty_time) {}
+                 double last_access, bool is_dirty, double dirty_time) : file_id(fid), location(location), size(sz),
+                                                                         last_access(last_access), dirty(is_dirty), dirty_time(dirty_time) {}
 
     /**
      * @brief Constructor (that does a copy)
@@ -32,7 +31,7 @@ namespace wrench {
      */
     Block::Block(Block *blk) {
         this->file_id = blk->getFileId();
-//        this->mountpoint = blk->getMountpoint();
+        //        this->mountpoint = blk->getMountpoint();
         this->location = blk->getLocation();
         this->last_access = blk->getLastAccess();
         this->size = blk->getSize();
@@ -56,13 +55,13 @@ namespace wrench {
         this->file_id = fid;
     }
 
-//    std::string Block::getMountpoint() {
-//        return this->mountpoint;
-//    }
-//
-//    void Block::setMountpoint(std::string mountpoint) {
-//        this->mountpoint = mountpoint;
-//    }
+    //    std::string Block::getMountpoint() {
+    //        return this->mountpoint;
+    //    }
+    //
+    //    void Block::setMountpoint(std::string mountpoint) {
+    //        this->mountpoint = mountpoint;
+    //    }
 
     /**
      * @brief Get the block's size
@@ -152,4 +151,4 @@ namespace wrench {
         return location;
     }
 
-}
+}// namespace wrench

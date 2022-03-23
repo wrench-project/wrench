@@ -132,8 +132,7 @@ namespace wrench {
             } else if ((not strcmp(argv[i], "--wrench-full-log")) or
                        (not strcmp(argv[i], "--wrench-full-logs")) or
                        (not strcmp(argv[i], "--wrench-log-full")) or
-                       (not strcmp(argv[i], "--wrench-logs-full"))
-                    ) {
+                       (not strcmp(argv[i], "--wrench-logs-full"))) {
                 xbt_log_control_set("root.thresh:info");
             } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
@@ -141,7 +140,7 @@ namespace wrench {
                     std::cerr << "Invalid --wrench-mailbox-pool-size argument.\n";
                     exit(1);
                 }
-                unsigned long pool_size = strtoul(equal_sign+1, nullptr, 10);
+                unsigned long pool_size = strtoul(equal_sign + 1, nullptr, 10);
                 if (pool_size <= 0) {
                     std::cerr << "Invalid --wrench-mailbox-pool-size argument value.\n";
                     exit(1);
@@ -208,7 +207,7 @@ namespace wrench {
 
 
         *argc = 0;
-        for (auto a : cleanedup_args) {
+        for (auto a: cleanedup_args) {
             //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
@@ -414,19 +413,19 @@ namespace wrench {
         return Simulation::energy_enabled;
     }
 
-///**
-// * @brief Method to retrieve MemoryManager by hostname
-// * @param hostname
-// * @return
-// */
-////    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
-////        for (auto mem_mng: this->memory_managers) {
-////            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
-////                return mem_mng.get();
-////            }
-////        }
-////        return nullptr;
-////    }
+    ///**
+    // * @brief Method to retrieve MemoryManager by hostname
+    // * @param hostname
+    // * @return
+    // */
+    ////    MemoryManager* Simulation::getMemoryManagerByHost(std::string hostname) {
+    ////        for (auto mem_mng: this->memory_managers) {
+    ////            if (strcmp(mem_mng.get()->getHostname().c_str(), hostname.c_str()) == 0) {
+    ////                return mem_mng.get();
+    ////            }
+    ////        }
+    ////        return nullptr;
+    ////    }
 
     /**
      * @brief Get the list of names of all the hosts in each cluster composing the platform
@@ -508,7 +507,6 @@ namespace wrench {
             throw std::runtime_error(
                     "An execution controller should have been instantiated and passed to Simulation.add()");
         }
-
     }
 
     /**
@@ -519,42 +517,42 @@ namespace wrench {
     void Simulation::startAllProcesses() {
         try {
             // Start the execution controllers
-            for (const auto &execution_controller : this->execution_controllers) {
-                execution_controller->start(execution_controller, false, false);  // Not daemonized, no auto-restart
+            for (const auto &execution_controller: this->execution_controllers) {
+                execution_controller->start(execution_controller, false, false);// Not daemonized, no auto-restart
             }
 
             // Start the compute services
-            for (const auto &compute_service : this->compute_services) {
-                compute_service->start(compute_service, true, false); // Daemonized, no auto-restart
+            for (const auto &compute_service: this->compute_services) {
+                compute_service->start(compute_service, true, false);// Daemonized, no auto-restart
             }
 
             // Start the storage services
-            for (const auto &storage_service : this->storage_services) {
-                storage_service->start(storage_service, true, true); // Daemonized, AUTO-RESTART
+            for (const auto &storage_service: this->storage_services) {
+                storage_service->start(storage_service, true, true);// Daemonized, AUTO-RESTART
             }
 
             // Start the scratch services
-            for (const auto &compute_service : this->compute_services) {
+            for (const auto &compute_service: this->compute_services) {
                 if (compute_service->hasScratch()) {
                     compute_service->getScratch()->simulation = this;
                     compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true,
-                                                         false); // Daemonized, no auto-restart
+                                                         false);// Daemonized, no auto-restart
                 }
             }
 
             // Start the network proximity services
-            for (const auto &network_proximity_service : this->network_proximity_services) {
-                network_proximity_service->start(network_proximity_service, true, false); // Daemonized, no auto-restart
+            for (const auto &network_proximity_service: this->network_proximity_services) {
+                network_proximity_service->start(network_proximity_service, true, false);// Daemonized, no auto-restart
             }
 
             // Start the file registry services
-            for (const auto &frs : this->file_registry_services) {
-                frs->start(frs, true, false); // Daemonized, no auto-restart
+            for (const auto &frs: this->file_registry_services) {
+                frs->start(frs, true, false);// Daemonized, no auto-restart
             }
 
             // Start the energy meter services
-            for (const auto &frs : this->energy_meter_services) {
-                frs->start(frs, true, false); // Daemonized, no auto-restart
+            for (const auto &frs: this->energy_meter_services) {
+                frs->start(frs, true, false);// Daemonized, no auto-restart
             }
         } catch (std::runtime_error &e) {
             throw;
@@ -690,7 +688,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> storage_service) {
+    void Simulation::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> storage_service) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
     }
 
@@ -704,7 +702,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<StorageService> storage_service,
+    void Simulation::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> storage_service,
                                std::string directory_absolute_path) {
         Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
     }
@@ -714,7 +712,7 @@ namespace wrench {
      * @param file: the file
      * @param location: the location
      */
-    void Simulation::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void Simulation::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -737,7 +735,7 @@ namespace wrench {
         }
 
         // Update all file registry services
-        for (auto frs : this->file_registry_services) {
+        for (auto frs: this->file_registry_services) {
             frs->addEntryToDatabase(file, location);
         }
     }
@@ -758,7 +756,7 @@ namespace wrench {
         try {
             S4U_Simulation::readFromDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
+            this->getOutput().addTimestampDiskReadFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
             throw;
         }
@@ -814,15 +812,15 @@ namespace wrench {
     void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes, temp_unique_sequence_number);
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
         try {
             S4U_Simulation::writeToDisk(num_bytes, hostname, mount_point);
         } catch (const std::invalid_argument &ia) {
-            this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
+            this->getOutput().addTimestampDiskWriteFailure(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                            temp_unique_sequence_number);
             throw;
         }
-        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, mount_point, num_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -833,7 +831,7 @@ namespace wrench {
      * @param n_bytes: number of read bytes
      * @param location: file location
      */
-    void Simulation::readWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location) {
+    void Simulation::readWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -862,10 +860,10 @@ namespace wrench {
             mem_mng->readChunkFromCache(file->getID(), from_cache);
         }
 
-//        Anonymous used by application
+        //        Anonymous used by application
         mem_mng->useAnonymousMemory(n_bytes);
 
-        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskReadCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                          temp_unique_sequence_number);
     }
 
@@ -878,14 +876,14 @@ namespace wrench {
      * @param is_dirty: true or false
      */
     void
-    Simulation::writebackWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes, std::shared_ptr<FileLocation> location,
+    Simulation::writebackWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location,
                                          bool is_dirty) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
 
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
@@ -917,7 +915,7 @@ namespace wrench {
             remaining -= to_cache;
         }
 
-        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -928,13 +926,13 @@ namespace wrench {
      * @param n_bytes: number of written bytes
      * @param location: file location
      */
-    void Simulation::writeThroughWithMemoryCache(std::shared_ptr<DataFile>file, double n_bytes,
+    void Simulation::writeThroughWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes,
                                                  std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
-        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                      temp_unique_sequence_number);
 
         MemoryManager *mem_mng = this->getMemoryManagerByHost(hostname);
@@ -945,7 +943,7 @@ namespace wrench {
         mem_mng->evict(n_bytes - mem_mng->getFreeMemory(), file->getID());
         mem_mng->addToCache(file->getID(), location, n_bytes, false);
 
-        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(),hostname, location->getMountPoint(), n_bytes,
+        this->getOutput().addTimestampDiskWriteCompletion(Simulation::getCurrentSimulatedDate(), hostname, location->getMountPoint(), n_bytes,
                                                           temp_unique_sequence_number);
     }
 
@@ -956,7 +954,7 @@ namespace wrench {
      * @return pointer to the memory manager running on the host (or nullptr)
      */
     MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
-        for (const auto &ptr : this->memory_managers) {
+        for (const auto &ptr: this->memory_managers) {
             if (strcmp(ptr->getHostname().c_str(), hostname.c_str()) == 0) {
                 return ptr.get();
             }
@@ -1183,7 +1181,7 @@ namespace wrench {
         }
 
         std::map<std::string, double> energy_consumptions;
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             energy_consumptions[h] = Simulation::getEnergyConsumed(h, record_as_time_stamps);
         }
         return energy_consumptions;
@@ -1196,7 +1194,7 @@ namespace wrench {
      */
     void Simulation::setPstate(const std::string &hostname, int pstate) {
         S4U_Simulation::setPstate(hostname, pstate);
-        this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(),hostname, pstate);
+        this->getOutput().addTimestampPstateSet(Simulation::getCurrentSimulatedDate(), hostname, pstate);
     }
 
     /**
@@ -1265,10 +1263,10 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
         this->compute_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+        shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
         if (service->hasScratch()) {
             service->getScratch()->simulation = this;
-            service->getScratch()->start(service->getScratchSharedPtr(), true, false); // Daemonized, no auto-restart
+            service->getScratch()->start(service->getScratchSharedPtr(), true, false);// Daemonized, no auto-restart
         }
 
         return shared_ptr;
@@ -1295,7 +1293,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
         this->storage_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+        shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
 
         return shared_ptr;
     }
@@ -1321,7 +1319,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<NetworkProximityService> shared_ptr = std::shared_ptr<NetworkProximityService>(service);
         this->network_proximity_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+        shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
 
         return shared_ptr;
     }
@@ -1347,7 +1345,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<FileRegistryService> shared_ptr = std::shared_ptr<FileRegistryService>(service);
         this->file_registry_services.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+        shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
 
         return shared_ptr;
     }
@@ -1373,7 +1371,7 @@ namespace wrench {
         service->simulation = this;
         std::shared_ptr<MemoryManager> shared_ptr = std::shared_ptr<MemoryManager>(service);
         this->memory_managers.insert(shared_ptr);
-        shared_ptr->start(shared_ptr, true, false); // Daemonized, no auto-restart
+        shared_ptr->start(shared_ptr, true, false);// Daemonized, no auto-restart
 
         return shared_ptr;
     }
@@ -1389,28 +1387,28 @@ namespace wrench {
         this->s4u_simulation->checkLinkBandwidths();
 
         // Check RAM Capacities
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             S4U_Simulation::getHostMemoryCapacity(h);
         }
 
         // Check Disk Capacities
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             auto disks = S4U_Simulation::getDisks(h);
-            for (auto const &d : disks) {
+            for (auto const &d: disks) {
                 S4U_Simulation::getDiskCapacity(h, d);
             }
         }
 
         // Check Disk Capacities
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             auto disks = S4U_Simulation::getDisks(h);
-            for (auto const &d : disks) {
+            for (auto const &d: disks) {
                 S4U_Simulation::getDiskCapacity(h, d);
             }
         }
 
         // Check Disk Prefixness
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             auto disks = S4U_Simulation::getDisks(h);
             for (unsigned int i = 0; i < disks.size(); i++) {
                 for (unsigned int j = 0; j < disks.size(); j++) {
@@ -1425,16 +1423,17 @@ namespace wrench {
                         (FileLocation::properPathPrefix(disks[i], disks[j]))) {
                         throw std::invalid_argument("Simulation::platformSanityCheck(): Host " + h +
                                                     " has two disks, with one of them having a mount point that "
-                                                    "is a prefix of the other (" + disks[j] + " and " + disks[i] + ")");
+                                                    "is a prefix of the other (" +
+                                                    disks[j] + " and " + disks[i] + ")");
                     }
                 }
             }
         }
 
         // Check Disk Bandwidth (TODO: Remove this check once SimGrid has a more decent I/O model)
-        for (auto const &h : hostnames) {
-//            WRENCH_INFO("---> %s", h.c_str());
-            for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
+        for (auto const &h: hostnames) {
+            //            WRENCH_INFO("---> %s", h.c_str());
+            for (auto const &d: simgrid::s4u::Host::by_name(h)->get_disks()) {
                 double read_bw = d->get_read_bandwidth();
                 double write_bw = d->get_write_bandwidth();
                 if (std::abs<double>(read_bw - write_bw) > DBL_EPSILON) {
@@ -1447,9 +1446,9 @@ namespace wrench {
 
         // Check that if --pagecache is passed, each host has a "/memory" disk
         if (this->isPageCachingEnabled()) {
-            for (auto const &h : hostnames) {
+            for (auto const &h: hostnames) {
                 bool has_memory_disk = false;
-                for (auto const &d : simgrid::s4u::Host::by_name(h)->get_disks()) {
+                for (auto const &d: simgrid::s4u::Host::by_name(h)->get_disks()) {
                     if (std::string(d->get_property("mount")) == "/memory") {
                         has_memory_disk = true;
                         break;
@@ -1457,7 +1456,8 @@ namespace wrench {
                 }
                 if (not has_memory_disk) {
                     throw std::invalid_argument("Simulation::platformSanityCheck(): Since --pagecache was passed, "
-                                                "each host must have a disk with mountpoint \"/memory\" (host " + h +
+                                                "each host must have a disk with mountpoint \"/memory\" (host " +
+                                                h +
                                                 " doesn't!)");
                 }
             }
@@ -1547,4 +1547,4 @@ namespace wrench {
         return std::shared_ptr<Simulation>(new Simulation);
     }
 
-}
+}// namespace wrench

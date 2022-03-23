@@ -23,12 +23,13 @@ namespace wrench {
     class CustomParallelModel : public ParallelModel {
 
     public:
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
+        //        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
+        double getPurelySequentialWork(double total_work, unsigned long num_threads) override;
+        double getParallelPerThreadWork(double total_work, unsigned long num_threads) override;
         ~CustomParallelModel() override {}
 
         /***********************/
@@ -36,16 +37,16 @@ namespace wrench {
         /***********************/
 
     protected:
-
     private:
         friend class ParallelModel;
 
-        CustomParallelModel(std::function<std::vector<double>(double, unsigned long)> lambda);
+        CustomParallelModel(std::function<double(double, unsigned long)> lambda_sequential, std::function<double(double, unsigned long)> lambda_per_thread);
 
-        std::function<std::vector<double>(double, unsigned long)> lambda;
+        std::function<double(double, unsigned long)> lambda_sequential;
+        std::function<double(double, unsigned long)> lambda_per_thread;
     };
 
 
-}
+}// namespace wrench
 
-#endif //WRENCH_CUSTOMPARALLELMODEL_H
+#endif//WRENCH_CUSTOMPARALLELMODEL_H

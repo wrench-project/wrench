@@ -30,7 +30,6 @@ namespace wrench {
                   std::string hostname);
 
     protected:
-
         // Overridden method
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
         /**
@@ -47,6 +46,6 @@ namespace wrench {
         std::shared_ptr<wrench::StorageService> storage_service;
     };
 
-}
+}// namespace wrench
 
-#endif //WRENCH_CONDORWMS_H
+#endif//WRENCH_CONDORWMS_H

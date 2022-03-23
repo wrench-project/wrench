@@ -37,8 +37,7 @@ namespace wrench {
             std::shared_ptr<CloudComputeService> cloud_cs,
             std::shared_ptr<StorageService> ss_1,
             std::shared_ptr<StorageService> ss_2,
-            const std::string &hostname) : ExecutionController(
-            hostname,"mamj"), bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
+            const std::string &hostname) : ExecutionController(hostname, "mamj"), bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
 
     /**
      * @brief main method of the SuperCustomActionController daemon
@@ -72,7 +71,7 @@ namespace wrench {
         auto job = job_manager->createCompoundJob("job");
 
         /* Add a compute action that will work fine */
-        auto compute_action  = job->addComputeAction("compute", 200 * GFLOP, 100, 3, 4, wrench::ParallelModel::AMDAHL(0.95));
+        auto compute_action = job->addComputeAction("compute", 200 * GFLOP, 100, 3, 4, wrench::ParallelModel::AMDAHL(0.95));
 
         /* Add a file-write action that will fail */
         auto file_write_action = job->addFileWriteAction("file_write", output_file, wrench::FileLocation::LOCATION(ss_2));
@@ -104,7 +103,7 @@ namespace wrench {
             WRENCH_INFO("Job %s has failed!", completed_job->getName().c_str());
             WRENCH_INFO("Job failure cause: %s", job_completion_event->failure_cause->toString().c_str());
             WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
-            for (auto const &action : completed_job->getActions()) {
+            for (auto const &action: completed_job->getActions()) {
                 WRENCH_INFO("  * Action %s: in state %s", action->getName().c_str(), action->getStateAsString().c_str());
                 if (action->getState() == wrench::Action::State::FAILED) {
                     WRENCH_INFO("    - start date: %.2lf", action->getStartDate());
@@ -131,4 +130,4 @@ namespace wrench {
         return 0;
     }
 
-}
+}// namespace wrench

@@ -17,7 +17,6 @@ public:
     void do_ChunkingTest(std::string mode);
 
 protected:
-
     ~SimpleStorageServiceChunkingTest() {
         workflow->clear();
     }
@@ -67,8 +66,7 @@ class SimpleStorageServiceChunkingTestWMS : public wrench::ExecutionController {
 public:
     SimpleStorageServiceChunkingTestWMS(SimpleStorageServiceChunkingTest *test,
                                         std::string mode,
-                                        std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), mode(mode) {
+                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), mode(mode) {
     }
 
 private:
@@ -102,7 +100,6 @@ private:
             data_movement_manager->doSynchronousFileCopy(this->test->file_size_100,
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_1),
                                                          wrench::FileLocation::LOCATION(this->test->storage_service_2));
-
         }
 
         return 0;
@@ -137,17 +134,15 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
 
     // Create One Storage Service
     ASSERT_NO_THROW(storage_service_1 = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", {"/disk1"},
-                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "5"},
-                                              {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}}
-            )));
+                            new wrench::SimpleStorageService("StorageHost", {"/disk1"},
+                                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "5"},
+                                                              {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
 
     // Create Another Storage Service
     ASSERT_NO_THROW(storage_service_2 = simulation->add(
-            new wrench::SimpleStorageService("StorageHost", {"/disk2"},
-                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"},
-                                              {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}}
-            )));
+                            new wrench::SimpleStorageService("StorageHost", {"/disk2"},
+                                                             {{wrench::SimpleStorageServiceProperty::BUFFER_SIZE, "10"},
+                                                              {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "10"}})));
 
     // Create a file registry
     std::shared_ptr<wrench::FileRegistryService> file_registry_service = nullptr;
@@ -164,7 +159,7 @@ void SimpleStorageServiceChunkingTest::do_ChunkingTest(std::string mode) {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

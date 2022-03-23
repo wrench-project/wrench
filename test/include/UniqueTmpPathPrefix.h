@@ -16,4 +16,4 @@
 #define UNIQUE_TMP_PATH_PREFIX ("/tmp/" + std::to_string(getuid()) + "_")
 #define UNIQUE_PREFIX (std::to_string(getuid()) + "_")
 
-#endif //WRENCH_UNIQUEPLATFORMFILEPATH_H
+#endif//WRENCH_UNIQUEPLATFORMFILEPATH_H

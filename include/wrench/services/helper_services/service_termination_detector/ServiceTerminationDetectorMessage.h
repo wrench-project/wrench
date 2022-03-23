@@ -60,6 +60,6 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_FAILUREDETECTORMESSAGE_H
+#endif//WRENCH_FAILUREDETECTORMESSAGE_H

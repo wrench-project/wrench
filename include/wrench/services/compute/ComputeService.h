@@ -45,7 +45,6 @@ namespace wrench {
 
 
     public:
-
         /** @brief A convenient constant to mean "use all cores of a physical host" whenever a number of cores
          *  is needed when instantiating compute services
          */
@@ -155,20 +154,17 @@ namespace wrench {
         std::shared_ptr<StorageService> getScratch();
 
 
-
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string scratch_space_mount_point);
 
     protected:
-
-
         friend class JobManager;
 
-        void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string>& = {});
+        void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> & = {});
 
         virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
-                                                      std::map<std::string, std::string> &service_specific_args) ;
+                                                      std::map<std::string, std::string> &service_specific_args);
 
         virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);
 
@@ -195,14 +191,12 @@ namespace wrench {
         /***********************/
 
     private:
-
         std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
         std::map<std::string, double> getServiceResourceInformation(const std::string &desired_entries);
-
     };
 
 
-};
+};// namespace wrench
 
-#endif //SIMULATION_COMPUTESERVICE_H
+#endif//SIMULATION_COMPUTESERVICE_H
