@@ -23,14 +23,13 @@ namespace wrench {
      * @param hostname: the hostname on which the service should start
      * @param measurement_periods: the measurement period for each metered host
      */
-    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
-            Service(hostname, "energy_meter") {
+    EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "energy_meter") {
 
         if (measurement_periods.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
 
-        for (auto &h : measurement_periods) {
+        for (auto &h: measurement_periods) {
             if (not S4U_Simulation::hostExists(h.first)) {
                 throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h.first);
             }
@@ -40,7 +39,7 @@ namespace wrench {
                         ")");
             }
             this->measurement_periods[h.first] = h.second;
-            this->time_to_next_measurement[h.first] = 0.0;  // We begin by taking a measurement
+            this->time_to_next_measurement[h.first] = 0.0;// We begin by taking a measurement
         }
     }
 
@@ -52,8 +51,7 @@ namespace wrench {
      * @param measurement_period: the measurement period
      */
     EnergyMeterService::EnergyMeterService(const std::string hostname, const std::vector<std::string> &hostnames,
-                                           double measurement_period) :
-            Service(hostname, "energy_meter") {
+                                           double measurement_period) : Service(hostname, "energy_meter") {
 
         if (hostnames.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
@@ -62,12 +60,12 @@ namespace wrench {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): measurement period must be at least 1 second");
         }
 
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             if (not S4U_Simulation::hostExists(h)) {
                 throw std::invalid_argument("EnergyMeter::EnergyMeter(): unknown host " + h);
             }
             this->measurement_periods[h] = measurement_period;
-            this->time_to_next_measurement[h] = 0.0;  // We begin by taking a measurement
+            this->time_to_next_measurement[h] = 0.0;// We begin by taking a measurement
         }
     }
 
@@ -126,12 +124,12 @@ namespace wrench {
             }
 
             // Update time-to-next-measurement for all hosts
-            for (auto &h : this->time_to_next_measurement) {
+            for (auto &h: this->time_to_next_measurement) {
                 h.second = std::max<double>(0, h.second - (Simulation::getCurrentSimulatedDate() - before));
             }
 
             // Take measurements
-            for (auto &h : this->time_to_next_measurement) {
+            for (auto &h: this->time_to_next_measurement) {
                 if (h.second < EPSILON) {
                     this->simulation->getEnergyConsumed(h.first, true);
                     this->time_to_next_measurement[h.first] = this->measurement_periods[h.first];
@@ -162,13 +160,12 @@ namespace wrench {
 
         WRENCH_INFO("Energy Meter got a %s message", message->getName().c_str());
 
-        if (dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
         }
 
         throw std::runtime_error("EnergyMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
-
     }
 
-};
+};// namespace wrench

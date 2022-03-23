@@ -42,13 +42,13 @@ public:
 
     void loopThroughTestCases(std::vector<double> points_of_interest, bool kill, std::string action_type) {
         std::vector<double> deltas = {0.000000000, 0.000000001, 0.00000001, 0.0000001, 0.000001, 0.00001, 0.0001, 0.001, 0.01, 0.1};
-        for (const auto &p : points_of_interest) {
-            for (const auto &d : deltas) {
+        for (const auto &p: points_of_interest) {
+            for (const auto &d: deltas) {
                 if (p - d >= 0) {
                     DO_TEST_WITH_FORK_THREE_ARGS(do_ActionExecutorKillFailTest_test, p - d, kill, action_type);
                 }
             }
-            for (const auto &d : deltas) {
+            for (const auto &d: deltas) {
                 DO_TEST_WITH_FORK_THREE_ARGS(do_ActionExecutorKillFailTest_test, p + d, kill, action_type);
             }
         }
@@ -125,7 +125,6 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 
@@ -141,17 +140,15 @@ public:
                                   std::string hostname,
                                   double sleep_time,
                                   bool kill,
-                                  std::string action_type) :
-            wrench::ExecutionController(hostname, "test") {
+                                  std::string action_type) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
         this->sleep_time = sleep_time;
-        this->kill =kill;
+        this->kill = kill;
         this->action_type = std::move(action_type);
     }
 
 
 private:
-
     KillFailActionExecutorTest *test;
     double thread_startup_overhead;
     double sleep_time;
@@ -185,25 +182,25 @@ private:
             num_cores = 2;
             ram = 200;
         } else if (this->action_type == "file_read") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileReadAction("", this->test->file,wrench::FileLocation::LOCATION(this->test->ss1)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileReadAction("", this->test->file, wrench::FileLocation::LOCATION(this->test->ss1)));
             thread_overhead = 0.1;
             expected_completion_date = 10.84743174020618639020;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_write") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", this->test->file_to_write,wrench::FileLocation::LOCATION(this->test->ss1)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileWriteAction("", this->test->file_to_write, wrench::FileLocation::LOCATION(this->test->ss1)));
             thread_overhead = 0.1;
-            expected_completion_date = 10.85743174020618617703 ;
+            expected_completion_date = 10.85743174020618617703;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_copy") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileCopyAction("", this->test->file,wrench::FileLocation::LOCATION(this->test->ss1), wrench::FileLocation::LOCATION(this->test->ss2)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileCopyAction("", this->test->file, wrench::FileLocation::LOCATION(this->test->ss1), wrench::FileLocation::LOCATION(this->test->ss2)));
             thread_overhead = 0.1;
             expected_completion_date = 10.97973091237113507646;
             num_cores = 0;
             ram = 0.0;
         } else if (this->action_type == "file_delete") {
-            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileDeleteAction("", this->test->file,wrench::FileLocation::LOCATION(this->test->ss1)));
+            action = std::dynamic_pointer_cast<wrench::Action>(job->addFileDeleteAction("", this->test->file, wrench::FileLocation::LOCATION(this->test->ss1)));
             thread_overhead = 0.1;
             expected_completion_date = 0.12242927216494845083;
             num_cores = 0;
@@ -214,7 +211,7 @@ private:
             auto lambda_execute = [storage_service, file](std::shared_ptr<wrench::ActionExecutor> action_executor) {
                 storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service));
                 wrench::Simulation::sleep(10.0); };
-            auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) { };
+            auto lambda_terminate = [](std::shared_ptr<wrench::ActionExecutor> action_executor) {};
 
             action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
             thread_overhead = 0.0;
@@ -240,7 +237,7 @@ private:
         action_executor->setSimulation(this->simulation);
         action_executor->start(action_executor, true, false);
 
-//        WRENCH_INFO("SLEEPING %lf", this->sleep_time);
+        //        WRENCH_INFO("SLEEPING %lf", this->sleep_time);
         wrench::Simulation::sleep(this->sleep_time);
 
         if (this->kill) {
@@ -257,12 +254,12 @@ private:
             throw std::runtime_error("Unexpected action start date: " + std::to_string(action->getStartDate()));
         }
 
-//        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
+        //        WRENCH_INFO("END_DATE = %.20lf (EXPECTED %.20lf)", action->getEndDate(), expected_completion_date);
         // Is the state and end date sensible?
         if ((this->sleep_time + EPSILON < expected_completion_date and
              ((this->kill and action->getState() != wrench::Action::State::KILLED) or
               ((not this->kill) and action->getState() != wrench::Action::State::FAILED))) or
-            (this->sleep_time > expected_completion_date  + EPSILON and action->getState() != wrench::Action::State::COMPLETED)) {
+            (this->sleep_time > expected_completion_date + EPSILON and action->getState() != wrench::Action::State::COMPLETED)) {
             throw std::runtime_error("Unexpected action state : " + action->getStateAsString());
         }
 
@@ -337,7 +334,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -361,14 +358,13 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new KillFailActionExecutorTestWMS(this, "Host1", sleep_time, kill, action_type)));
+                            new KillFailActionExecutorTestWMS(this, "Host1", sleep_time, kill, action_type)));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }

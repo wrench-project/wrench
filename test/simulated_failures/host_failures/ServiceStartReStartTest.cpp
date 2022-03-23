@@ -28,7 +28,6 @@ public:
     void do_ServiceRestartTest_test();
 
 protected:
-
     ~ServiceReStartHostFailuresTest() {
         workflow->clear();
     }
@@ -38,14 +37,13 @@ protected:
         workflow = wrench::Workflow::createWorkflow();
 
 
-
         // up from 0 to 100, down from 100 to 200, up from 200 to 300, etc.
         std::string trace_file_content = "PERIODICITY 100\n"
                                          " 0 1\n"
                                          " 100 0";
 
         std::string trace_file_name = UNIQUE_PREFIX + "host.trace";
-        std::string trace_file_path = "/tmp/"+trace_file_name;
+        std::string trace_file_path = "/tmp/" + trace_file_name;
 
         FILE *trace_file = fopen(trace_file_path.c_str(), "w");
         fprintf(trace_file, "%s", trace_file_content.c_str());
@@ -57,17 +55,18 @@ protected:
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"FailedHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\""+trace_file_name+"\"  core=\"1\"/> "
-                                                                                                           "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
-                                                                                                           "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
-                                                                                                           "       <route src=\"FailedHost\" dst=\"StableHost\">"
-                                                                                                           "           <link_ctn id=\"link1\"/>"
-                                                                                                           "       </route>"
-                                                                                                           "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
-                                                                                                           "           <link_ctn id=\"link1\"/>"
-                                                                                                           "       </route>"
-                                                                                                           "   </zone> "
-                                                                                                           "</platform>";
+                          "       <host id=\"FailedHostTrace\" speed=\"1f\" state_file=\"" +
+                          trace_file_name + "\"  core=\"1\"/> "
+                                            "       <host id=\"StableHost\" speed=\"1f\" core=\"1\"/> "
+                                            "       <link id=\"link1\" bandwidth=\"100kBps\" latency=\"0\"/>"
+                                            "       <route src=\"FailedHost\" dst=\"StableHost\">"
+                                            "           <link_ctn id=\"link1\"/>"
+                                            "       </route>"
+                                            "       <route src=\"FailedHostTrace\" dst=\"StableHost\">"
+                                            "           <link_ctn id=\"link1\"/>"
+                                            "       </route>"
+                                            "   </zone> "
+                                            "</platform>";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -85,13 +84,11 @@ class StartServiceOnDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     StartServiceOnDownHostTestWMS(ServiceReStartHostFailuresTest *test,
-                                  std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                  std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     ServiceReStartHostFailuresTest *test;
 
     int main() override {
@@ -104,10 +101,10 @@ private:
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         sleeper->setSimulation(this->simulation);
         try {
-            sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
+            sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
         } catch (std::shared_ptr<wrench::HostError> &e) {
             // Expected exception
-            e->toString(); // for coverage
+            e->toString();// for coverage
             return 0;
         }
         throw std::runtime_error("Should have gotten a HostFailure exception");
@@ -138,19 +135,19 @@ void ServiceReStartHostFailuresTest::do_StartServiceOnDownHostTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new StartServiceOnDownHostTestWMS(this, hostname)));
+                            new StartServiceOnDownHostTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -161,13 +158,11 @@ class ServiceRestartTestWMS : public wrench::ExecutionController {
 
 public:
     ServiceRestartTestWMS(ServiceReStartHostFailuresTest *test,
-                          std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                          std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     ServiceReStartHostFailuresTest *test;
 
     int main() override {
@@ -175,19 +170,19 @@ private:
         // Starting a sleeper (that will reply with a bogus TTL Expiration message)
         auto sleeper = std::shared_ptr<wrench::SleeperVictim>(new wrench::SleeperVictim("FailedHost", 100, new wrench::ServiceTTLExpiredMessage(1), this->mailbox));
         sleeper->setSimulation(this->simulation);
-        sleeper->start(sleeper, true, true); // Daemonized, auto-restart!!
+        sleeper->start(sleeper, true, true);// Daemonized, auto-restart!!
 
         // Starting a host-switcher-offer
         auto death = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 10, "FailedHost",
-                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                            wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         death->setSimulation(this->simulation);
-        death->start(death, true, false); // Daemonized, no auto-restart
+        death->start(death, true, false);// Daemonized, no auto-restart
 
         // Starting a host-switcher-oner
         auto life = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 30, "FailedHost",
-                wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
+                                                                                           wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         life->setSimulation(this->simulation);
-        life->start(life, true, false); // Daemonized, no auto-restart
+        life->start(life, true, false);// Daemonized, no auto-restart
 
         // Waiting for a message
         std::shared_ptr<wrench::SimulationMessage> message;
@@ -227,17 +222,16 @@ void ServiceReStartHostFailuresTest::do_ServiceRestartTest_test() {
     std::string hostname = "StableHost";
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ServiceRestartTestWMS(this, hostname)));
+                            new ServiceRestartTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-

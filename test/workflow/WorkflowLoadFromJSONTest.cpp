@@ -3197,7 +3197,7 @@ TEST_F(WorkflowLoadFromJSONTest, DISABLED_LoadValidJSON) {
     ASSERT_EQ(workflow->getNumberOfTasks(), 71);
     ASSERT_EQ(workflow->getFileMap().size(), 69);
 
-    for (auto task : workflow->getTasks()) {
+    for (auto task: workflow->getTasks()) {
         if (task->getID() == "register_local_2_0") {
             ASSERT_EQ(task->getPriority(), 100);
         } else {

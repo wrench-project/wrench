@@ -28,11 +28,10 @@ namespace wrench {
     class S4U_VirtualMachine {
 
     public:
-
         /**
          * @brief A map to keep track of VM-to-PM mapping
          */
-        static std::unordered_map<std::string,std::string> vm_to_pm_map;
+        static std::unordered_map<std::string, std::string> vm_to_pm_map;
 
         /** @brief VM state enum */
         enum State {
@@ -81,6 +80,6 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_S4U_VIRTUALMACHINE_H
+#endif//WRENCH_S4U_VIRTUALMACHINE_H

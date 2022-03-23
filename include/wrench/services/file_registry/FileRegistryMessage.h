@@ -30,7 +30,6 @@ namespace wrench {
     class FileRegistryMessage : public ServiceMessage {
     protected:
         FileRegistryMessage(double payload);
-
     };
 
     /**
@@ -38,12 +37,12 @@ namespace wrench {
      */
     class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file, double payload);
+        FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The file to lookup */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
     };
 
     /**
@@ -51,11 +50,11 @@ namespace wrench {
      */
     class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupAnswerMessage(std::shared_ptr<DataFile>file, std::set<std::shared_ptr<FileLocation>> locations,
+        FileRegistryFileLookupAnswerMessage(std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations,
                                             double payload);
 
         /** @brief The file that was looked up */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /** @brief A (possibly empty) set of file locations */
         std::set<std::shared_ptr<FileLocation>> locations;
     };
@@ -66,7 +65,7 @@ namespace wrench {
      */
     class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupByProximityRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file,
+        FileRegistryFileLookupByProximityRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
                                                         std::string reference_host,
                                                         std::shared_ptr<NetworkProximityService> network_proximity_service,
                                                         double payload);
@@ -74,7 +73,7 @@ namespace wrench {
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The file to lookup */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /**
          * @brief The host from which network proximity will be measured from.
          * If 'host_to_measure_from' is host 'A', and the workflow file resides at hosts 'B'
@@ -96,13 +95,13 @@ namespace wrench {
      */
     class FileRegistryFileLookupByProximityAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupByProximityAnswerMessage(std::shared_ptr<DataFile>file,
+        FileRegistryFileLookupByProximityAnswerMessage(std::shared_ptr<DataFile> file,
                                                        std::string reference_host,
                                                        std::map<double, std::shared_ptr<FileLocation>> locations,
                                                        double payload);
 
         /** @brief The file to lookup */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /**
          * @brief The host from which network proximity will be measured from.
          * If 'host_to_measure_from' is host 'A', and the workflow file resides at hosts 'B'
@@ -123,13 +122,13 @@ namespace wrench {
      */
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file,
+        FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
                                               std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The file for which one entry should be removed */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /** @brief The location to remove */
         std::shared_ptr<FileLocation> location;
     };
@@ -150,13 +149,13 @@ namespace wrench {
      */
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file,
+        FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
                                            std::shared_ptr<FileLocation> location, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The file for which to add an entry */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /** @brief The location in that entry */
         std::shared_ptr<FileLocation> location;
     };
@@ -172,7 +171,7 @@ namespace wrench {
     /***********************/
     /** \endcond          **/
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_FILEREGISTRYMESSAGE_H
+#endif//WRENCH_FILEREGISTRYMESSAGE_H

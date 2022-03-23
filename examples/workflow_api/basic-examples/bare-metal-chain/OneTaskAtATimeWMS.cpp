@@ -36,9 +36,8 @@ namespace wrench {
     OneTaskAtATimeWMS::OneTaskAtATimeWMS(std::shared_ptr<Workflow> workflow,
                                          const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                                          const std::shared_ptr<SimpleStorageService> &storage_service,
-                                         const std::string &hostname) :
-                                         ExecutionController(hostname,"one-task-at-a-time"),
-                                         workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
+                                         const std::string &hostname) : ExecutionController(hostname, "one-task-at-a-time"),
+                                                                        workflow(workflow), bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the OneTaskAtATimeWMS daemon
@@ -121,4 +120,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

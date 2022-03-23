@@ -43,7 +43,7 @@ namespace wrench {
         this->max_num_nodes = max_num_nodes;
         this->max_num_cores_per_node = max_num_cores_per_node;
 
-        for (unsigned int i=0; i < this->max_num_nodes; i++) {
+        for (unsigned int i = 0; i < this->max_num_nodes; i++) {
             this->integer_sequence.insert(this->integer_sequence.end(), i);
         }
     }
@@ -88,14 +88,14 @@ namespace wrench {
      */
     void CoreAvailabilityTimeLine::print() {
         std::cerr << "------ SCHEDULE -----\n";
-        for (auto &availability_timeslot : this->availability_timeslots) {
-            std::cerr << availability_timeslot.first <<  "(";
-            for (unsigned int i=0; i < this->max_num_nodes; i++) {
+        for (auto &availability_timeslot: this->availability_timeslots) {
+            std::cerr << availability_timeslot.first << "(";
+            for (unsigned int i = 0; i < this->max_num_nodes; i++) {
                 std::cerr << availability_timeslot.second.core_utilization[i] << " ";
             }
             std::cerr << ") | ";
-            for (auto const &j  : availability_timeslot.second.jobs) {
-                std::cerr << "j=" << j->getJobID() << "("<< j->getRequestedNumNodes() << "/" << j->getRequestedCoresPerNode() <<") ";
+            for (auto const &j: availability_timeslot.second.jobs) {
+                std::cerr << "j=" << j->getJobID() << "(" << j->getRequestedNumNodes() << "/" << j->getRequestedCoresPerNode() << ") ";
             }
             std::cerr << "\n";
         }
@@ -135,23 +135,23 @@ namespace wrench {
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
-//        WRENCH_INFO("IN FIND EARLIEST START TIME for job with %lu nodes and %lu cores per node", num_nodes, num_cores_per_node);
+        //        WRENCH_INFO("IN FIND EARLIEST START TIME for job with %lu nodes and %lu cores per node", num_nodes, num_cores_per_node);
         // Assume all nodes are feasible
         std::set<int> possible_node_indices = this->integer_sequence;
 
-        for (auto &availability_timeslot : this->availability_timeslots) {
+        for (auto &availability_timeslot: this->availability_timeslots) {
 
-//            std::cerr << "LOOKING AT A TIME SLOT " <<  availability_timeslot.first << "\n";
-//            std::cerr << " RIGHT NOW POSSIBLE NODES: " << possible_node_indices.size() << "\n";
+            //            std::cerr << "LOOKING AT A TIME SLOT " <<  availability_timeslot.first << "\n";
+            //            std::cerr << " RIGHT NOW POSSIBLE NODES: " << possible_node_indices.size() << "\n";
             // Remove infeasible hosts
             for (unsigned int i = 0; i < this->max_num_nodes; i++) {
-//                std::cerr << "  - " << availability_timeslot.second.core_utilization[i]  << "\n";
-                if (availability_timeslot.second.core_utilization[i]  + num_cores_per_node > this->max_num_cores_per_node) {
+                //                std::cerr << "  - " << availability_timeslot.second.core_utilization[i]  << "\n";
+                if (availability_timeslot.second.core_utilization[i] + num_cores_per_node > this->max_num_cores_per_node) {
                     possible_node_indices.erase(i);
                 }
             }
 
-//            std::cerr << " AFTER REMOVAL NOW POSSIBLE NODES: " << possible_node_indices.size() << "\n";
+            //            std::cerr << " AFTER REMOVAL NOW POSSIBLE NODES: " << possible_node_indices.size() << "\n";
 
             // Nope!
             if (possible_node_indices.size() < num_nodes) {
@@ -160,7 +160,7 @@ namespace wrench {
                 possible_node_indices = this->integer_sequence;
                 continue;
             }
-//            WRENCH_INFO("TIME SLOT IS FEASIBLE!");
+            //            WRENCH_INFO("TIME SLOT IS FEASIBLE!");
             u_int32_t interval_length = availability_timeslot.first.upper() - availability_timeslot.first.lower();
 
             // Yes!
@@ -194,10 +194,10 @@ namespace wrench {
      */
     std::set<std::shared_ptr<BatchJob>> CoreAvailabilityTimeLine::getJobsInFirstSlot() {
         std::set<std::shared_ptr<BatchJob>> to_return;
-        for (auto const &j : (*(this->availability_timeslots.begin())).second.jobs) {
+        for (auto const &j: (*(this->availability_timeslots.begin())).second.jobs) {
             to_return.insert(j);
         }
         return to_return;
     }
 
-}
+}// namespace wrench

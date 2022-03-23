@@ -53,9 +53,8 @@ namespace wrench {
 
         void simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
         void simulateComputationAsComputation(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
-
     };
-}
+}// namespace wrench
 
 
-#endif //WRENCH_COMPUTEACTION_H
+#endif//WRENCH_COMPUTEACTION_H

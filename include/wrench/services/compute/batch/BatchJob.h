@@ -53,16 +53,15 @@ namespace wrench {
         }
 
     private:
-
         friend class ConservativeBackfillingBatchScheduler;
         friend class ConservativeBackfillingBatchSchedulerCoreLevel;
 
-        u_int32_t conservative_bf_start_date;           // Field used by CONSERVATIVE_BF
-        u_int32_t conservative_bf_expected_end_date;    // Field used by CONSERVATIVE_BF
+        u_int32_t conservative_bf_start_date;       // Field used by CONSERVATIVE_BF
+        u_int32_t conservative_bf_expected_end_date;// Field used by CONSERVATIVE_BF
 
         unsigned long job_id;
         unsigned long requested_num_nodes;
-        unsigned long  requested_time;
+        unsigned long requested_time;
         std::shared_ptr<CompoundJob> compound_job;
         unsigned long requested_cores_per_node;
         std::string username;
@@ -78,16 +77,14 @@ namespace wrench {
         /** @brief The meta-data field for BatSim-style CSV output */
         std::string csv_metadata;
         /** @brief The allocated processors field for BatSim-style CSV output */
-        std::string csv_allocated_processors; 
+        std::string csv_allocated_processors;
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-}
+}// namespace wrench
 
 
-
-
-#endif //WRENCH_BATCHJOB_H
+#endif//WRENCH_BATCHJOB_H

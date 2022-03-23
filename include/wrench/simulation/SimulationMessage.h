@@ -28,8 +28,7 @@ namespace wrench {
     class SimulationMessage {
 
     public:
-
-        SimulationMessage( double payload);
+        SimulationMessage(double payload);
         virtual ~SimulationMessage();
 
         virtual std::string getName();
@@ -45,6 +44,6 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
-#endif //WRENCH_SIMGRIDMESSAGES_H
+#endif//WRENCH_SIMGRIDMESSAGES_H

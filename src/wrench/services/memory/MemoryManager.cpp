@@ -29,9 +29,8 @@ namespace wrench {
                                  double dirty_ratio,
                                  int interval,
                                  int expired_time,
-                                 std::string hostname) :
-            Service(hostname, "page_cache_manager_" + hostname),
-            memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
+                                 std::string hostname) : Service(hostname, "page_cache_manager_" + hostname),
+                                                         memory(memory), dirty_ratio(dirty_ratio), interval(interval), expired_time(expired_time) {
         // Get RAM disk size
         this->total = S4U_Simulation::getDiskCapacity(hostname, "/memory");
         this->free = total;
@@ -63,7 +62,8 @@ namespace wrench {
     }
 
     int MemoryManager::main() {
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);WRENCH_INFO(
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
+        WRENCH_INFO(
                 "Periodic Flush starting with interval = %d , expired time = %d",
                 this->interval, this->expired_time);
 
@@ -72,8 +72,9 @@ namespace wrench {
             double start_time = S4U_Simulation::getClock();
             double amt = pdflush();
             double end_time = S4U_Simulation::getClock();
-            if (amt > 0) { WRENCH_INFO("Periodically flushed %lf MB in %lf, %lf MB dirty data left",
-                                       amt / 1000000, end_time - start_time, this->dirty / 1000000)
+            if (amt > 0) {
+                WRENCH_INFO("Periodically flushed %lf MB in %lf, %lf MB dirty data left",
+                            amt / 1000000, end_time - start_time, this->dirty / 1000000)
             }
 
             if (end_time - start_time < interval) {
@@ -208,7 +209,7 @@ namespace wrench {
 
         std::map<std::string, double> flushing_map;
 
-        for (auto blk : list) {
+        for (auto blk: list) {
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
             }
@@ -271,9 +272,11 @@ namespace wrench {
             flushed_active = flushLruList(active_list, amount - flushed_inactive, excluded_filename);
         }
 
-        if (flushed_inactive > 0) { WRENCH_INFO("Flushed %lf from inactive list", flushed_inactive)
+        if (flushed_inactive > 0) {
+            WRENCH_INFO("Flushed %lf from inactive list", flushed_inactive)
         }
-        if (flushed_active > 0) { WRENCH_INFO("Flushed %lf from active list", flushed_active)
+        if (flushed_active > 0) {
+            WRENCH_INFO("Flushed %lf from active list", flushed_active)
         }
 
         return flushed_inactive + flushed_active;
@@ -291,7 +294,7 @@ namespace wrench {
         while (true) {
             this->acquireDaemonLock();
             Block *block_to_deal_with = nullptr;
-            for (auto blk : list) {
+            for (auto blk: list) {
                 if (!blk->isDirty()) continue;
                 if (S4U_Simulation::getClock() - blk->getDirtyTime() < expired_time) continue;
                 block_to_deal_with = blk;
@@ -508,10 +511,10 @@ namespace wrench {
             Block *new_blk = new Block(filename, location, clean_reaccessed, S4U_Simulation::getClock(), false, 0);
             active_list.push_back(new_blk);
         }
-//        if (dirty_reaccessed > 0) {
-//            Block *new_blk = new Block(filename, mnt_pt, dirty_reaccessed, S4U_Simulation::getClock(), true);
-//            active_list.push_back(new_blk);
-//        }
+        //        if (dirty_reaccessed > 0) {
+        //            Block *new_blk = new Block(filename, mnt_pt, dirty_reaccessed, S4U_Simulation::getClock(), true);
+        //            active_list.push_back(new_blk);
+        //        }
 
         balanceLruLists();
 
@@ -676,7 +679,7 @@ namespace wrench {
         }
 
         auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
-        for (auto disk : disk_list) {
+        for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
             if (disk_mountpoint == mountpoint) {
@@ -718,4 +721,4 @@ namespace wrench {
         fclose(log_file);
     }
 
-}
+}// namespace wrench

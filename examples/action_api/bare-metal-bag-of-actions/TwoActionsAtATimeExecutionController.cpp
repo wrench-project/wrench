@@ -32,11 +32,10 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoActionsAtATimeExecutionController::TwoActionsAtATimeExecutionController(int num_actions,
-                                                           const std::shared_ptr<BareMetalComputeService> compute_service,
-                                                           const std::shared_ptr<SimpleStorageService> storage_service,
-                                                           const std::string &hostname) :
-            ExecutionController(hostname, "me"),
-            compute_service(compute_service), storage_service(storage_service), num_actions(num_actions) {
+                                                                               const std::shared_ptr<BareMetalComputeService> compute_service,
+                                                                               const std::shared_ptr<SimpleStorageService> storage_service,
+                                                                               const std::string &hostname) : ExecutionController(hostname, "me"),
+                                                                                                              compute_service(compute_service), storage_service(storage_service), num_actions(num_actions) {
     }
 
     /**
@@ -49,7 +48,7 @@ namespace wrench {
     int TwoActionsAtATimeExecutionController::main() {
 
         /* Initialize and seed a RNG */
-        std::uniform_real_distribution<double> gflop_dist(10 * GFLOP,1000 * GFLOP);
+        std::uniform_real_distribution<double> gflop_dist(10 * GFLOP, 1000 * GFLOP);
         std::uniform_real_distribution<double> mb_dist(1.0 * MB, 100.0 * MB);
         std::mt19937 rng(42);
 
@@ -66,10 +65,10 @@ namespace wrench {
         /* Create random amounts of work in GFlop, input sizes in bytes, and output sizes in bytes */
         std::vector<std::tuple<double, std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::DataFile>>> actions;
         actions.reserve(num_actions);
-            auto input_file = wrench::Simulation::addFile("input_file_", mb_dist(rng));
-            this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
-            auto output_file = wrench::Simulation::addFile("output_file_", mb_dist(rng));
-        for (int i=0; i < 1; i++) {
+        auto input_file = wrench::Simulation::addFile("input_file_", mb_dist(rng));
+        this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+        auto output_file = wrench::Simulation::addFile("output_file_", mb_dist(rng));
+        for (int i = 0; i < 1; i++) {
             // Create action work
             auto work = gflop_dist(rng);
             // Create input file
@@ -77,15 +76,15 @@ namespace wrench {
             // Create output file
             actions.emplace_back(work, input_file, output_file);
         }
-        
+
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();
 
         /* Submit each pair of actions */
-        for (int i=0; i < num_actions; i+= 2) {
+        for (int i = 0; i < num_actions; i += 2) {
 
             WRENCH_INFO("Creating a 2-compute-action job");
-            auto job = job_manager->createCompoundJob("job_" + std::to_string(i/2));
+            auto job = job_manager->createCompoundJob("job_" + std::to_string(i / 2));
             // Action i with 2 cores
             auto file_read_1 = job->addFileReadAction("file_read_" + std::to_string(i), std::get<1>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
             auto compute_1 = job->addComputeAction("computation_" + std::to_string(i), std::get<0>(actions.at(0)), 0.0, 2, 2, wrench::ParallelModel::AMDAHL(0.9));
@@ -94,9 +93,9 @@ namespace wrench {
             job->addActionDependency(compute_1, file_write_1);
 
             // Action i+1 with 4 cores
-            auto file_read_2 = job->addFileReadAction("file_read_" + std::to_string(i+1), std::get<1>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
-            auto compute_2 = job->addComputeAction("computation_" + std::to_string(i+1), std::get<0>(actions.at(0)), 0.0, 4, 4, wrench::ParallelModel::AMDAHL(0.9));
-            std::shared_ptr<Action> file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i+1), std::get<2>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto file_read_2 = job->addFileReadAction("file_read_" + std::to_string(i + 1), std::get<1>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
+            auto compute_2 = job->addComputeAction("computation_" + std::to_string(i + 1), std::get<0>(actions.at(0)), 0.0, 4, 4, wrench::ParallelModel::AMDAHL(0.9));
+            std::shared_ptr<Action> file_write_2 = job->addFileWriteAction("file_write_" + std::to_string(i + 1), std::get<2>(actions.at(0)), wrench::FileLocation::LOCATION(this->storage_service));
             job->addActionDependency(file_read_2, compute_2);
             job->addActionDependency(compute_2, file_write_2);
 
@@ -127,7 +126,6 @@ namespace wrench {
         std::vector<std::shared_ptr<Action>> sorted_actions(job_actions.begin(), job_actions.end());
         std::sort(sorted_actions.begin(), sorted_actions.end(),
                   [](const std::shared_ptr<Action> &a1, const std::shared_ptr<Action> &a2) -> bool {
-
                       if (a1->getExecutionHistory().top().start_date == a2->getExecutionHistory().top().start_date) {
                           return ((uintptr_t) a1.get() > (uintptr_t) a2.get());
                       } else {
@@ -135,7 +133,7 @@ namespace wrench {
                       }
                   });
 
-        for (auto const &action : sorted_actions) {
+        for (auto const &action: sorted_actions) {
             WRENCH_INFO("  - Action %s ran with %lu cores from time %.2lf until time %.2lf",
                         action->getName().c_str(), action->getExecutionHistory().top().num_cores_allocated,
                         action->getExecutionHistory().top().start_date,
@@ -153,4 +151,4 @@ namespace wrench {
         throw std::runtime_error("This should not happen in this example");
     }
 
-}
+}// namespace wrench

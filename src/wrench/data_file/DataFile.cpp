@@ -23,8 +23,7 @@ namespace wrench {
      * @param id: the file id
      * @param s: the file size
      */
-    DataFile::DataFile(const std::string id, double s) :
-            id(id), size(s) {
+    DataFile::DataFile(const std::string id, double s) : id(id), size(s) {
     }
 
     /**
@@ -43,4 +42,4 @@ namespace wrench {
         return this->id;
     }
 
-}
+}// namespace wrench

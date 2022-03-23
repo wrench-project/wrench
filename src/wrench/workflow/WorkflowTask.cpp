@@ -34,16 +34,15 @@ namespace wrench {
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
-                               const double memory_requirement) :
-            id(id), color(""), flops(flops),
-            min_num_cores(min_num_cores),
-            max_num_cores(max_num_cores),
-            memory_requirement(memory_requirement),
-            execution_host(""),
-            visible_state(WorkflowTask::State::READY),
-//            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
-//            internal_state(WorkflowTask::InternalState::TASK_READY),
-            job(nullptr) {
+                               const double memory_requirement) : id(id), color(""), flops(flops),
+                                                                  min_num_cores(min_num_cores),
+                                                                  max_num_cores(max_num_cores),
+                                                                  memory_requirement(memory_requirement),
+                                                                  execution_host(""),
+                                                                  visible_state(WorkflowTask::State::READY),
+                                                                  //            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
+                                                                  //            internal_state(WorkflowTask::InternalState::TASK_READY),
+                                                                  job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
     }
@@ -54,7 +53,7 @@ namespace wrench {
      * @param file: the file
      * @throw std::invalid_argument
      */
-    void WorkflowTask::addInputFile(std::shared_ptr<DataFile>file) {
+    void WorkflowTask::addInputFile(std::shared_ptr<DataFile> file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
@@ -84,7 +83,7 @@ namespace wrench {
      *
      * @param file: the file
      */
-    void WorkflowTask::addOutputFile(std::shared_ptr<DataFile>file) {
+    void WorkflowTask::addOutputFile(std::shared_ptr<DataFile> file) {
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -97,14 +96,14 @@ namespace wrench {
         if (this->workflow->isFileOutputOfSomeTask(file)) {
             throw std::invalid_argument("WorkflowTask::addOutputFile(): File ID '" + file->getID() +
                                         "' is already an output file of another task (task '" +
-                                                this->workflow->getTaskThatOutputs(file)->getID() + "')");
+                                        this->workflow->getTaskThatOutputs(file)->getID() + "')");
         }
 
         // Otherwise proceeed
         this->output_files[file->getID()] = file;
         this->workflow->task_output_files[file] = this->getSharedPtr();
 
-        for (auto const &x : this->workflow->getTasksThatInput(file)) {
+        for (auto const &x: this->workflow->getTasksThatInput(file)) {
             workflow->addControlDependency(this->getSharedPtr(), x);
         }
     }
@@ -114,7 +113,7 @@ namespace wrench {
      *
      * @return an id as a string
      */
-    const std::string& WorkflowTask::getID() const {
+    const std::string &WorkflowTask::getID() const {
         return this->id;
     }
 
@@ -232,14 +231,14 @@ namespace wrench {
         }
     }
 
-//    /**
-//    * @brief Get the state of the task
-//    *
-//    * @return a task state
-//    */
-//    WorkflowTask::State WorkflowTask::getUpcomingState() const {
-//        return this->upcoming_visible_state;
-//    }
+    //    /**
+    //    * @brief Get the state of the task
+    //    *
+    //    * @return a task state
+    //    */
+    //    WorkflowTask::State WorkflowTask::getUpcomingState() const {
+    //        return this->upcoming_visible_state;
+    //    }
 
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
@@ -310,7 +309,7 @@ namespace wrench {
      * @param state: the task's internal state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
-//      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
+        //      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
         this->internal_state = state;
     }
 
@@ -329,14 +328,14 @@ namespace wrench {
         }
     }
 
-//    /**
-//     * @brief Set the upcoming visible state of the task
-//     *
-//     * @param state: the task state
-//     */
-//    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
-//        this->upcoming_visible_state = state;
-//    }
+    //    /**
+    //     * @brief Set the upcoming visible state of the task
+    //     *
+    //     * @param state: the task state
+    //     */
+    //    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
+    //        this->upcoming_visible_state = state;
+    //    }
 
     /**
      * @brief Set the task's containing job
@@ -732,13 +731,13 @@ namespace wrench {
             this->toplevel = 0;
         } else {
             unsigned long max_toplevel = 0;
-            for (auto parent : parents) {
+            for (auto parent: parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
             this->toplevel = 1 + max_toplevel;
         }
         std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
-        for (auto child : children) {
+        for (auto child: children) {
             child->updateTopLevel();
         }
         return this->toplevel;
@@ -852,14 +851,14 @@ namespace wrench {
      */
     void WorkflowTask::updateReadiness() {
         if (this->getState() == WorkflowTask::State::NOT_READY) {
-            for (auto const &parent : this->getParents()) {
+            for (auto const &parent: this->getParents()) {
                 if (parent->getState() != WorkflowTask::State::COMPLETED) {
                     return;
                 }
             }
             this->setState(WorkflowTask::State::READY);
         } else if (this->getState() == WorkflowTask::State::READY) {
-            for (auto const &parent : this->getParents()) {
+            for (auto const &parent: this->getParents()) {
                 if (parent->getState() != WorkflowTask::State::COMPLETED) {
                     this->setState(WorkflowTask::State::NOT_READY);
                     return;
@@ -870,4 +869,4 @@ namespace wrench {
         }
     }
 
-};
+};// namespace wrench

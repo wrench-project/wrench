@@ -51,7 +51,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_NOT_ENOUGH_RESOURCES_H
+#endif//WRENCH_NOT_ENOUGH_RESOURCES_H

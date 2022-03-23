@@ -16,9 +16,9 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
     /**
      * @brief An abstract class that defines a batch_standard_and_pilot_jobs scheduler
@@ -26,7 +26,6 @@ namespace wrench {
     class HomegrownBatchScheduler : public BatchScheduler {
 
     public:
-
         /**
          * @brief Constructor
          *
@@ -34,11 +33,11 @@ namespace wrench {
          */
         explicit HomegrownBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
 
-        void init() override {};
+        void init() override{};
 
-        void launch() override {};
+        void launch() override{};
 
-        void shutdown() override {};
+        void shutdown() override{};
 
         void processUnknownJobTermination(std::string job_id) override {
             throw std::runtime_error("HomegrownBatchScheduler::processUnknownJobTermination(): this method should not be called since this scheduler is not Batsched");
@@ -52,16 +51,13 @@ namespace wrench {
          * @return a host:<core,RAM> map
          */
         virtual std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) = 0;
-
-
-
     };
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
-}
+}// namespace wrench
 
 
-#endif //WRENCH_HOMEGROWNBATCHSCHEDULER_H
+#endif//WRENCH_HOMEGROWNBATCHSCHEDULER_H

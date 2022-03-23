@@ -34,7 +34,6 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
-
         explicit LogicalFileSystem(std::string hostname, StorageService *storage_service, std::string mount_point);
 
         void init();
@@ -42,22 +41,21 @@ namespace wrench {
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void reserveSpace(std::shared_ptr<DataFile>file, std::string absolute_path);
-        void unreserveSpace(std::shared_ptr<DataFile>file, std::string absolute_path);
+        void reserveSpace(std::shared_ptr<DataFile> file, std::string absolute_path);
+        void unreserveSpace(std::shared_ptr<DataFile> file, std::string absolute_path);
 
         void createDirectory(std::string absolute_path);
         bool doesDirectoryExist(std::string absolute_path);
         bool isDirectoryEmpty(std::string absolute_path);
         void removeEmptyDirectory(std::string absolute_path);
-        void storeFileInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path);
-        void removeFileFromDirectory(std::shared_ptr<DataFile>file, std::string absolute_path);
+        void storeFileInDirectory(std::shared_ptr<DataFile> file, std::string absolute_path);
+        void removeFileFromDirectory(std::shared_ptr<DataFile> file, std::string absolute_path);
         void removeAllFilesInDirectory(std::string absolute_path);
-        bool isFileInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path);
+        bool isFileInDirectory(std::shared_ptr<DataFile> file, std::string absolute_path);
         std::set<std::shared_ptr<DataFile>> listFilesInDirectory(std::string absolute_path);
 
 
     private:
-
         friend class StorageService;
 
         void stageFile(std::shared_ptr<DataFile> file, std::string absolute_path);
@@ -99,14 +97,13 @@ namespace wrench {
             }
         }
 
-        void assertFileIsInDirectory(std::shared_ptr<DataFile>file, std::string absolute_path) {
+        void assertFileIsInDirectory(std::shared_ptr<DataFile> file, std::string absolute_path) {
             assertDirectoryExist(absolute_path);
             if (this->content[absolute_path].find(file) == this->content[absolute_path].end()) {
                 throw std::invalid_argument("LogicalFileSystem::assertFileIsInDirectory(): File " + file->getID() +
-                " is not in directory " + absolute_path);
+                                            " is not in directory " + absolute_path);
             }
         }
-
     };
 
 
@@ -114,7 +111,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-}
+}// namespace wrench
 
 
-#endif //WRENCH_LOGICALFILESYSTEM_H
+#endif//WRENCH_LOGICALFILESYSTEM_H

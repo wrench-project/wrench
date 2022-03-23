@@ -25,9 +25,9 @@ WRENCH_LOG_CATEGORY(comprehensive_integration_host_failure_test, "Log category f
 #define NUM_TASKS 100
 #define MAX_TASK_DURATION_WITH_ON_CORE 3600
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_OFF 100
-#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 3000  // The bigger this number the less flaky the platform
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_OFF 3000// The bigger this number the less flaky the platform
 #define CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON 100
-#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 2000    // The bigger this number the more flaky the platform
+#define CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON 2000// The bigger this number the more flaky the platform
 
 class ComprehensiveIntegrationHostFailuresTest : public ::testing::Test {
 
@@ -44,11 +44,10 @@ public:
 
 
 protected:
-
     std::string createRoute(std::string src, std::string dst, std::vector<std::string> links) {
-        std::string to_return = "<route src=\"" +  src + "\" ";
+        std::string to_return = "<route src=\"" + src + "\" ";
         to_return += "dst=\"" + dst + "\">\n";
-        for (auto const &l : links) {
+        for (auto const &l: links) {
             to_return += "<link_ctn id=\"" + l + "\"/>\n";
         }
         to_return += "</route>\n";
@@ -75,7 +74,7 @@ protected:
                                               "CloudHead", "CloudHost1", "CloudHost2", "CloudHost3",
                                               "BareMetalHead", "BareMetalHost1", "BareMetalHost2"};
 
-        for (auto const &h : hostnames) {
+        for (auto const &h: hostnames) {
             xml += "<host id=\"" + h + "\"  speed=\"1f\" core=\"4\" > \n"
                                        "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">\n"
                                        "             <prop id=\"size\" value=\"10000000000000B\"/>\n"
@@ -150,7 +149,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -162,14 +160,11 @@ class IntegrationFailureTestTestWMS : public wrench::ExecutionController {
 
 public:
     IntegrationFailureTestTestWMS(ComprehensiveIntegrationHostFailuresTest *test,
-                                  std::string &hostname
-    ) :
-            wrench::ExecutionController(hostname, "test") {
+                                  std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     std::set<std::string> vms;
     std::map<std::shared_ptr<wrench::BareMetalComputeService>, bool> vm_used;
     ComprehensiveIntegrationHostFailuresTest *test;
@@ -186,7 +181,7 @@ private:
                                                          CHAOS_MONKEY_MIN_SLEEP_BEFORE_ON, CHAOS_MONKEY_MAX_SLEEP_BEFORE_ON,
                                                          victimhost, wrench::ResourceRandomRepeatSwitcher::ResourceType::HOST));
         switcher->setSimulation(this->simulation);
-        switcher->start(switcher, true, false); // Daemonized, no auto-restart
+        switcher->start(switcher, true, false);// Daemonized, no auto-restart
     }
 
     int main() override {
@@ -196,7 +191,7 @@ private:
         if (this->test->faulty_map.find("cloud") != this->test->faulty_map.end()) {
             // Create my sef of VMs
             try {
-                for (int i = 0; i < 2; i++) { // TODO: MAKE IT 6
+                for (int i = 0; i < 2; i++) {// TODO: MAKE IT 6
                     auto vm_name = this->test->cloud_service->createVM(2, 45);
                     this->test->cloud_service->startVM(vm_name);
                     this->vms.insert(vm_name);
@@ -207,14 +202,14 @@ private:
         }
 
         // Creating Chaos Monkeys
-        for (auto const &faulty : this->test->faulty_map) {
+        for (auto const &faulty: this->test->faulty_map) {
             if (not faulty.second) {
                 continue;
             }
             if (faulty.first == "cloud") {
                 createMonkey("CloudHost1");
-//                createMonkey("CloudHost2");
-//                createMonkey("CloudHost3");
+                //                createMonkey("CloudHost2");
+                //                createMonkey("CloudHost3");
 
             } else if (faulty.first == "baremetal") {
                 createMonkey("BareMetalHost1");
@@ -230,7 +225,7 @@ private:
         while (not this->test->workflow->isDone()) {
 
             // Try to restart down VMs
-            for (auto const &vm : this->vms) {
+            for (auto const &vm: this->vms) {
                 if (this->test->cloud_service->isVMDown(vm)) {
                     try {
                         this->test->cloud_service->startVM(vm);
@@ -238,7 +233,7 @@ private:
                         auto cause = std::dynamic_pointer_cast<wrench::NotEnoughResources>(e.getCause());
                         if (cause) {
                             // oh well
-//                            WRENCH_INFO("Cannot start VM");
+                            //                            WRENCH_INFO("Cannot start VM");
                         } else {
                             throw;
                         }
@@ -260,14 +255,14 @@ private:
 
         // Find a ready task1
         std::shared_ptr<wrench::WorkflowTask> task = nullptr;
-        for (auto const &t : this->test->workflow->getTasks()) {
+        for (auto const &t: this->test->workflow->getTasks()) {
             if (t->getState() == wrench::WorkflowTask::READY) {
                 task = t;
                 break;
             }
         }
         if (not task) {
-            return false; // no ready task1 right now
+            return false;// no ready task1 right now
         }
 
         // Pick a storage service
@@ -283,7 +278,7 @@ private:
 
         // Pick a compute resource (trying the cloud first)
         std::shared_ptr<wrench::ComputeService> target_cs = nullptr;
-        for (auto &vm : this->vms) {
+        for (auto &vm: this->vms) {
             auto vm_cs = this->test->cloud_service->getVMComputeService(vm);
             if (vm_cs->isUp() and (not this->vm_used[vm_cs])) {
                 target_cs = vm_cs;
@@ -305,15 +300,15 @@ private:
 
         // Create/submit a standard job
         auto job = this->job_manager->createStandardJob(task, {
-                {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
-                {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
-        });
+                                                                      {*(task->getInputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+                                                                      {*(task->getOutputFiles().begin()), wrench::FileLocation::LOCATION(target_storage_service)},
+                                                              });
         this->job_manager->submitJob(job, target_cs);
 
-//        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
-//                    task1->getID().c_str(),
-//                    target_cs->getName().c_str(),
-//                    target_storage_service->getName().c_str());
+        //        WRENCH_INFO("Submitted task1 '%s' to '%s' with files to read from '%s",
+        //                    task1->getID().c_str(),
+        //                    target_cs->getName().c_str(),
+        //                    target_storage_service->getName().c_str());
         return true;
     }
 
@@ -323,7 +318,7 @@ private:
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
         } else {
-            for (auto const &u : this->vm_used) {
+            for (auto const &u: this->vm_used) {
                 if (u.first == event->compute_service) {
                     this->vm_used[u.first] = false;
                 }
@@ -337,14 +332,13 @@ private:
         if (event->compute_service == this->test->baremetal_service) {
             num_jobs_on_baremetal_cs--;
         } else {
-            for (auto const &u : this->vm_used) {
+            for (auto const &u: this->vm_used) {
                 if (u.first == event->compute_service) {
                     this->vm_used[u.first] = false;
                 }
             }
         }
     }
-
 };
 
 TEST_F(ComprehensiveIntegrationHostFailuresTest, OneNonFaultyStorageOneFaultyBareMetal) {
@@ -415,7 +409,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
 
     this->faulty_map = args;
@@ -440,15 +434,14 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         this->baremetal_service = std::dynamic_pointer_cast<wrench::BareMetalComputeService>(simulation->add(
                 new wrench::BareMetalComputeService(
                         "BareMetalHead",
-                        (std::map<std::string, std::tuple<unsigned long, double>>) {
+                        (std::map<std::string, std::tuple<unsigned long, double>>){
                                 std::make_pair("BareMetalHost1", std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                  wrench::ComputeService::ALL_RAM)),
                                 std::make_pair("BareMetalHost2", std::make_tuple(wrench::ComputeService::ALL_CORES,
                                                                                  wrench::ComputeService::ALL_RAM)),
                         },
                         "/scratch",
-                        {
-                         {wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
+                        {{wrench::BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "false"}}, {})));
     }
 
     // Create Cloud Service
@@ -456,8 +449,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
         std::string cloudhead = "CloudHead";
         std::vector<std::string> cloudhosts;
         cloudhosts.push_back("CloudHost1");
-//        cloudhosts.push_back("CloudHost2");
-//        cloudhosts.push_back("CloudHost3");
+        //        cloudhosts.push_back("CloudHost2");
+        //        cloudhosts.push_back("CloudHost3");
         this->cloud_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(
                 simulation->add(new wrench::CloudComputeService(
                         cloudhead,
@@ -471,8 +464,8 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
 
     // Create workflow tasks and stage input file
     srand(666);
-    for (int i=0; i < NUM_TASKS; i++) {
-//        auto task1 = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
+    for (int i = 0; i < NUM_TASKS; i++) {
+        //        auto task1 = workflow->addTask("task_" + std::to_string(i), 1 + rand() % MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 1.0, 0);
         auto task = workflow->addTask("task_" + std::to_string(i), MAX_TASK_DURATION_WITH_ON_CORE, 1, 3, 40);
         auto input_file = workflow->addFile(task->getID() + ".input", 1 + rand() % 100);
         auto output_file = workflow->addFile(task->getID() + ".output", 1 + rand() % 100);
@@ -497,11 +490,7 @@ void ComprehensiveIntegrationHostFailuresTest::do_IntegrationFailureTest_test(st
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-
-
-

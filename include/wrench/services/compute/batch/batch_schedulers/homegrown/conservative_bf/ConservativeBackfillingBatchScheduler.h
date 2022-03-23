@@ -16,9 +16,9 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
     /**
      * @brief A class that defines a conservative backfilling batch_standard_and_pilot_jobs scheduler
@@ -26,7 +26,6 @@ namespace wrench {
     class ConservativeBackfillingBatchScheduler : public HomegrownBatchScheduler {
 
     public:
-
         explicit ConservativeBackfillingBatchScheduler(BatchComputeService *cs);
 
         void processQueuedJobs() override;
@@ -38,22 +37,20 @@ namespace wrench {
 
         void compactSchedule();
 
-        std::map <std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
+        std::map<std::string, std::tuple<unsigned long, double>> scheduleOnHosts(unsigned long, unsigned long, double) override;
 
         std::map<std::string, double>
-        getStartTimeEstimates(std::set <std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
+        getStartTimeEstimates(std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) override;
 
     private:
-
         std::unique_ptr<NodeAvailabilityTimeLine> schedule;
     };
 
 
-/***********************/
-/** \endcond           */
-/***********************/
-}
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}// namespace wrench
 
 
-
-#endif //WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H
+#endif//WRENCH_CONSERVATIVEBACKFILLINGBATCHSCHEDULER_H

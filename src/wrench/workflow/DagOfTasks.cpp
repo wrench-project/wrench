@@ -17,7 +17,7 @@ WRENCH_LOG_CATEGORY(dag_of_tasks, "Log category for DagOfTasks");
 
 namespace wrench {
 
-/**
+    /**
  * @brief Method to add a task vertex to the DAG
  * @param task: the task
  */
@@ -29,10 +29,10 @@ namespace wrench {
         // Update the vertex vector
         this->task_list.push_back(task);
         // Set the task's vertex id in the task map
-        this->task_map[task] =  this->task_list.size() - 1;
+        this->task_map[task] = this->task_list.size() - 1;
     }
 
-/**
+    /**
  * @brief Method to remove a task vertex from the DAG
  * @param task: the task
  */
@@ -44,7 +44,7 @@ namespace wrench {
         // Remove the correspond task list item
         this->task_list.erase(this->task_list.begin() + this->task_map[task]);
         // Update subsequent task's vertex indices
-        for (auto it = this->task_list.begin()  +  this->task_map[task]; it != this->task_list.end(); ++it) {
+        for (auto it = this->task_list.begin() + this->task_map[task]; it != this->task_list.end(); ++it) {
             this->task_map[*it]--;
         }
 
@@ -56,12 +56,12 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Method to add an edge between to task vertices
  * @param src: the source task
  * @param dst: the destination task
  */
-    void wrench::DagOfTasks::addEdge( wrench::WorkflowTask *src,  wrench::WorkflowTask *dst) {
+    void wrench::DagOfTasks::addEdge(wrench::WorkflowTask *src, wrench::WorkflowTask *dst) {
         // Check that vertices exist
         if (this->task_map[src] >= this->task_list.size()) {
             throw std::runtime_error(
@@ -75,12 +75,12 @@ namespace wrench {
         boost::add_edge(this->task_map[src], this->task_map[dst], this->dag);
     }
 
-/**
+    /**
  * @brief Remove an edge between two task vertices
  * @param src: the source task
  * @param dst: the destination task
  */
-    void wrench::DagOfTasks::removeEdge( wrench::WorkflowTask *src,  wrench::WorkflowTask *dst) {
+    void wrench::DagOfTasks::removeEdge(wrench::WorkflowTask *src, wrench::WorkflowTask *dst) {
         // Check that vertices exist
         if (this->task_map[src] >= this->task_list.size()) {
             throw std::runtime_error("wrench::DagOfTasks::removeEdge(): Trying add an edge from a non-existing vertex");
@@ -93,13 +93,13 @@ namespace wrench {
         boost::remove_edge(this->task_map[src], this->task_map[dst], this->dag);
     }
 
-/**
+    /**
  * @brief Method to check whether a path exists between to task vertices
  * @param src: the source task
  * @param dst: the destination task
  * @return true if there is a path between the tasks
  */
-    bool wrench::DagOfTasks::doesPathExist(const wrench::WorkflowTask *src,  const wrench::WorkflowTask *dst) {
+    bool wrench::DagOfTasks::doesPathExist(const wrench::WorkflowTask *src, const wrench::WorkflowTask *dst) {
         // Check that vertices exist
         if (this->task_map[src] >= this->task_list.size()) {
             throw std::runtime_error(
@@ -134,7 +134,7 @@ namespace wrench {
  * @param dst: the destination task
  * @return true if there is a path between the tasks
  */
-    bool wrench::DagOfTasks::doesEdgeExist(const wrench::WorkflowTask *src,  const wrench::WorkflowTask *dst) {
+    bool wrench::DagOfTasks::doesEdgeExist(const wrench::WorkflowTask *src, const wrench::WorkflowTask *dst) {
         // Check that vertices exist
         if (this->task_map[src] >= this->task_list.size()) {
             throw std::runtime_error(
@@ -148,10 +148,10 @@ namespace wrench {
         auto src_vertex = this->task_map[src];
         auto dst_vertex = this->task_map[dst];
 
-        return boost::edge(src_vertex,dst_vertex,this->dag).second;
+        return boost::edge(src_vertex, dst_vertex, this->dag).second;
     }
 
-/**
+    /**
  * @brief Method to get the number of children of a task vertex
  * @param task: the task
  * @return a number children
@@ -170,7 +170,7 @@ namespace wrench {
         return count;
     }
 
-/**
+    /**
  * @brief Method to get the children of a task vertex
  * @param task: the task
  * @return the children
@@ -185,12 +185,12 @@ namespace wrench {
         std::vector<WorkflowTask *> children;
         for (boost::tie(eo, edge_end) = boost::out_edges(vertex, dag); eo != edge_end; ++eo) {
             // Discard the const qualifier
-            children.push_back((WorkflowTask *)(dag[target(*eo, dag)].task));
+            children.push_back((WorkflowTask *) (dag[target(*eo, dag)].task));
         }
         return children;
     }
 
-/**
+    /**
  * @brief Method to get the number of parents of a task vertex
  * @param task: the task
  * @return a number parents
@@ -214,19 +214,19 @@ namespace wrench {
      * @param task: the task
      * @return the parents
      */
-    std::vector< WorkflowTask *> wrench::DagOfTasks::getParents(const WorkflowTask *task) {
+    std::vector<WorkflowTask *> wrench::DagOfTasks::getParents(const WorkflowTask *task) {
         // Find the vertex
         if (this->task_map[task] >= this->task_list.size()) {
             throw std::runtime_error("wrench::DagOfTasks::getParents(): Non-existing vertex");
         }
         auto vertex = this->task_map[task];
         boost::graph_traits<DAG>::in_edge_iterator ei, edge_end;
-        std::vector< WorkflowTask *> parents;
+        std::vector<WorkflowTask *> parents;
         for (boost::tie(ei, edge_end) = boost::in_edges(vertex, dag); ei != edge_end; ++ei) {
             // Discard the const qualifier
-            parents.push_back((WorkflowTask *)(dag[source(*ei, dag)].task));
+            parents.push_back((WorkflowTask *) (dag[source(*ei, dag)].task));
         }
         return parents;
     }
 
-}
+}// namespace wrench

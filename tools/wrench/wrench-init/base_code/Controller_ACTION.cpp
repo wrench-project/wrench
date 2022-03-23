@@ -32,9 +32,8 @@ namespace wrench {
      */
     Controller::Controller(const std::shared_ptr<BareMetalComputeService> &bare_metal_compute_service,
                            const std::shared_ptr<SimpleStorageService> &storage_service,
-                           const std::string &hostname) :
-            ExecutionController(hostname,"controller"),
-            bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
+                           const std::string &hostname) : ExecutionController(hostname, "controller"),
+                                                          bare_metal_compute_service(bare_metal_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the Controller
@@ -84,7 +83,7 @@ namespace wrench {
         WRENCH_INFO("Execution complete!");
 
         std::vector<std::shared_ptr<wrench::Action>> actions = {fileread, compute, filewrite, sleep};
-        for (auto const &a : actions) {
+        for (auto const &a: actions) {
             printf("Action %s: %.2fs - %.2fs\n", a->getName().c_str(), a->getStartDate(), a->getEndDate());
         }
 
@@ -101,6 +100,5 @@ namespace wrench {
         auto job = event->job;
         /* Print info about all actions in the job */
         WRENCH_INFO("Notified that compound job %s has completed:", job->getName().c_str());
-
     }
-}
+}// namespace wrench

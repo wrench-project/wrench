@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
     simulation->add(file_registry_service);
 
     /* Stage input files on the storage service */
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
 
     /* Print task execution timelines */
     std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = {task1, task2, task3, task4};
-    for (auto const &t : tasks) {
+    for (auto const &t: tasks) {
         printf("Task %s: %.2fs - %.2fs\n", t->getID().c_str(), t->getStartDate(), t->getEndDate());
     }
 

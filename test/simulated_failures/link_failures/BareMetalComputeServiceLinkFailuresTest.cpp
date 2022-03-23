@@ -24,13 +24,11 @@ WRENCH_LOG_CATEGORY(bare_metal_compute_service_link_failures_test, "Log category
 class BareMetalComputeServiceLinkFailuresTest : public ::testing::Test {
 
 public:
-
     std::shared_ptr<wrench::ComputeService> cs = nullptr;
 
     void do_ResourceInformationLinkFailure_test();
 
 protected:
-
     ~BareMetalComputeServiceLinkFailuresTest() {
         workflow->clear();
     }
@@ -93,7 +91,6 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 /**********************************************************************/
@@ -104,13 +101,11 @@ class BareMetalComputeServiceResourceInformationTestWMS : public wrench::Executi
 
 public:
     BareMetalComputeServiceResourceInformationTestWMS(BareMetalComputeServiceLinkFailuresTest *test,
-                                                      std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                      std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     BareMetalComputeServiceLinkFailuresTest *test;
 
     int main() {
@@ -120,12 +115,12 @@ private:
                 new wrench::ResourceRandomRepeatSwitcher("Host1", 123, 1, 50, 1, 10,
                                                          "link1", wrench::ResourceRandomRepeatSwitcher::ResourceType::LINK));
         switcher->setSimulation(this->simulation);
-        switcher->start(switcher, true, false); // Daemonized, no auto-restart
+        switcher->start(switcher, true, false);// Daemonized, no auto-restart
 
         // Do a bunch of resource requests
         unsigned long num_failures = 0;
         unsigned long num_trials = 2000;
-        for (unsigned int i=0; i < num_trials; i++) {
+        for (unsigned int i = 0; i < num_trials; i++) {
             try {
 
                 wrench::Simulation::sleep(25);
@@ -160,7 +155,7 @@ private:
                 }
 
             } catch (wrench::ExecutionException &e) {
-//                WRENCH_INFO("Got an exception");
+                //                WRENCH_INFO("Got an exception");
                 num_failures++;
                 if (not std::dynamic_pointer_cast<wrench::NetworkError>(e.getCause())) {
                     throw std::runtime_error("Invalid failure cause: " + e.getCause()->toString() + " (was expecting NetworkError");
@@ -210,8 +205,7 @@ void BareMetalComputeServiceLinkFailuresTest::do_ResourceInformationLinkFailure_
     simulation->launch();
 
 
-
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

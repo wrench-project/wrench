@@ -5,6 +5,11 @@ on:
     paths-ignore:
       - 'doc/**'
       - '**.md'
+  workflow_run:
+    workflows: ["clang-format"]
+    branches: [master]
+    types: 
+      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,7 +28,7 @@ jobs:
       
       - name: Install Simgrid
         run: |
-          curl https://framagit.org/simgrid/simgrid/-/archive/v3.29/simgrid-v3.29.tar.gz | tar -xz
+          curl https://framagit.org/simgrid/simgrid/-/archive/v3.31/simgrid-v3.31.tar.gz | tar -xz
           mv simgrid-v*.* simgrid
           cd simgrid
           cmake -Denable_smpi=off .

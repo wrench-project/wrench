@@ -31,7 +31,6 @@ namespace wrench {
                 const std::string &hostname);
 
     protected:
-
         // Overridden method
         void processEventStandardJobCompletion(std::shared_ptr<StandardJobCompletedEvent>) override;
         void processEventStandardJobFailure(std::shared_ptr<StandardJobFailedEvent>) override;
@@ -44,7 +43,6 @@ namespace wrench {
         std::shared_ptr<BareMetalComputeService> bare_metal_compute_service;
         std::shared_ptr<StorageService> storage_service1;
         std::shared_ptr<StorageService> storage_service2;
-
     };
-}
-#endif //WRENCH_EXAMPLE_DATA_MOVEMENT_H
+}// namespace wrench
+#endif//WRENCH_EXAMPLE_DATA_MOVEMENT_H

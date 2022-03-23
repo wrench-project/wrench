@@ -26,7 +26,6 @@ public:
     void do_logging_test();
 
 protected:
-
     ~SimulationLoggingTest() {
         workflow->clear();
     }
@@ -56,13 +55,11 @@ class SimulationLoggingWMS : public wrench::ExecutionController {
 
 public:
     SimulationLoggingWMS(SimulationLoggingTest *test,
-                         std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                         std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     SimulationLoggingTest *test;
 
     int main() {
@@ -112,9 +109,7 @@ void SimulationLoggingTest::do_logging_test() {
     simulation->launch();
 
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-
-

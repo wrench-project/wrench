@@ -28,7 +28,6 @@ namespace wrench {
     class Action : public std::enable_shared_from_this<Action> {
 
     public:
-
         /** @brief Action states */
         enum State {
             /** @brief Not ready (not ready, because depends on other actions) */
@@ -68,7 +67,7 @@ namespace wrench {
         void setPriority(double priority);
         double getPriority() const;
 
-        static std::string getActionTypeAsString(const std::shared_ptr<Action>& action);
+        static std::string getActionTypeAsString(const std::shared_ptr<Action> &action);
 
         /**
          * @brief A data structure that keeps track of an action's execution(s)
@@ -101,12 +100,11 @@ namespace wrench {
         std::shared_ptr<Action> getSharedPtr() { return this->shared_from_this(); }
 
     protected:
-
         friend class CompoundJob;
         friend class ActionExecutor;
         friend class ActionExecutionService;
-        friend class BareMetalComputeService; // this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
-        friend class BatchComputeService; // this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
+        friend class BareMetalComputeService;// this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
+        friend class BatchComputeService;    // this is a bit unfortunate (to call setFailureCause - perhaps go through CompoundJob?)
 
         void newExecution(Action::State state);
 
@@ -120,7 +118,7 @@ namespace wrench {
 
         virtual ~Action() = default;
 
-        Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job);
+        Action(const std::string &name, const std::string &prefix, std::shared_ptr<CompoundJob> job);
 
         /**
         * @brief Method to execute the task
@@ -136,9 +134,8 @@ namespace wrench {
         void updateState();
 
     private:
-
-        std::set<Action*> parents;
-        std::set<Action*> children;
+        std::set<Action *> parents;
+        std::set<Action *> children;
 
         double priority;
 
@@ -150,8 +147,7 @@ namespace wrench {
         static unsigned long getNewUniqueNumber();
 
         std::stack<ActionExecution> execution_history;
-
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_ACTION_H
+#endif//WRENCH_ACTION_H

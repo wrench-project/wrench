@@ -31,14 +31,13 @@ namespace wrench {
     class FileTransferThread : public Service {
 
     public:
-
         ~FileTransferThread() {
         }
 
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
-                           std::shared_ptr<DataFile>file,
+                           std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
                            simgrid::s4u::Mailbox *src_mailbox,
                            std::shared_ptr<FileLocation> dst_location,
@@ -49,7 +48,7 @@ namespace wrench {
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
-                           std::shared_ptr<DataFile>file,
+                           std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
                            simgrid::s4u::Mailbox *dst_mailbox,
@@ -60,7 +59,7 @@ namespace wrench {
 
         FileTransferThread(std::string hostname,
                            std::shared_ptr<StorageService> parent,
-                           std::shared_ptr<DataFile>file,
+                           std::shared_ptr<DataFile> file,
                            double num_bytes_to_transfer,
                            std::shared_ptr<FileLocation> src_location,
                            std::shared_ptr<FileLocation> dsg_location,
@@ -74,9 +73,8 @@ namespace wrench {
 
 
     private:
-
         std::shared_ptr<StorageService> parent;
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
 
         // Only one of these two is valid
         simgrid::s4u::Mailbox *src_mailbox;
@@ -95,15 +93,13 @@ namespace wrench {
 
         void receiveFileFromNetwork(std::shared_ptr<DataFile> file, simgrid::s4u::Mailbox *mailbox, std::shared_ptr<FileLocation> location);
         void sendLocalFileToNetwork(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, double num_bytes_to_transfer, simgrid::s4u::Mailbox *mailbox);
-        void downloadFileFromStorageService(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
-        void copyFileLocally(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
-
+        void downloadFileFromStorageService(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
+        void copyFileLocally(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src_location, std::shared_ptr<FileLocation> dst_location);
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_FILETRANSFERTHREAD_H
-
+#endif//WRENCH_FILETRANSFERTHREAD_H

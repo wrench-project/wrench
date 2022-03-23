@@ -28,7 +28,6 @@ namespace wrench {
      */
     class HostError : public FailureCause {
     public:
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -48,7 +47,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_HOST_ERROR_H
+#endif//WRENCH_HOST_ERROR_H

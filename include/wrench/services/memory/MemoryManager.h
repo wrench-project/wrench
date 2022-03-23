@@ -29,7 +29,6 @@ namespace wrench {
     class MemoryManager : public Service {
 
     public:
-
     private:
         simgrid::s4u::Disk *memory;
         double dirty_ratio;
@@ -65,7 +64,6 @@ namespace wrench {
         double evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename);
 
     public:
-
         static std::shared_ptr<MemoryManager> initAndStart(Simulation *simulation, simgrid::s4u::Disk *memory,
                                                            double dirty_ratio, int interval, int expired_time,
                                                            std::string hostname);
@@ -101,7 +99,7 @@ namespace wrench {
         double evict(double amount, std::string excluded_filename);
 
         simgrid::s4u::IoPtr readToCache(std::string filename, std::shared_ptr<FileLocation> location,
-                double amount, bool async);
+                                        double amount, bool async);
 
         void readChunkFromCache(std::string filename, double amount);
 
@@ -111,7 +109,7 @@ namespace wrench {
 
         double getCachedAmount(std::string filename);
 
-        std::vector<Block*> getCachedBlocks(std::string filename);
+        std::vector<Block *> getCachedBlocks(std::string filename);
 
         static simgrid::s4u::Disk *getDisk(std::string mountpoint, std::string hostname);
 
@@ -124,6 +122,6 @@ namespace wrench {
         /***********************/
     };
 
-}
+}// namespace wrench
 
-#endif //WRENCH_MEMORYMANAGER_H
+#endif//WRENCH_MEMORYMANAGER_H

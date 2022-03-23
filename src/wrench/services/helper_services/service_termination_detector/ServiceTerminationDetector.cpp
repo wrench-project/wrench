@@ -27,14 +27,12 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
                                                                std::shared_ptr<Service> service_to_monitor,
                                                                simgrid::s4u::Mailbox *mailbox_to_notify,
                                                                bool notify_on_crash,
-                                                               bool notify_on_termination) :
-        Service(host_on_which_to_run, "service_termination_detector_for_" + service_to_monitor->getName()) {
+                                                               bool notify_on_termination) : Service(host_on_which_to_run, "service_termination_detector_for_" + service_to_monitor->getName()) {
 
     this->service_to_monitor = service_to_monitor;
     this->mailbox_to_notify = mailbox_to_notify;
     this->notify_on_crash = notify_on_crash;
     this->notify_on_termination = notify_on_termination;
-
 }
 
 /**
@@ -62,6 +60,6 @@ int wrench::ServiceTerminationDetector::main() {
                                 new ServiceHasTerminatedMessage(this->service_to_monitor, return_value_from_main));
     }
 
-    this->service_to_monitor = nullptr;  // released, so that it can be freed in case refount = 0
+    this->service_to_monitor = nullptr;// released, so that it can be freed in case refount = 0
     return 0;
 }

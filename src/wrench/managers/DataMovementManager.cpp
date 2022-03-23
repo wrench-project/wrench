@@ -17,8 +17,8 @@
 #include <wrench/services/storage/StorageServiceMessage.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/managers/DataMovementManager.h>
-#include  <wrench/failure_causes/FileAlreadyBeingCopied.h>
-#include  <wrench/failure_causes/NetworkError.h>
+#include <wrench/failure_causes/FileAlreadyBeingCopied.h>
+#include <wrench/failure_causes/NetworkError.h>
 
 #include <memory>
 
@@ -32,12 +32,9 @@ namespace wrench {
      * @param hostname: the hostname on which the data movement manager is to run
      * @param creator_mailbox: the mailbox of the manager's creator
      */
-    DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) :
-            Service(hostname, "data_movement_manager") {
+    DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) : Service(hostname, "data_movement_manager") {
 
         this->creator_mailbox = creator_mailbox;
-
-
     }
 
     /**
@@ -71,7 +68,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void DataMovementManager::initiateAsynchronousFileCopy(std::shared_ptr<DataFile>file,
+    void DataMovementManager::initiateAsynchronousFileCopy(std::shared_ptr<DataFile> file,
                                                            std::shared_ptr<FileLocation> src,
                                                            std::shared_ptr<FileLocation> dst,
                                                            std::shared_ptr<FileRegistryService> file_registry_service) {
@@ -82,7 +79,7 @@ namespace wrench {
         DataMovementManager::CopyRequestSpecs request(file, src, dst, file_registry_service);
 
         try {
-            for (auto const &p : this->pending_file_copies) {
+            for (auto const &p: this->pending_file_copies) {
                 if (*p == request) {
                     throw ExecutionException(
                             std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
@@ -95,7 +92,7 @@ namespace wrench {
 
         try {
             this->pending_file_copies.push_front(std::make_unique<CopyRequestSpecs>(file, src, dst, file_registry_service));
-            wrench::StorageService::initiateFileCopy(this->mailbox, file,src, dst);
+            wrench::StorageService::initiateFileCopy(this->mailbox, file, src, dst);
         } catch (ExecutionException &e) {
             throw;
         }
@@ -111,7 +108,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw ExecutionException
      */
-    void DataMovementManager::doSynchronousFileCopy(std::shared_ptr<DataFile>file,
+    void DataMovementManager::doSynchronousFileCopy(std::shared_ptr<DataFile> file,
                                                     std::shared_ptr<FileLocation> src,
                                                     std::shared_ptr<FileLocation> dst,
                                                     std::shared_ptr<FileRegistryService> file_registry_service) {
@@ -122,7 +119,7 @@ namespace wrench {
         DataMovementManager::CopyRequestSpecs request(file, src, dst, file_registry_service);
 
         try {
-            for (auto const &p : this->pending_file_copies) {
+            for (auto const &p: this->pending_file_copies) {
                 if (*p == request) {
                     throw ExecutionException(
                             std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, src, dst)));
@@ -144,7 +141,7 @@ namespace wrench {
     }
 
 
-/**
+    /**
  * @brief Main method of the daemon that implements the DataMovementManager
  * @return 0 on success
  */
@@ -155,7 +152,6 @@ namespace wrench {
         WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox->get_cname());
 
         while (processNextMessage()) {
-
         }
 
         WRENCH_INFO("Data Movement Manager terminating");
@@ -163,7 +159,7 @@ namespace wrench {
         return 0;
     }
 
-/**
+    /**
  * @brief Process the next message
  * @return true if the daemon should continue, false otherwise
  *
@@ -182,11 +178,11 @@ namespace wrench {
 
         WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
 
-        } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
@@ -203,7 +199,7 @@ namespace wrench {
                 (*(*it)).dst->getStorageService();
                 if (*(*it) == request) {
                     request.file_registry_service = (*it)->file_registry_service;
-                    this->pending_file_copies.erase(it); // remove the entry
+                    this->pending_file_copies.erase(it);// remove the entry
                     break;
                 }
             }
@@ -230,15 +226,13 @@ namespace wrench {
                                                                              file_registry_service_updated,
                                                                              msg->success,
                                                                              std::move(msg->failure_cause),
-                                                                             0
-                                     ));
+                                                                             0));
             return true;
 
         } else {
             throw std::runtime_error(
                     "DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
         }
-
     }
 
     /** @brief Get the mailbox of the service that created this data movement manager
@@ -250,4 +244,4 @@ namespace wrench {
     }
 
 
-};
+};// namespace wrench

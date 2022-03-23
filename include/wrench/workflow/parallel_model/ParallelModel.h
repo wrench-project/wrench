@@ -23,7 +23,6 @@ namespace wrench {
     class ParallelModel {
 
     public:
-
         static std::shared_ptr<ParallelModel> AMDAHL(double alpha);
         static std::shared_ptr<ParallelModel> CONSTANTEFFICIENCY(double efficiency);
         static std::shared_ptr<ParallelModel> CUSTOM(std::function<double(double, long)> lambda_sequential, std::function<double(double, long)> lambda_per_thread);
@@ -41,7 +40,7 @@ namespace wrench {
          *
          * @return an amount of work (in flop) per thread
          */
-//        virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
+        //        virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
         virtual double getPurelySequentialWork(double total_work, unsigned long num_threads) = 0;
         virtual double getParallelPerThreadWork(double total_work, unsigned long num_threads) = 0;
 
@@ -52,9 +51,8 @@ namespace wrench {
         /***********************/
 
     private:
-
     };
 
-}
+}// namespace wrench
 
-#endif //WRENCH_PARALLELMODEL_H
+#endif//WRENCH_PARALLELMODEL_H
