@@ -12,7 +12,6 @@
 
 #include <wrench-dev.h>
 
-//#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 
 #include "../../include/TestWithFork.h"
@@ -280,7 +279,6 @@ bool compareNodes(const boost::json::value &lhs, const boost::json::value &rhs) 
 }
 
 bool compareLinks(const boost::json::value &lhs, const boost::json::value &rhs) {
-    std::cerr << "IN COMPARE LINK\n";
     if (lhs.as_object().at("source").as_string() < rhs.as_object().at("source").as_string()) {
         return true;
     }
@@ -482,7 +480,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true));
     auto result_json1 = readJSONFromFile("host_utilization_layout.json");
 
-//    EXPECT_TRUE(compareObjects(result_json1, expected_json1));
     EXPECT_TRUE(result_json1 == expected_json1);
 
     workflow->clear();
@@ -519,7 +516,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     auto result_json2 = readJSONFromFile("host_utilization_layout.json");
 
 
-//    EXPECT_TRUE(compareObjects(result_json2, expected_json2));
     EXPECT_TRUE(result_json2 == expected_json2);
 
     workflow->clear();
@@ -574,7 +570,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     auto result_json3 = readJSONFromFile("host_utilization_layout.json");
 
 
-//    EXPECT_TRUE(compareObjects(result_json3, expected_json3));
     EXPECT_TRUE(result_json3 == expected_json3);
 
     workflow->clear();
@@ -596,8 +591,6 @@ void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_te
     t2->setEndDate(2.0);
     t2->setExecutionHost("host1");
     t2->setNumCoresAllocated(10);
-
-    //EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow, execution_data_json_file_path, true), std::runtime_error);
 
     workflow->clear();
 
@@ -627,8 +620,6 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 
     EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, UNIQUE_TMP_PATH_PREFIX + "file.json"), std::invalid_argument);
 
-//    std::ifstream graph_json_file;
-
     // Generate a workflow with two independent tasks. Both tasks each have one input file and one output file.
     auto independent_tasks_workflow = wrench::Workflow::createWorkflow();
 
@@ -649,15 +640,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 )");
 
 
-//    TODO: implement the necessary sorts, but right now the tests pass anyway...
-//    std::sort(result_json1["workflow"].as_object()["tasks"].as_array().begin(), result_json1["workflow"].as_object()["tasks"].as_array().end(), compareNodes);
-//    std::cerr << "AAAC\n";
-//    std::sort(result_json1["workflow"].as_object()["vertices"].as_array().begin(), result_json1["workflow"].as_object()["vertices"].as_array().end(), compareNodes);
-//    std::cerr << "AAAA\n";
-//
-//    std::sort(expected_json1.as_object()["workflow"].as_object()["tasks"].as_array().begin(), expected_json1.as_object()["workflow"].as_object()["tasks"].as_array().end(), compareLinks);
-//    std::cerr << "AAAA\n";
-//    std::sort(expected_json1.as_object()["workflow"].as_object()["vertices"].as_array().begin(), expected_json1.as_object()["workflow"].as_object()["vertices"].as_array().end(), compareNodes);
+    // TODO: Perhaps do sorting? But the tests pass
 
     EXPECT_TRUE(result_json1 == expected_json1);
 
@@ -688,11 +671,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 {"name":"WRENCH-generated workflow","schemaVersion":"1.3","workflow":{"machines":[],"makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[{"link":"input","name":"input_file1","size":1.0},{"link":"input","name":"input_file2","size":2.0},{"link":"output","name":"output_file1","size":1.0},{"link":"output","name":"output_file2","size":2.0}],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[{"link":"input","name":"input_file1","size":1.0},{"link":"input","name":"input_file2","size":2.0},{"link":"output","name":"output_file3","size":1.0},{"link":"output","name":"output_file4","size":1.0}],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}}
 )");
 
-//    std::sort(result_json2["workflow"].as_object()["edges"].as_array().begin(), result_json2["workflow"].as_object()["edges"].as_array().end(), compareLinks);
-//    std::sort(result_json2["workflow"].as_object()["vertices"].as_array().begin(), result_json2["workflow"].as_object()["vertices"].as_array().end(), compareNodes);
-//
-//    std::sort(expected_json2.as_object()["workflow"].as_object()["edges"].as_array().begin(), expected_json2.as_object()["workflow"].as_object()["edges"].as_array().end(), compareLinks);
-//    std::sort(expected_json2.as_object()["workflow"].as_object()["vertices"].as_array().begin(), expected_json2.as_object()["workflow"].as_object()["vertices"].as_array().end(), compareNodes);
+    // TODO: Perhaps do sorting? But the tests pass
 
     EXPECT_TRUE(result_json2 == expected_json2);
 
@@ -731,12 +710,7 @@ void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
 {"name":"WRENCH-generated workflow","schemaVersion":"1.3","workflow":{"machines":[],"makespan":-1.0,"tasks":[{"children":["task2","task3"],"cores":1,"files":[{"link":"input","name":"task1_input","size":1.0},{"link":"output","name":"task1_output1","size":1.0},{"link":"output","name":"task1_output2","size":1.0}],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":["task4"],"cores":1,"files":[{"link":"input","name":"task1_output1","size":1.0},{"link":"output","name":"task2_output1","size":1.0}],"machine":"","memory":0.0,"name":"task2","parents":["task1"],"runtime":-1.0,"type":"compute"},{"children":["task4"],"cores":1,"files":[{"link":"input","name":"task1_output2","size":1.0},{"link":"output","name":"task3_output1","size":1.0}],"machine":"","memory":0.0,"name":"task3","parents":["task1"],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[{"link":"input","name":"task2_output1","size":1.0},{"link":"input","name":"task3_output1","size":1.0},{"link":"output","name":"task4_output1","size":1.0}],"machine":"","memory":0.0,"name":"task4","parents":["task2","task3"],"runtime":-1.0,"type":"compute"}]}}
 )");
 
-
-//        std::sort(result_json3["workflow"].as_object()["edges"].as_array().begin(), result_json3["workflow"].as_object()["edges"].as_array().end(), compareLinks);
-//        std::sort(result_json3["workflow"].as_object()["vertices"].as_array().begin(), result_json3["workflow"].as_object()["vertices"].as_array().end(), compareNodes);
-//
-//        std::sort(expected_json3.as_object()["workflow"].as_object()["edges"].as_array().begin(), expected_json3.as_object()["workflow"].as_object()["edges"].as_array().end(), compareLinks);
-//        std::sort(expected_json3.as_object()["workflow"].as_object()["vertices"].as_array().begin(), expected_json3.as_object()["workflow"].as_object()["vertices"].as_array().end(), compareNodes);
+    // TODO: Perhaps do sorting? But the tests pass
 
     EXPECT_TRUE(result_json3 == expected_json3);
 
@@ -784,19 +758,19 @@ private:
 TEST_F(SimulationDumpJSONTest, SimulationDumpEnergyConsumptionTest) {
     DO_TEST_WITH_FORK(do_SimulationDumpHostEnergyConsumptionJSON_test);
 }
-//
-//// some comparison functions to be used when sorting lists of JSON objects so that the tests are deterministic
-//bool comparePstate(const nlohmann::json &lhs, const nlohmann::json &rhs) {
-//    return lhs["pstate"] < rhs["pstate"];
-//}
-//
-//bool compareTime(const nlohmann::json &lhs, const nlohmann::json &rhs) {
-//    return lhs["time"] < rhs["time"];
-//}
-//
-//bool compareHostname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
-//    return lhs["hostname"] < rhs["hostname"];
-//}
+
+// some comparison functions to be used when sorting lists of JSON objects so that the tests are deterministic
+bool comparePstate(const boost::json::value &lhs, const boost::json::value &rhs) {
+    return lhs.as_object().at("pstate").to_number<int>() < rhs.as_object().at("pstate").to_number<int>();
+}
+
+bool compareTime(const boost::json::value &lhs, const boost::json::value &rhs) {
+    return lhs.as_object().at("time").to_number<double>() < rhs.as_object().at("time").to_number<double>();
+}
+
+bool compareHostname(const boost::json::value &lhs, const boost::json::value &rhs) {
+    return lhs.as_object().at("hostname").as_string() < rhs.as_object().at("hostname").as_string();
+}
 
 void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
@@ -828,8 +802,6 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
     ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
-
-    //    simulation->getOutput().dumpUnifiedJSON(workflow, "/tmp/energy_unified.json", false, true, false, true, false, false, false);
 
     auto expected_json = boost::json::parse(R"(
     {
@@ -939,21 +911,21 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         ]
     })");
 
-//    std::sort(expected_json["energy_consumption"].begin(), expected_json["energy_consumption"].end(), compareHostname);
-//    for (size_t i = 0; i < expected_json["energy_consumption"].size(); ++i) {
-//        std::sort(expected_json["energy_consumption"][i]["consumed_energy_trace"].begin(), expected_json["energy_consumption"][i]["consumed_energy_trace"].end(), compareTime);
-//        std::sort(expected_json["energy_consumption"][i]["pstates"].begin(), expected_json["energy_consumption"][i]["pstates"].end(), comparePstate);
-//        std::sort(expected_json["energy_consumption"][i]["pstate_trace"].begin(), expected_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
-//    }
+    std::sort(expected_json.as_object()["energy_consumption"].as_array().begin(), expected_json.as_object()["energy_consumption"].as_array().end(), compareHostname);
+    for (size_t i = 0; i < expected_json.as_object()["energy_consumption"].as_array().size(); ++i) {
+        std::sort(expected_json.as_object()["energy_consumption"].as_array()[i].as_object()["consumed_energy_trace"].as_array().begin(), expected_json.as_object()["energy_consumption"].as_array()[i].as_object()["consumed_energy_trace"].as_array().end(), compareTime);
+        std::sort(expected_json.as_object()["energy_consumption"].as_array()[i].as_object()["pstates"].as_array().begin(), expected_json.as_object()["energy_consumption"].as_array()[i].as_object()["pstates"].as_array().end(), comparePstate);
+        std::sort(expected_json.as_object()["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().begin(), expected_json.as_object()["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().end(), comparePstate);
+    }
 
     auto result_json = readJSONFromFile(this->energy_consumption_data_file_path);
 
-//    std::sort(result_json["energy_consumption"].begin(), result_json["energy_consumption"].end(), compareHostname);
-//    for (size_t i = 0; i < expected_json["energy_consumption"].size(); ++i) {
-//        std::sort(result_json["energy_consumption"][i]["consumed_energy_trace"].begin(), result_json["energy_consumption"][i]["consumed_energy_trace"].end(), compareTime);
-//        std::sort(result_json["energy_consumption"][i]["pstates"].begin(), result_json["energy_consumption"][i]["pstates"].end(), comparePstate);
-//        std::sort(result_json["energy_consumption"][i]["pstate_trace"].begin(), result_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
-//    }
+    std::sort(result_json["energy_consumption"].as_array().begin(), result_json["energy_consumption"].as_array().end(), compareHostname);
+    for (size_t i = 0; i < expected_json.as_object()["energy_consumption"].as_array().size(); ++i) {
+        std::sort(result_json["energy_consumption"].as_array()[i].as_object()["consumed_energy_trace"].as_array().begin(), result_json["energy_consumption"].as_array()[i].as_object()["consumed_energy_trace"].as_array().end(), compareTime);
+        std::sort(result_json["energy_consumption"].as_array()[i].as_object()["pstates"].as_array().begin(), result_json["energy_consumption"].as_array()[i].as_object()["pstates"].as_array().end(), comparePstate);
+        std::sort(result_json["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().begin(), result_json["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().end(), comparePstate);
+    }
 
     EXPECT_TRUE(expected_json == result_json);
 
@@ -1011,10 +983,6 @@ private:
 TEST_F(SimulationDumpJSONTest, SimulationDumpLinkUsageTest) {
     DO_TEST_WITH_FORK(do_SimulationDumpLinkUsageJSON_test);
 }
-
-//bool compareLinkname(const nlohmann::json &lhs, const nlohmann::json &rhs) {
-//    return lhs["linkname"] < rhs["linkname"];
-//}
 
 void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     auto simulation = wrench::Simulation::createSimulation();
@@ -1485,7 +1453,7 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
     t2->setNumCoresAllocated(20);
 
     auto expected_json5 = boost::json::parse(R"(
-{"platform":{"edges":[{"source":{"id":"host1","type":"host"},"target":{"id":"1","type":"link"}},{"source":{"id":"1","type":"link"},"target":{"id":"host2","type":"host"}}],"routes":[{"latency":1e-06,"route":["1"],"source":"host1","target":"host2"}],"vertices":[{"bandwidth":125000000.0,"id":"1","latency":1e-06,"type":"link"},{"cluster_id":"host1","cores":10,"flop_rate":1.0,"id":"host1","memory_manager_service":10.0,"type":"host"},{"cluster_id":"host2","cores":20,"flop_rate":1.0,"id":"host2","memory_manager_service":20.0,"type":"host"}]},"workflow_execution":{"tasks":[{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":10,"flop_rate":1.0,"hostname":"host1","memory_manager_service":10.0},"failed":-1.0,"num_cores_allocated":8,"read":[],"task_id":"task1","terminated":-1.0,"whole_task":{"end":2.0,"start":1.0},"write":[]},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":10,"read":[],"task_id":"task1","terminated":-1.0,"whole_task":{"end":3.0,"start":2.0},"write":[]},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":20,"read":[],"task_id":"task2","terminated":-1.0,"whole_task":{"end":4.0,"start":3.0},"write":[]}]},"workflow_graph":{"machines":[],"makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}}
+{"platform":{"edges":[{"source":{"id":"host1","type":"host"},"target":{"id":"1","type":"link"}},{"source":{"id":"1","type":"link"},"target":{"id":"host2","type":"host"}}],"routes":[{"latency":1e-06,"route":["1"],"source":"host1","target":"host2"}],"vertices":[{"bandwidth":125000000.0,"id":"1","latency":1e-06,"type":"link"},{"cluster_id":"host1","cores":10,"flop_rate":1.0,"id":"host1","memory_manager_service":10.0,"type":"host"},{"cluster_id":"host2","cores":20,"flop_rate":1.0,"id":"host2","memory_manager_service":20.0,"type":"host"}]},"workflow_execution":{"tasks":[{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":10,"flop_rate":1.0,"hostname":"host1","memory_manager_service":10.0},"failed":-1.0,"num_cores_allocated":8,"read":[],"task_id":"task1","terminated":-1.0,"whole_task":{"end":2.0,"start":1.0},"write":[]},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":10,"read":[],"task_id":"task1","terminated":-1.0,"whole_task":{"end":3.0,"start":2.0},"write":[]},{"color":"","compute":{"end":-1.0,"start":-1.0},"execution_host":{"cores":20,"flop_rate":1.0,"hostname":"host2","memory_manager_service":20.0},"failed":-1.0,"num_cores_allocated":20,"read":[],"task_id":"task2","terminated":-1.0,"whole_task":{"end":4.0,"start":3.0},"write":[]}]},"workflow_graph":{"name":"WRENCH-generated workflow","schemaVersion":"1.3", "workflow":{"machines":[],"makespan":-1.0,"tasks":[{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task1","parents":[],"runtime":-1.0,"type":"compute"},{"children":[],"cores":1,"files":[],"machine":"","memory":0.0,"name":"task2","parents":[],"runtime":-1.0,"type":"compute"}]}}}
 )");
 
     EXPECT_NO_THROW(simulation->getOutput().dumpUnifiedJSON(workflow, unified_json_file_path, true, true, true, false, false));
@@ -1502,7 +1470,6 @@ void SimulationDumpJSONTest::do_SimulationDumpUnifiedJSON_test() {
 
     std::sort(result_json["workflow_execution"].as_object()["tasks"].as_array().begin(), result_json["workflow_execution"].as_object()["tasks"].as_array().end(), compareStartTimes);
     std::sort(expected_json5.as_object()["workflow_execution"].as_object()["tasks"].as_array().begin(), expected_json5.as_object()["workflow_execution"].as_object()["tasks"].as_array().end(), compareStartTimes);
-
 
     EXPECT_TRUE(result_json == expected_json5);
 
