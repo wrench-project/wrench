@@ -10,7 +10,8 @@
 #include <fstream>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench-dev.h>
-#include <nlohmann/json.hpp>
+#include <stdio.h>
+#include <boost/json.hpp>
 #include <wrench/util/TraceFileLoader.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_trace_file_loader, "Log category for Trace File Loader");
@@ -319,64 +320,80 @@ namespace wrench {
 
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int, std::string>> trace_file_jobs = {};
 
-        std::ifstream file;
-        nlohmann::json j;
-
-
-        //handle the exceptions of opening the json file
-        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        try {
-            file.open(filename);
-        } catch (const std::ifstream::failure &e) {
+        FILE *file = fopen(filename.c_str(), "r");
+        if (!file) {
             throw std::invalid_argument(
                     "TraceFileLoader::loadFromTraceFileJSON(): Cannot open JSON BatchComputeService workload trace file " + filename);
         }
 
-        try {
-            file >> j;
-            file.close();
-        } catch (const std::exception &e) {
-            throw std::invalid_argument(
-                    std::string("TraceFileLoader::loadFromTraceFileJSON(): JSON parse error: ") + e.what());
+        // Parse the file content
+        boost::json::stream_parser p;
+        boost::json::error_code ec;
+        p.reset();
+        while (true) {
+            try {
+                char buf[1024];
+                auto nread = fread(buf, sizeof(char), 1024, file);
+                if (nread == 0) {
+                    break;
+                }
+                p.write(buf, nread, ec);
+            } catch (std::exception &e) {
+                std::cerr << e.what() << "\n";
+            }
         }
 
-        nlohmann::json jobs;
-        try {
-            jobs = j.at("jobs");
-        } catch (std::exception &e) {
+        p.finish(ec);
+
+        if ( ec ) {
+            throw std::invalid_argument(
+                    "TraceFileLoader::loadFromTraceFileJSON(): Error while reading JSON BatchComputeService workload trace file " +
+                    filename);
+        }
+
+
+        auto j = p.release();
+        auto obj = j.as_object();
+        if (obj.find("jobs") == obj.end()) {
             throw std::invalid_argument(
                     "TraceFileLoader::loadFromTraceFileJSON(): Could not find 'jobs' in JSON BatchComputeService workload trace file");
         }
 
         double original_submit_time_of_first_job = -1;
 
-        for (nlohmann::json::iterator it = jobs.begin(); it != jobs.end(); ++it) {
-            nlohmann::json json_job = it.value();
-            unsigned id;
+        auto jobs = obj["jobs"].as_array();
+        for (auto const &job : jobs) {
+            auto job_spec = job.as_object();
+            unsigned long id;
             unsigned long res;
             double subtime;
             double walltime;
             double requested_time;
-
             try {
-                if (not json_job.is_object()) {
-                    // Broken JSON
-                    throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFileJSON(): broken job specification in JSON BatchComputeService workload trace file");
-                }
-
-
                 try {
-                    id = json_job.at("id");
-                    res = json_job.at("res");
-                    subtime = json_job.at("subtime");
+                    std::vector<std::string> required_keys = {"id","res","subtime","walltime"};
+                    for (auto const &key : required_keys) {
+                        if (job_spec.find(key) == job_spec.end()) throw std::invalid_argument("Missing " + key + " field in job");
+                    }
+
+                    id = job_spec.at("id").to_number<unsigned int>(ec);
+                    if (ec) throw std::invalid_argument(ec.message());
+
+                    res = job_spec.at("res").to_number<unsigned int>(ec);
+                    if (ec) throw std::invalid_argument(ec.message());
+
+                    subtime = job_spec.at("subtime").to_number<double>(ec);
+                    if (ec) throw std::invalid_argument(ec.message());
+
                     if (original_submit_time_of_first_job < 0) {
                         original_submit_time_of_first_job = subtime;
                     }
-                    walltime = json_job.at("walltime");
+                    walltime = job_spec.at("walltime").to_number<double>(ec);
+                    if (ec) throw std::invalid_argument(ec.message());
+
                 } catch (std::exception &e) {
                     throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON BatchComputeService workload trace file");
+                            "TraceFileLoader::loadFromTraceFileJSON(): invalid job specification in JSON BatchComputeService workload trace file: " + std::string(e.what()));
                 }
 
                 // Fix/check values
@@ -392,6 +409,7 @@ namespace wrench {
                 // runtimes, and so we set the requested runtime to the walltime
                 // (i.e., users always ask exactly for what they need)
                 requested_time = walltime;
+
             } catch (std::invalid_argument &e) {
                 if (ignore_invalid_jobs) {
                     WRENCH_WARN("%s (in BatchComputeService workload file %s)", e.what(), filename.c_str());
@@ -399,15 +417,17 @@ namespace wrench {
                 } else {
                     throw std::invalid_argument("Error while reading BatchComputeService workload trace file " + filename + ": " + e.what());
                 }
+
             }
 
-            //      // Add the job to the list
-            std::tuple<std::string, double, double, double, double, unsigned int, std::string> job =
+            // Add the job to the list
+            std::tuple<std::string, double, double, double, double, unsigned int, std::string> parsed_job =
                     std::tuple<std::string, double, double, double, double, unsigned int, std::string>(
                             std::to_string(id), subtime, walltime, requested_time, 0.0, (unsigned int) res, "user");
-            trace_file_jobs.push_back(job);
+            trace_file_jobs.push_back(parsed_job);
         }
 
         return trace_file_jobs;
     }
+
 }// namespace wrench

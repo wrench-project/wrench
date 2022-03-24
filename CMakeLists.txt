@@ -18,6 +18,7 @@ endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS json REQUIRED)
 find_package(SimGrid REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -455,7 +456,7 @@ set(TEST_FILES
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SimGrid_LIBRARY})
+target_link_libraries(wrench ${SimGrid_LIBRARY} ${Boost_LIBRARIES})
 
 # wrench version
 add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/conf/cmake/Version.cmake)
@@ -470,9 +471,9 @@ if(GTEST_LIBRARY)
     add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
     if (ENABLE_BATSCHED)
         find_library(ZMQ_LIBRARY NAMES zmq)
-        target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY})
+        target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${ZMQ_LIBRARY} ${Boost_LIBRARIES})
     else ()
-        target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm)
+        target_link_libraries(unit_tests ${GTEST_LIBRARY} wrenchwfcommonsworkflowparser wrench -lpthread -lm ${Boost_LIBRARIES})
     endif ()
     set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
     set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")

@@ -1181,6 +1181,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
+//    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -1345,6 +1346,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     fclose(trace_file);
 
     // Create a Batch Service with a bogus trace file, which should throw
+
     ASSERT_THROW(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "",
@@ -1381,6 +1383,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     fclose(trace_file);
 
     // Create a Batch Service with a bogus trace file, which should throw
+
     ASSERT_NO_THROW(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "",
@@ -1418,6 +1421,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     fclose(trace_file);
 
     // Create a Batch Service with a bogus trace file, which should throw
+
     ASSERT_THROW(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "",
@@ -1456,6 +1460,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     fclose(trace_file);
 
     // Create a Batch Service with a bogus trace file, which should throw
+
     ASSERT_THROW(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "",
@@ -1493,6 +1498,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
     fclose(trace_file);
 
     // Create a Batch Service with a bogus trace file, which should throw
+
     ASSERT_THROW(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "",
@@ -1532,6 +1538,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
 
     // Create a Batch Service with a non-existing workload trace file, which should throw
+
     ASSERT_NO_THROW(
             new wrench::BatchComputeService(hostname,
                                             {"Host1", "Host2", "Host3", "Host4"}, "",
@@ -1571,6 +1578,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
 
     // Create a Batch Service with a non-existing workload trace file, which should throw
+
     ASSERT_NO_THROW(compute_service = simulation->add(
                             new wrench::BatchComputeService(hostname,
                                                             {"Host1", "Host2", "Host3", "Host4"}, "",
