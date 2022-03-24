@@ -451,7 +451,7 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
-        )
+        test/include/JSONFromFileUtil.h)
 
 
 add_library(wrench STATIC ${SOURCE_FILES})

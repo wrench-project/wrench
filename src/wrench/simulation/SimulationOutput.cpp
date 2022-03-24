@@ -15,7 +15,7 @@
 
 #include <wrench-dev.h>
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <iomanip>
@@ -35,7 +35,7 @@ namespace wrench {
     /** \cond         */
     /******************/
 
-    nlohmann::json host_utilization_layout;
+    boost::json::object host_utilization_layout;
 
     /*******************/
     /** \cond INTERNAL */
@@ -172,7 +172,7 @@ namespace wrench {
                                            bool generate_host_utilization_layout,
                                            bool include_disk,
                                            bool include_bandwidth) {
-        nlohmann::json unified_json;
+        boost::json::object unified_json;
 
         if (include_platform) {
             dumpPlatformGraphJSON(file_path, false);
@@ -204,6 +204,7 @@ namespace wrench {
             unified_json["link_usage"] = bandwidth_json_part;
         }
 
+
         std::ofstream output(file_path);
         output << std::setw(4) << unified_json << std::endl;
 
@@ -217,7 +218,7 @@ namespace wrench {
      * @param j: reference to a JSON object
      * @param w: reference to a WorkflowTaskExecutionInstance
      */
-    void to_json(nlohmann::json &j, const WorkflowTaskExecutionInstance &w) {
+    void to_json(boost::json::object &j, const WorkflowTaskExecutionInstance &w) {
         j["task_id"] = w.task_id;
 
         j["execution_host"] = {
@@ -234,9 +235,10 @@ namespace wrench {
                 {"start", w.whole_task.first},
                 {"end", w.whole_task.second}};
 
-        nlohmann::json file_reads;
+//        nlohmann::json file_reads;
+        boost::json::array file_reads;
         for (auto const &r: w.reads) {
-            nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
+            boost::json::object file_read = boost::json::object({{"end", std::get<1>(r)},
                                                                {"start", std::get<0>(r)},
                                                                {"id", std::get<2>(r)}});
             file_reads.push_back(file_read);
@@ -248,9 +250,9 @@ namespace wrench {
                 {"start", w.compute.first},
                 {"end", w.compute.second}};
 
-        nlohmann::json file_writes;
+        boost::json::array file_writes;
         for (auto const &r: w.writes) {
-            nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
+            boost::json::object file_write = boost::json::object({{"end", std::get<1>(r)},
                                                                 {"start", std::get<0>(r)},
                                                                 {"id", std::get<2>(r)}});
             file_writes.push_back(file_write);
@@ -525,7 +527,7 @@ namespace wrench {
         }
 
         auto tasks = workflow->getTasks();
-        nlohmann::json task_json;
+        boost::json::array task_json;
 
         auto read_start_timestamps = this->getTrace<SimulationTimestampFileReadStart>();
         auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampFileReadCompletion>();
@@ -569,17 +571,17 @@ namespace wrench {
                     }
                 }
 
-                nlohmann::json file_reads;
+                boost::json::array file_reads;
                 for (auto const &r: current_execution_instance.reads) {
-                    nlohmann::json file_read = nlohmann::json::object({{"end", std::get<1>(r)},
+                    boost::json::object file_read = boost::json::object({{"end", std::get<1>(r)},
                                                                        {"start", std::get<0>(r)},
                                                                        {"id", std::get<2>(r)}});
                     file_reads.push_back(file_read);
                 }
 
-                nlohmann::json file_writes;
+                boost::json::array file_writes;
                 for (auto const &r: current_execution_instance.writes) {
-                    nlohmann::json file_write = nlohmann::json::object({{"end", std::get<1>(r)},
+                    boost::json::object file_write = boost::json::object({{"end", std::get<1>(r)},
                                                                         {"start", std::get<0>(r)},
                                                                         {"id", std::get<2>(r)}});
                     file_writes.push_back(file_write);
@@ -670,8 +672,8 @@ namespace wrench {
             }
         }
 
-        nlohmann::json workflow_execution_json;
-        nlohmann::json workflow_execution_json_single;
+        boost::json::object workflow_execution_json;
+        boost::json::object workflow_execution_json_single;
         workflow_execution_json["tasks"] = task_json;
         workflow_execution_json_single["workflow_execution"] = workflow_execution_json;
         workflow_exec_json_part = workflow_execution_json;
@@ -708,12 +710,12 @@ namespace wrench {
 
         std::set<std::string> used_machines;
 
-        nlohmann::json tasks = nlohmann::json::array();
+        boost::json::array tasks;
 
         // add the task vertices
         for (const auto &task: workflow->getTasks()) {
 
-            nlohmann::json files = nlohmann::json::array();
+            boost::json::array files;
             for (const auto &f: task->getInputFiles()) {
                 files.push_back({{"link", "input"},
                                  {"name", f->getID()},
@@ -725,14 +727,14 @@ namespace wrench {
                                  {"size", f->getSize()}});
             }
 
-            nlohmann::json parents = nlohmann::json::array();
+            boost::json::array parents;
             for (const auto &parent: task->getParents()) {
-                parents.push_back(parent->getID());
+                parents.push_back(boost::json::value(parent->getID()));
             }
 
-            nlohmann::json children = nlohmann::json::array();
+            boost::json::array children;
             for (const auto &child: task->getChildren()) {
-                children.push_back(child->getID());
+                children.push_back(boost::json::value(child->getID()));
             }
 
             double runtime;
@@ -759,8 +761,7 @@ namespace wrench {
                              {"machine", machine}});
         }
 
-
-        nlohmann::json machines = nlohmann::json::array();
+        boost::json::array machines;
         for (auto const &m: used_machines) {
             double memory = Simulation::getHostMemoryCapacity(m);
             unsigned long num_cores = Simulation::getHostNumCores(m);
@@ -771,21 +772,21 @@ namespace wrench {
                                 {"cpu", {{"count", num_cores}, {"speed", (unsigned long) ghz_rate}}}});
         }
 
-
-        nlohmann::json json_workflow;
+        boost::json::object json_workflow;
         json_workflow["makespan"] = workflow->getCompletionDate();
         json_workflow["tasks"] = tasks;
         json_workflow["machines"] = machines;
 
-        nlohmann::json json_object;
+        boost::json::object json_object;
         json_object["name"] = "WRENCH-generated workflow";
         json_object["schemaVersion"] = "1.3";
         json_object["workflow"] = json_workflow;
-        workflow_graph_json_part = json_workflow;
+        workflow_graph_json_part = json_object;
 
         if (writing_file) {
             std::ofstream output(file_path);
-            output << std::setw(4) << nlohmann::json(json_object) << std::endl;
+//            output << std::setw(4) << nlohmann::json(json_object) << std::endl;
+            output << std::setw(4) << boost::json::serialize(json_object) << std::endl;
             output.close();
         }
     }
@@ -848,9 +849,9 @@ namespace wrench {
         try {
             std::vector<simgrid::s4u::Host *> hosts = get_all_physical_hosts();
 
-            nlohmann::json hosts_energy_consumption_information;
+            boost::json::array hosts_energy_consumption_information;
             for (const auto &host: hosts) {
-                nlohmann::json datum;
+                boost::json::object datum;
 
                 datum["hostname"] = host->get_name();
 
@@ -863,18 +864,19 @@ namespace wrench {
                 std::vector<std::string> watts_per_state;
                 boost::split(watts_per_state, watts_per_state_property_string, boost::is_any_of(","));
 
+                boost::json::array datum_pstates;
                 for (size_t pstate = 0; pstate < watts_per_state.size(); ++pstate) {
                     std::vector<std::string> current_state_watts;
                     boost::split(current_state_watts, watts_per_state.at(pstate), boost::is_any_of(":"));
 
                     if (current_state_watts.size() == 2) {
-                        datum["pstates"].push_back({{"pstate", pstate},
+                        datum_pstates.push_back({{"pstate", pstate},
                                                     {"speed", host->get_pstate_speed((int) pstate)},
                                                     {"idle", current_state_watts.at(0)},
                                                     {"epsilon", current_state_watts.at(0)},
                                                     {"all_cores", current_state_watts.at(1)}});
                     } else if (current_state_watts.size() == 3) {
-                        datum["pstates"].push_back({{"pstate", pstate},
+                        datum_pstates.push_back({{"pstate", pstate},
                                                     {"speed", host->get_pstate_speed((int) pstate)},
                                                     {"idle", current_state_watts.at(0)},
                                                     {"epsilon", current_state_watts.at(1)},
@@ -886,6 +888,8 @@ namespace wrench {
                     }
                 }
 
+                datum["pstates"] = datum_pstates;
+
                 const char *wattage_off_value = host->get_property("wattage_off");
                 if (wattage_off_value == nullptr) {
                     throw std::runtime_error("Host " + std::string(host->get_name()) +
@@ -896,32 +900,36 @@ namespace wrench {
                     datum["wattage_off"] = std::string(wattage_off_value);
                 }
 
+                boost::json::array datum_pstate_trace;
                 for (const auto &pstate_timestamp: this->getTrace<SimulationTimestampPstateSet>()) {
                     if (host->get_name() == pstate_timestamp->getContent()->getHostname()) {
-                        datum["pstate_trace"].push_back(
+                        datum_pstate_trace.push_back(
                                 {{"time", pstate_timestamp->getDate()},
                                  {"pstate", pstate_timestamp->getContent()->getPstate()}});
                     }
                 }
+                datum["pstate_trace"] = datum_pstate_trace;
 
+                boost::json::array datum_consumed_energy_trace;
                 for (const auto &energy_consumption_timestamp: this->getTrace<SimulationTimestampEnergyConsumption>()) {
                     if (host->get_name() == energy_consumption_timestamp->getContent()->getHostname()) {
-                        datum["consumed_energy_trace"].push_back(
+                        datum_consumed_energy_trace.push_back(
                                 {{"time", energy_consumption_timestamp->getDate()},
                                  {"joules", energy_consumption_timestamp->getContent()->getConsumption()}});
                     }
                 }
+                datum["consumed_energy_trace"] = datum_consumed_energy_trace;
 
                 hosts_energy_consumption_information.push_back(datum);
             }
 
-            nlohmann::json energy_consumption;
+            boost::json::object energy_consumption;
             energy_consumption["energy_consumption"] = hosts_energy_consumption_information;
             energy_json_part = hosts_energy_consumption_information;
 
             if (writing_file) {
                 std::ofstream output(file_path);
-                output << std::setw(4) << nlohmann::json(energy_consumption) << std::endl;
+                output << std::setw(4) << boost::json::serialize(energy_consumption) << std::endl;
                 output.close();
             }
 
@@ -992,7 +1000,7 @@ namespace wrench {
             throw std::invalid_argument("SimulationOutput::dumpPlatformGraphJSON() requires a valid file_path");
         }
 
-        nlohmann::json platform_graph_json;
+        boost::json::object platform_graph_json;
 
         //        simgrid::s4u::Engine *simgrid_engine = simgrid::s4u::Engine::get_instance();
 
@@ -1015,9 +1023,10 @@ namespace wrench {
             }
         }
 
+        boost::json::array platform_graph_json_vertices;
         // add all hosts to the list of vertices
         for (const auto &host: hosts) {
-            platform_graph_json["vertices"].push_back(
+            platform_graph_json_vertices.push_back(
                     {{"type", "host"},
                      {"id", host->get_name()},
                      {"cluster_id", host_to_cluster[host->get_name()]},
@@ -1031,13 +1040,15 @@ namespace wrench {
         std::vector<simgrid::s4u::Link *> links = get_all_links();
         for (const auto &link: links) {
             if (not(link->get_name() == "__loopback__")) {// Ignore loopback link
-                platform_graph_json["vertices"].push_back(
+                platform_graph_json_vertices.push_back(
                         {{"type", "link"},
                          {"id", link->get_name()},
                          {"bandwidth", link->get_bandwidth()},
                          {"latency", link->get_latency()}});
             }
         }
+
+        platform_graph_json["vertices"] = platform_graph_json_vertices;
 
         // add each route to the list of routes
         std::vector<simgrid::s4u::Link *> route_forward;
@@ -1046,9 +1057,10 @@ namespace wrench {
         double route_backward_latency = 0;
 
         // for every combination of host pairs
+        boost::json::array platform_graph_json_routes;
         for (auto target = hosts.begin(); target != hosts.end(); ++target) {
             for (auto source = hosts.begin(); source != target; ++source) {
-                nlohmann::json route_forward_json;
+                boost::json::object route_forward_json;
 
                 // populate "route_forward" with an ordered list of network links along
                 // the route between source and target
@@ -1059,16 +1071,18 @@ namespace wrench {
                 route_forward_json["target"] = (*target)->get_name();
                 route_forward_json["latency"] = route_forward_latency;
 
+                boost::json::array route_forward_json_route;
                 for (const auto &link: route_forward) {
-                    route_forward_json["route"].push_back(link->get_name());
+                    route_forward_json_route.push_back(boost::json::value(link->get_name()));
                 }
+                route_forward_json["route"] = route_forward_json_route;
 
-                platform_graph_json["routes"].push_back(route_forward_json);
+                platform_graph_json_routes.push_back(route_forward_json);
 
                 // populate "route_backward" with an ordered list of network links along
                 // the route between target and source; the "route_backward" could be different
                 // so we need to add it if it is in fact different
-                nlohmann::json route_backward_json;
+                boost::json::object route_backward_json;
                 (*target)->route_to(*source, route_backward, &route_backward_latency);
 
                 if (route_forward.empty() and route_backward.empty()) {
@@ -1098,11 +1112,13 @@ namespace wrench {
                     route_backward_json["target"] = (*source)->get_name();
                     route_backward_json["latency"] = route_backward_latency;
 
+                    boost::json::array route_backward_json_route;
                     for (const auto &link: route_backward) {
-                        route_backward_json["route"].push_back(link->get_name());
+                        route_backward_json_route.push_back(boost::json::value(link->get_name()));
                     }
+                    route_backward_json["route"] = route_backward_json_route;
 
-                    platform_graph_json["routes"].push_back(route_backward_json);
+                    platform_graph_json_routes.push_back(route_backward_json);
                 }
 
                 // reset these values
@@ -1115,88 +1131,92 @@ namespace wrench {
             }
         }
 
+        platform_graph_json["routes"] = platform_graph_json_routes;
+
+        platform_graph_json["edges"] = boost::json::array();
+
         // maintain a unique list of edges where edges are represented using the following string format:
         // <source_type>:<source_id>-<target_type>:<target_id> where type could be 'host' or 'link'
         std::unordered_set<std::string> edges;
         const std::string HOST("host");
         const std::string LINK("link");
 
-        std::string source_string;
-        std::string target_string;
+        boost::json::string source_string;
+        boost::json::string target_string;
 
-        std::string source_id;
-        std::string target_id;
+        boost::json::string source_id;
+        boost::json::string target_id;
 
         // for each route, add "host<-->link" and "link<-->link" connections
-        for (nlohmann::json::iterator route_itr = platform_graph_json["routes"].begin();
-             route_itr != platform_graph_json["routes"].end(); ++route_itr) {
-            source_id = (*route_itr)["source"].get<std::string>();
-            source_string = HOST + ":" + source_id;
+        for (auto route_itr = platform_graph_json["routes"].as_array().begin();
+             route_itr != platform_graph_json["routes"].as_array().end(); ++route_itr) {
+            source_id = (*route_itr).as_object()["source"].as_string();
+            source_string = boost::json::string(HOST + ":" + std::string(source_id.c_str()));
 
-            target_id = (*route_itr)["route"].at(0).get<std::string>();
-            target_string = LINK + ":" + target_id;
+            target_id = (*route_itr).as_object()["route"].as_array().at(0).as_string();
+            target_string = boost::json::string(LINK + ":" + std::string(target_id.c_str()));
 
             // check that the undirected edge doesn't already exist in set of edges
-            if (edges.find(source_string + "-" + target_string) == edges.end() and
-                edges.find(target_string + "-" + source_string) == edges.end()) {
-                edges.insert(source_string + "-" + target_string);
+            if (edges.find(std::string(source_string.c_str()) + "-" + std::string(target_string.c_str())) == edges.end() and
+                edges.find(std::string(target_string.c_str()) + "-" + std::string(source_string.c_str())) == edges.end()) {
+                edges.insert(std::string(source_string.c_str()) + "-" + std::string(target_string.c_str()));
 
                 // add a graph link from the source host to the first network link
-                platform_graph_json["edges"].push_back(
+                platform_graph_json["edges"].as_array().push_back(
                         {{"source", {{"type", HOST}, {"id", source_id}}},
                          {"target", {{"type", LINK}, {"id", target_id}}}});
             }
 
             // add graph edges comprising only network links
-            for (nlohmann::json::iterator link_itr = (*route_itr)["route"].begin();
-                 link_itr != (*route_itr)["route"].end(); ++link_itr) {
+            for (auto link_itr = (*route_itr).as_object()["route"].as_array().begin();
+                 link_itr != (*route_itr).as_object()["route"].as_array().end(); ++link_itr) {
                 auto next_link_itr = link_itr + 1;
 
-                if (next_link_itr != (*route_itr)["route"].end()) {
-                    source_id = (*link_itr).get<std::string>();
-                    source_string = LINK + ":" + source_id;
+                if (next_link_itr != (*route_itr).as_object()["route"].as_array().end()) {
+                    source_id = (*link_itr).as_string();
+                    source_string = std::string(LINK + ":") + std::string(source_id.c_str());
 
-                    target_id = (*next_link_itr).get<std::string>();
-                    target_string = LINK + ":" + target_id;
+                    target_id = (*next_link_itr).as_string();
+                    target_string = std::string(LINK + ":") + std::string(target_id.c_str());
 
                     // check that the undirected edge doesn't already exist in set of edges
-                    if (edges.find(source_string + "-" + target_string) == edges.end() and
-                        edges.find(target_string + "-" + source_string) == edges.end()) {
-                        edges.insert(source_string + "-" + target_string);
+                    if (edges.find(std::string(source_string.c_str()) + std::string("-") + std::string(target_string.c_str())) == edges.end() and
+                        edges.find(std::string(target_string.c_str()) + std::string("-") + std::string(source_string.c_str())) == edges.end()) {
+                        edges.insert(std::string(source_string.c_str()) + std::string("-") + std::string(target_string.c_str()));
 
-                        platform_graph_json["edges"].push_back(
+                        platform_graph_json["edges"].as_array().push_back(
                                 {{"source", {{"type", LINK}, {"id", source_id}}},
                                  {"target", {{"type", LINK}, {"id", target_id}}}});
                     }
                 }
             }
 
-            source_id = (*route_itr)["route"].at(((*route_itr)["route"].size()) - 1).get<std::string>();
-            source_string = LINK + ":" + source_id;
+            source_id = (*route_itr).as_object()["route"].as_array().at(((*route_itr).as_object()["route"].as_array().size()) - 1).as_string();
+            source_string = boost::json::string(LINK + std::string(":") + std::string(source_id.c_str()));
 
-            target_id = (*route_itr)["target"].get<std::string>();
-            target_string = HOST + ":" + target_id;
+            target_id = (*route_itr).as_object()["target"].as_string();
+            target_string = boost::json::string(HOST + std::string(":") + std::string(target_id.c_str()));
 
             // check that the undirected edge doesn't already exist in set of edges
-            if (edges.find(source_string + "-" + target_string) == edges.end() and
-                edges.find(target_string + "-" + source_string) == edges.end()) {
-                edges.insert(source_string + "-" + target_string);
+            if (edges.find(std::string(source_string.c_str()) + "-" + std::string(target_string.c_str())) == edges.end() and
+                edges.find(std::string(target_string.c_str()) + "-" + std::string(source_string.c_str())) == edges.end()) {
+                edges.insert(std::string(source_string.c_str()) + "-" + std::string(target_string.c_str()));
 
                 // add a graph link from the last link to the target host
-                platform_graph_json["edges"].push_back(
+                platform_graph_json["edges"].as_array().push_back(
                         {{"source", {{"type", "link"}, {"id", source_id}}},
                          {"target", {{"type", "host"}, {"id", target_id}}}});
             }
         }
 
         //std::cerr << platform_graph_json.dump(4) << std::endl;
-        nlohmann::json platform;
+        boost::json::object platform;
         platform["platform"] = platform_graph_json;
         platform_json_part = platform_graph_json;
 
         if (writing_file) {
             std::ofstream output(file_path);
-            output << std::setw(4) << nlohmann::json(platform) << std::endl;
+            output << std::setw(4) << boost::json::serialize(platform) << std::endl;
             output.close();
         }
     }
@@ -1253,7 +1273,7 @@ namespace wrench {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid file_path");
         }
-        nlohmann::json disk_operations_json;
+        boost::json::object disk_operations_json;
 
         auto read_start_timestamps = this->getTrace<SimulationTimestampDiskReadStart>();
         auto read_completion_timestamps = this->getTrace<wrench::SimulationTimestampDiskReadCompletion>();
@@ -1322,9 +1342,9 @@ namespace wrench {
                     }
                 }
 
-                nlohmann::json disk_reads;
+                boost::json::array disk_reads;
                 for (auto const &r: reads) {
-                    nlohmann::json disk_read = nlohmann::json::object({{"start", std::get<0>(r)},
+                    auto disk_read = boost::json::object({{"start", std::get<0>(r)},
                                                                        {"end", std::get<1>(r)},
                                                                        {"bytes", std::get<2>(r)},
                                                                        {"failed", "-1"}});
@@ -1333,17 +1353,17 @@ namespace wrench {
                 if (!read_failure_timestamps.empty()) {
                     for (auto &timestamp: read_failure_timestamps) {
                         for (auto &disk_read: disk_reads) {
-                            if (timestamp->getContent()->getDate() == disk_read["end"] &&
-                                timestamp->getContent()->getEndpoint()->getDate() == disk_read["start"]) {
-                                disk_read["failed"] = "1";
+                            if (timestamp->getContent()->getDate() == disk_read.as_object()["end"] &&
+                                timestamp->getContent()->getEndpoint()->getDate() == disk_read.as_object()["start"]) {
+                                disk_read.as_object()["failed"] = "1";
                             }
                         }
                     }
                 }
 
-                nlohmann::json disk_writes;
+                boost::json::array disk_writes;
                 for (auto const &w: writes) {
-                    nlohmann::json disk_write = nlohmann::json::object({{"start", std::get<0>(w)},
+                    auto disk_write = boost::json::object({{"start", std::get<0>(w)},
                                                                         {"end", std::get<1>(w)},
                                                                         {"bytes", std::get<2>(w)},
                                                                         {"failed", "-1"}});
@@ -1352,16 +1372,16 @@ namespace wrench {
                 if (!write_failure_timestamps.empty()) {
                     for (auto &timestamp: write_failure_timestamps) {
                         for (auto &disk_write: disk_writes) {
-                            if (timestamp->getContent()->getDate() == disk_write["end"] &&
-                                timestamp->getContent()->getEndpoint()->getDate() == disk_write["start"]) {
-                                disk_write["failed"] = "1";
+                            if (timestamp->getContent()->getDate() == disk_write.as_object()["end"] &&
+                                timestamp->getContent()->getEndpoint()->getDate() == disk_write.as_object()["start"]) {
+                                disk_write.as_object()["failed"] = "1";
                             }
                         }
                     }
                 }
 
-                disk_operations_json[host][mount]["reads"] = disk_reads;
-                disk_operations_json[host][mount]["writes"] = disk_writes;
+                disk_operations_json[host].emplace_object()[mount].emplace_object()["reads"] = disk_reads;
+                disk_operations_json[host].as_object()[mount].as_object()["writes"] = disk_writes;
             }
         }
 
@@ -1416,19 +1436,20 @@ namespace wrench {
             throw std::invalid_argument("SimulationOutput::dumpLinkUsageJSON() requires a valid file_path");
         }
 
-        nlohmann::json bandwidth_json;
+        boost::json::array bandwidth_json;
 
         try {
             auto simgrid_engine = simgrid::s4u::Engine::get_instance();
             std::vector<simgrid::s4u::Link *> links = get_all_links();
 
             for (const auto &link: links) {
-                nlohmann::json datum;
+                boost::json::object datum;
                 datum["linkname"] = link->get_name();
+                datum["link_usage_trace"] = boost::json::array();
 
                 for (const auto &link_usage_timestamp: this->getTrace<SimulationTimestampLinkUsage>()) {
                     if (link->get_name() == link_usage_timestamp->getContent()->getLinkname()) {
-                        datum["link_usage_trace"].push_back(
+                        datum["link_usage_trace"].as_array().push_back(
                                 {{"time", link_usage_timestamp->getDate()},
                                  {"bytes per second", link_usage_timestamp->getContent()->getUsage()}});
                     }
@@ -1437,8 +1458,8 @@ namespace wrench {
                 bandwidth_json.push_back(datum);
             }
 
-            nlohmann::json link_usage;
-            nlohmann::json links_list;
+            boost::json::object link_usage;
+            boost::json::object links_list;
             links_list["links"] = bandwidth_json;
             link_usage["link_usage"] = links_list;
             bandwidth_json_part = links_list;
