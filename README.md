@@ -38,8 +38,8 @@ And, one of the following:
 
 ### Required Dependencies 
 
+- [Boost](https://www.boost.org) - version 1.75 or higher
 - [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.31
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
 

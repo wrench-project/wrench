@@ -17,8 +17,8 @@ And, one of the following:
 
 ## Required Dependencies ##                  {#install-prerequisites-dependencies}
 
+- [Boost](https://www.boost.org) - version 1.75 or higher
 - [SimGrid](https://simgrid.org/) -- version 3.31
-- [JSON for Modern C++](https://github.com/nlohmann/json) -- version 3.9.0 or higher 
 
 (See the troubleshooting section below if encountering difficulties installing dependencies)
 

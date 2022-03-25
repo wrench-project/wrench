@@ -211,60 +211,6 @@ namespace wrench {
         output.close();
     }
 
-//    /**
-//     * @brief Function called by the nlohmann::json constructor when a WorkflowTaskExecutionInstance is passed in as
-//     *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance. The name of this function
-//     *      is important and should not be changed as it is what nlohmann expects (hardcoded in there).
-//     * @param j: reference to a JSON object
-//     * @param w: reference to a WorkflowTaskExecutionInstance
-//     */
-//    void to_json(boost::json::object &j, const WorkflowTaskExecutionInstance &w) {
-//        j["task_id"] = w.task_id;
-//
-//        j["execution_host"] = {
-//                {"hostname", w.hostname},
-//                {"flop_rate", w.host_flop_rate},
-//                {"memory_manager_service", w.host_memory},
-//                {"cores", w.host_num_cores}};
-//
-//        j["num_cores_allocated"] = w.num_cores_allocated;
-//
-//        j["vertical_position"] = w.vertical_position;
-//
-//        j["whole_task"] = {
-//                {"start", w.whole_task.first},
-//                {"end", w.whole_task.second}};
-//
-////        nlohmann::json file_reads;
-//        boost::json::array file_reads;
-//        for (auto const &r: w.reads) {
-//            boost::json::object file_read = boost::json::object({{"end", std::get<1>(r)},
-//                                                               {"start", std::get<0>(r)},
-//                                                               {"id", std::get<2>(r)}});
-//            file_reads.push_back(file_read);
-//        }
-//
-//        j["read"] = file_reads;
-//
-//        j["compute"] = {
-//                {"start", w.compute.first},
-//                {"end", w.compute.second}};
-//
-//        boost::json::array file_writes;
-//        for (auto const &r: w.writes) {
-//            boost::json::object file_write = boost::json::object({{"end", std::get<1>(r)},
-//                                                                {"start", std::get<0>(r)},
-//                                                                {"id", std::get<2>(r)}});
-//            file_writes.push_back(file_write);
-//        }
-//
-//        j["write"] = file_writes;
-//
-//        j["failed"] = w.failed;
-//
-//        j["terminated"] = w.terminated;
-//    }
-
     /**
      * @brief Determines if a point lies on a line segment.
      * @param segment: pair of start and end points that make up the line segment
