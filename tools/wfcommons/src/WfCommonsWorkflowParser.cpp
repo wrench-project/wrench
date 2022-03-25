@@ -14,12 +14,43 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 WRENCH_LOG_CATEGORY(wfcommons_workflow_parser, "Log category for WfCommonsWorkflowParser");
 
 
 namespace wrench {
+
+    boost::json::object readJSONFromFile(const std::string& filepath) {
+        FILE *file = fopen(filepath.c_str(), "r");
+        if (not file) {
+            throw std::invalid_argument("Cannot read JSON file " + filepath);
+        }
+
+        boost::json::stream_parser p;
+        boost::json::error_code ec;
+        p.reset();
+        while (true) {
+            try {
+                char buf[1024];
+                auto nread = fread(buf, sizeof(char), 1024, file);
+                if (nread == 0) {
+                    break;
+                }
+                p.write(buf, nread, ec);
+            } catch (std::exception &e) {
+                throw std::invalid_argument("Error while reading JSON file " + filepath + ": " + std::string(e.what()));
+            }
+        }
+
+        p.finish(ec);
+        if (ec) {
+            throw std::invalid_argument("Error while reading JSON file " + filepath + ": " + ec.message());
+        }
+        return p.release().as_object();
+    }
+
 
     /**
      * Documentation in .h file
@@ -32,7 +63,7 @@ namespace wrench {
                                                                               bool enforce_num_cores) {
 
         std::ifstream file;
-        nlohmann::json j;
+        boost::json::object j;
         std::set<std::string> ignored_auxiliary_jobs;
         std::set<std::string> ignored_transfer_jobs;
 
@@ -46,20 +77,17 @@ namespace wrench {
             throw;
         }
 
-        //handle the exceptions of opening the json file
-        file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         try {
-            file.open(filename);
-            file >> j;
-        } catch (const std::ifstream::failure &e) {
-            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid Json file");
+            j = readJSONFromFile(filename);
+        } catch (std::invalid_argument &e) {
+            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): " + std::string(e.what()));
         }
 
-        nlohmann::json workflowJobs;
+        boost::json::object workflowJobs;
         try {
-            workflowJobs = j.at("workflow");
+            workflowJobs = j["workflow"].as_object();
         } catch (std::out_of_range &e) {
-            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a workflow exit");
+            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'workflow' key");
         }
 
         std::shared_ptr<wrench::WorkflowTask> task;
