@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-//#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 
 WRENCH_LOG_CATEGORY(wfcommons_workflow_parser, "Log category for WfCommonsWorkflowParser");
@@ -83,9 +82,9 @@ namespace wrench {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): " + std::string(e.what()));
         }
 
-        boost::json::object workflowJobs;
+        boost::json::object workflow_spec;
         try {
-            workflowJobs = j["workflow"].as_object();
+            workflow_spec = j["workflow"].as_object();
         } catch (std::out_of_range &e) {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'workflow' key");
         }
@@ -94,37 +93,38 @@ namespace wrench {
 
         // Gather machine information if any
         std::map<std::string, std::pair<unsigned long, double>> machines;
-        for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        for (auto & it : workflow_spec) {
             if (it.key() == "machines") {
-                std::vector<nlohmann::json> machine_specs = it.value();
+                auto machine_specs = it.value().as_array();
                 for (auto &m: machine_specs) {
-                    std::string name = m.at("nodeName");
-                    nlohmann::json core_spec = m.at("cpu");
-                    unsigned long num_cores = core_spec.at("count");
-                    double ghz = core_spec.at("speed");
+                    std::string name = std::string(m.as_object().at("nodeName").as_string().c_str());
+                    auto core_spec = m.at("cpu").as_object();
+                    unsigned long num_cores = core_spec.at("count").to_number<unsigned long>();
+                    double ghz = core_spec.at("speed").to_number<double>();
                     machines[name] = std::make_pair(num_cores, ghz);
                 }
             }
         }
 
         // Process the tasks
-        for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        for (auto &it : workflow_spec) {
             if (it.key() == "tasks") {
-                std::vector<nlohmann::json> jobs = it.value();
+                auto task_specs = it.value().as_array();
 
-                for (auto &job: jobs) {
-                    std::string name = job.at("name");
-                    double runtime = job.at("runtime");
+                for (auto &task_spec : task_specs) {
+                    auto task_spec_object = task_spec.as_object();
+                    std::string name = task_spec_object.at("name").as_string().c_str();
+                    double runtime = task_spec_object.at("runtime").to_number<double>();
                     unsigned long min_num_cores, max_num_cores;
                     // Set the default values
                     min_num_cores = min_cores_per_task;
                     max_num_cores = max_cores_per_task;
                     // Overwrite the default is we don't enforce the default values AND the JSON specifies core numbers
-                    if ((not enforce_num_cores) and job.find("cores") != job.end()) {
-                        min_num_cores = job.at("cores");
-                        max_num_cores = job.at("cores");
+                    if ((not enforce_num_cores) and task_spec_object.find("cores") != task_spec_object.end()) {
+                        min_num_cores = task_spec_object.at("cores").to_number<unsigned long>();
+                        max_num_cores = task_spec_object.at("cores").to_number<unsigned long>();
                     }
-                    std::string type = job.at("type");
+                    std::string type = task_spec_object.at("type").as_string().c_str();
 
                     if (type == "transfer") {
                         // Ignore,  since this is an abstract workflow
@@ -142,7 +142,7 @@ namespace wrench {
                     }
 
                     double flop_amount;
-                    std::string execution_machine = job.at("machine");
+                    std::string execution_machine = std::string(task_spec_object.at("machine").as_string().c_str());
                     if (execution_machine.empty()) {
                         flop_amount = runtime * flop_rate;
                     } else {
@@ -160,40 +160,33 @@ namespace wrench {
                     task = workflow->addTask(name, flop_amount, min_num_cores, max_num_cores, 0.0);
 
                     // task priority
-                    try {
-                        task->setPriority(job.at("priority"));
-                    } catch (nlohmann::json::out_of_range &e) {
-                        // do nothing
+                    if (task_spec_object.find("priority") != task_spec_object.end()) {
+                        task->setPriority(task_spec_object.at("priority").to_number<long>());
                     }
 
                     // task average CPU
-                    try {
-                        task->setAverageCPU(job.at("avgCPU"));
-                    } catch (nlohmann::json::out_of_range &e) {
-                        // do nothing
+                    if (task_spec_object.find("avgCPU") != task_spec_object.end()) {
+                        task->setAverageCPU(task_spec_object.at("avgCPU").to_number<double>());
                     }
 
                     // task bytes read
-                    try {
-                        task->setBytesRead(job.at("bytesRead"));
-                    } catch (nlohmann::json::out_of_range &e) {
-                        // do nothing
+                    if (task_spec_object.find("bytesRead") != task_spec_object.end()) {
+                        task->setBytesRead(task_spec_object.at("bytesRead").to_number<unsigned long>());
                     }
 
                     // task bytes written
-                    try {
-                        task->setBytesWritten(job.at("bytesWritten"));
-                    } catch (nlohmann::json::out_of_range &e) {
-                        // do nothing
+                    if (task_spec_object.find("bytesWritten") != task_spec_object.end()) {
+                        task->setBytesWritten(task_spec_object.at("bytesWritten").to_number<unsigned long>());
                     }
 
                     // task files
-                    std::vector<nlohmann::json> files = job.at("files");
+                    auto files = task_spec_object.at("files").as_array();
 
                     for (auto &f: files) {
-                        double size = f.at("size");
-                        std::string link = f.at("link");
-                        std::string id = f.at("name");
+                        auto f_spec = f.as_object();
+                        double size = f_spec.at("size").to_number<double>();
+                        std::string link = std::string(f_spec.at("link").as_string().c_str());
+                        std::string id = std::string(f_spec.at("name").as_string().c_str());
                         std::shared_ptr<wrench::DataFile> workflow_file = nullptr;
                         // Check whether the file already exists
                         try {
@@ -211,26 +204,27 @@ namespace wrench {
                 }
 
                 // since tasks may not be ordered in the JSON file, we need to iterate over all tasks again
-                for (auto &job: jobs) {
+                for (auto &task_spec : task_specs) {
                     try {
-                        task = workflow->getTaskByID(job.at("name"));
+                        task = workflow->getTaskByID(std::string(task_spec.as_object().at("name").as_string().c_str()));
                     } catch (std::invalid_argument &e) {
                         // Ignored task
                         continue;
                     }
-                    std::vector<nlohmann::json> parents = job.at("parents");
+                    auto parents = task_spec.as_object().at("parents").as_array();
                     // task dependencies
                     for (auto &parent: parents) {
+                        std::string parent_id = std::string(parent.as_string().c_str());
                         // Ignore transfer jobs declared as parents
-                        if (ignored_transfer_jobs.find(parent) != ignored_transfer_jobs.end()) {
+                        if (ignored_transfer_jobs.find(parent_id) != ignored_transfer_jobs.end()) {
                             continue;
                         }
                         // Ignore auxiliary jobs declared as parents
-                        if (ignored_auxiliary_jobs.find(parent) != ignored_auxiliary_jobs.end()) {
+                        if (ignored_auxiliary_jobs.find(parent_id) != ignored_auxiliary_jobs.end()) {
                             continue;
                         }
                         try {
-                            auto parent_task = workflow->getTaskByID(parent);
+                            auto parent_task = workflow->getTaskByID(parent_id);
                             workflow->addControlDependency(parent_task, task, redundant_dependencies);
                         } catch (std::invalid_argument &e) {
                             // do nothing
