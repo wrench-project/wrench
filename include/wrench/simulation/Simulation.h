@@ -13,7 +13,6 @@
 
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
 #include <wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.h>
 
 #include "Version.h"

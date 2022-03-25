@@ -731,7 +731,6 @@ namespace wrench {
 
         if (writing_file) {
             std::ofstream output(file_path);
-//            output << std::setw(4) << nlohmann::json(json_object) << std::endl;
             output << std::setw(4) << boost::json::serialize(json_object) << std::endl;
             output.close();
         }
