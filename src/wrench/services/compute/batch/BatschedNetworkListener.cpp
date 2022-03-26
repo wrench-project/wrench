@@ -21,6 +21,7 @@
 #ifdef ENABLE_BATSCHED// Only include these files below if Batsched is enabled
 
 #include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <zmq.hpp>
 #include <zmq.h>
 
@@ -162,19 +163,25 @@ namespace wrench {
         std::string reply_data;
         reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
 
-        nlohmann::json reply_decisions;
-        nlohmann::json decision_events;
-        reply_decisions = nlohmann::json::parse(reply_data);
-        decision_events = reply_decisions["events"];
+//        nlohmann::json reply_decisions;
+//        nlohmann::json decision_events;
+//        reply_decisions = nlohmann::json::parse(reply_data);
+//        decision_events = reply_decisions["events"];
+
+auto reply_decisions = boost::json::parse(reply_data);
+        auto decision_events = reply_decisions.at("events").as_array();
+
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         for (auto decisions: decision_events) {
 
-            std::string decision_type = decisions["type"];
-            double decision_timestamp = decisions["timestamp"];
+            std::string decision_type = std::string(decisions.as_object().at("type").as_string().c_str());
+            double decision_timestamp = decisions.as_object().at("timestamp").to_number<double>();
             double time_to_sleep = S4U_Simulation::getClock() - decision_timestamp;
-            nlohmann::json execute_json_data = decisions["data"];
-            std::string job_reply_data = execute_json_data.dump();
+            //nlohmann::json execute_json_data = decisions["data"];
+            auto execute_json_data = decisions.at("data").as_object();
+            //std::string job_reply_data = execute_json_data.dump();
+            std::string job_reply_data = boost::json::serialize(execute_json_data);
 
             if (strcmp(decision_type.c_str(), "EXECUTE_JOB") == 0) {
                 if (time_to_sleep > 0) {
@@ -182,16 +189,15 @@ namespace wrench {
                 }
                 sendExecuteMessageToBatchComputeService(answer_mailbox, job_reply_data);
             } else if (strcmp(decision_type.c_str(), "ANSWER") == 0) {
-                double estimated_waiting_time = execute_json_data["estimate_waiting_time"]["estimated_waiting_time"];
+                double estimated_waiting_time = execute_json_data["estimate_waiting_time"].as_object().at("estimated_waiting_time").to_number<double>();
                 sendQueryAnswerMessageToBatchComputeService(estimated_waiting_time);
             }
         }
 
-        double decision_now = reply_decisions["now"];
+        double decision_now = reply_decisions.at("now").to_number<double>();
         double time_to_sleep_again = S4U_Simulation::getClock() - decision_now;
         if (time_to_sleep_again > 0) {
             S4U_Simulation::sleep(time_to_sleep_again);
         }
-    }
 #endif// ENABLE_BATSCHED
 }// namespace wrench
