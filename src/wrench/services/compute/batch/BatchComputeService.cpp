@@ -1274,12 +1274,12 @@ namespace wrench {
                     "BatchComputeService::processExecuteJobFromBatSched(): Job received from batsched that does not "
                     "belong to the list of known jobs... just telling Batsched that the job completed (Batsched seems "
                     "to send this back even when a job has been actively terminated)");
-            this->scheduler->processUnknownJobTermination(execute_events["job_id"]);
+            this->scheduler->processUnknownJobTermination(std::string(execute_events.as_object()["job_id"].as_string().c_str());
             return;
         }
 
         /* Get the nodes and cores per nodes asked for */
-        std::string nodes_allocated_by_batsched = execute_events["alloc"];
+        std::string nodes_allocated_by_batsched = std::string(execute_events.as_object()["alloc"].c_str());
         batch_job->csv_allocated_processors = nodes_allocated_by_batsched;
         std::vector<std::string> allocations;
         boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
