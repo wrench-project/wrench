@@ -199,5 +199,6 @@ auto reply_decisions = boost::json::parse(reply_data);
         if (time_to_sleep_again > 0) {
             S4U_Simulation::sleep(time_to_sleep_again);
         }
+    }
 #endif// ENABLE_BATSCHED
 }// namespace wrench
