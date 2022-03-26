@@ -20,7 +20,7 @@
 
 #ifdef ENABLE_BATSCHED// Only include these files below if Batsched is enabled
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 #include <zmq.hpp>
 #include <zmq.h>

@@ -7,7 +7,8 @@
  * (at your option) any later version.
  */
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <wrench/services/compute/cloud/CloudComputeService.h>
@@ -1255,11 +1256,12 @@ namespace wrench {
      * @param bat_sched_reply
      */
     void BatchComputeService::processExecuteJobFromBatSched(std::string bat_sched_reply) {
-        nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
+//        nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
+        auto execute_events = boost::json::parse(bat_sched_reply);
         std::shared_ptr<CompoundJob> compound_job = nullptr;
         std::shared_ptr<BatchJob> batch_job = nullptr;
         for (auto it1 = this->waiting_jobs.begin(); it1 != this->waiting_jobs.end(); it1++) {
-            if (std::to_string((*it1)->getJobID()) == execute_events["job_id"]) {
+            if (std::to_string((*it1)->getJobID()) == std::string(execute_events.as_object()["job_id"].as_string().c_str())) {
                 batch_job = (*it1);
                 compound_job = batch_job->getCompoundJob();
                 this->waiting_jobs.erase(batch_job);
