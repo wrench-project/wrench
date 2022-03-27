@@ -55,18 +55,18 @@ namespace wrench {
             throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Invalid Json file");
         }
 
-        nlohmann::json workflowJobs;
+        nlohmann::json workflow_spec;
         try {
-            workflowJobs = j.at("workflow");
+            workflow_spec = j.at("workflow");
         } catch (std::out_of_range &e) {
-            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a workflow exit");
+            throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Could not find a 'workflow' key");
         }
 
         std::shared_ptr<wrench::WorkflowTask> task;
 
         // Gather machine information if any
         std::map<std::string, std::pair<unsigned long, double>> machines;
-        for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        for (nlohmann::json::iterator it = workflow_spec.begin(); it != workflow_spec.end(); ++it) {
             if (it.key() == "machines") {
                 std::vector<nlohmann::json> machine_specs = it.value();
                 for (auto &m: machine_specs) {
@@ -80,7 +80,7 @@ namespace wrench {
         }
 
         // Process the tasks
-        for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        for (nlohmann::json::iterator it = workflow_spec.begin(); it != workflow_spec.end(); ++it) {
             if (it.key() == "tasks") {
                 std::vector<nlohmann::json> jobs = it.value();
 
