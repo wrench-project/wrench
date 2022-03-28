@@ -33,7 +33,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "MultiActionMultiJobController.h" // Controller implementation
+#include "MultiActionMultiJobController.h"// Controller implementation
 
 /**
  * @brief The Simulator's main function

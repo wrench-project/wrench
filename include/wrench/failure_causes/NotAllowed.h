@@ -46,6 +46,6 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
-#endif //WRENCH_NOT_ALLOWED_H
+#endif//WRENCH_NOT_ALLOWED_H

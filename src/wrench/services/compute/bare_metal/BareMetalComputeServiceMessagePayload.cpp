@@ -15,5 +15,4 @@ namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(BareMetalComputeServiceMessagePayload, FLOP_RATE_REQUEST_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(BareMetalComputeServiceMessagePayload, FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
 
-};
-
+};// namespace wrench

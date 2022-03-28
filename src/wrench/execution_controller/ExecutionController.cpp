@@ -31,9 +31,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ExecutionController::ExecutionController(
-             const std::string &hostname,
-             const std::string suffix) :
-            Service(hostname, "controller_" + suffix) {
+            const std::string &hostname,
+            const std::string suffix) : Service(hostname, "controller_" + suffix) {
     }
 
 
@@ -45,7 +44,7 @@ namespace wrench {
         std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(
                 new JobManager(this->hostname, this->mailbox));
         job_manager->simulation = this->simulation;
-        job_manager->start(job_manager, true, false); // Always daemonize, no auto-restart
+        job_manager->start(job_manager, true, false);// Always daemonize, no auto-restart
 
         return job_manager;
     }
@@ -58,7 +57,7 @@ namespace wrench {
         auto data_movement_manager = std::shared_ptr<DataMovementManager>(
                 new DataMovementManager(this->hostname, this->mailbox));
         data_movement_manager->simulation = this->simulation;
-        data_movement_manager->start(data_movement_manager, true, false); // Always daemonize, no auto-restart
+        data_movement_manager->start(data_movement_manager, true, false);// Always daemonize, no auto-restart
 
         return data_movement_manager;
     }
@@ -74,7 +73,7 @@ namespace wrench {
         auto energy_meter_raw_ptr = new EnergyMeterService(this->hostname, measurement_periods);
         std::shared_ptr<EnergyMeterService> energy_meter = std::shared_ptr<EnergyMeterService>(energy_meter_raw_ptr);
         energy_meter->setSimulation(this->simulation);
-        energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
+        energy_meter->start(energy_meter, true, false);// Always daemonize, no auto-restart
         return energy_meter;
     }
 
@@ -89,7 +88,7 @@ namespace wrench {
         auto energy_meter_raw_ptr = new EnergyMeterService(this->hostname, hostnames, measurement_period);
         std::shared_ptr<EnergyMeterService> energy_meter = std::shared_ptr<EnergyMeterService>(energy_meter_raw_ptr);
         energy_meter->setSimulation(this->simulation);
-        energy_meter->start(energy_meter, true, false); // Always daemonize, no auto-restart
+        energy_meter->start(energy_meter, true, false);// Always daemonize, no auto-restart
         return energy_meter;
     }
 
@@ -104,7 +103,7 @@ namespace wrench {
         auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, measurement_periods);
         std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
         bandwidth_meter->setSimulation(this->simulation);
-        bandwidth_meter->start(bandwidth_meter, true, false); // Always daemonize, no auto-restart
+        bandwidth_meter->start(bandwidth_meter, true, false);// Always daemonize, no auto-restart
         return bandwidth_meter;
     }
 
@@ -119,11 +118,9 @@ namespace wrench {
         auto bandwidth_meter_raw_ptr = new BandwidthMeterService(this->hostname, linknames, measurement_period);
         std::shared_ptr<BandwidthMeterService> bandwidth_meter = std::shared_ptr<BandwidthMeterService>(bandwidth_meter_raw_ptr);
         bandwidth_meter->setSimulation(this->simulation);
-        bandwidth_meter->start(bandwidth_meter, true, false); // Always daemonize, no auto-restart
+        bandwidth_meter->start(bandwidth_meter, true, false);// Always daemonize, no auto-restart
         return bandwidth_meter;
     }
-
-
 
 
     /**
@@ -178,7 +175,7 @@ namespace wrench {
             processEventCompoundJobCompletion(real_event);
         } else if (auto real_event = std::dynamic_pointer_cast<CompoundJobFailedEvent>(event)) {
             processEventCompoundJobFailure(real_event);
-        } else  if (auto real_event = std::dynamic_pointer_cast<StandardJobCompletedEvent>(event)) {
+        } else if (auto real_event = std::dynamic_pointer_cast<StandardJobCompletedEvent>(event)) {
             processEventStandardJobCompletion(real_event);
         } else if (auto real_event = std::dynamic_pointer_cast<StandardJobFailedEvent>(event)) {
             processEventStandardJobFailure(real_event);
@@ -280,4 +277,4 @@ namespace wrench {
     void ExecutionController::processEventCompoundJobFailure(std::shared_ptr<CompoundJobFailedEvent> event) {
         WRENCH_INFO("In default event-handler: Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
-};
+};// namespace wrench

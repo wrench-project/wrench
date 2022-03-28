@@ -28,7 +28,7 @@ namespace wrench {
      */
     class VirtualizedClusterComputeServiceMessage : public ComputeServiceMessage {
     protected:
-        VirtualizedClusterComputeServiceMessage(const std::string &name, double payload);
+        VirtualizedClusterComputeServiceMessage(double payload);
     };
 
 
@@ -63,12 +63,11 @@ namespace wrench {
         bool success;
         /** @brief A failure cause (or nullptr if success) */
         std::shared_ptr<FailureCause> failure_cause;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_VIRTUALIZEDCLUSTERSERVICEMESSAGE_H
+#endif//WRENCH_VIRTUALIZEDCLUSTERSERVICEMESSAGE_H

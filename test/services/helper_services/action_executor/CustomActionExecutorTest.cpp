@@ -108,7 +108,6 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 
@@ -121,13 +120,11 @@ class CustomActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     CustomActionExecutorTestWMS(CustomActionExecutorTest *test,
-                                 std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
-
     CustomActionExecutorTest *test;
 
     int main() {
@@ -145,19 +142,20 @@ private:
 
         auto storage_service = this->test->ss;
         auto file = this->test->file;
-        auto lambda_execute = [storage_service, file](const std::shared_ptr<wrench::ActionExecutor>& action_executor) {
+        auto lambda_execute = [storage_service, file](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {
             storage_service->readFile(file, wrench::FileLocation::LOCATION(storage_service));
             wrench::Simulation::sleep(10.0);
         };
-        auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor>& action_executor) { };
+        auto lambda_terminate = [](const std::shared_ptr<wrench::ActionExecutor> &action_executor) {};
 
         action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
-        action->setThreadCreationOverhead(0.0);
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2",
                                            num_cores,
                                            ram,
+                                           0,
+                                           false,
                                            this->mailbox,
                                            action, nullptr));
 
@@ -210,7 +208,7 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -230,14 +228,13 @@ void CustomActionExecutorTest::do_CustomActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new CustomActionExecutorTestWMS(this, "Host1")));
+                            new CustomActionExecutorTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }

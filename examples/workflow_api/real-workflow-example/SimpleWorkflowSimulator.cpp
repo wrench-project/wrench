@@ -13,8 +13,8 @@
 #include "SimpleWMS.h"
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
 
-static bool ends_with(const std::string& str, const std::string& suffix) {
-    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+static bool ends_with(const std::string &str, const std::string &suffix) {
+    return str.size() >= suffix.size() && 0 == str.compare(str.size() - suffix.size(), suffix.size(), suffix);
 }
 
 /**
@@ -55,10 +55,10 @@ int main(int argc, char **argv) {
 
 
     /* Reading and parsing the workflow description file to create a wrench::Workflow object */
-    std::cerr << "Loading workflow->.." << std::endl;
+    std::cerr << "Loading workflow..." << std::endl;
     std::shared_ptr<wrench::Workflow> workflow;
-    if (ends_with(workflow_file,"json")) {
-        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "1000Gf");
+    if (ends_with(workflow_file, "json")) {
+        workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "100Gf");
     } else {
         std::cerr << "Workflow file name must end with '.json'" << std::endl;
         exit(1);
@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
      * In this example, this particular batch_standard_and_pilot_jobs service has no scratch storage space (mount point = "").
      * The next argument to the constructor
      * shows how to configure particular simulated behaviors of the compute service via a property
-     * list. In this case, we use the  conservative_bf_core_level scheduling algorithm which implements
+     * list. In this case, we use the conservative_bf_core_level scheduling algorithm which implements
      * conservative backfilling at the core level (i.e., two jobs can shared a compute node by using different cores on it).
      * The last argument to the constructor makes it possible to specify various control message sizes.
      * In this example, one specifies that the message that will be send to the service to
@@ -108,14 +108,20 @@ int main(int argc, char **argv) {
      * configurable properties for each kind of service.
      */
     std::shared_ptr<wrench::BatchComputeService> batch_compute_service;
+#ifndef ENABLE_BATSCHED
+    std::string scheduling_algorithm = "conservative_bf_core_level";
+#else
+    std::string scheduling_algorithm = "conservative_bf";
+#endif
     try {
         batch_compute_service = simulation->add(new wrench::BatchComputeService(
-        {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
-                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf_core_level"}},
+                {"BatchHeadNode"}, {{"BatchNode1"}, {"BatchNode2"}}, "",
+                {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, scheduling_algorithm}},
                 {{wrench::BatchComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 2048}}));
     } catch (std::invalid_argument &e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        std::exit(1);}
+        std::exit(1);
+    }
 
     /* Instantiate and add to the simulation a cloud service, to be started on some host in the simulation platform.
      * A cloud service is an abstraction of a compute service that corresponds to a
@@ -162,7 +168,7 @@ int main(int argc, char **argv) {
      * These files are then staged on the storage service.
      */
     std::cerr << "Staging input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         try {
             simulation->stageFile(f, storage_service);
         } catch (std::runtime_error &e) {
@@ -170,6 +176,9 @@ int main(int argc, char **argv) {
             return 0;
         }
     }
+
+    /* Enable some output time stamps */
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
@@ -180,6 +189,9 @@ int main(int argc, char **argv) {
         return 0;
     }
     std::cerr << "Simulation done!" << std::endl;
+    std::cerr << "Workflow completed at time: " << workflow->getCompletionDate() << std::endl;
+
+    simulation->getOutput().dumpWorkflowGraphJSON(workflow, "/tmp/workflow.json", true);
 
     /* Simulation results can be examined via simulation->getOutput(), which provides access to traces
      * of events. In the code below, go through some time-stamps and compute some statistics.
@@ -189,7 +201,7 @@ int main(int argc, char **argv) {
     std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
     unsigned long num_failed_tasks = 0;
     double computation_communication_ratio_average = 0.0;
-    for (const auto &item : trace) {
+    for (const auto &item: trace) {
         auto task = item->getContent()->getTask();
         if (task->getExecutionHistory().size() > 1) {
             num_failed_tasks++;
@@ -199,7 +211,7 @@ int main(int argc, char **argv) {
         double compute_time = task->getExecutionHistory().top().computation_end - task->getExecutionHistory().top().computation_start;
         computation_communication_ratio_average += compute_time / io_time;
     }
-    computation_communication_ratio_average /= (double)(trace.size());
+    computation_communication_ratio_average /= (double) (trace.size());
 
     std::cerr << "Number of tasks that failed at least once: " << num_failed_tasks << "\n";
     std::cerr << "Average computation time / communication+IO time ratio over all tasks: " << computation_communication_ratio_average << "\n";

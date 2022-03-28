@@ -21,11 +21,9 @@ WRENCH_LOG_CATEGORY(s4u_simulation_test, "Log category for S4U_SimulationTest");
 class S4U_SimulationTest : public ::testing::Test {
 
 public:
-
     void do_basicAPI_Test();
 
 protected:
-
     ~S4U_SimulationTest() {
         workflow->clear();
     }
@@ -81,12 +79,10 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 /**********************************************************************/
@@ -98,12 +94,10 @@ class S4U_SimulationAPITestWMS : public wrench::ExecutionController {
 
 public:
     S4U_SimulationAPITestWMS(S4U_SimulationTest *test,
-                             std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     S4U_SimulationTest *test;
 
     int main() {
@@ -194,35 +188,35 @@ private:
         }
 
         try {
-            wrench::S4U_Simulation::hostHasMountPoint("bogus","/");
+            wrench::S4U_Simulation::hostHasMountPoint("bogus", "/");
             throw std::runtime_error("Checking mountpoint existence for a bogus host should have thrown");
         } catch (std::invalid_argument &e) {}
 
         try {
-            wrench::S4U_Simulation::hostHasMountPoint("Host1","/");
+            wrench::S4U_Simulation::hostHasMountPoint("Host1", "/");
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Checking mountpoint existence for a non-bogus host should not have thrown");
         }
 
         try {
-            wrench::S4U_Simulation::getDiskCapacity("bogus","/");
+            wrench::S4U_Simulation::getDiskCapacity("bogus", "/");
             throw std::runtime_error("Getting disk capacity for a bogus host should have thrown");
         } catch (std::invalid_argument &e) {}
 
         try {
-            wrench::S4U_Simulation::getDiskCapacity("Host1","/");
+            wrench::S4U_Simulation::getDiskCapacity("Host1", "/");
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Getting disk capacity for a non-bogus host should not have thrown");
         }
 
         try {
-            wrench::S4U_Simulation::getDiskCapacity("Host1","/no_capacity");
+            wrench::S4U_Simulation::getDiskCapacity("Host1", "/no_capacity");
         } catch (std::invalid_argument &e) {
             throw std::runtime_error("Getting disk capacity for a disk with no capacity capacity should not have thrown");
         }
 
         try {
-            wrench::S4U_Simulation::getDiskCapacity("Host1","/bogus");
+            wrench::S4U_Simulation::getDiskCapacity("Host1", "/bogus");
             throw std::runtime_error("Getting disk capacity for bogus mountpoint should have thrown");
         } catch (std::invalid_argument &e) {
         }
@@ -273,7 +267,7 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -284,17 +278,17 @@ void S4U_SimulationTest::do_basicAPI_Test() {
     std::string hostname = "Host1";
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_SimulationAPITestWMS(
-                    this, hostname)));
+                            new S4U_SimulationAPITestWMS(
+                                    this, hostname)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

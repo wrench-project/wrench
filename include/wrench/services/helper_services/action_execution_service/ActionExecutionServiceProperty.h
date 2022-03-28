@@ -25,6 +25,11 @@ namespace wrench {
     class ActionExecutionServiceProperty {
 
     public:
+        /** @brief The ActionExecutionService's overhead for creating a thread, in seconds **/
+        DECLARE_PROPERTY_NAME(THREAD_CREATION_OVERHEAD);
+
+        /** @brief Whether the ActionExecutionService should simulation computations as sleep **/
+        DECLARE_PROPERTY_NAME(SIMULATE_COMPUTATION_AS_SLEEP);
 
         /** @brief Whether the ActionExecutionService should terminate if all its hosts are down **/
         DECLARE_PROPERTY_NAME(TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
@@ -37,7 +42,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H
+#endif//WRENCH_ACTION_EXECUTION_SERVICE_PROPERTY_H

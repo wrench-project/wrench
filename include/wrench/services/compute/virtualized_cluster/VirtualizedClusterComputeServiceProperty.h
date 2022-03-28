@@ -23,6 +23,6 @@ namespace wrench {
     public:
     };
 
-}
+}// namespace wrench
 
-#endif //WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H
+#endif//WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H

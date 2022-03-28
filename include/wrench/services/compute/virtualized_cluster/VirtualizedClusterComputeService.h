@@ -29,24 +29,23 @@ namespace wrench {
     class VirtualizedClusterComputeService : public CloudComputeService {
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
-        };
+                {VirtualizedClusterComputeServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}};
 
-WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
-                {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  1024},
-                {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               1024},
+        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                {VirtualizedClusterComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
                 {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, 1024},
-                {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  1024},
-                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   1024},
-                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            1024},
-                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             1024},
-                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD,           1024},
-                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD,            1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     1024},
-                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      1024},
+                {VirtualizedClusterComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, 1024},
+                {VirtualizedClusterComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD, 1024},
                 {VirtualizedClusterComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_REQUEST_MESSAGE_PAYLOAD, 1024},
                 {VirtualizedClusterComputeServiceMessagePayload::IS_THERE_AT_LEAST_ONE_HOST_WITH_AVAILABLE_RESOURCES_ANSWER_MESSAGE_PAYLOAD, 1024},
         };
@@ -74,7 +73,6 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         /***********************/
 
     protected:
-
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -94,6 +92,6 @@ WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE  default_messagepayload_values = {
         /***********************/
     };
 
-}
+}// namespace wrench
 
-#endif //WRENCH_VIRTUALIZEDCLUSTERSERVICE_H
+#endif//WRENCH_VIRTUALIZEDCLUSTERSERVICE_H

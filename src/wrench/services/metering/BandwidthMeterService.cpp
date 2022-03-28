@@ -22,13 +22,12 @@ namespace wrench {
      * @param hostname: the hostname on which the service should start
      * @param measurement_periods: the measurement period for each monitored link
      */
-    BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) :
-            Service(hostname, "bandwidth_meter") {
+    BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "bandwidth_meter") {
         if (measurement_periods.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
 
-        for (auto &l : measurement_periods) {
+        for (auto &l: measurement_periods) {
             if (not S4U_Simulation::linkExists(l.first)) {
                 throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): unknown link " + l.first);
             }
@@ -38,7 +37,7 @@ namespace wrench {
                         ")");
             }
             this->measurement_periods[l.first] = l.second;
-            this->time_to_next_measurement[l.first] = 0.0;  // We begin by taking a measurement
+            this->time_to_next_measurement[l.first] = 0.0;// We begin by taking a measurement
         }
     }
 
@@ -50,8 +49,7 @@ namespace wrench {
      * @param measurement_period: the measurement period
      */
     BandwidthMeterService::BandwidthMeterService(const std::string hostname, const std::vector<std::string> &linknames,
-                                           double measurement_period) :
-            Service(hostname, "bandwidth_meter") {
+                                                 double measurement_period) : Service(hostname, "bandwidth_meter") {
         if (linknames.empty()) {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): no host to meter!");
         }
@@ -59,12 +57,12 @@ namespace wrench {
             throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): measurement period must be at least 0.01 second");
         }
 
-        for (auto const &l : linknames) {
+        for (auto const &l: linknames) {
             if (not S4U_Simulation::linkExists(l)) {
                 throw std::invalid_argument("BandwidthMeter::BandwidthMeter(): unknown link " + l);
             }
             this->measurement_periods[l] = measurement_period;
-            this->time_to_next_measurement[l] = 0.0;  // We begin by taking a measurement
+            this->time_to_next_measurement[l] = 0.0;// We begin by taking a measurement
         }
     }
 
@@ -98,7 +96,7 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         WRENCH_INFO("New Bandwidth Meter Manager starting (%s) and monitoring links", this->mailbox->get_cname());
-        for (auto const &l : this->measurement_periods) {
+        for (auto const &l: this->measurement_periods) {
             WRENCH_INFO("  - %s", l.first.c_str());
         }
 
@@ -125,12 +123,12 @@ namespace wrench {
             }
 
             // Update time-to-next-measurement for all links
-            for (auto &l : this->time_to_next_measurement) {
+            for (auto &l: this->time_to_next_measurement) {
                 l.second = std::max<double>(0, l.second - (Simulation::getCurrentSimulatedDate() - before));
             }
 
             // Take measurements
-            for (auto &l : this->time_to_next_measurement) {
+            for (auto &l: this->time_to_next_measurement) {
                 if (l.second < EPSILON) {
                     this->simulation->getLinkUsage(l.first, true);
                     this->time_to_next_measurement[l.first] = this->measurement_periods[l.first];
@@ -158,7 +156,7 @@ namespace wrench {
             return true;
         }
 
-        if (dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+        if (dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // There shouldn't be any need to clean any state up
             return false;
         }
@@ -166,5 +164,5 @@ namespace wrench {
         throw std::runtime_error("BandwidthMeter::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
     }
 
-     
-};
+
+};// namespace wrench

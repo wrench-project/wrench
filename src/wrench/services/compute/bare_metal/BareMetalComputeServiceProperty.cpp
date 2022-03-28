@@ -15,5 +15,4 @@ namespace wrench {
     SET_PROPERTY_NAME(BareMetalComputeServiceProperty, FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH);
     SET_PROPERTY_NAME(BareMetalComputeServiceProperty, TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN);
 
-};
-
+};// namespace wrench

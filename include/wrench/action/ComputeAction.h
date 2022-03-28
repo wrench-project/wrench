@@ -16,7 +16,6 @@
 
 namespace wrench {
 
-    class ComputeThread;
     class ParallelModel;
 
     /**
@@ -52,14 +51,10 @@ namespace wrench {
         double ram;
         std::shared_ptr<ParallelModel> parallel_model;
 
-        void simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, std::vector<double> &work_per_thread);
-        void simulateComputationWithComputeThreads(std::shared_ptr<ActionExecutor> action_executor, std::vector<double> &work_per_thread);
-
-        std::vector<std::shared_ptr<ComputeThread>> compute_threads;
-
-
+        void simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
+        void simulateComputationAsComputation(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
     };
-}
+}// namespace wrench
 
 
-#endif //WRENCH_COMPUTEACTION_H
+#endif//WRENCH_COMPUTEACTION_H

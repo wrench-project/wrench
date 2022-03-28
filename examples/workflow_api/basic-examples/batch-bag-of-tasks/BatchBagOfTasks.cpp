@@ -36,9 +36,9 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "TwoTasksAtATimeBatchWMS.h" // WMS implementation
+#include "TwoTasksAtATimeBatchWMS.h"// WMS implementation
 
-constexpr double TFLOP= 1000000000000.0;
+constexpr double TFLOP = 1000000000000.0;
 
 /**
  * @brief The Simulator's main function
@@ -50,7 +50,8 @@ constexpr double TFLOP= 1000000000000.0;
 int main(int argc, char **argv) {
 
     /* Create a WRENCH simulation object */
-    auto simulation = wrench::Simulation::createSimulation();;
+    auto simulation = wrench::Simulation::createSimulation();
+    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
     try {
         num_tasks = std::atoi(argv[1]);
     } catch (std::invalid_argument &e) {
-        std::cerr << "Invalid number of tasks ("  << e.what() << ")\n";
+        std::cerr << "Invalid number of tasks (" << e.what() << ")\n";
         exit(1);
     }
 
@@ -82,10 +83,10 @@ int main(int argc, char **argv) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     /* Add workflow tasks  and files */
-    for (int i=0; i < num_tasks; i++) {
+    for (int i = 0; i < num_tasks; i++) {
         /* Create a task: increasing GFlop, 1 to 10 cores, 0.90 parallel efficiency, 10MB memory_manager_service footprint */
         auto task = workflow->addTask("task_" + std::to_string(i), (100 + i * 500) * TFLOP,
-                1, 10, 1000);
+                                      1, 10, 1000);
         task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
         task->addInputFile(workflow->addFile("input_" + std::to_string(i), 10000000));
         task->addOutputFile(workflow->addFile("output_" + std::to_string(i), 10000000));
@@ -133,7 +134,7 @@ int main(int argc, char **argv) {
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -152,9 +153,9 @@ int main(int argc, char **argv) {
      * many such events there are, and print some information for the first such event.  Also print
      * out how many failures each task has experienced */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
-    for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at hour " << (item->getDate()/3600);
-        std::cerr << " with " << item->getContent()->getTask()->getFailureCount()  <<  " failures)\n";
+    for (auto const &item: trace) {
+        std::cerr << "Task " << item->getContent()->getTask()->getID() << " completed at hour " << (item->getDate() / 3600);
+        std::cerr << " with " << item->getContent()->getTask()->getFailureCount() << " failures)\n";
     }
 
     return 0;

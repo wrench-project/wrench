@@ -169,7 +169,7 @@ namespace wrench {
      * @brief Sets the service-specific arguments that are used during job submission
      * @param args: a map of argument name/values
      */
-     void Job::setServiceSpecificArguments(std::map<std::string, std::string> args) {
+    void Job::setServiceSpecificArguments(std::map<std::string, std::string> args) {
         this->service_specific_args = std::move(args);
     }
 
@@ -188,4 +188,4 @@ namespace wrench {
     void Job::setPriority(double priority) {
         this->priority = priority;
     }
-}
+}// namespace wrench

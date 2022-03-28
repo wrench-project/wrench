@@ -40,8 +40,7 @@ namespace wrench {
                                                                        std::string scratch_space_mount_point,
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-            :
-            CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
+        : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -121,7 +120,7 @@ namespace wrench {
                                 VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
         if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMAnswerMessage *>(
-                answer_message.get())) {
+                    answer_message.get())) {
             if (not msg->success) {
                 throw ExecutionException(msg->failure_cause);
             }
@@ -138,7 +137,8 @@ namespace wrench {
     */
     int VirtualizedClusterComputeService::main() {
 
-        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);WRENCH_INFO(
+        TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
+        WRENCH_INFO(
                 "Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
                 this->hostname.c_str(),
                 this->mailbox->get_cname());
@@ -173,7 +173,8 @@ namespace wrench {
             return true;
         }
 
-        if (message == nullptr) { WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
+        if (message == nullptr) {
+            WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
             return false;
         }
 
@@ -222,7 +223,7 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<VirtualizedClusterComputeServiceMigrateVMRequestMessage *>(
-                message.get())) {
+                           message.get())) {
             processMigrateVM(msg->answer_mailbox, msg->vm_name, msg->dest_pm_hostname);
             return true;
 
@@ -284,13 +285,13 @@ namespace wrench {
                             VirtualizedClusterComputeServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD));
         }
 
-//        try {
+        //        try {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 msg_to_send_back);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//            // ignore
-//        }
+        //        } catch (std::shared_ptr<NetworkError> &cause) {
+        //            // ignore
+        //        }
     }
 
-}
+}// namespace wrench

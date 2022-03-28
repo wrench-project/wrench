@@ -10,8 +10,8 @@
 <a href="https://wrench-project.org" target="_blank"><img src="https://wrench-project.org/images/logo-horizontal.png" width="350" alt="WRENCH Project" /></a>
 <br/>_Cyberinfrastructure Simulation Workbench_
 
-WRENCH is an _open-source library_ for developing workflow simulators. WRENCH exposes several high-level simulation 
-abstractions to provide the **building blocks** for developing custom simulators.
+WRENCH is an _open-source library_ that exposes several high-level simulation 
+abstractions that serve as **building blocks** for developing custom simulators.
 
 More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
@@ -38,15 +38,14 @@ And, one of the following:
 
 ### Required Dependencies 
 
-- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.30
-- [PugiXML](http://pugixml.org/) - version 1.8 or higher 
+- [SimGrid](https://framagit.org/simgrid/simgrid/-/releases) - version 3.31
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.9.0 or higher 
 
 ### Optional Dependencies
 
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
-- [Batsched](https://gitlab.inria.fr/batsim/batsched) - versionb 1.4 - only needed for batch-scheduled resource simulation
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) - version 1.4 - useful for expanded batch-scheduled resource simulation capabilities
 
 ## Building From Source
 

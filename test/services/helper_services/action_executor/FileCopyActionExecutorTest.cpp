@@ -99,7 +99,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -109,7 +108,6 @@ public:
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss1;
     std::shared_ptr<wrench::StorageService> ss2;
-
 };
 
 
@@ -121,13 +119,11 @@ class FileCopyActionExecutorSuccessTestWMS : public wrench::ExecutionController 
 
 public:
     FileCopyActionExecutorSuccessTestWMS(FileCopyActionExecutorTest *test,
-                                         std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                         std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     FileCopyActionExecutorTest *test;
 
     int main() {
@@ -143,7 +139,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss2));
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox, file_copy_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_copy_action, nullptr));
         // Start it
         file_copy_action_executor->setSimulation(this->simulation);
         file_copy_action_executor->start(file_copy_action_executor, true, false);
@@ -193,7 +189,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -211,7 +207,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
 
     // Create a file
     this->file = workflow->addFile("some_file", 1000000.0);
-    
+
     // Put it on ss1
     this->ss1->createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
 
@@ -223,9 +219,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
-

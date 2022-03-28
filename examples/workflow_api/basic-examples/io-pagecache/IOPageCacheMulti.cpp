@@ -32,7 +32,7 @@
 #include <iostream>
 #include <wrench.h>
 #include <wrench/services/memory/MemoryManager.h>
-#include "ConcurrentPipelineWMS.h" // WMS implementation
+#include "ConcurrentPipelineWMS.h"// WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -44,7 +44,7 @@
 
 
 std::shared_ptr<wrench::Workflow> generate_workflow(int num_pipes, int num_tasks, int core_per_task,
-                                    long flops, long file_size, long mem_required) {
+                                                    long flops, long file_size, long mem_required) {
 
     auto workflow = wrench::Workflow::createWorkflow();
 
@@ -130,7 +130,8 @@ int main(int argc, char **argv) {
 
     int num_task = 3;
 
-    auto simulation = wrench::Simulation::createSimulation();;
+    auto simulation = wrench::Simulation::createSimulation();
+    ;
     simulation->init(&argc, argv);
 
     if (argc < 5) {
@@ -170,7 +171,7 @@ int main(int argc, char **argv) {
 
     /* Declare a workflow */
     auto workflow = generate_workflow(no_pipelines, num_task, 1, cpu_time_sec * 1000000000,
-                                                   file_size_gb * 1000000000, mem_req_gb * 1000000000);
+                                      file_size_gb * 1000000000, mem_req_gb * 1000000000);
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
     auto storage_service = simulation->add(new wrench::SimpleStorageService(
@@ -188,7 +189,7 @@ int main(int argc, char **argv) {
     simulation->add(file_registry_service);
 
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -210,13 +211,13 @@ int main(int argc, char **argv) {
         sub_dir = "pagecache";
     }
 
-    std::string timelog_filename =  "multi/run_time_" + sub_dir + ".csv";
+    std::string timelog_filename = "multi/run_time_" + sub_dir + ".csv";
     FILE *time_log_file = fopen(timelog_filename.c_str(), "a");
-    fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start)/ 1000);
+    fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start) / 1000);
     fclose(time_log_file);
 
     {
-        std::string filename =  "multi_" + sub_dir + "dump_" + to_string(no_pipelines) + ".json";
+        std::string filename = "multi_" + sub_dir + "dump_" + to_string(no_pipelines) + ".json";
         simulation->getOutput().dumpUnifiedJSON(workflow, filename);
         std::cerr << "Written output to file " + filename << "\n";
     }
@@ -225,7 +226,7 @@ int main(int argc, char **argv) {
         std::string filename = "multi_" + sub_dir + "timestamp_multi_sim_.csv";
         export_output_multi(simulation->getOutput(), workflow->getNumberOfTasks(), filename);
         std::cerr << "Written output to file " + filename << "\n";
-//        simulation->getMemoryManagerByHost("host01")->export_log("multi/" + sub_dir + to_string(no_pipelines) + "_sim_mem.csv");
+        //        simulation->getMemoryManagerByHost("host01")->export_log("multi/" + sub_dir + to_string(no_pipelines) + "_sim_mem.csv");
     }
 
     return 0;

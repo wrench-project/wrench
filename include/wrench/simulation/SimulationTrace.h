@@ -30,7 +30,6 @@ namespace wrench {
 
     public:
         virtual ~GenericSimulationTrace() {}
-
     };
     /***********************/
     /** \endcond           */
@@ -45,10 +44,10 @@ namespace wrench {
      *
      * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
      */
-    template <class T> class SimulationTrace : public GenericSimulationTrace  {
+    template<class T>
+    class SimulationTrace : public GenericSimulationTrace {
 
     public:
-
         /**
          * @brief Append a timestamp to the trace
          *
@@ -56,7 +55,7 @@ namespace wrench {
          * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
         void addTimestamp(SimulationTimestamp<T> *timestamp) {
-          this->trace.push_back(timestamp);
+            this->trace.push_back(timestamp);
         }
 
 
@@ -67,16 +66,16 @@ namespace wrench {
          * @return a vector of pointers to SimulationTimestamp<T> objects
          */
         std::vector<SimulationTimestamp<T> *> getTrace() {
-          return this->trace;
+            return this->trace;
         }
 
         /**
          * @brief Destructor
          */
         ~SimulationTrace<T>() {
-          for (auto &timestamp : this->trace) {
-            delete timestamp;
-          }
+            for (auto &timestamp: this->trace) {
+                delete timestamp;
+            }
         }
 
 
@@ -88,10 +87,9 @@ namespace wrench {
     /**
      * @brief A specialized class to represent a trace of SimulationTimestampPstateSet timestamps
      */
-    template <>
+    template<>
     class SimulationTrace<SimulationTimestampPstateSet> : public GenericSimulationTrace {
     public:
-
         /**
          * @brief Append a SimulationTimestampPstateSet timestamp to the trace
          * @param new_timestamp: pointer to the timestamp
@@ -106,7 +104,7 @@ namespace wrench {
                 this->latest_timestamps_by_host[hostname] = this->trace.size() - 1;
             } else {
                 // a pstate timestamp associated to this host already exists
-                SimulationTimestamp<SimulationTimestampPstateSet> *& latest_timestamp = this->trace[this->latest_timestamps_by_host[hostname]];
+                SimulationTimestamp<SimulationTimestampPstateSet> *&latest_timestamp = this->trace[this->latest_timestamps_by_host[hostname]];
 
                 // if the new_timestamp has the same date as the latest_timestamp, then the new_timestamp replaces
                 // the latest_timestamp in the trace, else the new time_stamp is added to the trace and the map of latest
@@ -156,7 +154,7 @@ namespace wrench {
     /** \endcond INTERNAL  */
     /***********************/
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_SIMULATIONTRACE_H
+#endif//WRENCH_SIMULATIONTRACE_H

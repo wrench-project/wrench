@@ -1,0 +1,70 @@
+#!/bin/bash
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+set -e
+
+INSTALL_DIR=TO_FILL_IN
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/bare-metal-bag-of-actions/wrench-example-bare-metal-bag-of-actions${normal}"
+${INSTALL_DIR}/action_api/bare-metal-bag-of-actions/wrench-example-bare-metal-bag-of-actions 10 ${INSTALL_DIR}/action_api/bare-metal-bag-of-actions/two_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/batch-bag-of-actions/wrench-example-batch-bag-of-actions${normal}"
+${INSTALL_DIR}/action_api/batch-bag-of-actions/wrench-example-batch-bag-of-actions  10 ${INSTALL_DIR}/action_api/batch-bag-of-actions/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions${normal}"
+${INSTALL_DIR}/action_api/cloud-bag-of-actions/wrench-example-cloud-bag-of-actions 10 ${INSTALL_DIR}/action_api/cloud-bag-of-actions/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/multi-action-multi-job/wrench-example-multi-action-multi-job${normal}"
+${INSTALL_DIR}/action_api/multi-action-multi-job/wrench-example-multi-action-multi-job ${INSTALL_DIR}/action_api/multi-action-multi-job/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/job-action-failure/wrench-example-job-action-failure${normal}"
+${INSTALL_DIR}/action_api/job-action-failure/wrench-example-job-action-failure ${INSTALL_DIR}/action_api/job-action-failure/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/action_api/super-custom-action/wrench-example-super-custom-action${normal}"
+${INSTALL_DIR}/action_api/super-custom-action/wrench-example-super-custom-action ${INSTALL_DIR}/action_api/super-custom-action/four_hosts.xml 
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain/wrench-example-bare-metal-chain 10 ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain/two_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain-scratch/wrench-example-bare-metal-chain-scratch${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain-scratch/wrench-example-bare-metal-chain-scratch 10 ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-chain-scratch/two_hosts_scratch.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/wrench-example-bare-metal-bag-of-tasks-programmatic-platform${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-bag-of-tasks-programmatic-platform/wrench-example-bare-metal-bag-of-tasks-programmatic-platform 10
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-multicore-tasks/wrench-example-bare-metal-multicore-tasks${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-multicore-tasks/wrench-example-bare-metal-multicore-tasks ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-multicore-tasks/two_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-complex-job/wrench-example-bare-metal-complex-job${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-complex-job/wrench-example-bare-metal-complex-job ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-complex-job/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-data-movement/wrench-example-bare-metal-data-movement ${INSTALL_DIR}/workflow_api/basic-examples/bare-metal-data-movement/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks/wrench-example-cloud-bag-of-tasks 10 ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/wrench-example-cloud-bag-of-tasks-energy 10 ${INSTALL_DIR}/workflow_api/basic-examples/cloud-bag-of-tasks-energy/four_hosts_energy.xml --wrench-energy-simulation
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/wrench-example-virtualized-cluster-bag-of-tasks${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/wrench-example-virtualized-cluster-bag-of-tasks 10 ${INSTALL_DIR}/workflow_api/basic-examples/virtualized-cluster-bag-of-tasks/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/batch-bag-of-tasks/wrench-example-batch-bag-of-tasks 10 ${INSTALL_DIR}/workflow_api/basic-examples/batch-bag-of-tasks/four_hosts.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/wrench-example-batch-pilot-job${normal}"
+${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/wrench-example-batch-pilot-job ${INSTALL_DIR}/workflow_api/basic-examples/batch-pilot-job/four_hosts_scratch.xml
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow${normal}"
+${INSTALL_DIR}/workflow_api/real-workflow-example/wrench-example-real-workflow ${INSTALL_DIR}/workflow_api/real-workflow-example/cloud_batch_platform.xml ${INSTALL_DIR}/workflow_api/real-workflow-example/1000genome-chameleon-2ch-100k-001.json 
+
+echo "${bold}RUNNING: ${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-universe${normal}"
+${INSTALL_DIR}/workflow_api/condor-grid-example/wrench-example-condor-grid-universe ${INSTALL_DIR}/workflow_api/condor-grid-example/condor-grid-hosts.xml
+
+#${INSTALL_DIR}/workflow_api/basic-examples/io-pagecache/
+
+
+

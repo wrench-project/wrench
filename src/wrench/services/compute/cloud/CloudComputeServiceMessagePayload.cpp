@@ -27,4 +27,4 @@ namespace wrench {
     SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, DESTROY_VM_REQUEST_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(CloudComputeServiceMessagePayload, DESTROY_VM_ANSWER_MESSAGE_PAYLOAD);
 
-}
+}// namespace wrench

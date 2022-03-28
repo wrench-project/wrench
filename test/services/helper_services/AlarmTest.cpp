@@ -19,12 +19,10 @@
 class AlarmTest : public ::testing::Test {
 
 public:
-
     void do_downHost_Test();
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-
     ~AlarmTest() {
         workflow->clear();
     }
@@ -67,11 +65,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -84,26 +80,24 @@ class AlarmDownHostTestWMS : public wrench::ExecutionController {
 
 public:
     AlarmDownHostTestWMS(AlarmTest *test,
-                      std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     AlarmTest *test;
 
     int main() {
 
-       // Turn off Host2
-       wrench::Simulation::turnOffHost("Host2");
+        // Turn off Host2
+        wrench::Simulation::turnOffHost("Host2");
 
-       // Start an alarm
-       auto mailbox = simgrid::s4u::Mailbox::by_name("mailbox");
-       try {
-           wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
-                                              new wrench::SimulationMessage(1), "bogus");
+        // Start an alarm
+        auto mailbox = simgrid::s4u::Mailbox::by_name("mailbox");
+        try {
+            wrench::Alarm::createAndStartAlarm(this->simulation, 10.0, "Host2", mailbox,
+                                               new wrench::SimulationMessage(1), "bogus");
             throw std::runtime_error("Should not be able to create an alarm on a down host");
-       } catch (std::shared_ptr<wrench::HostError> &e) {}
+        } catch (std::shared_ptr<wrench::HostError> &e) {}
 
 
         return 0;
@@ -132,16 +126,16 @@ void AlarmTest::do_downHost_Test() {
     std::string hostname = wrench::Simulation::getHostnameList()[0];
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new AlarmDownHostTestWMS(this, hostname)));
+                            new AlarmDownHostTestWMS(this, hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }

@@ -42,4 +42,4 @@ namespace wrench {
         return std::string("Job has timed out - likely not enough time was requested for batch job");
     }
 
-}
+}// namespace wrench

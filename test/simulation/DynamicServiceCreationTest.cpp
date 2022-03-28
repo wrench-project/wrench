@@ -35,7 +35,6 @@ public:
     void do_getReadyTasksTest_test();
 
 protected:
-
     ~DynamicServiceCreationTest() {
         workflow->clear();
     }
@@ -137,12 +136,10 @@ class DynamicServiceCreationReadyTasksTestWMS : public wrench::ExecutionControll
 
 public:
     DynamicServiceCreationReadyTasksTestWMS(DynamicServiceCreationTest *test,
-                                            std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                            std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
-
     DynamicServiceCreationTest *test;
 
     int main() {
@@ -191,8 +188,8 @@ private:
         std::vector<std::string> execution_hosts = {"QuadCoreHost"};
         auto dynamically_created_compute_service = std::dynamic_pointer_cast<wrench::CloudComputeService>(simulation->startNewService(
                 new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                                { })));
-        std::vector<std::shared_ptr<wrench::WorkflowTask> > tasks = this->test->workflow->getReadyTasks();
+                                                {})));
+        std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = this->test->workflow->getReadyTasks();
 
         // Create a VM
         auto vm_name = dynamically_created_compute_service->createVM(4, 10);
@@ -200,7 +197,7 @@ private:
 
         std::shared_ptr<wrench::StandardJob> one_task_jobs[5];
         int job_index = 0;
-        for (auto task : tasks) {
+        for (auto task: tasks) {
             try {
                 one_task_jobs[job_index] = job_manager->createStandardJob(
                         {task},
@@ -225,7 +222,7 @@ private:
 
 
         // Wait for workflow execution events
-        for (auto task : tasks) {
+        for (auto task: tasks) {
             std::shared_ptr<wrench::ExecutionEvent> event;
             try {
                 event = this->waitForNextEvent();
@@ -237,7 +234,7 @@ private:
             }
         }
 
-        for (auto & j : one_task_jobs) {
+        for (auto &j: one_task_jobs) {
             if (j->getNumCompletedTasks() != 1) {
                 throw std::runtime_error("A job with one completed task1 should say it has one completed task1");
             }
@@ -271,14 +268,14 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     std::string hostname = "DualCoreHost";
 
     // Bogus startNewService() calls
-    ASSERT_THROW(simulation->startNewService((wrench::ComputeService *)nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->startNewService((wrench::StorageService *)nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *)nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *)nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->startNewService((wrench::ComputeService *)666), std::runtime_error);
-    ASSERT_THROW(simulation->startNewService((wrench::StorageService *)666), std::runtime_error);
-    ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *)666), std::runtime_error);
-    ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *)666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::ComputeService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::StorageService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *) nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->startNewService((wrench::ComputeService *) 666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::StorageService *) 666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *) 666), std::runtime_error);
+    ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *) 666), std::runtime_error);
 
     // Create a Storage Service
     storage_service = simulation->add(
@@ -287,9 +284,10 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new DynamicServiceCreationReadyTasksTestWMS(this, hostname)));
+                            new DynamicServiceCreationReadyTasksTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -301,9 +299,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-

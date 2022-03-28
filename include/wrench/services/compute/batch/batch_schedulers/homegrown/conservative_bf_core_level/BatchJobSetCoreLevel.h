@@ -25,7 +25,6 @@ namespace wrench {
     class BatchJobSetCoreLevel {
 
     public:
-
         BatchJobSetCoreLevel() = default;
 
         /** @brief The job set **/
@@ -39,9 +38,8 @@ namespace wrench {
          * @param right: right-hand side
          * @return
          */
-        BatchJobSetCoreLevel& operator += (const BatchJobSetCoreLevel& right)
-        {
-            for (const auto &j : right.jobs) {
+        BatchJobSetCoreLevel &operator+=(const BatchJobSetCoreLevel &right) {
+            for (const auto &j: right.jobs) {
                 add(j);
             }
             return *this;
@@ -52,9 +50,8 @@ namespace wrench {
          * @param right: right-hand side
          * @return
          */
-        BatchJobSetCoreLevel& operator -= (const BatchJobSetCoreLevel& right)
-        {
-            for (const auto &j : right.jobs) {
+        BatchJobSetCoreLevel &operator-=(const BatchJobSetCoreLevel &right) {
+            for (const auto &j: right.jobs) {
                 remove(j);
             }
             return *this;
@@ -66,8 +63,8 @@ namespace wrench {
          */
         void inline add(std::shared_ptr<BatchJob> job) {
             if (this->jobs.find(job) == this->jobs.end()) {
-                for (auto const &i : job->getAllocatedNodeIndices()) {
-                    if (this->core_utilization.find(i) == this->core_utilization.end())  {
+                for (auto const &i: job->getAllocatedNodeIndices()) {
+                    if (this->core_utilization.find(i) == this->core_utilization.end()) {
                         this->core_utilization[i] = job->getRequestedCoresPerNode();
                     } else {
                         this->core_utilization[i] += job->getRequestedCoresPerNode();
@@ -82,20 +79,19 @@ namespace wrench {
          * @param job: the batch_standard_and_pilot_jobs job
          */
         void inline remove(std::shared_ptr<BatchJob> job) {
-            if  (this->jobs.find(job) != this->jobs.end()) {
-                for (auto const &i : job->getAllocatedNodeIndices()) {
+            if (this->jobs.find(job) != this->jobs.end()) {
+                for (auto const &i: job->getAllocatedNodeIndices()) {
                     this->core_utilization[i] -= job->getRequestedCoresPerNode();
                 }
                 this->jobs.erase(job);
             }
         }
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-}
+}// namespace wrench
 
-#endif //WRENCH_BATCHJOBSETCORELEVEL_H
+#endif//WRENCH_BATCHJOBSETCORELEVEL_H
