@@ -12,7 +12,8 @@
 #include <wrench/services/storage/xrootd/XRootD.h>
 namespace wrench {
     namespace XRootD{
-
+//todo add specific handling for boing a file server
+//todo mae children a vector
             std::shared_ptr<SimpleStorageService> Node::getStorageServer(){}
             Node* Node::getChild(int n){
                 if(children!=nullptr&&n>0&&n<numChildren){
@@ -26,6 +27,7 @@ namespace wrench {
             }
 
             bool Node::lookupFile(std::shared_ptr<DataFile>file){
+                //seperate handling if not supervisor
                 return XRootDSearch(file).empty();
 
             }
@@ -36,6 +38,7 @@ namespace wrench {
                 return cache[file];//once timestamps are implimented also check the file is still in cache it (remove if not) and unwrap, and refresh timestamp
             }
             void Node::deleteFile(std::shared_ptr<DataFile>file){
+                //seperate handling if not supervisor
                 auto allNodes=metavisor->getFileNodes(file);
                 auto allSub=searchAll(allNodes);
                 auto allLocation =traverse(allSub,file,true);
@@ -44,6 +47,7 @@ namespace wrench {
                 }
             }//meta delete from sub tree
             void Node::readFile(std::shared_ptr<DataFile>file){
+                //seperate handling if not supervisor
                 auto locations=XRootDSearch(file);
                 //determine best location
                 shared_ptr<FileLocation> best;
@@ -86,6 +90,8 @@ namespace wrench {
                         while(!nodes.empty()){
                             node=nodes.top();
                             //some message thing here I dont know
+                            //add to cache
+                            nodes.pop();
                         }
                     }
             }//fake a search for the file, adding to the cache as we return
@@ -115,7 +121,7 @@ namespace wrench {
                         return ret;
                     }
                     current=current->supervisor;
-                    if(ret.size()>metavisor->files.size()){//crude cycle detection, but should prevent infinite unexplainable loop on file read
+                    if(ret.size()>metavisor->nodes.size()){//crude cycle detection, but should prevent infinite unexplainable loop on file read
                        throw std::runtime_error("Cycle detected in XRootD file server.  This version of wrench does not support cycles within XRootD.");
                     }
                 }while( current!=nullptr);
