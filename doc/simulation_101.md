@@ -9,17 +9,14 @@ simulator.
 
 A simulator is a software artifact that mimics the behavior of some system
 of interest.  In the context of the WRENCH project, the systems of
-interests are parallel and distributed platforms on which run various
-software runtime systems by which some application workload is to be
+interest are parallel and distributed platforms on which various
+software runtime systems are deployed by which some application workload is to be
 executed.  For instance, the platform could be a homogeneous cluster with
 some network attached storage, the software runtime systems could be a batch
 scheduler and a file server that controls access to the network attached
 storage, and the application workload could be a scientific workflow. The
-system could be much more complex, with different kinds of compute and
-storage services running on hardware resources connected over a wide-area
-network, including virtual machine instances provided by cloud
-infrastructures. Regardless, the underlying concepts are the same, and are
-outlined hereafter.
+system could be much more complex, with different kinds of 
+runtime systems running on hardware or virtualized resources connected over a wide-area network.
 
 # Simulated Platform    {#simulated-platform}
 
@@ -30,15 +27,16 @@ be stored and accessed.  The hosts are interconnected with each other over
 a network (otherwise this wouldn't be parallel and distributed computing).
 The network is a set of network **links**, each with some latency and
 bandwidth specification. Two hosts are connected via a network path, which
-is simply a sequence of links.
+is simply a sequence of links through which messages between the two
+hosts are routed. 
 
-The above concepts allow us to describe a platform to be simulated, that
+The above concepts allow us to describe a simulated platform that
 can resemble real-world, either current or upcoming, platforms. Many more
 details and features of the platform can be described, but the above
 concepts gives us enough of a basis for everything that follows. Platform
 description in WRENCH is based on the platform description capabilities in
-[SimGrid](https://simgrid.org), on which WRENCH builds: a platform can be
-described in an XML file or programmatically (see more details are given on the
+[SimGrid](https://simgrid.org): a platform can be
+described in an XML file or programmatically (see more details on the
 [WRENCH 101 page](@ref wrench-101)).
 
 # Simulated Processes   {#simulated-processes}
@@ -53,8 +51,7 @@ the characteristics of the hardware resources in the platform, and their
 usage by other processes. Process executions proceed through simulated time
 until the end of the simulation, e.g., when the application workload of
 interest has completed. At that point, the simulator can, for instance,
-print the simulated time, which is the simulated execution time of the
-application workload.
+print the simulated time.
 
 At this point, you may be thinking: "Are you telling me that I need to
 implement a bunch of simulated processes that do things and talk to each
@@ -68,23 +65,23 @@ where WRENCH comes in.
 
 # Simulated Services    {#simulated-services}
 
-WRENCH comes with a large set of already-implemented-for-you
+WRENCH comes with a large set of already-implemented
 **services**. A service is a set of one or more running simulated processes
 that simulate a software runtime system that is commonly useful and used
 for parallel and distributed computing. The two main kinds of services
-are *compute services* and *storage services*. There are other services,
-which are detailed on the [WRENCH 101 page](@ref wrench-101).
+are *compute services* and *storage services*, but there are others 
+(all detailed on the [WRENCH 101 page](@ref wrench-101)).
 
 A compute service is a runtime system to which you can say "run this
-computation" and it replies either "ok, I'll run it" or "I can". If it can
+computation" and it replies either "ok, I'll run it" or "I can't". If it can
 run it, then later on it will tell you either "It's done" or "It's failed".
 And that's it. Underneath, this entails all kinds of processes that
-compute, communicate with each other, and/or start other processes. But
-this is all abstracted away in the notion of a "service" that exposes a
+compute, communicate with each other, and start other processes. This
+complexity is all abstracted away by the service, which exposes a
 simple, high-level, easy-to-understand API.  For instance, in our example
-earlier we mentioned a batch scheduler. In the HPC (High Performance
-Computing) world, this is popular runtime system that controls access to
-and the execution of jobs on a set of compute nodes on some fast local
+earlier we mentioned a batch scheduler. For HPC (High Performance
+Computing), this is popular runtime system that manages 
+the execution of jobs on a set of compute nodes on some fast local
 network, i.e., a cluster. In the real-world, a batch scheduler consists of
 many running processes (a.k.a. daemons) running on the cluster, implements
 sophisticated algorithms to decide which job should run next, makes sure
@@ -94,23 +91,23 @@ that does all this for you, under the cover.
 
 A storage service is a runtime system to which you can say "here is some
 data I want you to store", "I want to read some bytes from that data I
-stored before", "Do you have this data?", etc.  Here again, a storage
+stored before", "Do you have this data?", etc.  A storage
 service in the real world consists of several processes (e.g., to handle
 bounded numbers of concurrent reads/writes from different clients) and can
 use non-trivial algorithms (e.g., for overlapping network communication and
 disk accesses). Here again, WRENCH comes with an already-implemented
 storage service called `wrench::SimpleStorageService` that does all this
-for you and computes with a straightforward, high-level API.
+for you and comes with a straightforward, high-level API.
 
 Each service in WRENCH comes with configurable *properties*, that are
 well-documented and can be used to specify particular features and/or
 behaviors. Each service also comes with *configurable message payloads*,
 which specify the size in bytes of the control messages that underlying
 processes exchange with each other to implement the service's
-functionality.  In the real-world, the processes the comprise a service
+functionality.  In the real-world, the processes that comprise a service
 exchange various messages, and in WRENCH you get to specify the size of all
-these messages (the larger the sizes, the longer the simulated
-communication times). See [Service Customization](@ref wrench-101-customizing-services) on the [WRENCH 101 page](@ref wrench-101).
+these messages (the larger the sizes the longer the simulated
+communication times). See more about [Service Customization](@ref wrench-101-customizing-services) on the [WRENCH 101 page](@ref wrench-101).
 
 
 # Simulated Controller          {#simulated-controller}
@@ -122,20 +119,20 @@ workload or about how one goes about simulating its execution. So let's...
 An application workload is executed using the services deployed on the
 platform. To do so, you need to implement one process called an **execution
 controller**. This process invokes the services to execute the application
-workload, whatever that workload is. Say for instance, the your application
-workload consists in performing some amount of computation based on input
-storage in some file.  Then the controller will ask a compute service to
-start a job to performance the computation, while reading the input from
+workload, whatever that workload is. Say, for instance, that your application
+workload consists in performing some amount of computation based on data
+in some input file.  The controller should ask a compute service to
+start a job to perform the computation, while reading the input from
 some storage service that stores the input file. Whenever the compute
 service replies that the computation has finished, then the execution
 controller's work is done.
 
-The execution controller is the core of the simulator, as it is when you
-can implement whatever algorithm/strategy you wish to simulate for
-executing the application workload.  We won't say more here, even though
-at this point the execution controller likely seems a bit abstract.
-This is why the simulation controller is the main topic of
-the [WRENCH 102 page](@ref wrench-102)!
+The execution controller is the core of the simulator, as it is where you
+implement whatever algorithm/strategy you wish to simulate for executing
+the application workload.  At this point the execution controller likely
+seems a bit abstract. But we won't say more about it untill you get to the
+[WRENCH 102 page](@ref wrench-102), which is exclusively about the
+controller.
 
 
 # What's next
