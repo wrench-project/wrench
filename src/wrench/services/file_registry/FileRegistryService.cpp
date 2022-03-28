@@ -38,8 +38,7 @@ namespace wrench {
     FileRegistryService::FileRegistryService(
             std::string hostname,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) :
-            Service(hostname, "file_registry") {
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname, "file_registry") {
 
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
@@ -58,7 +57,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(std::shared_ptr<DataFile>file) {
+    std::set<std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(std::shared_ptr<DataFile> file) {
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
         }
@@ -69,9 +68,9 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(this->mailbox, new FileRegistryFileLookupRequestMessage(
-                    answer_mailbox, file,
-                    this->getMessagePayloadValue(
-                            FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                                                           answer_mailbox, file,
+                                                           this->getMessagePayloadValue(
+                                                                   FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -85,9 +84,9 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
             std::set<std::shared_ptr<FileLocation>> result = msg->locations;
-//        msg->locations.clear(); // TODO: Understand why this removes a memory_manager_service leak
+            //        msg->locations.clear(); // TODO: Understand why this removes a memory_manager_service leak
             return result;
         } else {
             throw std::runtime_error(
@@ -105,7 +104,7 @@ namespace wrench {
      * @return a map of <distance , file location> pairs
      */
     std::map<double, std::shared_ptr<FileLocation>> FileRegistryService::lookupEntry(
-            std::shared_ptr<DataFile>file,
+            std::shared_ptr<DataFile> file,
             std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service) {
 
@@ -146,7 +145,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *>(message.get())) {
             return msg->locations;
         } else {
             throw std::runtime_error(
@@ -163,7 +162,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntry(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
         }
@@ -191,7 +190,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
             return;
         } else {
             std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
@@ -207,7 +206,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::removeEntry(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
         }
@@ -235,8 +234,9 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage*>(message.get())) {
-            if (!msg->success) { WRENCH_WARN(
+        if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
+            if (!msg->success) {
+                WRENCH_WARN(
                         "Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
                         file->getID().c_str(), location->toString().c_str());
             }
@@ -282,7 +282,7 @@ namespace wrench {
 
         WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
 
-        if (auto msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -293,7 +293,7 @@ namespace wrench {
             }
             return false;
 
-        } else if (auto msg = dynamic_cast<FileRegistryFileLookupRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<FileRegistryFileLookupRequestMessage *>(message.get())) {
             std::set<std::shared_ptr<FileLocation>> locations = {};
             if (this->entries.find(msg->file) != this->entries.end()) {
                 locations = this->entries[msg->file];
@@ -309,7 +309,7 @@ namespace wrench {
                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage *>(message.get())) {
             std::string reference_host = msg->reference_host;
 
             std::set<std::shared_ptr<FileLocation>> all_file_locations = {};
@@ -338,7 +338,7 @@ namespace wrench {
                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = dynamic_cast<FileRegistryAddEntryRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<FileRegistryAddEntryRequestMessage *>(message.get())) {
             addEntryToDatabase(msg->file, msg->location);
 
             // Simulate an add overhead
@@ -349,7 +349,7 @@ namespace wrench {
                                              FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
             return true;
 
-        } else if (auto msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage*>(message.get())) {
+        } else if (auto msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage *>(message.get())) {
             bool success = removeEntryFromDatabase(msg->file, msg->location);
 
             // Simulate a removal overhead
@@ -374,13 +374,13 @@ namespace wrench {
      * @param file: a file
      * @param storage_service: a storage_service
      */
-    void FileRegistryService::addEntryToDatabase(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntryToDatabase(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
                     location->getStorageService()->getHostname().c_str());
         if (this->entries.find(file) == this->entries.end()) {
             this->entries[file] = {};
         }
-        for (auto e : this->entries[file]) {
+        for (auto e: this->entries[file]) {
             if (FileLocation::equal(e, location)) {
                 return;
             }
@@ -395,18 +395,17 @@ namespace wrench {
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    bool FileRegistryService::removeEntryFromDatabase(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         WRENCH_INFO("Removing file (%s) from the file registry", file->getID().c_str());
         if (this->entries.find(file) != this->entries.end()) {
-            for (auto const &l : this->entries[file]) {
+            for (auto const &l: this->entries[file]) {
                 if (FileLocation::equal(l, location)) {
                     this->entries[file].erase(l);
                     return true;
-
                 }
             }
         }
         return false;
     }
 
-};
+};// namespace wrench

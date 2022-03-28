@@ -38,10 +38,9 @@ namespace wrench {
                                    const std::shared_ptr<ComputeService> &bare_metal_compute_service,
                                    const std::shared_ptr<StorageService> &client_storage_service,
                                    const std::shared_ptr<StorageService> &server_storage_service,
-                                   const std::string &hostname) :
-                                   ExecutionController (hostname,"nfs-pipeline-wms"),
-                                   workflow(workflow), bare_metal_compute_service(bare_metal_compute_service),
-                                   client_storage_service(client_storage_service), server_storage_service(server_storage_service) {
+                                   const std::string &hostname) : ExecutionController(hostname, "nfs-pipeline-wms"),
+                                                                  workflow(workflow), bare_metal_compute_service(bare_metal_compute_service),
+                                                                  client_storage_service(client_storage_service), server_storage_service(server_storage_service) {
     }
 
     /**
@@ -56,7 +55,8 @@ namespace wrench {
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
-        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());WRENCH_INFO(
+        WRENCH_INFO("WMS starting on host %s", Simulation::getHostName().c_str());
+        WRENCH_INFO(
                 "About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
         /* Create a job manager so that we can create/submit jobs */
@@ -67,7 +67,7 @@ namespace wrench {
 
             std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
-            for (const auto &ready_task : ready_tasks) {
+            for (const auto &ready_task: ready_tasks) {
 
                 /* Create a standard job for the task */
                 WRENCH_INFO("Creating a job for task %s", ready_task->getID().c_str());
@@ -78,15 +78,14 @@ namespace wrench {
                 std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies;
                 std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies;
 
-                for (const auto &input_file : ready_task->getInputFiles()) {
+                for (const auto &input_file: ready_task->getInputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {
                         file_locations[input_file] = FileLocation::LOCATION(this->client_storage_service, this->server_storage_service);
                     } else {
                         file_locations[input_file] = FileLocation::LOCATION(this->server_storage_service);
                     }
-
                 }
-                for (const auto &output_file : ready_task->getOutputFiles()) {
+                for (const auto &output_file: ready_task->getOutputFiles()) {
                     if (Simulation::isPageCachingEnabled()) {
                         file_locations[output_file] = FileLocation::LOCATION(this->server_storage_service, this->server_storage_service);
                     } else {
@@ -96,11 +95,11 @@ namespace wrench {
 
 
                 std::map<std::string, std::string> compute_args;
-                compute_args[ready_task->getID()] = "1"; // 1 core per task
+                compute_args[ready_task->getID()] = "1";// 1 core per task
 
                 /* Create the job  */
                 auto standard_job = job_manager->createStandardJob({ready_task}, file_locations,
-                        pre_file_copies, post_file_copies, {});
+                                                                   pre_file_copies, post_file_copies, {});
 
                 // Create service-specific arguments
                 std::map<std::string, std::string> batch_service_args;
@@ -123,7 +122,7 @@ namespace wrench {
                  * the event will be a StandardJobCompletionEvent, which is processed by the method
                  * processEventStandardJobCompletion() that this class overrides. */
 
-//            printf("Wait for events\n\n");
+            //            printf("Wait for events\n\n");
             this->waitForAndProcessNextEvent();
         }
 
@@ -140,8 +139,9 @@ namespace wrench {
         /* Retrieve the job that this event is for */
         auto job = event->standard_job;
         /* Retrieve the job's first (and in our case only) task */
-        auto task = job->getTasks().at(0);WRENCH_INFO("Notified that a standard job has completed task %s",
-                                                      task->getID().c_str());
+        auto task = job->getTasks().at(0);
+        WRENCH_INFO("Notified that a standard job has completed task %s",
+                    task->getID().c_str());
     }
 
     /**
@@ -162,4 +162,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

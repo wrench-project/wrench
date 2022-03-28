@@ -15,7 +15,6 @@
 class PointerUtilTest : public ::testing::Test {
 public:
     void do_moveUniqueFromSetToSet_test();
-
 };
 
 class TwoInts {
@@ -27,35 +26,33 @@ public:
 };
 
 TEST_F(PointerUtilTest, MoveUniqueFromSetToSet) {
-  DO_TEST_WITH_FORK(do_moveUniqueFromSetToSet_test);
+    DO_TEST_WITH_FORK(do_moveUniqueFromSetToSet_test);
 }
 
 void PointerUtilTest::do_moveUniqueFromSetToSet_test() {
-  std::set<std::unique_ptr<TwoInts>> src_set;
-  std::set<std::unique_ptr<TwoInts>> dst_set;
+    std::set<std::unique_ptr<TwoInts>> src_set;
+    std::set<std::unique_ptr<TwoInts>> dst_set;
 
-  src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(2,2)));
-  src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(2,2)));
+    src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(2, 2)));
+    src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(2, 2)));
 
-  dst_set.insert(std::unique_ptr<TwoInts>(new TwoInts(3,3)));
-  
-  wrench::PointerUtil::moveUniquePtrFromSetToSet(src_set.begin(), &src_set, &dst_set);
+    dst_set.insert(std::unique_ptr<TwoInts>(new TwoInts(3, 3)));
 
-  ASSERT_EQ(src_set.size(), 1);
-  ASSERT_EQ(dst_set.size(), 2);
+    wrench::PointerUtil::moveUniquePtrFromSetToSet(src_set.begin(), &src_set, &dst_set);
+
+    ASSERT_EQ(src_set.size(), 1);
+    ASSERT_EQ(dst_set.size(), 2);
 
 
-  int sum_src = 0;
-  for (const auto &e : src_set) {
-    sum_src += e->x + e->y;
-  }
-  int sum_dst = 0;
-  for (const auto &e : dst_set) {
-    sum_dst += e->x + e->y;
-  }
+    int sum_src = 0;
+    for (const auto &e: src_set) {
+        sum_src += e->x + e->y;
+    }
+    int sum_dst = 0;
+    for (const auto &e: dst_set) {
+        sum_dst += e->x + e->y;
+    }
 
-  ASSERT_EQ(sum_src, 4);
-  ASSERT_EQ(sum_dst, 10);
-
+    ASSERT_EQ(sum_src, 4);
+    ASSERT_EQ(sum_dst, 10);
 }
-

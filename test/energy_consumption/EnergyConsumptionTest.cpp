@@ -47,7 +47,6 @@ public:
     std::shared_ptr<wrench::Workflow> workflow;
 
 protected:
-
     ~EnergyConsumptionTest() {
         workflow->clear();
     }
@@ -129,11 +128,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
-        std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
+    std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
 };
 
 
@@ -145,13 +142,11 @@ class EnergyApiAccessExceptionsTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyApiAccessExceptionsTestWMS(EnergyConsumptionTest *test,
-                                     std::string& hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                     std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     EnergyConsumptionTest *test;
 
     int main() {
@@ -185,24 +180,21 @@ private:
             try {
                 std::map<std::string, double> value = this->simulation->getEnergyConsumed(std::vector<std::string>({"dummy_unavailable_host"}));
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
                 double value = this->simulation->getNumberofPstates("dummy_unavailable_host");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
                 double value = this->simulation->getCurrentPstate("dummy_unavailable_host");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
@@ -210,35 +202,30 @@ private:
             try {
                 double value = this->simulation->getMinPowerConsumption("dummy_unavailable_host");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
                 double value = this->simulation->getMaxPowerConsumption("dummy_unavailable_host");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->setPstate("dummy_unavailable_host",1);
+                this->simulation->setPstate("dummy_unavailable_host", 1);
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
 
             try {
-                this->simulation->setPstate("dummy_unavailable_host",2);
+                this->simulation->setPstate("dummy_unavailable_host", 2);
                 throw std::runtime_error(
-                        "Should not have been able to read the energy for dummy hosts"
-                );
+                        "Should not have been able to read the energy for dummy hosts");
             } catch (std::invalid_argument &e) {
             }
-
         }
 
         return 0;
@@ -271,26 +258,27 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new EnergyApiAccessExceptionsTestWMS(
-                    this,   hostname)));
+                            new EnergyApiAccessExceptionsTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -304,8 +292,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
     EXPECT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -319,14 +306,12 @@ class EnergyApiAccessExceptionsPluginNotActiveTestWMS : public wrench::Execution
 
 public:
     EnergyApiAccessExceptionsPluginNotActiveTestWMS(EnergyConsumptionTest *test,
-                                                    std::string& hostname) :
-            wrench::ExecutionController(hostname,
-                        "test") {
+                                                    std::string &hostname) : wrench::ExecutionController(hostname,
+                                                                                                         "test") {
         this->test = test;
     }
 
 private:
-
     EnergyConsumptionTest *test;
 
     int main() {
@@ -359,51 +344,44 @@ private:
             try {
                 std::map<std::string, double> value = this->simulation->getEnergyConsumed(std::vector<std::string>({"MyHost1"}));
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin"
-                );
+                        "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
                 double value = this->simulation->getNumberofPstates("MyHost1");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin"
-                );
+                        "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
                 double value = this->simulation->getCurrentPstate("MyHost1");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin"
-                );
+                        "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
                 double value = this->simulation->getMinPowerConsumption("MyHost1");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin"
-                );
+                        "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
                 double value = this->simulation->getMaxPowerConsumption("MyHost1");
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin"
-                );
+                        "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
 
             try {
-                this->simulation->setPstate("MyHost1",1);
+                this->simulation->setPstate("MyHost1", 1);
                 throw std::runtime_error(
-                        "Should not have been able to read the energy without activating energy plugin"
-                );
+                        "Should not have been able to read the energy without activating energy plugin");
             } catch (std::runtime_error &e) {
             }
-
         }
 
         return 0;
@@ -423,7 +401,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-energy-simulation");
+    //    argv[1] = strdup("--wrench-energy-simulation");
 
     EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -436,26 +414,27 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
-                    this,  hostname)));
+                            new EnergyApiAccessExceptionsPluginNotActiveTestWMS(
+                                    this, hostname)));
 
 
     // Create two workflow files
@@ -470,8 +449,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionPluginNotActiveTests_test
     EXPECT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -484,14 +462,12 @@ class EnergyConsumptionTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyConsumptionTestWMS(EnergyConsumptionTest *test,
-                             std::string& hostname) :
-            wrench::ExecutionController(hostname,
-                        "test") {
+                             std::string &hostname) : wrench::ExecutionController(hostname,
+                                                                                  "test") {
         this->test = test;
     }
 
 private:
-
     EnergyConsumptionTest *test;
 
     int main() {
@@ -520,12 +496,10 @@ private:
             double observed_duration = after - before;
             double expected_duration = 100;
             double EPSILON = 1;
-            if (std::abs(observed_duration-expected_duration) > EPSILON) {
-                throw std::runtime_error (
-                        "EnergyConsumptionTest::SimpleEnergyConsumptionTest(): Took more time to compute than expected with the current speed of the host"
-                );
+            if (std::abs(observed_duration - expected_duration) > EPSILON) {
+                throw std::runtime_error(
+                        "EnergyConsumptionTest::SimpleEnergyConsumptionTest(): Took more time to compute than expected with the current speed of the host");
             }
-
         }
 
         return 0;
@@ -557,26 +531,27 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new EnergyConsumptionTestWMS(
-                    this, hostname)));
+                            new EnergyConsumptionTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -590,8 +565,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
     EXPECT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -605,13 +579,11 @@ class EnergyAPICheckTestWMS : public wrench::ExecutionController {
 
 public:
     EnergyAPICheckTestWMS(EnergyConsumptionTest *test,
-                          std::string& hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                          std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     EnergyConsumptionTest *test;
 
     int main() {
@@ -626,54 +598,49 @@ private:
             //switch pstates right off the bat
             std::vector<int> list_of_pstates = this->simulation->getListOfPstates(simulation_hosts[1]);
             int max_num_pstate = list_of_pstates.size();
-            int pstate = std::max(0,max_num_pstate-1);
-            this->simulation->setPstate(simulation_hosts[1],pstate);
+            int pstate = std::max(0, max_num_pstate - 1);
+            this->simulation->setPstate(simulation_hosts[1], pstate);
 
             //check if the changed pstate is not equal to the current pstate
             if (cur_pstate == this->simulation->getCurrentPstate(simulation_hosts[1])) {
                 throw std::runtime_error(
-                        "The pstate should have changed but it did not change"
-                );
+                        "The pstate should have changed but it did not change");
             }
 
             //check if the max power possible/min power available in this pstate is different than the maximum power possible/min power available in the previous state
-            for (auto host:simulation_hosts) {
+            for (auto host: simulation_hosts) {
                 std::vector<int> states = this->simulation->getListOfPstates(host);
                 int prev_max_power = -1;
                 int prev_min_power = -1;
-                for (auto state:states) {
+                for (auto state: states) {
                     //check if max power is different in all the states as is in xml
-                    this->simulation->setPstate(host,state);
+                    this->simulation->setPstate(host, state);
                     if (prev_max_power == this->simulation->getMaxPowerConsumption(host)) {
                         throw std::runtime_error(
-                                "The max power from the xml and the APIs do not match"
-                        );
+                                "The max power from the xml and the APIs do not match");
                     }
                     prev_max_power = this->simulation->getMaxPowerConsumption(host);
 
                     //check if the min power is different in all the states as is in xml
-                    this->simulation->setPstate(host,state);
+                    this->simulation->setPstate(host, state);
                     if (prev_min_power == this->simulation->getMinPowerConsumption(host)) {
                         throw std::runtime_error(
-                                "The min power from the xml and the APIs do not match"
-                        );
+                                "The min power from the xml and the APIs do not match");
                     }
                     prev_min_power = this->simulation->getMinPowerConsumption(host);
                 }
             }
             //lets check if the energy consumed by host1 is less than the energy consumed by host1 + host2
             double energy_consumed_1 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
-            std::map<std::string, double> energy_consumed_2_map = this->simulation->getEnergyConsumed(std::vector<std::string>({simulation_hosts[1],simulation_hosts[2]}));
+            std::map<std::string, double> energy_consumed_2_map = this->simulation->getEnergyConsumed(std::vector<std::string>({simulation_hosts[1], simulation_hosts[2]}));
             double energy_consumed_2 = 0.0;
-            for (auto const &h : energy_consumed_2_map) {
+            for (auto const &h: energy_consumed_2_map) {
                 energy_consumed_2 += h.second;
             }
             if (energy_consumed_1 > energy_consumed_2) {
                 throw std::runtime_error(
-                        "Energy consumed by host X is greater than the combined energy consumed by host X and host Y"
-                );
+                        "Energy consumed by host X is greater than the combined energy consumed by host X and host Y");
             }
-
         }
 
         return 0;
@@ -705,26 +672,27 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new EnergyAPICheckTestWMS(
-                    this,  hostname)));
+                            new EnergyAPICheckTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -738,8 +706,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
     EXPECT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -753,14 +720,12 @@ class EnergyConsumptionPStateChangeTestWMS : public wrench::ExecutionController 
 
 public:
     EnergyConsumptionPStateChangeTestWMS(EnergyConsumptionTest *test,
-                                         std::string& hostname) :
-            wrench::ExecutionController(hostname,
-                        "test") {
+                                         std::string &hostname) : wrench::ExecutionController(hostname,
+                                                                                              "test") {
         this->test = test;
     }
 
 private:
-
     EnergyConsumptionTest *test;
 
     int main() {
@@ -807,7 +772,7 @@ private:
             int max_pstate_possible = this->simulation->getNumberofPstates(simulation_hosts[1]);
             //let's directly switch to pstate 2
             int pstate = 2;
-            this->simulation->setPstate(simulation_hosts[1],pstate);
+            this->simulation->setPstate(simulation_hosts[1], pstate);
 
             //Second energy consumption test
             double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
@@ -836,16 +801,13 @@ private:
             double exact_max_wattage_power_1 = wrench::Simulation::getMaxPowerConsumption(simulation_hosts[1]);
             double exact_max_wattage_power_2 = wrench::Simulation::getMaxPowerConsumption(simulation_hosts[1]);
             double EPSILON = 1.0;
-            double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed/higher_speed_compuation_time;
-            double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed/lower_speed_computation_time;
+            double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed / higher_speed_compuation_time;
+            double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed / lower_speed_computation_time;
 
-            if (std::abs(exact_max_wattage_power_1-computed_wattage_power_1) > EPSILON && std::abs(exact_max_wattage_power_2-computed_wattage_power_2) > EPSILON) {
+            if (std::abs(exact_max_wattage_power_1 - computed_wattage_power_1) > EPSILON && std::abs(exact_max_wattage_power_2 - computed_wattage_power_2) > EPSILON) {
                 throw std::runtime_error(
-                        "Something wrong with the computed energy and the expected energy consumption"
-                );
+                        "Something wrong with the computed energy and the expected energy consumption");
             }
-
-
         }
 
         return 0;
@@ -878,26 +840,27 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk1"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk1"})));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service2 = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"})));
+                            new wrench::SimpleStorageService(hostname, {"/disk2"})));
 
 
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(compute_hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new EnergyConsumptionPStateChangeTestWMS(
-                    this, hostname)));
+                            new EnergyConsumptionPStateChangeTestWMS(
+                                    this, hostname)));
 
     // Create two workflow files
     std::shared_ptr<wrench::DataFile> input_file = this->workflow->addFile("input_file", 10000.0);
@@ -911,12 +874,10 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
     EXPECT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -927,14 +888,12 @@ class PluginNotActivatedTestWMS : public wrench::ExecutionController {
 
 public:
     PluginNotActivatedTestWMS(EnergyConsumptionTest *test,
-                              std::string& hostname) :
-            wrench::ExecutionController(hostname,
-                        "test") {
+                              std::string &hostname) : wrench::ExecutionController(hostname,
+                                                                                   "test") {
         this->test = test;
     }
 
 private:
-
     EnergyConsumptionTest *test;
 
     int main() {
@@ -955,7 +914,6 @@ private:
             //Second energy consumption test
             wrench::Simulation::sleep(10);
             double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumed(simulation_hosts[1]);
-
         }
 
         return 0;
@@ -986,21 +944,21 @@ void EnergyConsumptionTest::do_PluginNotActive_test() {
 
     // Create a Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService(hostname,
-                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
-                                                "/scratch", {})));
+                            new wrench::BareMetalComputeService(hostname,
+                                                                {std::make_pair(hostname, std::make_tuple(wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM))},
+                                                                "/scratch", {})));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new PluginNotActivatedTestWMS(this, hostname)));
+                            new PluginNotActivatedTestWMS(this, hostname)));
 
     EXPECT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-

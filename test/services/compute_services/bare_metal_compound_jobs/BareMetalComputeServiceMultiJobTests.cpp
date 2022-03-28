@@ -29,7 +29,6 @@ public:
     void do_DAGOfJobs_test();
 
 protected:
-
     ~BareMetalComputeServiceActionMultiJobTest() {
         workflow->clear();
     }
@@ -107,14 +106,11 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
-
 
 
 /**********************************************************************/
@@ -125,12 +121,9 @@ class DAGOfJobsTestWMS : public wrench::ExecutionController {
 public:
     DAGOfJobsTestWMS(
             BareMetalComputeServiceActionMultiJobTest *test,
-            std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test)
-            { }
+            std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {}
 
 private:
-
     BareMetalComputeServiceActionMultiJobTest *test;
 
     int main() {
@@ -173,7 +166,7 @@ private:
         job_manager->submitJob(job1, this->test->compute_service);
 
         // Wait for events
-        for (int i=0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             this->waitForNextEvent();
         }
 
@@ -203,7 +196,7 @@ void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("multi_action_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -217,24 +210,24 @@ void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     // Create a Compute Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(compute_service = simulation->add(
-            new wrench::BareMetalComputeService("Host3",
-                                                {std::make_pair("Host4",
-                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM))},
-                                                {"/scratch"},
-                                                {})));
+                            new wrench::BareMetalComputeService("Host3",
+                                                                {std::make_pair("Host4",
+                                                                                std::make_tuple(wrench::ComputeService::ALL_CORES,
+                                                                                                wrench::ComputeService::ALL_RAM))},
+                                                                {"/scratch"},
+                                                                {})));
 
     // Create a Storage Service
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     ASSERT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService("Host2", {"/"})));
+                            new wrench::SimpleStorageService("Host2", {"/"})));
 
     // Create a WMS
     ASSERT_THROW(simulation->launch(), std::runtime_error);
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     std::string hostname = "Host1";
     ASSERT_NO_THROW(wms = simulation->add(
-            new DAGOfJobsTestWMS(this, hostname)));
+                            new DAGOfJobsTestWMS(this, hostname)));
 
     simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -249,9 +242,7 @@ void BareMetalComputeServiceActionMultiJobTest::do_DAGOfJobs_test() {
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-

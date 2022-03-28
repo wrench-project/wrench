@@ -21,7 +21,7 @@ wrench::ResourceRandomRepeatSwitcher::ResourceRandomRepeatSwitcher(std::string h
                                                                    std::string resource_to_switch,
                                                                    ResourceType resource_type) :
 
-        Service(host_on_which_to_run, "resource_switcher") {
+                                                                                                 Service(host_on_which_to_run, "resource_switcher") {
     this->seed = seed;
     this->min_sleep_before_off_time = min_sleep_before_off_time;
     this->max_sleep_before_off_time = max_sleep_before_off_time;
@@ -81,4 +81,3 @@ int wrench::ResourceRandomRepeatSwitcher::main() {
     }
     return 0;
 }
-

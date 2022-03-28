@@ -37,7 +37,6 @@ namespace wrench {
     class CompoundJobFailedEvent : public ExecutionEvent {
 
     private:
-
         friend class ExecutionEvent;
 
         /**
@@ -46,37 +45,34 @@ namespace wrench {
          * @param compute_service: a compute service
          */
         CompoundJobFailedEvent(std::shared_ptr<CompoundJob> job,
-                               std::shared_ptr<ComputeService>  compute_service,
+                               std::shared_ptr<ComputeService> compute_service,
                                std::shared_ptr<FailureCause> failure_cause)
-                : job(std::move(job)),
-                  compute_service(std::move(compute_service)),
-                  failure_cause(std::move(failure_cause)) {}
+            : job(std::move(job)),
+              compute_service(std::move(compute_service)),
+              failure_cause(std::move(failure_cause)) {}
 
     public:
-
         /** @brief The standard job that has failed */
         std::shared_ptr<CompoundJob> job;
         /** @brief The compute service on which the job has failed */
-        std::shared_ptr<ComputeService>  compute_service;
+        std::shared_ptr<ComputeService> compute_service;
         /** @brief The failure cause */
-        std::shared_ptr<FailureCause>  failure_cause;
+        std::shared_ptr<FailureCause> failure_cause;
 
         /** 
          * @brief Get a textual description of the event
          * @return a text string
          */
         std::string toString() override { return "CompoundJobFailedEvent (job: " + this->job->getName() + "; cs = " +
-                                                 this->compute_service->getName() + ")";}
-
+                                                 this->compute_service->getName() + ")"; }
     };
 
 
-};
+};// namespace wrench
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
-
-#endif //WRENCH_COMPOUND_JOB_FAILED_H
+#endif//WRENCH_COMPOUND_JOB_FAILED_H

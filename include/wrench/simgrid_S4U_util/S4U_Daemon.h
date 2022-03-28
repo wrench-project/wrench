@@ -39,17 +39,15 @@ namespace wrench {
         };
 
 
-
     public:
-
-        static std::unordered_map<aid_t , simgrid::s4u::Mailbox*> map_actor_to_recv_mailbox;
+        static std::unordered_map<aid_t, simgrid::s4u::Mailbox *> map_actor_to_recv_mailbox;
 
         /** @brief The name of the daemon */
         std::string process_name;
-//        /** @brief The initial name of the daemon's mailbox */
-//        std::string initial_mailbox_name;
-//        /** @brief The current name of the daemon's mailbox */
-//        std::string mailbox_name;
+        //        /** @brief The initial name of the daemon's mailbox */
+        //        std::string initial_mailbox_name;
+        //        /** @brief The current name of the daemon's mailbox */
+        //        std::string mailbox_name;
 
         /** @brief The daemon's mailbox **/
         simgrid::s4u::Mailbox *mailbox;
@@ -64,7 +62,7 @@ namespace wrench {
         S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         // Daemon without a mailbox (not needed?)
-//        S4U_Daemon(std::string hostname, std::string process_name_prefix);
+        //        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         virtual ~S4U_Daemon();
 
@@ -98,11 +96,11 @@ namespace wrench {
         /** @brief Daemon states */
         enum State {
             /** @brief UP state: the daemon has been started and is still running */
-                    UP,
+            UP,
             /** @brief DOWN state: the daemon has been shutdown and/or has terminated */
-                    DOWN,
+            DOWN,
             /** @brief SUSPENDED state: the daemon has been suspended (and hopefully will be resumed0 */
-                    SUSPENDED,
+            SUSPENDED,
         };
 
         S4U_Daemon::State getState();
@@ -134,35 +132,31 @@ namespace wrench {
         bool killActor();
 
 
-
         /** @brief The number of time that this daemon has started (i.e., 1 + number of restarts) */
         unsigned int num_starts = 0;
 
     private:
-
-
         // Lock used typically to prevent kill() from killing the actor
         // while it's in the middle of doing something critical
         simgrid::s4u::MutexPtr daemon_lock;
 
         simgrid::s4u::ActorPtr s4u_actor;
 
-        bool has_returned_from_main = false; // Set to true after main returns
-        int return_value = 0; // Set to the value returned by main
-        bool daemonized; // Set to true if daemon is daemonized
-        bool auto_restart; // Set to true if daemon is supposed to auto-restart
+        bool has_returned_from_main = false;// Set to true after main returns
+        int return_value = 0;               // Set to the value returned by main
+        bool daemonized;                    // Set to true if daemon is daemonized
+        bool auto_restart;                  // Set to true if daemon is supposed to auto-restart
 
 
 #ifdef ACTOR_TRACKING_OUTPUT
         std::string process_name_prefix;
 #endif
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_SIM4U_DAEMONWITHMAILBOX_H
+#endif//WRENCH_SIM4U_DAEMONWITHMAILBOX_H

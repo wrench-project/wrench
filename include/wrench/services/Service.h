@@ -20,18 +20,17 @@
 #include "wrench/services/ServiceProperty.h"
 #include "wrench/services/ServiceMessagePayload.h"
 namespace wrench {
-    typedef std::map<WRENCH_PROPERTY_TYPE,std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
-    typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE ,double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+    typedef std::map<WRENCH_PROPERTY_TYPE, std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
+    typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
     class FailureCause;
 
     /**
      * @brief A service that can be added to the simulation and that can be used by a WMS
      *        when executing a workflow
      */
-class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> {
+    class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> {
 
     public:
-
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
@@ -65,7 +64,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         /***********************/
 
         double getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE);
-        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& getMessagePayloadList() const;
+        const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &getMessagePayloadList() const;
 
         void setStateToDown();
 
@@ -74,7 +73,6 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         /***********************/
 
     protected:
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -92,7 +90,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         Service(std::string hostname, std::string process_name_prefix);
 
         // Property stuff
-        void setProperty(WRENCH_PROPERTY_TYPE, const std::string&);
+        void setProperty(WRENCH_PROPERTY_TYPE, const std::string &);
 
         void setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
                            WRENCH_PROPERTY_COLLECTION_TYPE overriden_property_values);
@@ -125,7 +123,7 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
          * @tparam T: the class of the service (the base class is Service)
          * @return a shared pointer
          */
-        template <class T>
+        template<class T>
         std::shared_ptr<T> getSharedPtr() {
             return std::dynamic_pointer_cast<T>(this->shared_from_this());
         }
@@ -135,13 +133,11 @@ class Service : public S4U_Daemon, public std::enable_shared_from_this<Service> 
         bool shutting_down = false;
 
     private:
-
         /***********************/
         /** \endcond           */
         /***********************/
-
     };
-};
+};// namespace wrench
 
 
-#endif //WRENCH_SERVICE_H
+#endif//WRENCH_SERVICE_H

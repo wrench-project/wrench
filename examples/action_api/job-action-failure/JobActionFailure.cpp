@@ -33,7 +33,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "JobActionFailureController.h" // Controller implementation
+#include "JobActionFailureController.h"// Controller implementation
 
 /**
  * @brief The Simulator's main function

@@ -49,6 +49,6 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the service in answer to a VM destruction request. **/
         DECLARE_MESSAGEPAYLOAD_NAME(DESTROY_VM_ANSWER_MESSAGE_PAYLOAD);
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_CLOUDSERVICEMESSAGEPAYLOAD_H
+#endif//WRENCH_CLOUDSERVICEMESSAGEPAYLOAD_H

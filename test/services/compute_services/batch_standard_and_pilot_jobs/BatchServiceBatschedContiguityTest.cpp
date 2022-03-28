@@ -24,7 +24,6 @@ WRENCH_LOG_CATEGORY(batch_service_contiguity_test, "Log category for BatchServic
 class BatchServiceBatschedContiguityTest : public ::testing::Test {
 
 public:
-
     std::shared_ptr<wrench::Workflow> workflow;
 
     std::shared_ptr<wrench::ComputeService> batch_service_conservative_bf_contiguous = nullptr;
@@ -64,11 +63,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -80,13 +77,11 @@ class BatchJobContiguousAllocationTestWMS : public wrench::ExecutionController {
 
 public:
     BatchJobContiguousAllocationTestWMS(BatchServiceBatschedContiguityTest *test,
-                                        std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
-
     BatchServiceBatschedContiguityTest *test;
 
     int main() {
@@ -99,7 +94,7 @@ private:
         compute_services.push_back(this->test->batch_service_easy_bf_contiguous);
         compute_services.push_back(this->test->batch_service_easy_bf_non_contiguous);
 
-        for (auto const &cs : compute_services) {
+        for (auto const &cs: compute_services) {
 
             std::shared_ptr<wrench::WorkflowTask> task1 = this->test->workflow->addTask(cs->getName() + "task1", 59, 1, 1, 0);
             std::shared_ptr<wrench::WorkflowTask> task2 = this->test->workflow->addTask(cs->getName() + "task2", 118, 1, 1, 0);
@@ -114,7 +109,7 @@ private:
             std::map<std::string, std::string> batch_job_args1;
             batch_job_args1["-N"] = "1";
             batch_job_args1["-t"] = "1"; //time in minutes
-            batch_job_args1["-c"] = "10"; // Get all cores
+            batch_job_args1["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args1);
             } catch (wrench::ExecutionException &e) {
@@ -126,7 +121,7 @@ private:
             std::map<std::string, std::string> batch_job_args2;
             batch_job_args2["-N"] = "2";
             batch_job_args2["-t"] = "2"; //time in minutes
-            batch_job_args2["-c"] = "10"; // Get all cores
+            batch_job_args2["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args2);
             } catch (wrench::ExecutionException &e) {
@@ -138,7 +133,7 @@ private:
             std::map<std::string, std::string> batch_job_args3;
             batch_job_args3["-N"] = "1";
             batch_job_args3["-t"] = "1"; //time in minutes
-            batch_job_args3["-c"] = "10"; // Get all cores
+            batch_job_args3["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args3);
             } catch (wrench::ExecutionException &e) {
@@ -150,7 +145,7 @@ private:
             std::map<std::string, std::string> batch_job_args4;
             batch_job_args4["-N"] = "2";
             batch_job_args4["-t"] = "1"; //time in minutes
-            batch_job_args4["-c"] = "10"; // Get all cores
+            batch_job_args4["-c"] = "10";// Get all cores
             try {
                 job_manager->submitJob(job, cs, batch_job_args4);
             } catch (wrench::ExecutionException &e) {
@@ -229,41 +224,26 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     // Create a Batch Service
     batch_service_conservative_bf_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "true"}
-                                            }));
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}, {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}, {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "true"}}));
 
     batch_service_conservative_bf_non_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "conservative_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}
-                                            }));
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}, {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}, {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}}));
 
     batch_service_easy_bf_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "easy_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "true"}
-                                            }));
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}, {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}, {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "true"}}));
 
     batch_service_easy_bf_non_contiguous = simulation->add(
             new wrench::BatchComputeService(hostname,
-                                            {"Host1", "Host2", "Host3", "Host4"}, "", {
-                                                    {wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "easy_bf"},
-                                                    {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY,       "0"},
-                                                    {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}
-                                            }));
+                                            {"Host1", "Host2", "Host3", "Host4"}, "", {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}, {wrench::BatchComputeServiceProperty::BATCH_RJMS_PADDING_DELAY, "0"}, {wrench::BatchComputeServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION, "false"}}));
 
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(new BatchJobContiguousAllocationTestWMS(
-            this, hostname)));
+                            this, hostname)));
 
     // Running a "run a single task1" simulation
     // Note that in these tests the WMS creates workflow tasks, which a user would
@@ -271,10 +251,7 @@ void BatchServiceBatschedContiguityTest::do_BatchJobContiguousAllocationTest_tes
     ASSERT_NO_THROW(simulation->launch());
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
-
-

@@ -33,7 +33,7 @@ namespace wrench {
      * @param prefix: the action's name prefix (if name is empty)
      * @param job: the job that contains this action
      */
-    Action::Action(const std::string& name, const std::string& prefix, std::shared_ptr<CompoundJob> job) {
+    Action::Action(const std::string &name, const std::string &prefix, std::shared_ptr<CompoundJob> job) {
         if (name.empty()) {
             this->name = prefix + std::to_string(Action::getNewUniqueNumber());
         } else {
@@ -42,8 +42,6 @@ namespace wrench {
         this->job = std::move(job);
 
         this->execution_history.push(Action::ActionExecution());
-        this->simulate_computation_as_sleep = false;
-        this->thread_creation_overhead = 0.0;
         this->priority = 0.0;
     }
 
@@ -78,7 +76,7 @@ namespace wrench {
      * @return a string
      */
     std::string Action::stateToString(Action::State state) {
-        switch(state) {
+        switch (state) {
             case Action::State::NOT_READY:
                 return "NOT READY";
             case Action::State::READY:
@@ -120,7 +118,7 @@ namespace wrench {
     void Action::setState(Action::State new_state) {
         auto old_state = this->execution_history.top().state;
         this->job.lock()->updateStateActionMap(this->getSharedPtr(), old_state, new_state);
-//        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
+        //        std::cerr << "ACTION " << this->getName() << ": " << Action::stateToString(old_state) << "-->" << Action::stateToString(new_state) << "\n";
         this->execution_history.top().state = new_state;
     }
 
@@ -206,14 +204,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set whether simulation should be simulated as sleep (default = false)
-     * @param simulate_computation_as_sleep: true or false
-     */
-    void Action::setSimulateComputationAsSleep(bool simulate_computation_as_sleep) {
-        this->simulate_computation_as_sleep = simulate_computation_as_sleep;
-    }
-
-    /**
      * @brief Create a new execution data structure (e.g., after a restart)
      * @param state: the action state
      */
@@ -230,14 +220,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the thread creation overhead (default = zero)
-     * @param overhead_in_seconds: overhead in seconds
-     */
-    void Action::setThreadCreationOverhead(double overhead_in_seconds) {
-        this->thread_creation_overhead = overhead_in_seconds;
-    }
-
-    /**
      * @brief Update the action's state
      */
     void Action::updateState() {
@@ -247,7 +229,7 @@ namespace wrench {
         }
         // Ready?
         bool ready = true;
-        for (auto const &p : this->parents) {
+        for (auto const &p: this->parents) {
             if (p->getState() != Action::State::COMPLETED) {
                 ready = false;
                 break;
@@ -299,7 +281,7 @@ namespace wrench {
      */
     std::set<std::shared_ptr<Action>> Action::getChildren() {
         std::set<std::shared_ptr<Action>> to_return;
-        for (auto const &c : this->children) {
+        for (auto const &c: this->children) {
             to_return.insert(c->getSharedPtr());
         }
         return to_return;
@@ -311,7 +293,7 @@ namespace wrench {
      */
     std::set<std::shared_ptr<Action>> Action::getParents() {
         std::set<std::shared_ptr<Action>> to_return;
-        for (auto const &p : this->parents) {
+        for (auto const &p: this->parents) {
             to_return.insert(p->getSharedPtr());
         }
         return to_return;
@@ -338,7 +320,7 @@ namespace wrench {
     * @param action: the action
     * @return the type as a string
     */
-    std::string Action::getActionTypeAsString(const std::shared_ptr<Action>& action) {
+    std::string Action::getActionTypeAsString(const std::shared_ptr<Action> &action) {
         if (std::dynamic_pointer_cast<SleepAction>(action)) {
             return "SLEEP-";
         } else if (std::dynamic_pointer_cast<ComputeAction>(action)) {
@@ -371,4 +353,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

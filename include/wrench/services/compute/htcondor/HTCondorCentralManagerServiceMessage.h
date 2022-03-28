@@ -49,12 +49,11 @@ namespace wrench {
     class CentralManagerWakeUpMessage : public HTCondorCentralManagerServiceMessage {
     public:
         CentralManagerWakeUpMessage(double payload);
-
     };
 
     /***********************/
     /** \endcond INTERNAL  */
     /***********************/
-}
+}// namespace wrench
 
-#endif //WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H
+#endif//WRENCH_HTCONDORCENTRALMANAGERSERVICEMESSAGE_H

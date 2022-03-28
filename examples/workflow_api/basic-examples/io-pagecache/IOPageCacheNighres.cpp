@@ -11,7 +11,7 @@
 #include <wrench.h>
 #include <wrench/services/memory/MemoryManager.h>
 #include <wrench/tools/wfcommons/WfCommonsWorkflowParser.h>
-#include "ConcurrentPipelineWMS.h" // WMS implementation
+#include "ConcurrentPipelineWMS.h"// WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -51,7 +51,8 @@ void export_output_single(wrench::SimulationOutput output, int num_tasks, std::s
 
 int main(int argc, char **argv) {
 
-    auto simulation = wrench::Simulation::createSimulation();;
+    auto simulation = wrench::Simulation::createSimulation();
+    ;
     simulation->init(&argc, argv);
 
     if (argc < 3) {
@@ -67,7 +68,7 @@ int main(int argc, char **argv) {
     simulation->instantiatePlatform(platform_file);
 
     auto workflow = wrench::WfCommonsWorkflowParser::createWorkflowFromJSON(workflow_file, "1Gf");
-//    wrench::Workflow *workflow = nighres_workflow(16000000000);
+    //    wrench::Workflow *workflow = nighres_workflow(16000000000);
     std::cerr << workflow->getTasks().size() << "\n";
 
     std::cerr << "Instantiating a SimpleStorageService on host01..." << std::endl;
@@ -86,7 +87,7 @@ int main(int argc, char **argv) {
     simulation->add(file_registry_service);
 
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -106,22 +107,22 @@ int main(int argc, char **argv) {
     }
 
     {
-        std::string filename =  "nighres/dump_nighres_" + mode + "_sim_time.json";
+        std::string filename = "nighres/dump_nighres_" + mode + "_sim_time.json";
         simulation->getOutput().dumpUnifiedJSON(workflow, filename);
         std::cerr << "Written output to file " + filename << "\n";
     }
 
-//    {
-//        std::string filename = "nighres/nighres_" + mode + "_sim_time.csv";
-//        export_output_single(simulation->getOutput(), 4, filename);
-//        std::cerr << "Written output to file " + filename << "\n";
-//    }
-//
-//    if (wrench::Simulation::isPageCachingEnabled()) {
-//        std::string filename = "nighres/nighres_sim_mem.csv";
-//        simulation->getMemoryManagerByHost("host01")->export_log(filename);
-//        std::cerr << "Written output to file " + filename << "\n";
-//    }
+    //    {
+    //        std::string filename = "nighres/nighres_" + mode + "_sim_time.csv";
+    //        export_output_single(simulation->getOutput(), 4, filename);
+    //        std::cerr << "Written output to file " + filename << "\n";
+    //    }
+    //
+    //    if (wrench::Simulation::isPageCachingEnabled()) {
+    //        std::string filename = "nighres/nighres_sim_mem.csv";
+    //        simulation->getMemoryManagerByHost("host01")->export_log(filename);
+    //        std::cerr << "Written output to file " + filename << "\n";
+    //    }
 
     return 0;
 }

@@ -40,22 +40,21 @@ namespace wrench {
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
-                                           std::shared_ptr<DataFile>file,
+                                           std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
                                            simgrid::s4u::Mailbox *src_mailbox,
                                            std::shared_ptr<FileLocation> dst_location,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) :
-            Service(hostname, "file_transfer_thread"),
-            parent(parent),
-            file(file),
-            num_bytes_to_transfer(num_bytes_to_transfer),
-            answer_mailbox_if_read(answer_mailbox_if_read),
-            answer_mailbox_if_write(answer_mailbox_if_write),
-            answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size) {
+                                           unsigned long buffer_size) : Service(hostname, "file_transfer_thread"),
+                                                                        parent(parent),
+                                                                        file(file),
+                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                        buffer_size(buffer_size) {
         this->src_mailbox = src_mailbox;
         this->src_location = nullptr;
         this->dst_mailbox = nullptr;
@@ -67,6 +66,7 @@ namespace wrench {
      * @param hostname: host on which to run
      * @param parent: the parent storage service
      * @param file: the file corresponding to the connection
+     * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
      * @param dst_mailbox: a mailbox to send data to
      * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read ("" if none). This
@@ -79,22 +79,21 @@ namespace wrench {
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
-                                           std::shared_ptr<DataFile>file,
+                                           std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
                                            simgrid::s4u::Mailbox *dst_mailbox,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) :
-            Service(hostname, "file_transfer_thread"),
-            parent(parent),
-            file(file),
-            num_bytes_to_transfer(num_bytes_to_transfer),
-            answer_mailbox_if_read(answer_mailbox_if_read),
-            answer_mailbox_if_write(answer_mailbox_if_write),
-            answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size) {
+                                           unsigned long buffer_size) : Service(hostname, "file_transfer_thread"),
+                                                                        parent(parent),
+                                                                        file(file),
+                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                        buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
         this->src_location = src_location;
         this->dst_mailbox = dst_mailbox;
@@ -106,6 +105,7 @@ namespace wrench {
      * @param hostname: host on which to run
      * @param parent: the parent storage service
      * @param file: the file corresponding to the connection
+     * @param num_bytes_to_transfer: number of bytes to transfer
      * @param src_location: a location to read data from
      * @param dst_location: a location to send data to
      * @param answer_mailbox_if_read: the mailbox to send an answer to in case this was a file read (nullptr if none). This
@@ -118,22 +118,21 @@ namespace wrench {
      */
     FileTransferThread::FileTransferThread(std::string hostname,
                                            std::shared_ptr<StorageService> parent,
-                                           std::shared_ptr<DataFile>file,
+                                           std::shared_ptr<DataFile> file,
                                            double num_bytes_to_transfer,
                                            std::shared_ptr<FileLocation> src_location,
                                            std::shared_ptr<FileLocation> dst_location,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) :
-            Service(hostname, "file_transfer_thread"),
-            parent(parent),
-            file(file),
-            num_bytes_to_transfer(num_bytes_to_transfer),
-            answer_mailbox_if_read(answer_mailbox_if_read),
-            answer_mailbox_if_write(answer_mailbox_if_write),
-            answer_mailbox_if_copy(answer_mailbox_if_copy),
-            buffer_size(buffer_size) {
+                                           unsigned long buffer_size) : Service(hostname, "file_transfer_thread"),
+                                                                        parent(parent),
+                                                                        file(file),
+                                                                        num_bytes_to_transfer(num_bytes_to_transfer),
+                                                                        answer_mailbox_if_read(answer_mailbox_if_read),
+                                                                        answer_mailbox_if_write(answer_mailbox_if_write),
+                                                                        answer_mailbox_if_copy(answer_mailbox_if_copy),
+                                                                        buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
         this->src_location = src_location;
         this->dst_mailbox = nullptr;
@@ -172,8 +171,7 @@ namespace wrench {
                 ((answer_mailbox_if_read == nullptr) ? "none" : answer_mailbox_if_read->get_cname()),
                 ((answer_mailbox_if_write == nullptr) ? "none" : answer_mailbox_if_write->get_cname()),
                 ((answer_mailbox_if_copy == nullptr) ? "none" : answer_mailbox_if_copy->get_cname()),
-                this->buffer_size
-        );
+                this->buffer_size);
 
         // Create a message to send back (some field of which may be overwritten below)
         msg_to_send_back = new FileTransferThreadNotificationMessage(
@@ -237,15 +235,15 @@ namespace wrench {
 
         // Call retire on all mailboxes passed, which is pretty brute force be should work
         // TODO: Figure out which ones to retire in the methods called above
-//        if (answer_mailbox_if_read) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_read);
-//        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
-//        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
+        //        if (answer_mailbox_if_read) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_read);
+        //        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
+        //        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
         if (this->dst_mailbox) {
-//            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
+            //            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
         }
         if (this->src_mailbox) {
-//            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
+            //            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
         }
 
@@ -268,7 +266,7 @@ namespace wrench {
     *
     * @throw shared_ptr<FailureCause>
     */
-    void FileTransferThread::receiveFileFromNetwork(std::shared_ptr<DataFile>file,
+    void FileTransferThread::receiveFileFromNetwork(std::shared_ptr<DataFile> file,
                                                     simgrid::s4u::Mailbox *mailbox,
                                                     std::shared_ptr<FileLocation> location) {
 
@@ -293,7 +291,7 @@ namespace wrench {
             try {
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
-//                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
+                    //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
 
                 // Receive chunks and write them to disk
@@ -321,7 +319,7 @@ namespace wrench {
                     // Wait for the comm to finish
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                                dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         throw std::runtime_error(
@@ -340,14 +338,14 @@ namespace wrench {
                         simulation->writeThroughWithMemoryCache(file, msg->payload, location);
                     }
                 } else {
-//                     Write to disk
+                    //                     Write to disk
                     simulation->writeToDisk(msg->payload, location->getStorageService()->hostname,
                                             location->getMountPoint());
                 }
 
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
-//                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
+                    //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
 
             } catch (std::shared_ptr<NetworkError> &e) {
@@ -365,7 +363,7 @@ namespace wrench {
      *
      * @throw shared_ptr<FailureCause>
      */
-    void FileTransferThread::sendLocalFileToNetwork(std::shared_ptr<DataFile>file,
+    void FileTransferThread::sendLocalFileToNetwork(std::shared_ptr<DataFile> file,
                                                     std::shared_ptr<FileLocation> location,
                                                     double num_bytes_to_transfer,
                                                     simgrid::s4u::Mailbox *mailbox) {
@@ -390,7 +388,8 @@ namespace wrench {
 
                     if (Simulation::isPageCachingEnabled()) {
                         simulation->readWithMemoryCache(file, chunk_size, location);
-                    } else { WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
+                    } else {
+                        WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                         simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
                                                  location->getMountPoint());
                     }
@@ -398,9 +397,9 @@ namespace wrench {
                     remaining -= (double) (this->buffer_size);
                     if (req) {
                         req->wait();
-//                        WRENCH_INFO("Bytes sent over the network were received");
+                        //                        WRENCH_INFO("Bytes sent over the network were received");
                     }
-//                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
+                    //                    WRENCH_INFO("Asynchronously sending %s bytes over the network", std::to_string(chunk_size).c_str());
                     req = S4U_Mailbox::iputMessage(mailbox,
                                                    new StorageServiceFileContentChunkMessage(
                                                            this->file,
@@ -408,7 +407,7 @@ namespace wrench {
                 }
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
-//                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
+                    //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
                 req->wait();
                 WRENCH_INFO("Bytes sent over the network were received");
@@ -424,14 +423,15 @@ namespace wrench {
      * @param src_location: the source location
      * @param dst_location: the destination location
      */
-    void FileTransferThread::copyFileLocally(std::shared_ptr<DataFile>file,
+    void FileTransferThread::copyFileLocally(std::shared_ptr<DataFile> file,
                                              std::shared_ptr<FileLocation> src_location,
                                              std::shared_ptr<FileLocation> dst_location) {
         double remaining = file->getSize();
         double to_send = std::min<double>(this->buffer_size, remaining);
 
         if ((src_location->getStorageService() == dst_location->getStorageService()) and
-            (src_location->getFullAbsolutePath() == dst_location->getFullAbsolutePath())) { WRENCH_INFO(
+            (src_location->getFullAbsolutePath() == dst_location->getFullAbsolutePath())) {
+            WRENCH_INFO(
                     "FileTransferThread::copyFileLocally(): Copying file %s onto itself at location %s... ignoring",
                     file->getID().c_str(), src_location->toString().c_str());
             return;
@@ -453,11 +453,11 @@ namespace wrench {
                         this->buffer_size, this->buffer_size, src_location->getStorageService()->hostname,
                         src_location->getMountPoint(), dst_location->getMountPoint());
 
-//
-//                simulation->writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
-//                                            dst_location->getMountPoint());
-//                simulation->readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
-//                                             src_location->getMountPoint());
+                //
+                //                simulation->writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
+                //                                            dst_location->getMountPoint());
+                //                simulation->readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
+                //                                             src_location->getMountPoint());
 
                 remaining -= this->buffer_size;
             }
@@ -474,7 +474,7 @@ namespace wrench {
      * @param dst_location: the destination location
      * @param downloader_buffer_size: buffer size of the downloader (0 means use "ideal fluid model")
      */
-    void FileTransferThread::downloadFileFromStorageService(std::shared_ptr<DataFile>file,
+    void FileTransferThread::downloadFileFromStorageService(std::shared_ptr<DataFile> file,
                                                             std::shared_ptr<FileLocation> src_location,
                                                             std::shared_ptr<FileLocation> dst_location) {
         if (file == nullptr) {
@@ -493,7 +493,7 @@ namespace wrench {
 
         // Send a message to the source
         auto request_answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-//        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("works_by_itself");
+        //        auto mailbox_that_should_receive_file_content = S4U_Mailbox::generateUniqueMailbox("works_by_itself");
         auto mailbox_that_should_receive_file_content = S4U_Mailbox::getTemporaryMailbox();
 
         try {
@@ -550,7 +550,7 @@ namespace wrench {
                 // Receive the first chunk
                 auto msg = S4U_Mailbox::getMessage(mailbox_that_should_receive_file_content);
                 if (auto file_content_chunk_msg =
-                        dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                     done = file_content_chunk_msg->last_chunk;
                 } else {
                     S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
@@ -563,8 +563,8 @@ namespace wrench {
                 while (not done) {
                     // Issue the receive
                     auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
-//                    WRENCH_INFO("Downloaded of %f of file  %s from location %s",
-//                                msg->payload, file->getID().c_str(), src_location->toString().c_str());
+                    //                    WRENCH_INFO("Downloaded of %f of file  %s from location %s",
+                    //                                msg->payload, file->getID().c_str(), src_location->toString().c_str());
                     // Do the I/O
                     if (Simulation::isPageCachingEnabled()) {
                         simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
@@ -575,10 +575,10 @@ namespace wrench {
                                                 dst_location->getMountPoint());
                     }
                     // Wait for the comm to finish
-//                    WRENCH_INFO("Wrote of %f of file  %s", msg->payload, file->getID().c_str());
+                    //                    WRENCH_INFO("Wrote of %f of file  %s", msg->payload, file->getID().c_str());
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
-                            dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
+                                dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
                         done = file_content_chunk_msg->last_chunk;
                     } else {
                         S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
@@ -605,4 +605,4 @@ namespace wrench {
         }
     }
 
-}
+}// namespace wrench

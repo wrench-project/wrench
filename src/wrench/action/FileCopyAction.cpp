@@ -14,6 +14,7 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/exceptions/ExecutionException.h>
+#include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
 #include <utility>
 
@@ -30,21 +31,20 @@ namespace wrench {
     * @param src_file_location: the location from which the file should be read
     * @param dst_file_location: the location to which the file should be written
     */
-    FileCopyAction::FileCopyAction(const std::string& name, std::shared_ptr<CompoundJob> job,
-                                     std::shared_ptr<DataFile>file,
-                                     std::shared_ptr<FileLocation> src_file_location,
-                                     std::shared_ptr<FileLocation> dst_file_location) :
-            Action(name, "file_copy_", std::move(job)),
-            file(file),
-            src_file_location(std::move(src_file_location)),
-            dst_file_location(std::move(dst_file_location)) {
+    FileCopyAction::FileCopyAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+                                   std::shared_ptr<DataFile> file,
+                                   std::shared_ptr<FileLocation> src_file_location,
+                                   std::shared_ptr<FileLocation> dst_file_location) : Action(name, "file_copy_", std::move(job)),
+                                                                                      file(file),
+                                                                                      src_file_location(std::move(src_file_location)),
+                                                                                      dst_file_location(std::move(dst_file_location)) {
     }
 
     /**
      * @brief Returns the action's file
      * @return the file
      */
-    std::shared_ptr<DataFile>FileCopyAction::getFile() const {
+    std::shared_ptr<DataFile> FileCopyAction::getFile() const {
         return this->file;
     }
 
@@ -70,7 +70,7 @@ namespace wrench {
      */
     void FileCopyAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
         // Thread overhead
-        Simulation::sleep(this->thread_creation_overhead);
+        Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File copy
         StorageService::copyFile(
                 this->file, this->src_file_location, this->dst_file_location);
@@ -94,4 +94,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

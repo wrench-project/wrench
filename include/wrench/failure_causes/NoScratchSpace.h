@@ -37,6 +37,7 @@ namespace wrench {
         /***********************/
 
         std::string toString() override;
+
     private:
         std::string error;
     };
@@ -44,7 +45,7 @@ namespace wrench {
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
 
-#endif //WRENCH_NOSCRATCHSPACE_H
+#endif//WRENCH_NOSCRATCHSPACE_H

@@ -37,7 +37,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "OneTaskAtATimeWMS.h" // WMS implementation
+#include "OneTaskAtATimeWMS.h"// WMS implementation
 
 #define GFLOP (1000.0 * 1000.0 * 1000.0)
 
@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
     /*
      * Create a WRENCH simulation object
      */
-    auto simulation = wrench::Simulation::createSimulation();;
+    auto simulation = wrench::Simulation::createSimulation();
+    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -113,10 +114,10 @@ int main(int argc, char **argv) {
 
     /* Print all task execution information */
     std::vector<std::shared_ptr<wrench::WorkflowTask>> tasks = {task_default, task_constant_efficiency, task_amdahl};
-    for (auto const &task : tasks) {
+    for (auto const &task: tasks) {
         std::cerr << "Task " + task->getID() + ": ";
-        std::cerr << task->getFlops() << " on " << task->getNumCoresAllocated() <<" ran in ";
-        std::cerr << (task->getComputationEndDate() - task->getComputationStartDate()) << " seconds"  << std::endl;
+        std::cerr << task->getFlops() << " on " << task->getNumCoresAllocated() << " ran in ";
+        std::cerr << (task->getComputationEndDate() - task->getComputationStartDate()) << " seconds" << std::endl;
     }
 
     return 0;

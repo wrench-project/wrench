@@ -24,7 +24,9 @@
 #include <wrench/simgrid_S4U_util/S4U_VirtualMachine.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_service, "Log category for Service");
-namespace std{inline std::string to_string(std::string a){return a;}}
+namespace std {
+    inline std::string to_string(std::string a) { return a; }
+}// namespace std
 
 namespace wrench {
 
@@ -32,7 +34,7 @@ namespace wrench {
      * @brief Destructor
      */
     Service::~Service() {
-//        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
+        //        WRENCH_INFO("IN SERVICE DESTRUCTOR: %s", this->getName().c_str());
     }
 
     /**
@@ -40,8 +42,7 @@ namespace wrench {
      * @param hostname: the name of the host on which the service will run
      * @param process_name_prefix: the prefix for the process name
      */
-    Service::Service(std::string hostname, std::string process_name_prefix) :
-            S4U_Daemon(hostname, process_name_prefix) {
+    Service::Service(std::string hostname, std::string process_name_prefix) : S4U_Daemon(hostname, process_name_prefix) {
         this->name = process_name_prefix;
     }
 
@@ -50,7 +51,7 @@ namespace wrench {
       * @param property: the property
       * @param value: the property value
       */
-    void Service::setProperty(WRENCH_PROPERTY_TYPE property, const std::string& value) {
+    void Service::setProperty(WRENCH_PROPERTY_TYPE property, const std::string &value) {
         if (this->property_list.find(property) != this->property_list.end()) {
             this->property_list[property] = value;
         } else {
@@ -165,7 +166,7 @@ namespace wrench {
      * @brief Get all message payloads and their values of the Service
      * @return the message payload map
      */
-    const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE& Service::getMessagePayloadList() const {
+    const WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE &Service::getMessagePayloadList() const {
         return this->messagepayload_list;
     }
 
@@ -213,21 +214,21 @@ namespace wrench {
             // Service object deleted from under its feet
             this->createLifeSaver(this_service);
 
-//            // Keep track of the master share_ptr reference to this service
-//            Service::service_shared_ptr_map[this] = this_service;
+            //            // Keep track of the master share_ptr reference to this service
+            //            Service::service_shared_ptr_map[this] = this_service;
 
             // Start the daemon for the service
             this->startDaemon(daemonize, auto_restart);
 
-//            // Print some information a out the currently tracked daemons
-//            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
-//                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
+            //            // Print some information a out the currently tracked daemons
+            //            WRENCH_DEBUG("MAP SIZE = %ld    NUM_TERMINATED_SERVICES = %ld",
+            //                         Service::service_shared_ptr_map.size(), Service::num_terminated_services);
 
-//            if ((Service::service_shared_ptr_map.size() > 5000) or
-//                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
-//                Service::cleanupTrackedServices();
-//                Service::num_terminated_services = 0;
-//            }
+            //            if ((Service::service_shared_ptr_map.size() > 5000) or
+            //                (Service::num_terminated_services > Service::service_shared_ptr_map.size() / 2)) {
+            //                Service::cleanupTrackedServices();
+            //                Service::num_terminated_services = 0;
+            //            }
 
         } catch (std::shared_ptr<HostError> &e) {
             throw;
@@ -248,7 +249,7 @@ namespace wrench {
         if ((this->state == Service::DOWN) or (this->shutting_down)) {
             return;
         }
-        this->shutting_down = true; // This is to avoid another process calling stop() and being stuck
+        this->shutting_down = true;// This is to avoid another process calling stop() and being stuck
 
         WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox->get_cname());
 
@@ -277,7 +278,7 @@ namespace wrench {
             throw ExecutionException(cause);
         }
 
-        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
             this->state = Service::DOWN;
         } else {
             throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
@@ -293,10 +294,10 @@ namespace wrench {
      */
     void Service::suspend() {
         if (this->state == Service::DOWN) {
-            return; // ignore
+            return;// ignore
         }
         if (this->state == Service::SUSPENDED) {
-            return; // ignore
+            return;// ignore
         }
         this->state = Service::SUSPENDED;
         this->suspendActor();
@@ -360,12 +361,12 @@ namespace wrench {
     void Service::setProperties(WRENCH_PROPERTY_COLLECTION_TYPE default_property_values,
                                 WRENCH_PROPERTY_COLLECTION_TYPE overridden_poperty_values) {
         // Set default properties
-        for (auto const &p : default_property_values) {
+        for (auto const &p: default_property_values) {
             this->setProperty(p.first, p.second);
         }
 
         // Set specified properties (possible overwriting default ones)
-        for (auto const &p : overridden_poperty_values) {
+        for (auto const &p: overridden_poperty_values) {
             this->setProperty(p.first, p.second);
         }
     }
@@ -377,14 +378,14 @@ namespace wrench {
      */
     void Service::setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overridden_messagepayload_values) {
-       
+
         // Set default messagepayloads
-        for (auto const &p : default_messagepayload_values) {
+        for (auto const &p: default_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);
         }
 
         // Set specified messagepayloads (possible overwriting default ones)
-        for (auto const &p : overridden_messagepayload_values) {
+        for (auto const &p: overridden_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);
         }
     }
@@ -429,4 +430,4 @@ namespace wrench {
                     std::shared_ptr<FailureCause>(new ServiceIsSuspended(this->getSharedPtr<Service>())));
         }
     }
-};
+};// namespace wrench

@@ -95,12 +95,10 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 
@@ -114,13 +112,11 @@ class SleepActionExecutorSuccessTestWMS : public wrench::ExecutionController {
 public:
     SleepActionExecutorSuccessTestWMS(SleepActionExecutorTest *test,
                                       std::shared_ptr<wrench::Workflow> workflow,
-                                      std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), workflow(workflow) {
+                                      std::string hostname) : wrench::ExecutionController(hostname, "test"), workflow(workflow) {
     }
 
 
 private:
-
     SleepActionExecutorTest *test;
     std::shared_ptr<wrench::Workflow> workflow;
 
@@ -135,7 +131,7 @@ private:
         auto sleep_action = job->addSleepAction("", 10.0);
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0,this->mailbox, sleep_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, sleep_action, nullptr));
         // Start it
         sleep_action_executor->setSimulation(this->simulation);
         sleep_action_executor->start(sleep_action_executor, true, false);
@@ -193,16 +189,12 @@ void SleepActionExecutorTest::do_SleepActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new SleepActionExecutorSuccessTestWMS(this, wrench::Workflow::createWorkflow(), "Host1")));
+                            new SleepActionExecutorSuccessTestWMS(this, wrench::Workflow::createWorkflow(), "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
-
-
-

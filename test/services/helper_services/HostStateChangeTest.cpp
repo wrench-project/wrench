@@ -19,8 +19,6 @@ WRENCH_LOG_CATEGORY(host_state_change_detector_service_test, "Log category for H
 class HostStateChangeDetectorServiceTest : public ::testing::Test {
 
 public:
-
-
     void do_StateChangeDetection_test(bool notify_when_speed_change);
 
 protected:
@@ -43,7 +41,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -54,13 +51,11 @@ class HostStateChangeDetectorTestWMS : public wrench::ExecutionController {
 
 public:
     HostStateChangeDetectorTestWMS(HostStateChangeDetectorServiceTest *test,
-                                   std::string hostname, bool notify_when_speed_change) :
-            wrench::ExecutionController(hostname, "test"),test(test), notify_when_speed_change(notify_when_speed_change) {
+                                   std::string hostname, bool notify_when_speed_change) : wrench::ExecutionController(hostname, "test"), test(test), notify_when_speed_change(notify_when_speed_change) {
     }
 
 
 private:
-
     HostStateChangeDetectorServiceTest *test;
     bool notify_when_speed_change;
 
@@ -116,7 +111,7 @@ private:
             }
         }
 
-        ssd->kill(); // coverage
+        ssd->kill();// coverage
 
 
         return 0;
@@ -144,13 +139,12 @@ void HostStateChangeDetectorServiceTest::do_StateChangeDetection_test(bool notif
     simulation->instantiatePlatform(platform_file_path);
 
     // Create the WMS
-    auto  wms = simulation->add(new HostStateChangeDetectorTestWMS(this, "Host1", notify_when_speed_change));
+    auto wms = simulation->add(new HostStateChangeDetectorTestWMS(this, "Host1", notify_when_speed_change));
 
     simulation->launch();
 
 
-
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

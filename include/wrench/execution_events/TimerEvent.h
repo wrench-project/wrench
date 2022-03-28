@@ -42,17 +42,15 @@ namespace wrench {
     class TimerEvent : public ExecutionEvent {
 
     private:
-
         friend class ExecutionEvent;
         /**
          * @brief Constructor
          * @param content: some arbitrary message
          */
         TimerEvent(std::string message)
-                : message(message) {}
+            : message(message) {}
 
     public:
-
         /** @brief The message */
         std::string message;
 
@@ -60,16 +58,14 @@ namespace wrench {
          * @brief Get a textual description of the event
          * @return a text string
          */
-        std::string toString() override { return "TimerEvent (message: " + this->message + ")";}
-
+        std::string toString() override { return "TimerEvent (message: " + this->message + ")"; }
     };
 
-};
+};// namespace wrench
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
-
-#endif //WRENCH_TIMER_EVENT_H
+#endif//WRENCH_TIMER_EVENT_H
