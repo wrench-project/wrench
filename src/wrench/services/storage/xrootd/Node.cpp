@@ -10,13 +10,116 @@
 #include <wrench/services/storage/xrootd/Node.h>
 
 #include <wrench/services/storage/xrootd/XRootD.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/failure_causes/NetworkError.h>
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/storage/xrootd/XRootDMessage.h"
+WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
+                    "Log category for XRootD");
 namespace wrench {
     namespace XRootD{
-//todo add specific handling for boing a file server
-//todo mae children a vector
-            std::shared_ptr<SimpleStorageService> Node::getStorageServer(){}
+//todo add specific handling for being a file server
+            int Node::main() {
+                //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
+
+                // Start file storage server
+                if(internalStorage!= nullptr){
+                    internalStorage->start(internalStorage,true,true);
+
+                }
+
+                std::string message = "XRootD Node " + this->getName() + "  starting on host " + this->getHostname();
+                WRENCH_INFO("%s", message.c_str());
+
+
+                /** Main loop **/
+                while (this->processNextMessage()) {
+
+                }
+
+                WRENCH_INFO("XRootD Node %s on host %s cleanly terminating!",
+                            this->getName().c_str(),
+                            S4U_Simulation::getHostName().c_str());
+
+                return 0;
+            }
+
+            /**
+             * @brief Process a received control message
+             *
+             * @return false if the daemon should terminate
+             */
+            bool Node::processNextMessage() {
+                S4U_Simulation::computeZeroFlop();
+
+                // Wait for a message
+                std::shared_ptr<SimulationMessage> message = nullptr;
+
+                try {
+                    message = S4U_Mailbox::getMessage(this->mailbox);
+                } catch (std::shared_ptr<NetworkError> &cause) {
+                    WRENCH_INFO("Got a network error while getting some message... ignoring");
+                    return true;// oh well
+                }
+
+                WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
+
+                if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+                    try {
+                        S4U_Mailbox::putMessage(msg->ack_mailbox,
+                                                new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
+                                                        SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                    } catch (std::shared_ptr<NetworkError> &cause) {
+                        return false;
+                    }
+                    return false;
+
+                }  else if (auto msg = dynamic_cast<FileReadRequestMessage *>(message.get())) {
+                    auto all= XRootDSearch(msg->file);
+                    //search all
+                    //send message to all and appropriate stacks
+                    return true;
+                }  else if (auto msg = dynamic_cast<UpdateCacheMessage *>(message.get())) {
+                    //flops calculation
+                    //get current time
+
+                    cache[msg->file].push_back(msg->location);//does c++ handle new entries fine?  Im not sure, but testing will show it up pretty fast
+                    if(this!=msg->cache_to){
+                        S4U_Mailbox::putMessage(supervisor->mailbox,msg);
+                    }
+
+                    return true;
+
+                }  else if (auto msg = dynamic_cast<ContinueSearchMessage *>(message.get())) {
+                    if(msg->path.size()>0){//continue search in "children"
+                        auto targets=msg->path.top();
+                        msg->path.pop();
+                        //filter repeat sends
+                        for(auto target:targets){
+                            S4U_Mailbox::putMessage(target->mailbox,msg);
+                        }
+                    }
+                    if(internalStorage){//check own file system
+                        auto potentialLocaiton=FileLocation::LOCATION(internalStorage);
+                        if(StorageService::lookupFile(msg->file,potentialLocaiton)){
+                            if(supervisor&&this!=msg->cache_to){
+                                S4U_Mailbox::putMessage(supervisor->mailbox,new UpdateCacheMessage(msg->file,msg->cache_to,potentialLocaiton,MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD));
+                            }
+                        }
+                    }
+                    return true;
+                } else {
+                    throw std::runtime_error(
+                            "SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
+                }
+            }
+
+            std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
+                return internalStorage;
+            }
             Node* Node::getChild(int n){
-                if(children!=nullptr&&n>0&&n<numChildren){
+                if(n>0&&n<children.size()){
                     return children[n].get();
                 }else{
                     return nullptr;
@@ -28,6 +131,7 @@ namespace wrench {
 
             bool Node::lookupFile(std::shared_ptr<DataFile>file){
                 //seperate handling if not supervisor
+
                 return XRootDSearch(file).empty();
 
             }
@@ -129,12 +233,8 @@ namespace wrench {
                 return  std::stack<Node*>();//if we get to here, the node is not in our subtree
 
             }//returns the path of nodes between here and other IF other is in this subtree.
-            bool Node::makeSupervisor() {
-                if(children!=nullptr){
-                    return false;
-                }
-                children= make_unique<std::shared_ptr<Node>[]>(64);//make_shared on an array was not added until c++ 20 [insert confused jacki chan], but this works for not
-                numChildren=0;
+
+            bool Node::makeSupervisor() {//this function does nothing anymore?
                 return true;
 
             }
