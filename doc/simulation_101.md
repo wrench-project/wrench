@@ -1,3 +1,7 @@
+Simulation 101                        {#simulation-101}
+==============
+
+
 This page provides a gentle introduction to the simulation of parallel and
 distributed executions, as enabled by WRENCH. This content is intended for
 users who have never implemented (or even thought of implementing) a
