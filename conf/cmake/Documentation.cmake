@@ -56,6 +56,8 @@ if (DOXYGEN_FOUND)
     endforeach ()
     add_custom_command(TARGET doc-deploy
             COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/pages/html/* ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION})
+    add_custom_command(TARGET doc-deploy
+            COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION} ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/latest)
 
     get_directory_property(extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
     set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${extra_clean_files};${CMAKE_HOME_DIRECTORY}/docs")
