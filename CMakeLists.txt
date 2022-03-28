@@ -454,7 +454,7 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
         test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
-        )
+        include/wrench/services/storage/xrootd/XRootDMessagePayload.h include/wrench/services/storage/xrootd/XRootDMessage.h)
 
 
 add_library(wrench STATIC ${SOURCE_FILES})
