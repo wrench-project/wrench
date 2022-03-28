@@ -98,7 +98,6 @@ protected:
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 /**********************************************************************/
@@ -114,8 +113,7 @@ protected:
 class SimulationTimestampTaskBasicTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampTaskBasicTestWMS(SimulationTimestampTaskTest *test,
-                                        std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                        std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -171,7 +169,7 @@ TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskBasicTest) {
     DO_TEST_WITH_FORK(do_SimulationTimestampTaskBasic_test);
 }
 
-void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
+void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
     auto simulation = wrench::Simulation::createSimulation();
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
@@ -193,9 +191,10 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskBasicTestWMS(
-            this, wms_host)));
+                            this, wms_host)));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -235,14 +234,14 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     // expected timeline: task2_end...failed_task_start...failed_task_failed
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
-//    for (auto const &ts : timestamp_start_trace) {
-//        std::cerr << "  - " << ts->getContent()->getTask()->getID() << ": " << ts->getDate() << "\n";
-//    }
+    //    for (auto const &ts : timestamp_start_trace) {
+    //        std::cerr << "  - " << ts->getContent()->getTask()->getID() << ": " << ts->getDate() << "\n";
+    //    }
     double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
     double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();
 
-//    ASSERT_GT(failed_task_start_timestamp, task2_completion_timestamp);
+    //    ASSERT_GT(failed_task_start_timestamp, task2_completion_timestamp);
     ASSERT_GT(failed_task_failure_timestamp, failed_task_start_timestamp);
 
     /*
@@ -253,7 +252,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     /*
      * check that there is no completion timestamp for the failed task1
      */
-    for (auto &ts : timestamp_completion_trace) {
+    for (auto &ts: timestamp_completion_trace) {
         if (ts->getContent()->getTask()->getID() == "failed_task") {
             throw std::runtime_error("timestamp_completion_trace should not have the 'failed_task'");
         }
@@ -281,12 +280,12 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     // test constructors
 
     ASSERT_THROW(simulation->getOutput().addTimestampTaskStart(0.0, nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskFailure(0.0,nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(0.0,nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(0.0,nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskFailure(0.0, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(0.0, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(0.0, nullptr), std::invalid_argument);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -303,8 +302,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 class SimulationTimestampTaskMultipleTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampTaskMultipleTestWMS(SimulationTimestampTaskTest *test,
-                                           std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                           std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -336,7 +334,6 @@ private:
                 this->test->failed_task,
                 {{this->test->small_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)},
                  {this->test->large_input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}});
-
 
 
         job_manager->submitJob(failed_job, this->test->compute_service);
@@ -385,9 +382,10 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/backup"})));
 
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
-            this, wms_host)));
+                            this, wms_host)));
 
     file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
 
@@ -494,7 +492,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     ASSERT_GT(failed_task_completion_date_1, failed_task_start_date_2);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -516,8 +514,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
 class SimulationTimestampTaskTerminateAndFailTestWMS : public wrench::ExecutionController {
 public:
     SimulationTimestampTaskTerminateAndFailTestWMS(SimulationTimestampTaskTest *test,
-                                                   std::string &hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                                   std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -575,9 +572,10 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, {"/"})));
 
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskTerminateAndFailTestWMS(
-            this, wms_host)));
+                            this, wms_host)));
 
     simulation->getOutput().enableWorkflowTaskTimestamps(true);
 
@@ -620,7 +618,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_tes
     ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
 
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

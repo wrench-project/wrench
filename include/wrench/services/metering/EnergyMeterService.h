@@ -23,7 +23,6 @@ namespace wrench {
     class EnergyMeterService : public Service {
 
     public:
-
         EnergyMeterService(std::string hostname, const std::vector<std::string> &hostnames, double period);
         EnergyMeterService(std::string hostname, const std::map<std::string, double> &measurement_periods);
 
@@ -43,10 +42,9 @@ namespace wrench {
 
         std::map<std::string, double> measurement_periods;
         std::map<std::string, double> time_to_next_measurement;
-
     };
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_ENERGYMETERSERVICE_H
+#endif//WRENCH_ENERGYMETERSERVICE_H

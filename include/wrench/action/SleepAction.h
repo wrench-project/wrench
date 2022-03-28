@@ -27,7 +27,7 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        SleepAction(const std::string& name, std::shared_ptr<CompoundJob> job, double sleep_time);
+        SleepAction(const std::string &name, std::shared_ptr<CompoundJob> job, double sleep_time);
 
         void execute(std::shared_ptr<ActionExecutor> action_executor) override;
         void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
@@ -35,8 +35,7 @@ namespace wrench {
 
     private:
         double sleep_time;
-
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_SLEEP_ACTION_H
+#endif//WRENCH_SLEEP_ACTION_H

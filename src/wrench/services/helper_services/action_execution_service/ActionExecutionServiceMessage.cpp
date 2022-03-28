@@ -18,11 +18,9 @@ namespace wrench {
     /**
     * @brief Constructor
     *
-    * @param name: the message name
     * @param payload: the message size in bytes
     */
-    ActionExecutionServiceMessage::ActionExecutionServiceMessage(double payload) :
-            SimulationMessage( payload) {
+    ActionExecutionServiceMessage::ActionExecutionServiceMessage(double payload) : SimulationMessage(payload) {
     }
 
 
@@ -35,8 +33,7 @@ namespace wrench {
     ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(
             simgrid::s4u::Mailbox *reply_mailbox,
             std::shared_ptr<Action> action,
-            double payload) :
-            ActionExecutionServiceMessage( payload) {
+            double payload) : ActionExecutionServiceMessage(payload) {
         this->action = std::move(action);
         this->reply_mailbox = reply_mailbox;
     }
@@ -50,8 +47,7 @@ namespace wrench {
     ActionExecutionServiceSubmitActionAnswerMessage::ActionExecutionServiceSubmitActionAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> cause,
-            double payload) :
-            ActionExecutionServiceMessage( payload) {
+            double payload) : ActionExecutionServiceMessage(payload) {
         this->success = success;
         this->cause = std::move(cause);
     }
@@ -67,8 +63,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *reply_mailbox,
             std::shared_ptr<Action> action,
             ComputeService::TerminationCause termination_cause,
-            double payload) :
-            ActionExecutionServiceMessage( payload) {
+            double payload) : ActionExecutionServiceMessage(payload) {
         this->reply_mailbox = reply_mailbox;
         this->action = std::move(action);
         this->termination_cause = termination_cause;
@@ -82,8 +77,7 @@ namespace wrench {
      */
     ActionExecutionServiceTerminateActionAnswerMessage::ActionExecutionServiceTerminateActionAnswerMessage(
             bool success,
-            std::shared_ptr<FailureCause> cause, double payload) :
-            ActionExecutionServiceMessage( payload) {
+            std::shared_ptr<FailureCause> cause, double payload) : ActionExecutionServiceMessage(payload) {
         this->success = success;
         this->cause = std::move(cause);
     }
@@ -94,10 +88,9 @@ namespace wrench {
   * @param payload: the message size in bytes
   */
     ActionExecutionServiceActionDoneMessage::ActionExecutionServiceActionDoneMessage(
-            std::shared_ptr<Action> action, double payload) :
-            ActionExecutionServiceMessage(payload){
+            std::shared_ptr<Action> action, double payload) : ActionExecutionServiceMessage(payload) {
         this->action = std::move(action);
         this->payload = payload;
     }
 
-};
+};// namespace wrench

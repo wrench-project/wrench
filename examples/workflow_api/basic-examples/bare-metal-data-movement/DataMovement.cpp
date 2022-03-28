@@ -32,7 +32,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "DataMovementWMS.h" // WMS implementation
+#include "DataMovementWMS.h"// WMS implementation
 
 /**
  * @brief The Simulator's main function
@@ -46,7 +46,8 @@ int main(int argc, char **argv) {
     /*
      * Create a WRENCH simulation object
      */
-    auto simulation = wrench::Simulation::createSimulation();;
+    auto simulation = wrench::Simulation::createSimulation();
+    ;
 
     /* Initialize the simulation, which may entail extracting WRENCH-specific and
      * Simgrid-specific command-line arguments that can modify general simulation behavior.
@@ -120,7 +121,7 @@ int main(int argc, char **argv) {
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service1);
     }
 
@@ -138,8 +139,8 @@ int main(int argc, char **argv) {
      * of events. In the code below, we print the  retrieve the trace of all task completion events, print how
      * many such events there are, and print some information for the first such event. */
     auto trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
-    for (auto const &item : trace) {
-        std::cerr << "Task "  << item->getContent()->getTask()->getID() << " completed at time " << item->getDate()  << std::endl;
+    for (auto const &item: trace) {
+        std::cerr << "Task " << item->getContent()->getTask()->getID() << " completed at time " << item->getDate() << std::endl;
     }
 
     return 0;

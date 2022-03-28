@@ -18,11 +18,9 @@
 class S4U_VirtualMachineTest : public ::testing::Test {
 
 public:
-
     void do_basic_Test();
 
 protected:
-
     ~S4U_VirtualMachineTest() {
         workflow->clear();
     }
@@ -65,25 +63,21 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 class Sleep100Daemon : public wrench::S4U_Daemon {
 
 public:
-    Sleep100Daemon(std::string hostname) :
-            S4U_Daemon(hostname, "sleep100daemon") {}
+    Sleep100Daemon(std::string hostname) : S4U_Daemon(hostname, "sleep100daemon") {}
 
     int main() override {
         simgrid::s4u::this_actor::execute(100);
         return 0;
     }
-
 };
 
 /**********************************************************************/
@@ -95,13 +89,11 @@ class S4U_VirtualMachineTestWMS : public wrench::ExecutionController {
 
 public:
     S4U_VirtualMachineTestWMS(S4U_VirtualMachineTest *test,
-                      std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                              std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     S4U_VirtualMachineTest *test;
 
     int main() {
@@ -183,16 +175,16 @@ void S4U_VirtualMachineTest::do_basic_Test() {
 
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new S4U_VirtualMachineTestWMS(
-                    this, hostname)));
+                            new S4U_VirtualMachineTestWMS(
+                                    this, hostname)));
 
     // Running a "run a single task" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-

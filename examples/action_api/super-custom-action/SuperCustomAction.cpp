@@ -33,7 +33,7 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "SuperCustomActionController.h" // Controller implementation
+#include "SuperCustomActionController.h"// Controller implementation
 
 /**
  * @brief The Simulator's main function

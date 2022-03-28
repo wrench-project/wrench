@@ -90,15 +90,15 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     //  Test task1 "getters"
     auto task_map = workflow->getTaskMap();
     ASSERT_EQ(4, task_map.size());
-    auto tasks =  workflow->getTasks();
+    auto tasks = workflow->getTasks();
     ASSERT_EQ(4, tasks.size());
     auto etask_map = workflow->getEntryTaskMap();
     ASSERT_EQ(1, etask_map.size());
-    auto etasks =  workflow->getEntryTasks();
+    auto etasks = workflow->getEntryTasks();
     ASSERT_EQ(1, etasks.size());
     auto xtask_map = workflow->getExitTaskMap();
     ASSERT_EQ(1, xtask_map.size());
-    auto xtasks =  workflow->getExitTasks();
+    auto xtasks = workflow->getExitTasks();
     ASSERT_EQ(1, xtasks.size());
 
     // Test file "getters"
@@ -118,7 +118,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_THROW(workflow->getTaskNumberOfChildren(nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->getTaskNumberOfParents(nullptr), std::invalid_argument);
     // Get tasks with a given top-level
-    std::vector<std::shared_ptr<wrench::WorkflowTask> > top_level_equal_to_1_or_2;
+    std::vector<std::shared_ptr<wrench::WorkflowTask>> top_level_equal_to_1_or_2;
     top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1, 2);
     ASSERT_EQ(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t1),
               top_level_equal_to_1_or_2.end());
@@ -133,11 +133,11 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     // Get Entry tasks and check they all are in the top level, as expected
     auto entry_tasks = workflow->getEntryTaskMap();
     auto top_level = workflow->getTasksInTopLevelRange(0, 0);
-    for (auto const &t : top_level) {
+    for (auto const &t: top_level) {
         ASSERT_TRUE(entry_tasks.find(t->getID()) != entry_tasks.end());
     }
     // Being paranoid, check that they don't have parents
-    for (auto const &t : entry_tasks) {
+    for (auto const &t: entry_tasks) {
         ASSERT_EQ(t.second->getNumberOfParents(), 0);
     }
 
@@ -154,7 +154,6 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_EQ(3, workflow->getTasks().size());
 
     workflow->removeTask(t1);
-
 }
 
 TEST_F(WorkflowTest, ControlDependency) {
@@ -163,12 +162,12 @@ TEST_F(WorkflowTest, ControlDependency) {
     ASSERT_THROW(workflow->addControlDependency(t1, nullptr), std::invalid_argument);
     ASSERT_THROW(workflow->addControlDependency(nullptr, t1), std::invalid_argument);
     workflow->addControlDependency(t2, t3);
-    workflow->removeControlDependency(t2,t3);  // removes something
-    workflow->removeControlDependency(t1,t2);  // nope (data depencency)
-    ASSERT_EQ(true, workflow->pathExists(t1,t2));
-    ASSERT_THROW(workflow->removeControlDependency(nullptr,t4), std::invalid_argument);
-    ASSERT_THROW(workflow->removeControlDependency(t1,nullptr), std::invalid_argument);
-    workflow->removeControlDependency(t1,t4);  // nope (nothing)
+    workflow->removeControlDependency(t2, t3);// removes something
+    workflow->removeControlDependency(t1, t2);// nope (data depencency)
+    ASSERT_EQ(true, workflow->pathExists(t1, t2));
+    ASSERT_THROW(workflow->removeControlDependency(nullptr, t4), std::invalid_argument);
+    ASSERT_THROW(workflow->removeControlDependency(t1, nullptr), std::invalid_argument);
+    workflow->removeControlDependency(t1, t4);// nope (nothing)
     auto new_task = workflow->addTask("new_task", 1.0, 1, 1, 0);
     workflow->addControlDependency(t1, new_task);
     workflow->removeControlDependency(t1, new_task);
@@ -205,7 +204,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
 
     bogus_workflow->clear();
 
-//  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
+    //  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
 TEST_F(WorkflowTest, DataFile) {
@@ -236,7 +235,7 @@ TEST_F(WorkflowTest, DataFile) {
 TEST_F(WorkflowTest, IsDone) {
     ASSERT_FALSE(workflow->isDone());
 
-    for (auto task : workflow->getTasks()) {
+    for (auto task: workflow->getTasks()) {
         task->setInternalState(wrench::WorkflowTask::InternalState::TASK_COMPLETED);
         task->setState(wrench::WorkflowTask::State::COMPLETED);
     }
@@ -258,7 +257,6 @@ TEST_F(WorkflowTest, Export) {
 
 class AllDependenciesWorkflowTest : public ::testing::Test {
 protected:
-
     ~AllDependenciesWorkflowTest() {
         workflow->clear();
     }

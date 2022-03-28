@@ -22,30 +22,30 @@ namespace wrench {
     class AmdahlParallelModel : public ParallelModel {
 
     public:
-
         double getAlpha();
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
-        ~AmdahlParallelModel() override {}
+        //        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
+        double getPurelySequentialWork(double total_work, unsigned long num_threads) override;
+        double getParallelPerThreadWork(double total_work, unsigned long num_threads) override;
+        ~AmdahlParallelModel() override = default;
 
         /***********************/
         /** \endcond          **/
         /***********************/
 
     protected:
-
     private:
         friend class ParallelModel;
 
         AmdahlParallelModel(double alpha);
-        double alpha; // Fraction of the work that's parallelizable
+        double alpha;// Fraction of the work that's parallelizable
     };
 
 
-}
+}// namespace wrench
 
-#endif //WRENCH_AMDAHLPARALLELMODEL_H
+#endif//WRENCH_AMDAHLPARALLELMODEL_H

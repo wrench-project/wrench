@@ -43,7 +43,6 @@ namespace wrench {
     class FileCopyCompletedEvent : public ExecutionEvent {
 
     private:
-
         friend class ExecutionEvent;
         /**
          * @brief Constructor
@@ -53,18 +52,18 @@ namespace wrench {
          * @param file_registry_service: a file registry service
          * @param file_registry_service_updated: whether the file registry service has been updated
          */
-        FileCopyCompletedEvent(std::shared_ptr<DataFile>file,
+        FileCopyCompletedEvent(std::shared_ptr<DataFile> file,
                                std::shared_ptr<FileLocation> src,
                                std::shared_ptr<FileLocation> dst,
                                std::shared_ptr<FileRegistryService> file_registry_service,
                                bool file_registry_service_updated)
-                : file(file), src(src), dst(dst),
-                  file_registry_service(file_registry_service),
-                  file_registry_service_updated(file_registry_service_updated) {}
+            : file(file), src(src), dst(dst),
+              file_registry_service(file_registry_service),
+              file_registry_service_updated(file_registry_service_updated) {}
 
     public:
         /** @brief The workflow file that has successfully been copied */
-        std::shared_ptr<DataFile>file;
+        std::shared_ptr<DataFile> file;
         /** @brief The source location */
         std::shared_ptr<FileLocation> src;
         /** @brief The destination location */
@@ -81,20 +80,16 @@ namespace wrench {
         std::string toString() override {
             return "FileCopyCompletedEvent (file: " + this->file->getID() +
                    "; src = " + this->src->toString() +
-                   "; dst = "+ this->dst->toString();
+                   "; dst = " + this->dst->toString();
         }
-
     };
 
 
+};// namespace wrench
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
-};
-
-/***********************/
-/** \endcond           */
-/***********************/
-
-
-
-#endif //WRENCH_FILE_COPY_COMPLETED_EVENT_H
+#endif//WRENCH_FILE_COPY_COMPLETED_EVENT_H

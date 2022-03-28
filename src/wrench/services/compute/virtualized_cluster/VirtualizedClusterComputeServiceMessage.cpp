@@ -15,12 +15,9 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param name: the message name
      * @param payload: the message size in bytes
      */
-    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(const std::string &name,
-                                                                                     double payload) :
-            ComputeServiceMessage(payload) {
+    VirtualizedClusterComputeServiceMessage::VirtualizedClusterComputeServiceMessage(double payload) : ComputeServiceMessage(payload) {
     }
 
     /**
@@ -37,8 +34,7 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             const std::string &vm_name,
             const std::string &dest_pm_hostname,
-            double payload) :
-            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_REQUEST", payload) {
+            double payload) : VirtualizedClusterComputeServiceMessage(payload) {
 
         if ((answer_mailbox == nullptr) || dest_pm_hostname.empty() || vm_name.empty()) {
             throw std::invalid_argument(
@@ -59,9 +55,8 @@ namespace wrench {
     VirtualizedClusterComputeServiceMigrateVMAnswerMessage::VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> failure_cause,
-            double payload) :
-            VirtualizedClusterComputeServiceMessage("MIGRATE_VM_ANSWER", payload), success(success),
-            failure_cause(failure_cause) {}
+            double payload) : VirtualizedClusterComputeServiceMessage(payload), success(success),
+                              failure_cause(failure_cause) {}
 
 
-}
+}// namespace wrench

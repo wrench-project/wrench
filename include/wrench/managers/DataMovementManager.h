@@ -35,24 +35,22 @@ namespace wrench {
     class DataMovementManager : public Service {
 
     public:
-
         void stop() override;
 
         void kill();
 
-        void initiateAsynchronousFileCopy(std::shared_ptr<DataFile>file,
+        void initiateAsynchronousFileCopy(std::shared_ptr<DataFile> file,
                                           std::shared_ptr<FileLocation> src,
                                           std::shared_ptr<FileLocation> dst,
-                                          std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
+                                          std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
 
-        void doSynchronousFileCopy(std::shared_ptr<DataFile>file,
+        void doSynchronousFileCopy(std::shared_ptr<DataFile> file,
                                    std::shared_ptr<FileLocation> src,
                                    std::shared_ptr<FileLocation> dst,
-                                   std::shared_ptr<FileRegistryService> file_registry_service=nullptr);
+                                   std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
 
 
     protected:
-
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -67,7 +65,6 @@ namespace wrench {
         /***********************/
 
     private:
-
         int main() override;
 
         simgrid::s4u::Mailbox *getCreatorMailbox();
@@ -77,7 +74,7 @@ namespace wrench {
         bool processNextMessage();
 
         struct CopyRequestSpecs {
-            std::shared_ptr<DataFile>file;
+            std::shared_ptr<DataFile> file;
             std::shared_ptr<FileLocation> src;
             std::shared_ptr<FileLocation> dst;
             std::shared_ptr<FileRegistryService> file_registry_service;
@@ -88,13 +85,12 @@ namespace wrench {
             CopyRequestSpecs(std::shared_ptr<DataFile> file,
                              std::shared_ptr<FileLocation> src,
                              std::shared_ptr<FileLocation> dst,
-                             std::shared_ptr<FileRegistryService> file_registry_service) :
-                    file(file), src(src), dst(dst), file_registry_service(file_registry_service) {}
+                             std::shared_ptr<FileRegistryService> file_registry_service) : file(file), src(src), dst(dst), file_registry_service(file_registry_service) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
                 return (file == rhs.file) &&
-                       (dst->getStorageService() == rhs.dst->getStorageService())  &&
-                       (dst->getAbsolutePathAtMountPoint()     == rhs.dst->getAbsolutePathAtMountPoint());
+                       (dst->getStorageService() == rhs.dst->getStorageService()) &&
+                       (dst->getAbsolutePathAtMountPoint() == rhs.dst->getAbsolutePathAtMountPoint());
             }
         };
 
@@ -106,7 +102,7 @@ namespace wrench {
     /***********************/
 
 
-};
+};// namespace wrench
 
 
-#endif //WRENCH_DATAMOVEMENTMANAGER_H
+#endif//WRENCH_DATAMOVEMENTMANAGER_H

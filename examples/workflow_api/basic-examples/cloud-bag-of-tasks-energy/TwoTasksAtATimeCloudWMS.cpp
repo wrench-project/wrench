@@ -38,9 +38,8 @@ namespace wrench {
     TwoTasksAtATimeCloudWMS::TwoTasksAtATimeCloudWMS(std::shared_ptr<Workflow> &workflow,
                                                      const std::shared_ptr<CloudComputeService> &cloud_compute_service,
                                                      const std::shared_ptr<StorageService> &storage_service,
-                                                     const std::string &hostname) :
-                                                     ExecutionController (hostname,"two-tasks-at-a-time-cloud"),
-                                                     workflow(workflow), cloud_compute_service(cloud_compute_service), storage_service(storage_service) {}
+                                                     const std::string &hostname) : ExecutionController(hostname, "two-tasks-at-a-time-cloud"),
+                                                                                    workflow(workflow), cloud_compute_service(cloud_compute_service), storage_service(storage_service) {}
 
     /**
      * @brief main method of the TwoTasksAtATimeCloudWMS daemon
@@ -79,7 +78,6 @@ namespace wrench {
             /* Sort them by flops */
             std::sort(ready_tasks.begin(), ready_tasks.end(),
                       [](const std::shared_ptr<WorkflowTask> t1, const std::shared_ptr<WorkflowTask> t2) -> bool {
-
                           if (t1->getFlops() == t2->getFlops()) {
                               return ((uintptr_t) t1.get() > (uintptr_t) t2.get());
                           } else {
@@ -100,7 +98,7 @@ namespace wrench {
 
             /* Create the job  */
             WRENCH_INFO("Creating a job to run task %s (%.2lf)",
-                        cheap_ready_task->getID().c_str(),  cheap_ready_task->getFlops());
+                        cheap_ready_task->getID().c_str(), cheap_ready_task->getFlops());
 
             auto standard_job1 = job_manager->createStandardJob(cheap_ready_task, file_locations1);
 
@@ -117,7 +115,7 @@ namespace wrench {
 
             /* Create the job  */
             WRENCH_INFO("Creating a job to run task %s (%.2lf)",
-                        expensive_ready_task->getID().c_str(),  expensive_ready_task->getFlops());
+                        expensive_ready_task->getID().c_str(), expensive_ready_task->getFlops());
 
             auto standard_job2 = job_manager->createStandardJob(expensive_ready_task, file_locations2);
 
@@ -131,7 +129,7 @@ namespace wrench {
 
             /* Change the pstate of large VM  */
             WRENCH_INFO("Changing the pstate of the large VM to the lower pstate to save on energy temporarily");
-            this->simulation->setPstate(large_vm, 0);
+            this->simulation->setPstate("CloudHost1", 0);
 
             /* Sleep 10 seconds */
             WRENCH_INFO("Sleeping for 10 seconds");
@@ -139,7 +137,7 @@ namespace wrench {
 
             /* Change the pstate of CloudHost1  */
             WRENCH_INFO("Changing the pstate of the large VM back to the higher pstate");
-            this->simulation->setPstate(large_vm, 1);
+            this->simulation->setPstate("CloudHost1", 1);
 
             /* Wait for  workflow execution event and process it. In this case we know that
              * the event will be a StandardJobCompletionEvent, which is processed by the method
@@ -187,4 +185,4 @@ namespace wrench {
     }
 
 
-}
+}// namespace wrench

@@ -27,7 +27,7 @@ namespace wrench {
 
     public:
         Block(std::string fid, std::shared_ptr<FileLocation> location, double sz,
-                     double last_access, bool is_dirty, double dirty_time);
+              double last_access, bool is_dirty, double dirty_time);
 
         Block(Block *blk);
 
@@ -35,9 +35,9 @@ namespace wrench {
 
         void setFileId(std::string &fid);
 
-//        std::string getMountpoint();
+        //        std::string getMountpoint();
 
-//        void setMountpoint(std::string mountpoint);
+        //        void setMountpoint(std::string mountpoint);
 
         double getSize() const;
 
@@ -57,11 +57,11 @@ namespace wrench {
 
         const std::shared_ptr<FileLocation> &getLocation() const;
 
-        Block* split(double remaining);
+        Block *split(double remaining);
 
     private:
         std::string file_id;
-//        std::string mountpoint;
+        //        std::string mountpoint;
         std::shared_ptr<FileLocation> location;
         double size;
         double last_access;
@@ -73,6 +73,6 @@ namespace wrench {
         /***********************/
     };
 
-}
+}// namespace wrench
 
-#endif //WRENCH_BLOCK_H
+#endif//WRENCH_BLOCK_H

@@ -99,7 +99,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -108,7 +107,6 @@ protected:
 public:
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss1;
-
 };
 
 
@@ -120,13 +118,11 @@ class FileWriteActionExecutorSuccessTestWMS : public wrench::ExecutionController
 
 public:
     FileWriteActionExecutorSuccessTestWMS(FileWriteActionExecutorTest *test,
-                                          std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                                          std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     FileWriteActionExecutorTest *test;
 
     int main() {
@@ -141,7 +137,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->ss1));
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
-                new wrench::ActionExecutor("Host2", 0, 0.0, this->mailbox, file_write_action, nullptr));
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_write_action, nullptr));
         // Start it
         file_write_action_executor->setSimulation(this->simulation);
         file_write_action_executor->start(file_write_action_executor, true, false);
@@ -191,7 +187,7 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
     int argc = 1;
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -215,9 +211,7 @@ void FileWriteActionExecutorTest::do_FileWriteActionExecutorSuccessTest_test() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }
-

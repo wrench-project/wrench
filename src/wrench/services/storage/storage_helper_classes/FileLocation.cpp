@@ -92,7 +92,7 @@ namespace wrench {
         absolute_path = FileLocation::sanitizePath(absolute_path);
 
         std::string mount_point = "";
-        for (auto const &mp : ss->getMountPoints()) {
+        for (auto const &mp: ss->getMountPoints()) {
             // This works because we disallowed two mounts from being proper prefixes of each other
             if ((mp != "/") and (absolute_path.find(mp) == 0)) {
                 mount_point = mp;
@@ -188,32 +188,33 @@ namespace wrench {
      */
     std::string FileLocation::sanitizePath(std::string path) {
 
-        if (path == "/") return "/";  // make the common case fast
+        if (path == "/") return "/";// make the common case fast
+
         if (path.empty()) {
             throw std::invalid_argument("FileLocation::sanitizePath(): path cannot be empty");
         }
 
 #if (__cpluplus >= 201703L)
-            // Adding a leading space because, weirdly, lexically_normal() doesn't behave
-            // correctly on Linux without it (it doesn't reduce "////" to "/", but does
-            // reduce " ////" to " /"
-            std::filesystem::path sanitized_path = " /" + path + "/";
-            std::string to_return = sanitized_path.lexically_normal();
-            // Remove the extra space
-            to_return.erase(0, 1);
-            return to_return;
+        // Adding a leading space because, weirdly, lexically_normal() doesn't behave
+        // correctly on Linux without it (it doesn't reduce "////" to "/", but does
+        // reduce " ////" to " /"
+        std::filesystem::path sanitized_path = " /" + path + "/";
+        std::string to_return = sanitized_path.lexically_normal();
+        // Remove the extra space
+        to_return.erase(0, 1);
+        return to_return;
 #else
         // Cannot have certain substring (why not)
-//        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
+        //        std::string unallowed_characters[] = {"\\", " ", "~", "`", "\"", "&", "*", "?"};
         char unallowed_characters[] = {'\\', ' ', '~', '`', '\'', '&', '*', '?'};
-        for (auto const &c : unallowed_characters) {
+        for (auto const &c: unallowed_characters) {
             if (path.find(c) != std::string::npos) {
                 throw std::invalid_argument("FileLocation::sanitizePath(): Unallowed character '" + std::to_string(c) + "' in path (" + path + ")");
             }
         }
 
         // Make it /-started and /-terminated
-        if (path.at(path.length()-1) != '/') {
+        if (path.at(path.length() - 1) != '/') {
             path = "/" + path + "/";
         }
 
@@ -224,7 +225,7 @@ namespace wrench {
         tokens.pop_back();
         std::vector<std::string> new_tokens;
 
-        for (auto t : tokens) {
+        for (auto t: tokens) {
             if ((t == ".") or t.empty()) {
                 // do nothing
             } else if (t == "..") {
@@ -240,8 +241,8 @@ namespace wrench {
 
         // Reconstruct sanitized path
         std::string sanitized = "";
-        for  (auto const & t : new_tokens) {
-            sanitized += "/"  + t;
+        for (auto const &t: new_tokens) {
+            sanitized += "/" + t;
         }
         sanitized += "/";
 
@@ -274,7 +275,7 @@ namespace wrench {
             longer = tokens1;
         }
 
-        for (unsigned int i=1; i < shorter.size()-1; i++) {
+        for (unsigned int i = 1; i < shorter.size() - 1; i++) {
             if (shorter.at(i) != longer.at(i)) {
                 return false;
             }
@@ -282,5 +283,4 @@ namespace wrench {
 
         return true;
     }
-}
-
+}// namespace wrench

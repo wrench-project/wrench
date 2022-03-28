@@ -32,20 +32,18 @@ namespace wrench {
      * @param hostname: the name of the host on which the service should run
      * @param mount_points: the mount points of each disk usable by the service
      * @param service_name: the name of the storage service
-     * @param mailbox_name_prefix: the mailbox name prefix
      *
      * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
                                    const std::set<std::string> mount_points,
-                                   const std::string &service_name) :
-            Service(hostname, service_name) {
+                                   const std::string &service_name) : Service(hostname, service_name) {
         if (mount_points.empty()) {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
         }
 
         try {
-            for (auto mp : mount_points) {
+            for (auto mp: mount_points) {
                 this->file_systems[mp] = std::unique_ptr<LogicalFileSystem>(
                         new LogicalFileSystem(this->getHostname(), this, mp));
             }
@@ -82,7 +80,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void StorageService::createFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void StorageService::createFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
@@ -96,7 +94,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void StorageService::stageFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void StorageService::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
@@ -146,9 +144,9 @@ namespace wrench {
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         try {
             S4U_Mailbox::putMessage(this->mailbox, new StorageServiceFreeSpaceRequestMessage(
-                    answer_mailbox,
-                    this->getMessagePayloadValue(
-                            StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                                                           answer_mailbox,
+                                                           this->getMessagePayloadValue(
+                                                                   StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -180,7 +178,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_arguments
      */
-    bool StorageService::lookupFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    bool StorageService::lookupFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
         }
@@ -228,7 +226,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_arguments
      */
-    void StorageService::readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
@@ -245,7 +243,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_arguments
      */
-    void StorageService::readFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location, double num_bytes_to_read) {
+    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, double num_bytes_to_read) {
         if ((file == nullptr) or (location == nullptr) or (num_bytes_to_read < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
@@ -258,7 +256,7 @@ namespace wrench {
         // Send a message to the daemon
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
-//        auto chunk_receiving_mailbox = S4U_Mailbox::generateUniqueMailbox("foo");
+        //        auto chunk_receiving_mailbox = S4U_Mailbox::generateUniqueMailbox("foo");
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
@@ -310,7 +308,7 @@ namespace wrench {
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
-                            file_content_message.get())) {
+                                file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
                             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                             break;
@@ -351,7 +349,7 @@ namespace wrench {
      *
      * @throw ExecutionException
      */
-    void StorageService::writeFile(std::shared_ptr<DataFile>file, std::shared_ptr<FileLocation> location) {
+    void StorageService::writeFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
         }
@@ -404,7 +402,7 @@ namespace wrench {
                         remaining -= storage_service->buffer_size;
                     }
                     S4U_Mailbox::putMessage(msg->data_write_mailbox, new StorageServiceFileContentChunkMessage(
-                            file, remaining, true));
+                                                                             file, remaining, true));
 
                 } catch (std::shared_ptr<NetworkError> &cause) {
                     throw ExecutionException(cause);
@@ -463,7 +461,7 @@ namespace wrench {
      */
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> locations) {
-        for (auto const &f : locations) {
+        for (auto const &f: locations) {
             if ((f.first == nullptr) or (f.second == nullptr)) {
                 throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid argument");
             }
@@ -471,11 +469,11 @@ namespace wrench {
 
         // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
         std::map<std::string, std::shared_ptr<DataFile>> sorted_files;
-        for (auto const &f : locations) {
+        for (auto const &f: locations) {
             sorted_files[f.first->getID()] = f.first;
         }
 
-        for (auto const &f : sorted_files) {
+        for (auto const &f: sorted_files) {
             auto file = f.second;
             auto location = locations[file];
 
@@ -512,7 +510,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(std::shared_ptr<DataFile>file,
+    void StorageService::deleteFile(std::shared_ptr<DataFile> file,
                                     std::shared_ptr<FileLocation> location,
                                     std::shared_ptr<FileRegistryService> file_registry_service) {
         if ((file == nullptr) or (location == nullptr)) {
@@ -551,8 +549,9 @@ namespace wrench {
             // On failure, throw an exception
             if (!msg->success) {
                 throw ExecutionException(std::move(msg->failure_cause));
-            }WRENCH_INFO("Deleted file %s at location %s",
-                         file->getID().c_str(), location->toString().c_str());
+            }
+            WRENCH_INFO("Deleted file %s at location %s",
+                        file->getID().c_str(), location->toString().c_str());
 
             if (unregister) {
                 file_registry_service->removeEntry(file, location);
@@ -573,7 +572,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::invalid_argument
      */
-    void StorageService::copyFile(std::shared_ptr<DataFile>file,
+    void StorageService::copyFile(std::shared_ptr<DataFile> file,
                                   std::shared_ptr<FileLocation> src_location,
                                   std::shared_ptr<FileLocation> dst_location) {
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
@@ -634,7 +633,7 @@ namespace wrench {
      * @throw std::invalid_argument
      *
      */
-    void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile>file,
+    void StorageService::initiateFileCopy(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file,
                                           std::shared_ptr<FileLocation> src_location,
                                           std::shared_ptr<FileLocation> dst_location) {
         if ((file == nullptr) || (src_location == nullptr) || (dst_location == nullptr)) {
@@ -671,7 +670,7 @@ namespace wrench {
      */
     std::map<std::string, double> StorageService::getTotalSpace() {
         std::map<std::string, double> to_return;
-        for (auto const &fs : this->file_systems) {
+        for (auto const &fs: this->file_systems) {
             to_return[fs.first] = fs.second->getTotalCapacity();
         }
         return to_return;
@@ -695,7 +694,7 @@ namespace wrench {
      */
     std::set<std::string> StorageService::getMountPoints() {
         std::set<std::string> to_return;
-        for (auto const &fs : this->file_systems) {
+        for (auto const &fs: this->file_systems) {
             to_return.insert(fs.first);
         }
         return to_return;
@@ -719,4 +718,4 @@ namespace wrench {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
 
-}
+}// namespace wrench

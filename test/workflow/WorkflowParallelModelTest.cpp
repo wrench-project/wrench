@@ -46,7 +46,6 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
@@ -55,8 +54,7 @@ protected:
 
 class ParallelModelTestWMS : public wrench::ExecutionController {
 public:
-    ParallelModelTestWMS(ParallelModelTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
+    ParallelModelTestWMS(ParallelModelTest *test, std::shared_ptr<wrench::Workflow> workflow, std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
@@ -97,7 +95,7 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -106,18 +104,19 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     std::string wms_host = "WMSHost";
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(
-            wms_host,
-            {std::make_pair(
-                    wms_host,
-                    std::make_tuple(
-                            wrench::ComputeService::ALL_CORES,
-                            wrench::ComputeService::ALL_RAM))}, "",
-            {})));
+                            wms_host,
+                            {std::make_pair(
+                                    wms_host,
+                                    std::make_tuple(
+                                            wrench::ComputeService::ALL_CORES,
+                                            wrench::ComputeService::ALL_RAM))},
+                            "",
+                            {})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, workflow, wms_host)));
+                            this, workflow, wms_host)));
     double work = 100.0;
     double alpha = 0.3;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
@@ -131,16 +130,16 @@ void ParallelModelTest::do_AdmdahlParallelModelTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
-    double expected_makespan = (alpha * work)  / 4 + (1 - alpha) * work;
+    double expected_makespan = (alpha * work) / 4 + (1 - alpha) * work;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
         throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
-        " instead of " + std::to_string(expected_makespan));
+                                 " instead of " + std::to_string(expected_makespan));
     }
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -160,7 +159,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -169,13 +168,14 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     std::string wms_host = "WMSHost";
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(
-            wms_host,
-            {std::make_pair(
-                    wms_host,
-                    std::make_tuple(
-                            wrench::ComputeService::ALL_CORES,
-                            wrench::ComputeService::ALL_RAM))}, "",
-            {})));
+                            wms_host,
+                            {std::make_pair(
+                                    wms_host,
+                                    std::make_tuple(
+                                            wrench::ComputeService::ALL_CORES,
+                                            wrench::ComputeService::ALL_RAM))},
+                            "",
+                            {})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     auto workflow = wrench::Workflow::createWorkflow();
@@ -194,7 +194,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
-    double expected_makespan = work  / (4 * efficiency);
+    double expected_makespan = work / (4 * efficiency);
 
     WRENCH_INFO("--> %lf %lf\n", makespan, expected_makespan);
 
@@ -205,7 +205,7 @@ void ParallelModelTest::do_ConstantEfficiencyParallelModelTest_test() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }
@@ -225,7 +225,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     int argc = 1;
     auto argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
-//    argv[1] = strdup("--wrench-full-log");
+    //    argv[1] = strdup("--wrench-full-log");
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
@@ -234,31 +234,29 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     std::string wms_host = "WMSHost";
 
     ASSERT_NO_THROW(compute_service = simulation->add(new wrench::BareMetalComputeService(
-            wms_host,
-            {std::make_pair(
-                    wms_host,
-                    std::make_tuple(
-                            wrench::ComputeService::ALL_CORES,
-                            wrench::ComputeService::ALL_RAM))}, "",
-            {})));
+                            wms_host,
+                            {std::make_pair(
+                                    wms_host,
+                                    std::make_tuple(
+                                            wrench::ComputeService::ALL_CORES,
+                                            wrench::ComputeService::ALL_RAM))},
+                            "",
+                            {})));
 
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     auto workflow = wrench::Workflow::createWorkflow();
     ASSERT_NO_THROW(wms = simulation->add(new ParallelModelTestWMS(
-            this, workflow, wms_host)));
+                            this, workflow, wms_host)));
 
     double work = 100.0;
     this->task = workflow->addTask("task1", work, 1, 4, 0.0);
     task->setParallelModel(wrench::ParallelModel::CUSTOM(
-            [] (double work, unsigned long num_threads) {
-                std::vector<double> works;
-                for (unsigned int i=0; i < num_threads; i++) {
-                    double thread_work = (i+1) * 10.0;
-                    works.push_back(thread_work);
-                }
-                return works;
-            }
-            ));
+            [](double work, unsigned long num_threads) {
+                return 0.1 * work;
+            },
+            [](double work, unsigned long num_threads) {
+                return 0.9 * work / num_threads;
+            }));
 
     auto parallel_model = task->getParallelModel();
     auto real_parallel_model = std::dynamic_pointer_cast<wrench::CustomParallelModel>(parallel_model);
@@ -267,7 +265,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
     ASSERT_NO_THROW(simulation->launch());
 
     double makespan = task->getComputationEndDate() - task->getComputationStartDate();
-    double expected_makespan = 40.0;
+    double expected_makespan = 0.1 * work + 0.9 * work / 4;
 
     if (std::abs(makespan - expected_makespan) > 0.001) {
         throw std::runtime_error("Unexpected task1 makespan: " + std::to_string(makespan) +
@@ -276,7 +274,7 @@ void ParallelModelTest::do_CustomParallelModelTest_test() {
 
     workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
 }

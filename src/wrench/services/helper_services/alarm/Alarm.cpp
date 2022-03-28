@@ -33,10 +33,10 @@ namespace wrench {
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
 
         this->date = date;
-//      if (this->date <= S4U_Simulation::getClock()) {
-//        WRENCH_INFO(
-//                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
-//      }
+        //      if (this->date <= S4U_Simulation::getClock()) {
+        //        WRENCH_INFO(
+        //                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
+        //      }
         this->reply_mailbox = reply_mailbox;
         this->msg = msg;
     }
@@ -73,7 +73,7 @@ namespace wrench {
      * @param date: the date at which the message should be sent (if date is in the past
      *              then the message will be sent immediately)
      * @param hostname: the name of the host on which to start the alarm service
-     * @param reply_mailbox_name: the mailbox to which the alarm service will send a message
+     * @param reply_mailbox: the mailbox to which the alarm service will send a message
      * @param msg: the message to send
      * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
      * @return a shared_ptr reference to the alarm service
@@ -89,7 +89,7 @@ namespace wrench {
                 new Alarm(date, hostname, reply_mailbox, msg, suffix));
         alarm_ptr->simulation = simulation;
         try {
-            alarm_ptr->start(alarm_ptr, true, false); // Daemonized, no auto-restart
+            alarm_ptr->start(alarm_ptr, true, false);// Daemonized, no auto-restart
         } catch (std::shared_ptr<HostError> &e) {
             throw;
         }
@@ -103,4 +103,4 @@ namespace wrench {
         this->killActor();
     }
 
-};
+};// namespace wrench

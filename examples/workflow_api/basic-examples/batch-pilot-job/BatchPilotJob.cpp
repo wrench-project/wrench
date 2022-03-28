@@ -32,9 +32,9 @@
 #include <iostream>
 #include <wrench.h>
 
-#include "PilotJobWMS.h" // WMS implementation
+#include "PilotJobWMS.h"// WMS implementation
 
-constexpr  double TFLOP=1000000000000.0;
+constexpr double TFLOP = 1000000000000.0;
 
 /**
  * @brief The Simulator's main function
@@ -69,9 +69,9 @@ int main(int argc, char **argv) {
     auto workflow = wrench::Workflow::createWorkflow();
 
     /* Add workflow tasks and files */
-    auto task0 = workflow->addTask("task_0", 100 * TFLOP,  1, 10, 1000);
+    auto task0 = workflow->addTask("task_0", 100 * TFLOP, 1, 10, 1000);
     task0->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
-    auto task = workflow->addTask("task_1", 300 * TFLOP,  1, 5, 1000);
+    auto task = workflow->addTask("task_1", 300 * TFLOP, 1, 5, 1000);
     task->setParallelModel(wrench::ParallelModel::CONSTANTEFFICIENCY(0.9));
     auto file0 = workflow->addFile("file_0", 10000000);
     auto file1 = workflow->addFile("file_1", 20000000);
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */
     std::cerr << "Staging task input files..." << std::endl;
-    for (auto const &f : workflow->getInputFiles()) {
+    for (auto const &f: workflow->getInputFiles()) {
         simulation->stageFile(f, storage_service);
     }
 
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
     std::cerr << "Simulation done!" << std::endl;
 
     /* Print task statistics */
-    for (auto const &task :  {task0,  task})  {
+    for (auto const &task: {task0, task}) {
         if (task->getState() == wrench::WorkflowTask::COMPLETED) {
             std::cerr << "Task " << task->getID() << " completed\n";
         } else {

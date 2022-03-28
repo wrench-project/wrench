@@ -11,7 +11,7 @@ add_executable(wrench-example-real-workflow
 add_custom_target(
         wrench-example-real-workflow-files
         COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/cloud_batch_platform.xml ${CMAKE_CURRENT_BINARY_DIR}/cloud_batch_platform.xml ; fi ;"
-        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/genome.json ${CMAKE_CURRENT_BINARY_DIR}/genome.json ; fi ;"
+        COMMAND /bin/sh -c "if [ '${CMAKE_CURRENT_SOURCE_DIR}' != '${CMAKE_CURRENT_BINARY_DIR}' ]; then /bin/cp -f ${CMAKE_CURRENT_SOURCE_DIR}/1000genome-chameleon-2ch-100k-001.json ${CMAKE_CURRENT_BINARY_DIR}/1000genome-chameleon-2ch-100k-001.json ; fi ;"
         VERBATIM
 )
 
@@ -24,7 +24,6 @@ if (ENABLE_BATSCHED)
             wrench
             wrenchwfcommonsworkflowparser
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             ${ZMQ_LIBRARY}
             )
@@ -33,7 +32,6 @@ else()
             wrench
             wrenchwfcommonsworkflowparser
             ${SimGrid_LIBRARY}
-            ${PUGIXML_LIBRARY}
             ${Boost_LIBRARIES}
             )
 endif()

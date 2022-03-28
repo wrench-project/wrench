@@ -73,11 +73,9 @@ protected:
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
-
     }
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
-
 };
 
 
@@ -89,13 +87,11 @@ class NetworkProxFailuresTestWMS : public wrench::ExecutionController {
 
 public:
     NetworkProxFailuresTestWMS(NetworkProximityHostFailuresTest *test,
-                               std::string hostname) :
-            wrench::ExecutionController(hostname, "test") {
+                               std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
 private:
-
     NetworkProximityHostFailuresTest *test;
 
     int main() {
@@ -104,13 +100,13 @@ private:
         auto murderer = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 100, "FailedHost1",
                                                                                                wrench::ResourceSwitcher::Action::TURN_OFF, wrench::ResourceSwitcher::ResourceType::HOST));
         murderer->setSimulation(this->simulation);
-        murderer->start(murderer, true, false); // Daemonized, no auto-restart
+        murderer->start(murderer, true, false);// Daemonized, no auto-restart
 
         // Starting a FailedHost1 resurector!!
         auto resurector = std::shared_ptr<wrench::ResourceSwitcher>(new wrench::ResourceSwitcher("StableHost", 300, "FailedHost1",
                                                                                                  wrench::ResourceSwitcher::Action::TURN_ON, wrench::ResourceSwitcher::ResourceType::HOST));
         resurector->setSimulation(this->simulation);
-        resurector->start(resurector, true, false); // Daemonized, no auto-restart
+        resurector->start(resurector, true, false);// Daemonized, no auto-restart
 
         std::pair<std::string, std::string> first_pair_to_compute_proximity;
         first_pair_to_compute_proximity = std::make_pair("FailedHost1", "FailedHost2");
@@ -119,7 +115,7 @@ private:
         auto result1 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
         // Check that timestamp isn't more than 20 seconds past
-        WRENCH_INFO("################ prox=%lf timestamp=%lf",result1.first, result1.second);
+        WRENCH_INFO("################ prox=%lf timestamp=%lf", result1.first, result1.second);
         if (wrench::Simulation::getCurrentSimulatedDate() - result1.second > 20) {
             throw std::runtime_error("Network proximity timestamp shouldn't be more than 20 seconds old");
         }
@@ -127,7 +123,7 @@ private:
         wrench::Simulation::sleep(221);
         auto result2 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
-        WRENCH_INFO("################ prox=%lf timestamp=%lf",result2.first, result2.second);
+        WRENCH_INFO("################ prox=%lf timestamp=%lf", result2.first, result2.second);
         // Check that timestamp is more than 120 seconds past
         if (wrench::Simulation::getCurrentSimulatedDate() - result2.second < 120) {
             throw std::runtime_error("Network proximity timestamp shouldn't be less than 120 seconds old");
@@ -136,7 +132,7 @@ private:
         wrench::Simulation::sleep(2000);
         auto result3 = this->test->network_proximity_service->getHostPairDistance(
                 first_pair_to_compute_proximity);
-        WRENCH_INFO("################ prox=%lf timestamp=%lf",result3.first, result3.second);
+        WRENCH_INFO("################ prox=%lf timestamp=%lf", result3.first, result3.second);
         // Check that timestamp isn't more than 10 seconds past
         if (wrench::Simulation::getCurrentSimulatedDate() - result3.second > 20) {
             throw std::runtime_error("Network proximity timestamp shouldn't be more than 20 seconds old");
@@ -147,8 +143,7 @@ private:
         std::pair<std::string, std::string> second_pair_to_compute_proximity;
         second_pair_to_compute_proximity = std::make_pair("FailedHost2", "FailedHost3");
         count = 0, max_count = 1000;
-        double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(
-                second_pair_to_compute_proximity);
+        double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(second_pair_to_compute_proximity);
 
         while (second_pair_proximity == DBL_MAX && count < max_count) {
             count++;
@@ -166,8 +161,7 @@ private:
 
         if (first_pair_proximity > second_pair_proximity) {
             throw std::runtime_error(
-                    "Expected proximity between a pair to be less than the other pair of hosts"
-            );
+                    "Expected proximity between a pair to be less than the other pair of hosts");
         }
 #endif
 
@@ -187,7 +181,7 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -197,26 +191,23 @@ void NetworkProximityHostFailuresTest::do_HostFailures_Test() {
     // Get a hostname
     std::string stable_hostname = "StableHost";
 
-//    std::vector<std::string> hosts_in_network = {"FailedHost1", "FailedHost2", "FailedHost3"};
+    //    std::vector<std::string> hosts_in_network = {"FailedHost1", "FailedHost2", "FailedHost3"};
     std::vector<std::string> hosts_in_network = {"FailedHost1", "FailedHost2"};
 
     ASSERT_NO_THROW(network_proximity_service = simulation->add(
-            new wrench::NetworkProximityService(
-                    stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,"10"},
-                                                        {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "0"},
-                                                        {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED, "0"}
-                                                        })));
+                            new wrench::NetworkProximityService(
+                                    stable_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "10"}, {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "0"}, {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_NOISE_SEED, "0"}})));
 
     // Create a WMS
-    std::shared_ptr<wrench::ExecutionController> wms = nullptr;;
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new NetworkProxFailuresTestWMS(this, stable_hostname)));
+                            new NetworkProxFailuresTestWMS(this, stable_hostname)));
 
     // Running a "run a single task1" simulation
     ASSERT_NO_THROW(simulation->launch());
 
-    for (int i=0; i < argc; i++)
-     free(argv[i]);
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
     free(argv);
 }
-

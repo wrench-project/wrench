@@ -29,12 +29,11 @@ namespace wrench {
                          const std::shared_ptr<BatchComputeService> &batch_compute_service,
                          const std::shared_ptr<CloudComputeService> &cloud_compute_service,
                          const std::shared_ptr<StorageService> &storage_service,
-                         const std::string &hostname) :
-            ExecutionController(hostname,"simple"),
-            workflow(workflow),
-            batch_compute_service(batch_compute_service),
-            cloud_compute_service(cloud_compute_service),
-            storage_service(storage_service) {}
+                         const std::string &hostname) : ExecutionController(hostname, "simple"),
+                                                        workflow(workflow),
+                                                        batch_compute_service(batch_compute_service),
+                                                        cloud_compute_service(cloud_compute_service),
+                                                        storage_service(storage_service) {}
 
     /**
      * @brief main method of the SimpleWMS daemon
@@ -57,11 +56,11 @@ namespace wrench {
         auto data_movement_manager = this->createDataMovementManager();
 
         // Create and start two VMs on the cloud service to use for the whole execution
-        auto vm1 = this->cloud_compute_service->createVM(2, 0.0); // 2 cores, 0 RAM (RAM isn't used in this simulation)
+        auto vm1 = this->cloud_compute_service->createVM(2, 0.0);// 2 cores, 0 RAM (RAM isn't used in this simulation)
         auto vm1_cs = this->cloud_compute_service->startVM(vm1);
         this->core_utilization_map[vm1_cs] = 2;
 
-        auto vm2 = this->cloud_compute_service->createVM(4, 0.0); // 4 cores, 0 RAM (RAM isn't used in this simulation)
+        auto vm2 = this->cloud_compute_service->createVM(4, 0.0);// 4 cores, 0 RAM (RAM isn't used in this simulation)
         auto vm2_cs = this->cloud_compute_service->startVM(vm2);
         this->core_utilization_map[vm2_cs] = 4;
 
@@ -74,7 +73,7 @@ namespace wrench {
                 WRENCH_INFO("Creating and submitting a pilot job");
                 pilot_job = job_manager->createPilotJob();
                 job_manager->submitJob(pilot_job, this->batch_compute_service,
-                                       {{"-N","2"}, {"-c","3"}, {"-t", "30"}});
+                                       {{"-N", "2"}, {"-c", "3"}, {"-t", "30"}});
             }
 
             // Construct the list of currently available bare-metal services (on VMs and perhaps within pilot job as well)
@@ -123,7 +122,6 @@ namespace wrench {
         WRENCH_INFO("Task %s has failed", (*job->getTasks().begin())->getID().c_str());
         WRENCH_INFO("failure cause: %s", event->failure_cause->toString().c_str());
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
-
     }
 
     /**
@@ -154,7 +152,6 @@ namespace wrench {
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
         this->pilot_job_is_running = true;
         this->core_utilization_map[this->pilot_job->getComputeService()] = event->pilot_job->getComputeService()->getTotalNumIdleCores();
-
     }
 
     /**
@@ -196,20 +193,21 @@ namespace wrench {
         WRENCH_INFO("Trying to schedule %lu ready tasks", ready_tasks.size());
 
         unsigned long num_tasks_scheduled = 0;
-        for (auto const &task : ready_tasks) {
+        for (auto const &task: ready_tasks) {
             bool scheduled = false;
-            for (auto const &cs : compute_services) {
+            for (auto const &cs: compute_services) {
                 if (this->core_utilization_map[cs] > 0) {
                     // Specify that ALL files are read/written from the one storage service
                     std::map<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>> file_locations;
-                    for (auto const &f : task->getInputFiles()) {
+                    for (auto const &f: task->getInputFiles()) {
                         file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service);
                     }
-                    for (auto const &f : task->getOutputFiles()) {
+                    for (auto const &f: task->getOutputFiles()) {
                         file_locations[f] = wrench::FileLocation::LOCATION(this->storage_service);
                     }
                     try {
-                        auto job = job_manager->createStandardJob(task, file_locations);WRENCH_INFO(
+                        auto job = job_manager->createStandardJob(task, file_locations);
+                        WRENCH_INFO(
                                 "Submitting task %s to compute service %s", task->getID().c_str(),
                                 cs->getName().c_str());
                         job_manager->submitJob(job, cs);
@@ -218,7 +216,8 @@ namespace wrench {
                         scheduled = true;
                     } catch (ExecutionException &e) {
                         WRENCH_INFO("WARNING: Was not able to submit task %s, likely due to the pilot job having expired "
-                                    "(I should get a notification of its expiration soon)", task->getID().c_str());
+                                    "(I should get a notification of its expiration soon)",
+                                    task->getID().c_str());
                     }
                     break;
                 }
@@ -228,4 +227,4 @@ namespace wrench {
         WRENCH_INFO("Was able to schedule %lu out of %lu ready tasks", num_tasks_scheduled, ready_tasks.size());
     }
 
-}
+}// namespace wrench

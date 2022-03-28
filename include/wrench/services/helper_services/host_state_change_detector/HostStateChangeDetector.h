@@ -27,11 +27,9 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {HostStateChangeDetectorProperty::MONITORING_PERIOD,                            "1.0"}
-        };
+                {HostStateChangeDetectorProperty::MONITORING_PERIOD, "1.0"}};
 
     public:
-
         explicit HostStateChangeDetector(std::string host_on_which_to_run,
                                          std::vector<std::string> hosts_to_monitor,
                                          bool notify_when_turned_on,
@@ -39,14 +37,12 @@ namespace wrench {
                                          bool notify_when_speed_change,
                                          std::shared_ptr<S4U_Daemon> creator,
                                          simgrid::s4u::Mailbox *mailbox_to_notify,
-                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {}
-        );
+                                         WRENCH_PROPERTY_COLLECTION_TYPE property_list = {});
 
         void kill();
 
 
     private:
-
         void cleanup(bool has_terminated_cleanly, int return_value) override;
         void hostStateChangeCallback(std::string const &hostname);
         void hostSpeedChangeCallback(std::string const &hostname);
@@ -68,15 +64,13 @@ namespace wrench {
 
         unsigned int on_state_change_call_back_id;
         unsigned int on_speed_change_call_back_id;
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
-};
+};// namespace wrench
 
 
-
-#endif //WRENCH_HOSTSTATECHANGEDETECTOR_H
+#endif//WRENCH_HOSTSTATECHANGEDETECTOR_H

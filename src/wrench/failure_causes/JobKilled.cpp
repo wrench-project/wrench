@@ -42,11 +42,11 @@ namespace wrench {
     std::string JobKilled::toString() {
         std::string message = "Job " + this->job->getName() + " ";
         if (this->job->getParentComputeService()) {
-            message += "on service " + this->job->getParentComputeService()->getName() +" ";
+            message += "on service " + this->job->getParentComputeService()->getName() + " ";
         }
         message += "was killed";
         return message;
     }
 
 
-}
+}// namespace wrench

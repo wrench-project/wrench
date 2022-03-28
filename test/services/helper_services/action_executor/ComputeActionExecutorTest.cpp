@@ -108,7 +108,6 @@ protected:
 
     std::string platform_file_path = UNIQUE_TMP_PATH_PREFIX + "platform.xml";
     std::shared_ptr<wrench::Workflow> workflow;
-
 };
 
 
@@ -121,13 +120,11 @@ class ComputeActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeActionExecutorTestWMS(ComputeActionExecutorTest *test,
-                                 std::string hostname) :
-            wrench::ExecutionController(hostname, "test"), test(test) {
+                                 std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 
 private:
-
     ComputeActionExecutorTest *test;
 
     int main() {
@@ -145,12 +142,12 @@ private:
 
         action = std::dynamic_pointer_cast<wrench::Action>(job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
 
-        action->setThreadCreationOverhead(0.1);
-
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2",
                                            num_cores,
                                            ram,
+                                           0.1,
+                                           false,
                                            this->mailbox,
                                            action,
                                            nullptr));
@@ -204,7 +201,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
     char **argv = (char **) calloc(argc, sizeof(char *));
     argv[0] = strdup("unit_test");
     argv[1] = strdup("--wrench-host-shutdown-simulation");
-//    argv[2] = strdup("--wrench-full-log");
+    //    argv[2] = strdup("--wrench-full-log");
 
     simulation->init(&argc, argv);
 
@@ -224,14 +221,13 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ComputeActionExecutorTestWMS(this, "Host1")));
+                            new ComputeActionExecutorTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
     this->workflow->clear();
 
-    for (int i=0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
         free(argv[i]);
     free(argv);
-
 }

@@ -50,17 +50,15 @@ namespace wrench {
             } catch (wrench::ExecutionException &e) {
                 //ignore (network error or something)
                 continue;
-
             }
 
             // DO NOT Remove tasks that correspond to the job, since people may still care! And
             // besides, timestamps have been generated that correspond to these tasks!
-//            for (auto t : job->getTasks()) {
-//                this->getWorkflow()->removeTask(t);
-//            }
+            //            for (auto t : job->getTasks()) {
+            //                this->getWorkflow()->removeTask(t);
+            //            }
 
-//            this->job_manager->forgetJob(job);
+            //            this->job_manager->forgetJob(job);
         }
-
     }
-};
+};// namespace wrench

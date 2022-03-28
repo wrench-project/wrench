@@ -31,7 +31,7 @@ namespace wrench {
      */
     class ActionExecutionServiceMessage : public SimulationMessage {
     protected:
-        ActionExecutionServiceMessage( double payload);
+        ActionExecutionServiceMessage(double payload);
     };
 
     /**
@@ -115,10 +115,9 @@ namespace wrench {
     };
 
 
-
     /***********************/
     /** \endcond           */
     /***********************/
-};
+};// namespace wrench
 
-#endif //WRENCH_ACTION_ACTION_EXECUTION_SERVICE_MESSAGE_H
+#endif//WRENCH_ACTION_ACTION_EXECUTION_SERVICE_MESSAGE_H

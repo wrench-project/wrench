@@ -42,7 +42,6 @@ namespace wrench {
     class StandardJobFailedEvent : public ExecutionEvent {
 
     private:
-
         friend class ExecutionEvent;
 
         /**
@@ -52,18 +51,17 @@ namespace wrench {
          * @param failure_cause: a failure_cause
          */
         StandardJobFailedEvent(std::shared_ptr<StandardJob> standard_job,
-                               std::shared_ptr<ComputeService>  compute_service,
+                               std::shared_ptr<ComputeService> compute_service,
                                std::shared_ptr<FailureCause> failure_cause)
-                : standard_job(standard_job),
-                  compute_service(compute_service),
-                  failure_cause(failure_cause) {}
+            : standard_job(standard_job),
+              compute_service(compute_service),
+              failure_cause(failure_cause) {}
 
     public:
-
         /** @brief The standard job that has failed */
         std::shared_ptr<StandardJob> standard_job;
         /** @brief The compute service on which the job has failed */
-        std::shared_ptr<ComputeService>  compute_service;
+        std::shared_ptr<ComputeService> compute_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> failure_cause;
 
@@ -72,17 +70,15 @@ namespace wrench {
          * @return a text string
          */
         std::string toString() override { return "StandardJobFailedEvent (job: " + this->standard_job->getName() + "; cs = " +
-                                                 this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")";}
-
+                                                 this->compute_service->getName() + "; cause: " + this->failure_cause->toString() + ")"; }
     };
 
 
-};
+};// namespace wrench
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
-
-#endif //WRENCH_STANDARD_JOB_FAILED_H
+#endif//WRENCH_STANDARD_JOB_FAILED_H

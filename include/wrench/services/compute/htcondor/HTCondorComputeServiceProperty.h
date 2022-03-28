@@ -20,7 +20,6 @@ namespace wrench {
     class HTCondorComputeServiceProperty : public ComputeServiceProperty {
 
     public:
-
         /** @brief Overhead, in seconds, of the HTCondor Negotiator, which is invoked each time a new job is submitted or
          *  a running job completes and there are still pending jobs **/
         DECLARE_PROPERTY_NAME(NEGOTIATOR_OVERHEAD);
@@ -40,8 +39,7 @@ namespace wrench {
         /** @brief Overhead (in seconds) between condor and a bare-metal compute for the completion of execution of non-grid-universe jobs
          */
         DECLARE_PROPERTY_NAME(NON_GRID_POST_EXECUTION_DELAY);
-
     };
-}
+}// namespace wrench
 
-#endif //WRENCH_HTCONDORCOMPUTESERVICEPROPERTY_H
+#endif//WRENCH_HTCONDORCOMPUTESERVICEPROPERTY_H
