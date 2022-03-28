@@ -10,17 +10,31 @@
 #ifndef WRENCH_XROOTD_NODE_H
 #define WRENCH_XROOTD_NODE_H
 #include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/storage/xrootd/XRootDMessagePayload.h"
 #include <stack>
 namespace wrench {
     namespace XRootD{
         class XRootD;
         class Node:public Service{//Conceptualy all nodes ARE storage services, HOWEVER, the API is entirly differnt for accessing a file in an XRootD deployment than usuall.
+        private:
+            WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+            };
+
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
+                    {MessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::UPDATE_CACHE, 1024},
+                    {MessagePayload::CONTINUE_SEARCH, 1024},
+                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024}
+            };
         public:
             Node(const std::string& hostname);
             std::shared_ptr<SimpleStorageService> getStorageServer();
             Node* getChild(int n);
             Node* getParrent();
             int main();
+            bool processNextMessage();
             bool lookupFile(std::shared_ptr<DataFile>file);
             void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
             void readFile(std::shared_ptr<DataFile>file);
@@ -44,8 +58,7 @@ namespace wrench {
             bool makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<SimpleStorageService> internalStorage=nullptr;
-            std::shared_ptr<std::shared_ptr<Node>> children=nullptr;
-            int numChildren=-1;
+            std::vector<std::shared_ptr<Node>> children;
             std::unordered_map< std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> cache;//probiably change the payload of this to an object containing the file location AND its queue time stamp
             Node* supervisor=nullptr;
             XRootD* metavisor=nullptr;
