@@ -589,22 +589,37 @@ namespace wrench {
     */
     void BatschedBatchScheduler::startBatschedNetworkListener() {
 
-        nlohmann::json compute_resources_map;
+//        nlohmann::json compute_resources_map;
+//        compute_resources_map["now"] = S4U_Simulation::getClock();
+//        compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
+//        compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
+//        compute_resources_map["events"][0]["data"]["nb_resources"] = this->cs->nodes_to_cores_map.size();
+//        compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
+//        compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
+
+        boost::json::object compute_resources_map;
         compute_resources_map["now"] = S4U_Simulation::getClock();
-        compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
-        compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
-        compute_resources_map["events"][0]["data"]["nb_resources"] = this->cs->nodes_to_cores_map.size();
-        compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
-        //    This was the "old" batsched up until commit 39a30d83
-        //      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
-        compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
+        compute_resources_map["events"] = boost::json::array();
+        compute_resources_map["events"].as_array()[0].emplace_object()["timestamp"] = S4U_Simulation::getClock();
+        compute_resources_map["events"].as_array()[0].as_object()["time"] = "SIMULATION_BEGINGS"";
+        compute_resources_map["events"].as_array()[0].as_object()["data"].emplace_object()["nb_resources"] = this->cs->nodes_to_cores_map.size();
+        compute_resources_map["events"].as_array()[0].as_object()["data"].as_object()["allow_time_sharing"] = false;
+        compute_resources_map["events"].as_array()[0].as_object()["data"].as_object()["config"].emplace_object()["redis-enabled"] = false;
+
+
         std::map<std::string, unsigned long>::iterator it;
         int count = 0;
         for (it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
-            compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
-            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
-            compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
-            compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
+//            compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
+//            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
+//            compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
+//            compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
+
+            compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].emplace_array()[count].emplace_object()["id"] = std::to_string(count);
+            compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["name"] = it->first;
+            compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["core"] = it->second;
+            compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["state"] = "idle";
+            count++;
         }
         std::string data = compute_resources_map.dump();
 
