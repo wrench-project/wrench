@@ -19,7 +19,7 @@
 #include <iostream>
 #include <fstream>
 
-//#include <nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 
 #endif
@@ -225,24 +225,25 @@ namespace wrench {
 
         int idx = 0;
 //        batch_submission_data["events"] = nlohmann::json::array();
+
         batch_submission_data["events"] = boost::json::array();
         for (auto job: set_of_jobs) {
             boost::json::object event_object;
 //            batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
-            event_object["timestamp"] = S4U_Simulation::getClock();
 //            batch_submission_data["events"][idx]["type"] = "QUERY";
-            event_object["type"] = "QUERY";
-            boost::json_object data_object;
 //            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
-            data_object["requests"].emplace_object()["estimate_waiting_time"].emplace_object()["job_id"] = std::get<0>(job);
 //            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(job);
-            data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].as_object()["id"] = std::get<0>(job);
 //            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(job);
+//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
+//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
+            event_object["timestamp"] = S4U_Simulation::getClock();
+            event_object["type"] = "QUERY";
+            boost::json::object data_object;
+            data_object["requests"].emplace_object()["estimate_waiting_time"].emplace_object()["job_id"] = std::get<0>(job);
+            data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].emplace_object()["id"] = std::get<0>(job);
             data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].as_object()["res"] = std::get<1>(job);
-//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
             data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].as_object()["walltime"] = std::get<3>(job);
-//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
-            batch_submission_data["events"][idx++] = data_object;
+            batch_submission_data["events"].as_array()[idx++] = data_object;
         }
 
 //        std::string data = batch_submission_data.dump();
