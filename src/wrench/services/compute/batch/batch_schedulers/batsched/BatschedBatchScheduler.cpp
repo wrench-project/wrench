@@ -299,12 +299,19 @@ namespace wrench {
         zmq::socket_t socket(context, ZMQ_REQ);
         socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
 
-        nlohmann::json simulation_ends_msg;
+//        nlohmann::json simulation_ends_msg;
+        boost::json::object simulation_ends_msg;
         simulation_ends_msg["now"] = S4U_Simulation::getClock();
-        simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
-        simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
-        simulation_ends_msg["events"][0]["data"] = {};
-        std::string data_to_send = simulation_ends_msg.dump();
+        simulation_ends_msg["events"] = boost::json::array();
+//        simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
+//        simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
+//        simulation_ends_msg["events"][0]["data"] = {};
+        simulation_ends_msg["events"].as_array()[0].emplace_object()["timestamp"] = S4U_Simulation::getClock();
+        simulation_ends_msg["events"].as_array()[0].as_object()["type"] = "SIMULATION_ENDS";
+        simulation_ends_msg["events"].as_array()[0].as_object()["data"] = {};
+
+//        std::string data_to_send = simulation_ends_msg.dump();
+        std::string data_to_send = boost::json::serialize(simulation_ends_msg);
 
         zmq::message_t request(strlen(data_to_send.c_str()));
         memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
@@ -318,9 +325,13 @@ namespace wrench {
         std::string reply_data;
         reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
 
-        nlohmann::json reply_decisions;
-        nlohmann::json decision_events;
-        reply_decisions = nlohmann::json::parse(reply_data);
+//        nlohmann::json reply_decisions;
+//        nlohmann::json decision_events;
+        boost::json::object reply_decisions;
+        boost::json::object decision_events;
+
+//        reply_decisions = nlohmann::json::parse(reply_data);
+        auto reply_decisions = boost::json::parse(reply_data);
         decision_events = reply_decisions["events"];
         if (decision_events.size() > 0) {
             throw std::runtime_error(
