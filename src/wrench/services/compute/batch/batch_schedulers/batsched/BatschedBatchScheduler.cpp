@@ -19,7 +19,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 
 #endif
@@ -361,7 +361,8 @@ namespace wrench {
 //        nlohmann::json batch_submission_data;
         boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
-        batch_submission_data["events"] = nlohmann::json::array();
+//        batch_submission_data["events"] = nlohmann::json::array();
+        batch_submission_data["events"] = boost::json::array();
         size_t i;
         std::deque<std::shared_ptr<BatchJob>>::iterator it;
         for (i = 0, it = this->cs->batch_queue.begin(); i < this->cs->batch_queue.size(); i++, it++) {
