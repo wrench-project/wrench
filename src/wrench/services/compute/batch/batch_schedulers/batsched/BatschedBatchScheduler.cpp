@@ -358,7 +358,8 @@ namespace wrench {
         // Send ALL Queued jobs to batsched, and move them all to the WAITING queue
         // The WAITING queue is: those jobs that I need to hear from Batsched about
 
-        nlohmann::json batch_submission_data;
+//        nlohmann::json batch_submission_data;
+        boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
         batch_submission_data["events"] = nlohmann::json::array();
         size_t i;
@@ -372,13 +373,25 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long allocated_time = batch_job->getRequestedTime();
 
-            batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimestamp();
-            batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
-            batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
-            batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
-            batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
-            batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
-            batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time + BATSCHED_JOB_EXTRA_TIME;
+//            batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimestamp();
+//            batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
+//            batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
+//            batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
+//            batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
+//            batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
+//            batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time + BATSCHED_JOB_EXTRA_TIME;
+
+            boost::json::object event;
+            event["timestamp"] = batch_job->getArrivalTimestamp();
+            event["type"] = "JOB_SUBMITTED";
+            event["data"] = boost::json::object();
+            event["data"].as_object()["job_id"] = std::to_string(batch_job->getJobID());
+            event["data"].as_object()["job"].emplace_object()["id"] = std::to_string(batch_job->getJobID());
+            event["data"].as_object()["job"].as_object()["res"] = num_nodes_asked_for;
+            event["data"].as_object()["job"].as_object()["core"] = cores_per_node_asked_for;
+            event["data"].as_object()["job"].as_object()["walltime"] = allocated_time + BATSCHED_JOB_EXTRA_TIME;
+
+            batch_submission_data["events"].as_array()[i] = event;
 
             this->cs->batch_queue.erase(it);
             this->cs->waiting_jobs.insert(batch_job);
