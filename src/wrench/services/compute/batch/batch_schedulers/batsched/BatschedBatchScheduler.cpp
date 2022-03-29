@@ -19,7 +19,8 @@
 #include <iostream>
 #include <fstream>
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 
 #endif
 
@@ -216,28 +217,38 @@ namespace wrench {
         if (supported_algorithms.find(this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM)) == supported_algorithms.end()) {
             throw std::runtime_error("BatschedBatchScheduler::getStartTimeEstimates(): Algorithm does not support start time estimates");
         }
-        nlohmann::json batch_submission_data;
+//        nlohmann::json batch_submission_data;
+        boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
 
         // IMPORTANT: THIS IGNORES THE NUMBER OF CORES (THIS IS A LIMITATION OF batsched!)
 
         int idx = 0;
-        batch_submission_data["events"] = nlohmann::json::array();
+//        batch_submission_data["events"] = nlohmann::json::array();
+        batch_submission_data["events"] = boost::json::array();
         for (auto job: set_of_jobs) {
-            batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
-            batch_submission_data["events"][idx]["type"] = "QUERY";
-            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
-            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(
-                    job);
-            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(
-                    job);
-            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(
-                    job);
+            boost::json::object event_object;
+//            batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
+            event_object["timestamp"] = S4U_Simulation::getClock();
+//            batch_submission_data["events"][idx]["type"] = "QUERY";
+            event_object["type"] = "QUERY";
+            boost::json_object data_object;
+//            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
+            data_object["requests"].emplace_object()["estimate_waiting_time"].emplace_object()["job_id"] = std::get<0>(job);
+//            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(job);
+            data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].as_object()["id"] = std::get<0>(job);
+//            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(job);
+            data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].as_object()["res"] = std::get<1>(job);
+//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
+            data_object["requests"].as_object()["estimate_waiting_time"].as_object()["job"].as_object()["walltime"] = std::get<3>(job);
+//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
+            batch_submission_data["events"][idx++] = data_object;
         }
 
-        std::string data = batch_submission_data.dump();
+//        std::string data = batch_submission_data.dump();
+        std::string data = boost::json::serialize(batch_submission_data);
 
-        simgrid::s4u::Mailbox *batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
+        auto batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
 
         std::shared_ptr<BatschedNetworkListener> network_listener =
                 std::shared_ptr<BatschedNetworkListener>(
