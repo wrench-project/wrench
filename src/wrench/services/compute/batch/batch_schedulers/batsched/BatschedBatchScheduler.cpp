@@ -478,14 +478,24 @@ namespace wrench {
     void BatschedBatchScheduler::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                                            std::string kill_reason, std::string event_type) {
 
-        nlohmann::json batch_submission_data;
+//        nlohmann::json batch_submission_data;
+//        batch_submission_data["now"] = S4U_Simulation::getClock();
+//        batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
+//        batch_submission_data["events"][0]["type"] = event_type;
+//        batch_submission_data["events"][0]["data"]["job_id"] = job_id;
+//        batch_submission_data["events"][0]["data"]["status"] = status;
+//        batch_submission_data["events"][0]["data"]["job_state"] = job_state;
+//        batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
+
+        boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
-        batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
-        batch_submission_data["events"][0]["type"] = event_type;
-        batch_submission_data["events"][0]["data"]["job_id"] = job_id;
-        batch_submission_data["events"][0]["data"]["status"] = status;
-        batch_submission_data["events"][0]["data"]["job_state"] = job_state;
-        batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
+        batch_submission_data["events"] = boost::json::array();
+        batch_submission_data["events"].as_array()[0].emplace_object()["timestamp"] = S4U_Simulation::getClock();
+        batch_submission_data["events"].as_array()[0].as_object()["time"] = event_type;
+        batch_submission_data["events"].as_array()[0].as_object()["data"].emplace_object()["job_id"] = job_id;
+        batch_submission_data["events"].as_array()[0].as_object()["data"].emplace_object()["status"] = status;
+        batch_submission_data["events"].as_array()[0].as_object()["data"].emplace_object()["job_state"] = job_state;
+        batch_submission_data["events"].as_array()[0].as_object()["data"].emplace_object()["kill_reason"] = kill_reason;
 
         std::string data = batch_submission_data.dump();
         std::shared_ptr<BatschedNetworkListener> network_listener =
