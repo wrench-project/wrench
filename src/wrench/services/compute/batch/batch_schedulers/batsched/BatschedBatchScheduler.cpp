@@ -19,7 +19,6 @@
 #include <iostream>
 #include <fstream>
 
-//#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 
 #endif
@@ -217,25 +216,16 @@ namespace wrench {
         if (supported_algorithms.find(this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM)) == supported_algorithms.end()) {
             throw std::runtime_error("BatschedBatchScheduler::getStartTimeEstimates(): Algorithm does not support start time estimates");
         }
-//        nlohmann::json batch_submission_data;
         boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
 
         // IMPORTANT: THIS IGNORES THE NUMBER OF CORES (THIS IS A LIMITATION OF batsched!)
 
         int idx = 0;
-//        batch_submission_data["events"] = nlohmann::json::array();
 
         batch_submission_data["events"] = boost::json::array();
         for (auto job: set_of_jobs) {
             boost::json::object event_object;
-//            batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
-//            batch_submission_data["events"][idx]["type"] = "QUERY";
-//            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
-//            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(job);
-//            batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(job);
-//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
-//            batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(job);
             event_object["timestamp"] = S4U_Simulation::getClock();
             event_object["type"] = "QUERY";
             boost::json::object data_object;
@@ -246,7 +236,6 @@ namespace wrench {
             batch_submission_data["events"].as_array()[idx++] = data_object;
         }
 
-//        std::string data = batch_submission_data.dump();
         std::string data = boost::json::serialize(batch_submission_data);
 
         auto batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailbox("batchsched_query_mailbox");
@@ -299,18 +288,13 @@ namespace wrench {
         zmq::socket_t socket(context, ZMQ_REQ);
         socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
 
-//        nlohmann::json simulation_ends_msg;
         boost::json::object simulation_ends_msg;
         simulation_ends_msg["now"] = S4U_Simulation::getClock();
         simulation_ends_msg["events"] = boost::json::array();
-//        simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
-//        simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
-//        simulation_ends_msg["events"][0]["data"] = {};
         simulation_ends_msg["events"].as_array()[0].emplace_object()["timestamp"] = S4U_Simulation::getClock();
         simulation_ends_msg["events"].as_array()[0].as_object()["type"] = "SIMULATION_ENDS";
         simulation_ends_msg["events"].as_array()[0].as_object()["data"] = {};
 
-//        std::string data_to_send = simulation_ends_msg.dump();
         std::string data_to_send = boost::json::serialize(simulation_ends_msg);
 
         zmq::message_t request(strlen(data_to_send.c_str()));
@@ -325,12 +309,9 @@ namespace wrench {
         std::string reply_data;
         reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
 
-//        nlohmann::json reply_decisions;
-//        nlohmann::json decision_events;
         boost::json::object reply_decisions;
         boost::json::object decision_events;
 
-//        reply_decisions = nlohmann::json::parse(reply_data);
         auto reply_decisions = boost::json::parse(reply_data);
         decision_events = reply_decisions["events"];
         if (decision_events.size() > 0) {
@@ -358,10 +339,8 @@ namespace wrench {
         // Send ALL Queued jobs to batsched, and move them all to the WAITING queue
         // The WAITING queue is: those jobs that I need to hear from Batsched about
 
-//        nlohmann::json batch_submission_data;
         boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
-//        batch_submission_data["events"] = nlohmann::json::array();
         batch_submission_data["events"] = boost::json::array();
         size_t i;
         std::deque<std::shared_ptr<BatchJob>>::iterator it;
@@ -374,13 +353,6 @@ namespace wrench {
             unsigned long num_nodes_asked_for = batch_job->getRequestedNumNodes();
             unsigned long allocated_time = batch_job->getRequestedTime();
 
-//            batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimestamp();
-//            batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
-//            batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
-//            batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
-//            batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
-//            batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
-//            batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time + BATSCHED_JOB_EXTRA_TIME;
 
             boost::json::object event;
             event["timestamp"] = batch_job->getArrivalTimestamp();
@@ -478,15 +450,6 @@ namespace wrench {
     */
     void BatschedBatchScheduler::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                                            std::string kill_reason, std::string event_type) {
-
-//        nlohmann::json batch_submission_data;
-//        batch_submission_data["now"] = S4U_Simulation::getClock();
-//        batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
-//        batch_submission_data["events"][0]["type"] = event_type;
-//        batch_submission_data["events"][0]["data"]["job_id"] = job_id;
-//        batch_submission_data["events"][0]["data"]["status"] = status;
-//        batch_submission_data["events"][0]["data"]["job_state"] = job_state;
-//        batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
 
         boost::json::object batch_submission_data;
         batch_submission_data["now"] = S4U_Simulation::getClock();
@@ -590,14 +553,6 @@ namespace wrench {
     */
     void BatschedBatchScheduler::startBatschedNetworkListener() {
 
-//        nlohmann::json compute_resources_map;
-//        compute_resources_map["now"] = S4U_Simulation::getClock();
-//        compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
-//        compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
-//        compute_resources_map["events"][0]["data"]["nb_resources"] = this->cs->nodes_to_cores_map.size();
-//        compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
-//        compute_resources_map["events"][0]["data"]["config"]["redis-enabled"] = false;
-
         boost::json::object compute_resources_map;
         compute_resources_map["now"] = S4U_Simulation::getClock();
         compute_resources_map["events"] = boost::json::array();
@@ -607,14 +562,9 @@ namespace wrench {
         compute_resources_map["events"].as_array()[0].as_object()["data"].as_object()["allow_time_sharing"] = false;
         compute_resources_map["events"].as_array()[0].as_object()["data"].as_object()["config"].emplace_object()["redis-enabled"] = false;
 
-
         std::map<std::string, unsigned long>::iterator it;
         int count = 0;
         for (it = this->cs->nodes_to_cores_map.begin(); it != this->cs->nodes_to_cores_map.end(); it++) {
-//            compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
-//            compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
-//            compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
-//            compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
 
             compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].emplace_array()[count].emplace_object()["id"] = std::to_string(count);
             compute_resource_map["events"].as_array()[0].as_object()["data"].as_object()["resources_data"].as_erray()[count].as_object()["name"] = it->first;

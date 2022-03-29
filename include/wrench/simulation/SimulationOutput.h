@@ -181,13 +181,6 @@ namespace wrench {
     private:
         std::map<std::type_index, GenericSimulationTrace *> traces;
 
-//        nlohmann::json platform_json_part;
-//        nlohmann::json workflow_exec_json_part;
-//        nlohmann::json workflow_graph_json_part;
-//        nlohmann::json energy_json_part;
-//        nlohmann::json disk_json_part;
-//        nlohmann::json bandwidth_json_part;
-
         boost::json::object platform_json_part;
         boost::json::object workflow_exec_json_part;
         boost::json::object workflow_graph_json_part;

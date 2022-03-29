@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-//#include <nlohmann/json.hpp>
 #include <boost/json.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -1256,7 +1255,6 @@ namespace wrench {
      * @param bat_sched_reply
      */
     void BatchComputeService::processExecuteJobFromBatSched(std::string bat_sched_reply) {
-//        nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
         auto execute_events = boost::json::parse(bat_sched_reply);
         std::shared_ptr<CompoundJob> compound_job = nullptr;
         std::shared_ptr<BatchJob> batch_job = nullptr;
