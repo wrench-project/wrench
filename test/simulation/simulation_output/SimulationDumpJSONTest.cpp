@@ -927,6 +927,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().begin(), result_json["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().end(), comparePstate);
     }
 
+    std::cerr << "EXPECTED: " << expected_json << "\n";
+    std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
 
@@ -1031,6 +1033,9 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     EXPECT_NO_THROW(simulation->getOutput().dumpLinkUsageJSON(this->link_usage_json_file_path));
     simulation->getOutput().dumpUnifiedJSON(link_usage_workflow, "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
 
+    /* The 125000000.00000001 below is confusing, because it doesn't account for the .97 factor that limits
+     * bandwidth, but that's something tthat was changed in SimGrid3.28 (simulation times are not affected,
+     * just number of bytes) */
     auto expected_json_link_usage = boost::json::parse(R"(
     {
         "link_usage": {

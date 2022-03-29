@@ -77,7 +77,7 @@ in green is produced by the execution controller implemented with
 the WRENCH developer API.
 
 Although you can inspect the codes of the examples on your own, we highly
-recommend that you go through the [WRENCH 101](@ref wrench-101) and 
-[WRENCH 102](@ref wrench-102) pages first. These pages make direct references to the
+recommend that you go through the [Simulation 101](@ref simulation-101), [WRENCH 101](@ref wrench-101) and 
+[WRENCH 102](@ref wrench-102) pages first. These  pages make direct references to the
 examples, a description of which is available in `examples/README.md`
 in the WRENCH distribution.

@@ -42,14 +42,14 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the daemon to answer a file copy request **/
         DECLARE_MESSAGEPAYLOAD_NAME(FILE_COPY_ANSWER_MESSAGE_PAYLOAD);
 
-        /** @brief The number of bytes in the control message sent to the daemon to request a file copy **/
+        /** @brief The number of bytes in the control message sent to the daemon to request a file write **/
         DECLARE_MESSAGEPAYLOAD_NAME(FILE_WRITE_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file copy request **/
+        /** @brief The number of bytes in the control message sent by the daemon to answer a file write request **/
         DECLARE_MESSAGEPAYLOAD_NAME(FILE_WRITE_ANSWER_MESSAGE_PAYLOAD);
 
-        /** @brief The number of bytes in the control message sent to the daemon to request a file copy **/
+        /** @brief The number of bytes in the control message sent to the daemon to request a file read **/
         DECLARE_MESSAGEPAYLOAD_NAME(FILE_READ_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file copy request **/
+        /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
         DECLARE_MESSAGEPAYLOAD_NAME(FILE_READ_ANSWER_MESSAGE_PAYLOAD);
 
         /** @brief The number of bytes in the control message sent by the daemon to say "file not found" **/
