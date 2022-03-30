@@ -397,7 +397,7 @@ namespace wrench {
 
         this->ttl = ttl;
         this->has_ttl = (this->ttl != DBL_MAX);
-        this->containing_pilot_job = std::move(pj);
+//        this->containing_pilot_job = std::move(pj);
     }
 
     /**
