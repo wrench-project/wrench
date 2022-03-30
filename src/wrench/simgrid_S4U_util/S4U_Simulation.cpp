@@ -203,30 +203,94 @@ namespace wrench {
         return links.at(0)->get_usage();
     }
 
-
     /**
- * @brief Get the by-cluster structure of the platform
- * @return a map of all cluster names and their associated hostname list
- */
-    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
+     * @brief A templated method to determine all hostnames declared under a NetZone in the platform
+     * @tparam T: NetZone class
+     * @return a map of netzone ids and the list of hostnames
+     */
+    template<class T>
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByNetZone() {
         std::map<std::string, std::vector<std::string>> result;
-        std::vector<simgrid::kernel::routing::ClusterZone *> clusters;
 
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
 
-        clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
-        for (auto c: clusters) {
-            std::vector<simgrid::s4u::Host *> host_list = c->get_all_hosts();
+        auto netzones = simgrid_engine->get_filtered_netzones<T>();
+        for (auto nz: netzones) {
+            std::vector<simgrid::s4u::Host *> host_list = nz->get_all_hosts();
             std::vector<std::string> hostname_list;
             hostname_list.reserve(host_list.size());
             for (auto h: host_list) {
-                hostname_list.push_back(std::string(h->get_cname()));
+                hostname_list.emplace_back(h->get_name());
             }
-            result.insert({c->get_name(), hostname_list});
+            result.insert({nz->get_name(), hostname_list});
         }
 
         return result;
     }
+
+
+
+/**
+ * @brief Get the list of hostnames in each ClusterZone in the platform (<cluster/> XML tag in the platform XML description)
+ * @return a map of all cluster ids and lists of hostnames
+ */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
+        return getAllHostnamesByNetZone<simgrid::kernel::routing::ClusterZone>();
+    }
+
+/**
+ * @brief Get the list of hostnames in each NetZone (<zone> and <cluster> tags in the platform XML description).
+ *        Note that this method does not recurse into sub-zones, so it only returns the hosts that are declared
+ *        directly under the <zone> and or <cluster> tags.
+ * @return a map of all zone ids and lists of hostnames
+ */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByZone() {
+        return getAllHostnamesByNetZone<simgrid::kernel::routing::NetZoneImpl>();
+    }
+
+
+    /**
+     * @brief A templated method to determine all sub-netzones  declared under a NetZone in the platform
+     * @tparam T: NetZone class
+     * @return a map of netzone ids and the list of hostnames
+     */
+    template<class T>
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllSubNetZonesByNetZone() {
+        std::map<std::string, std::vector<std::string>> result;
+
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+
+        auto netzones = simgrid_engine->get_filtered_netzones<T>();
+        for (auto nz: netzones) {
+            auto children = nz->get_children();
+            std::vector<std::string> child_list;
+            for (auto child: children) {
+                child_list.emplace_back(child->get_name());
+            }
+            result.insert({nz->get_name(), child_list});
+        }
+
+        return result;
+    }
+
+
+    /**
+ * @brief Get the list of ids of all ClusterZone in the platform within each zone (<cluster/> XML tag in the platform XML description)
+ * @return a map of all zone ids and lists of cluster ids
+ */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllClusterIDsByZone() {
+        return getAllSubNetZonesByNetZone<simgrid::kernel::routing::ClusterZone>();
+    }
+
+/**
+ * @brief Get the list of cluster ids in each NetZone (<zone> tags in the platform XML description).
+ *        Note that this method does not recurse into sub-zones, so it only returns the directy children sub-zones
+ * @return a map of all zone ids and lists of sub-zone ids
+ */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllSubZoneIDsByZone() {
+        return getAllHostnamesByNetZone<simgrid::kernel::routing::NetZoneImpl>();
+    }
+
 
     /**
  * @brief Determines whether a host exists for a given hostname
@@ -405,7 +469,6 @@ namespace wrench {
     void S4U_Simulation::compute(double flops) {
         simgrid::s4u::this_actor::execute(flops);
     }
-
 
     /**
      * @brief Simulates a multi-threaded computation
@@ -612,7 +675,7 @@ namespace wrench {
     }
 
     /**
- * @brief Get the property associated to the host specified in the platform file
+ * @brief Get the property associated to a host specified in the platform file
  * @param hostname: the host name
  * @param property_name: the property name
  * @return a string relating to the property specified in the platform file
@@ -627,6 +690,27 @@ namespace wrench {
         }
         return host->get_property(property_name);
     }
+
+    /**
+* @brief Get the property associated to a cluster specified in the platform file
+* @param cluster_id: the cluster id
+* @param property_name: the property name
+* @return a string relating to the property specified in the platform file
+*/
+    std::string S4U_Simulation::getClusterProperty(std::string cluster_id, std::string property_name) {
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        auto clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
+        for (auto c: clusters) {
+            if (c->get_name() == cluster_id) {
+                if (c->get_properties()->find(property_name) == c->get_properties()->end()) {
+                    throw std::invalid_argument("S4U_Simulation::getClusterProperty(): Unknown property " + property_name);
+                }
+                return c->get_property(property_name);
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::getClusterProperty(): Unknown cluster " + cluster_id);
+    }
+
 
     /**
  * @brief Set a property associated to a host specified in the platform file

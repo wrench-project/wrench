@@ -76,6 +76,7 @@ namespace wrench {
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);
         static void setHostProperty(std::string hostname, std::string property_name, std::string property_value);
+        static std::string getClusterProperty(std::string cluster_id, std::string property_name);
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);
@@ -94,10 +95,18 @@ namespace wrench {
         static std::vector<std::string> getAllLinknames();
         static double getLinkBandwidth(std::string name);
         static double getLinkUsage(std::string name);
+
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
+        static std::map<std::string, std::vector<std::string>> getAllHostnamesByZone();
+        static std::map<std::string, std::vector<std::string>> getAllClusterIDsByZone();
+        static std::map<std::string, std::vector<std::string>> getAllSubZoneIDsByZone();
+
         void shutdown();
 
     private:
+        template<class T> static std::map<std::string, std::vector<std::string>> getAllHostnamesByNetZone();
+        template<class T> static std::map<std::string, std::vector<std::string>> getAllSubNetZonesByNetZone();
+
         static double getHostMemoryCapacity(simgrid::s4u::Host *host);
         simgrid::s4u::Engine *engine;
         bool initialized = false;
