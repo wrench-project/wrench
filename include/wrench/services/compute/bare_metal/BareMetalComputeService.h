@@ -152,21 +152,48 @@ namespace wrench {
 
 
     protected:
-        std::shared_ptr<Alarm> death_alarm = nullptr;
-        std::shared_ptr<PilotJob> containing_pilot_job;// In case this service is in fact a pilot job
+//        std::shared_ptr<Alarm> death_alarm = nullptr;
+//        std::shared_ptr<PilotJob> containing_pilot_job;// In case this service is in fact a pilot job
 
 
+        /**
+         * @brief Sets of files stored in scratch space
+         */
         std::unordered_map<std::shared_ptr<StandardJob>, std::set<std::shared_ptr<DataFile>>> files_in_scratch;
 
+        /**
+         * @brief Set of jobs currently handled by the service
+         */
         std::set<std::shared_ptr<CompoundJob>> current_jobs;
 
+        /**
+         * @brief Set of non-ready actions
+         */
         std::set<std::shared_ptr<Action>> not_ready_actions;
+        /**
+         * @brief Set of ready actions
+         */
         std::vector<std::shared_ptr<Action>> ready_actions;
+        /**
+         * @brief Set of dispatched actions
+         */
         std::set<std::shared_ptr<Action>> dispatched_actions;
+        /**
+         * @brief Map of numbers of per-compound-job dispatched actions
+         */
         std::unordered_map<std::shared_ptr<CompoundJob>, int> num_dispatched_actions_for_cjob;
 
+        /**
+         * @brief Time to live (TTL)
+         */
         double ttl;
+        /**
+         * @brief Death date
+         */
         double death_date;
+        /**
+         * @brief Whether this service has a TTL
+         */
         bool has_ttl;
 
 
@@ -195,33 +222,29 @@ namespace wrench {
 
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
-        //        void processSubmitPilotJob(const std::string &answer_mailbox, std::shared_ptr<PilotJob> job, std::map<std::string, std::string> service_specific_args);
-
         void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<CompoundJob> job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
                 simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
 
-        //        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<WorkflowTask>task,
-        //                                                              std::string required_host, unsigned long required_num_cores, double required_ram,
-        //                                                              std::set<std::string> &hosts_to_avoid);
-
-        //        bool jobCanRun(std::shared_ptr<StandardJob> job, std::map<std::string, std::string> &service_specific_arguments);
-        //
-        //        bool isThereAtLeastOneHostWithResources(unsigned long num_cores, double ram);
-
         void cleanup(bool has_terminated_cleanly, int return_value) override;
-
-        //        bool areAllComputeResourcesDownWithNoWUERunning();
 
         static std::tuple<std::string, unsigned long> parseResourceSpec(const std::string &spec);
 
-
+        /**
+         * @brief This service's exit code
+         */
         int exit_code = 0;
 
+        /**
+         * @brief The HostStateChangeDetector that is (optionally) started by this service
+         */
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
 
+        /**
+         * @brief The ActionExecutionService that is started by this service
+         */
         std::shared_ptr<ActionExecutionService> action_execution_service;
 
         /***********************/

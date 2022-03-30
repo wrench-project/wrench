@@ -177,7 +177,6 @@ void BandwidthMeterServiceTest::do_BandwidthMeterCreationDestruction_test() {
     single_task = link_usage_workflow->addTask("dummy_task", 1, 1, 1, 8 * GB);
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10 * GB));
 
-
     EXPECT_NO_THROW(wms = simulation->add(
                             new BasicCreationDestructionTestWMS(
                                     this,
