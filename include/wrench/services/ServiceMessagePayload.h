@@ -13,8 +13,22 @@
 
 #include <string>
 namespace wrench {
+
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+    /**
+     * @brief Message Payload Type
+     */
     typedef int WRENCH_MESSAGEPAYLOAD_TYPE;
+    /**
+     * @brief Message Payload Count
+     */
     extern WRENCH_MESSAGEPAYLOAD_TYPE WRENCH_MESSAGEPAYLOAD_COUNT;
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 }// namespace wrench
 #define DECLARE_MESSAGEPAYLOAD_NAME(name) static const WRENCH_MESSAGEPAYLOAD_TYPE name

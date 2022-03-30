@@ -3,6 +3,10 @@ Overview                        {#mainpage}
 
 [TOC]
 
+[Click here for the documentation of the master branch](https://wrench-project.org/wrench/latest/)
+
+<br />
+
 [WRENCH](http://wrench-project.org) is an open-source framework designed to
 make it easy for users to develop accurate and scalable simulators of
 distributed computing applications, systems, and platforms. It has been

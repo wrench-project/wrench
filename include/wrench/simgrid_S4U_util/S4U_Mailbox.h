@@ -49,6 +49,9 @@ namespace wrench {
 
         static simgrid::s4u::Mailbox *generateUniqueMailbox(std::string prefix);
 
+        /**
+         * @brief The mailbox pool size
+         */
         static unsigned long mailbox_pool_size;
 
     private:
