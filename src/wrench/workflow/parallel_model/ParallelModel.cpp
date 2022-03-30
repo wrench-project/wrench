@@ -44,8 +44,10 @@ namespace wrench {
 
     /**
      * @brief Create an instance of a "Custom" parallel model
-     * @param lambda: a function that, when given a total flop amount and a number of
-     *        threads, returns a vector of per-thread work amounts
+     * @param lambda_sequential: a function that, when given a total flop amount and a number of
+     *        threads, returns the amount of purely sequential work, in flops
+     * @param lambda_per_thread: a function that, when given a total flop amount and a number of
+     *        threads, returns the amount of per-thread parallel work, in flops
      *
      * @return a model instance
      **/

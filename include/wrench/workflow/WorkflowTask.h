@@ -63,6 +63,10 @@ namespace wrench {
 
         unsigned int getFailureCount();
 
+        /**
+         * @brief Retrieved the official shared pointer for this object
+         * @return a shared pointer
+         */
         std::shared_ptr<WorkflowTask> getSharedPtr() { return this->shared_from_this(); }
 
 
