@@ -16,4 +16,4 @@ namespace wrench {
      */
     WRENCH_PROPERTY_TYPE WRENCH_PROPERTY_COUNT = 0;
 
-};
+};// namespace wrench
