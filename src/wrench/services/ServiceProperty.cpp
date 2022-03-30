@@ -11,6 +11,9 @@
 
 
 namespace wrench {
+    /**
+     * @brief Service Property Count
+     */
     WRENCH_PROPERTY_TYPE WRENCH_PROPERTY_COUNT = 0;
 
 };
