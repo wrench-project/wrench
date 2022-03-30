@@ -32,16 +32,20 @@ namespace wrench {
         /***********************/
 
         /**
-         * @brief A method the, for this parallel model, computes how much work each thread that is
-         * part of a parallel task should do
-         *
+         * @brief A method that computes the amount of purely sequential work
          * @param total_work: the total amount of work (in flops)
          * @param num_threads: the number of threads
          *
-         * @return an amount of work (in flop) per thread
+         * @return an amount of work (in flop)
          */
-        //        virtual std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) = 0;
         virtual double getPurelySequentialWork(double total_work, unsigned long num_threads) = 0;
+        /**
+         * @brief A method that computes the amount of per-thread parallel work
+         * @param total_work: the total amount of work (in flops)
+         * @param num_threads: the number of threads
+         *
+         * @return an amount of work (in flop)
+         */
         virtual double getParallelPerThreadWork(double total_work, unsigned long num_threads) = 0;
 
         virtual ~ParallelModel() = default;
