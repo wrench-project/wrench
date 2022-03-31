@@ -203,34 +203,33 @@ namespace wrench {
         return links.at(0)->get_usage();
     }
 
-//    /**
-//     * @brief A templated method to determine all hostnames declared under a NetZone in the platform
-//     * @tparam T: NetZone class
-//     * @return a map of netzone ids and the list of hostnames
-//     */
-//    template<class T>
-//    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByNetZone() {
-//        std::map<std::string, std::vector<std::string>> result;
-//
-//        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-//
-//        auto netzones = simgrid_engine->get_filtered_netzones<T>();
-//        for (auto nz: netzones) {
-//            std::vector<simgrid::s4u::Host *> host_list = nz->get_all_hosts();
-//            std::vector<std::string> hostname_list;
-//            hostname_list.reserve(host_list.size());
-//            for (auto h: host_list) {
-//                hostname_list.emplace_back(h->get_name());
-//            }
-//            result.insert({nz->get_name(), hostname_list});
-//        }
-//
-//        return result;
-//    }
+    //    /**
+    //     * @brief A templated method to determine all hostnames declared under a NetZone in the platform
+    //     * @tparam T: NetZone class
+    //     * @return a map of netzone ids and the list of hostnames
+    //     */
+    //    template<class T>
+    //    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByNetZone() {
+    //        std::map<std::string, std::vector<std::string>> result;
+    //
+    //        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+    //
+    //        auto netzones = simgrid_engine->get_filtered_netzones<T>();
+    //        for (auto nz: netzones) {
+    //            std::vector<simgrid::s4u::Host *> host_list = nz->get_all_hosts();
+    //            std::vector<std::string> hostname_list;
+    //            hostname_list.reserve(host_list.size());
+    //            for (auto h: host_list) {
+    //                hostname_list.emplace_back(h->get_name());
+    //            }
+    //            result.insert({nz->get_name(), hostname_list});
+    //        }
+    //
+    //        return result;
+    //    }
 
 
-
-/**
+    /**
  * @brief Get the list of hostnames in each ClusterZone in the platform (<cluster/> XML tag in the platform XML description)
  * @return a map of all cluster ids and lists of hostnames
  */
@@ -238,9 +237,10 @@ namespace wrench {
         std::map<std::string, std::vector<std::string>> result;
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
         S4U_Simulation::traverseAllNetZonesRecursive(simgrid_engine->get_netzone_root(), result, false, false, false, true);
-        return result;    }
+        return result;
+    }
 
-/**
+    /**
  * @brief Get the list of hostnames in each NetZone (<zone> and <cluster> tags in the platform XML description).
  *        Note that this method does not recurse into sub-zones, so it only returns the hosts that are declared
  *        directly under the <zone> and or <cluster> tags.
@@ -289,9 +289,9 @@ namespace wrench {
      */
     void S4U_Simulation::traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters) {
 
-//        std::cerr << "PROCESSING ROOT " << nz->get_name() << "\n";
-        for (auto const &child : nz->get_children()) {
-//            std::cerr << "PROCESSING CHILD " << child->get_name() << "\n";
+        //        std::cerr << "PROCESSING ROOT " << nz->get_name() << "\n";
+        for (auto const &child: nz->get_children()) {
+            //            std::cerr << "PROCESSING CHILD " << child->get_name() << "\n";
             bool is_cluster = dynamic_cast<simgrid::kernel::routing::ClusterZone *>(child->get_impl());
             bool is_zone = not is_cluster;
             if ((is_cluster and get_clusters) or (get_subzones and is_zone)) {
@@ -301,7 +301,7 @@ namespace wrench {
                 result[nz->get_name()].push_back(child->get_name());
             } else if ((get_hosts_from_clusters and is_cluster) or (get_hosts_from_zones and is_zone)) {
                 std::vector<std::string> hosts;
-                for (auto const &h : child->get_all_hosts()) {
+                for (auto const &h: child->get_all_hosts()) {
                     if (h->get_englobing_zone() == child) {
                         hosts.push_back(h->get_name());
                     }
@@ -316,9 +316,7 @@ namespace wrench {
                 continue;
             }
         }
-
     }
-
 
 
     /**
