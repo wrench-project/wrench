@@ -403,6 +403,7 @@ set(TEST_FILES
         test/wms/JobManagerTest.cpp
         test/simulation/BadPlatformTest.cpp
         test/simulation/SimpleSimulationTest.cpp
+        test/simulation/SimulationPlatformTest.cpp
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
         test/simulation/SimulationLoggingTest.cpp
