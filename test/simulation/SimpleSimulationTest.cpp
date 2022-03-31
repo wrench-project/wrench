@@ -341,7 +341,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-//    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    //    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
