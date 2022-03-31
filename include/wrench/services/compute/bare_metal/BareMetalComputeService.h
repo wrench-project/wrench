@@ -152,8 +152,8 @@ namespace wrench {
 
 
     protected:
-//        std::shared_ptr<Alarm> death_alarm = nullptr;
-//        std::shared_ptr<PilotJob> containing_pilot_job;// In case this service is in fact a pilot job
+        //        std::shared_ptr<Alarm> death_alarm = nullptr;
+        //        std::shared_ptr<PilotJob> containing_pilot_job;// In case this service is in fact a pilot job
 
 
         /**
