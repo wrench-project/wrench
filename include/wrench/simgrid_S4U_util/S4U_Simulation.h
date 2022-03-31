@@ -76,6 +76,7 @@ namespace wrench {
         static void yield();
         static std::string getHostProperty(std::string hostname, std::string property_name);
         static void setHostProperty(std::string hostname, std::string property_name, std::string property_value);
+        static std::string getClusterProperty(std::string cluster_id, std::string property_name);
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);
@@ -94,10 +95,19 @@ namespace wrench {
         static std::vector<std::string> getAllLinknames();
         static double getLinkBandwidth(std::string name);
         static double getLinkUsage(std::string name);
+
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
+        static std::map<std::string, std::vector<std::string>> getAllHostnamesByZone();
+        static std::map<std::string, std::vector<std::string>> getAllClusterIDsByZone();
+        static std::map<std::string, std::vector<std::string>> getAllSubZoneIDsByZone();
+
+        static void createNewDisk(const std::string& hostname, const std::string& disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, double capacity_in_bytes, const std::string& mount_point);
+
         void shutdown();
 
     private:
+        static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters);
+
         static double getHostMemoryCapacity(simgrid::s4u::Host *host);
         simgrid::s4u::Engine *engine;
         bool initialized = false;
