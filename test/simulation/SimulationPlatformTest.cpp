@@ -137,7 +137,7 @@ private:
             throw std::runtime_error("Invalid number of hosts found under cluster 'halfduplex' found");
         }
 
-        if (wrench::S4U_Simulation::getClusterProperty("simple","wattage_off") != "0.0") {
+        if (wrench::S4U_Simulation::getClusterProperty("simple", "wattage_off") != "0.0") {
             throw std::runtime_error("Invalid cluster property value");
         }
 
@@ -161,7 +161,7 @@ void SimulationPlatformTest::do_SimulationPlatformTest_test() {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-//    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    //    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
