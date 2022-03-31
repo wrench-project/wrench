@@ -17,6 +17,7 @@ class SimulationPlatformTest : public ::testing::Test {
 
 public:
     void do_SimulationPlatformTest_test();
+    void do_CreateNewDiskTest_test();
 
 protected:
     ~SimulationPlatformTest() {
@@ -170,6 +171,82 @@ void SimulationPlatformTest::do_SimulationPlatformTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationPlatformTestWMS(this, hostname)));
+
+    // Running the simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**            CREATE DISK TEST                                      **/
+/**********************************************************************/
+
+class CreateNewDiskTestWMS : public wrench::ExecutionController {
+
+public:
+    CreateNewDiskTestWMS(SimulationPlatformTest *test,
+                              std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    SimulationPlatformTest *test;
+
+    int main() override {
+
+        try {
+            wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 20.0, 100.0, "/foo");
+            throw std::runtime_error("Should not be able to create a disk with different read and write bandwidths");
+        } catch (std::invalid_argument &ignore) { }
+
+        // Create a new disk on subzonehost
+        wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
+
+        // Start a storage service that uses this disk
+        auto ss = this->simulation->startNewService(new wrench::SimpleStorageService("subzonehost", {"/foo"}, {}, {}));
+
+        // Create a file on it
+        auto too_big = wrench::Simulation::addFile("too_big", 200.0);
+        try {
+            ss->createFile(too_big, wrench::FileLocation::LOCATION(ss));
+            throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
+        } catch (std::invalid_argument &ignore) { }
+        auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
+        ss->createFile(not_too_big, wrench::FileLocation::LOCATION(ss));
+
+        return 0;
+    }
+};
+
+TEST_F(SimulationPlatformTest, CreateNewDiskTestWMS) {
+    DO_TEST_WITH_FORK(do_CreateNewDiskTest_test);
+}
+
+void SimulationPlatformTest::do_CreateNewDiskTest_test() {
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+//    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    simulation->instantiatePlatform(platform_file_path);
+
+    // Get a hostname
+    std::string hostname = "subzonehost";
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(new CreateNewDiskTestWMS(this, hostname)));
 
     // Running the simulation
     ASSERT_NO_THROW(simulation->launch());
