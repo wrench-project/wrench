@@ -1101,5 +1101,49 @@ namespace wrench {
                                     mount_point + " at host " + hostname);
     }
 
+    /**
+     * @brief Method to create, programmatically, a new disk
+     * @param hostname: the name of the host to which the disk should be attaced
+     * @param disk_id: the nae of the disk
+     * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
+     * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
+     * @param capacity_in_bytes: the disk's capacity in bytes
+     * @param mount_point: the disk's mount point (most people use "/")
+     */
+    void S4U_Simulation::createNewDisk(const std::string& hostname, const std::string& disk_id,
+                                       double read_bandwidth_in_bytes_per_sec,
+                                       double write_bandwidth_in_bytes_per_sec,
+                                       double capacity_in_bytes,
+                                       const std::string& mount_point) {
+
+        if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
+            throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
+                                        "read and write bandwidth");
+        }
+
+        // Get the host
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("S4U_Simulation::createNewDisk(): unknown host " + hostname);
+        }
+        // Check that no similar disk exists
+        for (auto const &d : host->get_disks()) {
+            if (d->get_name() == disk_id) {
+                throw std::invalid_argument("S4U_Simulation::createNewDisk(): a disk with id " + disk_id + " already exists at host " + hostname);
+            }
+            if (d->get_property("mount") == mount_point) {
+                throw std::invalid_argument(
+                        "S4U_Simulation::createNewDisk(): a disk with mount point " + mount_point +
+                        " already exists at host " + hostname);
+            }
+        }
+        // Create the disk
+        auto disk = host->create_disk(disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec);
+        // Add the required disk properties
+        disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
+        disk->set_property("mount", mount_point);
+
+    }
+
 
 };// namespace wrench
