@@ -1108,11 +1108,11 @@ namespace wrench {
      * @param capacity_in_bytes: the disk's capacity in bytes
      * @param mount_point: the disk's mount point (most people use "/")
      */
-    void S4U_Simulation::createNewDisk(const std::string& hostname, const std::string& disk_id,
+    void S4U_Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
                                        double read_bandwidth_in_bytes_per_sec,
                                        double write_bandwidth_in_bytes_per_sec,
                                        double capacity_in_bytes,
-                                       const std::string& mount_point) {
+                                       const std::string &mount_point) {
 
         if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
             throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
@@ -1125,7 +1125,7 @@ namespace wrench {
             throw std::invalid_argument("S4U_Simulation::createNewDisk(): unknown host " + hostname);
         }
         // Check that no similar disk exists
-        for (auto const &d : host->get_disks()) {
+        for (auto const &d: host->get_disks()) {
             if (d->get_name() == disk_id) {
                 throw std::invalid_argument("S4U_Simulation::createNewDisk(): a disk with id " + disk_id + " already exists at host " + hostname);
             }
@@ -1140,7 +1140,6 @@ namespace wrench {
         // Add the required disk properties
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
-
     }
 
 

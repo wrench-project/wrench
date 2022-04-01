@@ -181,7 +181,6 @@ void SimulationPlatformTest::do_SimulationPlatformTest_test() {
 }
 
 
-
 /**********************************************************************/
 /**            CREATE DISK TEST                                      **/
 /**********************************************************************/
@@ -190,7 +189,7 @@ class CreateNewDiskTestWMS : public wrench::ExecutionController {
 
 public:
     CreateNewDiskTestWMS(SimulationPlatformTest *test,
-                              std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                         std::string &hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -201,7 +200,7 @@ private:
         try {
             wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 20.0, 100.0, "/foo");
             throw std::runtime_error("Should not be able to create a disk with different read and write bandwidths");
-        } catch (std::invalid_argument &ignore) { }
+        } catch (std::invalid_argument &ignore) {}
 
         // Create a new disk on subzonehost
         wrench::S4U_Simulation::createNewDisk("subzonehost", "new_disk", 10.0, 10.0, 100.0, "/foo");
@@ -214,7 +213,7 @@ private:
         try {
             ss->createFile(too_big, wrench::FileLocation::LOCATION(ss));
             throw std::runtime_error("Should not be able to create a file that big on the newly created storage service");
-        } catch (std::invalid_argument &ignore) { }
+        } catch (std::invalid_argument &ignore) {}
         auto not_too_big = wrench::Simulation::addFile("not_too_big", 20.0);
         ss->createFile(not_too_big, wrench::FileLocation::LOCATION(ss));
 
@@ -238,7 +237,7 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-//    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    //    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
     simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
