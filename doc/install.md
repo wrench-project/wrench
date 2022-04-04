@@ -81,7 +81,7 @@ Building the examples is done as:
 make -j8 examples
 ~~~~~~~~~~~~~
 
-All binaries for the examples are then created in subdictories of `build/examples/`
+All binaries for the examples are then created in subdirectories of `build/examples/`
  
 ## Installation Troubleshooting ##  {#install-troubleshooting}
 
