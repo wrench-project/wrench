@@ -203,30 +203,121 @@ namespace wrench {
         return links.at(0)->get_usage();
     }
 
+    //    /**
+    //     * @brief A templated method to determine all hostnames declared under a NetZone in the platform
+    //     * @tparam T: NetZone class
+    //     * @return a map of netzone ids and the list of hostnames
+    //     */
+    //    template<class T>
+    //    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByNetZone() {
+    //        std::map<std::string, std::vector<std::string>> result;
+    //
+    //        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+    //
+    //        auto netzones = simgrid_engine->get_filtered_netzones<T>();
+    //        for (auto nz: netzones) {
+    //            std::vector<simgrid::s4u::Host *> host_list = nz->get_all_hosts();
+    //            std::vector<std::string> hostname_list;
+    //            hostname_list.reserve(host_list.size());
+    //            for (auto h: host_list) {
+    //                hostname_list.emplace_back(h->get_name());
+    //            }
+    //            result.insert({nz->get_name(), hostname_list});
+    //        }
+    //
+    //        return result;
+    //    }
+
 
     /**
- * @brief Get the by-cluster structure of the platform
- * @return a map of all cluster names and their associated hostname list
+ * @brief Get the list of hostnames in each ClusterZone in the platform (<cluster/> XML tag in the platform XML description)
+ * @return a map of all cluster ids and lists of hostnames
  */
     std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
         std::map<std::string, std::vector<std::string>> result;
-        std::vector<simgrid::kernel::routing::ClusterZone *> clusters;
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        S4U_Simulation::traverseAllNetZonesRecursive(simgrid_engine->get_netzone_root(), result, false, false, false, true);
+        return result;
+    }
+
+    /**
+ * @brief Get the list of hostnames in each NetZone (<zone> and <cluster> tags in the platform XML description).
+ *        Note that this method does not recurse into sub-zones, so it only returns the hosts that are declared
+ *        directly under the <zone> and or <cluster> tags.
+ * @return a map of all zone ids and lists of hostnames
+ */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByZone() {
+        std::map<std::string, std::vector<std::string>> result;
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        S4U_Simulation::traverseAllNetZonesRecursive(simgrid_engine->get_netzone_root(), result, false, false, true, false);
+        return result;
+    }
+
+
+    /**
+    * @brief Get the list of ids of all (sub-)zones in the platform within each zone (<zone/> XML tag in the platform XML description)
+    * @return a map of zone ids and the list of (sub-)zone ids
+    */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllSubZoneIDsByZone() {
+        std::map<std::string, std::vector<std::string>> result;
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        S4U_Simulation::traverseAllNetZonesRecursive(simgrid_engine->get_netzone_root(), result, true, false, false, false);
+        return result;
+    }
+
+    /**
+    * @brief Get the list of ids of all ClusterZone in the platform within each zone (<cluster/> XML tag in the platform XML description)
+    * @return a map of zone ids and the list of cluster ids
+    */
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllClusterIDsByZone() {
+        std::map<std::string, std::vector<std::string>> result;
 
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
 
-        clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
-        for (auto c: clusters) {
-            std::vector<simgrid::s4u::Host *> host_list = c->get_all_hosts();
-            std::vector<std::string> hostname_list;
-            hostname_list.reserve(host_list.size());
-            for (auto h: host_list) {
-                hostname_list.push_back(std::string(h->get_cname()));
-            }
-            result.insert({c->get_name(), hostname_list});
-        }
-
+        S4U_Simulation::traverseAllNetZonesRecursive(simgrid_engine->get_netzone_root(), result, false, true, false, false);
         return result;
     }
+
+
+    /**
+     * @brief A method to recursively explore sub-zones
+     * @param nz: the root netzone
+     * @param result: a reference to a map that's being incrementally built recursively
+     * @param get_subzones: true if this should return (sub-)zones
+     * @param get_clusters: true if this should return (sub-)clusters
+     * @param get_hosts: true if this should return hostnames
+     */
+    void S4U_Simulation::traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters) {
+
+        //        std::cerr << "PROCESSING ROOT " << nz->get_name() << "\n";
+        for (auto const &child: nz->get_children()) {
+            //            std::cerr << "PROCESSING CHILD " << child->get_name() << "\n";
+            bool is_cluster = dynamic_cast<simgrid::kernel::routing::ClusterZone *>(child->get_impl());
+            bool is_zone = not is_cluster;
+            if ((is_cluster and get_clusters) or (get_subzones and is_zone)) {
+                if (result.find(nz->get_name()) == result.end()) {
+                    result[nz->get_name()] = {};
+                }
+                result[nz->get_name()].push_back(child->get_name());
+            } else if ((get_hosts_from_clusters and is_cluster) or (get_hosts_from_zones and is_zone)) {
+                std::vector<std::string> hosts;
+                for (auto const &h: child->get_all_hosts()) {
+                    if (h->get_englobing_zone() == child) {
+                        hosts.push_back(h->get_name());
+                    }
+                }
+                if (not hosts.empty()) {
+                    result[child->get_name()] = hosts;
+                }
+            }
+            if (is_zone) {
+                S4U_Simulation::traverseAllNetZonesRecursive(child, result, get_subzones, get_clusters, get_hosts_from_zones, get_hosts_from_clusters);
+            } else {
+                continue;
+            }
+        }
+    }
+
 
     /**
  * @brief Determines whether a host exists for a given hostname
@@ -405,7 +496,6 @@ namespace wrench {
     void S4U_Simulation::compute(double flops) {
         simgrid::s4u::this_actor::execute(flops);
     }
-
 
     /**
      * @brief Simulates a multi-threaded computation
@@ -612,7 +702,7 @@ namespace wrench {
     }
 
     /**
- * @brief Get the property associated to the host specified in the platform file
+ * @brief Get the property associated to a host specified in the platform file
  * @param hostname: the host name
  * @param property_name: the property name
  * @return a string relating to the property specified in the platform file
@@ -627,6 +717,27 @@ namespace wrench {
         }
         return host->get_property(property_name);
     }
+
+    /**
+* @brief Get the property associated to a cluster specified in the platform file
+* @param cluster_id: the cluster id
+* @param property_name: the property name
+* @return a string relating to the property specified in the platform file
+*/
+    std::string S4U_Simulation::getClusterProperty(std::string cluster_id, std::string property_name) {
+        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
+        auto clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
+        for (auto c: clusters) {
+            if (c->get_name() == cluster_id) {
+                if (c->get_properties()->find(property_name) == c->get_properties()->end()) {
+                    throw std::invalid_argument("S4U_Simulation::getClusterProperty(): Unknown property " + property_name);
+                }
+                return c->get_property(property_name);
+            }
+        }
+        throw std::invalid_argument("S4U_Simulation::getClusterProperty(): Unknown cluster " + cluster_id);
+    }
+
 
     /**
  * @brief Set a property associated to a host specified in the platform file
@@ -986,6 +1097,49 @@ namespace wrench {
 
         throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown mount point " +
                                     mount_point + " at host " + hostname);
+    }
+
+    /**
+     * @brief Method to create, programmatically, a new disk
+     * @param hostname: the name of the host to which the disk should be attaced
+     * @param disk_id: the nae of the disk
+     * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
+     * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
+     * @param capacity_in_bytes: the disk's capacity in bytes
+     * @param mount_point: the disk's mount point (most people use "/")
+     */
+    void S4U_Simulation::createNewDisk(const std::string &hostname, const std::string &disk_id,
+                                       double read_bandwidth_in_bytes_per_sec,
+                                       double write_bandwidth_in_bytes_per_sec,
+                                       double capacity_in_bytes,
+                                       const std::string &mount_point) {
+
+        if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
+            throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
+                                        "read and write bandwidth");
+        }
+
+        // Get the host
+        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        if (not host) {
+            throw std::invalid_argument("S4U_Simulation::createNewDisk(): unknown host " + hostname);
+        }
+        // Check that no similar disk exists
+        for (auto const &d: host->get_disks()) {
+            if (d->get_name() == disk_id) {
+                throw std::invalid_argument("S4U_Simulation::createNewDisk(): a disk with id " + disk_id + " already exists at host " + hostname);
+            }
+            if (d->get_property("mount") == mount_point) {
+                throw std::invalid_argument(
+                        "S4U_Simulation::createNewDisk(): a disk with mount point " + mount_point +
+                        " already exists at host " + hostname);
+            }
+        }
+        // Create the disk
+        auto disk = host->create_disk(disk_id, read_bandwidth_in_bytes_per_sec, write_bandwidth_in_bytes_per_sec);
+        // Add the required disk properties
+        disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
+        disk->set_property("mount", mount_point);
     }
 
 
