@@ -101,7 +101,7 @@ namespace wrench {
         static std::map<std::string, std::vector<std::string>> getAllClusterIDsByZone();
         static std::map<std::string, std::vector<std::string>> getAllSubZoneIDsByZone();
 
-        static void createNewDisk(const std::string& hostname, const std::string& disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, double capacity_in_bytes, const std::string& mount_point);
+        static void createNewDisk(const std::string &hostname, const std::string &disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, double capacity_in_bytes, const std::string &mount_point);
 
         void shutdown();
 
