@@ -989,8 +989,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"][i]["pstate_trace"].begin(), result_json["energy_consumption"][i]["pstate_trace"].end(), comparePstate);
     }
 
-//    std::cerr << "EXPECTED: " << expected_json << "\n";
-//    std::cerr << "RESULT: " << result_json << "\n";
+    //    std::cerr << "EXPECTED: " << expected_json << "\n";
+    //    std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
 
