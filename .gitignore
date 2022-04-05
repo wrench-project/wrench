@@ -34,12 +34,18 @@ cmake-build-release
 build
 .idea
 
+# VSCode
+.vscode
+
 # Code coverage (testability files)
 *.gcno
 *.gcda
 
 # Documentation
 docs
+doc/source/api_developer
+doc/source/api_internal
+doc/source/api_user
 
 # MACOS
 .DS_Store

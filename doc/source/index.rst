@@ -3,9 +3,6 @@
 .. figure::  images/logo-horizontal.png
    :scale:   20%
 
-`Click here for the documentation of the master
-branch <https://wrench-project.org/wrench/latest/>`__
-
 `WRENCH <http://wrench-project.org>`__ is an open-source framework
 designed to make it easy for users to develop accurate and scalable
 simulators of distributed computing applications, systems, and
@@ -26,12 +23,12 @@ development effort.
 
 In a nutshell, WRENCH makes it possible to:
 
--  Develop in-simulation implementations of runtime systems that execute
-   application workloads on distributed hardware platforms managed by
-   various software services commonly known as Cyberinfrastructure (CI)
-   services; and
--  Quickly, scalably, and accurately simulate arbitrary application and
-   platform scenarios for these runtime system implementation.
+- Develop in-simulation implementations of runtime systems that execute
+  application workloads on distributed hardware platforms managed by
+  various software services commonly known as Cyberinfrastructure (CI)
+  services.
+- Quickly, scalably, and accurately simulate arbitrary application and
+  platform scenarios for these runtime system implementation.
 
 .. _overview-architecture:
 
@@ -128,27 +125,29 @@ The main channel to reach the WRENCH team is via the support email:
 | WRENCH’s `Github Issues
   Track <https://github.com/wrench-project/wrench/issues>`__.
 
-----
 
 .. toctree::
-    :caption: Quickstart
-    :maxdepth: 1
+   :hidden:
+   :caption: Quickstart
+   :maxdepth: 1
 
-    installation.rst
-    getting_started.rst
+   installation.rst
+   getting_started.rst
 
 .. toctree::
-    :caption: Concepts
-    :maxdepth: 1
+   :hidden:
+   :caption: Concepts
+   :maxdepth: 1
 
-    simulation_101.rst
-    wrench_101.rst
-    wrench_102.rst
+   simulation_101.rst
+   wrench_101.rst
+   wrench_102.rst
 
 .. toctree:: 
-    :caption: API Reference
-    :maxdepth: 1
+   :hidden:
+   :caption: API Reference
+   :maxdepth: 1
 
-    api_user.rst
-    api_developer.rst
-    api_internal.rst
+   api_user.rst
+   api_developer.rst
+   api_internal.rst
