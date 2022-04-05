@@ -65,7 +65,13 @@ if (DOXYGEN_FOUND)
     # add_custom_target(doc DEPENDS doc-deploy)
     add_custom_target(doc DEPENDS wrench ${WRENCH_SECTIONS_LIST})
 
-    add_custom_command(TARGET doc COMMAND sphinx-build ${CMAKE_HOME_DIRECTORY}/doc/source ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION})
+    add_custom_command(TARGET doc COMMAND python3 
+                        ${CMAKE_HOME_DIRECTORY}/doc/scripts/generate_rst.py 
+                        ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}
+                        ${CMAKE_HOME_DIRECTORY}/doc/source)
+    add_custom_command(TARGET doc COMMAND sphinx-build 
+                        ${CMAKE_HOME_DIRECTORY}/doc/source 
+                        ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION})
 
 else (DOXYGEN_FOUND)
     message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
