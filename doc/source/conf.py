@@ -9,10 +9,6 @@ project = 'WRENCH'
 copyright = '2020-2022, WRENCH'
 author = 'WRENCH Team'
 
-# The full version, including alpha/beta/rc tags
-version = '2.0-dev'
-release = '2.0-dev'
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -67,3 +63,5 @@ breathe_projects = {
     "internal": "../../docs/2.0-dev/internal/xml/",
 }
 breathe_default_project = "user"
+
+# The full version, including alpha/beta/rc tags
