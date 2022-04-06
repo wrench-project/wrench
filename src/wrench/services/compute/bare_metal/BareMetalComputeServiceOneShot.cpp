@@ -52,7 +52,7 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
-            const std::string& suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, std::move(compute_resources), std::move(property_list), std::move(messagepayload_list), ttl, std::move(pj), suffix, std::move(scratch_space)), job(std::move(job)) {
+            const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, std::move(compute_resources), std::move(property_list), std::move(messagepayload_list), ttl, std::move(pj), suffix, std::move(scratch_space)), job(std::move(job)) {
     }
 
     /**

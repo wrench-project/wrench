@@ -96,7 +96,7 @@ namespace wrench {
 
         std::string getClusterID() const;
 
-        void setClusterID(const std::string&);
+        void setClusterID(const std::string &);
 
         void setPriority(long);
 
@@ -295,7 +295,7 @@ namespace wrench {
         std::map<std::string, std::shared_ptr<DataFile>> input_files; // List of input files
 
         // Private constructor (called by Workflow)
-        WorkflowTask(std::string  id,
+        WorkflowTask(std::string id,
                      double flops,
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
