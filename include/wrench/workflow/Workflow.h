@@ -49,19 +49,19 @@ namespace wrench {
                                               unsigned long max_num_cores,
                                               double memory_requirement);
 
-        void removeTask(std::shared_ptr<WorkflowTask> task);
+        void removeTask(const std::shared_ptr<WorkflowTask>& task);
 
-        void removeFile(std::shared_ptr<DataFile> file);
+        void removeFile(const std::shared_ptr<DataFile>& file);
         std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
-        std::shared_ptr<DataFile> addFile(std::string id, double size);
+        std::shared_ptr<DataFile> addFile(const std::string& id, double size);
         std::shared_ptr<DataFile> getFileByID(const std::string &id);
         std::shared_ptr<WorkflowTask> getTaskByID(const std::string &id);
 
 
-        static double getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> tasks);
+        static double getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>>& tasks);
 
-        void addControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dest, bool redundant_dependencies = false);
-        void removeControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dest);
+        void addControlDependency(const std::shared_ptr<WorkflowTask>& src, const std::shared_ptr<WorkflowTask>& dest, bool redundant_dependencies = false);
+        void removeControlDependency(const std::shared_ptr<WorkflowTask>& src, const std::shared_ptr<WorkflowTask>& dest);
 
         unsigned long getNumberOfTasks();
 
@@ -69,7 +69,7 @@ namespace wrench {
 
         double getCompletionDate();
 
-        void exportToEPS(std::string);
+        void exportToEPS(const std::string&);
 
         std::vector<std::shared_ptr<DataFile>> getInputFiles() const;
         std::map<std::string, std::shared_ptr<DataFile>> getInputFileMap() const;
@@ -83,17 +83,17 @@ namespace wrench {
         std::map<std::string, std::shared_ptr<WorkflowTask>> getExitTaskMap() const;
         std::vector<std::shared_ptr<WorkflowTask>> getExitTasks() const;
 
-        std::vector<std::shared_ptr<WorkflowTask>> getTaskParents(const std::shared_ptr<WorkflowTask> task);
-        long getTaskNumberOfParents(const std::shared_ptr<WorkflowTask> task);
-        std::vector<std::shared_ptr<WorkflowTask>> getTaskChildren(const std::shared_ptr<WorkflowTask> task);
-        long getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask> task);
+        std::vector<std::shared_ptr<WorkflowTask>> getTaskParents(const std::shared_ptr<WorkflowTask>& task);
+        long getTaskNumberOfParents(const std::shared_ptr<WorkflowTask>& task);
+        std::vector<std::shared_ptr<WorkflowTask>> getTaskChildren(const std::shared_ptr<WorkflowTask>& task);
+        long getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask>& task);
 
-        bool pathExists(const std::shared_ptr<WorkflowTask> src, const std::shared_ptr<WorkflowTask> dst);
+        bool pathExists(const std::shared_ptr<WorkflowTask>& src, const std::shared_ptr<WorkflowTask>& dst);
 
-        std::shared_ptr<WorkflowTask> getTaskThatOutputs(std::shared_ptr<DataFile> file);
-        bool isFileOutputOfSomeTask(std::shared_ptr<DataFile> file);
+        std::shared_ptr<WorkflowTask> getTaskThatOutputs(const std::shared_ptr<DataFile>& file);
+        bool isFileOutputOfSomeTask(const std::shared_ptr<DataFile>& file);
 
-        std::set<std::shared_ptr<WorkflowTask>> getTasksThatInput(std::shared_ptr<DataFile> file);
+        std::set<std::shared_ptr<WorkflowTask>> getTasksThatInput(const std::shared_ptr<DataFile>& file);
         bool isDone();
 
         /***********************/
