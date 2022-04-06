@@ -37,9 +37,9 @@ namespace wrench {
         double getThreadCreationOverhead();
         std::shared_ptr<Action> getAction();
 
-        /***********************/
-        /** \cont INTERNAL     */
-        /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
         ActionExecutor(
                 std::string hostname,
@@ -69,14 +69,14 @@ namespace wrench {
         unsigned long num_cores;
         double ram_footprint;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
     };
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 };// namespace wrench
 
