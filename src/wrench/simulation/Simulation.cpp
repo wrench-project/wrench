@@ -274,7 +274,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void Simulation::instantiatePlatform(std::string filename) {
+    void Simulation::instantiatePlatform(const std::string &filename) {
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
         }
