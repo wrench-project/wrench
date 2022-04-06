@@ -6,7 +6,7 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'WRENCH'
-copyright = '2020-2022, WRENCH'
+copyright = '2017-2022, WRENCH'
 author = 'WRENCH Team'
 
 # -- General configuration ---------------------------------------------------
