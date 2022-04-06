@@ -28,8 +28,8 @@ service requires the following parameters:
 -  A list of mount points (corresponding to disks attached to the host);
    and
 -  Maps (``std::map``) of configurable properties
-   (:cpp:class:`wrench::BatchComputeServiceProperty`) and configurable message
-   payloads (:cpp:class:`wrench::BatchComputeServiceMessagePayload`).
+   (:cpp:class:`wrench::SimpleStorageServiceProperty`) and configurable message
+   payloads (:cpp:class:`wrench::SimpleStorageServiceMessagePayload`).
 
 The example below creates an instance of a Simple storage service that
 runs on host ``BigDisk``, has access to the disks mounted at paths
@@ -44,7 +44,7 @@ free space is configured to be 1KiB:
              new wrench::SimpleStorageService("BigDisk", 
                                      {"/data/", "/home/"},
                                           {{wrench::SimpleStorageProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "8"}},
-                                          {{wrench::SimpleStorageProperty::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, "1024"}
+                                          {{wrench::SimpleStorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD, "1024"}
                                          );
 
 See the documentation of :cpp:class:`wrench::SimpleStorageServiceProperty` and
