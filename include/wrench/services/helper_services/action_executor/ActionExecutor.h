@@ -39,7 +39,7 @@ namespace wrench {
         std::shared_ptr<Action> getAction();
 
 /***********************/
-/** \cont INTERNAL     */
+/** \cond INTERNAL     */
 /***********************/
 
         ActionExecutor(
