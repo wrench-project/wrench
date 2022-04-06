@@ -40,6 +40,9 @@ namespace wrench {
 
 
     public:
+        /**
+         * @brief A convenient map between actors and their default receive mailboxes
+         */
         static std::unordered_map<aid_t, simgrid::s4u::Mailbox *> map_actor_to_recv_mailbox;
 
         /** @brief The name of the daemon */

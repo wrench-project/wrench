@@ -47,6 +47,12 @@ namespace wrench {
         return this->lambda_sequential(total_work, num_threads);
     }
 
+    /**
+     * @brief Returns the per-thread parallel amount of work
+     * @param total_work: total amount of work (in flops)
+     * @param num_threads: number of threads
+     * @return an amount of work (in flops)
+     */
     double CustomParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
         return this->lambda_per_thread(total_work, num_threads);
     }

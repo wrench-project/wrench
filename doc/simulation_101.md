@@ -134,7 +134,7 @@ controller's work is done.
 The execution controller is the core of the simulator, as it is where you
 implement whatever algorithm/strategy you wish to simulate for executing
 the application workload.  At this point the execution controller likely
-seems a bit abstract. But we won't say more about it untill you get to the
+seems a bit abstract. But we won't say more about it until you get to the
 [WRENCH 102 page](@ref wrench-102), which is exclusively about the
 controller.
 

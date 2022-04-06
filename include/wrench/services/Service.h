@@ -20,8 +20,16 @@
 #include "wrench/services/ServiceProperty.h"
 #include "wrench/services/ServiceMessagePayload.h"
 namespace wrench {
+    /**
+     * @brief Abstraction of a service property collection type
+     */
     typedef std::map<WRENCH_PROPERTY_TYPE, std::string> WRENCH_PROPERTY_COLLECTION_TYPE;
+    /**
+     * @brief Abstraction of a service message payload collection type
+     */
     typedef std::unordered_map<WRENCH_MESSAGEPAYLOAD_TYPE, double> WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE;
+
+
     class FailureCause;
 
     /**

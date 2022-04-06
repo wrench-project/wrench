@@ -44,7 +44,7 @@ wrench::StorageService::writeFile(some_file, wrench::FileLocation::LOCATION(stor
 
 
 An operation commonly  performed by an execution controller is copying files between storage services (e.g., to 
-enforce some data locality).  This is typically done by [specifying file copy operations as part of standard jobs](@ref wrench-102-jobs). But it can also be done manually by the execution controller via
+enforce some data locality).  This is typically done by [specifying file copy operations as part of standard jobs](@ref wrench-102-controller-services-compute-job). But it can also be done manually by the execution controller via
 the data movement manager's methods 
 `wrench::DataMovementManager::doSynchronousFileCopy()` and 
 `wrench::DataMovementManager::initiateAsynchronousFileCopy()`.  Here is an example

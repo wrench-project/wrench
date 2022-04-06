@@ -373,11 +373,14 @@ links for more information on what these services are and on how to create them.
    - [Network Proximity Service](@ref guide-101-networkproximity)
 
 - **EnergyMeter Services**: These services are used to periodically measure host
-  energy consumption and include these measurements in the simulation output  
-  (see [this section](@ref wrench-101-simulator-1000ft-step-7)).
+  energy consumption and include these measurements in the simulation output: 
 
    - [Energy Meter Service](@ref guide-101-energymeter)
 
+- **BandwidthMeter Services**: These services are used to periodically measure network links'
+  bandwidth usage and include these measurements in the simulation output:
+
+  - [Bandwidth Meter Service](@ref guide-101-bandwidthmeter)
 
 # Customizing services #         {#wrench-101-customizing-services}
 

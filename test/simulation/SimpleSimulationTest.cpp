@@ -84,38 +84,38 @@ protected:
         workflow->addControlDependency(task4, task5);
 
         // Create a platform file
-        std::string xml = "<?xml version='1.0'?>"
-                          "<!DOCTYPE platform SYSTEM \"https://simgrid.org/simgrid.dtd\">"
-                          "<platform version=\"4.1\"> "
-                          "   <zone id=\"AS0\" routing=\"Full\"> "
-                          "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\" > "
-                          "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk1\"/>"
-                          "          </disk>"
-                          "          <disk id=\"large_disk2\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/disk2\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"101B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>  "
-                          "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\" > "
-                          "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"100B\"/>"
-                          "             <prop id=\"mount\" value=\"/\"/>"
-                          "          </disk>"
-                          "          <disk id=\"scratch\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
-                          "             <prop id=\"size\" value=\"101B\"/>"
-                          "             <prop id=\"mount\" value=\"/scratch\"/>"
-                          "          </disk>"
-                          "       </host>  "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                          "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                          "   </zone> "
-                          "</platform>";
+        std::string xml = R"(<?xml version='1.0'?>
+                          <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
+                          <platform version="4.1"> 
+                             <zone id="AS0" routing="Full"> 
+                                 <host id="DualCoreHost" speed="1f" core="2" > 
+                                    <disk id="large_disk1" read_bw="100MBps" write_bw="100MBps">
+                                       <prop id="size" value="100B"/>
+                                       <prop id="mount" value="/disk1"/>
+                                    </disk>
+                                    <disk id="large_disk2" read_bw="100MBps" write_bw="100MBps">
+                                       <prop id="size" value="100B"/>
+                                       <prop id="mount" value="/disk2"/>
+                                    </disk>
+                                    <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+                                       <prop id="size" value="101B"/>
+                                       <prop id="mount" value="/scratch"/>
+                                    </disk>
+                                 </host>  
+                                 <host id="QuadCoreHost" speed="1f" core="4" > 
+                                    <disk id="large_disk" read_bw="100MBps" write_bw="100MBps">
+                                       <prop id="size" value="100B"/>
+                                       <prop id="mount" value="/"/>
+                                    </disk>
+                                    <disk id="scratch" read_bw="100MBps" write_bw="100MBps">
+                                       <prop id="size" value="101B"/>
+                                       <prop id="mount" value="/scratch"/>
+                                    </disk>
+                                 </host>  
+                                 <link id="1" bandwidth="5000GBps" latency="0us"/>
+                                 <route src="DualCoreHost" dst="QuadCoreHost"> <link_ctn id="1"/> </route>
+                             </zone> 
+                          </platform>)";
         FILE *platform_file = fopen(platform_file_path.c_str(), "w");
         fprintf(platform_file, "%s", xml.c_str());
         fclose(platform_file);
@@ -291,9 +291,6 @@ private:
         }
         wrench::Simulation::compute(1 / flop_rate);
 
-        std::map<std::string, std::vector<std::string>> clusters =
-                wrench::Simulation::getHostnameListByCluster();
-
         cs->suspend();
         cs->suspend();
         cs->resume();
@@ -344,7 +341,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // Setting up the platform
-    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    //    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    simulation->instantiatePlatform(platform_file_path);
 
     // Get a hostname
     std::string hostname = "DualCoreHost";

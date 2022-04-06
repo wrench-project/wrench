@@ -29,7 +29,7 @@ service requires the following parameters:
 The set of compute services may include compute service instances that are either
 `wrench::BareMetalComputeService` or `wrench::BatchComputeService` instances.
 The example below creates an instance of an HTCondor service
-with a pool of resources containing a [Bare-metal](@ref guide-baremetal) server:
+with a pool of resources containing a [Bare-metal](@ref guide-101-baremetal) server:
 
 ~~~~~~~~~~~~~{.cpp}
 // Simulation 

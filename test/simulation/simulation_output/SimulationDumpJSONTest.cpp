@@ -927,8 +927,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
         std::sort(result_json["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().begin(), result_json["energy_consumption"].as_array()[i].as_object()["pstate_trace"].as_array().end(), comparePstate);
     }
 
-    std::cerr << "EXPECTED: " << expected_json << "\n";
-    std::cerr << "RESULT: " << result_json << "\n";
+    //    std::cerr << "EXPECTED: " << expected_json << "\n";
+    //    std::cerr << "RESULT: " << result_json << "\n";
     EXPECT_TRUE(expected_json == result_json);
 
 
@@ -1034,9 +1034,9 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     simulation->getOutput().dumpUnifiedJSON(link_usage_workflow, "/tmp/linkusage_unified.json", false, true, true, false, false, false, true);
 
     /* The 125000000.00000001 below is confusing, because it doesn't account for the .97 factor that limits
-     * bandwidth, but that's something tthat was changed in SimGrid3.28 (simulation times are not affected,
+     * bandwidth, but that's something that was changed in SimGrid3.28 (simulation times are not affected,
      * just number of bytes) */
-    auto expected_json_link_usage = boost::json::parse(R"(
+    auto expected_json_link_usage_version1 = boost::json::parse(R"(
     {
         "link_usage": {
             "links": [
@@ -1075,9 +1075,49 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     }
     )");
 
+    /* Depending on the SimGrid version there is a  .00000001 difference in value, so let's not care
+     * and down the line remove one of these two versions */
+    auto expected_json_link_usage_version2 = boost::json::parse(R"(
+    {
+        "link_usage": {
+            "links": [
+                {
+                    "link_usage_trace": [
+                        {
+                            "bytes per second": 0.0,
+                            "time": 0.0
+                        },
+                        {
+                            "bytes per second": 125000000.0,
+                            "time": 2.0
+                        },
+                        {
+                            "bytes per second": 125000000.0,
+                            "time": 86.0
+                        }
+                    ],
+                    "linkname": "1"
+                },
+                {
+                    "link_usage_trace": [
+                        {
+                            "bytes per second": 0.0,
+                            "time": 0.0
+                        },
+                        {
+                            "bytes per second": 0.0,
+                            "time": 86.0
+                        }
+                    ],
+                    "linkname": "__loopback__"
+                }
+            ]
+        }
+    })");
+
     auto result_json = readJSONFromFile(link_usage_json_file_path);
 
-    EXPECT_TRUE(expected_json_link_usage == result_json);
+    EXPECT_TRUE((expected_json_link_usage_version1 == result_json) or (expected_json_link_usage_version2 == result_json));
 
     link_usage_workflow->clear();
 

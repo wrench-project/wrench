@@ -15,11 +15,23 @@
 
 
 namespace wrench {
+
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+    /**
+     * @brief Property type
+     */
     typedef int WRENCH_PROPERTY_TYPE;
     extern WRENCH_PROPERTY_TYPE WRENCH_PROPERTY_COUNT;
     /**
      * @brief Configurable properties for a Service
      */
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
     class ServiceProperty {
 
     public:

@@ -122,7 +122,6 @@ namespace wrench {
     /**
      * @brief Function that generates a unified JSON file containing the information specified by boolean arguments.
      *
-     *
      *<pre>
      * JSON Structure:
      * {
@@ -148,10 +147,6 @@ namespace wrench {
      *</pre>
      *
      * Any pieces not specified in the arguments are left out. For full structure see documentation of specific sections.
-     *
-     *
-     *
-     *
      *
      * @param workflow: a pointer to the Workflow
      * @param file_path: path for generated JSON

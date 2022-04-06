@@ -36,10 +36,12 @@ namespace wrench {
             const std::string &dest_pm_hostname,
             double payload) : VirtualizedClusterComputeServiceMessage(payload) {
 
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || dest_pm_hostname.empty() || vm_name.empty()) {
             throw std::invalid_argument(
                     "VirtualizedClusterComputeServiceMigrateVMRequestMessage::VirtualizedClusterComputeServiceMigrateVMRequestMessage(): Invalid arguments");
         }
+#endif
         this->answer_mailbox = answer_mailbox;
         this->vm_name = vm_name;
         this->dest_pm_hostname = dest_pm_hostname;
@@ -56,7 +58,7 @@ namespace wrench {
             bool success,
             std::shared_ptr<FailureCause> failure_cause,
             double payload) : VirtualizedClusterComputeServiceMessage(payload), success(success),
-                              failure_cause(failure_cause) {}
+                              failure_cause(std::move(failure_cause)) {}
 
 
 }// namespace wrench

@@ -161,10 +161,22 @@ namespace wrench {
         bool isReady();
 
         //        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
+        /**
+         * @brief Actions in the job
+         */
         std::set<std::shared_ptr<Action>> actions;
+        /**
+         * @brief Map of action names to actions
+         */
         std::map<std::string, std::shared_ptr<Action>> name_map;
 
+        /**
+         * @brief Job state
+         */
         State state;
+        /**
+         * @brief Job priority
+         */
         double priority;
 
         void updateStateActionMap(const std::shared_ptr<Action> &action, Action::State old_state, Action::State new_state);
