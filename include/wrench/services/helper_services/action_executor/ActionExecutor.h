@@ -32,7 +32,6 @@ namespace wrench {
     class ActionExecutor : public ExecutionController {
 
     public:
-
         unsigned long getNumCoresAllocated() const;
         double getMemoryAllocated() const;
         double getThreadCreationOverhead();
@@ -73,7 +72,6 @@ namespace wrench {
 /***********************/
 /** \endcond           */
 /***********************/
-
     };
 
 /***********************/
