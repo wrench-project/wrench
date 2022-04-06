@@ -144,7 +144,7 @@ that you fine-tune the simulator to approximate the real performance
 of the target application when running on the modeled platform. 
 *Payloads* and *properties* play a central role in this calibration 
 step as they control the weight of many important actions (for example, 
-how much overhead for reading a file from a storage service?).
+how much overhead when reading a file from a storage service?).
 
 Simulated Controller
 ====================
