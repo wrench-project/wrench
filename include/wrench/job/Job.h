@@ -60,7 +60,7 @@ namespace wrench {
 
         virtual ~Job();
 
-        virtual void setPriority(double priority);
+        virtual void setPriority(double p);
 
         double getPriority() const;
 

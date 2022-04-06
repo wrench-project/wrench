@@ -91,14 +91,14 @@ namespace wrench {
     public:
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
-                                const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                const std::map<std::string, std::tuple<unsigned long, double>>& compute_resources,
                                 std::string scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
-                                const std::vector<std::string> compute_hosts,
+                                const std::vector<std::string>& compute_hosts,
                                 std::string scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -130,11 +130,11 @@ namespace wrench {
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 double ttl,
-                                std::shared_ptr<PilotJob> pj, std::string suffix,
+                                std::shared_ptr<PilotJob> pj, const std::string& suffix,
                                 std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         BareMetalComputeService(const std::string &hostname,
-                                std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                                const std::map<std::string, std::tuple<unsigned long, double>>& compute_resources,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                 std::shared_ptr<StorageService> scratch_space);
