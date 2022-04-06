@@ -175,7 +175,7 @@ namespace wrench {
      * @param pair_hosts: a pair of hosts
      * @param proximity_value: proximity value between the pair of hosts
      */
-    void NetworkProximityService::addEntryToDatabase(const std::pair<std::string, std::string>& pair_hosts,
+    void NetworkProximityService::addEntryToDatabase(const std::pair<std::string, std::string> &pair_hosts,
                                                      double proximity_value) {
         WRENCH_INFO("Received new measurement: %s-%s prox=%lf", pair_hosts.first.c_str(), pair_hosts.second.c_str(),
                     proximity_value);
