@@ -298,7 +298,7 @@ this as follows:
 This creates an execution controller and passes to its constructor a
 number of tasks to execute, the compute service to use, the storage
 service to use, and the host on which it is supposed to execute. Class
-:cpp:class:`wrench::TwoTasksAtATimeExecutionController` is of course provided
+``wrench::TwoTasksAtATimeExecutionController`` is of course provided
 with the example. See the :ref:`WRENCH 102 <wrench-102-header>` page for
 information on how to implement an execution controller.
 
@@ -308,7 +308,7 @@ the developer, and in this example the execution controller is simply
 given a number of tasks and then creates files, file read actions, file
 write actions, and compute actions to be executed as part of various
 jobs (see the implementation of
-:cpp:class:`wrench::TwoTasksAtATimeExecutionController`). All the examples in the
+``wrench::TwoTasksAtATimeExecutionController``). All the examples in the
 ``examples/action_api`` directory do this in different ways. *However*,
 many users are interested in **workflow applications**, for this reason,
 WRENCH provides a :cpp:class:`wrench::Workflow` class that has member functions
@@ -436,7 +436,7 @@ on how to create them.
    -  :ref:`Energy Meter Service <guide-101-energymeter>`
 
 -  **BandwidthMeter Services**: These services are used to periodically
-   measure network links’ bandwidth usage and include these measurements
+   measure network links' bandwidth usage and include these measurements
    in the simulation output:
 
    -  :ref:`Bandwidth Meter Service <guide-101-bandwidthmeter>`
@@ -470,7 +470,7 @@ Finally, each service exchanges messages on the network with other
 services (e.g., an execution controller sends a “do some work for me”
 messages to compute services). The size in bytes, or payload, of all
 messages can be customized similarly to the properties, i.e., by passing
-a key-value map to the service’s constructor. For instance, the
+a key-value map to the service's constructor. For instance, the
 :cpp:class:`wrench::ServiceMessagePayload` class defines a
 :cpp:class:`wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD` property
 which can be used to customize the size, in bytes, of the control
@@ -486,8 +486,8 @@ Customizing logging
 
 When running a WRENCH simulator you may notice that there is no logging
 output. By default logging output is disabled, but it is often useful to
-enable it (remembering that it can slow down the simulation). WRENCH’s
-logging system is a thin layer on top of SimGrid’s logging system, and
+enable it (remembering that it can slow down the simulation). WRENCH's
+logging system is a thin layer on top of SimGrid's logging system, and
 as such is controlled via command-line arguments.
 
 The ``bare-metal-chain`` example simulator can be executed as follows in
