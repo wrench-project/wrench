@@ -746,7 +746,7 @@ namespace wrench {
     SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart(double date, std::string hostname,
                                                                        std::string mount,
                                                                        double bytes,
-                                                                       int counter) : SimulationTimestampDiskRead(date, std::move(hostname), mount, bytes, counter) {
+                                                                       int counter) : SimulationTimestampDiskRead(date, std::move(hostname), std::move(mount), bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadStart timestamp for disk read");
 
         // all information about a disk read should be passed
@@ -770,8 +770,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, std::string hostname,
-                                                                           std::string mount,
+    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, const std::string& hostname,
+                                                                           const std::string& mount,
                                                                            double bytes,
                                                                            int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
@@ -795,8 +795,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(double date,
-                                                                                 std::string hostname,
-                                                                                 std::string mount,
+                                                                                 const std::string& hostname,
+                                                                                 const std::string& mount,
                                                                                  double bytes,
                                                                                  int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
@@ -821,7 +821,7 @@ namespace wrench {
     SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(double date, std::string hostname,
                                                                std::string mount,
                                                                double bytes,
-                                                               int counter) : hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
+                                                               int counter) : hostname(std::move(hostname)), mount(std::move(mount)), bytes(bytes), counter(counter) {
         this->date = date;
     }
 
@@ -845,7 +845,7 @@ namespace wrench {
      * @brief retrieves the amount of bytes being written
      * @return number of bytes as double
      */
-    double SimulationTimestampDiskWrite::getBytes() {
+    double SimulationTimestampDiskWrite::getBytes() const {
         return this->bytes;
     }
 
@@ -853,7 +853,7 @@ namespace wrench {
      * @brief retrieves the counter for this disk operation
      * @return int of counter
      */
-    int SimulationTimestampDiskWrite::getCounter() {
+    int SimulationTimestampDiskWrite::getCounter() const {
         return this->counter;
     }
 
@@ -904,7 +904,7 @@ namespace wrench {
     SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart(double date, std::string hostname,
                                                                          std::string mount,
                                                                          double bytes,
-                                                                         int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
+                                                                         int counter) : SimulationTimestampDiskWrite(date, std::move(hostname), mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteStart timestamp for disk write");
 
         // all information about a disk write should be passed
@@ -952,8 +952,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, std::string hostname,
-                                                                                   std::string mount,
+    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, const std::string& hostname,
+                                                                                   const std::string& mount,
                                                                                    double bytes,
                                                                                    int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
@@ -973,7 +973,7 @@ namespace wrench {
      * @param hostname: the host on which a pstate is being set
      * @param pstate: the pstate that is being set on this host
      */
-    SimulationTimestampPstateSet::SimulationTimestampPstateSet(double date, std::string hostname, int pstate) : hostname(hostname), pstate(pstate) {
+    SimulationTimestampPstateSet::SimulationTimestampPstateSet(double date, const std::string& hostname, int pstate) : hostname(hostname), pstate(pstate) {
         this->date = date;
 
         if (hostname.empty()) {
@@ -994,7 +994,7 @@ namespace wrench {
      * @brief Get the pstate associated with this timestamp
      * @return the pstate associated with this timestamp
      */
-    int SimulationTimestampPstateSet::getPstate() {
+    int SimulationTimestampPstateSet::getPstate() const {
         return this->pstate;
     }
 
@@ -1004,7 +1004,7 @@ namespace wrench {
      * @param hostname: the host on which this energy consumption timestamp applies to
      * @param joules: the energy consumption in joules 
      */
-    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, std::string hostname, double joules)
+    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string& hostname, double joules)
         : hostname(hostname), joules(joules) {
 
         this->date = date;
@@ -1026,7 +1026,7 @@ namespace wrench {
      * @brief Get the energy consumption in joules
      * @return energy consumed by this host in joules
      */
-    double SimulationTimestampEnergyConsumption::getConsumption() {
+    double SimulationTimestampEnergyConsumption::getConsumption() const {
         return this->joules;
     }
 
@@ -1036,7 +1036,7 @@ namespace wrench {
      * @param linkname: the link for which this bandwidth usage timestamp applies to
      * @param bytes_per_second: the bandwidth usage in bytes per second
      */
-    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, std::string linkname, double bytes_per_second)
+    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, const std::string& linkname, double bytes_per_second)
         : linkname(linkname), bytes_per_second(bytes_per_second) {
         this->date = date;
         if (linkname.empty() || bytes_per_second < 0.0) {
@@ -1057,7 +1057,7 @@ namespace wrench {
      * @brief Get the bandwidth usage in bytes per second
      * @return the bandwidth usage in bytes per second
      */
-    double SimulationTimestampLinkUsage::getUsage() {
+    double SimulationTimestampLinkUsage::getUsage() const {
         return this->bytes_per_second;
     }
 
