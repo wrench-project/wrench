@@ -9,14 +9,9 @@
 
 #include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 #include <wrench/logging/TerminalOutput.h>
-
-#include <wrench/logging/TerminalOutput.h>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/Workflow.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
 
 #include <utility>
 
@@ -131,14 +126,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the number of flops of the task (to be used only in very specific
+     * @brief Set the number of f of the task (to be used only in very specific
      * cases in which it is guaranteed that changing a task's work after that task
      * has been created is a valid thing to do)
      *
-     * @param flops: the number of flops
+     * @param f: the number of f
      */
-    void WorkflowTask::setFlops(double flops) {
-        this->flops = flops;
+    void WorkflowTask::setFlops(double f) {
+        this->flops = f;
     }
 
 
@@ -625,9 +620,10 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> WorkflowTask::getInputFiles() const {
         std::vector<std::shared_ptr<DataFile>> input;
+        input.reserve(this->input_files.size());
 
-        for (auto f: this->input_files) {
-            input.push_back(f.second);
+        for (const auto &f: this->input_files) {
+            input.emplace_back(f.second);
         }
         return input;
     }
@@ -638,9 +634,10 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> WorkflowTask::getOutputFiles() const {
         std::vector<std::shared_ptr<DataFile>> output;
+        output.reserve(this->output_files.size());
 
-        for (auto f: this->output_files) {
-            output.push_back(f.second);
+        for (const auto &f: this->output_files) {
+            output.emplace_back(f.second);
         }
         return output;
     }
@@ -831,7 +828,7 @@ namespace wrench {
      * @param c: A color string in  "#rrggbb" format
      */
     void WorkflowTask::setColor(const std::string& c) {
-        this->color = color;
+        this->color = c;
     }
 
     /**
