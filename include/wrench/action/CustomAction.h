@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     /**
      * @brief A class that implements a custom action
      */
@@ -45,6 +50,12 @@ namespace wrench {
         std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_execute;
         std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_CUSTOM_ACTION_H

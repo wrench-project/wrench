@@ -45,6 +45,7 @@ And, one of the following:
 
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
+- [Sphinx](https://www.sphinx-doc.org/en/master/usage/installation.html) - version 4.5 or higher along with the following Python packages: `pip3 install sphinx-rtd-theme breathe recommonmark`  (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) - version 1.4 - useful for expanded batch-scheduled resource simulation capabilities
 
 ## Building From Source

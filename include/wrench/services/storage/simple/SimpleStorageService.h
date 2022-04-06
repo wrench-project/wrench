@@ -68,7 +68,7 @@ namespace wrench {
 
     public:
         // Public Constructor
-        SimpleStorageService(std::string hostname,
+        SimpleStorageService(const std::string& hostname,
                              std::set<std::string> mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -89,41 +89,41 @@ namespace wrench {
         friend class Simulation;
 
         // Low-level Constructor
-        SimpleStorageService(std::string hostname,
+        SimpleStorageService(const std::string& hostname,
                              std::set<std::string> mount_points,
                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                             std::string suffix);
+                             const std::string& suffix);
 
         int main() override;
 
         bool processNextMessage();
 
-        unsigned long getNewUniqueNumber();
+        static unsigned long getNewUniqueNumber();
 
-        bool processFileDeleteRequest(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,
+        bool processFileDeleteRequest(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location,
                                       simgrid::s4u::Mailbox *answer_mailbox);
 
-        bool processFileWriteRequest(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation>, simgrid::s4u::Mailbox *answer_mailbox,
+        bool processFileWriteRequest(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>&, simgrid::s4u::Mailbox *answer_mailbox,
                                      unsigned long buffer_size);
 
         bool
-        processFileReadRequest(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,
+        processFileReadRequest(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location,
                                double num_bytes_to_read, simgrid::s4u::Mailbox *answer_mailbox,
                                simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content, unsigned long buffer_size);
 
-        bool processFileCopyRequest(std::shared_ptr<DataFile> file,
-                                    std::shared_ptr<FileLocation> src,
-                                    std::shared_ptr<FileLocation> dst,
+        bool processFileCopyRequest(const std::shared_ptr<DataFile>& file,
+                                    const std::shared_ptr<FileLocation>& src,
+                                    const std::shared_ptr<FileLocation>& dst,
                                     simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processFileTransferThreadNotification(
-                std::shared_ptr<FileTransferThread> ftt,
-                std::shared_ptr<DataFile> file,
+                const std::shared_ptr<FileTransferThread>& ftt,
+                const std::shared_ptr<DataFile>& file,
                 simgrid::s4u::Mailbox *src_mailbox,
-                std::shared_ptr<FileLocation> src_location,
+                const std::shared_ptr<FileLocation>& src_location,
                 simgrid::s4u::Mailbox *dst_mailbox,
-                std::shared_ptr<FileLocation> dst_location,
+                const std::shared_ptr<FileLocation>& dst_location,
                 bool success,
                 std::shared_ptr<FailureCause> failure_cause,
                 simgrid::s4u::Mailbox *answer_mailbox_if_read,

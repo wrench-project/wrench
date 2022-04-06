@@ -32,8 +32,8 @@ namespace wrench {
     class BareMetalComputeServiceOneShot;
 
     /**
-     * @brief A batch_standard_and_pilot_jobs-scheduled compute service that manages a set of compute hosts and
-     *        controls access to their resource via a batch_standard_and_pilot_jobs queue.
+     * @brief A batch-scheduled compute service that manages a set of compute hosts and
+     *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
      *        this service, like for many of its real-world counterparts, memory_manager_service
@@ -129,7 +129,7 @@ namespace wrench {
         /***********************/
         ~BatchComputeService() override;
         // helper function
-        static unsigned long parseUnsignedLongServiceSpecificArgument(std::string key, const std::map<std::string, std::string> &args);
+        static unsigned long parseUnsignedLongServiceSpecificArgument(const std::string& key, const std::map<std::string, std::string> &args);
 
         void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> compound_job,
                                               std::map<std::string, std::string> &service_specific_args) override;
@@ -146,14 +146,14 @@ namespace wrench {
 
         friend class BatschedBatchScheduler;
 
-        BatchComputeService(const std::string hostname,
+        BatchComputeService(const std::string& hostname,
                             std::vector<std::string> compute_hosts,
                             unsigned long cores_per_host,
                             double ram_per_host,
                             std::string scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-                            std::string suffix);
+                            const std::string& suffix);
 
         //submits a standard job
         void submitCompoundJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &batch_job_args) override;
@@ -169,7 +169,7 @@ namespace wrench {
         //create alarms for compound jobs
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<Alarm>> compound_job_alarms;
 
-        /* Resources information in batch_standard_and_pilot_jobs */
+        /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
@@ -177,21 +177,21 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
-        /* End Resources information in batch_standard_and_pilot_jobs */
+        /* End Resources information in batch */
 
         // Vector of one-shot bare-metal compute services
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BareMetalComputeServiceOneShot>> running_bare_metal_one_shot_compute_services;
 
-        // Master List of batch_standard_and_pilot_jobs jobs
+        // Master List of batch jobs
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> all_jobs;
 
-        //A set of running batch_standard_and_pilot_jobs jobs
+        //A set of running batch jobs
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> running_jobs;
 
-        // The batch_standard_and_pilot_jobs queue
+        // The batch queue
         std::deque<std::shared_ptr<BatchJob>> batch_queue;
 
-        // A set of "waiting" batch_standard_and_pilot_jobs jobs, i.e., jobs that are waiting to be sent to
+        // A set of "waiting" batch jobs, i.e., jobs that are waiting to be sent to
         //  the  scheduler (useful for batsched only)
         std::set<std::shared_ptr<BatchJob>> waiting_jobs;
 
@@ -222,13 +222,13 @@ namespace wrench {
 
 #endif
 
-        unsigned long generateUniqueJobID();
+        static unsigned long generateUniqueJobID();
 
-        void removeJobFromRunningList(std::shared_ptr<BatchJob> job);
+        void removeJobFromRunningList(const std::shared_ptr<BatchJob>& job);
 
-        void removeJobFromBatchQueue(std::shared_ptr<BatchJob> job);
+        void removeJobFromBatchQueue(const std::shared_ptr<BatchJob>& job);
 
-        void removeBatchJobFromJobsList(std::shared_ptr<BatchJob> job);
+        void removeBatchJobFromJobsList(const std::shared_ptr<BatchJob>& job);
 
         int main() override;
 
@@ -238,48 +238,48 @@ namespace wrench {
 
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
-        void processCompoundJobCompletion(std::shared_ptr<BareMetalComputeServiceOneShot> executor, std::shared_ptr<CompoundJob> job);
+        void processCompoundJobCompletion(const std::shared_ptr<BareMetalComputeServiceOneShot>& executor, const std::shared_ptr<CompoundJob>& job);
 
-        void processCompoundJobFailure(std::shared_ptr<BareMetalComputeServiceOneShot> executor,
-                                       std::shared_ptr<CompoundJob> job,
-                                       std::shared_ptr<FailureCause> cause);
+        void processCompoundJobFailure(const std::shared_ptr<BareMetalComputeServiceOneShot>& executor,
+                                       const std::shared_ptr<CompoundJob>& job,
+                                       const std::shared_ptr<FailureCause>& cause);
 
-        void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
+        void terminateRunningCompoundJob(const std::shared_ptr<CompoundJob>& job, ComputeService::TerminationCause termination_cause);
 
 
-        //Terminate the batch_standard_and_pilot_jobs service (this is usually for pilot jobs when they act as a batch_standard_and_pilot_jobs service)
+        //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
 
         // Terminate
         void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
         //Process standard job timeout
-        void processCompoundJobTimeout(std::shared_ptr<CompoundJob> job);
+        void processCompoundJobTimeout(const std::shared_ptr<CompoundJob>& job);
 
         //process standard job termination request
-        void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob>& job, simgrid::s4u::Mailbox *answer_mailbox);
 
-        // process a batch_standard_and_pilot_jobs bach_job tiemout event
-        void processAlarmJobTimeout(std::shared_ptr<BatchJob> bach_job);
+        // process a batch bach_job tiemout event
+        void processAlarmJobTimeout(const std::shared_ptr<BatchJob>& batch_job);
 
         //free up resources
-        void freeUpResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
+        void freeUpResources(const std::map<std::string, std::tuple<unsigned long, double>>& resources);
 
         //send call back to the pilot job submitters
-        void sendPilotJobExpirationNotification(std::shared_ptr<PilotJob> job);
+        void sendPilotJobExpirationNotification(const std::shared_ptr<PilotJob>& job);
 
         //send call back to the standard job submitters
-        void sendCompoundJobFailureNotification(std::shared_ptr<CompoundJob> job, std::string job_id, std::shared_ptr<FailureCause> cause);
+        void sendCompoundJobFailureNotification(const std::shared_ptr<CompoundJob>& job, const std::string& job_id, const std::shared_ptr<FailureCause>& cause);
 
         // process a job submission
-        void processJobSubmission(std::shared_ptr<BatchJob> job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processJobSubmission(const std::shared_ptr<BatchJob>& job, simgrid::s4u::Mailbox *answer_mailbox);
 
         //start a job
-        void startJob(std::map<std::string, std::tuple<unsigned long, double>>, std::shared_ptr<CompoundJob>,
-                      std::shared_ptr<BatchJob>, unsigned long, unsigned long, unsigned long);
+        void startJob(const std::map<std::string, std::tuple<unsigned long, double>>&, const std::shared_ptr<CompoundJob>&,
+                      const std::shared_ptr<BatchJob>&, unsigned long, unsigned long, unsigned long);
 
 
-        void processExecuteJobFromBatSched(std::string bat_sched_reply);
+        void processExecuteJobFromBatSched(const std::string& bat_sched_reply);
 
         void processIsThereAtLeastOneHostWithAvailableResources(simgrid::s4u::Mailbox *answer_mailbox, unsigned long num_cores, double ram);
     };
