@@ -33,13 +33,16 @@ namespace wrench {
     ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
-            const std::map<std::string, std::string> service_specific_args,
+            std::map<std::string, std::string>  service_specific_args,
             double payload) : ComputeServiceMessage(payload),
-                              answer_mailbox(answer_mailbox), job(job), service_specific_args(service_specific_args) {
+                              answer_mailbox(answer_mailbox), job(std::move(job)), service_specific_args(std::move(service_specific_args)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceSubmitCompoundJobRequestMessage::ComputeServiceSubmitCompoundJobRequestMessage(): Invalid arguments");
         }
+    }
+#endif
     }
 
     /**
@@ -57,16 +60,18 @@ namespace wrench {
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) : ComputeServiceMessage(payload) {
-        if ((job == nullptr) || (compute_service == nullptr) ||
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "ComputeServiceSubmitCompoundJobAnswerMessage::ComputeServiceSubmitCompoundJobAnswerMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = compute_service;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
         this->success = success;
-        this->failure_cause = failure_cause;
+        this->failure_cause = std::move(failure_cause);
     }
 
     /**
@@ -81,12 +86,15 @@ namespace wrench {
                                                                                std::shared_ptr<ComputeService> cs,
                                                                                double payload)
         : ComputeServiceMessage(payload) {
-        if ((job == nullptr) || (cs == nullptr)) {
+
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceCompoundJobDoneMessage::ComputeServiceCompoundJobDoneMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = cs;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(cs);
     }
 
     /**
@@ -101,12 +109,14 @@ namespace wrench {
                                                                                    std::shared_ptr<ComputeService> cs,
                                                                                    double payload)
         : ComputeServiceMessage(payload) {
-        if ((job == nullptr) || (cs == nullptr)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceCompoundJobFailedMessage::ComputeServiceCompoundJobFailedMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = cs;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(cs);
     }
 
     /**
@@ -120,11 +130,13 @@ namespace wrench {
     ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<CompoundJob> job,
-            double payload) : ComputeServiceMessage(payload), answer_mailbox(answer_mailbox), job(job) {
-        if ((answer_mailbox == nullptr) || (job == nullptr)) {
+            double payload) : ComputeServiceMessage(payload), answer_mailbox(answer_mailbox), job(std::move(job)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobRequestMessage::ComputeServiceTerminateCompoundJobRequestMessage(): Invalid arguments");
         }
+#endif
     }
 
     /**
@@ -142,16 +154,18 @@ namespace wrench {
                                                                                                      bool success,
                                                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) : ComputeServiceMessage(payload) {
-        if ((job == nullptr) || (compute_service == nullptr) ||
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "ComputeServiceTerminateCompoundJobAnswerMessage::ComputeServiceTerminateCompoundJobAnswerMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = compute_service;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
         this->success = success;
-        this->failure_cause = failure_cause;
+        this->failure_cause = std::move(failure_cause);
     }
 
     //    /**
@@ -219,13 +233,14 @@ namespace wrench {
                                                                                std::shared_ptr<ComputeService> cs,
                                                                                double payload)
         : ComputeServiceMessage(payload) {
-
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = cs;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(cs);
     }
 
     /**
@@ -240,12 +255,14 @@ namespace wrench {
                                                                                std::shared_ptr<ComputeService> cs,
                                                                                double payload)
         : ComputeServiceMessage(payload) {
-        if ((job == nullptr) || (cs == nullptr)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = cs;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(cs);
     }
 
     /**
@@ -261,13 +278,15 @@ namespace wrench {
                                                                              std::shared_ptr<ComputeService> cs,
                                                                              std::shared_ptr<FailureCause> cause,
                                                                              double payload) : ComputeServiceMessage(payload) {
-        if ((job == nullptr) || (cs == nullptr)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((job == nullptr) || (cs == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = cs;
-        this->cause = cause;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(cs);
+        this->cause = std::move(cause);
     }
 
     /**
@@ -282,12 +301,14 @@ namespace wrench {
             simgrid::s4u::Mailbox *answer_mailbox,
             std::shared_ptr<PilotJob> job,
             double payload) : ComputeServiceMessage(payload) {
-        if ((answer_mailbox == nullptr) || (job == nullptr)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+            if ((answer_mailbox == nullptr) || (job == nullptr)) {
             throw std::invalid_argument(
                     "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
         }
+#endif
         this->answer_mailbox = answer_mailbox;
-        this->job = job;
+        this->job = std::move(job);
     }
 
     /**
@@ -305,16 +326,18 @@ namespace wrench {
                                                                                                bool success,
                                                                                                std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) : ComputeServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((job == nullptr) || (compute_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
             (!success && (failure_cause == nullptr))) {
             throw std::invalid_argument(
                     "ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(): Invalid arguments");
         }
-        this->job = job;
-        this->compute_service = compute_service;
+#endif
+        this->job = std::move(job);
+        this->compute_service = std::move(compute_service);
         this->success = success;
-        this->failure_cause = failure_cause;
+        this->failure_cause = std::move(failure_cause);
     }
 
     /**
@@ -330,10 +353,12 @@ namespace wrench {
             const std::string &key,
             double payload)
         : ComputeServiceMessage(payload), answer_mailbox(answer_mailbox), key(key) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) or key.empty()) {
             throw std::invalid_argument(
                     "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
         }
+#endif
     }
 
 
@@ -364,11 +389,13 @@ namespace wrench {
 
                                                                                                                   payload) {
 
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (not answer_mailbox) {
             throw std::invalid_argument(
                     "ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage::ComputeServiceIsThereAtLeastOneHostWithAvailableResourcesRequestMessage(): "
                     "Invalid arguments");
         }
+#endif
         this->answer_mailbox = answer_mailbox;
         this->num_cores = num_cores;
         this->ram = ram;

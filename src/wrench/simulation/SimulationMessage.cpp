@@ -30,9 +30,11 @@ namespace wrench {
      * @param payload: message size in bytes
      */
     SimulationMessage::SimulationMessage(double payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (payload < 0) {
             throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
         }
+#endif
         this->payload = payload;
     }
 
