@@ -96,7 +96,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void addEntryToDatabase(std::pair<std::string, std::string> pair_hosts, double proximity_value);
+        void addEntryToDatabase(const std::pair<std::string, std::string>& pair_hosts, double proximity_value);
 
         std::map<std::pair<std::string, std::string>, std::pair<double, double>> entries;
 
