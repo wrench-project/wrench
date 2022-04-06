@@ -138,7 +138,7 @@ namespace wrench {
     public:
         ComputeServiceSubmitCompoundJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                       std::shared_ptr<CompoundJob> job,
-                                                      const std::map<std::string, std::string> service_specific_args,
+                                                      std::map<std::string, std::string> service_specific_args,
                                                       double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
