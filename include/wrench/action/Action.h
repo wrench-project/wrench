@@ -18,6 +18,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class CompoundJob;
     class FailureCause;
     class ActionExecutor;
@@ -148,6 +153,12 @@ namespace wrench {
 
         std::stack<ActionExecution> execution_history;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_ACTION_H
