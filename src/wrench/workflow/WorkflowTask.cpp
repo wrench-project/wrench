@@ -827,13 +827,8 @@ namespace wrench {
      * @brief Set the task's color
      * @param c: A color string in  "#rrggbb" format
      */
-<<<<<<< HEAD
     void WorkflowTask::setColor(const std::string& c) {
         this->color = c;
-=======
-    void WorkflowTask::setColor(const std::string &c) {
-        this->color = color;
->>>>>>> master
     }
 
     /**
