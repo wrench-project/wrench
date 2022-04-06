@@ -6,7 +6,7 @@ import sys
 # -- Project information -----------------------------------------------------
 
 project = 'WRENCH'
-copyright = '2020-2022, WRENCH'
+copyright = '2017-2022, WRENCH'
 author = 'WRENCH Team'
 
 # -- General configuration ---------------------------------------------------
@@ -65,3 +65,9 @@ breathe_projects = {
 breathe_default_project = "user"
 
 # The full version, including alpha/beta/rc tags
+version = '2.0-dev'
+release = '2.0-dev'
+version = '2.0-dev'
+release = '2.0-dev'
+version = '2.0-dev'
+release = '2.0-dev'

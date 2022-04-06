@@ -23,7 +23,7 @@ namespace wrench {
     class ActionExecutionService;
 
     /***********************/
-    /** \cond INTERNAL     */
+    /** \cond DEVELOPER    */
     /***********************/
 
     /**
@@ -32,6 +32,15 @@ namespace wrench {
     class ActionExecutor : public ExecutionController {
 
     public:
+        unsigned long getNumCoresAllocated() const;
+        double getMemoryAllocated() const;
+        double getThreadCreationOverhead();
+        std::shared_ptr<Action> getAction();
+
+        /***********************/
+        /** \cont INTERNAL     */
+        /***********************/
+
         ActionExecutor(
                 std::string hostname,
                 unsigned long num_cores,
@@ -45,14 +54,7 @@ namespace wrench {
         int main() override;
         void kill(bool job_termination);
         void cleanup(bool has_returned_from_main, int return_value) override;
-
-        std::shared_ptr<Action> getAction();
-        unsigned long getNumCoresAllocated() const;
-        double getMemoryAllocated() const;
-
         std::shared_ptr<ActionExecutionService> getActionExecutionService() const;
-
-        double getThreadCreationOverhead();
         bool getSimulateComputationAsSleep();
 
     private:
@@ -66,6 +68,10 @@ namespace wrench {
 
         unsigned long num_cores;
         double ram_footprint;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
     /***********************/
