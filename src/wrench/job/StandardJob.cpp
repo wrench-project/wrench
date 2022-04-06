@@ -20,8 +20,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param workflow: the workflow for which this job is
-     *
      * @param job_manager: the job manager that creates this job
      *
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
@@ -501,7 +499,7 @@ namespace wrench {
     /**
      * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
      * @param necessary_state_changes: the set of task state changes to apply
-     * @param necessary_failure_count_increments: the set ot task failure count increments to apply
+     * @param failure_count_increments: the set ot task failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
      * @param simulation: the simulation (to add timestamps!)
      */
