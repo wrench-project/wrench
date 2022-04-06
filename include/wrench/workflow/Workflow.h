@@ -44,7 +44,7 @@ namespace wrench {
         std::shared_ptr<Workflow> getSharedPtr() { return this->shared_from_this(); }
 
 
-        std::shared_ptr<WorkflowTask> addTask(std::string, double flops,
+        std::shared_ptr<WorkflowTask> addTask(const std::string&, double flops,
                                               unsigned long min_num_cores,
                                               unsigned long max_num_cores,
                                               double memory_requirement);
