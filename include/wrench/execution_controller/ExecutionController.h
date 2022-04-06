@@ -30,9 +30,9 @@ namespace wrench {
 
     class Simulation;
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
     /**
      * @brief An abstraction of an execution controller, i.e., a running process that interacts
@@ -89,9 +89,9 @@ namespace wrench {
         virtual int main() = 0;
     };
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };// namespace wrench
 
