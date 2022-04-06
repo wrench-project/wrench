@@ -3,7 +3,7 @@
 WRENCH 102
 **********
 
-In WRENCH’s terminology, and *execution controller* is software that
+In WRENCH's terminology, and *execution controller* is software that
 makes all decisions and takes all actions for executing some application
 workflow using cyberinfrastructure services. It is thus a crucial
 component in every WRENCH simulator. WRENCH does not provide any
@@ -103,7 +103,7 @@ Job Manager and Data Movement Manager
 
 As expected, each service type provides its own API. For instance, a
 network proximity service provides member functions to query the
-service’s host distance databases. The :ref:`Developer API
+service's host distance databases. The :ref:`Developer API
 Reference <developer-api>` provides all necessary
 documentation, which also explains which member functions are
 synchronous and which are asynchronous (in which case some
@@ -498,7 +498,7 @@ discover information about the (simulated) hardware platform and
 interact with it. It also provides other useful information about the
 simulation itself, such as the current simulation date. Some of these
 member functions are static, but others are not. The
-:cpp:class:`wrench:ExecutionController` class includes a ``simulation`` object.
+:cpp:class:`wrench::ExecutionController` class includes a ``simulation`` object.
 Thus, the execution controller can call member functions on the
 ``this->simulation`` object. For instance, this fragment of code shows
 how an execution controller can figure out the current simulated date
@@ -528,7 +528,7 @@ Logging
 It is typically desirable for the execution controller to print log
 output to the terminal. This is easily accomplished using the
 :cpp:class:`wrench::WRENCH_INFO()`, :cpp:class:`wrench::WRENCH_DEBUG()`, and
-:cpp:class:`wrench::WRENCH_WARN()` macros, which are used just like C’s
+:cpp:class:`wrench::WRENCH_WARN()` macros, which are used just like C's
 ``printf()``. Each of these macros corresponds to a different logging
 level in SimGrid. See the :ref:`SimGrid logging
 documentation <https://simgrid.org/doc/latest/Outcomes.html>` for all
