@@ -39,30 +39,9 @@ if (DOXYGEN_FOUND)
 
     configure_file(${CMAKE_HOME_DIRECTORY}/conf/doxygen/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
 
-    # add_custom_target(doc-pages
-    #         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    #         COMMENT "Generating WRENCH documentation pages" VERBATIM)
-
-    # add_custom_command(TARGET doc-pages
-    #         COMMAND mkdir -p ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/pages
-    #         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT})
-    # LIST(APPEND WRENCH_SECTIONS_LIST doc-pages)
-
-    # add_custom_target(doc-deploy DEPENDS wrench ${WRENCH_SECTIONS_LIST})
-    # foreach (DEP_NAME user developer internal)
-    #     add_custom_command(TARGET doc-deploy
-    #             COMMAND mkdir -p ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION}/${DEP_NAME}
-    #             COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/${DEP_NAME}/html/* ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION}/${DEP_NAME})
-    # endforeach ()
-    # add_custom_command(TARGET doc-deploy
-    #         COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/pages/html/* ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION})
-    # add_custom_command(TARGET doc-deploy
-    #         COMMAND cp -R ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/${WRENCH_RELEASE_VERSION} ${CMAKE_HOME_DIRECTORY}/docs/wrench-doc/latest)
-
     get_directory_property(extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
     set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${extra_clean_files};${CMAKE_HOME_DIRECTORY}/docs")
 
-    # add_custom_target(doc DEPENDS doc-deploy)
     add_custom_target(doc DEPENDS wrench ${WRENCH_SECTIONS_LIST})
 
     add_custom_command(TARGET doc COMMAND python3 
