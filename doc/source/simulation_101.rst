@@ -95,8 +95,16 @@ processes (a.k.a. daemons) running on the cluster, implements
 sophisticated algorithms to decide which job should run next, makes sure
 jobs do not run on the same cores, etc. WRENCH provides an
 already-implemented compute service called a
-:cpp:class:`wrench::BatchComputeService` that does all this for you, under the
-cover.
+:cpp:class:`wrench::BatchComputeService` that does all this for you,
+under the cover. 
+
+For example, the well-known batch scheduler 
+:ref:`Slurm <https://www.schedmd.com/>` uses several daemons to schedule
+and manage jobs(e.g., the process **slurmd** runs on each compute node
+and one **slurmctld** daemon controls everything). In this example, an
+instance of :cpp:class:`wrench::BatchComputeService` could represent
+one Slurm cluster with one **slurmctld** process and
+multiple **slurmd** processes.
 
 A storage service is a runtime system to which you can say "here is some
 data I want you to store", "I want to read some bytes from that data I
@@ -106,11 +114,19 @@ numbers of concurrent reads/writes from different clients) and can use
 non-trivial algorithms (e.g., for overlapping network communication and
 disk accesses). Here again, WRENCH comes with an already-implemented
 storage service called :cpp:class:`wrench::SimpleStorageService` that does all
-this for you and comes with a straightforward, high-level API.
+this for you and comes with a straightforward, high-level API. 
+Note that a storage service does not provide by default capabilities
+traditionally offered by parallel file systems such as 
+:ref:`Lustre <https://www.lustre.org/>` 
+(i.e., no stripping among storage nodes, no dedicated metadata servers). 
+If you want to model such storage back-end, you can do it by extending
+the :cpp:class:`wrench::SimpleStorageService`.
 
 Each service in WRENCH comes with configurable *properties*, that are
 well-documented and can be used to specify particular features and/or
-behaviors. Each service also comes with *configurable message payloads*,
+behaviors (e.g., a specific scheduling algorithm for a 
+given :cpp:class:`wrench::BatchComputeService`).
+Each service also comes with *configurable message payloads*,
 which specify the size in bytes of the control messages that underlying
 processes exchange with each other to implement the service's
 functionality. In the real-world, the processes that comprise a service
@@ -119,6 +135,16 @@ all these messages (the larger the sizes the longer the simulated
 communication times). See more about :ref:`Service
 Customization <wrench-101-customizing-services>` on the :ref:`WRENCH
 101 <wrench-101-header>` page.
+
+When the simulator is coded, the **calibration** phase begins. 
+The **calibration** step is crucial to ensure that your simulator
+accurately approximate the performance of the application you study 
+on the target platform. Basically, calibrating a simulator implies 
+that you fine-tune the simulator to approximate the real performance 
+of the target application when running on the modeled platform. 
+*Payloads* and *properties* play a central role in this calibration 
+step as they control the weight of many important actions (for example, 
+how much overhead for reading a file from a storage service?).
 
 Simulated Controller
 ====================
