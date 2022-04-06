@@ -32,8 +32,8 @@ namespace wrench {
     class BareMetalComputeServiceOneShot;
 
     /**
-     * @brief A batch_standard_and_pilot_jobs-scheduled compute service that manages a set of compute hosts and
-     *        controls access to their resource via a batch_standard_and_pilot_jobs queue.
+     * @brief A batch-scheduled compute service that manages a set of compute hosts and
+     *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
      *        this service, like for many of its real-world counterparts, memory_manager_service
@@ -169,7 +169,7 @@ namespace wrench {
         //create alarms for compound jobs
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<Alarm>> compound_job_alarms;
 
-        /* Resources information in batch_standard_and_pilot_jobs */
+        /* Resources information in batch */
         unsigned long total_num_of_nodes;
         unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
@@ -177,21 +177,21 @@ namespace wrench {
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
         std::vector<std::string> compute_hosts;
-        /* End Resources information in batch_standard_and_pilot_jobs */
+        /* End Resources information in batch */
 
         // Vector of one-shot bare-metal compute services
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BareMetalComputeServiceOneShot>> running_bare_metal_one_shot_compute_services;
 
-        // Master List of batch_standard_and_pilot_jobs jobs
+        // Master List of batch jobs
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> all_jobs;
 
-        //A set of running batch_standard_and_pilot_jobs jobs
+        //A set of running batch jobs
         std::map<std::shared_ptr<CompoundJob>, std::shared_ptr<BatchJob>> running_jobs;
 
-        // The batch_standard_and_pilot_jobs queue
+        // The batch queue
         std::deque<std::shared_ptr<BatchJob>> batch_queue;
 
-        // A set of "waiting" batch_standard_and_pilot_jobs jobs, i.e., jobs that are waiting to be sent to
+        // A set of "waiting" batch jobs, i.e., jobs that are waiting to be sent to
         //  the  scheduler (useful for batsched only)
         std::set<std::shared_ptr<BatchJob>> waiting_jobs;
 
@@ -247,7 +247,7 @@ namespace wrench {
         void terminateRunningCompoundJob(std::shared_ptr<CompoundJob> job, ComputeService::TerminationCause termination_cause);
 
 
-        //Terminate the batch_standard_and_pilot_jobs service (this is usually for pilot jobs when they act as a batch_standard_and_pilot_jobs service)
+        //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup(bool has_returned_from_main, int return_value) override;
 
         // Terminate
@@ -259,7 +259,7 @@ namespace wrench {
         //process standard job termination request
         void processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job, simgrid::s4u::Mailbox *answer_mailbox);
 
-        // process a batch_standard_and_pilot_jobs bach_job tiemout event
+        // process a batch bach_job tiemout event
         void processAlarmJobTimeout(std::shared_ptr<BatchJob> bach_job);
 
         //free up resources
