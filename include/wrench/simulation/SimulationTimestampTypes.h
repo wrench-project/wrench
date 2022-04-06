@@ -88,7 +88,7 @@ namespace wrench {
     class SimulationTimestampType {
     public:
         SimulationTimestampType();
-        double getDate();
+        double getDate() const;
 
     protected:
         /**
@@ -98,7 +98,7 @@ namespace wrench {
 
     private:
         friend class SimulationOutput;
-        void setDate(double date);
+        void setDate(double d);
     };
 
     /**
@@ -567,7 +567,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteFailure : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteFailure(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWriteFailure(double date, const std::string& hostname, const std::string& mount, double bytes, int counter);
     };
 
     /**

@@ -498,7 +498,7 @@ namespace wrench {
 
     /**
      * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
-     * @param necessary_state_changes: the set of task state changes to apply
+     * @param state_changes: the set of task state changes to apply
      * @param failure_count_increments: the set ot task failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
      * @param simulation: the simulation (to add timestamps!)

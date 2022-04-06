@@ -14,7 +14,6 @@
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/failure_causes/ComputationHasDied.h>
 #include <wrench/failure_causes/FatalFailure.h>
-#include <wrench/failure_causes/HostError.h>
 #include <wrench/exceptions/ExecutionException.h>
 
 #include <utility>
@@ -128,7 +127,9 @@ namespace wrench {
     /**
   * @brief Simulate computation with a single sleep
   * @param action_executor:  the executor that executes this action
-  * @param work_per_thread: amount of work (in flop) that each thread should do
+  * @param num_threads: the number of threads
+  * @param sequential_work: the total amount of sequential work
+  * @param parallel_per_thread_work: the parallel per-thread work
   */
     void ComputeAction::simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
@@ -141,8 +142,9 @@ namespace wrench {
     /**
      * @brief Simulation computation with compute threads
      * @param action_executor:  the executor that executes this action
-     *
-     * @param work_per_thread: amount of work (in flop) that each thread should do
+     * @param num_threads: the number of threads to use
+     * @param sequential_work: total amount of sequential work
+     * @param parallel_per_thread_work: amount of parallel per-thread work
      */
     void ComputeAction::simulateComputationAsComputation(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
 
