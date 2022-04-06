@@ -20,6 +20,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     class Simulation;
     class FailureCause;
     class Alarm;
@@ -165,6 +169,11 @@ namespace wrench {
 
         std::shared_ptr<HostStateChangeDetector> host_state_change_monitor;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 };// namespace wrench
 
 
