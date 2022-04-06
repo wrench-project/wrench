@@ -94,7 +94,7 @@ namespace wrench {
     unsigned long StandardJob::getMinimumRequiredMemory() const {
         unsigned long max_ram = 0;
         for (auto const &t: tasks) {
-            max_ram = std::max<unsigned long>(max_ram, (unsigned long)(t->getMemoryRequirement()));
+            max_ram = std::max<unsigned long>(max_ram, (unsigned long) (t->getMemoryRequirement()));
         }
         return max_ram;
     }

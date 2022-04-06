@@ -73,30 +73,30 @@ namespace wrench {
         std::string getStateAsString();
         void setPriority(double p) override;
 
-        std::shared_ptr<SleepAction> addSleepAction(const std::string& name, double sleep_time);
+        std::shared_ptr<SleepAction> addSleepAction(const std::string &name, double sleep_time);
 
-        std::shared_ptr<FileReadAction> addFileReadAction(const std::string& name,
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           std::shared_ptr<DataFile> file,
                                                           std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileReadAction> addFileReadAction(const std::string& name,
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           std::shared_ptr<DataFile> file,
                                                           std::vector<std::shared_ptr<FileLocation>> file_locations);
 
-        std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string& name,
+        std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
                                                             std::shared_ptr<DataFile> file,
                                                             std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string& name,
+        std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
                                                           std::shared_ptr<DataFile> file,
                                                           std::shared_ptr<FileLocation> src_file_location,
                                                           std::shared_ptr<FileLocation> dst_file_location);
 
-        std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string& name,
+        std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
                                                               std::shared_ptr<DataFile> file,
                                                               std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(const std::string& name,
+        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(const std::string &name,
                                                                                   std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
                                                                                   std::shared_ptr<FileLocation> file_location);
 
