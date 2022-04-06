@@ -141,6 +141,9 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating an EnergyMeterService on WMSHost that monitors CloudHost1 every minute ..." << std::endl;
     auto energy_meter_service = simulation->add(new wrench::EnergyMeterService("WMSHost", {"CloudHost1"}, 60));
 
+    /* Enable energy time stamps in the simulation output */
+    simulation->getOutput().enableEnergyTimestamps(true);
+
     /* It is necessary to store, or "stage", input files that only input. The getInputFiles()
      * method of the Workflow class returns the set of all workflow files that are not generated
      * by workflow tasks, and thus are only input files. These files are then staged on the storage service. */

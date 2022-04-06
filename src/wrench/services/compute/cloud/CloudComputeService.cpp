@@ -771,14 +771,15 @@ namespace wrench {
     /**
      * @brief A helper method that finds a host with a given number of available cores and a given amount of
      *        available RAM using one of the several resource allocation algorithms.
+     *
      * @param desired_num_cores: desired number of cores
      * @param desired_ram: desired amount of RAM
-     * @oaram desired_host: name of a desired host ("" if none)
+     * @param desired_host: name of a desired host ("" if none)
      * @return
      */
     std::string CloudComputeService::findHost(unsigned long desired_num_cores,
                                               double desired_ram,
-                                              std::string desired_host) {
+                                              const std::string& desired_host) {
         // Find a physical host to start the VM
         std::vector<std::string> possible_hosts;
         for (auto const &host: this->execution_hosts) {

@@ -22,7 +22,7 @@ namespace wrench {
     class AmdahlParallelModel : public ParallelModel {
 
     public:
-        double getAlpha();
+        double getAlpha() const;
 
         /***********************/
         /** \cond INTERNAL    **/

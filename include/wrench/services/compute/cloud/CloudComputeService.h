@@ -213,7 +213,7 @@ namespace wrench {
         /***********************/
 
     private:
-        std::string findHost(unsigned long desired_num_cores, double desired_ram, std::string desired_host);
+        std::string findHost(unsigned long desired_num_cores, double desired_ram, const std::string& desired_host);
     };
 }// namespace wrench
 

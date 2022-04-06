@@ -10,6 +10,7 @@
 
 #include <cfloat>
 #include <numeric>
+#include <utility>
 
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeServiceMessage.h"
 #include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
@@ -40,7 +41,7 @@ namespace wrench {
                                                                        std::string scratch_space_mount_point,
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
-        : CloudComputeService(hostname, execution_hosts, scratch_space_mount_point) {
+        : CloudComputeService(hostname, execution_hosts, std::move(scratch_space_mount_point)) {
 
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
@@ -266,8 +267,8 @@ namespace wrench {
         double dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) -
                                     this->used_ram_per_execution_host[dest_pm_hostname];
         double dest_available_cores =
-                Simulation::getHostNumCores(dest_pm_hostname) - this->used_cores_per_execution_host[dest_pm_hostname];
-        if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < vm->getNumCores())) {
+                (double)Simulation::getHostNumCores(dest_pm_hostname) - (double)this->used_cores_per_execution_host[dest_pm_hostname];
+        if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < (double)vm->getNumCores())) {
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(

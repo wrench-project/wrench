@@ -11,6 +11,7 @@
 #include <set>
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h"
 #include <boost/icl/interval_map.hpp>
+#include <utility>
 #include <wrench/services/compute/batch/BatchJob.h>
 
 namespace wrench {
@@ -94,7 +95,7 @@ namespace wrench {
      */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSet();
-        job_set->add(job);
+        job_set->add(std::move(job));
 
         if (add) {
             this->availability_timeslots +=

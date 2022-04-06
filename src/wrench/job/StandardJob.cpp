@@ -20,8 +20,6 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param workflow: the workflow for which this job is
-     *
      * @param job_manager: the job manager that creates this job
      *
      * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
@@ -93,8 +91,8 @@ namespace wrench {
      */
     unsigned long StandardJob::getMinimumRequiredMemory() const {
         unsigned long max_ram = 0;
-        for (auto t: tasks) {
-            max_ram = std::max<unsigned long>(max_ram, t->getMemoryRequirement());
+        for (auto const &t: tasks) {
+            max_ram = std::max<unsigned long>(max_ram, (unsigned long) (t->getMemoryRequirement()));
         }
         return max_ram;
     }
@@ -129,7 +127,7 @@ namespace wrench {
      *
      * @return a vector of workflow tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> StandardJob::getTasks() {
+    std::vector<std::shared_ptr<WorkflowTask>> StandardJob::getTasks() const {
         return this->tasks;
     }
 
@@ -138,7 +136,7 @@ namespace wrench {
      *
      * @return a map of files to storage services
      */
-    std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> StandardJob::getFileLocations() {
+    std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> StandardJob::getFileLocations() const {
         return this->file_locations;
     }
 
@@ -154,7 +152,7 @@ namespace wrench {
      * @brief get the job's pre-overhead
      * @return a number o seconds
      */
-    double StandardJob::getPreJobOverheadInSeconds() {
+    double StandardJob::getPreJobOverheadInSeconds() const {
         return this->pre_overhead;
     }
 
@@ -162,7 +160,7 @@ namespace wrench {
     * @brief get the job's post-overhead
     * @return a number o seconds
     */
-    double StandardJob::getPostJobOverheadInSeconds() {
+    double StandardJob::getPostJobOverheadInSeconds() const {
         return this->post_overhead;
     }
 
@@ -500,8 +498,8 @@ namespace wrench {
 
     /**
      * @brief Compute all task updates based on the state of the underlying compound job (also updates timing information and other task information)
-     * @param necessary_state_changes: the set of task state changes to apply
-     * @param necessary_failure_count_increments: the set ot task failure count increments to apply
+     * @param state_changes: the set of task state changes to apply
+     * @param failure_count_increments: the set ot task failure count increments to apply
      * @param job_failure_cause: the job failure cause, if any
      * @param simulation: the simulation (to add timestamps!)
      */

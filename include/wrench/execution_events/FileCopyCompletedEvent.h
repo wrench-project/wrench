@@ -12,6 +12,7 @@
 #define WRENCH_FILE_COPY_COMPLETED_EVENT_H
 
 #include <string>
+#include <utility>
 #include "wrench/failure_causes/FailureCause.h"
 
 /***********************/
@@ -48,7 +49,7 @@ namespace wrench {
          * @brief Constructor
          * @param file: a workflow file
          * @param src: the source location
-         * @param src: the destination location
+         * @param dst: the destination location
          * @param file_registry_service: a file registry service
          * @param file_registry_service_updated: whether the file registry service has been updated
          */
@@ -57,8 +58,8 @@ namespace wrench {
                                std::shared_ptr<FileLocation> dst,
                                std::shared_ptr<FileRegistryService> file_registry_service,
                                bool file_registry_service_updated)
-            : file(file), src(src), dst(dst),
-              file_registry_service(file_registry_service),
+            : file(std::move(file)), src(std::move(src)), dst(std::move(dst)),
+              file_registry_service(std::move(file_registry_service)),
               file_registry_service_updated(file_registry_service_updated) {}
 
     public:

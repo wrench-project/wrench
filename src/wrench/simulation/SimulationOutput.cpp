@@ -159,7 +159,7 @@ namespace wrench {
      * @param include_disk: boolean specifying whether to include disk operation in JSON (disk timestamps must be enabled)
      * @param include_bandwidth: boolean specifying whether to include link bandwidth measurements in JSON
      */
-    void SimulationOutput::dumpUnifiedJSON(std::shared_ptr<Workflow> workflow, std::string file_path,
+    void SimulationOutput::dumpUnifiedJSON(const std::shared_ptr<Workflow>& workflow, std::string file_path,
                                            bool include_platform,
                                            bool include_workflow_exec,
                                            bool include_workflow_graph,
@@ -458,8 +458,8 @@ namespace wrench {
       *
       * @throws std::invalid_argument
       */
-    void SimulationOutput::dumpWorkflowExecutionJSON(std::shared_ptr<Workflow> workflow,
-                                                     std::string file_path,
+    void SimulationOutput::dumpWorkflowExecutionJSON(const std::shared_ptr<Workflow>& workflow,
+                                                     const std::string& file_path,
                                                      bool generate_host_utilization_layout,
                                                      bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
@@ -641,8 +641,8 @@ namespace wrench {
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpWorkflowGraphJSON(std::shared_ptr<wrench::Workflow> workflow,
-                                                 std::string file_path,
+    void SimulationOutput::dumpWorkflowGraphJSON(const std::shared_ptr<wrench::Workflow>& workflow,
+                                                 const std::string& file_path,
                                                  bool writing_file) {
         if (workflow == nullptr || file_path.empty()) {
             throw std::invalid_argument(
@@ -780,7 +780,7 @@ namespace wrench {
      * @throws std::invalid_argument
      * @throws std::runtime_error
      */
-    void SimulationOutput::dumpHostEnergyConsumptionJSON(std::string file_path,
+    void SimulationOutput::dumpHostEnergyConsumptionJSON(const std::string& file_path,
                                                          bool writing_file) {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpHostEnergyConsumptionJSON() requires a valid file_path");
@@ -934,7 +934,7 @@ namespace wrench {
      *
      * @throws std::invalid_argument
      */
-    void SimulationOutput::dumpPlatformGraphJSON(std::string file_path,
+    void SimulationOutput::dumpPlatformGraphJSON(const std::string& file_path,
                                                  bool writing_file) {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpPlatformGraphJSON() requires a valid file_path");
@@ -1208,7 +1208,7 @@ namespace wrench {
      *
      * @throws invalid_argument
      */
-    void SimulationOutput::dumpDiskOperationsJSON(std::string file_path,
+    void SimulationOutput::dumpDiskOperationsJSON(const std::string& file_path,
                                                   bool writing_file) {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpDiskOperationJSON() requires a valid file_path");
@@ -1243,14 +1243,14 @@ namespace wrench {
             std::set<std::string> mounts;
             if (!read_start_timestamps.empty()) {
                 for (auto &timestamp: read_start_timestamps) {
-                    if (timestamp->getContent()->getHostname().compare(host) == 0) {
+                    if (timestamp->getContent()->getHostname() == host) {
                         mounts.insert(timestamp->getContent()->getMount());
                     }
                 }
             }
             if (!write_start_timestamps.empty()) {
                 for (auto &timestamp: write_start_timestamps) {
-                    if (timestamp->getContent()->getHostname().compare(host) == 0) {
+                    if (timestamp->getContent()->getHostname() == host) {
                         mounts.insert(timestamp->getContent()->getMount());
                     }
                 }
@@ -1261,8 +1261,8 @@ namespace wrench {
 
                 if (!read_start_timestamps.empty()) {
                     for (auto &read_start_timestamp: read_start_timestamps) {
-                        if (read_start_timestamp->getContent()->getHostname().compare(host) == 0 &&
-                            read_start_timestamp->getContent()->getMount().compare(mount) == 0) {
+                        if (read_start_timestamp->getContent()->getHostname() == host &&
+                            read_start_timestamp->getContent()->getMount() == mount) {
                             disk_operation = std::make_tuple(read_start_timestamp->getContent()->getDate(),
                                                              read_start_timestamp->getContent()->getEndpoint()->getDate(),
                                                              read_start_timestamp->getContent()->getBytes());
@@ -1272,8 +1272,8 @@ namespace wrench {
                 }
                 if (!write_start_timestamps.empty()) {
                     for (auto &write_start_timestamp: write_start_timestamps) {
-                        if (write_start_timestamp->getContent()->getHostname().compare(host) == 0 &&
-                            write_start_timestamp->getContent()->getMount().compare(mount) == 0) {
+                        if (write_start_timestamp->getContent()->getHostname() == host &&
+                            write_start_timestamp->getContent()->getMount() == mount) {
                             disk_operation = std::make_tuple(write_start_timestamp->getContent()->getDate(),
                                                              write_start_timestamp->getContent()->getEndpoint()->getDate(),
                                                              write_start_timestamp->getContent()->getBytes());
@@ -1370,7 +1370,7 @@ namespace wrench {
      * @throws std::invalid_argument
      * @throws std::runtime_error
      */
-    void SimulationOutput::dumpLinkUsageJSON(std::string file_path,
+    void SimulationOutput::dumpLinkUsageJSON(const std::string& file_path,
                                              bool writing_file) {
         if (file_path.empty()) {
             throw std::invalid_argument("SimulationOutput::dumpLinkUsageJSON() requires a valid file_path");
@@ -1474,7 +1474,7 @@ namespace wrench {
      * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskStart(double date, std::shared_ptr<WorkflowTask> task) {
+    void SimulationOutput::addTimestampTaskStart(double date, const std::shared_ptr<WorkflowTask>& task) {
         if (this->isEnabled<SimulationTimestampTaskStart>()) {
             this->addTimestamp<SimulationTimestampTaskStart>(new SimulationTimestampTaskStart(date, task));
         }
@@ -1485,7 +1485,7 @@ namespace wrench {
      * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask> task) {
+    void SimulationOutput::addTimestampTaskFailure(double date, const std::shared_ptr<WorkflowTask>& task) {
         if (this->isEnabled<SimulationTimestampTaskFailure>()) {
             this->addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(date, task));
         }
@@ -1496,7 +1496,7 @@ namespace wrench {
      * @param date: the date
      * @param task: a workflow task
      */
-    void SimulationOutput::addTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask> task) {
+    void SimulationOutput::addTimestampTaskCompletion(double date, const std::shared_ptr<WorkflowTask>& task) {
         if (this->isEnabled<SimulationTimestampTaskCompletion>()) {
             this->addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(date, task));
         }
@@ -1507,7 +1507,7 @@ namespace wrench {
     * @param date: the date
     * @param task: a workflow task
     */
-    void SimulationOutput::addTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask> task) {
+    void SimulationOutput::addTimestampTaskTermination(double date, const std::shared_ptr<WorkflowTask>& task) {
         if (this->isEnabled<SimulationTimestampTaskTermination>()) {
             this->addTimestamp<SimulationTimestampTaskTermination>(new SimulationTimestampTaskTermination(date, task));
         }
@@ -1522,13 +1522,13 @@ namespace wrench {
      * @param task: the workflow task for which this read is done (or nullptr);
      */
     void SimulationOutput::addTimestampFileReadStart(double date,
-                                                     std::shared_ptr<DataFile> file,
-                                                     std::shared_ptr<FileLocation> src,
-                                                     std::shared_ptr<StorageService> service,
+                                                     const std::shared_ptr<DataFile> &file,
+                                                     const std::shared_ptr<FileLocation> &src,
+                                                     const std::shared_ptr<StorageService> &service,
                                                      std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadStart>()) {
             this->addTimestamp<SimulationTimestampFileReadStart>(
-                    new SimulationTimestampFileReadStart(date, file, src, service, task));
+                    new SimulationTimestampFileReadStart(date, file, src, service, std::move(task)));
         }
     }
 
@@ -1541,13 +1541,13 @@ namespace wrench {
     * @param task: the workflow task for which this read is done (or nullptr);
     */
     void SimulationOutput::addTimestampFileReadFailure(double date,
-                                                       std::shared_ptr<DataFile> file,
-                                                       std::shared_ptr<FileLocation> src,
-                                                       std::shared_ptr<StorageService> service,
+                                                       const std::shared_ptr<DataFile>& file,
+                                                       const std::shared_ptr<FileLocation>& src,
+                                                       const std::shared_ptr<StorageService>& service,
                                                        std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadFailure>()) {
             this->addTimestamp<SimulationTimestampFileReadFailure>(
-                    new SimulationTimestampFileReadFailure(date, file, src, service, task));
+                    new SimulationTimestampFileReadFailure(date, file, src, service, std::move(task)));
         }
     }
 
@@ -1561,14 +1561,14 @@ namespace wrench {
     */
     void
     SimulationOutput::addTimestampFileReadCompletion(double date,
-                                                     std::shared_ptr<DataFile> file,
-                                                     std::shared_ptr<FileLocation> src,
-                                                     std::shared_ptr<StorageService> service,
+                                                     const std::shared_ptr<DataFile>& file,
+                                                     const std::shared_ptr<FileLocation>& src,
+                                                     const std::shared_ptr<StorageService>& service,
                                                      std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
 
             this->addTimestamp<SimulationTimestampFileReadCompletion>(
-                    new SimulationTimestampFileReadCompletion(date, file, src, service, task));
+                    new SimulationTimestampFileReadCompletion(date, file, src, service, std::move(task)));
         }
     }
 
@@ -1587,7 +1587,7 @@ namespace wrench {
                                                       std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
             this->addTimestamp<SimulationTimestampFileWriteStart>(
-                    new SimulationTimestampFileWriteStart(date, file, src, service, task));
+                    new SimulationTimestampFileWriteStart(date, std::move(file), src, service, task));
         }
     }
 
@@ -1600,13 +1600,13 @@ namespace wrench {
     * @param task: the workflow task for which this write is done (or nullptr);
     */
     void SimulationOutput::addTimestampFileWriteFailure(double date,
-                                                        std::shared_ptr<DataFile> file,
-                                                        std::shared_ptr<FileLocation> src,
-                                                        std::shared_ptr<StorageService> service,
+                                                        const std::shared_ptr<DataFile>& file,
+                                                        const std::shared_ptr<FileLocation>& src,
+                                                        const std::shared_ptr<StorageService>& service,
                                                         std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteFailure>()) {
             this->addTimestamp<SimulationTimestampFileWriteFailure>(
-                    new SimulationTimestampFileWriteFailure(date, file, src, service, task));
+                    new SimulationTimestampFileWriteFailure(date, file, src, service, std::move(task)));
         }
     }
 
@@ -1620,13 +1620,13 @@ namespace wrench {
     */
     void
     SimulationOutput::addTimestampFileWriteCompletion(double date,
-                                                      std::shared_ptr<DataFile> file,
-                                                      std::shared_ptr<FileLocation> src,
-                                                      std::shared_ptr<StorageService> service,
+                                                      const std::shared_ptr<DataFile>& file,
+                                                      const std::shared_ptr<FileLocation>& src,
+                                                      const std::shared_ptr<StorageService>& service,
                                                       std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteCompletion>()) {
             this->addTimestamp<SimulationTimestampFileWriteCompletion>(
-                    new SimulationTimestampFileWriteCompletion(date, file, src, service, task));
+                    new SimulationTimestampFileWriteCompletion(date, file, src, service, std::move(task)));
         }
     }
 
@@ -1642,7 +1642,7 @@ namespace wrench {
                                                      std::shared_ptr<FileLocation> src,
                                                      std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
-            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(date, file, src, dst));
+            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(date, std::move(file), std::move(src), dst));
         }
     }
 
@@ -1659,7 +1659,7 @@ namespace wrench {
                                                        std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
             this->addTimestamp<SimulationTimestampFileCopyFailure>(
-                    new SimulationTimestampFileCopyFailure(date, file, src, dst));
+                    new SimulationTimestampFileCopyFailure(date, std::move(file), std::move(src), std::move(dst)));
         }
     }
 
@@ -1676,7 +1676,7 @@ namespace wrench {
                                                           std::shared_ptr<FileLocation> dst) {
         if (this->isEnabled<SimulationTimestampFileCopyCompletion>()) {
             this->addTimestamp<SimulationTimestampFileCopyCompletion>(
-                    new SimulationTimestampFileCopyCompletion(date, file, src, dst));
+                    new SimulationTimestampFileCopyCompletion(date, std::move(file), std::move(src), std::move(dst)));
         }
     }
 
@@ -1695,7 +1695,7 @@ namespace wrench {
                                                      int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadStart>()) {
             this->addTimestamp<SimulationTimestampDiskReadStart>(
-                    new SimulationTimestampDiskReadStart(date, hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskReadStart(date, std::move(hostname), std::move(mount), bytes, unique_sequence_number));
         }
     }
 
@@ -1707,8 +1707,8 @@ namespace wrench {
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskReadFailure(double date, std::string hostname,
-                                                       std::string mount,
+    void SimulationOutput::addTimestampDiskReadFailure(double date, const std::string& hostname,
+                                                       const std::string& mount,
                                                        double bytes,
                                                        int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadFailure>()) {
@@ -1725,8 +1725,8 @@ namespace wrench {
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskReadCompletion(double date, std::string hostname,
-                                                          std::string mount,
+    void SimulationOutput::addTimestampDiskReadCompletion(double date, const std::string& hostname,
+                                                          const std::string& mount,
                                                           double bytes,
                                                           int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskReadCompletion>()) {
@@ -1749,7 +1749,7 @@ namespace wrench {
                                                       int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteStart>()) {
             this->addTimestamp<SimulationTimestampDiskWriteStart>(
-                    new SimulationTimestampDiskWriteStart(date, hostname, mount, bytes, unique_sequence_number));
+                    new SimulationTimestampDiskWriteStart(date, std::move(hostname), std::move(mount), bytes, unique_sequence_number));
         }
     }
 
@@ -1761,8 +1761,8 @@ namespace wrench {
      * @param bytes: number of bytes read
      * @param unique_sequence_number: an integer id
      */
-    void SimulationOutput::addTimestampDiskWriteFailure(double date, std::string hostname,
-                                                        std::string mount,
+    void SimulationOutput::addTimestampDiskWriteFailure(double date, const std::string& hostname,
+                                                        const std::string& mount,
                                                         double bytes,
                                                         int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteFailure>()) {
@@ -1779,8 +1779,8 @@ namespace wrench {
     * @param bytes: number of bytes read
     * @param unique_sequence_number: an integer id
     */
-    void SimulationOutput::addTimestampDiskWriteCompletion(double date, std::string hostname,
-                                                           std::string mount,
+    void SimulationOutput::addTimestampDiskWriteCompletion(double date, const std::string& hostname,
+                                                           const std::string& mount,
                                                            double bytes,
                                                            int unique_sequence_number) {
         if (this->isEnabled<SimulationTimestampDiskWriteCompletion>()) {
@@ -1795,7 +1795,7 @@ namespace wrench {
      * @param hostname: a hostname
      * @param pstate: a pstate index
      */
-    void SimulationOutput::addTimestampPstateSet(double date, std::string hostname,
+    void SimulationOutput::addTimestampPstateSet(double date, const std::string& hostname,
                                                  int pstate) {
         if (this->isEnabled<SimulationTimestampPstateSet>()) {
             this->addTimestamp<SimulationTimestampPstateSet>(new SimulationTimestampPstateSet(date, hostname, pstate));
@@ -1808,7 +1808,7 @@ namespace wrench {
      * @param hostname: a hostname
      * @param joules: consumption in joules
      */
-    void SimulationOutput::addTimestampEnergyConsumption(double date, std::string hostname,
+    void SimulationOutput::addTimestampEnergyConsumption(double date, const std::string& hostname,
                                                          double joules) {
         static std::unordered_map<std::string, std::vector<SimulationTimestampEnergyConsumption *>> last_two_timestamps;
 
@@ -1846,7 +1846,7 @@ namespace wrench {
      * @param linkname: a linkname
      * @param bytes_per_second: link usage in bytes_per_second
      */
-    void SimulationOutput::addTimestampLinkUsage(double date, std::string linkname,
+    void SimulationOutput::addTimestampLinkUsage(double date, const std::string& linkname,
                                                  double bytes_per_second) {
         static std::unordered_map<std::string, std::vector<SimulationTimestampLinkUsage *>> last_two_timestamps;
 

@@ -172,10 +172,10 @@ namespace wrench {
 
     /**
      * @brief Internal method to add an entry to the database
-     * @param pair: a pair of hosts
+     * @param pair_hosts: a pair of hosts
      * @param proximity_value: proximity value between the pair of hosts
      */
-    void NetworkProximityService::addEntryToDatabase(std::pair<std::string, std::string> pair_hosts,
+    void NetworkProximityService::addEntryToDatabase(const std::pair<std::string, std::string> &pair_hosts,
                                                      double proximity_value) {
         WRENCH_INFO("Received new measurement: %s-%s prox=%lf", pair_hosts.first.c_str(), pair_hosts.second.c_str(),
                     proximity_value);
@@ -200,7 +200,7 @@ namespace wrench {
         WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
         // Create  and start network daemons
-        for (auto h: this->hosts_in_network) {
+        for (const auto &h: this->hosts_in_network) {
             std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
                     new NetworkProximityDaemon(
                             this->simulation, h, this->mailbox,

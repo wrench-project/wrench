@@ -16,25 +16,25 @@ namespace wrench {
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
-        BatchJob(std::shared_ptr<CompoundJob> job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
-                 unsigned long cores_per_node, std::string username, double ending_time_stamp, double arrival_time_stamp);
+        BatchJob(const std::shared_ptr<CompoundJob>& job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
+                 unsigned long cores_per_node, const std::string &username, double ending_time_stamp, double arrival_time_stamp);
 
 
-        unsigned long getJobID();
-        unsigned long getRequestedTime();
+        unsigned long getJobID() const;
+        unsigned long getRequestedTime() const;
         void setRequestedTime(unsigned long time);
-        unsigned long getRequestedCoresPerNode();
+        unsigned long getRequestedCoresPerNode() const;
         std::string getUsername();
         double getMemoryRequirement();
-        double getBeginTimestamp();
+        double getBeginTimestamp() const;
         void setBeginTimestamp(double time_stamp);
-        double getEndingTimestamp();
-        double getArrivalTimestamp();
-        unsigned long getRequestedNumNodes();
+        double getEndingTimestamp() const;
+        double getArrivalTimestamp() const;
+        unsigned long getRequestedNumNodes() const;
         std::shared_ptr<CompoundJob> getCompoundJob();
         void setEndingTimestamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
-        void setAllocatedResources(std::map<std::string, std::tuple<unsigned long, double>> resources);
+        void setAllocatedResources(const std::map<std::string, std::tuple<unsigned long, double>>& resources);
 
         /** 
          * @brief Set the indices of the allocated nodes

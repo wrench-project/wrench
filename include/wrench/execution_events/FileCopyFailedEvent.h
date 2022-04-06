@@ -12,6 +12,7 @@
 #define WRENCH_FILE_COPY_FAILED_EVENT_H
 
 #include <string>
+#include <utility>
 #include "wrench/failure_causes/FailureCause.h"
 
 /***********************/
@@ -48,15 +49,15 @@ namespace wrench {
          * @brief Constructor
          * @param file: a workflow file
          * @param src: source location
-         * @param src: destination location
+         * @param dst: destination location
          * @param failure_cause: a failure cause
          */
         FileCopyFailedEvent(std::shared_ptr<DataFile> file,
                             std::shared_ptr<FileLocation> src,
                             std::shared_ptr<FileLocation> dst,
                             std::shared_ptr<FailureCause> failure_cause)
-            : file(file), src(src), dst(dst),
-              failure_cause(failure_cause) {}
+            : file(std::move(file)), src(std::move(src)), dst(std::move(dst)),
+              failure_cause(std::move(failure_cause)) {}
 
     public:
         /** @brief The workflow file that has failed to be copied */

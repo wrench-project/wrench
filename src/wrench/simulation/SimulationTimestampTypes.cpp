@@ -2,6 +2,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench-dev.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_simulation_timestamps, "Log category for SimulationTimestamps");
 
 
@@ -25,16 +27,16 @@ namespace wrench {
      * @brief Retrieve the date recorded for this timestamp
      * @return the date of this timestamp
      */
-    double SimulationTimestampType::getDate() {
+    double SimulationTimestampType::getDate() const {
         return this->date;
     }
 
     /**
      * @brief Set the date recorded for this timestamp
-     * @param date: the date of this timestamp
+     * @param d: the date of this timestamp
      */
-    void SimulationTimestampType::setDate(double date) {
-        this->date = date;
+    void SimulationTimestampType::setDate(double d) {
+        this->date = d;
     }
 
     /**
@@ -49,7 +51,7 @@ namespace wrench {
      * @param endpoint: an corresponding "end" timestamp or "start" timestamp
      */
     SimulationTimestampPair::SimulationTimestampPair(double date, SimulationTimestampPair *endpoint)
-        : endpoint(endpoint) {
+            : endpoint(endpoint) {
         this->date = date;
     }
 
@@ -67,7 +69,7 @@ namespace wrench {
      * @param task: a pointer to the WorkflowTask associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampTask::SimulationTimestampTask(double date, std::shared_ptr<WorkflowTask> task) : task(task) {
+    SimulationTimestampTask::SimulationTimestampTask(double date, const std::shared_ptr<WorkflowTask> &task) : task(task) {
         this->date = date;
         if (task == nullptr) {
             throw std::invalid_argument(
@@ -126,7 +128,7 @@ namespace wrench {
      * @param task: the WorkflowTask associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampTaskStart::SimulationTimestampTaskStart(double date, std::shared_ptr<WorkflowTask> task) : SimulationTimestampTask(date, task) {
+    SimulationTimestampTaskStart::SimulationTimestampTaskStart(double date, const std::shared_ptr<WorkflowTask> &task) : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a Taskstart timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
@@ -147,7 +149,7 @@ namespace wrench {
      * @param task: the WorkflowTask associated with this timestamp
      * @throw std::invalid_argument
      */
-    SimulationTimestampTaskFailure::SimulationTimestampTaskFailure(double date, std::shared_ptr<WorkflowTask> task) : SimulationTimestampTask(date, task) {
+    SimulationTimestampTaskFailure::SimulationTimestampTaskFailure(double date, const std::shared_ptr<WorkflowTask> &task) : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a TaskFailure timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
@@ -164,8 +166,7 @@ namespace wrench {
      * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      */
-    SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(double date, std::shared_ptr<WorkflowTask> task) : SimulationTimestampTask(
-                                                                                                                                    date, task) {
+    SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(double date, const std::shared_ptr<WorkflowTask>& task) : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a TaskCompletion timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
@@ -182,8 +183,8 @@ namespace wrench {
      * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      */
-    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, std::shared_ptr<WorkflowTask> task)
-        : SimulationTimestampTask(date, task) {
+    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, const std::shared_ptr<WorkflowTask>& task)
+            : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
@@ -204,7 +205,7 @@ namespace wrench {
      */
     SimulationTimestampFileCopy::SimulationTimestampFileCopy(double date, std::shared_ptr<DataFile> file,
                                                              std::shared_ptr<FileLocation> src_location,
-                                                             std::shared_ptr<FileLocation> dst_location) : file(file), source(src_location), destination(dst_location) {
+                                                             std::shared_ptr<FileLocation> dst_location) : file(std::move(file)), source(std::move(src_location)), destination(std::move(dst_location)) {
         this->date = date;
     }
 
@@ -277,7 +278,7 @@ namespace wrench {
      */
     SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(double date, std::shared_ptr<DataFile> file,
                                                                        std::shared_ptr<FileLocation> src,
-                                                                       std::shared_ptr<FileLocation> dst) : SimulationTimestampFileCopy(date, file, src, dst) {
+                                                                       std::shared_ptr<FileLocation> dst) : SimulationTimestampFileCopy(date, std::move(file), std::move(src), std::move(dst)) {
         WRENCH_DEBUG("Inserting a FileCopyStart timestamp for file copy");
 
         // all information about a file copy should be passed
@@ -301,7 +302,7 @@ namespace wrench {
      */
     SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(double date, std::shared_ptr<DataFile> file,
                                                                            std::shared_ptr<FileLocation> src,
-                                                                           std::shared_ptr<FileLocation> dst) : SimulationTimestampFileCopy(date, file, src, dst) {
+                                                                           std::shared_ptr<FileLocation> dst) : SimulationTimestampFileCopy(date, std::move(file), std::move(src), std::move(dst)) {
         WRENCH_DEBUG("Inserting a FileCopyFailure timestamp for file copy");
 
         // all information about a file copy should be passed
@@ -324,7 +325,7 @@ namespace wrench {
      */
     SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(double date, std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<FileLocation> src,
-                                                                                 std::shared_ptr<FileLocation> dst) : SimulationTimestampFileCopy(date, file, src, dst) {
+                                                                                 std::shared_ptr<FileLocation> dst) : SimulationTimestampFileCopy(date, std::move(file), std::move(src), std::move(dst)) {
         WRENCH_DEBUG("Inserting a FileCopyCompletion timestamp for file copy");
 
         // all information about a file copy should be passed
@@ -347,7 +348,7 @@ namespace wrench {
     SimulationTimestampFileRead::SimulationTimestampFileRead(double date, std::shared_ptr<DataFile> file,
                                                              std::shared_ptr<FileLocation> src_location,
                                                              std::shared_ptr<StorageService> service,
-                                                             std::shared_ptr<WorkflowTask> task) : file(file), source(src_location), service(service), task(task) {
+                                                             std::shared_ptr<WorkflowTask> task) : file(std::move(file)), source(std::move(src_location)), service(std::move(std::move(service))), task(std::move(task)) {
         this->date = date;
     }
 
@@ -431,7 +432,7 @@ namespace wrench {
                                                                        std::shared_ptr<DataFile> file,
                                                                        std::shared_ptr<FileLocation> src,
                                                                        std::shared_ptr<StorageService> service,
-                                                                       std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileRead(date, file, src, service, task) {
+                                                                       std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileRead(date, std::move(file), std::move(src), std::move(service), std::move(task)) {
         WRENCH_DEBUG("Inserting a FileReadStart timestamp for file read");
 
         // all information about a file read should be passed
@@ -452,12 +453,13 @@ namespace wrench {
      * @param file: the DataFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
+     * @param task: a workflow task associated to this file read
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(double date, std::shared_ptr<DataFile> file,
-                                                                           std::shared_ptr<FileLocation> src,
-                                                                           std::shared_ptr<StorageService> service,
-                                                                           std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileRead(date, file, src, service, task) {
+    SimulationTimestampFileReadFailure::SimulationTimestampFileReadFailure(double date, const std::shared_ptr<DataFile> &file,
+                                                                           const std::shared_ptr<FileLocation> &src,
+                                                                           const std::shared_ptr<StorageService> &service,
+                                                                           std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileRead(date, file, src, service, std::move(task)) {
         WRENCH_DEBUG("Inserting a FileReadFailure timestamp for file read");
 
         if (file == nullptr || src == nullptr || (service == nullptr)) {
@@ -475,12 +477,13 @@ namespace wrench {
      * @param file: the DataFile associated with this file read
      * @param src: the source location
      * @param service: service requesting file read
+     * @param task: a task associated to  this file read (or nullptr)
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(double date, std::shared_ptr<DataFile> file,
-                                                                                 std::shared_ptr<FileLocation> src,
-                                                                                 std::shared_ptr<StorageService> service,
-                                                                                 std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileRead(date, file, src, service, task) {
+    SimulationTimestampFileReadCompletion::SimulationTimestampFileReadCompletion(double date, const std::shared_ptr<DataFile> &file,
+                                                                                 const std::shared_ptr<FileLocation> &src,
+                                                                                 const std::shared_ptr<StorageService> &service,
+                                                                                 std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileRead(date, file, src, service, std::move(task)) {
         WRENCH_DEBUG("Inserting a FileReadCompletion timestamp for file read");
 
         if (file == nullptr || src == nullptr || service == nullptr) {
@@ -498,13 +501,13 @@ namespace wrench {
      * @param file: the DataFile associated with this file write
      * @param dst_location: the destination location
      * @param service: service requesting file write
-     * @param task: a  task associated to  this file read (or nullptr)
+     * @param task: a task associated to  this file read (or nullptr)
      */
     SimulationTimestampFileWrite::SimulationTimestampFileWrite(double date,
                                                                std::shared_ptr<DataFile> file,
                                                                std::shared_ptr<FileLocation> dst_location,
                                                                std::shared_ptr<StorageService> service,
-                                                               std::shared_ptr<WorkflowTask> task) : file(file), destination(dst_location), service(service), task(task) {
+                                                               std::shared_ptr<WorkflowTask> task) : file(std::move(file)), destination(std::move(dst_location)), service(std::move(service)), task(std::move(task)) {
         this->date = date;
     }
 
@@ -587,7 +590,11 @@ namespace wrench {
     SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart(double date, std::shared_ptr<DataFile> file,
                                                                          std::shared_ptr<FileLocation> dst,
                                                                          std::shared_ptr<StorageService> service,
-                                                                         std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileWrite(date, file, dst, service, task) {
+                                                                         std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileWrite(date,
+                                                                                                                                            std::move(file),
+                                                                                                                                            std::move(dst),
+                                                                                                                                            std::move(service),
+                                                                                                                                            std::move(task)) {
         WRENCH_DEBUG("Inserting a FileWriteStart timestamp for file write");
 
         // all information about a file write should be passed
@@ -608,12 +615,13 @@ namespace wrench {
      * @param file: the DataFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
+     * @param task: the workflow task
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure(double date, std::shared_ptr<DataFile> file,
-                                                                             std::shared_ptr<FileLocation> dst,
-                                                                             std::shared_ptr<StorageService> service,
-                                                                             std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileWrite(date, file, dst, service, task) {
+    SimulationTimestampFileWriteFailure::SimulationTimestampFileWriteFailure(double date, const std::shared_ptr<DataFile> &file,
+                                                                             const std::shared_ptr<FileLocation> &dst,
+                                                                             const std::shared_ptr<StorageService> &service,
+                                                                             std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileWrite(date, file, dst, service, std::move(task)) {
         WRENCH_DEBUG("Inserting a FileWriteFailure timestamp for file write");
 
         if (file == nullptr || dst == nullptr || service == nullptr) {
@@ -631,12 +639,13 @@ namespace wrench {
      * @param file: the DataFile associated with this file write
      * @param dst: the destination location
      * @param service: service requesting file write
+     * @param task: a workfow task associated to this file write
      * @throw std::invalid_argument
      */
-    SimulationTimestampFileWriteCompletion::SimulationTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile> file,
-                                                                                   std::shared_ptr<FileLocation> dst,
-                                                                                   std::shared_ptr<StorageService> service,
-                                                                                   std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileWrite(date, file, dst, service, task) {
+    SimulationTimestampFileWriteCompletion::SimulationTimestampFileWriteCompletion(double date, const std::shared_ptr<DataFile> &file,
+                                                                                   const std::shared_ptr<FileLocation> &dst,
+                                                                                   const std::shared_ptr<StorageService> &service,
+                                                                                   std::shared_ptr<WorkflowTask> task) : SimulationTimestampFileWrite(date, file, dst, service, std::move(task)) {
         WRENCH_DEBUG("Inserting a FileWriteCompletion timestamp for file write");
 
         if (file == nullptr || dst == nullptr || service == nullptr) {
@@ -660,7 +669,7 @@ namespace wrench {
                                                              std::string hostname,
                                                              std::string mount,
                                                              double bytes,
-                                                             int counter) : hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
+                                                             int counter) : hostname(std::move(hostname)), mount(std::move(mount)), bytes(bytes), counter(counter) {
         this->date = date;
     }
 
@@ -684,7 +693,7 @@ namespace wrench {
      * @brief retrieves the amount of bytes being read
      * @return number of bytes as double
      */
-    double SimulationTimestampDiskRead::getBytes() {
+    double SimulationTimestampDiskRead::getBytes() const {
         return this->bytes;
     }
 
@@ -692,7 +701,7 @@ namespace wrench {
      * @brief To get counter of disk operation
      * @return int of counter
      */
-    int SimulationTimestampDiskRead::getCounter() {
+    int SimulationTimestampDiskRead::getCounter() const {
         return this->counter;
     }
 
@@ -743,7 +752,7 @@ namespace wrench {
     SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart(double date, std::string hostname,
                                                                        std::string mount,
                                                                        double bytes,
-                                                                       int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
+                                                                       int counter) : SimulationTimestampDiskRead(date, std::move(hostname), std::move(mount), bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadStart timestamp for disk read");
 
         // all information about a disk read should be passed
@@ -767,8 +776,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, std::string hostname,
-                                                                           std::string mount,
+    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, const std::string& hostname,
+                                                                           const std::string& mount,
                                                                            double bytes,
                                                                            int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
@@ -792,8 +801,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(double date,
-                                                                                 std::string hostname,
-                                                                                 std::string mount,
+                                                                                 const std::string& hostname,
+                                                                                 const std::string& mount,
                                                                                  double bytes,
                                                                                  int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
@@ -818,7 +827,7 @@ namespace wrench {
     SimulationTimestampDiskWrite::SimulationTimestampDiskWrite(double date, std::string hostname,
                                                                std::string mount,
                                                                double bytes,
-                                                               int counter) : hostname(hostname), mount(mount), bytes(bytes), counter(counter) {
+                                                               int counter) : hostname(std::move(hostname)), mount(std::move(mount)), bytes(bytes), counter(counter) {
         this->date = date;
     }
 
@@ -842,7 +851,7 @@ namespace wrench {
      * @brief retrieves the amount of bytes being written
      * @return number of bytes as double
      */
-    double SimulationTimestampDiskWrite::getBytes() {
+    double SimulationTimestampDiskWrite::getBytes() const {
         return this->bytes;
     }
 
@@ -850,7 +859,7 @@ namespace wrench {
      * @brief retrieves the counter for this disk operation
      * @return int of counter
      */
-    int SimulationTimestampDiskWrite::getCounter() {
+    int SimulationTimestampDiskWrite::getCounter() const {
         return this->counter;
     }
 
@@ -901,7 +910,7 @@ namespace wrench {
     SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart(double date, std::string hostname,
                                                                          std::string mount,
                                                                          double bytes,
-                                                                         int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
+                                                                         int counter) : SimulationTimestampDiskWrite(date, std::move(hostname), std::move(mount), bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteStart timestamp for disk write");
 
         // all information about a disk write should be passed
@@ -925,8 +934,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(double date, std::string hostname,
-                                                                             std::string mount,
+    SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(double date, const std::string& hostname,
+                                                                             const std::string& mount,
                                                                              double bytes,
                                                                              int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteFailure timestamp for disk write");
@@ -949,8 +958,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, std::string hostname,
-                                                                                   std::string mount,
+    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, const std::string& hostname,
+                                                                                   const std::string& mount,
                                                                                    double bytes,
                                                                                    int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
@@ -967,10 +976,11 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param date: the date
      * @param hostname: the host on which a pstate is being set
      * @param pstate: the pstate that is being set on this host
      */
-    SimulationTimestampPstateSet::SimulationTimestampPstateSet(double date, std::string hostname, int pstate) : hostname(hostname), pstate(pstate) {
+    SimulationTimestampPstateSet::SimulationTimestampPstateSet(double date, const std::string& hostname, int pstate) : hostname(hostname), pstate(pstate) {
         this->date = date;
 
         if (hostname.empty()) {
@@ -991,7 +1001,7 @@ namespace wrench {
      * @brief Get the pstate associated with this timestamp
      * @return the pstate associated with this timestamp
      */
-    int SimulationTimestampPstateSet::getPstate() {
+    int SimulationTimestampPstateSet::getPstate() const {
         return this->pstate;
     }
 
@@ -1001,8 +1011,8 @@ namespace wrench {
      * @param hostname: the host on which this energy consumption timestamp applies to
      * @param joules: the energy consumption in joules 
      */
-    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, std::string hostname, double joules)
-        : hostname(hostname), joules(joules) {
+    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string& hostname, double joules)
+            : hostname(hostname), joules(joules) {
 
         this->date = date;
         if (hostname.empty() || joules < 0.0) {
@@ -1023,7 +1033,7 @@ namespace wrench {
      * @brief Get the energy consumption in joules
      * @return energy consumed by this host in joules
      */
-    double SimulationTimestampEnergyConsumption::getConsumption() {
+    double SimulationTimestampEnergyConsumption::getConsumption() const {
         return this->joules;
     }
 
@@ -1033,8 +1043,8 @@ namespace wrench {
      * @param linkname: the link for which this bandwidth usage timestamp applies to
      * @param bytes_per_second: the bandwidth usage in bytes per second
      */
-    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, std::string linkname, double bytes_per_second)
-        : linkname(linkname), bytes_per_second(bytes_per_second) {
+    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, const std::string& linkname, double bytes_per_second)
+            : linkname(linkname), bytes_per_second(bytes_per_second) {
         this->date = date;
         if (linkname.empty() || bytes_per_second < 0.0) {
             throw std::invalid_argument(
@@ -1054,7 +1064,7 @@ namespace wrench {
      * @brief Get the bandwidth usage in bytes per second
      * @return the bandwidth usage in bytes per second
      */
-    double SimulationTimestampLinkUsage::getUsage() {
+    double SimulationTimestampLinkUsage::getUsage() const {
         return this->bytes_per_second;
     }
 

@@ -1107,8 +1107,9 @@ namespace wrench {
 
     /**
   * @brief Process a pilot job failing (whatever that means)
-  * @param job: the pilot job that failued
+  * @param job: the pilot job that failed
   * @param compute_service: the compute service on which it was running
+  * @param cause: the failure cause
   */
     void JobManager::processPilotJobFailure(const std::shared_ptr<PilotJob> &job,
                                             std::shared_ptr<ComputeService> compute_service,

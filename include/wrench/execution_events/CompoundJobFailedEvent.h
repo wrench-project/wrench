@@ -43,6 +43,7 @@ namespace wrench {
          * @brief Constructor
          * @param job: a compound job
          * @param compute_service: a compute service
+         * @param failure_cause: the failure cause
          */
         CompoundJobFailedEvent(std::shared_ptr<CompoundJob> job,
                                std::shared_ptr<ComputeService> compute_service,

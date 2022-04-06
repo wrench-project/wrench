@@ -472,7 +472,6 @@ namespace wrench {
      * @param file: the file to download
      * @param src_location: the source location
      * @param dst_location: the destination location
-     * @param downloader_buffer_size: buffer size of the downloader (0 means use "ideal fluid model")
      */
     void FileTransferThread::downloadFileFromStorageService(std::shared_ptr<DataFile> file,
                                                             std::shared_ptr<FileLocation> src_location,

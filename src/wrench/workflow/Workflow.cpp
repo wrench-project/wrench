@@ -45,7 +45,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string id,
+    std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string &id,
                                                     double flops,
                                                     unsigned long min_num_cores,
                                                     unsigned long max_num_cores,
@@ -84,7 +84,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Workflow::removeFile(std::shared_ptr<DataFile> file) {
+    void Workflow::removeFile(const std::shared_ptr<DataFile>& file) {
 
         //        std::cerr << "REMOVING FILE " << file->getID() << "\n";
 
@@ -114,7 +114,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Workflow::removeTask(std::shared_ptr<WorkflowTask> task) {
+    void Workflow::removeTask(const std::shared_ptr<WorkflowTask>& task) {
 
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::removeTask(): Invalid arguments");
@@ -177,7 +177,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Workflow::addControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst, bool redundant_dependencies) {
+    void Workflow::addControlDependency(const std::shared_ptr<WorkflowTask>& src, const std::shared_ptr<WorkflowTask>& dst, bool redundant_dependencies) {
 
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
@@ -207,7 +207,7 @@ namespace wrench {
      * @param src: the source task
      * @param dst: the destination task
      */
-    void Workflow::removeControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst) {
+    void Workflow::removeControlDependency(const std::shared_ptr<WorkflowTask>& src, const std::shared_ptr<WorkflowTask>& dst) {
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("Workflow::removeControlDependency(): Invalid arguments");
         }
@@ -249,7 +249,7 @@ namespace wrench {
      * @param eps_filename: a filename to which the EPS content is saved
      *
      */
-    void Workflow::exportToEPS(std::string eps_filename) {
+    void Workflow::exportToEPS(const std::string& eps_filename) {
         throw std::runtime_error("Export to EPS broken / not implemented at the moment");
     }
 
@@ -270,7 +270,7 @@ namespace wrench {
      *
      * @return true if there is a path from src to dst, false otherwise
      */
-    bool Workflow::pathExists(const std::shared_ptr<WorkflowTask> src, const std::shared_ptr<WorkflowTask> dst) {
+    bool Workflow::pathExists(const std::shared_ptr<WorkflowTask>& src, const std::shared_ptr<WorkflowTask>& dst) {
         return this->dag.doesPathExist(src.get(), dst.get());
     }
 
@@ -331,7 +331,7 @@ namespace wrench {
      * @return true or false
      */
     bool Workflow::isDone() {
-        for (auto &it: this->tasks) {
+        for (const auto &it: this->tasks) {
             auto task = it.second;
             if (task->getState() != WorkflowTask::State::COMPLETED) {
                 return false;
@@ -370,7 +370,7 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTaskChildren(const std::shared_ptr<WorkflowTask> task) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTaskChildren(const std::shared_ptr<WorkflowTask>& task) {
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::getTaskChildren(): Invalid arguments");
         }
@@ -391,7 +391,7 @@ namespace wrench {
      *
      * @return a number of children
      */
-    long Workflow::getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask> task) {
+    long Workflow::getTaskNumberOfChildren(const std::shared_ptr<WorkflowTask>& task) {
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::getTaskNumberOfChildren(): Invalid arguments");
         }
@@ -405,7 +405,7 @@ namespace wrench {
      *
      * @return a vector of tasks
      */
-    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTaskParents(const std::shared_ptr<WorkflowTask> task) {
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTaskParents(const std::shared_ptr<WorkflowTask>& task) {
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::getTaskParents(): Invalid arguments");
         }
@@ -425,7 +425,7 @@ namespace wrench {
      *
      * @return a number of parents
      */
-    long Workflow::getTaskNumberOfParents(const std::shared_ptr<WorkflowTask> task) {
+    long Workflow::getTaskNumberOfParents(const std::shared_ptr<WorkflowTask>& task) {
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::getTaskNumberOfParents(): Invalid arguments");
         }
@@ -527,7 +527,7 @@ namespace wrench {
      *
      * @return the total number of flops
      */
-    double Workflow::getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>> tasks) {
+    double Workflow::getSumFlops(const std::vector<std::shared_ptr<WorkflowTask>>& tasks) {
         double total_flops = 0;
         for (auto const &task: tasks) {
             total_flops += task->getFlops();
@@ -660,7 +660,7 @@ namespace wrench {
      * @param file: a file
      * @return at task (or nullptr)
      */
-    std::shared_ptr<WorkflowTask> Workflow::getTaskThatOutputs(std::shared_ptr<DataFile> file) {
+    std::shared_ptr<WorkflowTask> Workflow::getTaskThatOutputs(const std::shared_ptr<DataFile>& file) {
         if (this->task_output_files.find(file) == this->task_output_files.end()) {
             return nullptr;
         } else {
@@ -673,7 +673,7 @@ namespace wrench {
      * @param file: a file
      * @return true or false
      */
-    bool Workflow::isFileOutputOfSomeTask(std::shared_ptr<DataFile> file) {
+    bool Workflow::isFileOutputOfSomeTask(const std::shared_ptr<DataFile>& file) {
         return (this->task_output_files.find(file) != this->task_output_files.end());
     }
 
@@ -682,7 +682,7 @@ namespace wrench {
      * @param file : a file
      * @return a vector of tasks
      */
-    std::set<std::shared_ptr<WorkflowTask>> Workflow::getTasksThatInput(std::shared_ptr<DataFile> file) {
+    std::set<std::shared_ptr<WorkflowTask>> Workflow::getTasksThatInput(const std::shared_ptr<DataFile>& file) {
         std::set<std::shared_ptr<WorkflowTask>> to_return;
         if (this->task_input_files.find(file) != this->task_input_files.end()) {
             to_return = this->task_input_files[file];
@@ -697,7 +697,7 @@ namespace wrench {
      * @param size : file size in bytes
      * @return a file
      */
-    std::shared_ptr<DataFile> Workflow::addFile(std::string id, double size) {
+    std::shared_ptr<DataFile> Workflow::addFile(const std::string& id, double size) {
         //        std::cerr << "CREATING DATA FILE " << id << "\n";
         auto data_file = Simulation::addFile(id, size);
         this->data_files.insert(data_file);

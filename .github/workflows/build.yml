@@ -5,19 +5,38 @@ on:
     paths-ignore:
       - 'doc/**'
       - '**.md'
-  workflow_run:
-    workflows: ["clang-format"]
-    branches: [master]
-    types: 
-      - completed
+      - '**.rst'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  format:
+    name: "Code Formatting"
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: DoozyX/clang-format-lint-action@v0.13
+        with:
+          source: '.'
+          exclude: './doc'
+          extensions: 'h,cpp'
+          clangFormatVersion: 13
+          inplace: True
+      - uses: EndBug/add-and-commit@v4
+        with:
+          message: 'Committing clang-format changes'
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+
   build:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: format
+
     strategy:
       matrix:
         include:
@@ -98,7 +117,7 @@ jobs:
             docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
             docker exec -w /home/wrench/wrench/build wrench make doc;
             docker cp wrench:/home/wrench/wrench/docs .;
-            cp -R ./docs/wrench-doc $HOME/gh-pages-to-deploy;
+            cp -R ./docs/build $HOME/gh-pages-to-deploy;
             echo "Starting to update gh-pages"
             #copy data we're interested in to other place
             git config --global user.email "actions@github.com"

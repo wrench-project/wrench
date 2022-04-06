@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 
     // Parse simulator-specific command-line arguments
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <XML platform file>\n";
+        std::cerr << "Usage: " << argv[0] << " <XML platform file> [--log=custom_wms.threshold=info]\n";
         exit(1);
     }
 
@@ -101,9 +101,6 @@ int main(int argc, char **argv) {
     std::cerr << "Launching simulation of execution...\n";
     simulation->launch();
     std::cerr << "Simulation execution finished at time " << workflow->getCompletionDate() << "\n";
-    std::cerr << "(run with --log=custom_wms.threshold=info to see WMS log)\n";
-
-    //    delete simulation;
 
     return 0;
 }

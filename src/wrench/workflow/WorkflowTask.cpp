@@ -9,14 +9,11 @@
 
 #include <wrench/workflow/parallel_model/AmdahlParallelModel.h>
 #include <wrench/logging/TerminalOutput.h>
-
-#include <wrench/logging/TerminalOutput.h>
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/Workflow.h>
 #include <wrench/services/compute/cloud/CloudComputeService.h>
-#include <wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h>
-#include <wrench/simulation/Simulation.h>
-#include <wrench/simulation/SimulationTimestampTypes.h>
+
+#include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_task, "Log category for WorkflowTask");
 
@@ -27,14 +24,15 @@ namespace wrench {
      *
      * @param id: the task id
      * @param flops: the task's number of flops
-     * @param min_cores: the minimum number of cores required for running the task
-     * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
-     * @param spec: the multi-core parallel performance model
+     * @param min_num_cores: the minimum number of cores required for running the task
+     * @param max_num_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param memory_requirement: memory_manager_service requirement in bytes
      */
-    WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
+    WorkflowTask::WorkflowTask(std::string  id,
+                               const double flops,
+                               const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
-                               const double memory_requirement) : id(id), color(""), flops(flops),
+                               const double memory_requirement) : id(std::move(id)), color(""), flops(flops),
                                                                   min_num_cores(min_num_cores),
                                                                   max_num_cores(max_num_cores),
                                                                   memory_requirement(memory_requirement),
@@ -45,6 +43,7 @@ namespace wrench {
                                                                   job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
+        this->toplevel = 0;
     }
 
     /**
@@ -53,7 +52,7 @@ namespace wrench {
      * @param file: the file
      * @throw std::invalid_argument
      */
-    void WorkflowTask::addInputFile(std::shared_ptr<DataFile> file) {
+    void WorkflowTask::addInputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
@@ -83,7 +82,7 @@ namespace wrench {
      *
      * @param file: the file
      */
-    void WorkflowTask::addOutputFile(std::shared_ptr<DataFile> file) {
+    void WorkflowTask::addOutputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -127,14 +126,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the number of flops of the task (to be used only in very specific
+     * @brief Set the number of f of the task (to be used only in very specific
      * cases in which it is guaranteed that changing a task's work after that task
      * has been created is a valid thing to do)
      *
-     * @param flops: the number of flops
+     * @param f: the number of f
      */
-    void WorkflowTask::setFlops(double flops) {
-        this->flops = flops;
+    void WorkflowTask::setFlops(double f) {
+        this->flops = f;
     }
 
 
@@ -338,12 +337,12 @@ namespace wrench {
     //    }
 
     /**
-     * @brief Set the task's containing job
+     * @brief Set the task's containing j
      *
-     * @param job: the job
+     * @param j: the j
      */
-    void WorkflowTask::setJob(Job *job) {
-        this->job = job;
+    void WorkflowTask::setJob(Job *j) {
+        this->job = j;
     }
 
     /**
@@ -363,12 +362,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the cluster id for the task
+     * @brief Set the cluster c_id for the task
      *
-     * @param id: cluster id the task belongs to
+     * @param c_id: cluster c_id the task belongs to
      */
-    void WorkflowTask::setClusterID(std::string id) {
-        this->cluster_id = id;
+    void WorkflowTask::setClusterID(const std::string& c_id) {
+        this->cluster_id = c_id;
     }
 
     /**
@@ -380,11 +379,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task priority
-     * @param priority: task priority
+     * @brief Set the task p
+     * @param p: task p
      */
-    void WorkflowTask::setPriority(long priority) {
-        this->priority = priority;
+    void WorkflowTask::setPriority(long p) {
+        this->priority = p;
     }
 
     /**
@@ -397,10 +396,10 @@ namespace wrench {
 
     /**
      * @brief Set the task average CPU usage
-     * @param average_cpu: task average CPU usage
+     * @param a_cpu: task average CPU usage
      */
-    void WorkflowTask::setAverageCPU(double average_cpu) {
-        this->average_cpu = average_cpu;
+    void WorkflowTask::setAverageCPU(double a_cpu) {
+        this->average_cpu = a_cpu;
     }
 
     /**
@@ -413,10 +412,10 @@ namespace wrench {
 
     /**
      * @brief Set the number of bytes read by the task
-     * @param bytes_read: number of bytes read by the task in KB
+     * @param b_read: number of bytes read by the task in KB
      */
-    void WorkflowTask::setBytesRead(unsigned long bytes_read) {
-        this->bytes_read = bytes_read;
+    void WorkflowTask::setBytesRead(unsigned long b_read) {
+        this->bytes_read = b_read;
     }
 
     /**
@@ -429,10 +428,10 @@ namespace wrench {
 
     /**
      * @brief Set the number of bytes written by the task
-     * @param bytes_written: number of bytes written by the task in KB
+     * @param b_written: number of bytes written by the task in KB
      */
-    void WorkflowTask::setBytesWritten(unsigned long bytes_written) {
-        this->bytes_written = bytes_written;
+    void WorkflowTask::setBytesWritten(unsigned long b_written) {
+        this->bytes_written = b_written;
     }
 
     /**
@@ -604,7 +603,7 @@ namespace wrench {
      *
      * @return a failure count
      */
-    unsigned int WorkflowTask::getFailureCount() {
+    unsigned int WorkflowTask::getFailureCount() const {
         return this->failure_count;
     }
 
@@ -621,9 +620,10 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> WorkflowTask::getInputFiles() const {
         std::vector<std::shared_ptr<DataFile>> input;
+        input.reserve(this->input_files.size());
 
-        for (auto f: this->input_files) {
-            input.push_back(f.second);
+        for (const auto &f: this->input_files) {
+            input.emplace_back(f.second);
         }
         return input;
     }
@@ -634,9 +634,10 @@ namespace wrench {
      */
     std::vector<std::shared_ptr<DataFile>> WorkflowTask::getOutputFiles() const {
         std::vector<std::shared_ptr<DataFile>> output;
+        output.reserve(this->output_files.size());
 
-        for (auto f: this->output_files) {
-            output.push_back(f.second);
+        for (const auto &f: this->output_files) {
+            output.emplace_back(f.second);
         }
         return output;
     }
@@ -731,13 +732,13 @@ namespace wrench {
             this->toplevel = 0;
         } else {
             unsigned long max_toplevel = 0;
-            for (auto parent: parents) {
+            for (const auto &parent: parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
             this->toplevel = 1 + max_toplevel;
         }
         std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
-        for (auto child: children) {
+        for (const auto &child: children) {
             child->updateTopLevel();
         }
         return this->toplevel;
@@ -783,7 +784,7 @@ namespace wrench {
      * the corresponding physical host name will be set!
      * @param hostname: the host name
      */
-    void WorkflowTask::setExecutionHost(std::string hostname) {
+    void WorkflowTask::setExecutionHost(const std::string &hostname) {
         std::string physical_hostname;
         /** The conversion below has been removed as it makes more sense to keep the virtual and the physical separate **/
         // Convert the virtual hostname to a physical hostname if needed
@@ -824,10 +825,15 @@ namespace wrench {
 
     /**
      * @brief Set the task's color
-     * @param color A color string in  "#rrggbb" format
+     * @param c: A color string in  "#rrggbb" format
      */
-    void WorkflowTask::setColor(std::string color) {
+<<<<<<< HEAD
+    void WorkflowTask::setColor(const std::string& c) {
+        this->color = c;
+=======
+    void WorkflowTask::setColor(const std::string &c) {
         this->color = color;
+>>>>>>> master
     }
 
     /**
@@ -835,7 +841,7 @@ namespace wrench {
      * @param model: a parallel model
      */
     void WorkflowTask::setParallelModel(std::shared_ptr<ParallelModel> model) {
-        this->parallel_model = model;
+        this->parallel_model = std::move(model);
     }
 
     /**

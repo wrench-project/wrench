@@ -199,17 +199,18 @@ namespace wrench {
      * @brief Flush dirty data in a LRU list
      * @param list: the LRU list whose data will be flushed
      * @param amount: the amount requested to flush
+     * @param excluded_filename: filename excluded from the flush
      * @return flushed amount
      */
     double MemoryManager::flushLruList(std::vector<Block *> &list,
                                        double amount,
-                                       std::string excluded_filename) {
+                                       const std::string& excluded_filename) {
         if (amount <= 0) return 0;
         double flushed = 0;
 
         std::map<std::string, double> flushing_map;
 
-        for (auto blk: list) {
+        for (const auto &blk: list) {
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
             }
@@ -262,7 +263,7 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flush(double amount,
-                                std::string excluded_filename) {
+                                const std::string& excluded_filename) {
         if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);

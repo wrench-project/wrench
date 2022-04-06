@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <iostream>
+#include <utility>
 
 
 namespace wrench {
@@ -77,9 +78,10 @@ namespace wrench {
         /**
          * @brief Constructor
          * @param ss: the storage service
-         * @param ap: the absolute path
+         * @param mp: the mount point path
+         * @param apamp: the absolute path
          */
-        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp) : storage_service(ss), mount_point(mp), absolute_path_at_mount_point(apamp) {}
+        FileLocation(std::shared_ptr<StorageService> ss, std::string mp, std::string apamp) : storage_service(std::move(ss)), mount_point(std::move(mp)), absolute_path_at_mount_point(std::move(apamp)) {}
 
         std::shared_ptr<StorageService> storage_service;
         std::shared_ptr<StorageService> server_storage_service;

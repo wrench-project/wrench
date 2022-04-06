@@ -13,6 +13,8 @@
 #include <wrench/simulation/Simulation.h>
 #include <wrench-dev.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_failure_detector, "Log category for ServiceTerminationDetector");
 
 /**
@@ -27,9 +29,9 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
                                                                std::shared_ptr<Service> service_to_monitor,
                                                                simgrid::s4u::Mailbox *mailbox_to_notify,
                                                                bool notify_on_crash,
-                                                               bool notify_on_termination) : Service(host_on_which_to_run, "service_termination_detector_for_" + service_to_monitor->getName()) {
+                                                               bool notify_on_termination) : Service(std::move(host_on_which_to_run), "service_termination_detector_for_" + service_to_monitor->getName()) {
 
-    this->service_to_monitor = service_to_monitor;
+    this->service_to_monitor = std::move(service_to_monitor);
     this->mailbox_to_notify = mailbox_to_notify;
     this->notify_on_crash = notify_on_crash;
     this->notify_on_termination = notify_on_termination;
