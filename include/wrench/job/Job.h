@@ -20,9 +20,9 @@
 
 namespace wrench {
 
-/***********************/
-/** \cond DEVELOPER    */
-/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
     class Workflow;
     class ComputeService;
@@ -39,9 +39,9 @@ namespace wrench {
         double getSubmitDate();
         double getEndDate();
 
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
         simgrid::s4u::Mailbox *popCallbackMailbox();
 
@@ -101,15 +101,14 @@ namespace wrench {
         double priority = 0.0;
 
     private:
-
-/***********************/
-/** \endcond           */
-/***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };// namespace wrench
 

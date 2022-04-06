@@ -138,9 +138,9 @@ namespace wrench {
 
         double getMinimumRequiredMemory();
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
         bool usesScratch();
 
