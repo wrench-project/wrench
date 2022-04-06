@@ -28,7 +28,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A message sent to a BatchComputeService to submit a batch_standard_and_pilot_jobs job for execution
+     * @brief A message sent to a BatchComputeService to submit a batch job for execution
      */
     class BatchComputeServiceJobRequestMessage : public BatchComputeServiceMessage {
     public:
@@ -36,7 +36,7 @@ namespace wrench {
 
         /** @brief The mailbox to answer to */
         simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The batch_standard_and_pilot_jobs job */
+        /** @brief The batch job */
         std::shared_ptr<BatchJob> job;
     };
 
@@ -47,7 +47,7 @@ namespace wrench {
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
         AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload);
-        /** @brief The batch_standard_and_pilot_jobs job */
+        /** @brief The batch job */
         std::shared_ptr<BatchJob> job;
     };
 
@@ -58,7 +58,7 @@ namespace wrench {
     class AlarmNotifyBatschedMessage : public ServiceMessage {
     public:
         AlarmNotifyBatschedMessage(std::string job_id, double payload);
-        /** @brief the batch_standard_and_pilot_jobs job's id */
+        /** @brief the batch job's id */
         std::string job_id;
     };
 #endif
@@ -144,7 +144,7 @@ namespace wrench {
 
         /** @brief The mailbox to answer to */
         simgrid::s4u::Mailbox *answer_mailbox;
-        /** @brief The batch_standard_and_pilot_jobs job */
+        /** @brief The batch job */
         Job *job;
         /** @brief JSON data arguments to the scheduler */
         std::string job_args_to_scheduler;
