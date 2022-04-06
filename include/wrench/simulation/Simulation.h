@@ -68,7 +68,7 @@ namespace wrench {
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(std::shared_ptr<DataFile> file);
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
-        static std::shared_ptr<DataFile> addFile(const std::string&, double);
+        static std::shared_ptr<DataFile> addFile(const std::string &, double);
 
 
         void launch();

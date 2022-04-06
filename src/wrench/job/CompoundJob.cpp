@@ -91,7 +91,7 @@ namespace wrench {
      * @param sleep_time: the time to sleep, in seconds
      * @return a sleep action
      */
-    std::shared_ptr<SleepAction> CompoundJob::addSleepAction(const std::string& name, double sleep_time) {
+    std::shared_ptr<SleepAction> CompoundJob::addSleepAction(const std::string &name, double sleep_time) {
         auto new_action = std::shared_ptr<SleepAction>(new SleepAction(name, this->getSharedPtr(), sleep_time));
         this->addAction(new_action);
         return new_action;
@@ -127,7 +127,7 @@ namespace wrench {
      * @param file_location: the file's location
      * @return a file read action
      */
-    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string& name,
+    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    std::shared_ptr<DataFile> file,
                                                                    std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileReadAction>(
@@ -143,7 +143,7 @@ namespace wrench {
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
     * @return a file read action
     */
-    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string& name,
+    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
                                                                    std::shared_ptr<DataFile> file,
                                                                    std::vector<std::shared_ptr<FileLocation>> file_locations) {
         auto new_action = std::shared_ptr<FileReadAction>(
@@ -159,7 +159,7 @@ namespace wrench {
     * @param file_location: the file's location where it should be written
     * @return a file write action
     */
-    std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(const std::string& name,
+    std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(const std::string &name,
                                                                      std::shared_ptr<DataFile> file,
                                                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileWriteAction>(
@@ -194,7 +194,7 @@ namespace wrench {
     * @return a file delete action
     */
     std::shared_ptr<FileDeleteAction>
-    CompoundJob::addFileDeleteAction(const std::string& name, std::shared_ptr<DataFile> file,
+    CompoundJob::addFileDeleteAction(const std::string &name, std::shared_ptr<DataFile> file,
                                      std::shared_ptr<FileLocation> file_location) {
         auto new_action = std::shared_ptr<FileDeleteAction>(
                 new FileDeleteAction(name, this->getSharedPtr(), std::move(file), std::move(file_location)));
@@ -211,7 +211,7 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<FileRegistryAddEntryAction> CompoundJob::addFileRegistryAddEntryAction(
-            const std::string& name,
+            const std::string &name,
             std::shared_ptr<FileRegistryService> file_registry,
             std::shared_ptr<DataFile> file,
             std::shared_ptr<FileLocation> file_location) {

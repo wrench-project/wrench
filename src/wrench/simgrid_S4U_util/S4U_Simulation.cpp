@@ -75,7 +75,7 @@ namespace wrench {
      */
     void S4U_Simulation::shutdown() {
         if (this->initialized) {
-//            this->engine->shutdown();
+            //            this->engine->shutdown();
         }
     }
 
