@@ -30,13 +30,14 @@
 #include "../../include/UniqueTmpPathPrefix.h"
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
-#define CUSTOM_THROW(x, y)  \
+#define CUSTOM_THROW(x, y)                                                                                 \
     try {                                                                                                  \
         x;                                                                                                 \
         throw std::runtime_error(std::string("Throwing at ") + __FILE__ + ":" + std::to_string(__LINE__)); \
     } catch (std::invalid_argument & ignore) {}
 #else
-#define CUSTOM_THROW(x, y) {}
+#define CUSTOM_THROW(x, y) \
+    {}
 #endif
 
 #define CUSTOM_NO_THROW(x)                                                                                                   \

@@ -20,7 +20,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A class that implements a batch_standard_and_pilot_jobs job set abstrsaction
+     * @brief A class that implements a batch job set abstrsaction
      */
     class BatchJobSetCoreLevel {
 
@@ -58,8 +58,8 @@ namespace wrench {
         }
 
         /**
-         * @brief Add a batch_standard_and_pilot_jobs job to the set
-         * @param job: the batch_standard_and_pilot_jobs job
+         * @brief Add a batch job to the set
+         * @param job: the batch job
          */
         void inline add(std::shared_ptr<BatchJob> job) {
             if (this->jobs.find(job) == this->jobs.end()) {
@@ -75,8 +75,8 @@ namespace wrench {
         }
 
         /**
-         * @brief Remove a batch_standard_and_pilot_jobs job from the set
-         * @param job: the batch_standard_and_pilot_jobs job
+         * @brief Remove a batch job from the set
+         * @param job: the batch job
          */
         void inline remove(std::shared_ptr<BatchJob> job) {
             if (this->jobs.find(job) != this->jobs.end()) {

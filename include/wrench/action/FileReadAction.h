@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
 
@@ -46,6 +51,12 @@ namespace wrench {
         std::vector<std::shared_ptr<FileLocation>> file_locations;
         std::shared_ptr<FileLocation> used_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_READ_ACTION_H

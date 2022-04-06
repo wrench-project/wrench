@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
 
@@ -48,6 +53,12 @@ namespace wrench {
         std::shared_ptr<FileLocation> src_file_location;
         std::shared_ptr<FileLocation> dst_file_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_COPY_ACTION_H

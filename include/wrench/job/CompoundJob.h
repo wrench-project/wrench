@@ -19,6 +19,7 @@
 
 #include "Job.h"
 
+
 namespace wrench {
 
     /***********************/
@@ -38,11 +39,11 @@ namespace wrench {
     class ParallelModel;
     class CustomAction;
     class ActionExecutor;
-
     class DataFile;
 
+
     /**
-     * @brief A compound job
+     * @brief A compound job class
      */
     class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob> {
 
@@ -133,23 +134,20 @@ namespace wrench {
         bool hasSuccessfullyCompleted();
         bool hasFailed();
 
-        void printActionDependencies();
-
-        void printTaskMap();
-
         unsigned long getMinimumRequiredNumCores();
 
         double getMinimumRequiredMemory();
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
         bool usesScratch();
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        void printActionDependencies();
 
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
+        void printTaskMap();
+
 
     protected:
         friend class BareMetalComputeService;
@@ -189,9 +187,6 @@ namespace wrench {
         std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
-        double pre_job_overhead;
-        double post_job_overhead;
-
         void assertJobNotSubmitted();
         void assertActionNameDoesNotAlreadyExist(const std::string &name);
 
@@ -206,13 +201,17 @@ namespace wrench {
         std::map<std::string, std::string> service_specific_args;
 
         std::unordered_map<Action::State, std::set<std::shared_ptr<Action>>> state_task_map;
-    };
 
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
 };// namespace wrench
+
 
 #endif//WRENCH_COMPOUNDJOB_H

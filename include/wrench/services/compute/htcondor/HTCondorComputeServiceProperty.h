@@ -24,11 +24,11 @@ namespace wrench {
          *  a running job completes and there are still pending jobs **/
         DECLARE_PROPERTY_NAME(NEGOTIATOR_OVERHEAD);
 
-        /** @brief Overhead (in seconds) between condor and a batch_standard_and_pilot_jobs compute service for the start of execution of grid-universe jobs
+        /** @brief Overhead (in seconds) between condor and a batch compute service for the start of execution of grid-universe jobs
          */
         DECLARE_PROPERTY_NAME(GRID_PRE_EXECUTION_DELAY);
 
-        /** @brief Overhead (in seconds) between condor and a batch_standard_and_pilot_jobs compute service for the completion of execution of grid-universe jobs
+        /** @brief Overhead (in seconds) between condor and a batch compute service for the completion of execution of grid-universe jobs
          */
         DECLARE_PROPERTY_NAME(GRID_POST_EXECUTION_DELAY);
 

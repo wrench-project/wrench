@@ -20,6 +20,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     class Simulation;
     class StorageService;
     class FailureCause;
@@ -55,6 +59,11 @@ namespace wrench {
 
         std::shared_ptr<CompoundJob> job;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 };// namespace wrench
 
 

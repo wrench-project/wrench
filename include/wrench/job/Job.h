@@ -20,13 +20,13 @@
 
 namespace wrench {
 
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
     class Workflow;
     class ComputeService;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
 
     /**
      * @brief Abstraction of a job used for executing tasks in a Workflow
@@ -39,9 +39,9 @@ namespace wrench {
         double getSubmitDate();
         double getEndDate();
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
         simgrid::s4u::Mailbox *popCallbackMailbox();
 
@@ -85,8 +85,6 @@ namespace wrench {
         /** @brief The originator's mailbox */
         simgrid::s4u::Mailbox *originator_mailbox;
 
-        //        /** @brief The workflow this job belong to */
-        //        Workflow *workflow;
         /** @brief The job's name */
         std::string name;
         /** @brief The date at which the job was last submitted */
@@ -103,17 +101,15 @@ namespace wrench {
         double priority = 0.0;
 
     private:
-        //        bool forward_notification_to_original_source;
 
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
     };
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+/***********************/
+/** \endcond           */
+/***********************/
 
 };// namespace wrench
 

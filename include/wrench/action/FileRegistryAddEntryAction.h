@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
     class FileRegistryService;
@@ -50,6 +55,13 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_REGISTRY_ADD_ENTRY_ACTION_H
