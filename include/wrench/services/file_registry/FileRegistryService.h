@@ -68,9 +68,9 @@ namespace wrench {
                 std::shared_ptr<DataFile> file, std::string reference_host,
                 std::shared_ptr<NetworkProximityService> network_proximity_service);
 
-        void addEntry(const std::shared_ptr<DataFile>& file, std::shared_ptr<FileLocation> location);
+        void addEntry(const std::shared_ptr<DataFile> &file, std::shared_ptr<FileLocation> location);
 
-        void removeEntry(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location);
+        void removeEntry(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         /****************************/
         /** \endcond                */
@@ -89,9 +89,9 @@ namespace wrench {
     private:
         friend class Simulation;
 
-        void addEntryToDatabase(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location);
+        void addEntryToDatabase(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
-        bool removeEntryFromDatabase(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location);
+        bool removeEntryFromDatabase(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         int main() override;
 

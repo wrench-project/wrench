@@ -34,31 +34,31 @@ namespace wrench {
     class LogicalFileSystem {
 
     public:
-        explicit LogicalFileSystem(const std::string& hostname, StorageService *storage_service, std::string mount_point);
+        explicit LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point);
 
         void init();
 
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
-        void reserveSpace(const std::shared_ptr<DataFile>& file, std::string absolute_path);
-        void unreserveSpace(const std::shared_ptr<DataFile>& file, std::string absolute_path);
+        void reserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
+        void unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
-        void createDirectory(const std::string& absolute_path);
-        bool doesDirectoryExist(const std::string& absolute_path);
-        bool isDirectoryEmpty(const std::string& absolute_path);
-        void removeEmptyDirectory(const std::string& absolute_path);
-        void storeFileInDirectory(std::shared_ptr<DataFile> file, const std::string& absolute_path);
-        void removeFileFromDirectory(std::shared_ptr<DataFile> file, const std::string& absolute_path);
-        void removeAllFilesInDirectory(const std::string& absolute_path);
-        bool isFileInDirectory(std::shared_ptr<DataFile> file, const std::string& absolute_path);
-        std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string& absolute_path);
+        void createDirectory(const std::string &absolute_path);
+        bool doesDirectoryExist(const std::string &absolute_path);
+        bool isDirectoryEmpty(const std::string &absolute_path);
+        void removeEmptyDirectory(const std::string &absolute_path);
+        void storeFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path);
+        void removeFileFromDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path);
+        void removeAllFilesInDirectory(const std::string &absolute_path);
+        bool isFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path);
+        std::set<std::shared_ptr<DataFile>> listFilesInDirectory(const std::string &absolute_path);
 
 
     private:
         friend class StorageService;
 
-        void stageFile(const std::shared_ptr<DataFile>& file, std::string absolute_path);
+        void stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path);
 
         static std::map<std::string, StorageService *> mount_points;
 

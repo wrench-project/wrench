@@ -779,7 +779,7 @@ namespace wrench {
      */
     std::string CloudComputeService::findHost(unsigned long desired_num_cores,
                                               double desired_ram,
-                                              const std::string& desired_host) {
+                                              const std::string &desired_host) {
         // Find a physical host to start the VM
         std::vector<std::string> possible_hosts;
         for (auto const &host: this->execution_hosts) {

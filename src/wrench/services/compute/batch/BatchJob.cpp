@@ -24,8 +24,8 @@ namespace wrench {
      * @param ending_time_stamp: the job's end date
      * @param arrival_time_stamp: the job's arrival date
      */
-    BatchJob::BatchJob(const std::shared_ptr<CompoundJob>& job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
-                       unsigned long cores_per_node, const std::string& username, double ending_time_stamp, double arrival_time_stamp) {
+    BatchJob::BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
+                       unsigned long cores_per_node, const std::string &username, double ending_time_stamp, double arrival_time_stamp) {
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): job cannot be null");
@@ -177,7 +177,7 @@ namespace wrench {
      * @brief Set the resources allocated to this BatchComputeService job
      * @param resources: a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
      */
-    void BatchJob::setAllocatedResources(const std::map<std::string, std::tuple<unsigned long, double>>& resources) {
+    void BatchJob::setAllocatedResources(const std::map<std::string, std::tuple<unsigned long, double>> &resources) {
         if (resources.empty()) {
             throw std::invalid_argument(
                     "BatchJob::setAllocatedResources(): Empty Resources allocated");

@@ -68,7 +68,7 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
-    SimpleStorageService::SimpleStorageService(const std::string& hostname,
+    SimpleStorageService::SimpleStorageService(const std::string &hostname,
                                                std::set<std::string> mount_points,
                                                WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : SimpleStorageService(hostname, mount_points, property_list, messagepayload_list,
@@ -86,11 +86,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimpleStorageService::SimpleStorageService(
-            const std::string& hostname,
+            const std::string &hostname,
             std::set<std::string> mount_points,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
-            const std::string& suffix) : StorageService(hostname, std::move(mount_points), "simple_storage" + suffix) {
+            const std::string &suffix) : StorageService(hostname, std::move(mount_points), "simple_storage" + suffix) {
         this->setProperties(this->default_property_values, std::move(property_list));
         this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
         this->validateProperties();
@@ -254,7 +254,7 @@ namespace wrench {
      * @param buffer_size: the buffer size to use
      * @return true if this process should keep running
      */
-    bool SimpleStorageService::processFileWriteRequest(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location,
+    bool SimpleStorageService::processFileWriteRequest(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
                                                        simgrid::s4u::Mailbox *answer_mailbox, unsigned long buffer_size) {
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
@@ -357,8 +357,8 @@ namespace wrench {
      * @param buffer_size: the buffer_size to use
      * @return
      */
-    bool SimpleStorageService::processFileReadRequest(const std::shared_ptr<DataFile>& file,
-                                                      const std::shared_ptr<FileLocation>& location,
+    bool SimpleStorageService::processFileReadRequest(const std::shared_ptr<DataFile> &file,
+                                                      const std::shared_ptr<FileLocation> &location,
                                                       double num_bytes_to_read,
                                                       simgrid::s4u::Mailbox *answer_mailbox,
                                                       simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
@@ -430,9 +430,9 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @return
      */
-    bool SimpleStorageService::processFileCopyRequest(const std::shared_ptr<DataFile>& file,
-                                                      const std::shared_ptr<FileLocation>& src_location,
-                                                      const std::shared_ptr<FileLocation>& dst_location,
+    bool SimpleStorageService::processFileCopyRequest(const std::shared_ptr<DataFile> &file,
+                                                      const std::shared_ptr<FileLocation> &src_location,
+                                                      const std::shared_ptr<FileLocation> &dst_location,
                                                       simgrid::s4u::Mailbox *answer_mailbox) {
 
         //        // File System  and path at the destination exists?
@@ -547,12 +547,12 @@ namespace wrench {
      * @param answer_mailbox_if_copy: the mailbox to send a copy notification ("" if not a copy)
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFileTransferThreadNotification(const std::shared_ptr<FileTransferThread>& ftt,
-                                                                     const std::shared_ptr<DataFile>& file,
+    bool SimpleStorageService::processFileTransferThreadNotification(const std::shared_ptr<FileTransferThread> &ftt,
+                                                                     const std::shared_ptr<DataFile> &file,
                                                                      simgrid::s4u::Mailbox *src_mailbox,
-                                                                     const std::shared_ptr<FileLocation>& src_location,
+                                                                     const std::shared_ptr<FileLocation> &src_location,
                                                                      simgrid::s4u::Mailbox *dst_mailbox,
-                                                                     const std::shared_ptr<FileLocation>& dst_location,
+                                                                     const std::shared_ptr<FileLocation> &dst_location,
                                                                      bool success,
                                                                      std::shared_ptr<FailureCause> failure_cause,
                                                                      simgrid::s4u::Mailbox *answer_mailbox_if_read,
@@ -632,8 +632,8 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the notification should be sent
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processFileDeleteRequest(const std::shared_ptr<DataFile>& file,
-                                                        const std::shared_ptr<FileLocation>& location,
+    bool SimpleStorageService::processFileDeleteRequest(const std::shared_ptr<DataFile> &file,
+                                                        const std::shared_ptr<FileLocation> &location,
                                                         simgrid::s4u::Mailbox *answer_mailbox) {
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 

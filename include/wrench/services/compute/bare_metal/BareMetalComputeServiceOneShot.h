@@ -52,7 +52,7 @@ namespace wrench {
                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                        double ttl,
                                        std::shared_ptr<PilotJob> pj,
-                                       const std::string& suffix,
+                                       const std::string &suffix,
                                        std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         int main() override;

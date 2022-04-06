@@ -204,7 +204,7 @@ namespace wrench {
      */
     double MemoryManager::flushLruList(std::vector<Block *> &list,
                                        double amount,
-                                       const std::string& excluded_filename) {
+                                       const std::string &excluded_filename) {
         if (amount <= 0) return 0;
         double flushed = 0;
 
@@ -263,7 +263,7 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flush(double amount,
-                                const std::string& excluded_filename) {
+                                const std::string &excluded_filename) {
         if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);
