@@ -16,7 +16,7 @@ namespace wrench {
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
-        BatchJob(const std::shared_ptr<CompoundJob>& job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
+        BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id, unsigned long time_in_minutes, unsigned long number_nodes,
                  unsigned long cores_per_node, const std::string &username, double ending_time_stamp, double arrival_time_stamp);
 
 
@@ -34,7 +34,7 @@ namespace wrench {
         std::shared_ptr<CompoundJob> getCompoundJob();
         void setEndingTimestamp(double time_stamp);
         std::map<std::string, std::tuple<unsigned long, double>> getResourcesAllocated();
-        void setAllocatedResources(const std::map<std::string, std::tuple<unsigned long, double>>& resources);
+        void setAllocatedResources(const std::map<std::string, std::tuple<unsigned long, double>> &resources);
 
         /** 
          * @brief Set the indices of the allocated nodes
