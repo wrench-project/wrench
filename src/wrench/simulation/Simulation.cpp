@@ -1500,7 +1500,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<DataFile> Simulation::addFile(const std::string id, double size) {
+    std::shared_ptr<DataFile> Simulation::addFile(const std::string & id, double size) {
 
         if (size < 0) {
             throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
