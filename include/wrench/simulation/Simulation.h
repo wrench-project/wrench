@@ -99,7 +99,7 @@ namespace wrench {
         static double getMaxPowerConsumption(const std::string &hostname);
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
-        void stageFile(const std::shared_ptr<DataFile>& file, std::shared_ptr<StorageService> ss);
+        void stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> ss);
         void stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
         /***********************/
@@ -142,17 +142,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        void readFromDisk(double num_bytes, const std::string& hostname, const std::string& mount_point);
+        void readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point);
         void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
-                                                    const std::string& hostname,
-                                                    const std::string& read_mount_point,
-                                                    const std::string& write_mount_point);
-        void writeToDisk(double num_bytes, const std::string& hostname, std::string mount_point);
+                                                    const std::string &hostname,
+                                                    const std::string &read_mount_point,
+                                                    const std::string &write_mount_point);
+        void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point);
 
-        void readWithMemoryCache(const std::shared_ptr<DataFile>& file, double n_bytes, std::shared_ptr<FileLocation> location);
-        void writebackWithMemoryCache(const std::shared_ptr<DataFile>& file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
-        void writeThroughWithMemoryCache(const std::shared_ptr<DataFile>& file, double n_bytes, const std::shared_ptr<FileLocation>& location);
-        MemoryManager *getMemoryManagerByHost(const std::string& hostname);
+        void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, std::shared_ptr<FileLocation> location);
+        void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
+        MemoryManager *getMemoryManagerByHost(const std::string &hostname);
 
         static double getMemoryCapacity();
         static unsigned long getNumCores();
@@ -196,21 +196,21 @@ namespace wrench {
 
         static int unique_disk_sequence_number;
 
-        void stageFile(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location);
+        void stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
         void platformSanityCheck();
         void checkSimulationSetup();
         bool isRunning() const;
 
         void startAllProcesses();
-        void addService(const std::shared_ptr<ComputeService>& service);
-        void addService(const std::shared_ptr<StorageService>& service);
-        void addService(const std::shared_ptr<NetworkProximityService>& service);
-        void addService(const std::shared_ptr<ExecutionController>& service);
-        void addService(const std::shared_ptr<FileRegistryService>& service);
-        void addService(const std::shared_ptr<EnergyMeterService>& service);
-        void addService(const std::shared_ptr<BandwidthMeterService>& service);
-        void addService(const std::shared_ptr<MemoryManager>& memory_manager);
+        void addService(const std::shared_ptr<ComputeService> &service);
+        void addService(const std::shared_ptr<StorageService> &service);
+        void addService(const std::shared_ptr<NetworkProximityService> &service);
+        void addService(const std::shared_ptr<ExecutionController> &service);
+        void addService(const std::shared_ptr<FileRegistryService> &service);
+        void addService(const std::shared_ptr<EnergyMeterService> &service);
+        void addService(const std::shared_ptr<BandwidthMeterService> &service);
+        void addService(const std::shared_ptr<MemoryManager> &memory_manager);
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 

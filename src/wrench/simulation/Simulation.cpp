@@ -569,7 +569,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(const std::shared_ptr<ComputeService>& service) {
+    void Simulation::addService(const std::shared_ptr<ComputeService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -584,7 +584,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(const std::shared_ptr<NetworkProximityService>& service) {
+    void Simulation::addService(const std::shared_ptr<NetworkProximityService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -599,7 +599,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    void Simulation::addService(const std::shared_ptr<StorageService>& service) {
+    void Simulation::addService(const std::shared_ptr<StorageService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -614,7 +614,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(const std::shared_ptr<ExecutionController>& service) {
+    void Simulation::addService(const std::shared_ptr<ExecutionController> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -629,7 +629,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(const std::shared_ptr<FileRegistryService>& service) {
+    void Simulation::addService(const std::shared_ptr<FileRegistryService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -644,7 +644,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(const std::shared_ptr<EnergyMeterService>& service) {
+    void Simulation::addService(const std::shared_ptr<EnergyMeterService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -659,7 +659,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(const std::shared_ptr<BandwidthMeterService>& service) {
+    void Simulation::addService(const std::shared_ptr<BandwidthMeterService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -674,7 +674,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(const std::shared_ptr<MemoryManager>& memory_manager) {
+    void Simulation::addService(const std::shared_ptr<MemoryManager> &memory_manager) {
         if (memory_manager == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
         }
@@ -691,7 +691,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile>& file, std::shared_ptr<StorageService> storage_service) {
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service) {
         Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service)));
     }
 
@@ -715,7 +715,7 @@ namespace wrench {
      * @param file: the file
      * @param location: the location
      */
-    void Simulation::stageFile(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location) {
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -752,7 +752,7 @@ namespace wrench {
      *
      * @throw invalid_argument
      */
-    void Simulation::readFromDisk(double num_bytes, const std::string& hostname, const std::string& mount_point) {
+    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
@@ -778,9 +778,9 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
-                                                            const std::string& hostname,
-                                                            const std::string& read_mount_point,
-                                                            const std::string& write_mount_point) {
+                                                            const std::string &hostname,
+                                                            const std::string &read_mount_point,
+                                                            const std::string &write_mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
@@ -812,7 +812,7 @@ namespace wrench {
      *
      * @throw invalid_argument
      */
-    void Simulation::writeToDisk(double num_bytes, const std::string& hostname, std::string mount_point) {
+    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
@@ -834,7 +834,7 @@ namespace wrench {
      * @param n_bytes: number of read bytes
      * @param location: file location
      */
-    void Simulation::readWithMemoryCache(const std::shared_ptr<DataFile>& file, double n_bytes, std::shared_ptr<FileLocation> location) {
+    void Simulation::readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, std::shared_ptr<FileLocation> location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -845,11 +845,11 @@ namespace wrench {
         auto mem_mng = getMemoryManagerByHost(hostname);
         std::vector<Block *> file_blocks = mem_mng->getCachedBlocks(file->getID());
         long cached_amt = 0;
-        for (auto & file_block : file_blocks) {
-            cached_amt += (long)(file_block->getSize());
+        for (auto &file_block: file_blocks) {
+            cached_amt += (long) (file_block->getSize());
         }
 
-        double from_disk = std::min(n_bytes, file->getSize() - (double)cached_amt);
+        double from_disk = std::min(n_bytes, file->getSize() - (double) cached_amt);
         double from_cache = n_bytes - from_disk;
 
         mem_mng->flush(n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory(),
@@ -879,7 +879,7 @@ namespace wrench {
      * @param is_dirty: true or false
      */
     void
-    Simulation::writebackWithMemoryCache(const std::shared_ptr<DataFile>& file, double n_bytes, std::shared_ptr<FileLocation> location,
+    Simulation::writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, std::shared_ptr<FileLocation> location,
                                          bool is_dirty) {
         std::string hostname = getHostName();
 
@@ -929,8 +929,8 @@ namespace wrench {
      * @param n_bytes: number of written bytes
      * @param location: file location
      */
-    void Simulation::writeThroughWithMemoryCache(const std::shared_ptr<DataFile>& file, double n_bytes,
-                                                 const std::shared_ptr<FileLocation>& location) {
+    void Simulation::writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes,
+                                                 const std::shared_ptr<FileLocation> &location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -956,7 +956,7 @@ namespace wrench {
      * @param hostname: name of the host
      * @return pointer to the memory manager running on the host (or nullptr)
      */
-    MemoryManager *Simulation::getMemoryManagerByHost(const std::string& hostname) {
+    MemoryManager *Simulation::getMemoryManagerByHost(const std::string &hostname) {
         for (const auto &ptr: this->memory_managers) {
             if (strcmp(ptr->getHostname().c_str(), hostname.c_str()) == 0) {
                 return ptr.get();
