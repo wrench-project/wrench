@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void S4U_Simulation::setupPlatform(std::string &filename) {
+    void S4U_Simulation::setupPlatform(const std::string &filename) {
 
         try {
             this->engine->load_platform(filename);

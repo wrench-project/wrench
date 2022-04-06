@@ -56,7 +56,7 @@ namespace wrench {
 
         static bool isInitialized();
 
-        void instantiatePlatform(std::string);
+        void instantiatePlatform(const std::string &);
         void instantiatePlatform(const std::function<void()> &);
 
         static std::vector<std::string> getHostnameList();
