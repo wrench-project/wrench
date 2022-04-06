@@ -33,7 +33,7 @@ namespace wrench {
      * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param memory_requirement: memory_manager_service requirement in bytes
      */
-    WorkflowTask::WorkflowTask(std::string  id, const double flops, const unsigned long min_num_cores,
+    WorkflowTask::WorkflowTask(std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
                                const double memory_requirement) : id(std::move(id)), color(""), flops(flops),
                                                                   min_num_cores(min_num_cores),
@@ -55,7 +55,7 @@ namespace wrench {
      * @param file: the file
      * @throw std::invalid_argument
      */
-    void WorkflowTask::addInputFile(const std::shared_ptr<DataFile>& file) {
+    void WorkflowTask::addInputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
@@ -85,7 +85,7 @@ namespace wrench {
      *
      * @param file: the file
      */
-    void WorkflowTask::addOutputFile(const std::shared_ptr<DataFile>& file) {
+    void WorkflowTask::addOutputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -785,7 +785,7 @@ namespace wrench {
      * the corresponding physical host name will be set!
      * @param hostname: the host name
      */
-    void WorkflowTask::setExecutionHost(const std::string& hostname) {
+    void WorkflowTask::setExecutionHost(const std::string &hostname) {
         std::string physical_hostname;
         /** The conversion below has been removed as it makes more sense to keep the virtual and the physical separate **/
         // Convert the virtual hostname to a physical hostname if needed
@@ -828,7 +828,7 @@ namespace wrench {
      * @brief Set the task's color
      * @param c: A color string in  "#rrggbb" format
      */
-    void WorkflowTask::setColor(const std::string& c) {
+    void WorkflowTask::setColor(const std::string &c) {
         this->color = color;
     }
 

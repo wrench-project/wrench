@@ -57,9 +57,9 @@ namespace wrench {
 
         std::vector<std::shared_ptr<WorkflowTask>> getParents();
 
-        void addInputFile(const std::shared_ptr<DataFile>& file);
+        void addInputFile(const std::shared_ptr<DataFile> &file);
 
-        void addOutputFile(const std::shared_ptr<DataFile>& file);
+        void addOutputFile(const std::shared_ptr<DataFile> &file);
 
         unsigned int getFailureCount() const;
 
@@ -156,7 +156,7 @@ namespace wrench {
 
         std::string getColor() const;
 
-        void setColor(const std::string&);
+        void setColor(const std::string &);
 
         /***********************/
         /** \endcond           */
@@ -218,7 +218,7 @@ namespace wrench {
 
         void incrementFailureCount();
 
-        void setExecutionHost(const std::string& hostname);
+        void setExecutionHost(const std::string &hostname);
 
         void setNumCoresAllocated(unsigned long num_cores);
 
@@ -295,7 +295,7 @@ namespace wrench {
         std::map<std::string, std::shared_ptr<DataFile>> input_files; // List of input files
 
         // Private constructor (called by Workflow)
-        WorkflowTask(std::string  id,
+        WorkflowTask(std::string id,
                      double t,
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
