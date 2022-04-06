@@ -143,7 +143,7 @@ The execution controller is the core of the simulator, as it is where
 you implement whatever algorithm/strategy you wish to simulate for
 executing the application workload. At this point the execution
 controller likely seems a bit abstract. But we would not say more about it
-untill you get to the :ref:`WRENCH 102 <wrench-102-header>` page, which is
+until you get to the :ref:`WRENCH 102 <wrench-102-header>` page, which is
 exclusively about the controller.
 
 What's next
