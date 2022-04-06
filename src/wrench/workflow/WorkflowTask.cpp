@@ -29,11 +29,13 @@ namespace wrench {
      *
      * @param id: the task id
      * @param flops: the task's number of flops
-     * @param min_cores: the minimum number of cores required for running the task
-     * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
+     * @param min_num_cores: the minimum number of cores required for running the task
+     * @param max_num_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param memory_requirement: memory_manager_service requirement in bytes
      */
-    WorkflowTask::WorkflowTask(std::string  id, const double flops, const unsigned long min_num_cores,
+    WorkflowTask::WorkflowTask(std::string  id,
+                               const double flops,
+                               const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
                                const double memory_requirement) : id(std::move(id)), color(""), flops(flops),
                                                                   min_num_cores(min_num_cores),
@@ -340,12 +342,12 @@ namespace wrench {
     //    }
 
     /**
-     * @brief Set the task's containing job
+     * @brief Set the task's containing j
      *
-     * @param job: the job
+     * @param j: the j
      */
-    void WorkflowTask::setJob(Job *job) {
-        this->job = job;
+    void WorkflowTask::setJob(Job *j) {
+        this->job = j;
     }
 
     /**
@@ -365,12 +367,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the cluster id for the task
+     * @brief Set the cluster c_id for the task
      *
-     * @param id: cluster id the task belongs to
+     * @param c_id: cluster c_id the task belongs to
      */
-    void WorkflowTask::setClusterID(std::string id) {
-        this->cluster_id = id;
+    void WorkflowTask::setClusterID(const std::string& c_id) {
+        this->cluster_id = c_id;
     }
 
     /**
@@ -382,11 +384,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task priority
-     * @param priority: task priority
+     * @brief Set the task p
+     * @param p: task p
      */
-    void WorkflowTask::setPriority(long priority) {
-        this->priority = priority;
+    void WorkflowTask::setPriority(long p) {
+        this->priority = p;
     }
 
     /**
@@ -399,10 +401,10 @@ namespace wrench {
 
     /**
      * @brief Set the task average CPU usage
-     * @param average_cpu: task average CPU usage
+     * @param a_cpu: task average CPU usage
      */
-    void WorkflowTask::setAverageCPU(double average_cpu) {
-        this->average_cpu = average_cpu;
+    void WorkflowTask::setAverageCPU(double a_cpu) {
+        this->average_cpu = a_cpu;
     }
 
     /**
@@ -415,10 +417,10 @@ namespace wrench {
 
     /**
      * @brief Set the number of bytes read by the task
-     * @param bytes_read: number of bytes read by the task in KB
+     * @param b_read: number of bytes read by the task in KB
      */
-    void WorkflowTask::setBytesRead(unsigned long bytes_read) {
-        this->bytes_read = bytes_read;
+    void WorkflowTask::setBytesRead(unsigned long b_read) {
+        this->bytes_read = b_read;
     }
 
     /**
@@ -431,10 +433,10 @@ namespace wrench {
 
     /**
      * @brief Set the number of bytes written by the task
-     * @param bytes_written: number of bytes written by the task in KB
+     * @param b_written: number of bytes written by the task in KB
      */
-    void WorkflowTask::setBytesWritten(unsigned long bytes_written) {
-        this->bytes_written = bytes_written;
+    void WorkflowTask::setBytesWritten(unsigned long b_written) {
+        this->bytes_written = b_written;
     }
 
     /**
