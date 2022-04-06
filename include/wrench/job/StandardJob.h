@@ -70,9 +70,9 @@ namespace wrench {
 
 
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations() const;
-/***********************/
-/** \cond INTERNAL     */
-/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
         bool usesScratch();
 

@@ -33,7 +33,7 @@ namespace wrench {
      * @param max_num_cores: the maximum number of cores that can be used
      * @param parallel_model: the parallel model (to determine speedup vs. number of cores)
      */
-    ComputeAction::ComputeAction(const std::string& name,
+    ComputeAction::ComputeAction(const std::string &name,
                                  std::shared_ptr<CompoundJob> job,
                                  double flops,
                                  double ram,
@@ -130,7 +130,7 @@ namespace wrench {
   * @param action_executor:  the executor that executes this action
   * @param work_per_thread: amount of work (in flop) that each thread should do
   */
-    void ComputeAction::simulateComputationAsSleep(const std::shared_ptr<ActionExecutor>& action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
+    void ComputeAction::simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
         // Thread startup_overhead
         S4U_Simulation::sleep((double) (num_threads) *action_executor->getThreadCreationOverhead());
         // Then sleep for the computation duration
@@ -144,7 +144,7 @@ namespace wrench {
      *
      * @param work_per_thread: amount of work (in flop) that each thread should do
      */
-    void ComputeAction::simulateComputationAsComputation(const std::shared_ptr<ActionExecutor>& action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
+    void ComputeAction::simulateComputationAsComputation(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
 
         try {
             S4U_Simulation::compute_multi_threaded(num_threads,
