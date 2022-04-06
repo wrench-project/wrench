@@ -28,7 +28,7 @@ namespace wrench {
      * @param max_num_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param memory_requirement: memory_manager_service requirement in bytes
      */
-    WorkflowTask::WorkflowTask(std::string  id,
+    WorkflowTask::WorkflowTask(std::string id,
                                const double flops,
                                const unsigned long min_num_cores,
                                const unsigned long max_num_cores,
@@ -366,7 +366,7 @@ namespace wrench {
      *
      * @param c_id: cluster c_id the task belongs to
      */
-    void WorkflowTask::setClusterID(const std::string& c_id) {
+    void WorkflowTask::setClusterID(const std::string &c_id) {
         this->cluster_id = c_id;
     }
 
@@ -828,7 +828,7 @@ namespace wrench {
      * @param c: A color string in  "#rrggbb" format
      */
 <<<<<<< HEAD
-    void WorkflowTask::setColor(const std::string& c) {
+    void WorkflowTask::setColor(const std::string &c) {
         this->color = c;
 =======
     void WorkflowTask::setColor(const std::string &c) {
