@@ -92,14 +92,14 @@ namespace wrench {
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
-                                const std::string& scratch_space_mount_point,
+                                const std::string &scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
         // Public Constructor
         BareMetalComputeService(const std::string &hostname,
                                 const std::vector<std::string> &compute_hosts,
-                                const std::string& scratch_space_mount_point,
+                                const std::string &scratch_space_mount_point,
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
@@ -209,20 +209,20 @@ namespace wrench {
 
         void terminate(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        void processActionDone(const std::shared_ptr<Action>& action);
+        void processActionDone(const std::shared_ptr<Action> &action);
 
-        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob>& job, simgrid::s4u::Mailbox *answer_mailbox);
+        void processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job, simgrid::s4u::Mailbox *answer_mailbox);
 
         bool processNextMessage();
 
         void dispatchReadyActions();
 
 
-        void terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob>& job, ComputeService::TerminationCause termination_cause);
+        void terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob> &job, ComputeService::TerminationCause termination_cause);
 
         void processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox, const std::string &key);
 
-        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob>& job,
+        void processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<CompoundJob> &job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
         void processIsThereAtLeastOneHostWithAvailableResources(
