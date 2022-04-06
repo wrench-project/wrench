@@ -68,10 +68,14 @@ namespace wrench {
 
         StandardJob::State getState();
 
-        bool usesScratch();
+
 
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
+/***********************/
+/** \cond INTERNAL     */
+/***********************/
 
+        bool usesScratch();
 
         /** @brief The job's computational tasks */
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
@@ -94,14 +98,6 @@ namespace wrench {
          * @return a shared pointer to the object
          */
         std::shared_ptr<StandardJob> getSharedPtr() { return this->shared_from_this(); }
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
 
         double getPreJobOverheadInSeconds();
         void setPreJobOverheadInSeconds(double overhead);
@@ -151,6 +147,11 @@ namespace wrench {
         std::vector<std::shared_ptr<Action>> post_file_copy_actions;
         std::vector<std::shared_ptr<Action>> cleanup_actions;
         std::shared_ptr<Action> scratch_cleanup = nullptr;
+
+/***********************/
+/** \endcond           */
+/***********************/
+
     };
 
     /***********************/
@@ -159,4 +160,4 @@ namespace wrench {
 
 };// namespace wrench
 
-#endif//WRENCH_MULTITASKJOB_H
+#endif//WRENCH_STANDARDJOB_H
