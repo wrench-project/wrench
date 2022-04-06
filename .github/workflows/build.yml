@@ -6,19 +6,36 @@ on:
       - 'doc/**'
       - '**.md'
       - '**.rst'
-  workflow_run:
-    workflows: ["clang-format"]
-    branches: [master]
-    types: 
-      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: DoozyX/clang-format-lint-action@v0.13
+        with:
+          source: '.'
+          exclude: './doc'
+          extensions: 'h,cpp'
+          clangFormatVersion: 13
+          inplace: True
+      - uses: EndBug/add-and-commit@v4
+        with:
+          message: 'Committing clang-format changes'
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+
   build:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: format
+
     strategy:
       matrix:
         include:
