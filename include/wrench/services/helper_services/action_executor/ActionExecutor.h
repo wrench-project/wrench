@@ -32,15 +32,14 @@ namespace wrench {
     class ActionExecutor : public ExecutionController {
 
     public:
-
         unsigned long getNumCoresAllocated() const;
         double getMemoryAllocated() const;
         double getThreadCreationOverhead();
         std::shared_ptr<Action> getAction();
 
-/***********************/
-/** \cont INTERNAL     */
-/***********************/
+        /***********************/
+        /** \cont INTERNAL     */
+        /***********************/
 
         ActionExecutor(
                 std::string hostname,
@@ -70,15 +69,14 @@ namespace wrench {
         unsigned long num_cores;
         double ram_footprint;
 
-/***********************/
-/** \endcond           */
-/***********************/
-
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
-/***********************/
-/** \endcond           */
-/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };// namespace wrench
 
