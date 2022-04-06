@@ -69,7 +69,6 @@ namespace wrench {
         StandardJob::State getState();
 
 
-
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations() const;
 /***********************/
 /** \cond INTERNAL     */
@@ -148,10 +147,9 @@ namespace wrench {
         std::vector<std::shared_ptr<Action>> cleanup_actions;
         std::shared_ptr<Action> scratch_cleanup = nullptr;
 
-/***********************/
-/** \endcond           */
-/***********************/
-
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
     /***********************/
