@@ -33,6 +33,7 @@
 
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <memory>
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
@@ -77,7 +78,7 @@ namespace wrench {
         }
 
         // Create the S4U simulation wrapper
-        this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
+        this->s4u_simulation = std::make_unique<S4U_Simulation>();
     }
 
     /**
