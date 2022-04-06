@@ -52,6 +52,9 @@ if (DOXYGEN_FOUND)
     add_custom_command(TARGET doc COMMAND sphinx-build 
                         ${CMAKE_HOME_DIRECTORY}/doc/source 
                         ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION})
+    add_custom_command(TARGET doc COMMAND cp -R
+                        ${CMAKE_HOME_DIRECTORY}/docs/build/${WRENCH_RELEASE_VERSION}
+                        ${CMAKE_HOME_DIRECTORY}/docs/build/latest)
 
 else (DOXYGEN_FOUND)
     message("-- Doxygen: No (warning: Doxygen is needed in case you want to generate WRENCH documentation)")
