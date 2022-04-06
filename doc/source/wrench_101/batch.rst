@@ -64,7 +64,7 @@ requests is configured to be 1KiB:
              new wrench::BatchComputeService("Gateway",
                                       {"Node1", "Node2", "Node3", "Node4"},
                                       "/scratch/",
-                                      {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}},
+                                      {{wrench::BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM, "fcfs"}},
                                       {{wrench::BareMetalComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, 1024}});
 
 See the documentation of :cpp:class:`wrench::BatchComputeServiceProperty` and
