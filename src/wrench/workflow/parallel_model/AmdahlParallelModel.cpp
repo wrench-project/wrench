@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Get the Amdahl Law's alpha parameter
      * @return the alpha parameter
      */
-    double AmdahlParallelModel::getAlpha() {
+    double AmdahlParallelModel::getAlpha() const {
         return this->alpha;
     }
 

@@ -75,7 +75,7 @@ namespace wrench {
      */
     void S4U_Simulation::shutdown() {
         if (this->initialized) {
-            this->engine->shutdown();
+            //            this->engine->shutdown();
         }
     }
 
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void S4U_Simulation::setupPlatform(std::string &filename) {
+    void S4U_Simulation::setupPlatform(const std::string &filename) {
 
         try {
             this->engine->load_platform(filename);
@@ -285,7 +285,8 @@ namespace wrench {
      * @param result: a reference to a map that's being incrementally built recursively
      * @param get_subzones: true if this should return (sub-)zones
      * @param get_clusters: true if this should return (sub-)clusters
-     * @param get_hosts: true if this should return hostnames
+     * @param get_hosts_from_zones: true if this should return hostnames from zones
+     * @param get_hosts_from_clusters: true if this should return hostnames from clusters
      */
     void S4U_Simulation::traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters) {
 

@@ -10,6 +10,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simulation/Simulation.h>
 
+#include <memory>
+
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/ConservativeBackfillingBatchSchedulerCoreLevel.h"
 
 //#define  PRINT_SCHEDULE 1
@@ -23,7 +25,7 @@ namespace wrench {
      * @param cs: The BatchComputeService for which this scheduler is working
      */
     ConservativeBackfillingBatchSchedulerCoreLevel::ConservativeBackfillingBatchSchedulerCoreLevel(BatchComputeService *cs) : HomegrownBatchScheduler(cs) {
-        this->schedule = std::unique_ptr<CoreAvailabilityTimeLine>(new CoreAvailabilityTimeLine(cs->total_num_of_nodes, cs->num_cores_per_node));
+        this->schedule = std::make_unique<CoreAvailabilityTimeLine>(cs->total_num_of_nodes, cs->num_cores_per_node);
     }
 
     /**
@@ -165,7 +167,8 @@ namespace wrench {
 
 
 #if 0
-        // OLD IMPLEMENTATION THAT RECONSTRUCTS THE SCHEDULE FROM SCRATCH \
+        // OLD IMPLEMENTATION THAT RECONSTRUCTS THE SCHEDULE FROM SCRATCH
+
         // Clear the schedule
         this->schedule->clear();
 
