@@ -121,13 +121,13 @@ namespace wrench {
 
         void failCurrentActions();
 
-        void processActionExecutorCompletion(std::shared_ptr<ActionExecutor> executor);
+        void processActionExecutorCompletion(const std::shared_ptr<ActionExecutor>& executor);
 
-        void processActionExecutorFailure(std::shared_ptr<ActionExecutor> executor);
+        void processActionExecutorFailure(const std::shared_ptr<ActionExecutor>& executor);
 
         void processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor);
 
-        void processActionTerminationRequest(std::shared_ptr<Action> action, simgrid::s4u::Mailbox *answer_mailbox, ComputeService::TerminationCause termination_cause);
+        void processActionTerminationRequest(const std::shared_ptr<Action>& action, simgrid::s4u::Mailbox *answer_mailbox, ComputeService::TerminationCause termination_cause);
 
         bool processNextMessage();
 
