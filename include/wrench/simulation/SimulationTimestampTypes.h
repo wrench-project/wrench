@@ -486,7 +486,7 @@ namespace wrench {
     class SimulationTimestampDiskReadFailure : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadFailure(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskReadFailure(double date, const std::string& hostname, const std::string& mount, double bytes, int counter);
     };
 
     /**
@@ -495,7 +495,7 @@ namespace wrench {
     class SimulationTimestampDiskReadCompletion : public SimulationTimestampDiskRead {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskReadCompletion(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskReadCompletion(double date, const std::string& hostname, const std::string& mount, double bytes, int counter);
     };
 
     class SimulationTimestampDiskWriteStart;
@@ -510,10 +510,10 @@ namespace wrench {
          * @brief Retrieve the matching endpoint, if any
          */
         SimulationTimestampDiskWrite *getEndpoint() override;
-        double getBytes();
+        double getBytes() const;
         std::string getHostname();
         std::string getMount();
-        int getCounter();
+        int getCounter() const;
 
     protected:
         /**
@@ -576,7 +576,7 @@ namespace wrench {
     class SimulationTimestampDiskWriteCompletion : public SimulationTimestampDiskWrite {
     private:
         friend class SimulationOutput;
-        SimulationTimestampDiskWriteCompletion(double date, std::string hostname, std::string mount, double bytes, int counter);
+        SimulationTimestampDiskWriteCompletion(double date, const std::string& hostname, const std::string& mount, double bytes, int counter);
     };
 
     /**
@@ -585,11 +585,11 @@ namespace wrench {
     class SimulationTimestampPstateSet : public SimulationTimestampType {
     public:
         std::string getHostname();
-        int getPstate();
+        int getPstate() const;
 
     private:
         friend class SimulationOutput;
-        SimulationTimestampPstateSet(double date, std::string hostname, int pstate);
+        SimulationTimestampPstateSet(double date, const std::string& hostname, int pstate);
         std::string hostname;
         int pstate;
     };
@@ -600,11 +600,11 @@ namespace wrench {
     class SimulationTimestampEnergyConsumption : public SimulationTimestampType {
     public:
         std::string getHostname();
-        double getConsumption();
+        double getConsumption() const;
 
     private:
         friend class SimulationOutput;
-        SimulationTimestampEnergyConsumption(double date, std::string hostname, double joules);
+        SimulationTimestampEnergyConsumption(double date, const std::string& hostname, double joules);
         std::string hostname;
         double joules;
     };
@@ -615,11 +615,11 @@ namespace wrench {
     class SimulationTimestampLinkUsage : public SimulationTimestampType {
     public:
         std::string getLinkname();
-        double getUsage();
+        double getUsage() const;
 
     private:
         friend class SimulationOutput;
-        SimulationTimestampLinkUsage(double date, std::string linkname, double bytes_per_second);
+        SimulationTimestampLinkUsage(double date, const std::string& linkname, double bytes_per_second);
         std::string linkname;
         double bytes_per_second;
     };
