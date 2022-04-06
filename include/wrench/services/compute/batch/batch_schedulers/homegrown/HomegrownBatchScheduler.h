@@ -21,7 +21,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief An abstract class that defines a batch_standard_and_pilot_jobs scheduler
+     * @brief An abstract class that defines a batch scheduler
      */
     class HomegrownBatchScheduler : public BatchScheduler {
 
@@ -29,7 +29,7 @@ namespace wrench {
         /**
          * @brief Constructor
          *
-         * @param cs: the batch_standard_and_pilot_jobs compute service for which this scheduler is operating
+         * @param cs: the batch compute service for which this scheduler is operating
          */
         explicit HomegrownBatchScheduler(BatchComputeService *cs) : BatchScheduler(cs) {}
 
