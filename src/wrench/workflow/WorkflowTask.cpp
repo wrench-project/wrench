@@ -52,7 +52,7 @@ namespace wrench {
      * @param file: the file
      * @throw std::invalid_argument
      */
-    void WorkflowTask::addInputFile(const std::shared_ptr<DataFile>& file) {
+    void WorkflowTask::addInputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as input to task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is alreadxy an input file of the task, complain
@@ -82,7 +82,7 @@ namespace wrench {
      *
      * @param file: the file
      */
-    void WorkflowTask::addOutputFile(const std::shared_ptr<DataFile>& file) {
+    void WorkflowTask::addOutputFile(const std::shared_ptr<DataFile> &file) {
         WRENCH_DEBUG("Adding file '%s' as output t task %s", file->getID().c_str(), this->getID().c_str());
 
         // If the file is already input, complain
@@ -784,7 +784,7 @@ namespace wrench {
      * the corresponding physical host name will be set!
      * @param hostname: the host name
      */
-    void WorkflowTask::setExecutionHost(const std::string& hostname) {
+    void WorkflowTask::setExecutionHost(const std::string &hostname) {
         std::string physical_hostname;
         /** The conversion below has been removed as it makes more sense to keep the virtual and the physical separate **/
         // Convert the virtual hostname to a physical hostname if needed
@@ -827,8 +827,13 @@ namespace wrench {
      * @brief Set the task's color
      * @param c: A color string in  "#rrggbb" format
      */
+<<<<<<< HEAD
     void WorkflowTask::setColor(const std::string& c) {
         this->color = c;
+=======
+    void WorkflowTask::setColor(const std::string &c) {
+        this->color = color;
+>>>>>>> master
     }
 
     /**
