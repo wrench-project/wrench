@@ -37,7 +37,7 @@ namespace wrench {
 
         double getFlops() const;
 
-        void setFlops(double flops);
+        void setFlops(double f);
 
         unsigned long getMinNumCores() const;
 

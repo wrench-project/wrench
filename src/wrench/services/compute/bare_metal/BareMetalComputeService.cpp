@@ -251,11 +251,11 @@ namespace wrench {
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
             const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
-            std::string scratch_space_mount_point,
+            const std::string& scratch_space_mount_point,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
                                                                                         "bare_metal",
-                                                                                        std::move(scratch_space_mount_point)) {
+                                                                                        scratch_space_mount_point) {
         initiateInstance(hostname,
                          compute_resources,
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
@@ -273,11 +273,11 @@ namespace wrench {
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
                                                      const std::vector<std::string> &compute_hosts,
-                                                     std::string scratch_space_mount_point,
+                                                     const std::string& scratch_space_mount_point,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
                                                                                                                                  "bare_metal",
-                                                                                                                                 std::move(scratch_space_mount_point)) {
+                                                                                                                                 scratch_space_mount_point) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (auto h: compute_hosts) {
             specified_compute_resources.insert(
@@ -571,7 +571,7 @@ namespace wrench {
     */
     void BareMetalComputeService::processSubmitCompoundJob(
             simgrid::s4u::Mailbox *answer_mailbox,
-            std::shared_ptr<CompoundJob> job,
+            const std::shared_ptr<CompoundJob>& job,
             std::map<std::string, std::string> &service_specific_arguments) {
         WRENCH_INFO("Asked to run compound job %s, which has %ld actions", job->getName().c_str(), job->getActions().size());
 
@@ -665,7 +665,7 @@ namespace wrench {
  * @param job: the job to terminate
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
-    void BareMetalComputeService::processCompoundJobTerminationRequest(std::shared_ptr<CompoundJob> job,
+    void BareMetalComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob>& job,
                                                                        simgrid::s4u::Mailbox *answer_mailbox) {
 
         // If the job doesn't exit, we reply right away
@@ -836,7 +836,7 @@ namespace wrench {
  * @brief Process an action completion
  * @param action
  */
-    void BareMetalComputeService::processActionDone(std::shared_ptr<Action> action) {
+    void BareMetalComputeService::processActionDone(const std::shared_ptr<Action>& action) {
 
         //        for (auto const &a : this->dispatched_actions) {
         //            WRENCH_INFO("DISPATCHED LIST: %s", a->getName().c_str());
@@ -894,7 +894,7 @@ namespace wrench {
      * @param job: the job
      * @param termination_cause: the sermination cause
      */
-    void BareMetalComputeService::terminateCurrentCompoundJob(std::shared_ptr<CompoundJob> job,
+    void BareMetalComputeService::terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob>& job,
                                                               ComputeService::TerminationCause termination_cause) {
 
         for (auto const &action: job->getActions()) {

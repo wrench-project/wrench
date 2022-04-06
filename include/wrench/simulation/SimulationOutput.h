@@ -95,7 +95,7 @@ namespace wrench {
 
         void addTimestampTaskTermination(double date, const std::shared_ptr<WorkflowTask>& task);
 
-        void addTimestampFileReadStart(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+        void addTimestampFileReadStart(double date, const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& src, const std::shared_ptr<StorageService>& service,
                                        std::shared_ptr<WorkflowTask> task = nullptr);
 
         void addTimestampFileReadFailure(double date, const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& src, const std::shared_ptr<StorageService>& service,
@@ -110,7 +110,7 @@ namespace wrench {
         void addTimestampFileWriteFailure(double date, const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& src, const std::shared_ptr<StorageService>& service,
                                           std::shared_ptr<WorkflowTask> task = nullptr);
 
-        void addTimestampFileWriteCompletion(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src, std::shared_ptr<StorageService> service,
+        void addTimestampFileWriteCompletion(double date, const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& src, const std::shared_ptr<StorageService>& service,
                                              std::shared_ptr<WorkflowTask> task = nullptr);
 
         void addTimestampFileCopyStart(double date, std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> src,
@@ -128,23 +128,23 @@ namespace wrench {
         void
         addTimestampDiskReadFailure(double date, const std::string& hostname, const std::string& mount, double bytes, int unique_sequence_number);
 
-        void addTimestampDiskReadCompletion(double date, std::string hostname, std::string mount, double bytes,
+        void addTimestampDiskReadCompletion(double date, const std::string& hostname, const std::string& mount, double bytes,
                                             int unique_sequence_number);
 
         void
         addTimestampDiskWriteStart(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
 
         void
-        addTimestampDiskWriteFailure(double date, std::string hostname, std::string mount, double bytes, int unique_sequence_number);
+        addTimestampDiskWriteFailure(double date, const std::string& hostname, const std::string& mount, double bytes, int unique_sequence_number);
 
-        void addTimestampDiskWriteCompletion(double date, std::string hostname, std::string mount, double bytes,
+        void addTimestampDiskWriteCompletion(double date, const std::string& hostname, const std::string& mount, double bytes,
                                              int unique_sequence_number);
 
-        void addTimestampPstateSet(double date, std::string hostname, int pstate);
+        void addTimestampPstateSet(double date, const std::string& hostname, int pstate);
 
-        void addTimestampEnergyConsumption(double date, std::string hostname, double joules);
+        void addTimestampEnergyConsumption(double date, const std::string& hostname, double joules);
 
-        void addTimestampLinkUsage(double date, std::string linkname, double bytes_per_second);
+        void addTimestampLinkUsage(double date, const std::string& linkname, double bytes_per_second);
 
         /**
         * @brief Append a simulation timestamp to a simulation output trace
