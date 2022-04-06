@@ -56,7 +56,7 @@ namespace wrench {
             TERMINATED
         };
 
-        std::vector<std::shared_ptr<WorkflowTask>> getTasks();
+        std::vector<std::shared_ptr<WorkflowTask>> getTasks() const;
 
         unsigned long getMinimumRequiredNumCores() const;
 
@@ -68,10 +68,13 @@ namespace wrench {
 
         StandardJob::State getState();
 
+
+        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations() const;
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
         bool usesScratch();
-
-        std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> getFileLocations();
-
 
         /** @brief The job's computational tasks */
         std::vector<std::shared_ptr<WorkflowTask>> tasks;
@@ -95,17 +98,9 @@ namespace wrench {
          */
         std::shared_ptr<StandardJob> getSharedPtr() { return this->shared_from_this(); }
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
-
-        double getPreJobOverheadInSeconds();
+        double getPreJobOverheadInSeconds() const;
         void setPreJobOverheadInSeconds(double overhead);
-        double getPostJobOverheadInSeconds();
+        double getPostJobOverheadInSeconds() const;
         void setPostJobOverheadInSeconds(double overhead);
 
 
@@ -151,6 +146,10 @@ namespace wrench {
         std::vector<std::shared_ptr<Action>> post_file_copy_actions;
         std::vector<std::shared_ptr<Action>> cleanup_actions;
         std::shared_ptr<Action> scratch_cleanup = nullptr;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
     /***********************/
@@ -159,4 +158,4 @@ namespace wrench {
 
 };// namespace wrench
 
-#endif//WRENCH_MULTITASKJOB_H
+#endif//WRENCH_STANDARDJOB_H

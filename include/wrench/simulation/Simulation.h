@@ -56,7 +56,7 @@ namespace wrench {
 
         static bool isInitialized();
 
-        void instantiatePlatform(std::string);
+        void instantiatePlatform(const std::string &);
         void instantiatePlatform(const std::function<void()> &);
 
         static std::vector<std::string> getHostnameList();
@@ -68,7 +68,7 @@ namespace wrench {
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
         static void removeFile(std::shared_ptr<DataFile> file);
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
-        static std::shared_ptr<DataFile> addFile(std::string, double);
+        static std::shared_ptr<DataFile> addFile(const std::string &, double);
 
 
         void launch();

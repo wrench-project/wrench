@@ -16,7 +16,7 @@ namespace wrench {
 
 
     /**
-     * @brief Configurable message payloads for a batch_standard_and_pilot_jobs
+     * @brief Configurable message payloads for a batch
      */
     class BatchComputeServiceMessagePayload : public ComputeServiceMessagePayload {
 
