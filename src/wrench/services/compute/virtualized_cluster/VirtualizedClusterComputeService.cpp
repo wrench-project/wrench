@@ -267,8 +267,8 @@ namespace wrench {
         double dest_available_ram = Simulation::getHostMemoryCapacity(dest_pm_hostname) -
                                     this->used_ram_per_execution_host[dest_pm_hostname];
         double dest_available_cores =
-                (double)Simulation::getHostNumCores(dest_pm_hostname) - (double)this->used_cores_per_execution_host[dest_pm_hostname];
-        if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < (double)vm->getNumCores())) {
+                (double) Simulation::getHostNumCores(dest_pm_hostname) - (double) this->used_cores_per_execution_host[dest_pm_hostname];
+        if ((dest_available_ram < vm->getMemory()) or (dest_available_cores < (double) vm->getNumCores())) {
             msg_to_send_back = new VirtualizedClusterComputeServiceMigrateVMAnswerMessage(
                     false,
                     std::shared_ptr<FailureCause>(

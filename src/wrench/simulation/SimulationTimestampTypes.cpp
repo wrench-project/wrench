@@ -51,7 +51,7 @@ namespace wrench {
      * @param endpoint: an corresponding "end" timestamp or "start" timestamp
      */
     SimulationTimestampPair::SimulationTimestampPair(double date, SimulationTimestampPair *endpoint)
-            : endpoint(endpoint) {
+        : endpoint(endpoint) {
         this->date = date;
     }
 
@@ -166,7 +166,7 @@ namespace wrench {
      * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      */
-    SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(double date, const std::shared_ptr<WorkflowTask>& task) : SimulationTimestampTask(date, task) {
+    SimulationTimestampTaskCompletion::SimulationTimestampTaskCompletion(double date, const std::shared_ptr<WorkflowTask> &task) : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a TaskCompletion timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
@@ -183,8 +183,8 @@ namespace wrench {
      * @param date: the date
      * @param task: the WorkflowTask associated with this timestamp
      */
-    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, const std::shared_ptr<WorkflowTask>& task)
-            : SimulationTimestampTask(date, task) {
+    SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, const std::shared_ptr<WorkflowTask> &task)
+        : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task '%s'", task->getID().c_str());
 
         if (task == nullptr) {
@@ -776,8 +776,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, const std::string& hostname,
-                                                                           const std::string& mount,
+    SimulationTimestampDiskReadFailure::SimulationTimestampDiskReadFailure(double date, const std::string &hostname,
+                                                                           const std::string &mount,
                                                                            double bytes,
                                                                            int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadFailure timestamp for disk read");
@@ -801,8 +801,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     SimulationTimestampDiskReadCompletion::SimulationTimestampDiskReadCompletion(double date,
-                                                                                 const std::string& hostname,
-                                                                                 const std::string& mount,
+                                                                                 const std::string &hostname,
+                                                                                 const std::string &mount,
                                                                                  double bytes,
                                                                                  int counter) : SimulationTimestampDiskRead(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskReadCompletion timestamp for disk read");
@@ -934,8 +934,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(double date, const std::string& hostname,
-                                                                             const std::string& mount,
+    SimulationTimestampDiskWriteFailure::SimulationTimestampDiskWriteFailure(double date, const std::string &hostname,
+                                                                             const std::string &mount,
                                                                              double bytes,
                                                                              int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteFailure timestamp for disk write");
@@ -958,8 +958,8 @@ namespace wrench {
      * @param counter: an integer ID
      * @throw std::invalid_argument
      */
-    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, const std::string& hostname,
-                                                                                   const std::string& mount,
+    SimulationTimestampDiskWriteCompletion::SimulationTimestampDiskWriteCompletion(double date, const std::string &hostname,
+                                                                                   const std::string &mount,
                                                                                    double bytes,
                                                                                    int counter) : SimulationTimestampDiskWrite(date, hostname, mount, bytes, counter) {
         WRENCH_DEBUG("Inserting a DiskWriteCompletion timestamp for disk write");
@@ -980,7 +980,7 @@ namespace wrench {
      * @param hostname: the host on which a pstate is being set
      * @param pstate: the pstate that is being set on this host
      */
-    SimulationTimestampPstateSet::SimulationTimestampPstateSet(double date, const std::string& hostname, int pstate) : hostname(hostname), pstate(pstate) {
+    SimulationTimestampPstateSet::SimulationTimestampPstateSet(double date, const std::string &hostname, int pstate) : hostname(hostname), pstate(pstate) {
         this->date = date;
 
         if (hostname.empty()) {
@@ -1011,8 +1011,8 @@ namespace wrench {
      * @param hostname: the host on which this energy consumption timestamp applies to
      * @param joules: the energy consumption in joules 
      */
-    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string& hostname, double joules)
-            : hostname(hostname), joules(joules) {
+    SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string &hostname, double joules)
+        : hostname(hostname), joules(joules) {
 
         this->date = date;
         if (hostname.empty() || joules < 0.0) {
@@ -1043,8 +1043,8 @@ namespace wrench {
      * @param linkname: the link for which this bandwidth usage timestamp applies to
      * @param bytes_per_second: the bandwidth usage in bytes per second
      */
-    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, const std::string& linkname, double bytes_per_second)
-            : linkname(linkname), bytes_per_second(bytes_per_second) {
+    SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, const std::string &linkname, double bytes_per_second)
+        : linkname(linkname), bytes_per_second(bytes_per_second) {
         this->date = date;
         if (linkname.empty() || bytes_per_second < 0.0) {
             throw std::invalid_argument(

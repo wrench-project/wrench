@@ -764,7 +764,7 @@ namespace wrench {
      * @param executor: the action executor
      */
     void ActionExecutionService::processActionExecutorCompletion(
-            const std::shared_ptr<ActionExecutor>& executor) {
+            const std::shared_ptr<ActionExecutor> &executor) {
 
         // Update RAM availabilities and running thread counts
         this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
@@ -785,7 +785,7 @@ namespace wrench {
      * @brief Process an action executor failure
      * @param executor: the action executor
      */
-    void ActionExecutionService::processActionExecutorFailure(const std::shared_ptr<ActionExecutor>& executor) {
+    void ActionExecutionService::processActionExecutorFailure(const std::shared_ptr<ActionExecutor> &executor) {
         auto action = executor->getAction();
         auto cause = action->getFailureCause();
 
@@ -815,7 +815,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param termination_cause: the termination cause
      */
-    void ActionExecutionService::processActionTerminationRequest(const std::shared_ptr<Action>& action,
+    void ActionExecutionService::processActionTerminationRequest(const std::shared_ptr<Action> &action,
                                                                  simgrid::s4u::Mailbox *answer_mailbox,
                                                                  ComputeService::TerminationCause termination_cause) {
         // If the action doesn't exit, we reply right away
