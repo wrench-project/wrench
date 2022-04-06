@@ -12,19 +12,23 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_custom_parallel_model, "Log category for CustomParallelModel");
 
 namespace wrench {
 
     /**
      * @brief Constructor
-     * @param lambda: a function that, when given a total flop amount and a number of
+     * @param lambda_sequential: a function that, when given a total flop amount and a number of
      *        threads, the amount of purely sequential work
+     * @param lambda_per_thread: a function that, when given a total flop amount and a number of
+     *        threads, the amount of pre-thread parallel work
      */
     CustomParallelModel::CustomParallelModel(std::function<double(double, unsigned long)> lambda_sequential,
                                              std::function<double(double, unsigned long)> lambda_per_thread) {
-        this->lambda_sequential = lambda_sequential;
-        this->lambda_per_thread = lambda_per_thread;
+        this->lambda_sequential = std::move(lambda_sequential);
+        this->lambda_per_thread = std::move(lambda_per_thread);
     }
 
     //    /**

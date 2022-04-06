@@ -38,7 +38,7 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        ComputeAction(std::string name,
+        ComputeAction(const std::string &name,
                       std::shared_ptr<CompoundJob> job,
                       double flops,
                       double ram,
@@ -56,8 +56,8 @@ namespace wrench {
         double ram;
         std::shared_ptr<ParallelModel> parallel_model;
 
-        void simulateComputationAsSleep(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
-        void simulateComputationAsComputation(std::shared_ptr<ActionExecutor> action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
+        void simulateComputationAsSleep(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
+        void simulateComputationAsComputation(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work);
     };
 
 

@@ -12,6 +12,7 @@
 #define WRENCH_TIMER_EVENT_H
 
 #include <string>
+#include <utility>
 #include "wrench/failure_causes/FailureCause.h"
 
 /***********************/
@@ -45,10 +46,10 @@ namespace wrench {
         friend class ExecutionEvent;
         /**
          * @brief Constructor
-         * @param content: some arbitrary message
+         * @param message: some arbitrary message
          */
-        TimerEvent(std::string message)
-            : message(message) {}
+        explicit TimerEvent(std::string message)
+            : message(std::move(message)) {}
 
     public:
         /** @brief The message */

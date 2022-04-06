@@ -183,9 +183,9 @@ namespace wrench {
 
     /**
    * @brief Set the job's priority (the higher the priority value, the higher the priority)
-   * @param priority: a priority
+   * @param p: a priority
    */
-    void Job::setPriority(double priority) {
-        this->priority = priority;
+    void Job::setPriority(double p) {
+        this->priority = p;
     }
 }// namespace wrench

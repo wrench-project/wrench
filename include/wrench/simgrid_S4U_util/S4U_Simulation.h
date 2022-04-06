@@ -33,7 +33,7 @@ namespace wrench {
 
     public:
         void initialize(int *argc, char **argv);
-        void setupPlatform(std::string &);
+        void setupPlatform(const std::string &);
         void setupPlatform(const std::function<void()> &creation_function);
         void runSimulation();
         static double getClock();
