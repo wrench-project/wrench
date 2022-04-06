@@ -37,7 +37,7 @@ namespace wrench {
 
         double getFlops() const;
 
-        void setFlops(double flops);
+        void setFlops(double f);
 
         unsigned long getMinNumCores() const;
 
@@ -57,11 +57,11 @@ namespace wrench {
 
         std::vector<std::shared_ptr<WorkflowTask>> getParents();
 
-        void addInputFile(std::shared_ptr<DataFile> file);
+        void addInputFile(const std::shared_ptr<DataFile> &file);
 
-        void addOutputFile(std::shared_ptr<DataFile> file);
+        void addOutputFile(const std::shared_ptr<DataFile> &file);
 
-        unsigned int getFailureCount();
+        unsigned int getFailureCount() const;
 
         /**
          * @brief Retrieved the official shared pointer for this object
@@ -88,7 +88,7 @@ namespace wrench {
             UNKNOWN
         };
 
-        static std::string stateToString(WorkflowTask::State state);
+        static std::string stateToString(State state);
 
         Job *getJob() const;
 
@@ -96,7 +96,7 @@ namespace wrench {
 
         std::string getClusterID() const;
 
-        void setClusterID(std::string);
+        void setClusterID(const std::string&);
 
         void setPriority(long);
 
@@ -156,7 +156,7 @@ namespace wrench {
 
         std::string getColor() const;
 
-        void setColor(std::string);
+        void setColor(const std::string &);
 
         /***********************/
         /** \endcond           */
@@ -178,7 +178,7 @@ namespace wrench {
 
         void updateReadiness();
 
-        static std::string stateToString(WorkflowTask::InternalState state);
+        static std::string stateToString(InternalState internal_state);
 
         unsigned long updateTopLevel();
 
@@ -192,7 +192,7 @@ namespace wrench {
 
         WorkflowTask::InternalState getInternalState() const;
 
-        void setJob(Job *job);
+        void setJob(Job *j);
 
         void setStartDate(double date);
 
@@ -218,7 +218,7 @@ namespace wrench {
 
         void incrementFailureCount();
 
-        void setExecutionHost(std::string hostname);
+        void setExecutionHost(const std::string &hostname);
 
         void setNumCoresAllocated(unsigned long num_cores);
 
@@ -248,9 +248,9 @@ namespace wrench {
             double task_terminated = -1.0;
 
             /** @brief Task's execution host (could be a virtual host)**/
-            std::string execution_host = "";
+            std::string execution_host;
             /** @brief Task's execution physical host **/
-            std::string physical_execution_host = "";
+            std::string physical_execution_host;
             /** @brief Task's number of allocated cores **/
             unsigned long num_cores_allocated = 0;
 
@@ -259,7 +259,7 @@ namespace wrench {
              *
              * @param task_start: Task start time
              */
-            WorkflowTaskExecution(double task_start) : task_start(task_start) {}
+            explicit WorkflowTaskExecution(double task_start) : task_start(task_start) {}
         };
 
 
@@ -295,8 +295,8 @@ namespace wrench {
         std::map<std::string, std::shared_ptr<DataFile>> input_files; // List of input files
 
         // Private constructor (called by Workflow)
-        WorkflowTask(std::string id,
-                     double t,
+        WorkflowTask(std::string  id,
+                     double flops,
                      unsigned long min_num_cores,
                      unsigned long max_num_cores,
                      double memory_requirement);

@@ -33,25 +33,25 @@ namespace wrench {
 
     public:
         void initialize(int *argc, char **argv);
-        void setupPlatform(std::string &);
+        void setupPlatform(const std::string &);
         void setupPlatform(const std::function<void()> &creation_function);
         void runSimulation();
         static double getClock();
         static std::string getHostName();
         static bool hostExists(std::string hostname);
-        static bool linkExists(std::string linkname);
+        static bool linkExists(const std::string &linkname);
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
-        static unsigned int getHostNumCores(std::string hostname);
+        static unsigned int getHostNumCores(const std::string &hostname);
         static unsigned int getNumCores();
-        static double getHostFlopRate(std::string hostname);
-        static bool isHostOn(std::string hostname);
-        static void turnOffHost(std::string hostname);
-        static void turnOnHost(std::string hostname);
+        static double getHostFlopRate(const std::string &hostname);
+        static bool isHostOn(const std::string &hostname);
+        static void turnOffHost(const std::string &hostname);
+        static void turnOnHost(const std::string &hostname);
         static bool isLinkOn(std::string linkname);
-        static void turnOffLink(std::string linkname);
-        static void turnOnLink(std::string linkname);
+        static void turnOffLink(const std::string &linkname);
+        static void turnOnLink(const std::string &linkname);
         static double getFlopRate();
-        static double getHostMemoryCapacity(std::string hostname);
+        static double getHostMemoryCapacity(const std::string &hostname);
         static double getMemoryCapacity();
         static void compute(double);
         static void compute_multi_threaded(unsigned long num_threads,
@@ -61,22 +61,22 @@ namespace wrench {
         static void sleep(double);
         static void computeZeroFlop();
         static void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
-        static void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
+        static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point);
         static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
-                                                           std::string hostname,
-                                                           std::string read_mount_point,
-                                                           std::string write_mount_point);
+                                                           const std::string &hostname,
+                                                           const std::string &read_mount_point,
+                                                           const std::string &write_mount_point);
 
         static double getDiskCapacity(std::string hostname, std::string mount_point);
-        static std::vector<std::string> getDisks(std::string hostname);
+        static std::vector<std::string> getDisks(const std::string &hostname);
         static bool hostHasMountPoint(std::string hostname, std::string mount_point);
 
         void checkLinkBandwidths();
 
         static void yield();
-        static std::string getHostProperty(std::string hostname, std::string property_name);
-        static void setHostProperty(std::string hostname, std::string property_name, std::string property_value);
-        static std::string getClusterProperty(std::string cluster_id, std::string property_name);
+        static std::string getHostProperty(std::string hostname, const std::string &property_name);
+        static void setHostProperty(const std::string &hostname, const std::string &property_name, const std::string &property_value);
+        static std::string getClusterProperty(const std::string &cluster_id, const std::string &property_name);
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);

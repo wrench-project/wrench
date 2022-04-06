@@ -75,7 +75,7 @@ namespace wrench {
      */
     void S4U_Simulation::shutdown() {
         if (this->initialized) {
-            this->engine->shutdown();
+            //            this->engine->shutdown();
         }
     }
 
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void S4U_Simulation::setupPlatform(std::string &filename) {
+    void S4U_Simulation::setupPlatform(const std::string &filename) {
 
         try {
             this->engine->load_platform(filename);
@@ -285,7 +285,8 @@ namespace wrench {
      * @param result: a reference to a map that's being incrementally built recursively
      * @param get_subzones: true if this should return (sub-)zones
      * @param get_clusters: true if this should return (sub-)clusters
-     * @param get_hosts: true if this should return hostnames
+     * @param get_hosts_from_zones: true if this should return hostnames from zones
+     * @param get_hosts_from_clusters: true if this should return hostnames from clusters
      */
     void S4U_Simulation::traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters) {
 
@@ -333,7 +334,7 @@ namespace wrench {
  * @param linkname: the name of the link
  * @return true or false
  */
-    bool S4U_Simulation::linkExists(std::string linkname) {
+    bool S4U_Simulation::linkExists(const std::string &linkname) {
         return (simgrid::s4u::Link::by_name_or_null(linkname) != nullptr);
     }
 
@@ -345,7 +346,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    unsigned int S4U_Simulation::getHostNumCores(std::string hostname) {
+    unsigned int S4U_Simulation::getHostNumCores(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -369,7 +370,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    double S4U_Simulation::getHostFlopRate(std::string hostname) {
+    double S4U_Simulation::getHostFlopRate(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -385,7 +386,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    bool S4U_Simulation::isHostOn(std::string hostname) {
+    bool S4U_Simulation::isHostOn(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -400,7 +401,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void S4U_Simulation::turnOffHost(std::string hostname) {
+    void S4U_Simulation::turnOffHost(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -415,7 +416,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void S4U_Simulation::turnOnHost(std::string hostname) {
+    void S4U_Simulation::turnOnHost(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -446,7 +447,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void S4U_Simulation::turnOffLink(std::string linkname) {
+    void S4U_Simulation::turnOffLink(const std::string &linkname) {
         auto link = simgrid::s4u::Link::by_name_or_null(linkname);
         if (link == nullptr) {
             throw std::invalid_argument("Unknown linkname " + linkname);
@@ -461,7 +462,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void S4U_Simulation::turnOnLink(std::string linkname) {
+    void S4U_Simulation::turnOnLink(const std::string &linkname) {
         auto link = simgrid::s4u::Link::by_name_or_null(linkname);
         if (link == nullptr) {
             throw std::invalid_argument("Unknown linkname " + linkname);
@@ -562,9 +563,9 @@ namespace wrench {
  * @param write_mount_point: the mountpoint to write to
  */
     void S4U_Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
-                                                                std::string hostname,
-                                                                std::string read_mount_point,
-                                                                std::string write_mount_point) {
+                                                                const std::string &hostname,
+                                                                const std::string &read_mount_point,
+                                                                const std::string &write_mount_point) {
 
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
@@ -603,7 +604,7 @@ namespace wrench {
  * @param hostname: name of host to which disk is attached
  * @param mount_point: mount point
  */
-    void S4U_Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
+    void S4U_Simulation::readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
@@ -648,7 +649,7 @@ namespace wrench {
  * @param hostname: the name of the host
  * @return a memory_manager_service capacity in bytes
  */
-    double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
+    double S4U_Simulation::getHostMemoryCapacity(const std::string &hostname) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -707,7 +708,7 @@ namespace wrench {
  * @param property_name: the property name
  * @return a string relating to the property specified in the platform file
  */
-    std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
+    std::string S4U_Simulation::getHostProperty(std::string hostname, const std::string &property_name) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
@@ -724,7 +725,7 @@ namespace wrench {
 * @param property_name: the property name
 * @return a string relating to the property specified in the platform file
 */
-    std::string S4U_Simulation::getClusterProperty(std::string cluster_id, std::string property_name) {
+    std::string S4U_Simulation::getClusterProperty(const std::string &cluster_id, const std::string &property_name) {
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
         auto clusters = simgrid_engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
         for (auto c: clusters) {
@@ -745,7 +746,7 @@ namespace wrench {
  * @param property_name: the property name
  * @param property_value: the property value
  */
-    void S4U_Simulation::setHostProperty(std::string hostname, std::string property_name, std::string property_value) {
+    void S4U_Simulation::setHostProperty(const std::string &hostname, const std::string &property_name, const std::string &property_value) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
@@ -839,7 +840,7 @@ namespace wrench {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
         try {
-            return host->get_pstate_count();
+            return (int) (host->get_pstate_count());
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. "
@@ -880,7 +881,7 @@ namespace wrench {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
         try {
-            return sg_host_get_wattmin_at(host, host->get_pstate());
+            return sg_host_get_wattmin_at(host, (int) (host->get_pstate()));
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMinPowerConsumption(): Was not able to get the min power available to the host. "
@@ -902,7 +903,7 @@ namespace wrench {
         }
         try {
             return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
-                                          (simgrid::s4u::Host::by_name(hostname))->get_pstate());
+                                          (int) ((simgrid::s4u::Host::by_name(hostname))->get_pstate()));
         } catch (std::exception &e) {
             throw std::runtime_error(
                     "S4U_Simulation::getMaxPowerConsumption():: Was not able to get the max power possible for the host. "
@@ -959,7 +960,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    std::vector<std::string> S4U_Simulation::getDisks(std::string hostname) {
+    std::vector<std::string> S4U_Simulation::getDisks(const std::string &hostname) {
 
         simgrid::s4u::Host *host;
         try {
