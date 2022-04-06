@@ -65,3 +65,9 @@ breathe_projects = {
 breathe_default_project = "user"
 
 # The full version, including alpha/beta/rc tags
+version = '2.0-dev'
+release = '2.0-dev'
+version = '2.0-dev'
+release = '2.0-dev'
+version = '2.0-dev'
+release = '2.0-dev'
