@@ -59,7 +59,7 @@ namespace wrench {
 
         double flushExpiredData(std::vector<Block *> &list);
 
-        double flushLruList(std::vector<Block *> &list, double amount, const std::string& excluded_filename);
+        double flushLruList(std::vector<Block *> &list, double amount, const std::string &excluded_filename);
 
         double evictLruList(std::vector<Block *> &lru_list, double amount, std::string excluded_filename);
 
@@ -94,7 +94,7 @@ namespace wrench {
 
         double getTotalMemory();
 
-        double flush(double amount, const std::string& excluded_filename);
+        double flush(double amount, const std::string &excluded_filename);
 
         double evict(double amount, std::string excluded_filename);
 
