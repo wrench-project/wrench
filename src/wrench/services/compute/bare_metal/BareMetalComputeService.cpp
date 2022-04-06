@@ -11,6 +11,7 @@
 #include <map>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <utility>
 
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
@@ -249,14 +250,14 @@ namespace wrench {
      */
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
             std::string scratch_space_mount_point,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
                                                                                         "bare_metal",
-                                                                                        scratch_space_mount_point) {
+                                                                                        std::move(scratch_space_mount_point)) {
         initiateInstance(hostname,
-                         std::move(compute_resources),
+                         compute_resources,
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
     }
 
@@ -271,12 +272,12 @@ namespace wrench {
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     BareMetalComputeService::BareMetalComputeService(const std::string &hostname,
-                                                     const std::vector<std::string> compute_hosts,
+                                                     const std::vector<std::string> &compute_hosts,
                                                      std::string scratch_space_mount_point,
                                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname,
                                                                                                                                  "bare_metal",
-                                                                                                                                 scratch_space_mount_point) {
+                                                                                                                                 std::move(scratch_space_mount_point)) {
         std::map<std::string, std::tuple<unsigned long, double>> specified_compute_resources;
         for (auto h: compute_hosts) {
             specified_compute_resources.insert(
@@ -310,9 +311,9 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
-            std::string suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
-                                                                                                "bare_metal" + suffix,
-                                                                                                scratch_space) {
+            const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
+                                                                                                       "bare_metal" + suffix,
+                                                                                                       std::move(scratch_space)) {
         initiateInstance(hostname,
                          std::move(compute_resources),
                          std::move(property_list),
@@ -333,12 +334,12 @@ namespace wrench {
      */
     BareMetalComputeService::BareMetalComputeService(
             const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::shared_ptr<StorageService> scratch_space) : ComputeService(hostname,
                                                                             "bare_metal",
-                                                                            scratch_space) {
+                                                                            std::move(scratch_space)) {
         initiateInstance(hostname,
                          compute_resources,
                          std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);

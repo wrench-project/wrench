@@ -45,7 +45,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string id,
+    std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string &id,
                                                     double flops,
                                                     unsigned long min_num_cores,
                                                     unsigned long max_num_cores,

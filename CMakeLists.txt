@@ -15,6 +15,10 @@ endif ()
 if (ENABLE_MESSAGE_MANAGER)
     add_definitions(-DMESSAGE_MANAGER)
 endif ()
+if (ENABLE_WRENCH_INTERNAL_EXCEPTIONS)
+    add_definitions(-DWRENCH_INTERNAL_EXCEPTIONS)
+endif ()
+
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/conf/cmake/")
 find_package(Boost REQUIRED)
@@ -403,6 +407,7 @@ set(TEST_FILES
         test/wms/JobManagerTest.cpp
         test/simulation/BadPlatformTest.cpp
         test/simulation/SimpleSimulationTest.cpp
+        test/simulation/SimulationPlatformTest.cpp
         test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
         test/simulation/SimulationLoggingTest.cpp

@@ -33,6 +33,7 @@
 
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <memory>
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
@@ -77,7 +78,7 @@ namespace wrench {
         }
 
         // Create the S4U simulation wrapper
-        this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
+        this->s4u_simulation = std::make_unique<S4U_Simulation>();
     }
 
     /**
@@ -273,7 +274,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void Simulation::instantiatePlatform(std::string filename) {
+    void Simulation::instantiatePlatform(const std::string &filename) {
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
         }
@@ -1500,7 +1501,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<DataFile> Simulation::addFile(const std::string id, double size) {
+    std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, double size) {
 
         if (size < 0) {
             throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
