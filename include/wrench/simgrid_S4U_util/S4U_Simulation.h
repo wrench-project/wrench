@@ -39,7 +39,7 @@ namespace wrench {
         static double getClock();
         static std::string getHostName();
         static bool hostExists(std::string hostname);
-        static bool linkExists(const std::string &linkname);
+        static bool linkExists(const std::string &link_name);
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
         static unsigned int getHostNumCores(const std::string &hostname);
         static unsigned int getNumCores();
@@ -47,9 +47,9 @@ namespace wrench {
         static bool isHostOn(const std::string &hostname);
         static void turnOffHost(const std::string &hostname);
         static void turnOnHost(const std::string &hostname);
-        static bool isLinkOn(std::string linkname);
-        static void turnOffLink(const std::string &linkname);
-        static void turnOnLink(const std::string &linkname);
+        static bool isLinkOn(const std::string &link_name);
+        static void turnOffLink(const std::string &link_name);
+        static void turnOnLink(const std::string &link_name);
         static double getFlopRate();
         static double getHostMemoryCapacity(const std::string &hostname);
         static double getMemoryCapacity();
@@ -60,21 +60,21 @@ namespace wrench {
                                            double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
-        static void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
+        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point);
         static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point);
         static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
                                                            const std::string &hostname,
                                                            const std::string &read_mount_point,
                                                            const std::string &write_mount_point);
 
-        static double getDiskCapacity(std::string hostname, std::string mount_point);
+        static double getDiskCapacity(const std::string &hostname, std::string mount_point);
         static std::vector<std::string> getDisks(const std::string &hostname);
-        static bool hostHasMountPoint(std::string hostname, std::string mount_point);
+        static bool hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
         void checkLinkBandwidths();
 
         static void yield();
-        static std::string getHostProperty(std::string hostname, const std::string &property_name);
+        static std::string getHostProperty(const std::string &hostname, const std::string &property_name);
         static void setHostProperty(const std::string &hostname, const std::string &property_name, const std::string &property_value);
         static std::string getClusterProperty(const std::string &cluster_id, const std::string &property_name);
 
@@ -89,12 +89,12 @@ namespace wrench {
         static std::vector<int> getListOfPstates(const std::string &hostname);
         //end energy related calls
 
-        bool isInitialized();
+        bool isInitialized() const;
         bool isPlatformSetup();
         static std::vector<std::string> getAllHostnames();
         static std::vector<std::string> getAllLinknames();
-        static double getLinkBandwidth(std::string name);
-        static double getLinkUsage(std::string name);
+        static double getLinkBandwidth(const std::string &name);
+        static double getLinkUsage(const std::string &name);
 
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByZone();
