@@ -638,7 +638,7 @@ namespace wrench {
         cjob->addCustomAction(
                 "pilot_job_",
                 0, 0,
-                [callback_mailbox, job, compute_service](const std::shared_ptr<ActionExecutor>& executor) {
+                [callback_mailbox, job, compute_service](const std::shared_ptr<ActionExecutor> &executor) {
                     // Create a bare-metal compute service and start it
                     auto execution_service = executor->getActionExecutionService();
 
@@ -669,7 +669,7 @@ namespace wrench {
                     // Sleep FOREVER (will be killed by service above)
                     Simulation::sleep(DBL_MAX);
                 },
-                [job](const std::shared_ptr<ActionExecutor>& executor) {
+                [job](const std::shared_ptr<ActionExecutor> &executor) {
                     job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
                 });
 
@@ -1024,7 +1024,7 @@ namespace wrench {
      * @param job: the job that failure
      * @param compute_service: the compute service on which the job has failed
      */
-    void JobManager::processStandardJobFailure(const std::shared_ptr<StandardJob>& job,
+    void JobManager::processStandardJobFailure(const std::shared_ptr<StandardJob> &job,
                                                std::shared_ptr<ComputeService> compute_service) {
         // update job state
         job->state = StandardJob::State::FAILED;

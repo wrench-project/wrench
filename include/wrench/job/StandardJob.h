@@ -123,7 +123,7 @@ namespace wrench {
         void applyTaskUpdates(std::map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                               std::set<std::shared_ptr<WorkflowTask>> &failure_count_increments);
 
-        void analyzeActions(const std::vector<std::shared_ptr<Action>>& actions,
+        void analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
                             bool *at_least_one_failed,
                             bool *at_least_one_killed,
                             std::shared_ptr<FailureCause> *failure_cause,

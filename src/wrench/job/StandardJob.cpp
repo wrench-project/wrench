@@ -455,7 +455,7 @@ namespace wrench {
         this->compound_job = cjob;
     }
 
-    void StandardJob::analyzeActions(const std::vector<std::shared_ptr<Action>>& actions,
+    void StandardJob::analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
                                      bool *at_least_one_failed,
                                      bool *at_least_one_killed,
                                      std::shared_ptr<FailureCause> *failure_cause,
