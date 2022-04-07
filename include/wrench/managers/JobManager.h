@@ -141,7 +141,7 @@ namespace wrench {
         processStandardJobCompletion(const std::shared_ptr<StandardJob> &job, std::shared_ptr<ComputeService> compute_service);
 
         void
-        processStandardJobFailure(std::shared_ptr<StandardJob> job, std::shared_ptr<ComputeService> compute_service);
+        processStandardJobFailure(const std::shared_ptr<StandardJob> &job, std::shared_ptr<ComputeService> compute_service);
 
         void
         processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job, std::shared_ptr<ComputeService> compute_service);
