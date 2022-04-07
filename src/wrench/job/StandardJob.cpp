@@ -14,7 +14,6 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_standard_job, "Log category for StandardJob");
 
-
 namespace wrench {
 
     /**
@@ -46,12 +45,11 @@ namespace wrench {
           post_file_copies(post_file_copies),
           cleanup_file_deletions(cleanup_file_deletions),
           state(StandardJob::State::NOT_SUBMITTED) {
-
         // Check that this is a ready sub-graph
-        for (auto t: tasks) {
+        for (const auto &t: tasks) {
             if (t->getState() != WorkflowTask::State::READY) {
                 std::vector<std::shared_ptr<WorkflowTask>> parents = t->getWorkflow()->getTaskParents(t);
-                for (auto parent: parents) {
+                for (const auto &parent: parents) {
                     if (parent->getState() != WorkflowTask::State::COMPLETED) {
                         if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
                             throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
@@ -62,13 +60,14 @@ namespace wrench {
             }
         }
 
-        for (auto t: tasks) {
+        for (const auto &t: tasks) {
             this->tasks.push_back(t);
             t->setJob(this);
             this->total_flops += t->getFlops();
         }
         //        this->workflow = workflow;
         this->name = "standard_job_" + std::to_string(Job::getNewUniqueNumber());
+        this->total_flops = 0.0;
     }
 
     /**
@@ -184,7 +183,6 @@ namespace wrench {
      * @brief Instantiate a compound job
      */
     void StandardJob::createUnderlyingCompoundJob(const std::shared_ptr<ComputeService> &compute_service) {
-
         this->compound_job = nullptr;
         this->pre_overhead_action = nullptr;
         this->post_overhead_action = nullptr;
@@ -457,14 +455,13 @@ namespace wrench {
         this->compound_job = cjob;
     }
 
-    void StandardJob::analyzeActions(std::vector<std::shared_ptr<Action>> actions,
+    void StandardJob::analyzeActions(const std::vector<std::shared_ptr<Action>> &actions,
                                      bool *at_least_one_failed,
                                      bool *at_least_one_killed,
                                      std::shared_ptr<FailureCause> *failure_cause,
                                      double *earliest_start_date,
                                      double *latest_end_date,
                                      double *earliest_failure_date) {
-
         *at_least_one_failed = false;
         *at_least_one_killed = false;
         *failure_cause = nullptr;
@@ -812,7 +809,6 @@ namespace wrench {
      */
     void StandardJob::applyTaskUpdates(map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                                        set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
-
         // Update task states
         for (auto &state_update: state_changes) {
             std::shared_ptr<WorkflowTask> task = state_update.first;
@@ -831,7 +827,7 @@ namespace wrench {
         }
 
         // Update task failure counts if any
-        for (auto task: failure_count_increments) {
+        for (const auto &task: failure_count_increments) {
             task->incrementFailureCount();
         }
     }
