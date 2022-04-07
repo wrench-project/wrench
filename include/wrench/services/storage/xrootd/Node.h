@@ -15,6 +15,7 @@
 namespace wrench {
     namespace XRootD{
         class XRootD;
+        class SearchStack;
         class Node:public Service{//Conceptualy all nodes ARE storage services, HOWEVER, the API is entirly differnt for accessing a file in an XRootD deployment than usuall.
         private:
             WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
@@ -29,16 +30,18 @@ namespace wrench {
                     {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024}
             };
         public:
+            //XRootD* getMetavisor();
             Node(const std::string& hostname);
             std::shared_ptr<SimpleStorageService> getStorageServer();
             Node* getChild(int n);
-            Node* getParrent();
+            Node* getParent();
             int main();
             bool processNextMessage();
             bool lookupFile(std::shared_ptr<DataFile>file);
             void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
             void readFile(std::shared_ptr<DataFile>file);
             void readFile(std::shared_ptr<DataFile>file, double num_bytes);
+
             //void writeFile(std::shared_ptr<DataFile>file);//unclear how this would work, do we write to 1 existing file then let the background clone it?
 
 
@@ -52,6 +55,7 @@ namespace wrench {
             bool cached(shared_ptr<DataFile> file);
             std::vector<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
         private:
+            std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
             std::vector<shared_ptr<FileLocation>> XRootDSearch(shared_ptr<DataFile> file);
             std::vector< std::stack<Node*>> searchAll(std::vector<std::shared_ptr<Node>> potential);
             bool makeSupervisor();
@@ -63,7 +67,7 @@ namespace wrench {
             Node* supervisor=nullptr;
             XRootD* metavisor=nullptr;
             friend XRootD;
-
+            friend SearchStack;
         };
     }
 }
