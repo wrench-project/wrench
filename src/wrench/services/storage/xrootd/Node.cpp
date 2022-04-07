@@ -83,7 +83,7 @@ namespace wrench {
                 }  else if (auto msg = dynamic_cast<UpdateCacheMessage *>(message.get())) {
                     //flops calculation
                     //get current time
-
+                    wrench::S4U_Simulation::getClock();
                     cache[msg->file].push_back(msg->location);//does c++ handle new entries fine?  Im not sure, but testing will show it up pretty fast
                     if(this!=msg->cache_to){
                         S4U_Mailbox::putMessage(supervisor->mailbox,msg);
@@ -92,6 +92,7 @@ namespace wrench {
                     return true;
 
                 }  else if (auto msg = dynamic_cast<ContinueSearchMessage *>(message.get())) {
+                    //add queue checking
                     if(msg->path.size()>0){//continue search in "children"
                         auto targets=msg->path.top();
                         msg->path.pop();
