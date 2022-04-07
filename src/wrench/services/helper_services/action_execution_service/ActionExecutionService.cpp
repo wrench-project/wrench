@@ -201,7 +201,7 @@ namespace wrench {
      */
     ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>>& compute_resources,
+            const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
             std::shared_ptr<Service> parent_service,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname,
@@ -345,8 +345,8 @@ namespace wrench {
      * @return an allocation
      */
     std::tuple<std::string, unsigned long> ActionExecutionService::pickAllocation(
-            const std::shared_ptr<Action>& action,
-            const std::string& required_host,
+            const std::shared_ptr<Action> &action,
+            const std::string &required_host,
             unsigned long required_num_cores,
             std::set<std::string> &hosts_to_avoid) {
         // Compute possible hosts
@@ -639,8 +639,8 @@ namespace wrench {
      * @param cause: the failure cause
      */
     void ActionExecutionService::killAction(
-            const std::shared_ptr<Action>& action,
-            const std::shared_ptr<FailureCause>& cause) {
+            const std::shared_ptr<Action> &action,
+            const std::shared_ptr<FailureCause> &cause) {
         WRENCH_INFO("Killing action %s", action->getName().c_str());
 
         bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
@@ -873,7 +873,7 @@ namespace wrench {
      * @param action: the action
      * @return true if the action can run
      */
-    bool ActionExecutionService::actionCanRun(const std::shared_ptr<Action>& action) {
+    bool ActionExecutionService::actionCanRun(const std::shared_ptr<Action> &action) {
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
 
         // No service-specific argument
@@ -925,7 +925,7 @@ namespace wrench {
      *
      */
     void ActionExecutionService::processSubmitAction(
-            simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action>& action) {
+            simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action> &action) {
         WRENCH_INFO("Asked to run action %s", action->getName().c_str());
 
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
@@ -1092,7 +1092,7 @@ namespace wrench {
      *
      * @param executor: the action executor that has crashed
      */
-    void ActionExecutionService::processActionExecutorCrash(const std::shared_ptr<ActionExecutor>& executor) {
+    void ActionExecutionService::processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor) {
         std::shared_ptr<Action> action = executor->getAction();
 
         WRENCH_INFO("Handling an ActionExecutor crash!");
