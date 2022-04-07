@@ -227,9 +227,10 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
-        if ((file == nullptr) or (location == nullptr)) {
-            throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        }
+        //if ((file == nullptr) or (location == nullptr)) {
+        //    throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
+        //}
+        //I dont think we need to check this HERE because we hand off to another fundtion that will
         readFile(file, location, file->getSize());
     }
 
@@ -244,7 +245,15 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, double num_bytes_to_read) {
-        if ((file == nullptr) or (location == nullptr) or (num_bytes_to_read < 0.0)) {
+        // Get mailbox to send message too
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        readFile(file,location,answer_mailbox,num_bytes_to_read);
+    }
+    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,simgrid::s4u::Mailbox* answer_mailbox){
+        readFile(file, location, answer_mailbox,file->getSize());
+    }
+    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, simgrid::s4u::Mailbox* answer_mailbox, double num_bytes_to_read){
+        if ((file == nullptr) or (location == nullptr) or (answer_mailbox == nullptr) or (num_bytes_to_read < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
 
@@ -254,7 +263,6 @@ namespace wrench {
         assertServiceIsUp(storage_service);
 
         // Send a message to the daemon
-        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
         //        auto chunk_receiving_mailbox = S4U_Mailbox::generateUniqueMailbox("foo");
 
@@ -308,7 +316,7 @@ namespace wrench {
                     }
 
                     if (auto file_content_chunk_msg = dynamic_cast<StorageServiceFileContentChunkMessage *>(
-                                file_content_message.get())) {
+                            file_content_message.get())) {
                         if (file_content_chunk_msg->last_chunk) {
                             S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                             break;
@@ -340,7 +348,6 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
     }
-
     /**
      * @brief Synchronously write a file to the storage service
      *

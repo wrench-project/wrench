@@ -56,6 +56,8 @@ namespace wrench {
                                std::shared_ptr<FileRegistryService> file_registry_service = nullptr);
         static void readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
         static void readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, double num_bytes);
+        static void readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,simgrid::s4u::Mailbox * answer_mailbox);
+        static void readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, simgrid::s4u::Mailbox * answer_mailbox, double num_bytes);
         static void writeFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
         static void createFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location);
 
