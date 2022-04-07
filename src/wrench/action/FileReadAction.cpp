@@ -29,11 +29,18 @@ namespace wrench {
     * @param job: the job this action belongs to
     * @param file: the file
     * @param file_locations: the locations to read the file from (will be tried in order until one succeeds)
+    * @param num_bytes_to_read: the number of bytes to read (if < 0: read the whole file)
     */
-    FileReadAction::FileReadAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+    FileReadAction::FileReadAction(const std::string &name,
+                                   std::shared_ptr<CompoundJob> job,
                                    std::shared_ptr<DataFile> file,
-                                   std::vector<std::shared_ptr<FileLocation>> file_locations) : Action(name, "file_read_", job),
-                                                                                                file(std::move(file)), file_locations(std::move(file_locations)) {
+                                   std::vector<std::shared_ptr<FileLocation>> file_locations,
+                                   double num_bytes_to_read) : Action(name, "file_read_", std::move(job)),
+                                                               file(std::move(file)),
+                                                               file_locations(std::move(file_locations)) {
+        if (num_bytes_to_read < 0.0) {
+            this->num_bytes_to_read = file->getSize();
+        }
     }
 
     /**
@@ -64,7 +71,7 @@ namespace wrench {
         for (unsigned long i = 0; i < this->file_locations.size(); i++) {
             try {
                 this->used_location = this->file_locations[i];
-                StorageService::readFile(this->getFile(), this->file_locations[i]);
+                StorageService::readFile(this->getFile(), this->file_locations[i], this->num_bytes_to_read);
                 continue;
             } catch (ExecutionException &e) {
                 if (i == this->file_locations.size() - 1) {
