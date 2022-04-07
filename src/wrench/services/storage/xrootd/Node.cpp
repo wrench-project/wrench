@@ -126,9 +126,38 @@ namespace wrench {
                     return nullptr;
                 }
             }
-            Node* Node::getParrent(){
+            Node* Node::getParent(){
                 return supervisor;
             }
+
+
+            std::shared_ptr<FileLocation> Node::hasFile(shared_ptr<DataFile> file){
+                if(internalStorage==nullptr or file==nullptr){
+                    return nullptr;
+                }
+                return FileLocation::LOCATION(internalStorage);
+
+            }
+            /***********************************************************************************
+             *                                                                                 *
+             *      Functions under this line may need SERIOUS rework to fit simgird model     *
+             *                                                                                 *
+             ***********************************************************************************/
+
+
+            std::vector<shared_ptr<FileLocation>> Node::XRootDSearch(std::shared_ptr<DataFile> file){
+                std::vector<shared_ptr<FileLocation>> subLocations;
+                if(!cached(file)){
+                    subLocations= getCached(file);
+                }else{
+                    auto potential=metavisor->getFileNodes(file);
+                    auto searchPath =searchAll(potential);
+                    subLocations=traverse(searchPath,file);
+                }
+                return subLocations;
+            }
+
+
 
             bool Node::lookupFile(std::shared_ptr<DataFile>file){
                 //seperate handling if not supervisor
@@ -166,18 +195,7 @@ namespace wrench {
             }
             //void writeFile(std::shared_ptr<DataFile>file);//unclear how this would work, do we write to 1 existing file then let the background clone it?
             //utility
-            std::vector<shared_ptr<FileLocation>> Node::XRootDSearch(std::shared_ptr<DataFile> file){
-                //something to make service think, unsure how to do that
-                std::vector<shared_ptr<FileLocation>> subLocations;
-                if(!cached(file)){
-                    subLocations= getCached(file);
-                }else{
-                    auto potential=metavisor->getFileNodes(file);
-                    auto searchPath =searchAll(potential);
-                    subLocations=traverse(searchPath,file);
-                }
-                return subLocations;
-            }
+
             std::shared_ptr<FileLocation> Node::traverse(std::stack<Node*> nodes,std::shared_ptr<DataFile> file,bool meta){
 
                     Node* node;
