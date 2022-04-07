@@ -39,7 +39,7 @@ namespace wrench {
                                                                file(std::move(file)),
                                                                file_locations(std::move(file_locations)) {
         if (num_bytes_to_read < 0.0) {
-            this->num_bytes_to_read = file->getSize();
+            this->num_bytes_to_read = this->file->getSize();
         }
     }
 
