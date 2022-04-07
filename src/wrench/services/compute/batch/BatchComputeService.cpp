@@ -594,7 +594,6 @@ namespace wrench {
     */
     void BatchComputeService::terminate(bool send_failure_notifications,
                                         ComputeService::TerminationCause termination_cause) {
-        // LOCK
         this->acquireDaemonLock();
 
         WRENCH_INFO("Terminating all current compound jobs");
@@ -1014,7 +1013,6 @@ namespace wrench {
             const std::shared_ptr<BatchJob> &batch_job, unsigned long num_nodes_allocated,
             unsigned long allocated_time,
             unsigned long cores_per_node_asked_for) {
-
         WRENCH_INFO(
                 "Creating a BareMetalComputeServiceOneShot for a compound job on %ld nodes with %ld cores per node",
                 num_nodes_allocated, cores_per_node_asked_for);

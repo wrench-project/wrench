@@ -28,11 +28,11 @@ WRENCH is fully developed in C++. The code follows the **C++14** standard, and t
 older compilers tend to fail the compilation process. Therefore, we strongly 
 recommend users to satisfy the following requirements:
 
-- **CMake** - version 3.7 or higher
+- **CMake** - version 3.10 or higher
   
 And, one of the following:
-- **g++** - version 6.3 or higher
-- **clang** - version 3.8 or higher
+- **g++** - version 7.5 or higher
+- **clang** - version 9.0 or higher
 
 ## Dependencies
 

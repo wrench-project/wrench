@@ -15,11 +15,10 @@
 #include <wrench-dev.h>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <wrench/services/storage/storage_helpers/FileTransferThread.h>
+#include <utility>
 #include <wrench/services/memory/MemoryManager.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_file_transfer_thread, "Log category for File Transfer Thread");
-
 
 namespace wrench {
     /**
@@ -47,9 +46,9 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) : Service(hostname, "file_transfer_thread"),
-                                                                        parent(parent),
-                                                                        file(file),
+                                           unsigned long buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                                                        parent(std::move(parent)),
+                                                                        file(std::move(file)),
                                                                         num_bytes_to_transfer(num_bytes_to_transfer),
                                                                         answer_mailbox_if_read(answer_mailbox_if_read),
                                                                         answer_mailbox_if_write(answer_mailbox_if_write),
@@ -58,7 +57,7 @@ namespace wrench {
         this->src_mailbox = src_mailbox;
         this->src_location = nullptr;
         this->dst_mailbox = nullptr;
-        this->dst_location = dst_location;
+        this->dst_location = std::move(dst_location);
     }
 
     /**
@@ -86,16 +85,16 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) : Service(hostname, "file_transfer_thread"),
-                                                                        parent(parent),
-                                                                        file(file),
+                                           unsigned long buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                                                        parent(std::move(parent)),
+                                                                        file(std::move(file)),
                                                                         num_bytes_to_transfer(num_bytes_to_transfer),
                                                                         answer_mailbox_if_read(answer_mailbox_if_read),
                                                                         answer_mailbox_if_write(answer_mailbox_if_write),
                                                                         answer_mailbox_if_copy(answer_mailbox_if_copy),
                                                                         buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
-        this->src_location = src_location;
+        this->src_location = std::move(src_location);
         this->dst_mailbox = dst_mailbox;
         this->dst_location = nullptr;
     }
@@ -125,18 +124,18 @@ namespace wrench {
                                            simgrid::s4u::Mailbox *answer_mailbox_if_read,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_write,
                                            simgrid::s4u::Mailbox *answer_mailbox_if_copy,
-                                           unsigned long buffer_size) : Service(hostname, "file_transfer_thread"),
-                                                                        parent(parent),
-                                                                        file(file),
+                                           unsigned long buffer_size) : Service(std::move(hostname), "file_transfer_thread"),
+                                                                        parent(std::move(parent)),
+                                                                        file(std::move(file)),
                                                                         num_bytes_to_transfer(num_bytes_to_transfer),
                                                                         answer_mailbox_if_read(answer_mailbox_if_read),
                                                                         answer_mailbox_if_write(answer_mailbox_if_write),
                                                                         answer_mailbox_if_copy(answer_mailbox_if_copy),
                                                                         buffer_size(buffer_size) {
         this->src_mailbox = nullptr;
-        this->src_location = src_location;
+        this->src_location = std::move(src_location);
         this->dst_mailbox = nullptr;
-        this->dst_location = dst_location;
+        this->dst_location = std::move(dst_location);
     }
 
     /**
@@ -259,17 +258,16 @@ namespace wrench {
     }
 
     /**
-    * @brief Method to received a file from the network onto the local disk
-    * @param file: the file
+    * @brief Method to received a f from the network onto the local disk
+    * @param f: the f
     * @param mailbox: the source mailbox
     * @param location: the destination location
     *
     * @throw shared_ptr<FailureCause>
     */
-    void FileTransferThread::receiveFileFromNetwork(std::shared_ptr<DataFile> file,
+    void FileTransferThread::receiveFileFromNetwork(const std::shared_ptr<DataFile>& f,
                                                     simgrid::s4u::Mailbox *mailbox,
-                                                    std::shared_ptr<FileLocation> location) {
-
+                                                    const std::shared_ptr<FileLocation>& location) {
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
             throw std::runtime_error(
@@ -299,16 +297,16 @@ namespace wrench {
                     // Issue the receive
                     auto req = S4U_Mailbox::igetMessage(mailbox);
 
-                    // In NFS, write to cache only if the current host not the server host where the file is stored
-                    // If the current host is file server, write to disk directly
+                    // In NFS, write to cache only if the current host not the server host where the f is stored
+                    // If the current host is f server, write to disk directly
                     if (Simulation::isPageCachingEnabled()) {
 
                         bool write_locally = location->getServerStorageService() == nullptr;
 
                         if (write_locally) {
-                            simulation->writebackWithMemoryCache(file, msg->payload, location, true);
+                            simulation->writebackWithMemoryCache(f, msg->payload, location, true);
                         } else {
-                            simulation->writeThroughWithMemoryCache(file, msg->payload, location);
+                            simulation->writeThroughWithMemoryCache(f, msg->payload, location);
                         }
                     } else {
                         // Write to disk
@@ -333,9 +331,9 @@ namespace wrench {
                     bool write_locally = location->getServerStorageService() == nullptr;
 
                     if (write_locally) {
-                        simulation->writebackWithMemoryCache(file, msg->payload, location, true);
+                        simulation->writebackWithMemoryCache(f, msg->payload, location, true);
                     } else {
-                        simulation->writeThroughWithMemoryCache(file, msg->payload, location);
+                        simulation->writeThroughWithMemoryCache(f, msg->payload, location);
                     }
                 } else {
                     //                     Write to disk
@@ -355,17 +353,17 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to send a file from the local disk to the network
-     * @param file: the file
+     * @brief Method to send a f from the local disk to the network
+     * @param f: the f
      * @param location: the source location
-     * @param num_bytes_to_transfer: number of bytes to transfer
+     * @param num_bytes: number of bytes to transfer
      * @param mailbox: the destination mailbox
      *
      * @throw shared_ptr<FailureCause>
      */
-    void FileTransferThread::sendLocalFileToNetwork(std::shared_ptr<DataFile> file,
-                                                    std::shared_ptr<FileLocation> location,
-                                                    double num_bytes_to_transfer,
+    void FileTransferThread::sendLocalFileToNetwork(const std::shared_ptr<DataFile>& f,
+                                                    const std::shared_ptr<FileLocation>& location,
+                                                    double num_bytes,
                                                     simgrid::s4u::Mailbox *mailbox) {
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
@@ -376,18 +374,18 @@ namespace wrench {
             try {
                 /** Non-zero buffer size */
                 std::shared_ptr<S4U_PendingCommunication> req = nullptr;
-                // Sending a zero-byte file is really sending a 1-byte file
-                double remaining = std::max<double>(1, num_bytes_to_transfer);
+                // Sending a zero-byte f is really sending a 1-byte f
+                double remaining = std::max<double>(1, num_bytes);
 
                 if (Simulation::isPageCachingEnabled()) {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                 }
 
                 while (remaining > 0) {
-                    double chunk_size = std::min<double>(this->buffer_size, remaining);
+                    double chunk_size = std::min<double>((double)this->buffer_size, remaining);
 
                     if (Simulation::isPageCachingEnabled()) {
-                        simulation->readWithMemoryCache(file, chunk_size, location);
+                        simulation->readWithMemoryCache(f, chunk_size, location);
                     } else {
                         WRENCH_INFO("Reading %s bytes from disk", std::to_string(chunk_size).c_str());
                         simulation->readFromDisk(chunk_size, location->getStorageService()->hostname,
@@ -418,22 +416,22 @@ namespace wrench {
     }
 
     /**
-     * @brief Method to copy a file localy
-     * @param file: the file to copy
-     * @param src_location: the source location
-     * @param dst_location: the destination location
+     * @brief Method to copy a f localy
+     * @param f: the f to copy
+     * @param src_loc: the source location
+     * @param dst_loc: the destination location
      */
-    void FileTransferThread::copyFileLocally(std::shared_ptr<DataFile> file,
-                                             std::shared_ptr<FileLocation> src_location,
-                                             std::shared_ptr<FileLocation> dst_location) {
-        double remaining = file->getSize();
-        double to_send = std::min<double>(this->buffer_size, remaining);
+    void FileTransferThread::copyFileLocally(const std::shared_ptr<DataFile>& f,
+                                             const std::shared_ptr<FileLocation>& src_loc,
+                                             const std::shared_ptr<FileLocation>& dst_loc) {
+        double remaining = f->getSize();
+        double to_send = std::min<double>((double)this->buffer_size, remaining);
 
-        if ((src_location->getStorageService() == dst_location->getStorageService()) and
-            (src_location->getFullAbsolutePath() == dst_location->getFullAbsolutePath())) {
+        if ((src_loc->getStorageService() == dst_loc->getStorageService()) and
+            (src_loc->getFullAbsolutePath() == dst_loc->getFullAbsolutePath())) {
             WRENCH_INFO(
-                    "FileTransferThread::copyFileLocally(): Copying file %s onto itself at location %s... ignoring",
-                    file->getID().c_str(), src_location->toString().c_str());
+                    "FileTransferThread::copyFileLocally(): Copying f %s onto itself at location %s... ignoring",
+                    f->getID().c_str(), src_loc->toString().c_str());
             return;
         }
 
@@ -444,48 +442,48 @@ namespace wrench {
 
         } else {
             // Read the first chunk
-            simulation->readFromDisk(to_send, src_location->getStorageService()->hostname,
-                                     src_location->getMountPoint());
+            simulation->readFromDisk(to_send, src_loc->getStorageService()->hostname,
+                                     src_loc->getMountPoint());
             // start the pipeline
-            while (remaining > this->buffer_size) {
+            while (remaining > (double)this->buffer_size) {
 
                 simulation->readFromDiskAndWriteToDiskConcurrently(
-                        this->buffer_size, this->buffer_size, src_location->getStorageService()->hostname,
-                        src_location->getMountPoint(), dst_location->getMountPoint());
+                        (double)this->buffer_size, (double)this->buffer_size, src_loc->getStorageService()->hostname,
+                        src_loc->getMountPoint(), dst_loc->getMountPoint());
 
                 //
-                //                simulation->writeToDisk(this->buffer_size, dst_location->getStorageService()->hostname,
-                //                                            dst_location->getMountPoint());
-                //                simulation->readFromDisk(this->buffer_size, src_location->getStorageService()->hostname,
-                //                                             src_location->getMountPoint());
+                //                simulation->writeToDisk(this->buffer_size, dst_loc->getStorageService()->hostname,
+                //                                            dst_loc->getMountPoint());
+                //                simulation->readFromDisk(this->buffer_size, src_loc->getStorageService()->hostname,
+                //                                             src_loc->getMountPoint());
 
-                remaining -= this->buffer_size;
+                remaining -= (double)this->buffer_size;
             }
             // Write the last chunk
-            simulation->writeToDisk(remaining, dst_location->getStorageService()->hostname,
-                                    dst_location->getMountPoint());
+            simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
+                                    dst_loc->getMountPoint());
         }
     }
 
     /**
-     * @brief Download a file to a local partition/disk
-     * @param file: the file to download
-     * @param src_location: the source location
-     * @param dst_location: the destination location
+     * @brief Download a f to a local partition/disk
+     * @param f: the f to download
+     * @param src_loc: the source location
+     * @param dst_loc: the destination location
      */
-    void FileTransferThread::downloadFileFromStorageService(std::shared_ptr<DataFile> file,
-                                                            std::shared_ptr<FileLocation> src_location,
-                                                            std::shared_ptr<FileLocation> dst_location) {
-        if (file == nullptr) {
+    void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile>& f,
+                                                            const std::shared_ptr<FileLocation>& src_loc,
+                                                            const std::shared_ptr<FileLocation>& dst_loc) {
+        if (f == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }
 
-        WRENCH_INFO("Downloading file  %s from location %s",
-                    file->getID().c_str(), src_location->toString().c_str());
+        WRENCH_INFO("Downloading f  %s from location %s",
+                    f->getID().c_str(), src_loc->toString().c_str());
 
         // Check that the buffer size is compatible
-        if (((this->buffer_size == 0) && (src_location->getStorageService()->buffer_size != 0)) or
-            ((this->buffer_size != 0) && (src_location->getStorageService()->buffer_size == 0))) {
+        if (((this->buffer_size == 0) && (src_loc->getStorageService()->buffer_size != 0)) or
+            ((this->buffer_size != 0) && (src_loc->getStorageService()->buffer_size == 0))) {
             throw std::invalid_argument("FileTransferThread::downloadFileFromStorageService(): "
                                         "Incompatible buffer size specs (both must be zero, or both must be non-zero");
         }
@@ -497,16 +495,16 @@ namespace wrench {
 
         try {
             S4U_Mailbox::putMessage(
-                    src_location->getStorageService()->mailbox,
+                    src_loc->getStorageService()->mailbox,
                     new StorageServiceFileReadRequestMessage(
                             request_answer_mailbox,
                             mailbox_that_should_receive_file_content,
-                            file,
-                            src_location,
-                            file->getSize(),
+                            f,
+                            src_loc,
+                            f->getSize(),
                             std::min<unsigned long>(this->buffer_size,
                                                     this->buffer_size),
-                            src_location->getStorageService()->getMessagePayloadValue(
+                            src_loc->getStorageService()->getMessagePayloadValue(
                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
             S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);
@@ -535,7 +533,7 @@ namespace wrench {
                                      message->getName() + "] message!");
         }
 
-        WRENCH_INFO("Download request accepted (will receive file content on mailbox_name %s)",
+        WRENCH_INFO("Download request accepted (will receive f content on mailbox_name %s)",
                     mailbox_that_should_receive_file_content->get_cname());
 
         if (this->buffer_size == 0) {
@@ -562,19 +560,19 @@ namespace wrench {
                 while (not done) {
                     // Issue the receive
                     auto req = S4U_Mailbox::igetMessage(mailbox_that_should_receive_file_content);
-                    //                    WRENCH_INFO("Downloaded of %f of file  %s from location %s",
-                    //                                msg->payload, file->getID().c_str(), src_location->toString().c_str());
+                    //                    WRENCH_INFO("Downloaded of %f of f  %s from location %s",
+                    //                                msg->payload, f->getID().c_str(), src_loc->toString().c_str());
                     // Do the I/O
                     if (Simulation::isPageCachingEnabled()) {
-                        simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
+                        simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
                     } else {
                         // Write to disk
                         simulation->writeToDisk(msg->payload,
-                                                dst_location->getStorageService()->getHostname(),
-                                                dst_location->getMountPoint());
+                                                dst_loc->getStorageService()->getHostname(),
+                                                dst_loc->getMountPoint());
                     }
                     // Wait for the comm to finish
-                    //                    WRENCH_INFO("Wrote of %f of file  %s", msg->payload, file->getID().c_str());
+                    //                    WRENCH_INFO("Wrote of %f of f  %s", msg->payload, f->getID().c_str());
                     msg = req->wait();
                     if (auto file_content_chunk_msg =
                                 dynamic_cast<StorageServiceFileContentChunkMessage *>(msg.get())) {
@@ -590,12 +588,12 @@ namespace wrench {
 
                 // Do the I/O for the last chunk
                 if (Simulation::isPageCachingEnabled()) {
-                    simulation->writebackWithMemoryCache(file, msg->payload, dst_location, false);
+                    simulation->writebackWithMemoryCache(f, msg->payload, dst_loc, false);
                 } else {
                     // Write to disk
                     simulation->writeToDisk(msg->payload,
-                                            dst_location->getStorageService()->getHostname(),
-                                            dst_location->getMountPoint());
+                                            dst_loc->getStorageService()->getHostname(),
+                                            dst_loc->getMountPoint());
                 }
             } catch (std::shared_ptr<NetworkError> &e) {
                 S4U_Mailbox::retireTemporaryMailbox(mailbox_that_should_receive_file_content);

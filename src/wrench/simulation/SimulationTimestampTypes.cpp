@@ -6,18 +6,7 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_timestamps, "Log category for SimulationTimestamps");
 
-
 namespace wrench {
-
-    ///*
-    // *
-    // * @param file - tuple of three strings relating to File, Source and Whoami
-    // * @return XOR of hashes of file
-    // */
-    ///size_t file_hash( const File & file )
-    ///{
-    ///    return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
-    ///}
 
     SimulationTimestampType::SimulationTimestampType() {
         this->date = S4U_Simulation::getClock();
@@ -291,7 +280,6 @@ namespace wrench {
         pending_file_copies.insert(std::make_pair(FileCopy(this->file, this->source, this->destination), this));
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -418,7 +406,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -445,7 +432,6 @@ namespace wrench {
 
         pending_file_reads.insert(std::make_pair(FileReadWrite(this->file, this->source, this->service), std::make_pair(this, this->task)));
     }
-
 
     /**
      * @brief Constructor
@@ -577,7 +563,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -607,7 +592,6 @@ namespace wrench {
 
         pending_file_writes.insert(std::make_pair(FileReadWrite(this->file, this->destination, this->service), std::make_pair(this, this->task)));
     }
-
 
     /**
      * @brief Constructor
@@ -739,7 +723,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -765,7 +748,6 @@ namespace wrench {
 
         pending_disk_reads.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
     }
-
 
     /**
      * @brief Constructor
@@ -924,7 +906,6 @@ namespace wrench {
         pending_disk_writes.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -972,7 +953,6 @@ namespace wrench {
         // match this timestamp with a SimulationTimestampDiskWriteStart
         setEndpoints();
     }
-
 
     /**
      * @brief Constructor

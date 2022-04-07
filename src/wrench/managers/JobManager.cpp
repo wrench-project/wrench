@@ -99,7 +99,6 @@ namespace wrench {
             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
-
         // Transform the non-vector file location map into a vector file location map
         std::map<std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> file_locations_vector;
         for (auto const &e: file_locations) {
@@ -143,9 +142,8 @@ namespace wrench {
             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> pre_file_copies,
             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>, std::shared_ptr<FileLocation>>> post_file_copies,
             std::vector<std::tuple<std::shared_ptr<DataFile>, std::shared_ptr<FileLocation>>> cleanup_file_deletions) {
-
         // Do a sanity check of everything (looking for nullptr)
-        for (auto t: tasks) {
+        for (const auto &t: tasks) {
             if (t == nullptr) {
                 throw std::invalid_argument("JobManager::createStandardJob(): nullptr task in the task vector");
             }
@@ -397,7 +395,6 @@ namespace wrench {
     void JobManager::submitJob(const std::shared_ptr<StandardJob> &job,
                                const std::shared_ptr<ComputeService> &compute_service,
                                std::map<std::string, std::string> service_specific_args) {
-
         if ((job == nullptr) || (compute_service == nullptr)) {
             throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
         }
@@ -641,7 +638,7 @@ namespace wrench {
         cjob->addCustomAction(
                 "pilot_job_",
                 0, 0,
-                [callback_mailbox, job, compute_service](std::shared_ptr<ActionExecutor> executor) {
+                [callback_mailbox, job, compute_service](const std::shared_ptr<ActionExecutor>& executor) {
                     // Create a bare-metal compute service and start it
                     auto execution_service = executor->getActionExecutionService();
 
@@ -672,7 +669,7 @@ namespace wrench {
                     // Sleep FOREVER (will be killed by service above)
                     Simulation::sleep(DBL_MAX);
                 },
-                [job](std::shared_ptr<ActionExecutor> executor) {
+                [job](const std::shared_ptr<ActionExecutor>& executor) {
                     job->compute_service->stop(true, ComputeService::TerminationCause::TERMINATION_JOB_TIMEOUT);
                 });
 
@@ -691,9 +688,7 @@ namespace wrench {
             throw;
         }
 
-
         this->cjob_to_pjob_map[job->compound_job] = job;
-
 
         this->acquireDaemonLock();
         this->jobs_to_dispatch.push_back(job->compound_job);
@@ -998,7 +993,6 @@ namespace wrench {
      */
     void JobManager::processStandardJobCompletion(const std::shared_ptr<StandardJob> &job,
                                                   std::shared_ptr<ComputeService> compute_service) {
-
         // update job state
         job->state = StandardJob::State::COMPLETED;
 
@@ -1030,9 +1024,8 @@ namespace wrench {
      * @param job: the job that failure
      * @param compute_service: the compute service on which the job has failed
      */
-    void JobManager::processStandardJobFailure(std::shared_ptr<StandardJob> job,
+    void JobManager::processStandardJobFailure(const std::shared_ptr<StandardJob>& job,
                                                std::shared_ptr<ComputeService> compute_service) {
-
         // update job state
         job->state = StandardJob::State::FAILED;
 
@@ -1060,7 +1053,7 @@ namespace wrench {
 
         // Forward the notification along the notification chain
         auto augmented_message =
-                new JobManagerStandardJobFailedMessage(job, compute_service,
+                new JobManagerStandardJobFailedMessage(job, std::move(compute_service),
                                                        state_changes,
                                                        failure_count_increments,
                                                        std::move(job_failure_cause));
@@ -1082,7 +1075,7 @@ namespace wrench {
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
         S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                 new ComputeServicePilotJobStartedMessage(job, compute_service, 0.0));
+                                 new ComputeServicePilotJobStartedMessage(job, std::move(compute_service), 0.0));
     }
 
     /**
@@ -1102,7 +1095,7 @@ namespace wrench {
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
         S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                 new ComputeServicePilotJobExpiredMessage(job, compute_service, 0.0));
+                                 new ComputeServicePilotJobExpiredMessage(job, std::move(compute_service), 0.0));
     }
 
     /**
@@ -1124,7 +1117,7 @@ namespace wrench {
         // Forward the notification to the source
         WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
         S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                 new ComputeServicePilotJobFailedMessage(job, std::move(compute_service), cause, 0.0));
+                                 new ComputeServicePilotJobFailedMessage(job, std::move(compute_service), std::move(cause), 0.0));
     }
 
     /**
@@ -1141,7 +1134,6 @@ namespace wrench {
      * @brief Helper method to dispatch jobs
      */
     void JobManager::dispatchJobs() {
-
         std::set<std::shared_ptr<Job>> dispatched;
 
         this->acquireDaemonLock();
@@ -1241,7 +1233,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Method to process a compound job completion
      * @param job: the job that completed
@@ -1249,7 +1240,6 @@ namespace wrench {
      */
     void JobManager::processCompoundJobCompletion(const std::shared_ptr<CompoundJob> &job,
                                                   std::shared_ptr<ComputeService> compute_service) {
-
         job->state = CompoundJob::State::COMPLETED;
         job->end_date = Simulation::getCurrentSimulatedDate();
         // remove the job from the "dispatched" list
