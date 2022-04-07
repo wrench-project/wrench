@@ -13,7 +13,9 @@
 namespace wrench {
     namespace XRootD{
 
-        SearchStack::SearchStack(Node* terminal,std::shared_ptr<DataFile> file):terminalNode(terminal),file(file),fileLocation(terminalNode->hasFile(file)){}
+        SearchStack::SearchStack(Node* terminal,std::shared_ptr<DataFile> file):terminalNode(terminal),file(file),fileLocation(terminalNode->hasFile(file)){
+            current=stack.begin();
+        }
 
         Node* SearchStack::moveUp(){
             current--;
@@ -47,6 +49,7 @@ namespace wrench {
                 push(current);
                 if(current==potentialParent){
                     headNode=potentialParent;
+                    this->current=stack.begin();
                     return true;
                 }
                 current=current->getParent();
