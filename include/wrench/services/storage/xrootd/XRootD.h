@@ -6,7 +6,14 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  */
-
+/**
+ * Copyright (c) 2017-2018. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 #ifndef WRENCH_XROOTD_H
 #define WRENCH_XROOTD_H
@@ -26,7 +33,7 @@ namespace wrench {
             std::shared_ptr<Node> createStorageServer(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
             std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
-
+            int size();
         private:
             friend Node;
             std::vector<std::shared_ptr<Node>> getFileNodes(std::shared_ptr<DataFile> file);
