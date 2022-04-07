@@ -10,6 +10,7 @@
 
 #include <cfloat>
 #include <numeric>
+#include <utility>
 
 #include "wrench/services/compute/cloud/CloudComputeServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
@@ -39,8 +40,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     CloudComputeService::CloudComputeService(const std::string &hostname,
-                                             std::vector<std::string> execution_hosts,
-                                             std::string scratch_space_mount_point,
+                                             const std::vector<std::string>& execution_hosts,
+                                             const std::string& scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "cloud_service",
                                                                                                                          scratch_space_mount_point) {
@@ -120,7 +121,7 @@ namespace wrench {
                                               double ram_memory,
                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
-        return this->createVM(num_cores, ram_memory, "", property_list, messagepayload_list);
+        return this->createVM(num_cores, ram_memory, "", std::move(property_list), std::move(messagepayload_list));
     }
 
     /**
@@ -160,7 +161,7 @@ namespace wrench {
                 answer_mailbox,
                 new CloudComputeServiceCreateVMRequestMessage(
                         answer_mailbox,
-                        num_cores, ram_memory, desired_vm_name, property_list, messagepayload_list,
+                        num_cores, ram_memory, std::move(desired_vm_name), std::move(property_list), std::move(messagepayload_list),
                         this->getMessagePayloadValue(
                                 CloudComputeServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
@@ -201,7 +202,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void CloudComputeService::shutdownVM(const std::string &vm_name, bool send_failure_notifications, ComputeService::TerminationCause termination_cause) {
-
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument("CloudComputeService::shutdownVM(): Unknown VM name '" + vm_name + "'");
         }
@@ -632,7 +632,7 @@ namespace wrench {
     void CloudComputeService::processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                               unsigned long requested_num_cores,
                                               double requested_ram,
-                                              std::string desired_vm_name,
+                                              const std::string& desired_vm_name,
                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
@@ -695,8 +695,8 @@ namespace wrench {
             } else {
                 // Create the VM
                 auto vm = std::shared_ptr<S4U_VirtualMachine>(
-                        new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, property_list,
-                                               messagepayload_list));
+                        new S4U_VirtualMachine(vm_name, requested_num_cores, requested_ram, std::move(property_list),
+                                               std::move(messagepayload_list)));
 
                 WRENCH_INFO("Created a VM called %s with %lu cores and %lf RAM",
                             vm_name.c_str(), requested_num_cores, requested_ram);
@@ -1094,7 +1094,6 @@ namespace wrench {
      */
     void CloudComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                             const std::string &key) {
-        // Build a dictionary
         std::map<std::string, double> dict;
 
         if (key == "num_hosts") {
@@ -1257,7 +1256,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void CloudComputeService::validateProperties() {
-
         // VM Boot overhead
         bool success = true;
         double vm_boot_overhead = 0;
