@@ -265,9 +265,9 @@ namespace wrench {
     *
     * @throw shared_ptr<FailureCause>
     */
-    void FileTransferThread::receiveFileFromNetwork(const std::shared_ptr<DataFile>& f,
+    void FileTransferThread::receiveFileFromNetwork(const std::shared_ptr<DataFile> &f,
                                                     simgrid::s4u::Mailbox *mailbox,
-                                                    const std::shared_ptr<FileLocation>& location) {
+                                                    const std::shared_ptr<FileLocation> &location) {
         /** Ideal Fluid model buffer size */
         if (this->buffer_size == 0) {
             throw std::runtime_error(
@@ -361,8 +361,8 @@ namespace wrench {
      *
      * @throw shared_ptr<FailureCause>
      */
-    void FileTransferThread::sendLocalFileToNetwork(const std::shared_ptr<DataFile>& f,
-                                                    const std::shared_ptr<FileLocation>& location,
+    void FileTransferThread::sendLocalFileToNetwork(const std::shared_ptr<DataFile> &f,
+                                                    const std::shared_ptr<FileLocation> &location,
                                                     double num_bytes,
                                                     simgrid::s4u::Mailbox *mailbox) {
         /** Ideal Fluid model buffer size */
@@ -382,7 +382,7 @@ namespace wrench {
                 }
 
                 while (remaining > 0) {
-                    double chunk_size = std::min<double>((double)this->buffer_size, remaining);
+                    double chunk_size = std::min<double>((double) this->buffer_size, remaining);
 
                     if (Simulation::isPageCachingEnabled()) {
                         simulation->readWithMemoryCache(f, chunk_size, location);
@@ -421,11 +421,11 @@ namespace wrench {
      * @param src_loc: the source location
      * @param dst_loc: the destination location
      */
-    void FileTransferThread::copyFileLocally(const std::shared_ptr<DataFile>& f,
-                                             const std::shared_ptr<FileLocation>& src_loc,
-                                             const std::shared_ptr<FileLocation>& dst_loc) {
+    void FileTransferThread::copyFileLocally(const std::shared_ptr<DataFile> &f,
+                                             const std::shared_ptr<FileLocation> &src_loc,
+                                             const std::shared_ptr<FileLocation> &dst_loc) {
         double remaining = f->getSize();
-        double to_send = std::min<double>((double)this->buffer_size, remaining);
+        double to_send = std::min<double>((double) this->buffer_size, remaining);
 
         if ((src_loc->getStorageService() == dst_loc->getStorageService()) and
             (src_loc->getFullAbsolutePath() == dst_loc->getFullAbsolutePath())) {
@@ -445,10 +445,10 @@ namespace wrench {
             simulation->readFromDisk(to_send, src_loc->getStorageService()->hostname,
                                      src_loc->getMountPoint());
             // start the pipeline
-            while (remaining > (double)this->buffer_size) {
+            while (remaining > (double) this->buffer_size) {
 
                 simulation->readFromDiskAndWriteToDiskConcurrently(
-                        (double)this->buffer_size, (double)this->buffer_size, src_loc->getStorageService()->hostname,
+                        (double) this->buffer_size, (double) this->buffer_size, src_loc->getStorageService()->hostname,
                         src_loc->getMountPoint(), dst_loc->getMountPoint());
 
                 //
@@ -457,7 +457,7 @@ namespace wrench {
                 //                simulation->readFromDisk(this->buffer_size, src_loc->getStorageService()->hostname,
                 //                                             src_loc->getMountPoint());
 
-                remaining -= (double)this->buffer_size;
+                remaining -= (double) this->buffer_size;
             }
             // Write the last chunk
             simulation->writeToDisk(remaining, dst_loc->getStorageService()->hostname,
@@ -471,9 +471,9 @@ namespace wrench {
      * @param src_loc: the source location
      * @param dst_loc: the destination location
      */
-    void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile>& f,
-                                                            const std::shared_ptr<FileLocation>& src_loc,
-                                                            const std::shared_ptr<FileLocation>& dst_loc) {
+    void FileTransferThread::downloadFileFromStorageService(const std::shared_ptr<DataFile> &f,
+                                                            const std::shared_ptr<FileLocation> &src_loc,
+                                                            const std::shared_ptr<FileLocation> &dst_loc) {
         if (f == nullptr) {
             throw std::invalid_argument("StorageService::downloadFile(): Invalid arguments");
         }

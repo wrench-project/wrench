@@ -40,8 +40,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     CloudComputeService::CloudComputeService(const std::string &hostname,
-                                             const std::vector<std::string>& execution_hosts,
-                                             const std::string& scratch_space_mount_point,
+                                             const std::vector<std::string> &execution_hosts,
+                                             const std::string &scratch_space_mount_point,
                                              WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                              WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "cloud_service",
                                                                                                                          scratch_space_mount_point) {
@@ -632,7 +632,7 @@ namespace wrench {
     void CloudComputeService::processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                               unsigned long requested_num_cores,
                                               double requested_ram,
-                                              const std::string& desired_vm_name,
+                                              const std::string &desired_vm_name,
                                               WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                               WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) {
         WRENCH_INFO("Asked to create a VM with %s cores and %s RAM",
