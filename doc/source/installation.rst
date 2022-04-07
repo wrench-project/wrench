@@ -12,10 +12,10 @@ WRENCH is developed in ``C++``. The code follows the C++14 standard, and
 thus older compilers may fail to compile it. Therefore, we strongly
 recommend users to satisfy the following requirements:
 
--  **CMake** - version 3.7 or higher
+-  **CMake** - version 3.10 or higher
 
-And, one of the following: - **g++** - version 6.3 or higher - **clang**
-- version 3.8 or higher
+And, one of the following: - **g++** - version 7.5 or higher - **clang**
+- version 9.0 or higher
 
 .. _install-prerequisites-dependencies:
 
@@ -38,6 +38,10 @@ Optional Dependencies
    or higher (only required for running tests)
 -  `Doxygen <http://www.doxygen.org>`__ – version 1.8 or higher (only
    required for generating documentation)
+-  `Sphinx <https://www.sphinx-doc.org/en/master/usage/installation.html>`__ - 
+   version 4.5 or higher along with the following Python packages: 
+   ``pip3 install sphinx-rtd-theme breathe recommonmark``  (only required 
+   for generating documentation)
 -  `Batsched <https://gitlab.inria.fr/batsim/batsched>`__ – version 1.4
    - useful for expanded batch-scheduled resource simulation
    capabilities
@@ -52,20 +56,20 @@ Source Install
 Building WRENCH
 ---------------
 
-You can download the ``@WRENCHRelease.tar.gz`` archive from the `GitHub
+You can download the ``wrench-<version>.tar.gz`` archive from the `GitHub
 releases <https://github.com/wrench-project/wrench/releases>`__ page.
 Once you have installed dependencies (see above), you can install WRENCH
 as follows:
 
 .. code:: sh
 
-      tar xf @WRENCHRelease.tar.gz
-      cd @WRENCHRelease
+      tar xf wrench-<version>.tar.gz
+      cd wrench-<version>
       mkdir build
       cd build
       cmake ..
       make -j8
-      make install # try “sudo make install” if you do not have write privileges
+      make install # try "sudo make install" if you do not have write privileges
 
 If you want to see actual compiler and linker invocations, add
 ``VERBOSE=1`` to the compilation command:
