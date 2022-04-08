@@ -448,7 +448,7 @@ namespace wrench {
             throw std::runtime_error("Unknown file " + filename);
         }
 
-        ss->createFile(file, FileLocation::LOCATION(ss));
+        wrench::Simulation::createFile(file, FileLocation::LOCATION(ss));
 
         // Return the expected answer
         return {};
