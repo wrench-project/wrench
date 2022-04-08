@@ -197,7 +197,7 @@ void FileDeleteActionExecutorTest::do_FileDeleteActionExecutorSuccessTest_test()
     // Create a file
     this->file = wrench::Simulation::addFile("some_file", 1000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
