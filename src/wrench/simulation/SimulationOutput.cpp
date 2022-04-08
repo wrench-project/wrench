@@ -699,7 +699,6 @@ namespace wrench {
 
         // add the task vertices
         for (const auto &task: workflow->getTasks()) {
-
             nlohmann::json files = nlohmann::json::array();
             for (const auto &f: task->getInputFiles()) {
                 files.push_back({{"link", "input"},
@@ -911,7 +910,6 @@ namespace wrench {
                 output << std::setw(4) << nlohmann::json(energy_consumption) << std::endl;
                 output.close();
             }
-
         } catch (std::runtime_error &e) {
             // Just re-throw
             throw;
@@ -1010,7 +1008,7 @@ namespace wrench {
                      {"cluster_id", host_to_cluster[host->get_name()]},
                      {"flop_rate", host->get_speed()},
                      {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                                        host->get_name())},
+                             host->get_name())},
                      {"cores", host->get_core_count()}});
         }
 
@@ -1592,7 +1590,6 @@ namespace wrench {
                                                      const std::shared_ptr<StorageService> &service,
                                                      std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
-
             this->addTimestamp<SimulationTimestampFileReadCompletion>(
                     new SimulationTimestampFileReadCompletion(date, file, src, service, std::move(task)));
         }

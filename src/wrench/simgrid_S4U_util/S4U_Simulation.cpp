@@ -1027,8 +1027,6 @@ namespace wrench {
         mount_point = FileLocation::sanitizePath(mount_point + "/");
 
         for (auto const &d: host->get_disks()) {
-
-
             // Get the disk's mount point
             const char *mp = d->get_property("mount");
             if (!mp) {

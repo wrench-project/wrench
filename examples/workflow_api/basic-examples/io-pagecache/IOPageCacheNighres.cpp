@@ -22,7 +22,7 @@
  */
 
 
-void export_output_single(wrench::SimulationOutput output, int num_tasks, std::string filename) {
+void export_output_single(wrench::SimulationOutput& output, int num_tasks, std::string filename) {
     auto read_start = output.getTrace<wrench::SimulationTimestampFileReadStart>();
     auto read_end = output.getTrace<wrench::SimulationTimestampFileReadCompletion>();
     auto write_start = output.getTrace<wrench::SimulationTimestampFileWriteStart>();
@@ -91,6 +91,9 @@ int main(int argc, char **argv) {
         simulation->stageFile(f, storage_service);
     }
 
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
+    simulation->getOutput().enableFileReadWriteCopyTimestamps(true);
+
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
@@ -107,19 +110,19 @@ int main(int argc, char **argv) {
     }
 
     {
-        std::string filename = "nighres/dump_nighres_" + mode + "_sim_time.json";
+        std::string filename = "nighres_dump_nighres_" + mode + "_sim_time.json";
         simulation->getOutput().dumpUnifiedJSON(workflow, filename);
         std::cerr << "Written output to file " + filename << "\n";
     }
 
     //    {
-    //        std::string filename = "nighres/nighres_" + mode + "_sim_time.csv";
+    //        std::string filename = "nighres_nighres_" + mode + "_sim_time.csv";
     //        export_output_single(simulation->getOutput(), 4, filename);
     //        std::cerr << "Written output to file " + filename << "\n";
     //    }
     //
     //    if (wrench::Simulation::isPageCachingEnabled()) {
-    //        std::string filename = "nighres/nighres_sim_mem.csv";
+    //        std::string filename = "nighres_nighres_sim_mem.csv";
     //        simulation->getMemoryManagerByHost("host01")->export_log(filename);
     //        std::cerr << "Written output to file " + filename << "\n";
     //    }

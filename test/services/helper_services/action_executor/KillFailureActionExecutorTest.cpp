@@ -350,7 +350,7 @@ void KillFailActionExecutorTest::do_ActionExecutorKillFailTest_test(double sleep
 
     // Create a file to read
     this->file = this->workflow->addFile("some_file", 1000000.0);
-    ss1->createFile(file, wrench::FileLocation::LOCATION(ss1));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss1));
 
     // Create a file to write
     this->file_to_write = this->workflow->addFile("some_file_to_write", 1000000.0);
