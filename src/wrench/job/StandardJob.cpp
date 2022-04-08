@@ -582,7 +582,6 @@ namespace wrench {
          * Look at all the tasks
          */
         for (auto &t: this->tasks) {
-
             // Set a provisional start date and end date
             t->setStartDate(-1.0);
             t->setEndDate(-1.0);
@@ -837,7 +836,6 @@ namespace wrench {
      * @return
      */
     bool StandardJob::usesScratch() {
-
         for (const auto &fl: this->file_locations) {
             for (auto const &fl_l: fl.second) {
                 if (fl_l == FileLocation::SCRATCH) {

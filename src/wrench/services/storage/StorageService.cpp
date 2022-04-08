@@ -464,7 +464,6 @@ namespace wrench {
             auto location = locations[file];
 
             if (action == READ) {
-
                 WRENCH_INFO("Reading file %s from location %s",
                             file->getID().c_str(),
                             location->toString().c_str());
@@ -473,7 +472,6 @@ namespace wrench {
                 WRENCH_INFO("File %s read", file->getID().c_str());
 
             } else {
-
                 WRENCH_INFO("Writing file %s to location %s",
                             file->getID().c_str(),
                             location->toString().c_str());

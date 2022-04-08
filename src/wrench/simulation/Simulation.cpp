@@ -100,7 +100,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
-
         if (Simulation::initialized) {
             throw std::runtime_error("Simulation::init(): Simulation already initialized");
         }
@@ -446,7 +445,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::launch() {
-
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
@@ -1518,7 +1516,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, double size) {
-
         if (size < 0) {
             throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
         }
