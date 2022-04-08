@@ -73,7 +73,7 @@ std::shared_ptr<wrench::Workflow> generate_workflow(int num_pipes, int num_tasks
     return workflow;
 }
 
-void export_output_single(wrench::SimulationOutput& output, int num_tasks, std::string filename) {
+void export_output_single(wrench::SimulationOutput &output, int num_tasks, std::string filename) {
     auto read_start = output.getTrace<wrench::SimulationTimestampFileReadStart>();
     auto read_end = output.getTrace<wrench::SimulationTimestampFileReadCompletion>();
     auto write_start = output.getTrace<wrench::SimulationTimestampFileWriteStart>();
