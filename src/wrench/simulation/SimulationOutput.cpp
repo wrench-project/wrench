@@ -1008,7 +1008,7 @@ namespace wrench {
                      {"cluster_id", host_to_cluster[host->get_name()]},
                      {"flop_rate", host->get_speed()},
                      {"memory_manager_service", Simulation::getHostMemoryCapacity(
-                                                        host->get_name())},
+                             host->get_name())},
                      {"cores", host->get_core_count()}});
         }
 
