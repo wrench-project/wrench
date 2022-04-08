@@ -127,7 +127,6 @@ namespace wrench {
     * @brief A base class for simulation timestamps regarding workflow tasks
     */
     class SimulationTimestampTask : public SimulationTimestampPair {
-
     public:
         std::shared_ptr<WorkflowTask> getTask();
         SimulationTimestampTask *getEndpoint() override;

@@ -191,7 +191,6 @@ namespace wrench {
             try {
                 sendLocalFileToNetwork(this->file, this->src_location, num_bytes_to_transfer, this->dst_mailbox);
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
-
                 WRENCH_INFO(
                         "FileTransferThread::main(): Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
@@ -204,7 +203,6 @@ namespace wrench {
             try {
                 receiveFileFromNetwork(this->file, this->src_mailbox, this->dst_location);
             } catch (std::shared_ptr<NetworkError> &failure_cause) {
-
                 WRENCH_INFO(
                         "FileTransferThread::main() Network error (%s)", failure_cause->toString().c_str());
                 msg_to_send_back->success = false;
@@ -300,7 +298,6 @@ namespace wrench {
                     // In NFS, write to cache only if the current host not the server host where the f is stored
                     // If the current host is f server, write to disk directly
                     if (Simulation::isPageCachingEnabled()) {
-
                         bool write_locally = location->getServerStorageService() == nullptr;
 
                         if (write_locally) {
@@ -345,7 +342,6 @@ namespace wrench {
                     simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->log();
                     //                    simulation->getMemoryManagerByHost(location->getStorageService()->hostname)->fincore();
                 }
-
             } catch (std::shared_ptr<NetworkError> &e) {
                 throw;
             }
@@ -446,7 +442,6 @@ namespace wrench {
                                      src_loc->getMountPoint());
             // start the pipeline
             while (remaining > (double) this->buffer_size) {
-
                 simulation->readFromDiskAndWriteToDiskConcurrently(
                         (double) this->buffer_size, (double) this->buffer_size, src_loc->getStorageService()->hostname,
                         src_loc->getMountPoint(), dst_loc->getMountPoint());
