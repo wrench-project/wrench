@@ -40,6 +40,8 @@ namespace wrench {
                                                                file_locations(std::move(file_locations)) {
         if (num_bytes_to_read < 0.0) {
             this->num_bytes_to_read = this->file->getSize();
+        } else if (num_bytes_to_read > this->file->getSize()) {
+            throw std::invalid_argument("FileReadAction::FileReadAction(): cannot create a file read action that would read more bytes than the file size");
         }
     }
 
