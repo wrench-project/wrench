@@ -147,7 +147,6 @@ namespace wrench {
      * @param parallel_per_thread_work: amount of parallel per-thread work
      */
     void ComputeAction::simulateComputationAsComputation(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
-
         try {
             S4U_Simulation::compute_multi_threaded(num_threads,
                                                    action_executor->getThreadCreationOverhead(),

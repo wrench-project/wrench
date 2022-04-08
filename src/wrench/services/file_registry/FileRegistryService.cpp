@@ -39,7 +39,6 @@ namespace wrench {
             std::string hostname,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname, "file_registry") {
-
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -80,7 +79,6 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-
             throw ExecutionException(cause);
         }
 
@@ -107,7 +105,6 @@ namespace wrench {
             std::shared_ptr<DataFile> file,
             std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service) {
-
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
         }

@@ -363,7 +363,6 @@ namespace wrench {
                                                       simgrid::s4u::Mailbox *answer_mailbox,
                                                       simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content,
                                                       unsigned long buffer_size) {
-
         // Figure out whether this succeeds or not
         std::shared_ptr<FailureCause> failure_cause = nullptr;
 
@@ -434,7 +433,6 @@ namespace wrench {
                                                       const std::shared_ptr<FileLocation> &src_location,
                                                       const std::shared_ptr<FileLocation> &dst_location,
                                                       simgrid::s4u::Mailbox *answer_mailbox) {
-
         //        // File System  and path at the destination exists?
         //        if (this->file_systems.find(dst_location->getMountPoint()) == this->file_systems.end())  {
         //

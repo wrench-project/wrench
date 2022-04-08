@@ -221,7 +221,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionSuccessTest_t
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -339,7 +339,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionTerminateTest
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -505,7 +505,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashRestartT
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -630,7 +630,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionCrashNoRestar
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -759,7 +759,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionFailureTest_t
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -864,7 +864,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceOneActionNotEnoughReso
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
@@ -1027,7 +1027,7 @@ void ActionExecutionServiceTest::do_ActionExecutionServiceThreeActionsInSequence
     // Create a file
     this->file = this->workflow->addFile("some_file", 1000000.0);
 
-    ss->createFile(file, wrench::FileLocation::LOCATION(ss));
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

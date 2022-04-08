@@ -158,7 +158,7 @@ namespace wrench {
         WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
-        throw std::runtime_error("ABORTING DUE TO JOB FAILURE");
+        throw std::runtime_error("ABORTING DUE TO JOB FAILURE: " + event->failure_cause->toString());
     }
 
 

@@ -174,7 +174,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dst, bool redundant_dependencies) {
-
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
         }
@@ -185,7 +184,6 @@ namespace wrench {
         }
 
         if (redundant_dependencies || not this->dag.doesPathExist(src.get(), dst.get())) {
-
             WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
             this->dag.addEdge(src.get(), dst.get());
 
@@ -300,7 +298,6 @@ namespace wrench {
             std::shared_ptr<WorkflowTask> task = it.second;
 
             if (task->getState() == WorkflowTask::State::READY) {
-
                 if (task->getClusterID().empty()) {
                     task_map[task->getID()] = {task};
 

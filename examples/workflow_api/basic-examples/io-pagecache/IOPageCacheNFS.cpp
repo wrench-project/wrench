@@ -65,7 +65,7 @@ std::shared_ptr<wrench::Workflow> workflow_multithread(int num_pipes, int num_ta
     return workflow;
 }
 
-void export_output_multi(wrench::SimulationOutput output, int num_tasks, std::string filename) {
+void export_output_multi(wrench::SimulationOutput& output, int num_tasks, std::string filename) {
     auto read_start = output.getTrace<wrench::SimulationTimestampFileReadStart>();
     auto read_end = output.getTrace<wrench::SimulationTimestampFileReadCompletion>();
     auto write_start = output.getTrace<wrench::SimulationTimestampFileWriteStart>();
@@ -169,6 +169,9 @@ int main(int argc, char **argv) {
         simulation->stageFile(f, server_storage_service);
     }
 
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
+    simulation->getOutput().enableFileReadWriteCopyTimestamps(true);
+
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -186,13 +189,13 @@ int main(int argc, char **argv) {
     }
 
     double end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    std::string timelog_filename = "nfs/run_time_" + sub_dir + ".csv";
+    std::string timelog_filename = "nfs_run_time_" + sub_dir + ".csv";
     FILE *time_log_file = fopen(timelog_filename.c_str(), "a");
     fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start) / 1000);
     fclose(time_log_file);
 
     //    simulation->getOutput().dumpUnifiedJSON(workflow,
-    //                                           "nfs/" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
+    //                                           "nfs_" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
 
     return 0;
 }

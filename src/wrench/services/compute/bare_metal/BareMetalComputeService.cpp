@@ -138,7 +138,6 @@ namespace wrench {
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
                 if (not target_host.empty()) {
-
                     if (compute_resources.find(target_host) == compute_resources.end()) {
                         throw std::invalid_argument(
                                 "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +

@@ -37,7 +37,6 @@ namespace wrench {
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
-
         if (not simgrid::s4u::Engine::is_initialized()) {
             throw std::runtime_error("Simulation must be initialized before services can be created");
         }
@@ -128,7 +127,6 @@ namespace wrench {
      * @throw std::shared_ptr<HostError>
      */
     void S4U_Daemon::startDaemon(bool daemonized, bool auto_restart) {
-
         // Check that there is a lifesaver
         if (not this->life_saver) {
             throw std::runtime_error(
@@ -170,7 +168,6 @@ namespace wrench {
         // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
         // fixed at some point, but this test saves us for now.
         if (not this->has_returned_from_main) {
-
             this->setupOnExitFunction();
 
             if (this->daemonized) {
@@ -192,7 +189,6 @@ namespace wrench {
      * @brief Sets up the on_exit function for the actor
      */
     void S4U_Daemon::setupOnExitFunction() {
-
         this->s4u_actor->on_exit([this](bool failed) {
             // Set state to down
             this->state = S4U_Daemon::State::DOWN;
@@ -233,7 +229,6 @@ namespace wrench {
  * @brief Method that run's the user-defined main method (that's called by the S4U actor class)
  */
     void S4U_Daemon::runMainMethod() {
-
         S4U_Daemon::map_actor_to_recv_mailbox[simgrid::s4u::this_actor::get_pid()] = this->recv_mailbox;
         this->num_starts++;
         // Compute zero flop so that nothing happens
@@ -257,7 +252,6 @@ namespace wrench {
  * @throw std::shared_ptr<FatalFailure>
  */
     bool S4U_Daemon::killActor() {
-
         // Do the kill only if valid actor and not already done
         if ((this->s4u_actor != nullptr) && (not this->has_returned_from_main)) {
             try {
@@ -299,7 +293,6 @@ namespace wrench {
  *          and B is the int returned from main() (if main returned).
  */
     std::pair<bool, int> S4U_Daemon::join() {
-
         if (this->s4u_actor != nullptr) {
             this->s4u_actor->join();
         } else {

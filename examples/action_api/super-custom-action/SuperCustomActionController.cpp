@@ -63,7 +63,7 @@ namespace wrench {
 
         /* Creates an instance of input_file on both storage services. This takes zero simulation time. After
          * all, that file needs to be there somewhere initially if it's indeed some input file */
-        ss_1->createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
+        wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
 
         /* Create a one-action job with a custom action */
         auto job = job_manager->createCompoundJob("job");

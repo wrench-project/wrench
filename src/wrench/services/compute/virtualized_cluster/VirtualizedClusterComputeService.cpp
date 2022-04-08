@@ -42,7 +42,6 @@ namespace wrench {
                                                                        WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list)
         : CloudComputeService(hostname, execution_hosts, std::move(scratch_space_mount_point)) {
-
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
         // Set default and specified message payloads
@@ -63,7 +62,6 @@ namespace wrench {
      */
     std::shared_ptr<BareMetalComputeService>
     VirtualizedClusterComputeService::startVM(const std::string &vm_name, const std::string &pm_name) {
-
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument("CloudComputeService::startVM(): Unknown VM name '" + vm_name + "'");
         }
@@ -104,7 +102,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void VirtualizedClusterComputeService::migrateVM(const std::string &vm_name, const std::string &dest_pm_hostname) {
-
         if (this->vm_list.find(vm_name) == this->vm_list.end()) {
             throw std::invalid_argument(
                     "VirtualizedClusterComputeService::migrateVM(): Unknown VM name '" + vm_name + "'");
@@ -137,7 +134,6 @@ namespace wrench {
     * @return 0 on termination
     */
     int VirtualizedClusterComputeService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
         WRENCH_INFO(
                 "Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
@@ -162,7 +158,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool VirtualizedClusterComputeService::processNextMessage() {
-
         S4U_Simulation::computeZeroFlop();
 
         // Wait for a message
@@ -253,8 +248,6 @@ namespace wrench {
     void
     VirtualizedClusterComputeService::processMigrateVM(simgrid::s4u::Mailbox *answer_mailbox, const std::string &vm_name,
                                                        const std::string &dest_pm_hostname) {
-
-
         WRENCH_INFO("Asked to migrate the VM %s to PM %s", vm_name.c_str(), dest_pm_hostname.c_str());
 
         VirtualizedClusterComputeServiceMigrateVMAnswerMessage *msg_to_send_back;

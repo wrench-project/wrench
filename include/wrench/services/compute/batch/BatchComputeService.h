@@ -47,7 +47,6 @@ namespace wrench {
      *        of memory_manager_service sharing (e.g., swapping).
      */
     class BatchComputeService : public ComputeService {
-
         /**
          * @brief A Batch Service
          */
@@ -211,9 +210,7 @@ namespace wrench {
                                                        "sequencer", "sleeper", "submitter", "waiting_time_estimator"};
 
         std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
-                                                        "asc_size", "desc_size", "asc_walltime", "desc_walltime"
-
-        };
+                                                        "asc_size", "desc_size", "asc_walltime", "desc_walltime"};
 #else
         std::set<std::string> scheduling_algorithms = {"fcfs", "conservative_bf", "conservative_bf_core_level"};
 

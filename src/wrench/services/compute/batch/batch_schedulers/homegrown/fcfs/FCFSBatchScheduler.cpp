@@ -39,7 +39,6 @@ namespace wrench {
      */
     std::map<std::string, std::tuple<unsigned long, double>> FCFSBatchScheduler::scheduleOnHosts(
             unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
-
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }
@@ -160,7 +159,6 @@ namespace wrench {
 
     std::map<std::string, double> FCFSBatchScheduler::getStartTimeEstimates(
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
-
         if (cs->getPropertyValueAsString(BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM) != "FIRSTFIT") {
             throw std::runtime_error("FCFSBatchScheduler::getStartTimeEstimates(): The fcfs sceduling algorithm can only provide start time estimates "
                                      "when the HOST_SELECTION_ALGORITHM property is set to FIRSTFIT");
@@ -289,11 +287,9 @@ namespace wrench {
 
             if ((num_hosts > core_available_times.size()) ||
                 (num_cores_per_host > cs->num_cores_per_node)) {
-
                 earliest_job_start_time = -1.0;
 
             } else {
-
 #if 0
                 std::cerr << "COMPUTING PREDICTIONS for JOB: num_hosts=" << num_hosts <<
                     ", num_cores_per_hosts=" << num_cores_per_host << ", duration=" << duration << "\n";
@@ -332,9 +328,7 @@ namespace wrench {
      * @brief Method to process queued  jobs
      */
     void FCFSBatchScheduler::processQueuedJobs() {
-
         while (true) {
-
             // Invoke the scheduler to pick a job to schedule
             auto batch_job = this->pickNextJobToSchedule();
             if (batch_job == nullptr) {

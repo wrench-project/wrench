@@ -45,7 +45,6 @@ namespace wrench {
      * @brief A compound job class
      */
     class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob> {
-
     public:
         /** @brief Compound job states */
         enum State {
@@ -76,16 +75,26 @@ namespace wrench {
         std::shared_ptr<SleepAction> addSleepAction(const std::string &name, double sleep_time);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
-                                                          std::shared_ptr<DataFile> file,
-                                                          std::shared_ptr<FileLocation> file_location);
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
-                                                          std::shared_ptr<DataFile> file,
-                                                          std::vector<std::shared_ptr<FileLocation>> file_locations);
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::vector<std::shared_ptr<FileLocation>> &file_locations);
+
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<FileLocation> &file_location,
+                                                          const double num_bytes_to_read);
+
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::vector<std::shared_ptr<FileLocation>> &file_locations,
+                                                          const double num_bytes_to_read);
 
         std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
-                                                            std::shared_ptr<DataFile> file,
-                                                            std::shared_ptr<FileLocation> file_location);
+                                                            const std::shared_ptr<DataFile> &file,
+                                                            const std::shared_ptr<FileLocation> &file_location);
 
         std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
                                                           std::shared_ptr<DataFile> file,
@@ -109,7 +118,7 @@ namespace wrench {
                                                         double ram,
                                                         unsigned long min_num_cores,
                                                         unsigned long max_num_cores,
-                                                        std::shared_ptr<ParallelModel> parallel_model);
+                                                        const std::shared_ptr<ParallelModel> &parallel_model);
 
         std::shared_ptr<CustomAction> addCustomAction(const std::string &name,
                                                       double ram,

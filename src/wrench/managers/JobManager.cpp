@@ -861,7 +861,6 @@ namespace wrench {
         }
 
         if (job->getType() == Job::STANDARD) {
-
             if ((this->pending_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->pending_standard_jobs.end()) ||
                 (this->running_standard_jobs.find((std::shared_ptr<StandardJob> ) job) != this->running_standard_jobs.end())) {
                 std::string msg = "Job cannot be forgotten because it is pending or running";
@@ -1154,7 +1153,6 @@ namespace wrench {
                 it = this->jobs_to_dispatch.erase(it);
                 //                job->popCallbackMailbox();
                 if (auto cjob = std::dynamic_pointer_cast<CompoundJob>(job)) {
-
                     if (this->cjob_to_sjob_map.find(cjob) == this->cjob_to_sjob_map.end()) {
                         cjob->setAllActionsFailed(e.getCause());
                         try {
@@ -1202,7 +1200,6 @@ namespace wrench {
      * @brief Helper method to dispatch jobs
      */
     void JobManager::dispatchJob(const std::shared_ptr<CompoundJob> &job) {
-
         // Submit the job to the service
         try {
             job->submit_date = Simulation::getCurrentSimulatedDate();
@@ -1227,7 +1224,6 @@ namespace wrench {
             }
             job->popCallbackMailbox();
             throw;
-
         } catch (std::invalid_argument &e) {
             throw;
         }

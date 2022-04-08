@@ -31,7 +31,6 @@ namespace wrench {
      * @brief A computational task in a Workflow
      */
     class WorkflowTask : public std::enable_shared_from_this<WorkflowTask> {
-
     public:
         const std::string &getID() const;
 

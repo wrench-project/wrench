@@ -293,7 +293,6 @@ namespace wrench {
                 proximity_value = 0.0;
                 timestamp = Simulation::getCurrentSimulatedDate();
             } else {
-
                 if (boost::iequals(network_service_type, "vivaldi")) {
                     auto host1 = this->coordinate_lookup_table.find(msg->hosts.first);
                     auto host2 = this->coordinate_lookup_table.find(msg->hosts.second);

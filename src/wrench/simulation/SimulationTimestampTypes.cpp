@@ -272,7 +272,6 @@ namespace wrench {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
@@ -295,7 +294,6 @@ namespace wrench {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure() cannot take nullptr arguments");
         }
@@ -318,7 +316,6 @@ namespace wrench {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() cannot take nullptr arguments");
         }
@@ -424,7 +421,6 @@ namespace wrench {
 
         // all information about a file read should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->service == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
         }
@@ -584,7 +580,6 @@ namespace wrench {
 
         // all information about a file write should be passed
         if ((this->file == nullptr) || (this->destination == nullptr) || (this->service == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart() cannot take nullptr arguments");
         }
@@ -740,7 +735,6 @@ namespace wrench {
 
         // all information about a disk read should be passed
         if (this->hostname.empty() || this->mount.empty()) {
-
             throw std::invalid_argument(
                     "SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart() cannot take nullptr arguments");
         }
@@ -897,7 +891,6 @@ namespace wrench {
 
         // all information about a disk write should be passed
         if (this->hostname.empty() || this->mount.empty()) {
-
             throw std::invalid_argument(
                     "SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart() cannot take nullptr arguments");
         }
@@ -993,7 +986,6 @@ namespace wrench {
      */
     SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string &hostname, double joules)
         : hostname(hostname), joules(joules) {
-
         this->date = date;
         if (hostname.empty() || joules < 0.0) {
             throw std::invalid_argument(

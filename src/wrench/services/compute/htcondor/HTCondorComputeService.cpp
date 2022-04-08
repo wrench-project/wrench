@@ -43,7 +43,6 @@ namespace wrench {
                                                    std::set<std::shared_ptr<ComputeService>> compute_services,
                                                    WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                                    WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : ComputeService(hostname, "htcondor_service", "") {
-
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -128,7 +127,6 @@ namespace wrench {
      */
     void HTCondorComputeService::submitCompoundJob(std::shared_ptr<CompoundJob> job,
                                                    const std::map<std::string, std::string> &service_specific_args) {
-
         serviceSanityCheck();
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
@@ -188,7 +186,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int HTCondorComputeService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
         WRENCH_INFO(
                 "HTCondor Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
@@ -265,7 +262,6 @@ namespace wrench {
     void HTCondorComputeService::processSubmitCompoundJob(simgrid::s4u::Mailbox *answer_mailbox,
                                                           std::shared_ptr<CompoundJob> job,
                                                           const std::map<std::string, std::string> &service_specific_args) {
-
         WRENCH_INFO("Asked to run compound job %s, which has %ld actions", job->getName().c_str(), job->getActions().size());
 
         // Check that the job can run on some child service
@@ -378,7 +374,6 @@ namespace wrench {
      * @param service_specific_args: the service-specific arguments (useful for some services)
      */
     void HTCondorComputeService::validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args) {
-
         throw std::invalid_argument("Jobs submitted to an HT-Condor compute service cannot make use of scratch");
     }
 

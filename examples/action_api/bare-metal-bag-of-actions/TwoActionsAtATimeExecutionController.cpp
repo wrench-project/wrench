@@ -66,7 +66,7 @@ namespace wrench {
         std::vector<std::tuple<double, std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::DataFile>>> actions;
         actions.reserve(num_actions);
         auto input_file = wrench::Simulation::addFile("input_file_", mb_dist(rng));
-        this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+        wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
         auto output_file = wrench::Simulation::addFile("output_file_", mb_dist(rng));
         for (int i = 0; i < 1; i++) {
             // Create action work

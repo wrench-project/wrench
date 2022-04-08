@@ -47,7 +47,6 @@ namespace wrench {
      *
      */
     class BareMetalComputeService : public ComputeService {
-
         friend class CloudComputeService;
         friend class BatchComputeService;
 

@@ -206,7 +206,6 @@ namespace wrench {
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname,
                                                                                  "action_execution_service") {
-
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -1013,14 +1012,12 @@ namespace wrench {
         std::map<std::string, double> information;
 
         if (key == "num_hosts") {
-
             // Num hosts
             std::map<std::string, double> num_hosts;
             num_hosts.insert(std::make_pair(this->getName(), this->compute_resources.size()));
             return num_hosts;
 
         } else if (key == "num_cores") {
-
             // Num cores per hosts
             std::map<std::string, double> num_cores;
             for (auto r: this->compute_resources) {
@@ -1029,7 +1026,6 @@ namespace wrench {
             return num_cores;
 
         } else if (key == "num_idle_cores") {
-
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
             for (auto r: this->running_thread_counts) {
@@ -1041,7 +1037,6 @@ namespace wrench {
             return num_idle_cores;
 
         } else if (key == "flop_rates") {
-
             // Flop rate per host
             std::map<std::string, double> flop_rates;
             for (auto h: this->compute_resources) {
@@ -1050,7 +1045,6 @@ namespace wrench {
             return flop_rates;
 
         } else if (key == "ram_capacities") {
-
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
             for (auto h: this->compute_resources) {
@@ -1059,7 +1053,6 @@ namespace wrench {
             return ram_capacities;
 
         } else if (key == "ram_availabilities") {
-
             // RAM availability per host
             std::map<std::string, double> ram_availabilities_to_return;
             for (auto r: this->ram_availabilities) {
@@ -1105,7 +1098,6 @@ namespace wrench {
         this->action_executors.erase(action);
 
         if (not this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
-
             // Reset the action state to READY)
             action->newExecution(Action::State::READY);
             //            action->setState(Action::State::READY);

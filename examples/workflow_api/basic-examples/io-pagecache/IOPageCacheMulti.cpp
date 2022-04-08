@@ -100,7 +100,7 @@ void export_output_single(wrench::SimulationOutput output, int num_tasks, std::s
     fclose(log_file);
 }
 
-void export_output_multi(wrench::SimulationOutput output, int num_tasks, std::string filename) {
+void export_output_multi(wrench::SimulationOutput& output, int num_tasks, std::string filename) {
     auto read_start = output.getTrace<wrench::SimulationTimestampFileReadStart>();
     auto read_end = output.getTrace<wrench::SimulationTimestampFileReadCompletion>();
     auto write_start = output.getTrace<wrench::SimulationTimestampFileWriteStart>();
@@ -195,6 +195,8 @@ int main(int argc, char **argv) {
 
     double start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
+    simulation->getOutput().enableWorkflowTaskTimestamps(true);
+    simulation->getOutput().enableFileReadWriteCopyTimestamps(true);
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
     try {
@@ -211,7 +213,7 @@ int main(int argc, char **argv) {
         sub_dir = "pagecache";
     }
 
-    std::string timelog_filename = "multi/run_time_" + sub_dir + ".csv";
+    std::string timelog_filename = "multi_run_time_" + sub_dir + ".csv";
     FILE *time_log_file = fopen(timelog_filename.c_str(), "a");
     fprintf(time_log_file, "%d,%lf\n", no_pipelines, (end - start) / 1000);
     fclose(time_log_file);

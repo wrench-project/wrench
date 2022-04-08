@@ -33,7 +33,6 @@ namespace wrench {
      * @param batch_job: the newly submitted BatchComputeService job
      */
     void ConservativeBackfillingBatchScheduler::processJobSubmission(std::shared_ptr<BatchJob> batch_job) {
-
         WRENCH_INFO("Scheduling a new BatchComputeService job, %lu, that needs %lu nodes",
                     batch_job->getJobID(), batch_job->getRequestedNumNodes());
 
@@ -60,7 +59,6 @@ namespace wrench {
      * @brief Method to schedule (possibly) the next jobs to be scheduled
      */
     void ConservativeBackfillingBatchScheduler::processQueuedJobs() {
-
         if (this->cs->batch_queue.empty()) {
             return;
         }
@@ -115,7 +113,6 @@ namespace wrench {
      * @brief Method to compact the schedule
      */
     void ConservativeBackfillingBatchScheduler::compactSchedule() {
-
         WRENCH_INFO("Compacting schedule...");
 
 #ifdef PRINT_SCHEDULE
@@ -233,7 +230,6 @@ namespace wrench {
      */
     std::map<std::string, std::tuple<unsigned long, double>>
     ConservativeBackfillingBatchScheduler::scheduleOnHosts(unsigned long num_nodes, unsigned long cores_per_node, double ram_per_node) {
-
         if (ram_per_node == ComputeService::ALL_RAM) {
             ram_per_node = Simulation::getHostMemoryCapacity(cs->available_nodes_to_cores.begin()->first);
         }

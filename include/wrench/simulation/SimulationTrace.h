@@ -29,7 +29,8 @@ namespace wrench {
     class GenericSimulationTrace {
 
     public:
-        virtual ~GenericSimulationTrace() {}
+        virtual ~GenericSimulationTrace() {
+        }
     };
     /***********************/
     /** \endcond           */

@@ -142,7 +142,11 @@ namespace wrench {
                     }
 
                     double flop_amount;
-                    std::string execution_machine = std::string(task_spec_object.at("machine").as_string().c_str());
+                    std::string execution_machine;
+                    if (task_spec_object.find("machine") != task_spec_object.end()) {
+                      execution_machine = std::string(task_spec_object.at("machine").as_string().c_str());
+                    }
+
                     if (execution_machine.empty()) {
                         flop_amount = runtime * flop_rate;
                     } else {
