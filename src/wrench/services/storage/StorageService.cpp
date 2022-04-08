@@ -21,6 +21,8 @@
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
 #include <wrench/failure_causes/NetworkError.h>
 
+#include <memory>
+
 WRENCH_LOG_CATEGORY(wrench_core_storage_service, "Log category for Storage Service");
 
 #define GB (1000.0 * 1000.0 * 1000.0)
@@ -36,16 +38,16 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
-                                   const std::set<std::string> mount_points,
+                                   const std::set<std::string>& mount_points,
                                    const std::string &service_name) : Service(hostname, service_name) {
         if (mount_points.empty()) {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
         }
 
         try {
-            for (auto mp: mount_points) {
-                this->file_systems[mp] = std::unique_ptr<LogicalFileSystem>(
-                        new LogicalFileSystem(this->getHostname(), this, mp));
+            for (const auto &mp: mount_points) {
+                this->file_systems[mp] = std::make_unique<LogicalFileSystem>(
+                        this->getHostname(), this, mp);
             }
         } catch (std::invalid_argument &e) {
             throw;
@@ -59,7 +61,7 @@ namespace wrench {
      * @brief Determines whether the storage service is a scratch service of a ComputeService
      * @return true if it is, false otherwise
      */
-    bool StorageService::isScratch() {
+    bool StorageService::isScratch() const {
         return this->is_stratch;
     }
 
@@ -70,20 +72,7 @@ namespace wrench {
         this->is_stratch = true;
     }
 
-    /**
-     * @brief Store a file at a particular mount point ex nihilo (this instantly creates the file at the
-     * storage service - zero simulation time). Will do nothing (and won't complain) if the file already exists
-     * at that location.
-     *
-     * @param file: a file
-     * @param location: a file location
-     *
-     * @throw std::invalid_argument
-     */
-    void StorageService::createFile(std::shared_ptr<DataFile> file, const std::shared_ptr<FileLocation> &location) {
-        location->getStorageService()->stageFile(file, location->getMountPoint(),
-                                                 location->getAbsolutePathAtMountPoint());
-    }
+
 
 
     /**
