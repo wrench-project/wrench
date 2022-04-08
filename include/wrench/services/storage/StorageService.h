@@ -36,8 +36,6 @@ namespace wrench {
     class StorageService : public Service {
 
     public:
-
-
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
@@ -83,7 +81,7 @@ namespace wrench {
 
 
         StorageService(const std::string &hostname,
-                       const std::set<std::string>& mount_points,
+                       const std::set<std::string> &mount_points,
                        const std::string &service_name);
 
     protected:

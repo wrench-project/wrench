@@ -38,7 +38,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
-                                   const std::set<std::string>& mount_points,
+                                   const std::set<std::string> &mount_points,
                                    const std::string &service_name) : Service(hostname, service_name) {
         if (mount_points.empty()) {
             throw std::invalid_argument("StorageService::StorageService(): At least one mount point must be provided");
@@ -71,8 +71,6 @@ namespace wrench {
     void StorageService::setScratch() {
         this->is_stratch = true;
     }
-
-
 
 
     /**
