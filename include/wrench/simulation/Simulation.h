@@ -46,7 +46,6 @@ namespace wrench {
      *        to memory_manager_service being de-allocated).
      */
     class Simulation {
-
     public:
         static std::shared_ptr<Simulation> createSimulation();
 
