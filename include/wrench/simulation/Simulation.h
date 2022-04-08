@@ -61,12 +61,12 @@ namespace wrench {
 
         static std::vector<std::string> getHostnameList();
         static std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
-        static double getHostMemoryCapacity(std::string hostname);
-        static unsigned long getHostNumCores(std::string hostname);
-        static double getHostFlopRate(std::string hostname);
+        static double getHostMemoryCapacity(const std::string& hostname);
+        static unsigned long getHostNumCores(const std::string& hostname);
+        static double getHostFlopRate(const std::string& hostname);
 
         static std::map<std::string, std::shared_ptr<DataFile>> &getFileMap();
-        static void removeFile(std::shared_ptr<DataFile> file);
+        static void removeFile(const std::shared_ptr<DataFile>& file);
         static std::shared_ptr<DataFile> getFileByID(const std::string &id);
         static std::shared_ptr<DataFile> addFile(const std::string &, double);
 
@@ -100,7 +100,10 @@ namespace wrench {
         static std::vector<int> getListOfPstates(const std::string &hostname);
 
         void stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> ss);
-        void stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
+        void stageFile(const std::shared_ptr<DataFile>& file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
+
+        static void createFile(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation> &location);
+
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -113,13 +116,13 @@ namespace wrench {
         std::map<std::string, double> getEnergyConsumed(const std::vector<std::string> &hostnames, bool record_as_time_stamps);
 
         static bool doesHostExist(std::string hostname);
-        static bool isHostOn(std::string hostname);
-        static void turnOnHost(std::string hostname);
-        static void turnOffHost(std::string hostname);
-        static bool doesLinkExist(std::string link_name);
-        static bool isLinkOn(std::string link_name);
-        static void turnOnLink(std::string link_name);
-        static void turnOffLink(std::string link_name);
+        static bool isHostOn(const std::string& hostname);
+        static void turnOnHost(const std::string& hostname);
+        static void turnOffHost(const std::string& hostname);
+        static bool doesLinkExist(const std::string& link_name);
+        static bool isLinkOn(const std::string& link_name);
+        static void turnOnLink(const std::string& link_name);
+        static void turnOffLink(const std::string& link_name);
 
         // pstate related calls
         void setPstate(const std::string &hostname, int pstate);
@@ -147,10 +150,10 @@ namespace wrench {
                                                     const std::string &hostname,
                                                     const std::string &read_mount_point,
                                                     const std::string &write_mount_point);
-        void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point);
+        void writeToDisk(double num_bytes, const std::string &hostname, const std::string& mount_point);
 
-        void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, std::shared_ptr<FileLocation> location);
-        void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, std::shared_ptr<FileLocation> location, bool is_dirty);
+        void readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation>& location);
+        void writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation>& location, bool is_dirty);
         void writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location);
         MemoryManager *getMemoryManagerByHost(const std::string &hostname);
 
@@ -160,8 +163,8 @@ namespace wrench {
         static std::string getHostName();
 
         static std::vector<std::string> getLinknameList();
-        static double getLinkUsage(std::string link_name);
-        static double getLinkBandwidth(std::string link_name);
+        static double getLinkUsage(const std::string& link_name);
+        static double getLinkBandwidth(const std::string& link_name);
         static bool isPageCachingEnabled();
         static bool isHostShutdownSimulationEnabled();
         static bool isEnergySimulationEnabled();
