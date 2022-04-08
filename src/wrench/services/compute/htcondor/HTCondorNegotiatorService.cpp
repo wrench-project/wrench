@@ -42,7 +42,6 @@ namespace wrench {
             simgrid::s4u::Mailbox *reply_mailbox)
         : Service(hostname, "htcondor_negotiator"), reply_mailbox(reply_mailbox),
           compute_services(compute_services), running_jobs(running_jobs), pending_jobs(pending_jobs) {
-
         this->startup_overhead = startup_overhead;
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -74,7 +73,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int HTCondorNegotiatorService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
         WRENCH_INFO("HTCondor Negotiator Service starting on host %s listening on mailbox_name %s",
@@ -90,7 +88,6 @@ namespace wrench {
 
         // Go through the jobs and schedule them if possible
         for (auto entry: this->pending_jobs) {
-
             auto job = std::get<0>(entry);
             auto service_specific_arguments = std::get<1>(entry);
             bool is_standard_job = (std::dynamic_pointer_cast<CompoundJob>(job) != nullptr);
@@ -130,7 +127,6 @@ namespace wrench {
             std::shared_ptr<CompoundJob> job, std::map<std::string,
                                                        std::string>
                                                       service_specific_arguments) {
-
         bool is_grid_universe = (service_specific_arguments.find("-universe") != service_specific_arguments.end());
 
         if (is_grid_universe) {
@@ -150,7 +146,6 @@ namespace wrench {
             std::shared_ptr<CompoundJob> job, std::map<std::string,
                                                        std::string>
                                                       service_specific_arguments) {
-
         std::set<std::shared_ptr<BatchComputeService>> available_batch_compute_services;
 
         // Figure out which BatchComputeService compute services are available
@@ -214,7 +209,6 @@ namespace wrench {
             std::shared_ptr<CompoundJob> job, std::map<std::string,
                                                        std::string>
                                                       service_specific_arguments) {
-
         std::shared_ptr<BareMetalComputeService> target_cs = nullptr;
 
         // Figure out which BatchComputeService compute services are available

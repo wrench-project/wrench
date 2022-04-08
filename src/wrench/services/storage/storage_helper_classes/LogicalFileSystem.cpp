@@ -26,7 +26,6 @@ namespace wrench {
      * @param mount_point: the mount point
      */
     LogicalFileSystem::LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point) {
-
         mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
         if (storage_service == nullptr) {
@@ -75,7 +74,6 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void LogicalFileSystem::createDirectory(const std::string &absolute_path) {
-
         assertInitHasBeenCalled();
         assertDirectoryDoesNotExist(absolute_path);
         this->content[absolute_path] = {};
@@ -99,7 +97,6 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     bool LogicalFileSystem::isDirectoryEmpty(const std::string &absolute_path) {
-
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         return (this->content[absolute_path].empty());
@@ -284,7 +281,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void LogicalFileSystem::stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
-
         // If Space is not sufficient, forget it
         if (this->occupied_space + file->getSize() > this->total_capacity) {
             throw std::invalid_argument("LogicalFileSystem::stageFile(): Insufficient space to store file " +

@@ -179,7 +179,6 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
-
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
             msg->src->getStorageService();

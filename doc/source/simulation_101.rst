@@ -136,7 +136,7 @@ communication times). See more about :ref:`Service
 Customization <wrench-101-customizing-services>` on the :ref:`WRENCH
 101 <wrench-101-header>` page.
 
-When the simulator is coded, the **calibration** phase begins. 
+When the simulator is done, the **calibration** phase begins. 
 The **calibration** step is crucial to ensure that your simulator
 accurately approximate the performance of the application you study 
 on the target platform. Basically, calibrating a simulator implies 
