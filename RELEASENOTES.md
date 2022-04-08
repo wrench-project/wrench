@@ -6,7 +6,7 @@ WRENCH Release Notes
 (April 8, 2022) This is a **major** release, which includes:
 
 - Created a more general Developer API, called the *action API*, that makes it possible
-  to simulate application workloadsj that are not necessarily workflow applications. Examples
+  to simulate application workloads that are not necessarily workflow applications. Examples
   are provided in the `examples/action_api` directory. 
 - Minor changes to the workflow API (which is now implemented internally on top of the action API).
 - Removed support for the obsolete DAX XML workflow description format, which removes an external software dependency.
