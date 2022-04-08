@@ -165,7 +165,6 @@ namespace wrench {
      * @throw wrench::ExecutionException
      */
     bool ExecutionController::waitForAndProcessNextEvent(double timeout) {
-
         std::shared_ptr<ExecutionEvent> event = this->waitForNextEvent(timeout);
         if (event == nullptr) {
             return false;

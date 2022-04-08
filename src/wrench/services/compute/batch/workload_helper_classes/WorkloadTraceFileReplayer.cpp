@@ -39,7 +39,6 @@ namespace wrench {
 
 
     int WorkloadTraceFileReplayer::main() {
-
         // Create a Job Manager
         std::shared_ptr<JobManager> job_manager = this->createJobManager();
 
@@ -60,7 +59,6 @@ namespace wrench {
 
         unsigned long counter = 0;
         for (auto job: this->workload_trace) {
-
             // Sleep until the submission time
             double sub_time = real_start_time + std::get<1>(job);
             double curtime = S4U_Simulation::getClock();
