@@ -17,7 +17,12 @@ src_path = pathlib.Path(sys.argv[2])
 release_version = sys.argv[3]
 
 with open(src_path.joinpath("conf.py"), "a") as f:
-    f.write(f"version = '{release_version}'\n" \
+    f.write("breathe_projects = {\n"
+            f"    \"user\": \"../../docs/{release_version}/user/xml/\",\n"
+            f"    \"developer\": \"../../docs/{release_version}/developer/xml/\",\n"
+            f"    \"internal\": \"../../docs/{release_version}/internal/xml/\",\n"
+            "}\n\n"
+            f"version = '{release_version}'\n"
             f"release = '{release_version}'\n")
 
 for section in ["user", "developer", "internal"]:
