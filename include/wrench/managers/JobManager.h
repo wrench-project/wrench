@@ -54,7 +54,6 @@ namespace wrench {
  *        handle all job executions
  */
     class JobManager : public Service {
-
     public:
         void stop() override;
 

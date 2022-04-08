@@ -114,7 +114,10 @@ namespace wrench {
                     }
 
                     double flop_amount;
-                    std::string execution_machine = job.at("machine");
+                    std::string execution_machine;
+                    if (job.find("machine") != job.end()) {
+                      execution_machine = job.at("machine");
+                    }
                     if (execution_machine.empty()) {
                         flop_amount = runtime * flop_rate;
                     } else {
