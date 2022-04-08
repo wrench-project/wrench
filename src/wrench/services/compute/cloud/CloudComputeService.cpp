@@ -917,7 +917,6 @@ namespace wrench {
 
                 // Create the Compute Service if needed
                 if ((vm_pair.second == nullptr) or (not vm_pair.second->isUp())) {
-
                     // Create the resource set for the BareMetalComputeService
                     std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
                             std::make_pair(vm_name, std::make_tuple(vm->getNumCores(), vm->getMemory()))};
@@ -991,7 +990,6 @@ namespace wrench {
                             CloudComputeServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD));
 
         } else {
-
             WRENCH_INFO("Asked to suspend VM %s", vm_name.c_str());
 
             auto vm_tuple = this->vm_list.find(vm_name);
@@ -1097,12 +1095,10 @@ namespace wrench {
         std::map<std::string, double> dict;
 
         if (key == "num_hosts") {
-
             // Num hosts
             dict.insert(std::make_pair(this->getName(), (double) (this->vm_list.size())));
 
         } else if (key == "num_cores") {
-
             // Total num cores
             for (auto &host: this->execution_hosts) {
                 unsigned long total_num_cores = Simulation::getHostNumCores(host);
@@ -1110,7 +1106,6 @@ namespace wrench {
             }
 
         } else if (key == "num_idle_cores") {
-
             for (auto &host: this->execution_hosts) {
                 // Total num cores
                 unsigned long total_num_cores = Simulation::getHostNumCores(host);
@@ -1126,21 +1121,18 @@ namespace wrench {
                 dict.insert(std::make_pair(host, (double) (total_num_cores - num_cores_allocated_to_vms)));
             }
         } else if (key == "flop_rates") {
-
             for (auto &host: this->execution_hosts) {
                 double flop_rate = Simulation::getHostFlopRate(host);
                 dict.insert(std::make_pair(host, flop_rate));
             }
 
         } else if (key == "ram_capacities") {
-
             for (auto &host: this->execution_hosts) {
                 double total_ram = Simulation::getHostMemoryCapacity(host);
                 dict.insert(std::make_pair(host, total_ram));
             }
 
         } else if (key == "ram_availabilities") {
-
             for (auto &host: this->execution_hosts) {
                 double total_ram = Simulation::getHostMemoryCapacity(host);
                 // Available RAM
@@ -1156,7 +1148,6 @@ namespace wrench {
             }
 
         } else if (key == "ttl") {
-
             dict.insert(std::make_pair(this->getName(), DBL_MAX));
 
         } else {

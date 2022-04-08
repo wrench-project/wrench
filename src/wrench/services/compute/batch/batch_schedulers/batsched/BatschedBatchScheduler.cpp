@@ -55,7 +55,6 @@ namespace wrench {
         int top_pid = fork();
 
         if (top_pid == 0) {// Child process that will exec batsched
-
             std::string algorithm = this->cs->getPropertyValueAsString(BatchComputeServiceProperty::BATCH_SCHEDULING_ALGORITHM);
             bool is_supported = this->cs->scheduling_algorithms.find(algorithm) != this->cs->scheduling_algorithms.end();
             if (not is_supported) {
@@ -209,7 +208,6 @@ namespace wrench {
 
     std::map<std::string, double> BatschedBatchScheduler::getStartTimeEstimates(
             std::set<std::tuple<std::string, unsigned long, unsigned long, double>> set_of_jobs) {
-
 #ifdef ENABLE_BATSCHED
 
         std::set<std::string> supported_algorithms = {"conservative_bf", "fast_conservative_bf", "fcfs_fast"};
@@ -279,7 +277,6 @@ namespace wrench {
      * @brief Method to shutdown Batsched
      */
     void BatschedBatchScheduler::shutdown() {
-
 #ifdef ENABLE_BATSCHED
 
         // Stop Batsched
@@ -341,7 +338,6 @@ namespace wrench {
         size_t i;
         std::deque<std::shared_ptr<BatchJob>>::iterator it;
         for (i = 0, it = this->cs->batch_queue.begin(); i < this->cs->batch_queue.size(); i++, it++) {
-
             auto batch_job = *it;
 
             /* Get the nodes and cores per nodes asked for */
@@ -387,7 +383,6 @@ namespace wrench {
 
 
     void BatschedBatchScheduler::processJobCompletion(std::shared_ptr<BatchJob> batch_job) {
-
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
         this->appendJobInfoToCSVOutputFile(batch_job.get(), "success");
@@ -398,7 +393,6 @@ namespace wrench {
 
 
     void BatschedBatchScheduler::processJobTermination(std::shared_ptr<BatchJob> batch_job) {
-
 #ifdef ENABLE_BATSCHED
         // Fake it as a success
         this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_KILLED", "terminated by users", "JOB_COMPLETED");
@@ -410,7 +404,6 @@ namespace wrench {
 
 
     void BatschedBatchScheduler::processUnknownJobTermination(std::string job_id) {
-
 #ifdef ENABLE_BATSCHED
         // Fake it as a success
         this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
