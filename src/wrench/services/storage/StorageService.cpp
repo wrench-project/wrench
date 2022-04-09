@@ -231,7 +231,9 @@ namespace wrench {
         //    throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         //}
         //I dont think we need to check this HERE because we hand off to another fundtion that will
-        readFile(file, location, file->getSize());
+        auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+        auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        readFile(file, location, answer_mailbox, chunk_receiving_mailbox, file->getSize());
     }
 
     /**
@@ -246,13 +248,26 @@ namespace wrench {
      */
     void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, double num_bytes_to_read) {
         // Get mailbox to send message too
+
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-        readFile(file,location,answer_mailbox,num_bytes_to_read);
+        auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
+        readFile(file, location, answer_mailbox, chunk_receiving_mailbox, num_bytes_to_read);
+
     }
-    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,simgrid::s4u::Mailbox* answer_mailbox){
-        readFile(file, location, answer_mailbox,file->getSize());
-    }
-    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, simgrid::s4u::Mailbox* answer_mailbox, double num_bytes_to_read){
+
+    /**
+     * @brief Synchronously read a file from the storage service
+     * @param file: the file
+     * @param location: the file location
+     * @param answer_mailbox: the answer mailbox
+     * @param chunk_receiving_mailbox: the chunk receiving mailbox (WILL BE RETIRED BY THIS FUNCTION)
+     * @param num_bytes_to_read: number of bytes to read
+     */
+    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,
+                                  simgrid::s4u::Mailbox* answer_mailbox,
+                                  simgrid::s4u::Mailbox* chunk_receiving_mailbox,
+                                  double num_bytes_to_read) {
+
         if ((file == nullptr) or (location == nullptr) or (answer_mailbox == nullptr) or (num_bytes_to_read < 0.0)) {
             throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
         }
@@ -261,10 +276,6 @@ namespace wrench {
         StorageService *service = storage_service.get();
 
         assertServiceIsUp(storage_service);
-
-        // Send a message to the daemon
-        auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
-        //        auto chunk_receiving_mailbox = S4U_Mailbox::generateUniqueMailbox("foo");
 
         try {
             S4U_Mailbox::putMessage(storage_service->mailbox,
