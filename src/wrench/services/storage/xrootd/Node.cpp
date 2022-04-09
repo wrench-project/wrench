@@ -76,7 +76,10 @@ namespace wrench {
                     return false;
 
                 }  else if (auto msg = dynamic_cast<FileReadRequestMessage *>(message.get())) {
+                    // If it's in cache then we know, otherwise we must "search"
                     auto all= XRootDSearch(msg->file);
+                    auto client_answer_mailbox = msg->answer_mailbox;
+                    auto client_mailbox_to_receive_the_file_content = msg->mailbox_to_receive_the_file_content;
                     //search all
                     //send message to all and appropriate stacks
                     return true;
@@ -88,6 +91,7 @@ namespace wrench {
                     if(this!=msg->cache_to){
                         S4U_Mailbox::putMessage(supervisor->mailbox,msg);
                     }
+                    // If success, then do: StorageService::readFile(file, ....., client_answer_mailbox, client_mailbox_to_receive_the_file_content, num_bytes);
 
                     return true;
 
