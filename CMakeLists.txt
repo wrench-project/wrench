@@ -184,6 +184,9 @@ set(HEADER_FILES
         include/wrench/data_file/DataFile.h
         include/wrench/services/storage/xrootd/XRootD.h
         include/wrench/services/storage/xrootd/Node.h
+        include/wrench/services/storage/xrootd/XRootDMessagePayload.h
+        include/wrench/services/storage/xrootd/XRootDMessage.h
+        include/wrench/services/storage/xrootd/SearchStack.h
         )
 
 # source files
@@ -347,6 +350,7 @@ set(SOURCE_FILES
         src/wrench/data_file/DataFile.cpp
         src/wrench/services/storage/xrootd/XRootD.cpp
         src/wrench/services/storage/xrootd/Node.cpp
+        src/wrench/services/storage/xrootd/SearchStack.cpp
         )
 
 # test files
@@ -453,11 +457,10 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
-        include/wrench/services/storage/xrootd/XRootDMessagePayload.h include/wrench/services/storage/xrootd/XRootDMessage.h)
+        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp)
 
 
-add_library(wrench STATIC ${SOURCE_FILES} include/wrench/services/storage/xrootd/SearchStack.h src/wrench/services/storage/xrootd/SearchStack.cpp)
+add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SimGrid_LIBRARY})
 
