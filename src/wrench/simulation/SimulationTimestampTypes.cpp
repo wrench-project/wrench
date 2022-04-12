@@ -6,18 +6,7 @@
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation_timestamps, "Log category for SimulationTimestamps");
 
-
 namespace wrench {
-
-    ///*
-    // *
-    // * @param file - tuple of three strings relating to File, Source and Whoami
-    // * @return XOR of hashes of file
-    // */
-    ///size_t file_hash( const File & file )
-    ///{
-    ///    return std::hash<void *>()(std::get<0>(file)) ^ std::hash<void *>()(std::get<1>(file)) ^ std::hash<void *>()(std::get<2>(file));
-    ///}
 
     SimulationTimestampType::SimulationTimestampType() {
         this->date = S4U_Simulation::getClock();
@@ -283,14 +272,12 @@ namespace wrench {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart() cannot take nullptr arguments");
         }
 
         pending_file_copies.insert(std::make_pair(FileCopy(this->file, this->source, this->destination), this));
     }
-
 
     /**
      * @brief Constructor
@@ -307,7 +294,6 @@ namespace wrench {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure() cannot take nullptr arguments");
         }
@@ -330,7 +316,6 @@ namespace wrench {
 
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() cannot take nullptr arguments");
         }
@@ -418,7 +403,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -437,7 +421,6 @@ namespace wrench {
 
         // all information about a file read should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->service == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileReadStart::SimulationTimestampFileReadStart() cannot take nullptr arguments");
         }
@@ -445,7 +428,6 @@ namespace wrench {
 
         pending_file_reads.insert(std::make_pair(FileReadWrite(this->file, this->source, this->service), std::make_pair(this, this->task)));
     }
-
 
     /**
      * @brief Constructor
@@ -577,7 +559,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -599,7 +580,6 @@ namespace wrench {
 
         // all information about a file write should be passed
         if ((this->file == nullptr) || (this->destination == nullptr) || (this->service == nullptr)) {
-
             throw std::invalid_argument(
                     "SimulationTimestampFileWriteStart::SimulationTimestampFileWriteStart() cannot take nullptr arguments");
         }
@@ -607,7 +587,6 @@ namespace wrench {
 
         pending_file_writes.insert(std::make_pair(FileReadWrite(this->file, this->destination, this->service), std::make_pair(this, this->task)));
     }
-
 
     /**
      * @brief Constructor
@@ -739,7 +718,6 @@ namespace wrench {
         }
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -757,7 +735,6 @@ namespace wrench {
 
         // all information about a disk read should be passed
         if (this->hostname.empty() || this->mount.empty()) {
-
             throw std::invalid_argument(
                     "SimulationTimestampDiskReadStart::SimulationTimestampDiskReadStart() cannot take nullptr arguments");
         }
@@ -765,7 +742,6 @@ namespace wrench {
 
         pending_disk_reads.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
     }
-
 
     /**
      * @brief Constructor
@@ -915,7 +891,6 @@ namespace wrench {
 
         // all information about a disk write should be passed
         if (this->hostname.empty() || this->mount.empty()) {
-
             throw std::invalid_argument(
                     "SimulationTimestampDiskWriteStart::SimulationTimestampDiskWriteStart() cannot take nullptr arguments");
         }
@@ -923,7 +898,6 @@ namespace wrench {
 
         pending_disk_writes.insert(std::make_pair(DiskAccess(this->hostname, this->mount, this->counter), this));
     }
-
 
     /**
      * @brief Constructor
@@ -973,7 +947,6 @@ namespace wrench {
         setEndpoints();
     }
 
-
     /**
      * @brief Constructor
      * @param date: the date
@@ -1013,7 +986,6 @@ namespace wrench {
      */
     SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string &hostname, double joules)
         : hostname(hostname), joules(joules) {
-
         this->date = date;
         if (hostname.empty() || joules < 0.0) {
             throw std::invalid_argument(

@@ -72,7 +72,7 @@ namespace wrench {
             // Create input file
             auto input_file = wrench::Simulation::addFile("input_file_" + std::to_string(i), mb_dist(rng));
             // Create a copy of the input file on the storage service
-            this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+            wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
             auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(i), mb_dist(rng));
             action_specs.push_back(std::make_tuple(work, input_file, output_file));
         }

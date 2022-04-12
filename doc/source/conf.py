@@ -21,7 +21,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
-    'sphinx.ext.imgmath', 
+    'sphinx.ext.imgmath',
     'sphinx.ext.todo',
     'breathe',
 ]
@@ -57,29 +57,6 @@ html_static_path = ['_static']
 
 # -- Extension configuration -------------------------------------------------
 
-breathe_projects = { 
-    "user": "../../docs/2.0-dev/user/xml/",
-    "developer": "../../docs/2.0-dev/developer/xml/",
-    "internal": "../../docs/2.0-dev/internal/xml/",
-}
 breathe_default_project = "user"
 
 # The full version, including alpha/beta/rc tags
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'
-version = '2.0-dev'
-release = '2.0-dev'

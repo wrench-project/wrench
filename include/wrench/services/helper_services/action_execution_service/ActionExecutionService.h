@@ -54,7 +54,7 @@ namespace wrench {
     public:
         // Public Constructor
         ActionExecutionService(const std::string &hostname,
-                               std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+                               const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
                                std::shared_ptr<Service> parent_service,
                                WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
@@ -63,7 +63,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        bool actionCanRun(std::shared_ptr<Action> action);
+        bool actionCanRun(const std::shared_ptr<Action> &action);
 
         std::shared_ptr<Service> getParentService() const;
 
@@ -125,7 +125,7 @@ namespace wrench {
 
         void processActionExecutorFailure(const std::shared_ptr<ActionExecutor> &executor);
 
-        void processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor);
+        void processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor);
 
         void processActionTerminationRequest(const std::shared_ptr<Action> &action, simgrid::s4u::Mailbox *answer_mailbox, ComputeService::TerminationCause termination_cause);
 
@@ -148,13 +148,13 @@ namespace wrench {
 
         void terminateRunningAction(std::shared_ptr<Action> action, bool killed_due_to_job_cancelation);
 
-        void killAction(std::shared_ptr<Action> action, std::shared_ptr<FailureCause> cause);
+        void killAction(const std::shared_ptr<Action> &action, const std::shared_ptr<FailureCause> &cause);
 
 
-        void processSubmitAction(simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<Action> action);
+        void processSubmitAction(simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action> &action);
 
-        std::tuple<std::string, unsigned long> pickAllocation(std::shared_ptr<Action> action,
-                                                              std::string required_host, unsigned long required_num_cores,
+        std::tuple<std::string, unsigned long> pickAllocation(const std::shared_ptr<Action> &action,
+                                                              const std::string &required_host, unsigned long required_num_cores,
                                                               std::set<std::string> &hosts_to_avoid);
 
 

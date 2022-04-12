@@ -46,7 +46,6 @@ namespace wrench {
      *
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox) {
-
         WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox->get_cname());
         //        auto mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
         SimulationMessage *msg;
@@ -76,7 +75,6 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(simgrid::s4u::Mailbox *mailbox, double timeout) {
-
         if (timeout < 0) {
             return S4U_Mailbox::getMessage(mailbox);
         }
@@ -145,7 +143,6 @@ namespace wrench {
      *
      */
     void S4U_Mailbox::dputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
-
         WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
@@ -180,7 +177,6 @@ namespace wrench {
     */
     std::shared_ptr<S4U_PendingCommunication>
     S4U_Mailbox::iputMessage(simgrid::s4u::Mailbox *mailbox, SimulationMessage *msg) {
-
         WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                      msg->getName().c_str(), msg->payload,
                      mailbox->get_cname());
@@ -215,7 +211,6 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
     */
     std::shared_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(simgrid::s4u::Mailbox *mailbox) {
-
         simgrid::s4u::CommPtr comm_ptr = nullptr;
 
         WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox->get_cname());
@@ -253,8 +248,6 @@ namespace wrench {
      * @return a temporary mailbox
      */
     simgrid::s4u::Mailbox *S4U_Mailbox::getTemporaryMailbox() {
-
-
         if (S4U_Mailbox::free_mailboxes.empty()) {
             throw std::runtime_error("S4U_Mailbox::getTemporaryMailbox(): Out of mailboxes! "
                                      "(Increase the mailbox pool size with the --wrench-mailbox-pool-size command-line argument)");

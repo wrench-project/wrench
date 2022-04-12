@@ -25,7 +25,6 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param name: the action's name (if empty, a unique name will be picked)
-     * @param job: the job this action belongs to
      * @param flops: the number of flops to perform
      * @param ram: the ram that is required
      * @param min_num_cores: the minimum number of cores that can be used
@@ -33,12 +32,11 @@ namespace wrench {
      * @param parallel_model: the parallel model (to determine speedup vs. number of cores)
      */
     ComputeAction::ComputeAction(const std::string &name,
-                                 std::shared_ptr<CompoundJob> job,
                                  double flops,
                                  double ram,
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
-                                 std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_", std::move(job)) {
+                                 std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_") {
         if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
             throw std::invalid_argument("ComputeAction::ComputeAction(): invalid arguments");
         }
@@ -147,7 +145,6 @@ namespace wrench {
      * @param parallel_per_thread_work: amount of parallel per-thread work
      */
     void ComputeAction::simulateComputationAsComputation(const std::shared_ptr<ActionExecutor> &action_executor, unsigned long num_threads, double sequential_work, double parallel_per_thread_work) {
-
         try {
             S4U_Simulation::compute_multi_threaded(num_threads,
                                                    action_executor->getThreadCreationOverhead(),
