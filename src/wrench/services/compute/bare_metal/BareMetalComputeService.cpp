@@ -96,7 +96,6 @@ namespace wrench {
      */
     void BareMetalComputeService::validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                                    std::map<std::string, std::string> &service_specific_args) {
-
         auto cjob = std::dynamic_pointer_cast<CompoundJob>(job);
         auto compute_resources = this->action_execution_service->getComputeResources();
         // Check that each action can run w.r.t. the resource I have
@@ -139,7 +138,6 @@ namespace wrench {
                 unsigned long target_num_cores = std::get<1>(parsed_spec);
 
                 if (not target_host.empty()) {
-
                     if (compute_resources.find(target_host) == compute_resources.end()) {
                         throw std::invalid_argument(
                                 "BareMetalComputeService::validateServiceSpecificArguments(): Invalid service-specific argument '" +
@@ -409,7 +407,6 @@ namespace wrench {
     int BareMetalComputeService::main() {
         this->state = Service::UP;
 
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
         WRENCH_INFO("New BareMetal Compute Service starting");
@@ -667,7 +664,6 @@ namespace wrench {
  */
     void BareMetalComputeService::processCompoundJobTerminationRequest(const std::shared_ptr<CompoundJob> &job,
                                                                        simgrid::s4u::Mailbox *answer_mailbox) {
-
         // If the job doesn't exit, we reply right away
         if (this->current_jobs.find(job) == this->current_jobs.end()) {
             WRENCH_INFO(
@@ -719,7 +715,6 @@ namespace wrench {
  */
     void BareMetalComputeService::processGetResourceInformation(simgrid::s4u::Mailbox *answer_mailbox,
                                                                 const std::string &key) {
-
         std::map<std::string, double> dict;
 
         if (key == "ttl") {
@@ -784,9 +779,7 @@ namespace wrench {
  * @brief Helper method to dispatch actions
  */
     void BareMetalComputeService::dispatchReadyActions() {
-
         //        std::cerr << "DISPACHING READY ACTIONS: |" << this->ready_actions.size() << " |\n";
-
 
         // Sort all the actions in the ready queue by (job.priority, action.priority, action.name)
         // TODO: This may be a performance bottleneck... may have to remedy
@@ -837,7 +830,6 @@ namespace wrench {
  * @param action
  */
     void BareMetalComputeService::processActionDone(const std::shared_ptr<Action> &action) {
-
         //        for (auto const &a : this->dispatched_actions) {
         //            WRENCH_INFO("DISPATCHED LIST: %s", a->getName().c_str());
         //        }
@@ -896,7 +888,6 @@ namespace wrench {
      */
     void BareMetalComputeService::terminateCurrentCompoundJob(const std::shared_ptr<CompoundJob> &job,
                                                               ComputeService::TerminationCause termination_cause) {
-
         for (auto const &action: job->getActions()) {
             if (this->dispatched_actions.find(action) != this->dispatched_actions.end()) {
                 this->action_execution_service->terminateAction(action, termination_cause);

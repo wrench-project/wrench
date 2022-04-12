@@ -540,27 +540,23 @@ namespace wrench {
 
                 current_execution_instance.task_id = task->getID();
 
-                if (!read_start_timestamps.empty()) {
-                    for (auto &read_start_timestamp: read_start_timestamps) {
-                        if (read_start_timestamp->getContent()->getTask()->getID() ==
-                            current_execution_instance.task_id) {
-                            current_execution_instance.reads.emplace_back(
-                                    read_start_timestamp->getContent()->getDate(),
-                                    read_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                    read_start_timestamp->getContent()->getFile()->getID());
-                        }
+                for (auto &read_start_timestamp: read_start_timestamps) {
+                    if (read_start_timestamp->getContent()->getTask()->getID() ==
+                        current_execution_instance.task_id) {
+                        current_execution_instance.reads.emplace_back(
+                                read_start_timestamp->getContent()->getDate(),
+                                read_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                read_start_timestamp->getContent()->getFile()->getID());
                     }
                 }
 
-                if (!write_start_timestamps.empty()) {
-                    for (auto &write_start_timestamp: write_start_timestamps) {
-                        if (write_start_timestamp->getContent()->getTask()->getID() ==
-                            current_execution_instance.task_id) {
-                            current_execution_instance.writes.emplace_back(
-                                    write_start_timestamp->getContent()->getDate(),
-                                    write_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                    write_start_timestamp->getContent()->getFile()->getID());
-                        }
+                for (auto &write_start_timestamp: write_start_timestamps) {
+                    if (write_start_timestamp->getContent()->getTask()->getID() ==
+                        current_execution_instance.task_id) {
+                        current_execution_instance.writes.emplace_back(
+                                write_start_timestamp->getContent()->getDate(),
+                                write_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                write_start_timestamp->getContent()->getFile()->getID());
                     }
                 }
 
@@ -605,27 +601,23 @@ namespace wrench {
 
                 current_execution_instance.task_id = task->getID();
 
-                if (!read_start_timestamps.empty()) {
-                    for (auto &read_start_timestamp: read_start_timestamps) {
-                        if (read_start_timestamp->getContent()->getTask()->getID() ==
-                            current_execution_instance.task_id) {
-                            current_execution_instance.reads.emplace_back(
-                                    read_start_timestamp->getContent()->getDate(),
-                                    read_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                    read_start_timestamp->getContent()->getFile()->getID());
-                        }
+                for (auto &read_start_timestamp: read_start_timestamps) {
+                    if (read_start_timestamp->getContent()->getTask()->getID() ==
+                        current_execution_instance.task_id) {
+                        current_execution_instance.reads.emplace_back(
+                                read_start_timestamp->getContent()->getDate(),
+                                read_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                read_start_timestamp->getContent()->getFile()->getID());
                     }
                 }
 
-                if (!write_start_timestamps.empty()) {
-                    for (auto &write_start_timestamp: write_start_timestamps) {
-                        if (write_start_timestamp->getContent()->getTask()->getID() ==
-                            current_execution_instance.task_id) {
-                            current_execution_instance.writes.emplace_back(
-                                    write_start_timestamp->getContent()->getDate(),
-                                    write_start_timestamp->getContent()->getEndpoint()->getDate(),
-                                    write_start_timestamp->getContent()->getFile()->getID());
-                        }
+                for (auto &write_start_timestamp: write_start_timestamps) {
+                    if (write_start_timestamp->getContent()->getTask()->getID() ==
+                        current_execution_instance.task_id) {
+                        current_execution_instance.writes.emplace_back(
+                                write_start_timestamp->getContent()->getDate(),
+                                write_start_timestamp->getContent()->getEndpoint()->getDate(),
+                                write_start_timestamp->getContent()->getFile()->getID());
                     }
                 }
 
@@ -707,7 +699,6 @@ namespace wrench {
 
         // add the task vertices
         for (const auto &task: workflow->getTasks()) {
-
             nlohmann::json files = nlohmann::json::array();
             for (const auto &f: task->getInputFiles()) {
                 files.push_back({{"link", "input"},
@@ -919,7 +910,6 @@ namespace wrench {
                 output << std::setw(4) << nlohmann::json(energy_consumption) << std::endl;
                 output.close();
             }
-
         } catch (std::runtime_error &e) {
             // Just re-throw
             throw;
@@ -1600,7 +1590,6 @@ namespace wrench {
                                                      const std::shared_ptr<StorageService> &service,
                                                      std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileReadCompletion>()) {
-
             this->addTimestamp<SimulationTimestampFileReadCompletion>(
                     new SimulationTimestampFileReadCompletion(date, file, src, service, std::move(task)));
         }

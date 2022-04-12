@@ -38,8 +38,9 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        FileReadAction(const std::string &name, std::shared_ptr<CompoundJob> job,
-                       std::shared_ptr<DataFile> file, std::vector<std::shared_ptr<FileLocation>> file_locations);
+        FileReadAction(const std::string &name,
+                       std::shared_ptr<DataFile> file, std::vector<std::shared_ptr<FileLocation>> file_locations,
+                       double num_bytes_to_read);
 
 
         void execute(std::shared_ptr<ActionExecutor> action_executor) override;
@@ -50,6 +51,7 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         std::vector<std::shared_ptr<FileLocation>> file_locations;
         std::shared_ptr<FileLocation> used_location;
+        double num_bytes_to_read;
     };
 
 

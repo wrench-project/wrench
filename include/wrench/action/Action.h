@@ -123,7 +123,7 @@ namespace wrench {
 
         virtual ~Action() = default;
 
-        Action(const std::string &name, const std::string &prefix, std::shared_ptr<CompoundJob> job);
+        Action(const std::string &name, const std::string &prefix);
 
         /**
         * @brief Method to execute the task

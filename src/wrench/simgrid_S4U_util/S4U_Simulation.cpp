@@ -11,7 +11,6 @@
 #include <iostream>
 #include <set>
 #include <cfloat>
-#include <wrench/services/compute/ComputeService.h>
 #include <wrench/util/UnitParser.h>
 #include <simgrid/plugins/energy.h>
 #include <simgrid/plugins/file_system.h>
@@ -45,7 +44,7 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool S4U_Simulation::isInitialized() {
+    bool S4U_Simulation::isInitialized() const {
         return this->initialized;
     }
 
@@ -100,7 +99,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void S4U_Simulation::setupPlatform(const std::string &filename) {
-
         try {
             this->engine->load_platform(filename);
         } catch (simgrid::ParseError &e) {
@@ -136,7 +134,6 @@ namespace wrench {
      * @return the hostname as a string
      */
     std::string S4U_Simulation::getHostName() {
-
         return simgrid::s4u::Host::current()->get_name();
     }
 
@@ -165,12 +162,12 @@ namespace wrench {
      */
     std::vector<std::string> S4U_Simulation::getAllLinknames() {
         std::vector<simgrid::s4u::Link *> link_list = simgrid::s4u::Engine::get_instance()->get_all_links();
-        std::vector<std::string> linkname_list;
-        linkname_list.reserve(link_list.size());
+        std::vector<std::string> link_name_list;
+        link_name_list.reserve(link_list.size());
         for (auto h: link_list) {
-            linkname_list.push_back(h->get_name());
+            link_name_list.push_back(h->get_name());
         }
-        return linkname_list;
+        return link_name_list;
     }
 
     /**
@@ -179,7 +176,7 @@ namespace wrench {
      *
      * @return a bandwidth in Bps
      */
-    double S4U_Simulation::getLinkBandwidth(std::string name) {
+    double S4U_Simulation::getLinkBandwidth(const std::string &name) {
         auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
                 [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
         if (links.empty()) {
@@ -194,7 +191,7 @@ namespace wrench {
      *
      * @return a bandwidth usage in Bps
      */
-    double S4U_Simulation::getLinkUsage(std::string name) {
+    double S4U_Simulation::getLinkUsage(const std::string &name) {
         auto links = simgrid::s4u::Engine::get_instance()->get_filtered_links(
                 [name](simgrid::s4u::Link *l) { return (l->get_name() == name); });
         if (links.empty()) {
@@ -202,32 +199,6 @@ namespace wrench {
         }
         return links.at(0)->get_usage();
     }
-
-    //    /**
-    //     * @brief A templated method to determine all hostnames declared under a NetZone in the platform
-    //     * @tparam T: NetZone class
-    //     * @return a map of netzone ids and the list of hostnames
-    //     */
-    //    template<class T>
-    //    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByNetZone() {
-    //        std::map<std::string, std::vector<std::string>> result;
-    //
-    //        auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-    //
-    //        auto netzones = simgrid_engine->get_filtered_netzones<T>();
-    //        for (auto nz: netzones) {
-    //            std::vector<simgrid::s4u::Host *> host_list = nz->get_all_hosts();
-    //            std::vector<std::string> hostname_list;
-    //            hostname_list.reserve(host_list.size());
-    //            for (auto h: host_list) {
-    //                hostname_list.emplace_back(h->get_name());
-    //            }
-    //            result.insert({nz->get_name(), hostname_list});
-    //        }
-    //
-    //        return result;
-    //    }
-
 
     /**
  * @brief Get the list of hostnames in each ClusterZone in the platform (<cluster/> XML tag in the platform XML description)
@@ -271,9 +242,7 @@ namespace wrench {
     */
     std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllClusterIDsByZone() {
         std::map<std::string, std::vector<std::string>> result;
-
         auto simgrid_engine = simgrid::s4u::Engine::get_instance();
-
         S4U_Simulation::traverseAllNetZonesRecursive(simgrid_engine->get_netzone_root(), result, false, true, false, false);
         return result;
     }
@@ -289,7 +258,6 @@ namespace wrench {
      * @param get_hosts_from_clusters: true if this should return hostnames from clusters
      */
     void S4U_Simulation::traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters) {
-
         //        std::cerr << "PROCESSING ROOT " << nz->get_name() << "\n";
         for (auto const &child: nz->get_children()) {
             //            std::cerr << "PROCESSING CHILD " << child->get_name() << "\n";
@@ -330,12 +298,12 @@ namespace wrench {
     }
 
     /**
- * @brief Determines whether a link exists for a given linkname
- * @param linkname: the name of the link
+ * @brief Determines whether a link exists for a given link_name
+ * @param link_name: the name of the link
  * @return true or false
  */
-    bool S4U_Simulation::linkExists(const std::string &linkname) {
-        return (simgrid::s4u::Link::by_name_or_null(linkname) != nullptr);
+    bool S4U_Simulation::linkExists(const std::string &link_name) {
+        return (simgrid::s4u::Link::by_name_or_null(link_name) != nullptr);
     }
 
     /**
@@ -427,15 +395,15 @@ namespace wrench {
     /**
 * @brief Returns whether a link is on or not
 *
-* @param linkname: the name of the link
+* @param link_name: the name of the link
 * @return true or false
 *
 * @throw std::invalid_argument
 */
-    bool S4U_Simulation::isLinkOn(std::string linkname) {
-        auto link = simgrid::s4u::Link::by_name_or_null(linkname);
+    bool S4U_Simulation::isLinkOn(const std::string &link_name) {
+        auto link = simgrid::s4u::Link::by_name_or_null(link_name);
         if (link == nullptr) {
-            throw std::invalid_argument("Unknown linkname " + linkname);
+            throw std::invalid_argument("Unknown link_name " + link_name);
         }
         return link->is_on();
     }
@@ -443,14 +411,14 @@ namespace wrench {
     /**
  * @brief Turn off a link
  *
- * @param linkname: the name of the link to turn off
+ * @param link_name: the name of the link to turn off
  *
  * @throw std::invalid_argument
  */
-    void S4U_Simulation::turnOffLink(const std::string &linkname) {
-        auto link = simgrid::s4u::Link::by_name_or_null(linkname);
+    void S4U_Simulation::turnOffLink(const std::string &link_name) {
+        auto link = simgrid::s4u::Link::by_name_or_null(link_name);
         if (link == nullptr) {
-            throw std::invalid_argument("Unknown linkname " + linkname);
+            throw std::invalid_argument("Unknown link_name " + link_name);
         }
         link->turn_off();
     }
@@ -458,14 +426,14 @@ namespace wrench {
     /**
  * @brief Turn on a link
  *
- * @param linkname: the name of the link to turn on
+ * @param link_name: the name of the link to turn on
  *
  * @throw std::invalid_argument
  */
-    void S4U_Simulation::turnOnLink(const std::string &linkname) {
-        auto link = simgrid::s4u::Link::by_name_or_null(linkname);
+    void S4U_Simulation::turnOnLink(const std::string &link_name) {
+        auto link = simgrid::s4u::Link::by_name_or_null(link_name);
         if (link == nullptr) {
-            throw std::invalid_argument("Unknown linkname " + linkname);
+            throw std::invalid_argument("Unknown link_name " + link_name);
         }
         link->turn_on();
     }
@@ -530,7 +498,7 @@ namespace wrench {
  * @param hostname: name of host to which disk is attached
  * @param mount_point: mount point
  */
-    void S4U_Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
+    void S4U_Simulation::writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point) {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
@@ -544,7 +512,7 @@ namespace wrench {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
             if (disk_mountpoint == mount_point) {
-                disk->write(num_bytes);
+                disk->write((sg_size_t) num_bytes);
                 return;
             }
         }
@@ -566,8 +534,6 @@ namespace wrench {
                                                                 const std::string &hostname,
                                                                 const std::string &read_mount_point,
                                                                 const std::string &write_mount_point) {
-
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s and writing %lf bytes to disk %s:%s",
                      num_bytes_to_read, hostname.c_str(), read_mount_point.c_str(),
                      num_bytes_to_write, hostname.c_str(), write_mount_point.c_str());
@@ -588,10 +554,10 @@ namespace wrench {
         }
 
         // Start asynchronous read
-        auto read_activity = read_disk->io_init(num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
+        auto read_activity = read_disk->io_init((sg_size_t) num_bytes_to_read, simgrid::s4u::Io::OpType::READ);
         read_activity->start();
         // Do synchronous write
-        write_disk->write(num_bytes_to_write);
+        write_disk->write((sg_size_t) num_bytes_to_write);
         // Wait for asychronous read to be done
         read_activity->wait();
     }
@@ -620,7 +586,7 @@ namespace wrench {
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
 
             if (disk_mountpoint == mount_point) {
-                disk->read(num_bytes);
+                disk->read((sg_size_t) num_bytes);
                 return;
             }
         }
@@ -708,7 +674,7 @@ namespace wrench {
  * @param property_name: the property name
  * @return a string relating to the property specified in the platform file
  */
-    std::string S4U_Simulation::getHostProperty(std::string hostname, const std::string &property_name) {
+    std::string S4U_Simulation::getHostProperty(const std::string &hostname, const std::string &property_name) {
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::getHostProperty(): Unknown hostname " + hostname);
@@ -921,7 +887,6 @@ namespace wrench {
  * @throw std::runtime_error
  */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
-
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -961,7 +926,6 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     std::vector<std::string> S4U_Simulation::getDisks(const std::string &hostname) {
-
         simgrid::s4u::Host *host;
         try {
             host = simgrid::s4u::Host::by_name(hostname);
@@ -989,8 +953,7 @@ namespace wrench {
  * @param mount_point: the mount point
  * @return true if the host has a disk attached to the specified mount point, false otherwise
  */
-    bool S4U_Simulation::hostHasMountPoint(std::string hostname, std::string mount_point) {
-
+    bool S4U_Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
         simgrid::s4u::Host *host;
         try {
             host = simgrid::s4u::Host::by_name(hostname);
@@ -1036,8 +999,9 @@ namespace wrench {
         std::vector<simgrid::s4u::Link *> links;
         src->route_to(dst, links, nullptr);
         std::vector<std::string> to_return;
+        to_return.reserve(links.size());
         for (auto const &l: links) {
-            to_return.push_back(l->get_name());
+            to_return.emplace_back(l->get_name());
         }
         return to_return;
     }
@@ -1051,8 +1015,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    double S4U_Simulation::getDiskCapacity(std::string hostname, std::string mount_point) {
-
+    double S4U_Simulation::getDiskCapacity(const std::string &hostname, std::string mount_point) {
         //        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
         simgrid::s4u::Host *host;
         try {
@@ -1064,8 +1027,6 @@ namespace wrench {
         mount_point = FileLocation::sanitizePath(mount_point + "/");
 
         for (auto const &d: host->get_disks()) {
-
-
             // Get the disk's mount point
             const char *mp = d->get_property("mount");
             if (!mp) {
@@ -1114,7 +1075,6 @@ namespace wrench {
                                        double write_bandwidth_in_bytes_per_sec,
                                        double capacity_in_bytes,
                                        const std::string &mount_point) {
-
         if (read_bandwidth_in_bytes_per_sec != write_bandwidth_in_bytes_per_sec) {
             throw std::invalid_argument("Simulation::createNewDisk(): For now, disks must have equal "
                                         "read and write bandwidth");
@@ -1142,6 +1102,5 @@ namespace wrench {
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
     }
-
 
 };// namespace wrench

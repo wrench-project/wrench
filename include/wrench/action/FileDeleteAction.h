@@ -37,7 +37,7 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        FileDeleteAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+        FileDeleteAction(const std::string &name,
                          std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
 
 

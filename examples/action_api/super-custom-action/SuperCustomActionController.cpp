@@ -12,6 +12,7 @@
  **/
 
 #include <iostream>
+#include <utility>
 
 #include "SuperCustomActionController.h"
 
@@ -21,6 +22,27 @@
 WRENCH_LOG_CATEGORY(custom_controller, "Log category for SuperCustomActionController");
 
 namespace wrench {
+
+    /**
+     * @brief A class that showcases how one can extend the wrench::CustomAction class.
+     *        In this case, this is a simple extension that adds a single integer
+     *        instance variable.
+     */
+    class DerivedCustomAction : public CustomAction {
+    public:
+        int additional_variable;
+        /**
+         * @brief Constructor that takes it one extra parameter
+         */
+        DerivedCustomAction(const std::string &name,
+                            double ram,
+                            unsigned long num_cores,
+                            std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_execute,
+                            std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate,
+                            int value) :
+                CustomAction(name, ram, num_cores, lambda_execute, lambda_terminate),
+                additional_variable(value) {}
+    };
 
     /**
      * @brief Constructor, which calls the super constructor
@@ -36,7 +58,7 @@ namespace wrench {
             std::shared_ptr<CloudComputeService> cloud_cs,
             std::shared_ptr<StorageService> ss_1,
             const std::string &hostname) : ExecutionController(hostname, "mamj"),
-                                           bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1) {}
+                                           bm_cs(std::move(bm_cs)), cloud_cs(std::move(cloud_cs)), ss_1(std::move(ss_1)) {}
 
     /**
      * @brief main method of the SuperCustomActionController daemon
@@ -63,7 +85,7 @@ namespace wrench {
 
         /* Creates an instance of input_file on both storage services. This takes zero simulation time. After
          * all, that file needs to be there somewhere initially if it's indeed some input file */
-        ss_1->createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
+        wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
 
         /* Create a one-action job with a custom action */
         auto job = job_manager->createCompoundJob("job");
@@ -129,6 +151,43 @@ namespace wrench {
         } else {
             throw std::runtime_error("Unexpected event: " + event->toString());
         }
+
+        /* Now create a job with a derived custom action */
+        auto even_more_custom_job = job_manager->createCompoundJob("even_more_custom_job");
+        auto my_derived_custom_action = std::make_shared<DerivedCustomAction>("powerful",
+                                                                              0, 0,
+                                                                              [num_cores_to_use_for_vm, cloud_service](std::shared_ptr<ActionExecutor> action_executor) {
+                                                                                  TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
+
+                                                                                  auto the_action = std::dynamic_pointer_cast<DerivedCustomAction>(action_executor->getAction());
+                                                                                  WRENCH_INFO("Derived custom action executing on host %s", action_executor->getHostname().c_str());
+                                                                                  WRENCH_INFO("The additional instance variable's value was %d", the_action->additional_variable);
+                                                                                  WRENCH_INFO("But I am incrementing it by 1");
+                                                                                  the_action->additional_variable++;
+                                                                              },
+                                                                              [](std::shared_ptr<ActionExecutor> action_executor) {
+                                                                                  WRENCH_INFO("Derived custom action terminating");
+                                                                              },
+                                                                              42);
+        even_more_custom_job->addCustomAction(my_derived_custom_action);
+
+        /* Submit the job to the bare-metal service compute service, letting the service pick where
+         * to run the job's actions */
+        WRENCH_INFO("Submitting the job %s to the bare-metal service", even_more_custom_job->getName().c_str());
+        job_manager->submitJob(even_more_custom_job, bm_cs);
+
+        /* Wait for an execution event */
+        auto second_event = this->waitForNextEvent();
+        if (auto job_completion_event = std::dynamic_pointer_cast<wrench::CompoundJobCompletedEvent>(second_event)) {
+            auto completed_job = job_completion_event->job;
+            WRENCH_INFO("Job %s has completed!", completed_job->getName().c_str());
+            WRENCH_INFO("It had %lu actions:", completed_job->getActions().size());
+            auto derived_custom_action = std::dynamic_pointer_cast<DerivedCustomAction>(*(completed_job->getActions().begin()));
+            WRENCH_INFO("The additional instance variable's value in the action is now %d", derived_custom_action->additional_variable);
+        } else {
+            throw std::runtime_error("Unexpected event: " + event->toString());
+        }
+
 
         WRENCH_INFO("Controller terminating");
         return 0;

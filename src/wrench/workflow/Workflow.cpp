@@ -50,8 +50,6 @@ namespace wrench {
                                                     unsigned long min_num_cores,
                                                     unsigned long max_num_cores,
                                                     double memory_requirement) {
-
-
         if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) || (memory_requirement < 0)) {
             throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
         }
@@ -85,7 +83,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::removeFile(const std::shared_ptr<DataFile> &file) {
-
         //        std::cerr << "REMOVING FILE " << file->getID() << "\n";
 
         if (this->task_output_files.find(file) != this->task_output_files.end()) {
@@ -115,7 +112,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::removeTask(const std::shared_ptr<WorkflowTask> &task) {
-
         if (task == nullptr) {
             throw std::invalid_argument("Workflow::removeTask(): Invalid arguments");
         }
@@ -178,7 +174,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::addControlDependency(const std::shared_ptr<WorkflowTask> &src, const std::shared_ptr<WorkflowTask> &dst, bool redundant_dependencies) {
-
         if ((src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
         }
@@ -189,7 +184,6 @@ namespace wrench {
         }
 
         if (redundant_dependencies || not this->dag.doesPathExist(src.get(), dst.get())) {
-
             WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
             this->dag.addEdge(src.get(), dst.get());
 
@@ -295,8 +289,8 @@ namespace wrench {
      *
      * @return map of workflow cluster tasks
      */
-    // TODO: Implement this more efficiently
     std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> Workflow::getReadyClusters() {
+        // TODO: Implement this more efficiently
 
         std::map<std::string, std::vector<std::shared_ptr<WorkflowTask>>> task_map;
 
@@ -304,7 +298,6 @@ namespace wrench {
             std::shared_ptr<WorkflowTask> task = it.second;
 
             if (task->getState() == WorkflowTask::State::READY) {
-
                 if (task->getClusterID().empty()) {
                     task_map[task->getID()] = {task};
 
@@ -361,7 +354,6 @@ namespace wrench {
         }
         return all_tasks;
     }
-
 
     /**
      * @brief Get the list of children for a task
@@ -619,7 +611,6 @@ namespace wrench {
         return exit_tasks;
     }
 
-
     /**
      * @brief Returns the number of levels in the workflow
      * @return the number of levels
@@ -690,7 +681,6 @@ namespace wrench {
         return to_return;
     }
 
-
     /**
      * @brief Add a file to the workflow
      * @param id : file name
@@ -727,11 +717,7 @@ namespace wrench {
      * @return
      */
     std::shared_ptr<Workflow> Workflow::createWorkflow() {
-        //        if (not Simulation::isInitialized()) {
-        //            throw std::runtime_error("Cannot create a workflow before the simulation is initialized");
-        //        }
         return std::shared_ptr<Workflow>(new Workflow());
     }
-
 
 }// namespace wrench

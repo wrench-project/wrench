@@ -19,7 +19,6 @@
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
-#include <wrench/job/CompoundJob.h>
 #include <wrench/action/Action.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutorMessage.h>
@@ -55,7 +54,7 @@ namespace wrench {
 
         // Clean up state in case of a restart
         if (this->isSetToAutoRestart()) {
-            for (auto host: this->compute_resources) {
+            for (const auto &host: this->compute_resources) {
                 this->ram_availabilities.insert(
                         std::make_pair(host.first, S4U_Simulation::getHostMemoryCapacity(host.first)));
                 this->running_thread_counts.insert(std::make_pair(host.first, 0));
@@ -202,12 +201,11 @@ namespace wrench {
      */
     ActionExecutionService::ActionExecutionService(
             const std::string &hostname,
-            const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
+            const std::map<std::string, std::tuple<unsigned long, double>> &compute_resources,
             std::shared_ptr<Service> parent_service,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname,
                                                                                  "action_execution_service") {
-
         // Set default and specified properties
         this->setProperties(this->default_property_values, std::move(property_list));
 
@@ -274,7 +272,7 @@ namespace wrench {
             this->running_thread_counts[host.first] = 0;
         }
 
-        this->parent_service = parent_service;
+        this->parent_service = std::move(parent_service);
     }
 
     /**
@@ -346,14 +344,13 @@ namespace wrench {
      * @return an allocation
      */
     std::tuple<std::string, unsigned long> ActionExecutionService::pickAllocation(
-            std::shared_ptr<Action> action,
-            std::string required_host,
+            const std::shared_ptr<Action> &action,
+            const std::string &required_host,
             unsigned long required_num_cores,
             std::set<std::string> &hosts_to_avoid) {
-
         // Compute possible hosts
         std::set<std::string> possible_hosts;
-        std::string new_host_to_avoid = "";
+        std::string new_host_to_avoid;
         double new_host_to_avoid_ram_capacity = 0;
         for (auto const &r: this->compute_resources) {
             // If there is a required host, then don't even look at others
@@ -408,7 +405,7 @@ namespace wrench {
 
         // Select the "best" host
         double lowest_load = DBL_MAX;
-        std::string picked_host = "";
+        std::string picked_host;
         unsigned long picked_num_cores = 0;
         for (auto const &h: possible_hosts) {
             unsigned long num_running_threads = this->running_thread_counts[h];
@@ -641,9 +638,8 @@ namespace wrench {
      * @param cause: the failure cause
      */
     void ActionExecutionService::killAction(
-            std::shared_ptr<Action> action,
-            std::shared_ptr<FailureCause> cause) {
-
+            const std::shared_ptr<Action> &action,
+            const std::shared_ptr<FailureCause> &cause) {
         WRENCH_INFO("Killing action %s", action->getName().c_str());
 
         bool killed_due_to_job_cancelation = (std::dynamic_pointer_cast<JobKilled>(cause) != nullptr);
@@ -734,7 +730,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox,
                                     new ActionExecutionServiceTerminateActionRequestMessage(
-                                            answer_mailbox, action, termination_cause, 0.0));
+                                            answer_mailbox, std::move(action), termination_cause, 0.0));
         } catch (std::shared_ptr<NetworkError> &cause) {
             throw ExecutionException(cause);
         }
@@ -765,7 +761,6 @@ namespace wrench {
      */
     void ActionExecutionService::processActionExecutorCompletion(
             const std::shared_ptr<ActionExecutor> &executor) {
-
         // Update RAM availabilities and running thread counts
         this->ram_availabilities[executor->getHostname()] += executor->getMemoryAllocated();
         this->running_thread_counts[executor->getHostname()] -= executor->getNumCoresAllocated();
@@ -877,7 +872,7 @@ namespace wrench {
      * @param action: the action
      * @return true if the action can run
      */
-    bool ActionExecutionService::actionCanRun(std::shared_ptr<Action> action) {
+    bool ActionExecutionService::actionCanRun(const std::shared_ptr<Action> &action) {
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
 
         // No service-specific argument
@@ -929,7 +924,7 @@ namespace wrench {
      *
      */
     void ActionExecutionService::processSubmitAction(
-            simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<Action> action) {
+            simgrid::s4u::Mailbox *answer_mailbox, const std::shared_ptr<Action> &action) {
         WRENCH_INFO("Asked to run action %s", action->getName().c_str());
 
         auto service_specific_arguments = action->getJob()->getServiceSpecificArguments();
@@ -1017,14 +1012,12 @@ namespace wrench {
         std::map<std::string, double> information;
 
         if (key == "num_hosts") {
-
             // Num hosts
             std::map<std::string, double> num_hosts;
             num_hosts.insert(std::make_pair(this->getName(), this->compute_resources.size()));
             return num_hosts;
 
         } else if (key == "num_cores") {
-
             // Num cores per hosts
             std::map<std::string, double> num_cores;
             for (auto r: this->compute_resources) {
@@ -1033,7 +1026,6 @@ namespace wrench {
             return num_cores;
 
         } else if (key == "num_idle_cores") {
-
             // Num idle cores per hosts
             std::map<std::string, double> num_idle_cores;
             for (auto r: this->running_thread_counts) {
@@ -1045,7 +1037,6 @@ namespace wrench {
             return num_idle_cores;
 
         } else if (key == "flop_rates") {
-
             // Flop rate per host
             std::map<std::string, double> flop_rates;
             for (auto h: this->compute_resources) {
@@ -1054,7 +1045,6 @@ namespace wrench {
             return flop_rates;
 
         } else if (key == "ram_capacities") {
-
             // RAM capacity per host
             std::map<std::string, double> ram_capacities;
             for (auto h: this->compute_resources) {
@@ -1063,7 +1053,6 @@ namespace wrench {
             return ram_capacities;
 
         } else if (key == "ram_availabilities") {
-
             // RAM availability per host
             std::map<std::string, double> ram_availabilities_to_return;
             for (auto r: this->ram_availabilities) {
@@ -1096,7 +1085,7 @@ namespace wrench {
      *
      * @param executor: the action executor that has crashed
      */
-    void ActionExecutionService::processActionExecutorCrash(std::shared_ptr<ActionExecutor> executor) {
+    void ActionExecutionService::processActionExecutorCrash(const std::shared_ptr<ActionExecutor> &executor) {
         std::shared_ptr<Action> action = executor->getAction();
 
         WRENCH_INFO("Handling an ActionExecutor crash!");
@@ -1109,7 +1098,6 @@ namespace wrench {
         this->action_executors.erase(action);
 
         if (not this->getPropertyValueAsBoolean(ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)) {
-
             // Reset the action state to READY)
             action->newExecution(Action::State::READY);
             //            action->setState(Action::State::READY);

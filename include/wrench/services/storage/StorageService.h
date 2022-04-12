@@ -57,13 +57,12 @@ namespace wrench {
         static void readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
         static void readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location, double num_bytes);
         static void writeFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
-        static void createFile(std::shared_ptr<DataFile> file, const std::shared_ptr<FileLocation> &location);
 
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-        bool isScratch();
+        bool isScratch() const;
         void setScratch();
 
         static void copyFile(const std::shared_ptr<DataFile> &file,
@@ -82,7 +81,7 @@ namespace wrench {
 
 
         StorageService(const std::string &hostname,
-                       const std::set<std::string> mount_points,
+                       const std::set<std::string> &mount_points,
                        const std::string &service_name);
 
     protected:
