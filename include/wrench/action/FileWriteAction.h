@@ -36,7 +36,7 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        FileWriteAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+        FileWriteAction(const std::string &name,
                         std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
 
         void execute(std::shared_ptr<ActionExecutor> action_executor) override;
