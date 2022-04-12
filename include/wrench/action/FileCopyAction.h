@@ -39,7 +39,7 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        FileCopyAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+        FileCopyAction(const std::string &name,
                        std::shared_ptr<DataFile> file,
                        std::shared_ptr<FileLocation> src_file_location,
                        std::shared_ptr<FileLocation> dst_file_location);

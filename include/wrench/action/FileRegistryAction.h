@@ -48,7 +48,6 @@ namespace wrench {
 
         FileRegistryAction(FileRegistryAction::Type type,
                            const std::string &name,
-                           std::shared_ptr<CompoundJob> job,
                            std::shared_ptr<FileRegistryService> file_registry_service,
                            std::shared_ptr<DataFile> file,
                            std::shared_ptr<FileLocation> file_location);
