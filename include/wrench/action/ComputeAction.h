@@ -39,7 +39,6 @@ namespace wrench {
         friend class CompoundJob;
 
         ComputeAction(const std::string &name,
-                      std::shared_ptr<CompoundJob> job,
                       double flops,
                       double ram,
                       unsigned long min_core,
