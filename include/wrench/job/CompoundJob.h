@@ -126,6 +126,8 @@ namespace wrench {
                                                       const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                                                       const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
 
+        std::shared_ptr<CustomAction> addCustomAction(std::shared_ptr<CustomAction> custom_action);
+
         void removeAction(std::shared_ptr<Action> &action);
 
         void addActionDependency(const std::shared_ptr<Action> &parent, const std::shared_ptr<Action> &child);
