@@ -51,7 +51,6 @@ namespace wrench {
      */
     std::shared_ptr<ExecutionEvent>
     ExecutionEvent::waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox, double timeout) {
-
         // Get the message from the mailbox_name
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
