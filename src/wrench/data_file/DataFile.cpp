@@ -24,7 +24,7 @@ namespace wrench {
      * @param id: the file id
      * @param s: the file size
      */
-    DataFile::DataFile(std::string  id, double s) : id(std::move(id)), size(s) {
+    DataFile::DataFile(std::string id, double s) : id(std::move(id)), size(s) {
     }
 
     /**

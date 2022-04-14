@@ -93,7 +93,7 @@ namespace wrench {
         job->addCustomAction(
                 "powerful",
                 0, 0,
-                [num_cores_to_use_for_vm, cloud_service](const std::shared_ptr<ActionExecutor>& action_executor) {
+                [num_cores_to_use_for_vm, cloud_service](const std::shared_ptr<ActionExecutor> &action_executor) {
                     TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
                     WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
@@ -164,7 +164,7 @@ namespace wrench {
                     WRENCH_INFO("But I am incrementing it by 1");
                     the_action->additional_variable++;
                 },
-                [](const std::shared_ptr<ActionExecutor>& action_executor) {
+                [](const std::shared_ptr<ActionExecutor> &action_executor) {
                     WRENCH_INFO("Derived custom action terminating");
                 },
                 42);

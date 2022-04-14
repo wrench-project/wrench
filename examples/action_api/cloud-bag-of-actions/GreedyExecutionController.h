@@ -27,8 +27,8 @@ namespace wrench {
         // Constructor
         GreedyExecutionController(
                 int num_actions,
-                std::shared_ptr<CloudComputeService>  compute_service,
-                std::shared_ptr<SimpleStorageService>  storage_service,
+                std::shared_ptr<CloudComputeService> compute_service,
+                std::shared_ptr<SimpleStorageService> storage_service,
                 const std::string &hostname);
 
     private:

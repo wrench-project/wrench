@@ -109,15 +109,15 @@ namespace wrench {
         return std::any_of(this->file_locations.begin(),
                            this->file_locations.end(),
                            [](const std::shared_ptr<FileLocation> &fl) {
-            return (fl == FileLocation::SCRATCH);
-        });
+                               return (fl == FileLocation::SCRATCH);
+                           });
 
-//        for (auto const &fl: this->file_locations) {
-//            if (fl == FileLocation::SCRATCH) {
-//                return true;
-//            }
-//        }
-//        return false;
+        //        for (auto const &fl: this->file_locations) {
+        //            if (fl == FileLocation::SCRATCH) {
+        //                return true;
+        //            }
+        //        }
+        //        return false;
     }
 
 }// namespace wrench
