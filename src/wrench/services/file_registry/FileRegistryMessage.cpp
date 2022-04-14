@@ -27,7 +27,6 @@ namespace wrench {
      */
     FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<DataFile> file, double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file) {
-
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || file == nullptr) {
             throw std::invalid_argument(
