@@ -64,7 +64,6 @@ namespace wrench {
      * @param t: a date
      */
     void CoreAvailabilityTimeLine::setTimeOrigin(u_int32_t t) {
-
         while (true) {
             auto ts = this->availability_timeslots.begin();
             if (ts->first.lower() >= t) {
@@ -131,8 +130,6 @@ namespace wrench {
      * @return a date and a set of host indices
      */
     std::pair<u_int32_t, std::vector<int>> CoreAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes, unsigned long num_cores_per_node) {
-
-
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
@@ -141,7 +138,6 @@ namespace wrench {
         std::set<int> possible_node_indices = this->integer_sequence;
 
         for (auto &availability_timeslot: this->availability_timeslots) {
-
             //            std::cerr << "LOOKING AT A TIME SLOT " <<  availability_timeslot.first << "\n";
             //            std::cerr << " RIGHT NOW POSSIBLE NODES: " << possible_node_indices.size() << "\n";
             // Remove infeasible hosts

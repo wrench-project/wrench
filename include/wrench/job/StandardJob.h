@@ -38,7 +38,6 @@ namespace wrench {
      * by a WMS (via a JobManager)
      */
     class StandardJob : public Job, public std::enable_shared_from_this<StandardJob> {
-
     public:
         /** @brief Standard job states */
         enum State {
