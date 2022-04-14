@@ -68,7 +68,7 @@ namespace wrench {
     }
 
     double
-    UnitParser::parseValueWithUnit(std::string string, const UnitParser::unit_scale &units, const char *default_unit) {
+    UnitParser::parseValueWithUnit(const std::string& string, const UnitParser::unit_scale &units, const char *default_unit) {
         char *ptr;
         const char *c_string = string.c_str();
         errno = 0;
@@ -97,7 +97,7 @@ namespace wrench {
      *
      * @throws std::invalid_argument
      */
-    double UnitParser::parse_size(std::string string) {
+    double UnitParser::parse_size(const std::string& string) {
         static const UnitParser::unit_scale units{std::make_tuple("b", 0.125, 2, true),
                                                   std::make_tuple("b", 0.125, 10, true),
                                                   std::make_tuple("B", 1.0, 2, true),
@@ -119,7 +119,7 @@ namespace wrench {
      *
      * @throws std::invalid_argument
      */
-    double UnitParser::parse_compute_speed(std::string string) {
+    double UnitParser::parse_compute_speed(const std::string& string) {
         static const UnitParser::unit_scale units{std::make_tuple("f", 1.0, 10, true)};
         double compute_speed;
         try {

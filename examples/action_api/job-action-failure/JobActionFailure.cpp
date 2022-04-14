@@ -93,19 +93,19 @@ int main(int argc, char **argv) {
     auto baremetal_service = simulation->add(new wrench::BareMetalComputeService(
             "ComputeHost1", {{"ComputeHost1"}, {"ComputeHost2"}}, "", {}, {}));
 
-    /* Instantiate a cloud compute service, and add it to the simulation.
-     * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
-     * to a cloud that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
-     * This particular service is started on CloudProviderHost, uses CloudHost1 and CloudHost2
-     * as hardware resources, and has access scratch storage space (mount point argument = "/scratch").
-     * This means that tasks running on this service will access data only from remote storage services. */
-    std::cerr << "Instantiating a cloud compute service on CloudHeadHost..." << std::endl;
-    auto cloud_service = simulation->add(new wrench::CloudComputeService(
-            "CloudHeadHost", {"CloudHost"}, "/scratch/", {}, {}));
+//    /* Instantiate a cloud compute service, and add it to the simulation.
+//     * A wrench::CloudComputeService is an abstraction of a compute service that corresponds
+//     * to a cloud that responds to VM creating requests, and each VM exposes a "bare-metal" compute service.
+//     * This particular service is started on CloudProviderHost, uses CloudHost1 and CloudHost2
+//     * as hardware resources, and has access scratch storage space (mount point argument = "/scratch").
+//     * This means that tasks running on this service will access data only from remote storage services. */
+//    std::cerr << "Instantiating a cloud compute service on CloudHeadHost..." << std::endl;
+//    auto cloud_service = simulation->add(new wrench::CloudComputeService(
+//            "CloudHeadHost", {"CloudHost"}, "/scratch/", {}, {}));
 
     /* Instantiate an execution execution_controller to be stated on UserHost */
     auto wms = simulation->add(
-            new wrench::JobActionFailureController(baremetal_service, cloud_service, storage_service_1, storage_service_2, "UserHost"));
+            new wrench::JobActionFailureController(baremetal_service, storage_service_1, storage_service_2, "UserHost"));
 
     /* Launch the simulation. This call only returns when the simulation is complete. */
     std::cerr << "Launching the Simulation..." << std::endl;
