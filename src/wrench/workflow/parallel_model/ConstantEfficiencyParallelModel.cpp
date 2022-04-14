@@ -32,7 +32,7 @@ namespace wrench {
      * @brief Get the model's parallel efficiency
      * @return a parallel efficiency
      */
-    double wrench::ConstantEfficiencyParallelModel::getEfficiency() {
+    double wrench::ConstantEfficiencyParallelModel::getEfficiency() const {
         return this->efficiency;
     }
 

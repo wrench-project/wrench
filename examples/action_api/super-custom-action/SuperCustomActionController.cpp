@@ -39,7 +39,7 @@ namespace wrench {
                             unsigned long num_cores,
                             std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_execute,
                             std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate,
-                            int value) : CustomAction(name, ram, num_cores, lambda_execute, lambda_terminate),
+                            int value) : CustomAction(name, ram, num_cores, std::move(lambda_execute), std::move(lambda_terminate)),
                                          additional_variable(value) {}
     };
 
@@ -67,7 +67,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int SuperCustomActionController::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
@@ -94,7 +93,7 @@ namespace wrench {
         job->addCustomAction(
                 "powerful",
                 0, 0,
-                [num_cores_to_use_for_vm, cloud_service](std::shared_ptr<ActionExecutor> action_executor) {
+                [num_cores_to_use_for_vm, cloud_service](const std::shared_ptr<ActionExecutor>& action_executor) {
                     TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
                     WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
@@ -165,7 +164,7 @@ namespace wrench {
                     WRENCH_INFO("But I am incrementing it by 1");
                     the_action->additional_variable++;
                 },
-                [](std::shared_ptr<ActionExecutor> action_executor) {
+                [](const std::shared_ptr<ActionExecutor>& action_executor) {
                     WRENCH_INFO("Derived custom action terminating");
                 },
                 42);
