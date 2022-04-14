@@ -21,13 +21,12 @@ namespace wrench {
     class DataFile {
 
     public:
-        double getSize();
-
-        std::string getID();
+        double getSize() const;
+        std::string getID() const;
 
     protected:
         friend class Simulation;
-        DataFile(std::string id, double size);
+        DataFile(std::string  id, double size);
 
         /** @brief File id/name **/
         std::string id;

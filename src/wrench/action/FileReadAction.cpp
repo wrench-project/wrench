@@ -61,12 +61,11 @@ namespace wrench {
         return this->file_locations;
     }
 
-
     /**
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileReadAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileReadAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File read
@@ -89,7 +88,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileReadAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileReadAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 
@@ -107,12 +106,18 @@ namespace wrench {
       * @return true if the action uses scratch, false otherwise
       */
     bool FileReadAction::usesScratch() const {
-        for (auto const &fl: this->file_locations) {
-            if (fl == FileLocation::SCRATCH) {
-                return true;
-            }
-        }
-        return false;
+        return std::any_of(this->file_locations.begin(),
+                           this->file_locations.end(),
+                           [](const std::shared_ptr<FileLocation> &fl) {
+            return (fl == FileLocation::SCRATCH);
+        });
+
+//        for (auto const &fl: this->file_locations) {
+//            if (fl == FileLocation::SCRATCH) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
 }// namespace wrench

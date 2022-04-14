@@ -71,7 +71,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileRegistryAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileRegistryAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
@@ -86,7 +86,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileRegistryAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileRegistryAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 

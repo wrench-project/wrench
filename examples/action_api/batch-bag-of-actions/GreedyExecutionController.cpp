@@ -46,7 +46,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int GreedyExecutionController::main() {
-
         /* Initialize and seed a RNG */
         std::mt19937 rng(42);
 
