@@ -221,7 +221,6 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
-
             return true;
 
         } else {
