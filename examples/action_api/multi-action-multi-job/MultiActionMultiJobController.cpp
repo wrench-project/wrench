@@ -89,13 +89,13 @@ namespace wrench {
         job3->addCustomAction(
                 "file_copy",
                 0, 0,
-                [ss_to_use, input_file](const std::shared_ptr<ActionExecutor>& action_executor) {
+                [ss_to_use, input_file](const std::shared_ptr<ActionExecutor> &action_executor) {
                     WRENCH_INFO("Custom action executing on host %s", action_executor->getHostname().c_str());
 
                     // Which host I am running on?
                     auto execution_host = action_executor->getPhysicalHostname();
                     // Based on where I am running, pick a storage service
-                    const auto& target_ss = ss_to_use.at(execution_host);
+                    const auto &target_ss = ss_to_use.at(execution_host);
                     WRENCH_INFO("Custom action about to read file from storage service on host %s",
                                 target_ss->getHostname().c_str());
                     // Read a input_file from the target storage service (which takes some time)
@@ -107,7 +107,7 @@ namespace wrench {
                     // Deleted the input file from the target storage service!
                     target_ss->deleteFile(input_file, wrench::FileLocation::LOCATION(target_ss, "/data/"));
                 },
-                [](const std::shared_ptr<ActionExecutor>& action_executor) {
+                [](const std::shared_ptr<ActionExecutor> &action_executor) {
                     WRENCH_INFO("Custom action terminating");
                 });
 

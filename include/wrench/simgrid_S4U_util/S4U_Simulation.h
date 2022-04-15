@@ -37,7 +37,7 @@ namespace wrench {
         void runSimulation();
         static double getClock();
         static std::string getHostName();
-        static bool hostExists(const std::string& hostname);
+        static bool hostExists(const std::string &hostname);
         static bool linkExists(const std::string &link_name);
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
         static unsigned int getHostNumCores(const std::string &hostname);

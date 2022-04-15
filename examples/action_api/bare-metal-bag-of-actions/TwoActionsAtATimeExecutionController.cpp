@@ -33,8 +33,8 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoActionsAtATimeExecutionController::TwoActionsAtATimeExecutionController(int num_actions,
-                                                                               std::shared_ptr<BareMetalComputeService>  compute_service,
-                                                                               std::shared_ptr<SimpleStorageService>  storage_service,
+                                                                               std::shared_ptr<BareMetalComputeService> compute_service,
+                                                                               std::shared_ptr<SimpleStorageService> storage_service,
                                                                                const std::string &hostname) : ExecutionController(hostname, "me"),
                                                                                                               compute_service(std::move(compute_service)), storage_service(std::move(storage_service)), num_actions(num_actions) {
     }
