@@ -310,7 +310,7 @@ namespace wrench {
      * @param prefix: mailbox name prefix
      * @return
      */
-    simgrid::s4u::Mailbox *S4U_Mailbox::generateUniqueMailbox(std::string prefix) {
+    simgrid::s4u::Mailbox *S4U_Mailbox::generateUniqueMailbox(const std::string &prefix) {
         return simgrid::s4u::Mailbox::by_name(prefix + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber()));
     }
 

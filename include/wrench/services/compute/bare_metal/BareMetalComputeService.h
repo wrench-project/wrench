@@ -102,9 +102,9 @@ namespace wrench {
                                 WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        virtual bool supportsStandardJobs() override;
-        virtual bool supportsCompoundJobs() override;
-        virtual bool supportsPilotJobs() override;
+        bool supportsStandardJobs() override;
+        bool supportsCompoundJobs() override;
+        bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond INTERNAL     */
@@ -114,7 +114,7 @@ namespace wrench {
 
         void terminateCompoundJob(std::shared_ptr<CompoundJob> job) override;
 
-        ~BareMetalComputeService();
+        ~BareMetalComputeService() override;
 
 
     protected:
