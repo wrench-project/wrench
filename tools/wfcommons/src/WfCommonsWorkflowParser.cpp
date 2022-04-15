@@ -76,8 +76,7 @@ namespace wrench {
                     try {
                         num_cores = core_spec.at("count");
                     } catch (nlohmann::detail::out_of_range &e) {
-                        throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Machine specification for " +
-                                                    name + " does not provide a core count - aborting");
+                        num_cores = 1;
                     }
                     double ghz;
                     try {
