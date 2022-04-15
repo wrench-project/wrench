@@ -12,6 +12,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/failure_causes/FailureCause.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_host_error, "Log category for HostError");
 
 namespace wrench {
@@ -21,7 +23,7 @@ namespace wrench {
      * @param hostname: the name of the host that experienced the error
      */
     HostError::HostError(std::string hostname) {
-        this->hostname = hostname;
+        this->hostname = std::move(hostname);
     }
 
     /** @brief Get the human-readable failure message

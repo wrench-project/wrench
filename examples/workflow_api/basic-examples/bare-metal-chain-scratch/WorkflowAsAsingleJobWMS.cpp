@@ -47,7 +47,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int WorkflowAsAsingleJobWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 

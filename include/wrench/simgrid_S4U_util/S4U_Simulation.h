@@ -37,7 +37,7 @@ namespace wrench {
         void runSimulation();
         static double getClock();
         static std::string getHostName();
-        static bool hostExists(std::string hostname);
+        static bool hostExists(const std::string &hostname);
         static bool linkExists(const std::string &link_name);
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
         static unsigned int getHostNumCores(const std::string &hostname);
@@ -89,7 +89,7 @@ namespace wrench {
         //end energy related calls
 
         bool isInitialized() const;
-        bool isPlatformSetup();
+        bool isPlatformSetup() const;
         static std::vector<std::string> getAllHostnames();
         static std::vector<std::string> getAllLinknames();
         static double getLinkBandwidth(const std::string &name);
@@ -102,7 +102,7 @@ namespace wrench {
 
         static void createNewDisk(const std::string &hostname, const std::string &disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, double capacity_in_bytes, const std::string &mount_point);
 
-        void shutdown();
+        void shutdown() const;
 
     private:
         static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters);

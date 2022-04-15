@@ -535,7 +535,6 @@ namespace wrench {
     * @brief Start a network listener process (for batsched only)
     */
     void BatschedBatchScheduler::startBatschedNetworkListener() {
-
         nlohmann::json compute_resources_map;
         compute_resources_map["now"] = S4U_Simulation::getClock();
         compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();

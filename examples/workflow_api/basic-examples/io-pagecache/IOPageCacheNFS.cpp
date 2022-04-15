@@ -99,11 +99,10 @@ void export_output_multi(wrench::SimulationOutput &output, int num_tasks, std::s
  * @return 0 on success, non-zero otherwise
  */
 int main(int argc, char **argv) {
-
     int num_task = 3;
 
     auto simulation = wrench::Simulation::createSimulation();
-    ;
+
     simulation->init(&argc, argv);
 
     if (argc < 5) {
@@ -196,6 +195,5 @@ int main(int argc, char **argv) {
 
     //    simulation->getOutput().dumpUnifiedJSON(workflow,
     //                                           "nfs_" + sub_dir + "/dump_" + to_string(no_pipelines) + ".json");
-
     return 0;
 }

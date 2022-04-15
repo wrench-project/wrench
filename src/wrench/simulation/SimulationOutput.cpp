@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
+#include <utility>
 #include <vector>
 #include <cmath>
 #include <unordered_set>
@@ -48,9 +49,9 @@ namespace wrench {
         /* @brief  a task ID */
         std::string task_id;
         /* @brief number of allocated cores */
-        unsigned long long num_cores_allocated;
+        unsigned long long num_cores_allocated = 0;
         /* @brief vertical position in gantt chart display */
-        unsigned long long vertical_position;
+        unsigned long long vertical_position = 0;
 
         /* @brief task geometry in gantt chart display */
         std::pair<double, double> whole_task;
@@ -66,19 +67,19 @@ namespace wrench {
         /* @brief file write operations */
         std::vector<std::tuple<double, double, std::string>> writes;
 
-        /* @brief whether the task has failed */
-        double failed;
-        /* @brief whether the task was terminated */
-        double terminated;
+        /* @brief The date at which the task has failed */
+        double failed = -1.0;
+        /* @brief The date at which the task was terminated */
+        double terminated = -1.0;
 
         /* @brief name of the host that ran the task */
         std::string hostname;
         /* @brief flop rate of the host that ran the task */
-        double host_flop_rate;
+        double host_flop_rate = 0.0;
         /* @brief RAM capacity of the host that ran the task */
-        double host_memory;
+        double host_memory = 0.0;
         /* @brief number of cores of the host that ran the task */
-        unsigned long long host_num_cores;
+        unsigned long long host_num_cores = 0;
 
         /* 
          * @brief get the task end time
@@ -1604,13 +1605,13 @@ namespace wrench {
      * @param task: the workflow task for which this write is done (or nullptr);
      */
     void SimulationOutput::addTimestampFileWriteStart(double date,
-                                                      std::shared_ptr<DataFile> file,
-                                                      std::shared_ptr<FileLocation> src,
-                                                      std::shared_ptr<StorageService> service,
+                                                      const std::shared_ptr<DataFile> &file,
+                                                      const std::shared_ptr<FileLocation> &src,
+                                                      const std::shared_ptr<StorageService> &service,
                                                       std::shared_ptr<WorkflowTask> task) {
         if (this->isEnabled<SimulationTimestampFileWriteStart>()) {
             this->addTimestamp<SimulationTimestampFileWriteStart>(
-                    new SimulationTimestampFileWriteStart(date, std::move(file), src, service, task));
+                    new SimulationTimestampFileWriteStart(date, file, src, service, std::move(task)));
         }
     }
 
@@ -1661,11 +1662,11 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyStart(double date,
-                                                     std::shared_ptr<DataFile> file,
-                                                     std::shared_ptr<FileLocation> src,
-                                                     std::shared_ptr<FileLocation> dst) {
+                                                     const std::shared_ptr<DataFile> &file,
+                                                     const std::shared_ptr<FileLocation> &src,
+                                                     const std::shared_ptr<FileLocation> &dst) {
         if (this->isEnabled<SimulationTimestampFileCopyStart>()) {
-            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(date, std::move(file), std::move(src), dst));
+            this->addTimestamp<SimulationTimestampFileCopyStart>(new SimulationTimestampFileCopyStart(date, file, src, dst));
         }
     }
 
@@ -1677,12 +1678,12 @@ namespace wrench {
      * @param dst: the target location
      */
     void SimulationOutput::addTimestampFileCopyFailure(double date,
-                                                       std::shared_ptr<DataFile> file,
-                                                       std::shared_ptr<FileLocation> src,
-                                                       std::shared_ptr<FileLocation> dst) {
+                                                       const std::shared_ptr<DataFile> &file,
+                                                       const std::shared_ptr<FileLocation> &src,
+                                                       const std::shared_ptr<FileLocation> &dst) {
         if (this->isEnabled<SimulationTimestampFileCopyFailure>()) {
             this->addTimestamp<SimulationTimestampFileCopyFailure>(
-                    new SimulationTimestampFileCopyFailure(date, std::move(file), std::move(src), std::move(dst)));
+                    new SimulationTimestampFileCopyFailure(date, file, src, dst));
         }
     }
 

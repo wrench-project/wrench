@@ -13,7 +13,6 @@
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
 
@@ -59,7 +58,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileWriteAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileWriteAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
@@ -70,7 +69,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileWriteAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileWriteAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 

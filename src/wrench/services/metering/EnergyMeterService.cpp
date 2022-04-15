@@ -24,7 +24,6 @@ namespace wrench {
      * @param measurement_periods: the measurement period for each metered host
      */
     EnergyMeterService::EnergyMeterService(const std::string hostname, const std::map<std::string, double> &measurement_periods) : Service(hostname, "energy_meter") {
-
         if (measurement_periods.empty()) {
             throw std::invalid_argument("EnergyMeter::EnergyMeter(): no host to meter!");
         }
@@ -96,7 +95,6 @@ namespace wrench {
      * @return 0 on success
      */
     int EnergyMeterService::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         WRENCH_INFO("New Energy Meter Manager starting (%s)", this->mailbox->get_cname());
@@ -149,7 +147,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool EnergyMeterService::processNextMessage(double timeout) {
-
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
