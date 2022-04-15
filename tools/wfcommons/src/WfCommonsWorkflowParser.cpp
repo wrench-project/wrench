@@ -83,7 +83,7 @@ namespace wrench {
                     try {
                         ghz = core_spec.at("speed");
                     } catch (nlohmann::detail::out_of_range &e) {
-                        ghz = -1.0; // unknown
+                        ghz = -1.0;// unknown
                     }
                     machines[name] = std::make_pair(num_cores, ghz);
                 }
@@ -138,12 +138,12 @@ namespace wrench {
                                                         "  but no description for that machine is found on the JSON file");
                         }
                         if (machines[execution_machine].second >= 0) {
-                            double core_ghz= (machines[execution_machine].second);
+                            double core_ghz = (machines[execution_machine].second);
                             double total_compute_power_used = core_ghz * (double) min_num_cores;
                             double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
                             flop_amount = runtime * actual_flop_rate;
                         } else {
-                            flop_amount = (double) min_num_cores * runtime * flop_rate; // Assume a min-core execution
+                            flop_amount = (double) min_num_cores * runtime * flop_rate;// Assume a min-core execution
                         }
                     }
 
