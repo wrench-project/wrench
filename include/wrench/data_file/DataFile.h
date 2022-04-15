@@ -26,7 +26,7 @@ namespace wrench {
 
     protected:
         friend class Simulation;
-        DataFile(std::string  id, double size);
+        DataFile(std::string id, double size);
 
         /** @brief File id/name **/
         std::string id;

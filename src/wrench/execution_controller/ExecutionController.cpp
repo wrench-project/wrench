@@ -32,7 +32,7 @@ namespace wrench {
      */
     ExecutionController::ExecutionController(
             const std::string &hostname,
-            const std::string& suffix) : Service(hostname, "controller_" + suffix) {
+            const std::string &suffix) : Service(hostname, "controller_" + suffix) {
     }
 
 
