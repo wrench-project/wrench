@@ -99,11 +99,12 @@ namespace wrench {
                 for (auto &m: machine_specs) {
                     std::string name = std::string(m.as_object().at("nodeName").as_string().c_str());
                     auto core_spec = m.at("cpu").as_object();
+                    unsigned long num_cores;
                     if (core_spec.find("count") == core_spec.end()) {
-                        throw std::invalid_argument("WfCommonsWorkflowParser::createWorkflowFromJson(): Machine specification for " +
-                                                    name + " does not provide a core count - aborting");
+                        num_cores = 1;
+                    } else {
+                        num_cores = core_spec.at("count").to_number<unsigned long>();
                     }
-                    unsigned long num_cores = core_spec.at("count").to_number<unsigned long>();
                     double ghz;
                     if (core_spec.find("speed") == core_spec.end()) {
                         ghz = -1.0;
@@ -165,12 +166,12 @@ namespace wrench {
                                                         "  but no description for that machine is found on the JSON file");
                         }
                         if (machines[execution_machine].second >= 0) {
-                            double core_ghz= (machines[execution_machine].second);
+                            double core_ghz = (machines[execution_machine].second);
                             double total_compute_power_used = core_ghz * (double) min_num_cores;
                             double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
                             flop_amount = runtime * actual_flop_rate;
                         } else {
-                            flop_amount = (double) min_num_cores * runtime * flop_rate; // Assume a min-core execution
+                            flop_amount = (double) min_num_cores * runtime * flop_rate;// Assume a min-core execution
                         }
                     }
 
