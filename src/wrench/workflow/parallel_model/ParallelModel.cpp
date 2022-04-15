@@ -51,7 +51,7 @@ namespace wrench {
      *
      * @return a model instance
      **/
-    std::shared_ptr<ParallelModel> ParallelModel::CUSTOM(std::function<double(double, long)> lambda_sequential, std::function<double(double, long)> lambda_per_thread) {
+    std::shared_ptr<ParallelModel> ParallelModel::CUSTOM(const std::function<double(double, long)> &lambda_sequential, const std::function<double(double, long)> &lambda_per_thread) {
         return std::shared_ptr<ParallelModel>(new CustomParallelModel(lambda_sequential, lambda_per_thread));
     }
 

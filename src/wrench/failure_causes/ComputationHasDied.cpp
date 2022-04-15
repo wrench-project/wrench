@@ -18,8 +18,7 @@ namespace wrench {
     /** @brief Constructor
      *
      */
-    ComputationHasDied::ComputationHasDied() {
-    }
+    ComputationHasDied::ComputationHasDied() = default;
 
 
     /**
