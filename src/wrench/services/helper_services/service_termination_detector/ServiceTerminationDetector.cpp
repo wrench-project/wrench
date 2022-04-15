@@ -30,7 +30,6 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
                                                                simgrid::s4u::Mailbox *mailbox_to_notify,
                                                                bool notify_on_crash,
                                                                bool notify_on_termination) : Service(std::move(host_on_which_to_run), "service_termination_detector_for_" + service_to_monitor->getName()) {
-
     this->service_to_monitor = std::move(service_to_monitor);
     this->mailbox_to_notify = mailbox_to_notify;
     this->notify_on_crash = notify_on_crash;
@@ -41,7 +40,6 @@ wrench::ServiceTerminationDetector::ServiceTerminationDetector(std::string host_
  * @brief main method
  */
 int wrench::ServiceTerminationDetector::main() {
-
     WRENCH_INFO("Starting");
     std::pair<bool, int> return_values_from_join;
     return_values_from_join = this->service_to_monitor->join();

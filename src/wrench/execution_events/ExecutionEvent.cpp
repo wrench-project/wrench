@@ -17,7 +17,6 @@
 #include <wrench/execution_controller/ExecutionControllerMessage.h>
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include <wrench/exceptions/ExecutionException.h>
-#include "wrench.h"
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_execution_event, "Log category for Workflow Execution Event");
 
@@ -51,7 +50,6 @@ namespace wrench {
      */
     std::shared_ptr<ExecutionEvent>
     ExecutionEvent::waitForNextExecutionEvent(simgrid::s4u::Mailbox *mailbox, double timeout) {
-
         // Get the message from the mailbox_name
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {

@@ -48,7 +48,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int PilotJobWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 

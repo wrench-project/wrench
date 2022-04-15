@@ -15,10 +15,11 @@
 #include <wrench/services/compute/ComputeService.h>
 #include <wrench/failure_causes/StorageServiceNotEnoughSpace.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_storage_service_not_enough_space, "Log category for StorageServiceNotEnoughSpace");
 
 namespace wrench {
-
 
     /**
      * @brief Constructor
@@ -27,8 +28,8 @@ namespace wrench {
      */
     StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(std::shared_ptr<DataFile> file,
                                                                std::shared_ptr<StorageService> storage_service) {
-        this->file = file;
-        this->storage_service = storage_service;
+        this->file = std::move(file);
+        this->storage_service = std::move(storage_service);
     }
 
     /**

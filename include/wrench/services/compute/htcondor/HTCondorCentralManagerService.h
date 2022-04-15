@@ -50,9 +50,9 @@ namespace wrench {
                                       WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                                       WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        virtual bool supportsStandardJobs() override;
-        virtual bool supportsCompoundJobs() override;
-        virtual bool supportsPilotJobs() override;
+        bool supportsStandardJobs() override;
+        bool supportsCompoundJobs() override;
+        bool supportsPilotJobs() override;
 
         void addComputeService(std::shared_ptr<ComputeService> compute_service);
 

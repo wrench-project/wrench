@@ -22,7 +22,6 @@ namespace wrench {
  * @param task: the task
  */
     void wrench::DagOfTasks::addVertex(const wrench::WorkflowTask *task) {
-
         // Add a new vertex
         VertexProperties p = {task};
         boost::add_vertex(p, this->dag);

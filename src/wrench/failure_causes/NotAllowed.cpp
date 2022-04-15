@@ -11,6 +11,8 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_not_allowed, "Log category for NotAllowed");
 
 namespace wrench {
@@ -21,7 +23,7 @@ namespace wrench {
      * @param error_message: a custom error message
      */
     NotAllowed::NotAllowed(std::shared_ptr<Service> service, std::string &error_message) {
-        this->service = service;
+        this->service = std::move(service);
         this->error_message = error_message;
     }
 

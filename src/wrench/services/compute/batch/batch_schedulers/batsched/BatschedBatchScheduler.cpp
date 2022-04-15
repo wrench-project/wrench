@@ -545,7 +545,6 @@ namespace wrench {
     * @brief Start a network listener process (for batsched only)
     */
     void BatschedBatchScheduler::startBatschedNetworkListener() {
-
         boost::json::object compute_resources_map;
         compute_resources_map["now"] = S4U_Simulation::getClock();
         compute_resources_map["events"] = boost::json::array();

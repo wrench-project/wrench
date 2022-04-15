@@ -13,6 +13,8 @@
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_file_already_being_copied, "Log category for FileAlreadyBeingCopied");
 
 namespace wrench {
@@ -26,9 +28,9 @@ namespace wrench {
     FileAlreadyBeingCopied::FileAlreadyBeingCopied(std::shared_ptr<DataFile> file,
                                                    std::shared_ptr<FileLocation> src,
                                                    std::shared_ptr<FileLocation> dst) {
-        this->file = file;
-        this->src_location = src;
-        this->dst_location = dst;
+        this->file = std::move(file);
+        this->src_location = std::move(src);
+        this->dst_location = std::move(dst);
     }
 
     /**

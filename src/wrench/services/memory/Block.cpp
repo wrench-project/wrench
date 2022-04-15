@@ -133,7 +133,6 @@ namespace wrench {
      * @return: a pointer to a new block
      */
     Block *Block::split(double remaining) {
-
         if (remaining > this->size) remaining = this->size;
         if (remaining < 0) remaining = 0;
 

@@ -91,7 +91,7 @@ namespace wrench {
      * @brief Method to execute the task
      * @param action_executor: the executor that executes this action
      */
-    void ComputeAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void ComputeAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         auto num_threads = action_executor->getNumCoresAllocated();
         if ((num_threads < this->min_num_cores) || (num_threads > this->max_num_cores) || (action_executor->getMemoryAllocated() < this->ram)) {
             throw ExecutionException(std::shared_ptr<FailureCause>(new FatalFailure("Invalid resource specs for Action Executor")));
@@ -111,7 +111,7 @@ namespace wrench {
      * @brief Method called when the task terminates
      * @param action_executor:  the executor that executes this action
      */
-    void ComputeAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void ComputeAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
 #if 0
         action_executor->acquireDaemonLock();
         for (auto const &ct : this->compute_threads) {

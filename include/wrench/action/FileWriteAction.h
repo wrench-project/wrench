@@ -39,8 +39,8 @@ namespace wrench {
         FileWriteAction(const std::string &name,
                         std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         std::shared_ptr<DataFile> file;

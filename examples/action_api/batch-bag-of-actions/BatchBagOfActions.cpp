@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     simulation->instantiatePlatform(argv[2]);
 
     /* Parse the first command-line argument (number of actions) */
-    int num_actions = 0;
+    int num_actions;
     try {
         num_actions = std::atoi(argv[1]);
         if (num_actions % 2) {

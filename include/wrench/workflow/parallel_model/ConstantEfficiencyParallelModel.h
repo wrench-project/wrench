@@ -22,7 +22,7 @@ namespace wrench {
     class ConstantEfficiencyParallelModel : public ParallelModel {
 
     public:
-        double getEfficiency();
+        double getEfficiency() const;
 
         /***********************/
         /** \cond INTERNAL    **/

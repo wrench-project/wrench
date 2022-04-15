@@ -51,7 +51,6 @@ namespace wrench {
      * @param t: a date
      */
     void NodeAvailabilityTimeLine::setTimeOrigin(u_int32_t t) {
-
         while (true) {
             auto ts = this->availability_timeslots.begin();
             if (ts->first.lower() >= t) {
@@ -113,8 +112,6 @@ namespace wrench {
      * @return a date
      */
     u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes) {
-
-
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 

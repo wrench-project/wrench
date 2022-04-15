@@ -40,7 +40,6 @@ namespace wrench {
      * Main method of the WMS
      */
     int CondorWMS::main() {
-
         // Set the logging output to GREEN
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 

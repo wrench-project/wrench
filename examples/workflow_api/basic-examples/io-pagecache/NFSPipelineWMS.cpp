@@ -51,7 +51,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int NFSPipelineWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
@@ -64,7 +63,6 @@ namespace wrench {
 
         /* While the workflow isn't done, repeat the main loop */
         while (not this->workflow->isDone()) {
-
             std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
             for (const auto &ready_task: ready_tasks) {

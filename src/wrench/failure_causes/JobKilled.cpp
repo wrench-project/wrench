@@ -15,6 +15,8 @@
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/Service.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_job_killed, "Log category for JobKilled");
 
 namespace wrench {
@@ -24,7 +26,7 @@ namespace wrench {
     * @param job: the job that was killed
     */
     JobKilled::JobKilled(std::shared_ptr<Job> job) {
-        this->job = job;
+        this->job = std::move(job);
     }
 
     /**

@@ -26,15 +26,15 @@ namespace wrench {
     CustomAction::CustomAction(const std::string &name,
                                double ram,
                                unsigned long num_cores,
-                               std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_execute,
-                               std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate) : Action(name, "custom_"), ram(ram), num_cores(num_cores), lambda_execute(std::move(lambda_execute)), lambda_terminate(std::move(lambda_terminate)) {
+                               const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
+                               const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate) : Action(name, "custom_"), ram(ram), num_cores(num_cores), lambda_execute(std::move(lambda_execute)), lambda_terminate(std::move(lambda_terminate)) {
     }
 
     /**
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void CustomAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void CustomAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         this->lambda_execute(action_executor);
     }
 
@@ -42,7 +42,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void CustomAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void CustomAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         this->lambda_terminate(action_executor);
     }
 

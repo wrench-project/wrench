@@ -53,8 +53,8 @@ namespace wrench {
                            std::shared_ptr<FileLocation> file_location);
 
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         FileRegistryAction::Type type;

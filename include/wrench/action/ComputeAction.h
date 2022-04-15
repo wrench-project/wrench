@@ -45,8 +45,8 @@ namespace wrench {
                       unsigned long max_core,
                       std::shared_ptr<ParallelModel> parallel_model);
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         double flops;

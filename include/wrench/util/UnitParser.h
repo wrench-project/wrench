@@ -39,11 +39,11 @@ namespace wrench {
         };
 
     private:
-        static double parseValueWithUnit(std::string string, const unit_scale &units, const char *default_unit);
+        static double parseValueWithUnit(const std::string &string, const unit_scale &units, const char *default_unit);
 
     public:
-        static double parse_size(std::string string);
-        static double parse_compute_speed(std::string string);
+        static double parse_size(const std::string &string);
+        static double parse_compute_speed(const std::string &string);
     };
 
     /***********************/

@@ -21,12 +21,10 @@ namespace wrench {
      * @return 0 on success
      */
     int WorkloadTraceFileReplayerEventReceiver::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         WRENCH_INFO("Starting!");
         while (true) {
-
             std::shared_ptr<StandardJob> job = nullptr;
 
             // Wait for the workflow execution event

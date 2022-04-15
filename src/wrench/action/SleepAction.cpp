@@ -29,7 +29,7 @@ namespace wrench {
      * @brief Returns the action's sleep time
      * @return the sleep time (in sec)
      */
-    double SleepAction::getSleepTime() {
+    double SleepAction::getSleepTime() const {
         return this->sleep_time;
     }
 
@@ -37,7 +37,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void SleepAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void SleepAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread creation overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // Sleeping
@@ -48,7 +48,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void SleepAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void SleepAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do for a Sleep Action
     }
 

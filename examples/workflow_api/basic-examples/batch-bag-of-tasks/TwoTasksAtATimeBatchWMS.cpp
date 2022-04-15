@@ -49,7 +49,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int TwoTasksAtATimeBatchWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
@@ -81,7 +80,6 @@ namespace wrench {
 
         /* While the workflow isn't done, repeat the main loop */
         while (not this->workflow->isDone()) {
-
             /* Get the ready tasks */
             auto ready_tasks = this->workflow->getReadyTasks();
 

@@ -11,6 +11,8 @@
 #include <wrench/failure_causes/ServiceIsSuspended.h>
 #include <wrench/services/Service.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_service_is_suspended, "Log category for ServiceIsSuspended");
 
 namespace wrench {
@@ -21,7 +23,7 @@ namespace wrench {
      * @param service: the service that was suspended
      */
     ServiceIsSuspended::ServiceIsSuspended(std::shared_ptr<Service> service) {
-        this->service = service;
+        this->service = std::move(service);
     }
 
     /**

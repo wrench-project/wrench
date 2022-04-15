@@ -35,7 +35,6 @@ namespace wrench {
                                            WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : vm_name(vm_name), num_cores(num_cores), ram_memory(ram_memory),
                                                                                                         property_list(property_list), messagepayload_list(messagepayload_list) {
-
         this->state = State::DOWN;
     }
 
@@ -73,7 +72,6 @@ namespace wrench {
     * @param pm_name: the physical host name
     */
     void S4U_VirtualMachine::start(std::string &pm_name) {
-
         if (this->state != State::DOWN) {
             throw std::runtime_error(
                     "S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
@@ -163,7 +161,6 @@ namespace wrench {
      * @param dest_pm_name: the name of the host to which to migrate the VM
      */
     void S4U_VirtualMachine::migrate(const std::string &dest_pm_name) {
-
         std::string src_pm_hostname = this->vm->get_pm()->get_name();
         simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name_or_null(dest_pm_name);
 

@@ -19,7 +19,6 @@ namespace wrench {
      * @param job_manager: a job manager
      */
     PilotJob::PilotJob(std::shared_ptr<JobManager> job_manager) : Job("", std::move(job_manager)), state(PilotJob::State::NOT_SUBMITTED) {
-
         this->name = "pilot_job_" + std::to_string(Job::getNewUniqueNumber());
     }
 

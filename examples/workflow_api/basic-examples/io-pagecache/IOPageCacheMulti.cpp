@@ -45,7 +45,6 @@
 
 std::shared_ptr<wrench::Workflow> generate_workflow(int num_pipes, int num_tasks, int core_per_task,
                                                     long flops, long file_size, long mem_required) {
-
     auto workflow = wrench::Workflow::createWorkflow();
 
     for (int i = 0; i < num_pipes; i++) {
@@ -127,11 +126,10 @@ void export_output_multi(wrench::SimulationOutput &output, int num_tasks, std::s
 }
 
 int main(int argc, char **argv) {
-
     int num_task = 3;
 
     auto simulation = wrench::Simulation::createSimulation();
-    ;
+
     simulation->init(&argc, argv);
 
     if (argc < 5) {

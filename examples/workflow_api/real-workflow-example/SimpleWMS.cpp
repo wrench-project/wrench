@@ -43,7 +43,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int SimpleWMS::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
         WRENCH_INFO("Starting on host %s", S4U_Simulation::getHostName().c_str());
@@ -64,9 +63,7 @@ namespace wrench {
         auto vm2_cs = this->cloud_compute_service->startVM(vm2);
         this->core_utilization_map[vm2_cs] = 4;
 
-
         while (true) {
-
             // If a pilot job is not running on the batch service, let's submit one that asks
             // for 3 cores on 2 compute nodes for 1 hour
             if (not pilot_job) {

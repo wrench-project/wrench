@@ -16,6 +16,8 @@
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/services/compute/ComputeService.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_invalid_directory_path, "Log category for InvalidDirectoryPath");
 
 namespace wrench {
@@ -28,8 +30,8 @@ namespace wrench {
      */
     InvalidDirectoryPath::InvalidDirectoryPath(std::shared_ptr<StorageService> storage_service,
                                                std::string invalid_path) {
-        this->storage_service = storage_service;
-        this->invalid_path = invalid_path;
+        this->storage_service = std::move(storage_service);
+        this->invalid_path = std::move(invalid_path);
     }
 
     /**

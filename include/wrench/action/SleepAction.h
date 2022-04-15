@@ -27,15 +27,15 @@ namespace wrench {
     class SleepAction : public Action {
 
     public:
-        double getSleepTime();
+        double getSleepTime() const;
 
     protected:
         friend class CompoundJob;
 
         SleepAction(const std::string &name, double sleep_time);
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         double sleep_time;

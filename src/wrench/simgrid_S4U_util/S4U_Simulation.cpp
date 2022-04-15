@@ -52,7 +52,7 @@ namespace wrench {
      * @brief Returns true if S4U_Simulation::setupPlatform() has been called successfully previously
      * @return true or false
      */
-    bool S4U_Simulation::isPlatformSetup() {
+    bool S4U_Simulation::isPlatformSetup() const {
         return this->platform_setup;
     }
 
@@ -72,7 +72,7 @@ namespace wrench {
     /**
      * @brief Shutdown the simulation
      */
-    void S4U_Simulation::shutdown() {
+    void S4U_Simulation::shutdown() const {
         if (this->initialized) {
             //            this->engine->shutdown();
         }
@@ -293,7 +293,7 @@ namespace wrench {
  * @param hostname: the name of the host
  * @return true or false
  */
-    bool S4U_Simulation::hostExists(std::string hostname) {
+    bool S4U_Simulation::hostExists(const std::string &hostname) {
         return (simgrid::s4u::Host::by_name_or_null(hostname) != nullptr);
     }
 
