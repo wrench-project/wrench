@@ -293,7 +293,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
-     * @param location: the location of the file
+     * @param location: the location of the file trrex
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
      * @param payload: the message size in bytes

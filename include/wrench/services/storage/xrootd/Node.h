@@ -51,14 +51,15 @@ namespace wrench {
             std::vector<std::shared_ptr<FileLocation>> traverse(std::vector<std::stack<Node*>> nodes,std::shared_ptr<DataFile> file,bool meta=false);//"search" multiple paths that go through this supreviser in parallel
             //meta
 
-            std::stack<Node*> search(Node* other);//returns the path of nodes between here and other IF other is in this subtree.
+            //SearchStack search(Node* other,const shared_ptr<DataFile> & file);//returns the path of nodes between here and other IF other is in this subtree.
             bool cached(shared_ptr<DataFile> file);
             std::vector<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
         private:
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
             std::vector<shared_ptr<FileLocation>> XRootDSearch(shared_ptr<DataFile> file);
-            std::vector< std::stack<Node*>> searchAll(std::vector<std::shared_ptr<Node>> potential);
+            std::vector<std::shared_ptr<SearchStack>> searchAll(const std::vector<std::shared_ptr<Node>>&  potential,const shared_ptr<DataFile> & file);
             bool makeSupervisor();
+            std::vector<std::vector<std::shared_ptr<SearchStack>>> bundle(std::vector<std::shared_ptr<SearchStack>> stacks);
             bool makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<SimpleStorageService> internalStorage=nullptr;
