@@ -24,6 +24,7 @@
 #include "wrench/simulation/SimulationTimestampTypes.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"]
+#include "SearchStack.h"
 
 namespace wrench {
     namespace XRootD{
@@ -47,27 +48,26 @@ namespace wrench {
         */
         class ContinueSearchMessage : public Message {
         public:
-            ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox, Node *cache_to, std::stack<Node*> path, std::shared_ptr<DataFile> file,std::shared_ptr<Message> message,
+            ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,simgrid::s4u::Mailbox *block_mailbox,   std::vector<std::shared_ptr<SearchStack>> path,
                                                     double payload);
 
             /** @brief Mailbox to which the answer message should be sent */
             simgrid::s4u::Mailbox *answer_mailbox;
-            /** @brief The highest node in the tree to return to when caching (should be the node the original message was sent) */
-            Node *cache_to;
+
+            /** @brief The mailbox to which the file content should be sent */
+            simgrid::s4u::Mailbox *mailbox_to_receive_the_file_content;
             /** @brief Nodes to search */
-            std::stack<vector<Node*>> path;
-            /** @brief The file to lookup */
-            std::shared_ptr<DataFile> file;
+            std::vector<std::shared_ptr<SearchStack>> path;
             /** @brief The message to hand off to any file servers in the path */
             std::shared_ptr<Message> message;
         };
         class UpdateCacheMessage : public Message {
         public:
-            UpdateCacheMessage(std::shared_ptr<DataFile> file, Node *cache_to, std::shared_ptr<FileLocation> location,
+            UpdateCacheMessage(std::shared_ptr<DataFile> file, std::shared_ptr<SearchStack> stack, std::shared_ptr<FileLocation> location,
                                   double payload);
 
             /** @brief The highest node in the tree to return to when caching (should be the node the original message was sent) */
-            Node *cache_to;
+            std::shared_ptr<SearchStack> stack;
             /** @brief The file found */
             std::shared_ptr<DataFile> file;
             /** @brief the location to cache */
@@ -126,7 +126,18 @@ namespace wrench {
             /** @brief The requested buffer size */
             unsigned long buffer_size;
         };
+        class FileReadAnswerMessage : public Message {
+        public:
+            FileReadAnswerMessage(std::shared_ptr<DataFile> file,
+                                  std::shared_ptr<FileLocation> location,
+                                  bool success,
+                                  std::shared_ptr<FailureCause> failure_cause,
+                                  double payload);
 
+
+
+
+        };
 
 
 

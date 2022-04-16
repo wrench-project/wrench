@@ -236,7 +236,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
 
-    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location, double num_bytes_to_read) {
+    void StorageService::readFile(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location, double num_bytes_to_read) {
         // Get mailbox to send message too
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
@@ -253,7 +253,7 @@ namespace wrench {
      * @param chunk_receiving_mailbox: the chunk receiving mailbox (WILL BE RETIRED BY THIS FUNCTION)
      * @param num_bytes_to_read: number of bytes to read
      */
-    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location,
+    void StorageService::readFile(const std::shared_ptr<DataFile>& file, const std::shared_ptr<FileLocation>& location,
                                   simgrid::s4u::Mailbox* answer_mailbox,
                                   simgrid::s4u::Mailbox* chunk_receiving_mailbox,
                                   double num_bytes_to_read) {

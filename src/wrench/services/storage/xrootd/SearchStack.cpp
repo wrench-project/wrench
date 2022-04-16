@@ -29,6 +29,10 @@ namespace wrench {
             return *current;
 
         }
+        bool SearchStack::empty(){
+            return stack.empty();
+
+        }
         bool SearchStack::atEnd(){
             return current==stack.end();
         }
