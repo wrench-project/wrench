@@ -33,6 +33,7 @@ namespace wrench {
             Node* peak();
             bool atStart();
             bool atEnd();
+            bool empty();
             void push(Node* node);
             bool inTree(Node* potentialParent);
         };
