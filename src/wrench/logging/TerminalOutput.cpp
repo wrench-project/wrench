@@ -41,7 +41,6 @@ namespace wrench {
      * @brief Turn on colored output for the calling process
      */
     void TerminalOutput::beginThisProcessColor() {
-
         if (TerminalOutput::color_enabled) {
             std::cerr << TerminalOutput::getThisProcessLoggingColor();
         }
@@ -68,7 +67,6 @@ namespace wrench {
      * @return the color ASCII code sequence as a string
      */
     std::string TerminalOutput::getThisProcessLoggingColor() {
-
         if (simgrid::s4u::this_actor::is_maestro() ||
             (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) == TerminalOutput::colormap.end())) {
             return "";

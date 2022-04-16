@@ -229,7 +229,6 @@ namespace wrench {
             //                Service::cleanupTrackedServices();
             //                Service::num_terminated_services = 0;
             //            }
-
         } catch (std::shared_ptr<HostError> &e) {
             throw;
         }
@@ -243,8 +242,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Service::stop() {
-
-
         // Do nothing if the service is already down
         if ((this->state == Service::DOWN) or (this->shutting_down)) {
             return;
@@ -378,7 +375,6 @@ namespace wrench {
      */
     void Service::setMessagePayloads(WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values,
                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE overridden_messagepayload_values) {
-
         // Set default messagepayloads
         for (auto const &p: default_messagepayload_values) {
             this->setMessagePayload(p.first, p.second);

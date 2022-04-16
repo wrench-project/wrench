@@ -31,16 +31,13 @@ namespace wrench {
      * @brief Constructor
      * @param name: the action's name (if empty, a unique name will be picked)
      * @param prefix: the action's name prefix (if name is empty)
-     * @param job: the job that contains this action
      */
-    Action::Action(const std::string &name, const std::string &prefix, std::shared_ptr<CompoundJob> job) {
+    Action::Action(const std::string &name, const std::string &prefix) {
         if (name.empty()) {
             this->name = prefix + std::to_string(Action::getNewUniqueNumber());
         } else {
             this->name = name;
         }
-        this->job = std::move(job);
-
         this->execution_history.push(Action::ActionExecution());
         this->priority = 0.0;
     }

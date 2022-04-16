@@ -19,7 +19,6 @@ namespace wrench {
      */
     ExecutionControllerMessage::ExecutionControllerMessage(double payload) : SimulationMessage(payload) {}
 
-
     /**
      * @brief Constructor
      * @param message: the (string) message to be sent

@@ -33,7 +33,6 @@ namespace wrench {
      * @param creator_mailbox: the mailbox of the manager's creator
      */
     DataMovementManager::DataMovementManager(std::string hostname, simgrid::s4u::Mailbox *creator_mailbox) : Service(hostname, "data_movement_manager") {
-
         this->creator_mailbox = creator_mailbox;
     }
 
@@ -146,13 +145,11 @@ namespace wrench {
  * @return 0 on success
  */
     int DataMovementManager::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
         WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox->get_cname());
 
-        while (processNextMessage()) {
-        }
+        while (processNextMessage()) {}
 
         WRENCH_INFO("Data Movement Manager terminating");
 
@@ -166,7 +163,6 @@ namespace wrench {
  * @throw std::runtime_error
  */
     bool DataMovementManager::processNextMessage() {
-
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
@@ -183,7 +179,6 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
-
             // Remove the record and find the File Registry Service, if any
             DataMovementManager::CopyRequestSpecs request(msg->file, msg->src, msg->dst, nullptr);
             msg->src->getStorageService();

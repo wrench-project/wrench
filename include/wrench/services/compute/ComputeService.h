@@ -77,7 +77,7 @@ namespace wrench {
 
         virtual void stop(bool send_failure_notifications, ComputeService::TerminationCause termination_cause);
 
-        void terminateJob(std::shared_ptr<CompoundJob> job);
+        void terminateJob(const std::shared_ptr<CompoundJob> &job);
 
         /**
          * @brief Returns true if the service supports standard jobs
@@ -155,13 +155,13 @@ namespace wrench {
 
 
         ComputeService(const std::string &hostname,
-                       std::string service_name,
-                       std::string scratch_space_mount_point);
+                       const std::string &service_name,
+                       const std::string &scratch_space_mount_point);
 
     protected:
         friend class JobManager;
 
-        void submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> & = {});
+        void submitJob(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> & = {});
 
         virtual void validateServiceSpecificArguments(std::shared_ptr<CompoundJob> job,
                                                       std::map<std::string, std::string> &service_specific_args);
@@ -169,7 +169,7 @@ namespace wrench {
         virtual void validateJobsUseOfScratch(std::map<std::string, std::string> &service_specific_args);
 
         ComputeService(const std::string &hostname,
-                       std::string service_name,
+                       const std::string &service_name,
                        std::shared_ptr<StorageService> scratch_space);
 
         /** @brief A scratch storage service associated to the compute service */

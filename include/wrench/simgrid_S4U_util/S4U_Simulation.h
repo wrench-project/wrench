@@ -26,32 +26,31 @@ namespace wrench {
      * @brief Wrappers around S4U's basic simulation methods
      */
     class S4U_Simulation {
-
     public:
         /** @brief The ram capacity of a physical host whenever not specified in the platform description file */
         static constexpr double DEFAULT_RAM = (1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0);// 1 PiB
 
     public:
         void initialize(int *argc, char **argv);
-        void setupPlatform(std::string &);
+        void setupPlatform(const std::string &);
         void setupPlatform(const std::function<void()> &creation_function);
         void runSimulation();
         static double getClock();
         static std::string getHostName();
-        static bool hostExists(std::string hostname);
-        static bool linkExists(std::string linkname);
+        static bool hostExists(const std::string &hostname);
+        static bool linkExists(const std::string &link_name);
         static std::vector<std::string> getRoute(std::string &src_host, std::string &dst_host);
-        static unsigned int getHostNumCores(std::string hostname);
+        static unsigned int getHostNumCores(const std::string &hostname);
         static unsigned int getNumCores();
-        static double getHostFlopRate(std::string hostname);
-        static bool isHostOn(std::string hostname);
-        static void turnOffHost(std::string hostname);
-        static void turnOnHost(std::string hostname);
-        static bool isLinkOn(std::string linkname);
-        static void turnOffLink(std::string linkname);
-        static void turnOnLink(std::string linkname);
+        static double getHostFlopRate(const std::string &hostname);
+        static bool isHostOn(const std::string &hostname);
+        static void turnOffHost(const std::string &hostname);
+        static void turnOnHost(const std::string &hostname);
+        static bool isLinkOn(const std::string &link_name);
+        static void turnOffLink(const std::string &link_name);
+        static void turnOnLink(const std::string &link_name);
         static double getFlopRate();
-        static double getHostMemoryCapacity(std::string hostname);
+        static double getHostMemoryCapacity(const std::string &hostname);
         static double getMemoryCapacity();
         static void compute(double);
         static void compute_multi_threaded(unsigned long num_threads,
@@ -60,22 +59,23 @@ namespace wrench {
                                            double parallel_per_thread_work);
         static void sleep(double);
         static void computeZeroFlop();
-        static void writeToDisk(double num_bytes, std::string hostname, std::string mount_point);
-        static void readFromDisk(double num_bytes, std::string hostname, std::string mount_point);
+        static void writeToDisk(double num_bytes, const std::string &hostname, std::string mount_point);
+        static void readFromDisk(double num_bytes, const std::string &hostname, std::string mount_point);
         static void readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
-                                                           std::string hostname,
-                                                           std::string read_mount_point,
-                                                           std::string write_mount_point);
+                                                           const std::string &hostname,
+                                                           const std::string &read_mount_point,
+                                                           const std::string &write_mount_point);
 
-        static double getDiskCapacity(std::string hostname, std::string mount_point);
-        static std::vector<std::string> getDisks(std::string hostname);
-        static bool hostHasMountPoint(std::string hostname, std::string mount_point);
+        static double getDiskCapacity(const std::string &hostname, std::string mount_point);
+        static std::vector<std::string> getDisks(const std::string &hostname);
+        static bool hostHasMountPoint(const std::string &hostname, const std::string &mount_point);
 
         void checkLinkBandwidths();
 
         static void yield();
-        static std::string getHostProperty(std::string hostname, std::string property_name);
-        static void setHostProperty(std::string hostname, std::string property_name, std::string property_value);
+        static std::string getHostProperty(const std::string &hostname, const std::string &property_name);
+        static void setHostProperty(const std::string &hostname, const std::string &property_name, const std::string &property_value);
+        static std::string getClusterProperty(const std::string &cluster_id, const std::string &property_name);
 
         //start energy related calls
         static double getEnergyConsumedByHost(const std::string &hostname);
@@ -88,16 +88,25 @@ namespace wrench {
         static std::vector<int> getListOfPstates(const std::string &hostname);
         //end energy related calls
 
-        bool isInitialized();
-        bool isPlatformSetup();
+        bool isInitialized() const;
+        bool isPlatformSetup() const;
         static std::vector<std::string> getAllHostnames();
         static std::vector<std::string> getAllLinknames();
-        static double getLinkBandwidth(std::string name);
-        static double getLinkUsage(std::string name);
+        static double getLinkBandwidth(const std::string &name);
+        static double getLinkUsage(const std::string &name);
+
         static std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
-        void shutdown();
+        static std::map<std::string, std::vector<std::string>> getAllHostnamesByZone();
+        static std::map<std::string, std::vector<std::string>> getAllClusterIDsByZone();
+        static std::map<std::string, std::vector<std::string>> getAllSubZoneIDsByZone();
+
+        static void createNewDisk(const std::string &hostname, const std::string &disk_id, double read_bandwidth_in_bytes_per_sec, double write_bandwidth_in_bytes_per_sec, double capacity_in_bytes, const std::string &mount_point);
+
+        void shutdown() const;
 
     private:
+        static void traverseAllNetZonesRecursive(simgrid::s4u::NetZone *nz, std::map<std::string, std::vector<std::string>> &result, bool get_subzones, bool get_clusters, bool get_hosts_from_zones, bool get_hosts_from_clusters);
+
         static double getHostMemoryCapacity(simgrid::s4u::Host *host);
         simgrid::s4u::Engine *engine;
         bool initialized = false;

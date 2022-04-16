@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
 
@@ -34,20 +39,26 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        FileCopyAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+        FileCopyAction(const std::string &name,
                        std::shared_ptr<DataFile> file,
                        std::shared_ptr<FileLocation> src_file_location,
                        std::shared_ptr<FileLocation> dst_file_location);
 
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> src_file_location;
         std::shared_ptr<FileLocation> dst_file_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_COPY_ACTION_H

@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
     class FileRegistryService;
@@ -32,15 +37,14 @@ namespace wrench {
         /**
         * @brief Constructor
         * @param name: the action's name
-        * @param job: the job this action belongs to
         * @param file_registry_service: the file registry service to update
         * @param file: the file
         * @param file_location: the file location
         */
-        FileRegistryDeleteEntryAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+        FileRegistryDeleteEntryAction(const std::string &name,
                                       std::shared_ptr<FileRegistryService> file_registry_service,
                                       std::shared_ptr<DataFile> file,
-                                      std::shared_ptr<FileLocation> file_location) : FileRegistryAction(FileRegistryAction::DELETE, name, std::move(job), std::move(file_registry_service), file, std::move(file_location)) {}
+                                      std::shared_ptr<FileLocation> file_location) : FileRegistryAction(FileRegistryAction::DELETE, name, std::move(file_registry_service), file, std::move(file_location)) {}
 
         //        void execute(std::shared_ptr<ActionExecutor> action_executor,unsigned long num_threads, double ram_footprint) override;
         //        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
@@ -50,6 +54,12 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_REGISTRY_DELETE_ENTRY_ACTION_H

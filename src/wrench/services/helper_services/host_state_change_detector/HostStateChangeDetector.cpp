@@ -93,7 +93,6 @@ void wrench::HostStateChangeDetector::hostSpeedChangeCallback(std::string const 
 
 
 int wrench::HostStateChangeDetector::main() {
-
     WRENCH_INFO("Starting");
     while (true) {
         if (creator->getState() == State::DOWN) {

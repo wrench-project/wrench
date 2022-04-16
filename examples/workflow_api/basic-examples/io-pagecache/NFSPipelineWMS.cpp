@@ -51,7 +51,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int NFSPipelineWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
@@ -64,7 +63,6 @@ namespace wrench {
 
         /* While the workflow isn't done, repeat the main loop */
         while (not this->workflow->isDone()) {
-
             std::vector<std::shared_ptr<wrench::WorkflowTask>> ready_tasks = this->workflow->getReadyTasks();
 
             for (const auto &ready_task: ready_tasks) {
@@ -158,7 +156,7 @@ namespace wrench {
         WRENCH_INFO("Notified that a standard job has failed for task %s with error %s",
                     task->getID().c_str(),
                     event->failure_cause->toString().c_str());
-        throw std::runtime_error("ABORTING DUE TO JOB FAILURE");
+        throw std::runtime_error("ABORTING DUE TO JOB FAILURE: " + event->failure_cause->toString());
     }
 
 

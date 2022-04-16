@@ -43,7 +43,6 @@ namespace wrench {
             simgrid::s4u::Mailbox *callback_mailbox,
             std::shared_ptr<Action> action,
             std::shared_ptr<ActionExecutionService> action_execution_service) : ExecutionController(hostname, "action_executor") {
-
         if (action == nullptr) {
             throw std::invalid_argument("ActionExecutor::ActionExecutor(): action cannot be nullptr");
         }
@@ -124,7 +123,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int ActionExecutor::main() {
-
         S4U_Simulation::computeZeroFlop();// to block in case pstate speed is 0
 
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);

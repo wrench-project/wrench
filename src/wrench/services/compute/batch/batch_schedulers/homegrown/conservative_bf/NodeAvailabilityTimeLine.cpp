@@ -11,6 +11,7 @@
 #include <set>
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf/NodeAvailabilityTimeLine.h"
 #include <boost/icl/interval_map.hpp>
+#include <utility>
 #include <wrench/services/compute/batch/BatchJob.h>
 
 namespace wrench {
@@ -50,7 +51,6 @@ namespace wrench {
      * @param t: a date
      */
     void NodeAvailabilityTimeLine::setTimeOrigin(u_int32_t t) {
-
         while (true) {
             auto ts = this->availability_timeslots.begin();
             if (ts->first.lower() >= t) {
@@ -94,7 +94,7 @@ namespace wrench {
      */
     void NodeAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSet();
-        job_set->add(job);
+        job_set->add(std::move(job));
 
         if (add) {
             this->availability_timeslots +=
@@ -112,8 +112,6 @@ namespace wrench {
      * @return a date
      */
     u_int32_t NodeAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes) {
-
-
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
