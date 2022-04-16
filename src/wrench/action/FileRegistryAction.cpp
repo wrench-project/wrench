@@ -29,16 +29,15 @@ namespace wrench {
     * @brief Constructor
     * @param type: the action's type
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param job: the job this action belongs to
     * @param file_registry_service: the file registry service toupdate
     * @param file: the file
     * @param file_location: the location where the file should be deleted
     */
     FileRegistryAction::FileRegistryAction(FileRegistryAction::Type type,
-                                           const std::string &name, std::shared_ptr<CompoundJob> job,
+                                           const std::string &name,
                                            std::shared_ptr<FileRegistryService> file_registry_service,
                                            std::shared_ptr<DataFile> file,
-                                           std::shared_ptr<FileLocation> file_location) : Action(name, "file_registry", job),
+                                           std::shared_ptr<FileLocation> file_location) : Action(name, "file_registry"),
                                                                                           type(type), file_registry_service(std::move(file_registry_service)), file(std::move(file)), file_location(std::move(file_location)) {
     }
 
@@ -72,7 +71,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileRegistryAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileRegistryAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
@@ -87,7 +86,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileRegistryAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileRegistryAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 

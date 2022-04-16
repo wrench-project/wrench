@@ -19,6 +19,7 @@
 
 #include "Job.h"
 
+
 namespace wrench {
 
     /***********************/
@@ -38,14 +39,12 @@ namespace wrench {
     class ParallelModel;
     class CustomAction;
     class ActionExecutor;
-
     class DataFile;
 
     /**
-     * @brief A compound job
+     * @brief A compound job class
      */
     class CompoundJob : public Job, public std::enable_shared_from_this<CompoundJob> {
-
     public:
         /** @brief Compound job states */
         enum State {
@@ -71,51 +70,63 @@ namespace wrench {
         std::set<std::shared_ptr<Action>> getActions();
         CompoundJob::State getState();
         std::string getStateAsString();
-        void setPriority(double priority) override;
+        void setPriority(double p) override;
 
-        std::shared_ptr<SleepAction> addSleepAction(std::string name, double sleep_time);
+        std::shared_ptr<SleepAction> addSleepAction(const std::string &name, double sleep_time);
 
-        std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          std::shared_ptr<DataFile> file,
-                                                          std::shared_ptr<FileLocation> file_location);
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<FileLocation> &file_location);
 
-        std::shared_ptr<FileReadAction> addFileReadAction(std::string name,
-                                                          std::shared_ptr<DataFile> file,
-                                                          std::vector<std::shared_ptr<FileLocation>> file_locations);
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::vector<std::shared_ptr<FileLocation>> &file_locations);
 
-        std::shared_ptr<FileWriteAction> addFileWriteAction(std::string name,
-                                                            std::shared_ptr<DataFile> file,
-                                                            std::shared_ptr<FileLocation> file_location);
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<FileLocation> &file_location,
+                                                          const double num_bytes_to_read);
 
-        std::shared_ptr<FileCopyAction> addFileCopyAction(std::string name,
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::vector<std::shared_ptr<FileLocation>> &file_locations,
+                                                          const double num_bytes_to_read);
+
+        std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
+                                                            const std::shared_ptr<DataFile> &file,
+                                                            const std::shared_ptr<FileLocation> &file_location);
+
+        std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
                                                           std::shared_ptr<DataFile> file,
                                                           std::shared_ptr<FileLocation> src_file_location,
                                                           std::shared_ptr<FileLocation> dst_file_location);
 
-        std::shared_ptr<FileDeleteAction> addFileDeleteAction(std::string name,
+        std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
                                                               std::shared_ptr<DataFile> file,
                                                               std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(std::string name,
+        std::shared_ptr<FileRegistryAddEntryAction> addFileRegistryAddEntryAction(const std::string &name,
                                                                                   std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
                                                                                   std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(std::string name,
+        std::shared_ptr<FileRegistryDeleteEntryAction> addFileRegistryDeleteEntryAction(const std::string &name,
                                                                                         std::shared_ptr<FileRegistryService> file_registry, std::shared_ptr<DataFile> file,
                                                                                         std::shared_ptr<FileLocation> file_location);
 
-        std::shared_ptr<ComputeAction> addComputeAction(std::string name,
+        std::shared_ptr<ComputeAction> addComputeAction(const std::string &name,
                                                         double flops,
                                                         double ram,
                                                         unsigned long min_num_cores,
                                                         unsigned long max_num_cores,
-                                                        std::shared_ptr<ParallelModel> parallel_model);
+                                                        const std::shared_ptr<ParallelModel> &parallel_model);
 
-        std::shared_ptr<CustomAction> addCustomAction(std::string name,
+        std::shared_ptr<CustomAction> addCustomAction(const std::string &name,
                                                       double ram,
                                                       unsigned long num_cores,
                                                       const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_execute,
                                                       const std::function<void(std::shared_ptr<ActionExecutor> action_executor)> &lambda_terminate);
+
+        std::shared_ptr<CustomAction> addCustomAction(std::shared_ptr<CustomAction> custom_action);
 
         void removeAction(std::shared_ptr<Action> &action);
 
@@ -133,23 +144,20 @@ namespace wrench {
         bool hasSuccessfullyCompleted();
         bool hasFailed();
 
-        void printActionDependencies();
-
-        void printTaskMap();
-
         unsigned long getMinimumRequiredNumCores();
 
         double getMinimumRequiredMemory();
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
         bool usesScratch();
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        void printActionDependencies();
 
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
+        void printTaskMap();
+
 
     protected:
         friend class BareMetalComputeService;
@@ -161,10 +169,22 @@ namespace wrench {
         bool isReady();
 
         //        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
+        /**
+         * @brief Actions in the job
+         */
         std::set<std::shared_ptr<Action>> actions;
+        /**
+         * @brief Map of action names to actions
+         */
         std::map<std::string, std::shared_ptr<Action>> name_map;
 
+        /**
+         * @brief Job state
+         */
         State state;
+        /**
+         * @brief Job priority
+         */
         double priority;
 
         void updateStateActionMap(const std::shared_ptr<Action> &action, Action::State old_state, Action::State new_state);
@@ -177,9 +197,6 @@ namespace wrench {
         std::set<std::shared_ptr<CompoundJob>> &getParents();
 
     private:
-        double pre_job_overhead;
-        double post_job_overhead;
-
         void assertJobNotSubmitted();
         void assertActionNameDoesNotAlreadyExist(const std::string &name);
 
@@ -194,13 +211,17 @@ namespace wrench {
         std::map<std::string, std::string> service_specific_args;
 
         std::unordered_map<Action::State, std::set<std::shared_ptr<Action>>> state_task_map;
-    };
 
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
 };// namespace wrench
+
 
 #endif//WRENCH_COMPOUNDJOB_H

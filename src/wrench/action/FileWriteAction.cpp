@@ -13,7 +13,6 @@
 #include <wrench/action/FileWriteAction.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
 
@@ -27,14 +26,15 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param job: the job this action belongs to
     * @param file: the file
     * @param file_location: the location where the file should be written
+    * @param num_bytes_to_write: the number of bytes to write (if < 0, write the whole file)
     */
-    FileWriteAction::FileWriteAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+    FileWriteAction::FileWriteAction(const std::string &name,
                                      std::shared_ptr<DataFile> file,
-                                     std::shared_ptr<FileLocation> file_location) : Action(name, "file_write_", job),
-                                                                                    file(std::move(file)), file_location(std::move(file_location)) {
+                                     std::shared_ptr<FileLocation> file_location) : Action(name, "file_write_"),
+                                                                                    file(std::move(file)),
+                                                                                    file_location(std::move(file_location)) {
     }
 
     /**
@@ -58,7 +58,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileWriteAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileWriteAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
@@ -69,7 +69,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileWriteAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileWriteAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 

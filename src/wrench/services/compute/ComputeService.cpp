@@ -13,15 +13,15 @@
 #include <wrench/services/compute/ComputeService.h>
 #include <wrench/services/compute/ComputeServiceProperty.h>
 #include <wrench/services/compute/ComputeServiceMessagePayload.h>
-#include <wrench/simulation/Simulation.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/failure_causes/NetworkError.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_compute_service, "Log category for Compute Service");
 
 namespace wrench {
-
 
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
@@ -105,8 +105,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::submitJob(std::shared_ptr<CompoundJob> job, const std::map<std::string, std::string> &service_specific_args) {
-
+    void ComputeService::submitJob(const std::shared_ptr<CompoundJob> &job, const std::map<std::string, std::string> &service_specific_args) {
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
         }
@@ -129,8 +128,7 @@ namespace wrench {
      * @throw ExecutionException
      * @throw std::runtime_error
      */
-    void ComputeService::terminateJob(std::shared_ptr<CompoundJob> job) {
-
+    void ComputeService::terminateJob(const std::shared_ptr<CompoundJob> &job) {
         if (job == nullptr) {
             throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
         }
@@ -152,13 +150,11 @@ namespace wrench {
      * @param scratch_space_mount_point: the service's scratch space's mount point ("" if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
-                                   const std::string service_name,
-                                   std::string scratch_space_mount_point) : Service(hostname, service_name) {
-
+                                   const std::string &service_name,
+                                   const std::string &scratch_space_mount_point) : Service(hostname, service_name) {
         this->state = ComputeService::UP;
 
         if (not scratch_space_mount_point.empty()) {
-
             try {
                 this->scratch_space_storage_service =
                         std::shared_ptr<StorageService>(new SimpleStorageService(hostname, {scratch_space_mount_point}));
@@ -181,11 +177,10 @@ namespace wrench {
      * @param scratch_space: scratch storage space of the compute service (nullptr if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
-                                   const std::string service_name,
+                                   const std::string &service_name,
                                    std::shared_ptr<StorageService> scratch_space) : Service(hostname, service_name) {
-
         this->state = ComputeService::UP;
-        this->scratch_space_storage_service = scratch_space;
+        this->scratch_space_storage_service = std::move(scratch_space);
     }
 
     /**
@@ -196,7 +191,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumHosts() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("num_hosts");
@@ -216,7 +210,6 @@ namespace wrench {
       * @throw std::runtime_error
       */
     std::vector<std::string> ComputeService::getHosts() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("num_cores");
@@ -225,6 +218,7 @@ namespace wrench {
         }
 
         std::vector<std::string> to_return;
+        to_return.reserve(dict.size());
 
         for (auto const &x: dict) {
             to_return.emplace_back(x.first);
@@ -242,7 +236,6 @@ namespace wrench {
       * @throw std::runtime_error
       */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumCores() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("num_cores");
@@ -267,7 +260,6 @@ namespace wrench {
       * @throw std::runtime_error
       */
     unsigned long ComputeService::getTotalNumCores() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("num_cores");
@@ -294,7 +286,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::map<std::string, unsigned long> ComputeService::getPerHostNumIdleCores() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("num_idle_cores");
@@ -319,7 +310,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getPerHostAvailableMemoryCapacity() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("ram_availabilities");
@@ -347,7 +337,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getTotalNumIdleCores() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("num_idle_cores");
@@ -415,7 +404,6 @@ namespace wrench {
     * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getCoreFlopRate() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("flop_rates");
@@ -438,7 +426,6 @@ namespace wrench {
     * @throw ExecutionException
     */
     std::map<std::string, double> ComputeService::getMemoryCapacity() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("ram_capacities");
@@ -462,7 +449,6 @@ namespace wrench {
      * @throw ExecutionException
      */
     double ComputeService::getTTL() {
-
         std::map<std::string, double> dict;
         try {
             dict = this->getServiceResourceInformation("ttl");
@@ -482,7 +468,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::map<std::string, double> ComputeService::getServiceResourceInformation(const std::string &key) {
-
         assertServiceIsUp();
 
         // send a "info request" message to the daemon's mailbox_name

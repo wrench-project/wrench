@@ -12,6 +12,7 @@
  **/
 
 #include <iostream>
+#include <utility>
 
 #include "JobActionFailureController.h"
 
@@ -27,17 +28,15 @@ namespace wrench {
      * @brief Constructor, which calls the super constructor
      *
      * @param bm_cs: a bare-metal compute service
-     * @param cloud_cs: a cloud compute service
      * @param ss_1: a storage service
      * @param ss_2: a storage service
      * @param hostname: the name of the host on which to start the Controller
      */
     JobActionFailureController::JobActionFailureController(
             std::shared_ptr<BareMetalComputeService> bm_cs,
-            std::shared_ptr<CloudComputeService> cloud_cs,
             std::shared_ptr<StorageService> ss_1,
             std::shared_ptr<StorageService> ss_2,
-            const std::string &hostname) : ExecutionController(hostname, "mamj"), bm_cs(bm_cs), cloud_cs(cloud_cs), ss_1(ss_1), ss_2(ss_2) {}
+            const std::string &hostname) : ExecutionController(hostname, "mamj"), bm_cs(std::move(bm_cs)), ss_1(std::move(ss_1)), ss_2(std::move(ss_2)) {}
 
     /**
      * @brief main method of the SuperCustomActionController daemon
@@ -47,7 +46,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int JobActionFailureController::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
@@ -65,7 +63,7 @@ namespace wrench {
 
         /* Creates an instance of input_file on both storage services. This takes zero simulation time. After
          * all, that file needs to be there somewhere initially if it's indeed some input file */
-        ss_1->createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
+        wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(ss_1, "/data/"));
 
         /* Create a job  */
         auto job = job_manager->createCompoundJob("job");

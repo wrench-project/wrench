@@ -30,15 +30,16 @@ namespace wrench {
 
     class Simulation;
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     /**
      * @brief An abstraction of an execution controller, i.e., a running process that interacts
      * with other services to accomplish some computational goal
      */
     class ExecutionController : public Service {
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
 
     public:
         virtual std::shared_ptr<JobManager> createJobManager();
@@ -73,31 +74,24 @@ namespace wrench {
     protected:
         ExecutionController(
                 const std::string &hostname,
-                const std::string suffix);
+                const std::string &suffix);
 
 
         void setTimer(double date, std::string message);
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
 
     private:
         friend class Simulation;
         friend class DataMovementManager;
         friend class JobManager;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     private:
         virtual int main() = 0;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };// namespace wrench
 

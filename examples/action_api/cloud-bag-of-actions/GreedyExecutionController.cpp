@@ -13,6 +13,7 @@
  **/
 
 #include <iostream>
+#include <utility>
 
 #include "GreedyExecutionController.h"
 
@@ -32,10 +33,10 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     GreedyExecutionController::GreedyExecutionController(int num_actions,
-                                                         const std::shared_ptr<CloudComputeService> compute_service,
-                                                         const std::shared_ptr<SimpleStorageService> storage_service,
+                                                         std::shared_ptr<CloudComputeService> compute_service,
+                                                         std::shared_ptr<SimpleStorageService> storage_service,
                                                          const std::string &hostname) : ExecutionController(hostname, "me"),
-                                                                                        compute_service(compute_service), storage_service(storage_service), num_actions(num_actions) {
+                                                                                        compute_service(std::move(compute_service)), storage_service(std::move(storage_service)), num_actions(num_actions) {
     }
 
 
@@ -47,7 +48,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int GreedyExecutionController::main() {
-
         /* Initialize and seed a RNG */
         std::mt19937 rng(42);
 
@@ -73,9 +73,9 @@ namespace wrench {
             // Create input file
             auto input_file = wrench::Simulation::addFile("input_file_" + std::to_string(i), mb_dist(rng));
             // Create a copy of the input file on the storage service
-            this->storage_service->createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
+            wrench::Simulation::createFile(input_file, wrench::FileLocation::LOCATION(this->storage_service));
             auto output_file = wrench::Simulation::addFile("output_file_" + std::to_string(i), mb_dist(rng));
-            action_specs.push_back(std::make_tuple(work, input_file, output_file));
+            action_specs.emplace_back(work, input_file, output_file);
         }
 
         /* Create two VMs on the cloud service and start them */

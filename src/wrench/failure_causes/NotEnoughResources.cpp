@@ -13,6 +13,8 @@
 #include <wrench/job/Job.h>
 #include <wrench/services/Service.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_not_enough_resources, "Log category for NotEnoughResources");
 
 namespace wrench {
@@ -24,8 +26,8 @@ namespace wrench {
      * @param service: the compute service that didn't have enough cores or ram
      */
     NotEnoughResources::NotEnoughResources(std::shared_ptr<Job> job, std::shared_ptr<Service> service) {
-        this->job = job;
-        this->service = service;
+        this->job = std::move(job);
+        this->service = std::move(service);
     }
 
     /**

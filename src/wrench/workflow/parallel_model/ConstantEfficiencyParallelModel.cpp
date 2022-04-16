@@ -32,7 +32,7 @@ namespace wrench {
      * @brief Get the model's parallel efficiency
      * @return a parallel efficiency
      */
-    double wrench::ConstantEfficiencyParallelModel::getEfficiency() {
+    double wrench::ConstantEfficiencyParallelModel::getEfficiency() const {
         return this->efficiency;
     }
 
@@ -63,6 +63,12 @@ namespace wrench {
         return 0;
     }
 
+    /**
+     * @brief Returns the parallel per-thread amount of work
+     * @param total_work: total amount of work (in flops)
+     * @param num_threads: number of threads
+     * @return an amount of work (in flops)
+     */
     double ConstantEfficiencyParallelModel::getParallelPerThreadWork(double total_work, unsigned long num_threads) {
         return (total_work) / ((double) num_threads * this->efficiency);
     }

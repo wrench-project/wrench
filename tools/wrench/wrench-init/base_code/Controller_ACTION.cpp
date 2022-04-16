@@ -51,7 +51,7 @@ namespace wrench {
         /* Create a files */
         auto some_file = wrench::Simulation::addFile("some_file", 1 * GBYTE);
         auto some_other_file = wrench::Simulation::addFile("some_other_file", 2 * GBYTE);
-        this->storage_service->createFile(some_file, wrench::FileLocation::LOCATION(this->storage_service));
+        wrench::Simulation::createFile(some_file, wrench::FileLocation::LOCATION(this->storage_service));
 
         /* Create a job manager so that we can create/submit jobs */
         auto job_manager = this->createJobManager();

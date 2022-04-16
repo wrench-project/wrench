@@ -68,14 +68,14 @@ namespace wrench {
 
     public:
         CloudComputeService(const std::string &hostname,
-                            std::vector<std::string> execution_hosts,
-                            std::string scratch_space_mount_point,
+                            const std::vector<std::string> &execution_hosts,
+                            const std::string &scratch_space_mount_point,
                             WRENCH_PROPERTY_COLLECTION_TYPE property_list = {},
                             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list = {});
 
-        virtual bool supportsStandardJobs() override;
-        virtual bool supportsCompoundJobs() override;
-        virtual bool supportsPilotJobs() override;
+        bool supportsStandardJobs() override;
+        bool supportsCompoundJobs() override;
+        bool supportsPilotJobs() override;
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -159,7 +159,7 @@ namespace wrench {
         virtual void processCreateVM(simgrid::s4u::Mailbox *answer_mailbox,
                                      unsigned long requested_num_cores,
                                      double requested_ram,
-                                     std::string desired_vm_name,
+                                     const std::string &desired_vm_name,
                                      WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
 
@@ -213,7 +213,7 @@ namespace wrench {
         /***********************/
 
     private:
-        std::string findHost(unsigned long desired_num_cores, double desired_ram, std::string desired_host);
+        std::string findHost(unsigned long desired_num_cores, double desired_ram, const std::string &desired_host);
     };
 }// namespace wrench
 

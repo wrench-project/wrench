@@ -22,13 +22,12 @@ namespace wrench {
     class ConstantEfficiencyParallelModel : public ParallelModel {
 
     public:
-        double getEfficiency();
+        double getEfficiency() const;
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        //        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
         double getPurelySequentialWork(double total_work, unsigned long num_threads) override;
         double getParallelPerThreadWork(double total_work, unsigned long num_threads) override;
         ~ConstantEfficiencyParallelModel() override {}

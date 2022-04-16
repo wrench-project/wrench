@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
     class FileRegistryService;
@@ -43,14 +48,13 @@ namespace wrench {
 
         FileRegistryAction(FileRegistryAction::Type type,
                            const std::string &name,
-                           std::shared_ptr<CompoundJob> job,
                            std::shared_ptr<FileRegistryService> file_registry_service,
                            std::shared_ptr<DataFile> file,
                            std::shared_ptr<FileLocation> file_location);
 
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         FileRegistryAction::Type type;
@@ -58,6 +62,12 @@ namespace wrench {
         std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_REGISTRY_ACTION_H

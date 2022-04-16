@@ -27,13 +27,12 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param job: the job this action belongs to
     * @param file: the file
     * @param file_location: the location where the file should be deleted
     */
-    FileDeleteAction::FileDeleteAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+    FileDeleteAction::FileDeleteAction(const std::string &name,
                                        std::shared_ptr<DataFile> file,
-                                       std::shared_ptr<FileLocation> file_location) : Action(name, "file_delete_", job),
+                                       std::shared_ptr<FileLocation> file_location) : Action(name, "file_delete_"),
                                                                                       file(std::move(file)), file_location(std::move(file_location)) {
     }
 
@@ -58,7 +57,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileDeleteAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileDeleteAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File write
@@ -69,7 +68,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileDeleteAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileDeleteAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 

@@ -7,10 +7,8 @@
  * (at your option) any later version.
  */
 
-#include <typeinfo>
 #include <map>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
+#include <utility>
 
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionService.h>
 #include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.h>
@@ -19,14 +17,11 @@
 #include <wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/ComputeServiceMessage.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/simulation/Simulation.h>
 #include <wrench/job/PilotJob.h>
 #include <wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.h>
-#include <wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_bare_metal_compute_service_one_shot, "Log category for bare_metal_compute_service_on_shot");
 
@@ -36,6 +31,7 @@ namespace wrench {
     /**
      * @brief Internal constructor
      *
+     * @param job: the compound job to be executed
      * @param hostname: the name of the host on which the service should be started
      * @param compute_resources: a list of <hostname, num_cores, memory_manager_service> tuples, which represent
      *        the compute resources available to this service
@@ -44,6 +40,7 @@ namespace wrench {
      * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
+     * @param scratch_space: the scratch space to use
      *
      * @throw std::invalid_argument
      */
@@ -55,7 +52,7 @@ namespace wrench {
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             double ttl,
             std::shared_ptr<PilotJob> pj,
-            std::string suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, compute_resources, property_list, messagepayload_list, ttl, pj, suffix, scratch_space), job(job) {
+            const std::string &suffix, std::shared_ptr<StorageService> scratch_space) : BareMetalComputeService(hostname, std::move(compute_resources), std::move(property_list), std::move(messagepayload_list), ttl, std::move(pj), suffix, std::move(scratch_space)), job(std::move(job)) {
     }
 
     /**

@@ -68,7 +68,6 @@ namespace wrench {
                 this->interval, this->expired_time);
 
         while (this->getState() == State::UP) {
-
             double start_time = S4U_Simulation::getClock();
             double amt = pdflush();
             double end_time = S4U_Simulation::getClock();
@@ -199,17 +198,18 @@ namespace wrench {
      * @brief Flush dirty data in a LRU list
      * @param list: the LRU list whose data will be flushed
      * @param amount: the amount requested to flush
+     * @param excluded_filename: filename excluded from the flush
      * @return flushed amount
      */
     double MemoryManager::flushLruList(std::vector<Block *> &list,
                                        double amount,
-                                       std::string excluded_filename) {
+                                       const std::string &excluded_filename) {
         if (amount <= 0) return 0;
         double flushed = 0;
 
         std::map<std::string, double> flushing_map;
 
-        for (auto blk: list) {
+        for (const auto &blk: list) {
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
                 continue;
             }
@@ -221,7 +221,6 @@ namespace wrench {
                     flushed += blk->getSize();
                     flushing_map[blk->getLocation()->getMountPoint()] += blk->getSize();
                 } else if (flushed < amount && amount < flushed + blk->getSize()) {
-
                     double blk_flushed = amount - flushed;
                     flushing_map[blk->getLocation()->getMountPoint()] += blk_flushed;
 
@@ -262,7 +261,7 @@ namespace wrench {
      * @return flushed amount
      */
     double MemoryManager::flush(double amount,
-                                std::string excluded_filename) {
+                                const std::string &excluded_filename) {
         if (amount <= 0) return 0;
 
         double flushed_inactive = flushLruList(inactive_list, amount, excluded_filename);
@@ -361,7 +360,6 @@ namespace wrench {
         double evicted = 0;
 
         for (unsigned int i = 0; i < lru_list.size(); i++) {
-
             Block *blk = lru_list.at(i);
 
             if (!excluded_filename.empty() && blk->getFileId().compare(excluded_filename) == 0) {
@@ -431,14 +429,12 @@ namespace wrench {
         double read = 0;
 
         for (unsigned int i = 0; i < inactive_list.size(); i++) {
-
             if (read >= amount) {
                 break;
             }
 
             Block *blk = inactive_list.at(i);
             if (blk->getFileId().compare(filename) == 0) {
-
                 if (location == nullptr) {
                     location = blk->getLocation();
                 }
@@ -475,7 +471,6 @@ namespace wrench {
 
             Block *blk = active_list.at(i);
             if (blk->getFileId().compare(filename) == 0) {
-
                 if (location == nullptr) {
                     location = blk->getLocation();
                 }
@@ -588,7 +583,6 @@ namespace wrench {
         // Active list should not be large then twice the size of the inactive list
         // Balance the lists: make their sizes equal
         if (active_size > 2 * inactive_size) {
-
             double to_move_amt = (active_size - inactive_size) / 2;
             double moved_amt = 0;
 

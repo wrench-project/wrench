@@ -39,7 +39,6 @@ namespace wrench {
             std::string hostname,
             WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list) : Service(hostname, "file_registry") {
-
         this->setProperties(this->default_property_values, property_list);
         this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
@@ -80,7 +79,6 @@ namespace wrench {
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
         } catch (std::shared_ptr<NetworkError> &cause) {
-
             throw ExecutionException(cause);
         }
 
@@ -107,7 +105,6 @@ namespace wrench {
             std::shared_ptr<DataFile> file,
             std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service) {
-
         if (file == nullptr) {
             throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
         }
@@ -162,7 +159,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::addEntry(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntry(const std::shared_ptr<DataFile> &file, std::shared_ptr<FileLocation> location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
         }
@@ -206,7 +203,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::removeEntry(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         if ((file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
         }
@@ -372,9 +369,9 @@ namespace wrench {
     /**
      * Internal method to add an entry to the database
      * @param file: a file
-     * @param storage_service: a storage_service
+     * @param location: a file location
      */
-    void FileRegistryService::addEntryToDatabase(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
+    void FileRegistryService::addEntryToDatabase(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         WRENCH_INFO("Adding file (%s) at (%s) to the file registry", file->getID().c_str(),
                     location->getStorageService()->getHostname().c_str());
         if (this->entries.find(file) == this->entries.end()) {
@@ -391,11 +388,11 @@ namespace wrench {
     /**
      * Internal method to remove an entry from the database
      * @param file: a file
-     * @param location: a location
+     * @param location: a file location
      *
      * @return true if an entry was removed
      */
-    bool FileRegistryService::removeEntryFromDatabase(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
+    bool FileRegistryService::removeEntryFromDatabase(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         WRENCH_INFO("Removing file (%s) from the file registry", file->getID().c_str());
         if (this->entries.find(file) != this->entries.end()) {
             for (auto const &l: this->entries[file]) {
