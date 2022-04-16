@@ -72,8 +72,18 @@ namespace wrench {
                 for (auto &m: machine_specs) {
                     std::string name = m.at("nodeName");
                     nlohmann::json core_spec = m.at("cpu");
-                    unsigned long num_cores = core_spec.at("count");
-                    double ghz = core_spec.at("speed");
+                    unsigned long num_cores;
+                    try {
+                        num_cores = core_spec.at("count");
+                    } catch (nlohmann::detail::out_of_range &e) {
+                        num_cores = 1;
+                    }
+                    double ghz;
+                    try {
+                        ghz = core_spec.at("speed");
+                    } catch (nlohmann::detail::out_of_range &e) {
+                        ghz = -1.0;// unknown
+                    }
                     machines[name] = std::make_pair(num_cores, ghz);
                 }
             }
@@ -114,7 +124,10 @@ namespace wrench {
                     }
 
                     double flop_amount;
-                    std::string execution_machine = job.at("machine");
+                    std::string execution_machine;
+                    if (job.find("machine") != job.end()) {
+                        execution_machine = job.at("machine");
+                    }
                     if (execution_machine.empty()) {
                         flop_amount = runtime * flop_rate;
                     } else {
@@ -123,10 +136,14 @@ namespace wrench {
                                                         " is said to have been executed on machine " + execution_machine +
                                                         "  but no description for that machine is found on the JSON file");
                         }
-                        double core_ghz = (machines[execution_machine].second);
-                        double total_compute_power_used = core_ghz * (double) min_num_cores;
-                        double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
-                        flop_amount = runtime * actual_flop_rate;
+                        if (machines[execution_machine].second >= 0) {
+                            double core_ghz = (machines[execution_machine].second);
+                            double total_compute_power_used = core_ghz * (double) min_num_cores;
+                            double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
+                            flop_amount = runtime * actual_flop_rate;
+                        } else {
+                            flop_amount = (double) min_num_cores * runtime * flop_rate;// Assume a min-core execution
+                        }
                     }
 
                     task = workflow->addTask(name, flop_amount, min_num_cores, max_num_cores, 0.0);

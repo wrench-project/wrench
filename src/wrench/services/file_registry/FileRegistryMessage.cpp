@@ -27,11 +27,12 @@ namespace wrench {
      */
     FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<DataFile> file, double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file) {
-
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || file == nullptr) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(): Invalid argument");
         }
+#endif
     }
 
     /**
@@ -43,12 +44,14 @@ namespace wrench {
     FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(std::shared_ptr<DataFile> file,
                                                                              std::set<std::shared_ptr<FileLocation>> locations,
                                                                              double payload) : FileRegistryMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(): Invalid argument");
         }
-        this->file = file;
-        this->locations = locations;
+#endif
+        this->file = std::move(file);
+        this->locations = std::move(locations);
     }
 
     /**
@@ -62,15 +65,17 @@ namespace wrench {
     FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
             simgrid::s4u::Mailbox *answer_mailbox, std::shared_ptr<DataFile> file, std::string reference_host,
             std::shared_ptr<NetworkProximityService> network_proximity_service, double payload) : FileRegistryMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (answer_mailbox == nullptr) || (reference_host == "") ||
             (network_proximity_service == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(): Invalid Argument");
         }
+#endif
         this->answer_mailbox = answer_mailbox;
-        this->file = file;
-        this->reference_host = reference_host;
-        this->network_proximity_service = network_proximity_service;
+        this->file = std::move(file);
+        this->reference_host = std::move(reference_host);
+        this->network_proximity_service = std::move(network_proximity_service);
     }
 
     /**
@@ -84,13 +89,15 @@ namespace wrench {
             std::shared_ptr<DataFile> file, std::string reference_host,
             std::map<double, std::shared_ptr<FileLocation>> locations,
             double payload) : FileRegistryMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (reference_host.empty())) {
             throw std::invalid_argument(
                     "FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(): Invalid Argument");
         }
-        this->file = file;
-        this->reference_host = reference_host;
-        this->locations = locations;
+#endif
+        this->file = std::move(file);
+        this->reference_host = std::move(reference_host);
+        this->locations = std::move(locations);
     }
 
     /**
@@ -103,11 +110,13 @@ namespace wrench {
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<FileLocation> location,
-                                                                                 double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location) {
+                                                                                 double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(std::move(file)), location(std::move(location)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
         }
+#endif
     }
 
 
@@ -131,11 +140,13 @@ namespace wrench {
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                            std::shared_ptr<DataFile> file,
                                                                            std::shared_ptr<FileLocation> location,
-                                                                           double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(file), location(location) {
+                                                                           double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(std::move(file)), location(std::move(location)) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
         }
+#endif
     }
 
     /**

@@ -50,7 +50,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int DataMovementWMS::main() {
-
         /* Set the logging output to GREEN */
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 

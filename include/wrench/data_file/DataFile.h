@@ -21,9 +21,8 @@ namespace wrench {
     class DataFile {
 
     public:
-        double getSize();
-
-        std::string getID();
+        double getSize() const;
+        std::string getID() const;
 
     protected:
         friend class Simulation;

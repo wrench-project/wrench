@@ -69,7 +69,6 @@ namespace wrench {
             std::string sched_port,
             std::string data_to_send, WRENCH_PROPERTY_COLLECTION_TYPE property_list,
             std::string suffix = "") : Service(hostname, "batch_network_listener" + suffix) {
-
         // Start the daemon on the same host
         this->sched_port = sched_port;
         this->data_to_send = data_to_send;
@@ -84,7 +83,6 @@ namespace wrench {
      * @return
      */
     int BatschedNetworkListener::main() {
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
         WRENCH_INFO("Starting");
@@ -131,7 +129,6 @@ namespace wrench {
      * @brief Method to interact with Batsched
      */
     void BatschedNetworkListener::send_receive() {
-
         zmq::context_t context(1);
         zmq::socket_t socket(context, ZMQ_REQ);
         socket.connect("tcp://localhost:" + this->sched_port);
@@ -169,7 +166,6 @@ namespace wrench {
 
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         for (auto decisions: decision_events) {
-
             std::string decision_type = decisions["type"];
             double decision_timestamp = decisions["timestamp"];
             double time_to_sleep = S4U_Simulation::getClock() - decision_timestamp;

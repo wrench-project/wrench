@@ -33,7 +33,6 @@ namespace wrench {
      * @param job_manager: manager in charge of this job
      */
     Job::Job(std::string name, std::shared_ptr<JobManager> job_manager) {
-
         if (name.empty()) {
             this->name = "job_" + std::to_string(getNewUniqueNumber());
         } else {
@@ -183,9 +182,9 @@ namespace wrench {
 
     /**
    * @brief Set the job's priority (the higher the priority value, the higher the priority)
-   * @param priority: a priority
+   * @param p: a priority
    */
-    void Job::setPriority(double priority) {
-        this->priority = priority;
+    void Job::setPriority(double p) {
+        this->priority = p;
     }
 }// namespace wrench

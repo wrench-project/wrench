@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "wrench/services/compute/batch/batch_schedulers/homegrown/conservative_bf_core_level/CoreAvailabilityTimeLine.h"
 #include <boost/icl/interval_map.hpp>
+#include <utility>
 #include <wrench/services/compute/batch/BatchJob.h>
 
 #include <wrench/logging/TerminalOutput.h>
@@ -43,7 +44,7 @@ namespace wrench {
         this->max_num_nodes = max_num_nodes;
         this->max_num_cores_per_node = max_num_cores_per_node;
 
-        for (unsigned int i = 0; i < this->max_num_nodes; i++) {
+        for (int i = 0; i < (int) this->max_num_nodes; i++) {
             this->integer_sequence.insert(this->integer_sequence.end(), i);
         }
     }
@@ -63,7 +64,6 @@ namespace wrench {
      * @param t: a date
      */
     void CoreAvailabilityTimeLine::setTimeOrigin(u_int32_t t) {
-
         while (true) {
             auto ts = this->availability_timeslots.begin();
             if (ts->first.lower() >= t) {
@@ -90,7 +90,7 @@ namespace wrench {
         std::cerr << "------ SCHEDULE -----\n";
         for (auto &availability_timeslot: this->availability_timeslots) {
             std::cerr << availability_timeslot.first << "(";
-            for (unsigned int i = 0; i < this->max_num_nodes; i++) {
+            for (int i = 0; i < (int) this->max_num_nodes; i++) {
                 std::cerr << availability_timeslot.second.core_utilization[i] << " ";
             }
             std::cerr << ") | ";
@@ -111,7 +111,7 @@ namespace wrench {
      */
     void CoreAvailabilityTimeLine::update(bool add, u_int32_t start, u_int32_t end, std::shared_ptr<BatchJob> job) {
         auto job_set = new BatchJobSetCoreLevel();
-        job_set->add(job);
+        job_set->add(std::move(job));
 
         if (add) {
             this->availability_timeslots +=
@@ -130,8 +130,6 @@ namespace wrench {
      * @return a date and a set of host indices
      */
     std::pair<u_int32_t, std::vector<int>> CoreAvailabilityTimeLine::findEarliestStartTime(uint32_t duration, unsigned long num_nodes, unsigned long num_cores_per_node) {
-
-
         uint32_t start_time = UINT32_MAX;
         uint32_t remaining_duration = duration;
 
@@ -140,11 +138,10 @@ namespace wrench {
         std::set<int> possible_node_indices = this->integer_sequence;
 
         for (auto &availability_timeslot: this->availability_timeslots) {
-
             //            std::cerr << "LOOKING AT A TIME SLOT " <<  availability_timeslot.first << "\n";
             //            std::cerr << " RIGHT NOW POSSIBLE NODES: " << possible_node_indices.size() << "\n";
             // Remove infeasible hosts
-            for (unsigned int i = 0; i < this->max_num_nodes; i++) {
+            for (int i = 0; i < (int) this->max_num_nodes; i++) {
                 //                std::cerr << "  - " << availability_timeslot.second.core_utilization[i]  << "\n";
                 if (availability_timeslot.second.core_utilization[i] + num_cores_per_node > this->max_num_cores_per_node) {
                     possible_node_indices.erase(i);

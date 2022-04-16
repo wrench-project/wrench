@@ -16,6 +16,11 @@
 
 namespace wrench {
 
+
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     class DataFile;
     class FileLocation;
 
@@ -32,17 +37,23 @@ namespace wrench {
     protected:
         friend class CompoundJob;
 
-        FileDeleteAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+        FileDeleteAction(const std::string &name,
                          std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> file_location);
 
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         std::shared_ptr<DataFile> file;
         std::shared_ptr<FileLocation> file_location;
     };
+
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }// namespace wrench
 
 #endif//WRENCH_FILE_DELETE_ACTION_H

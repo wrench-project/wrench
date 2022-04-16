@@ -26,15 +26,14 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param name: the action's name (if empty, a unique name will be picked for you)
-    * @param job: the job this action belongs to
     * @param file: the file
     * @param src_file_location: the location from which the file should be read
     * @param dst_file_location: the location to which the file should be written
     */
-    FileCopyAction::FileCopyAction(const std::string &name, std::shared_ptr<CompoundJob> job,
+    FileCopyAction::FileCopyAction(const std::string &name,
                                    std::shared_ptr<DataFile> file,
                                    std::shared_ptr<FileLocation> src_file_location,
-                                   std::shared_ptr<FileLocation> dst_file_location) : Action(name, "file_copy_", std::move(job)),
+                                   std::shared_ptr<FileLocation> dst_file_location) : Action(name, "file_copy_"),
                                                                                       file(file),
                                                                                       src_file_location(std::move(src_file_location)),
                                                                                       dst_file_location(std::move(dst_file_location)) {
@@ -68,7 +67,7 @@ namespace wrench {
      * @brief Method to execute the action
      * @param action_executor: the executor that executes this action
      */
-    void FileCopyAction::execute(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileCopyAction::execute(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Thread overhead
         Simulation::sleep(action_executor->getThreadCreationOverhead());
         // File copy
@@ -80,7 +79,7 @@ namespace wrench {
      * @brief Method called when the action terminates
      * @param action_executor: the executor that executes this action
      */
-    void FileCopyAction::terminate(std::shared_ptr<ActionExecutor> action_executor) {
+    void FileCopyAction::terminate(const std::shared_ptr<ActionExecutor> &action_executor) {
         // Nothing to do
     }
 

@@ -10,6 +10,8 @@
 #include <wrench-dev.h>
 #include <wrench/services/storage/storage_helpers/LogicalFileSystem.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical File System");
 
 
@@ -23,8 +25,7 @@ namespace wrench {
      * @param storage_service: the storage service this file system is for
      * @param mount_point: the mount point
      */
-    LogicalFileSystem::LogicalFileSystem(std::string hostname, StorageService *storage_service, std::string mount_point) {
-
+    LogicalFileSystem::LogicalFileSystem(const std::string &hostname, StorageService *storage_service, std::string mount_point) {
         mount_point = FileLocation::sanitizePath("/" + mount_point + "/");
 
         if (storage_service == nullptr) {
@@ -72,8 +73,7 @@ namespace wrench {
  * @param absolute_path: the directory's absolute path
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::createDirectory(std::string absolute_path) {
-
+    void LogicalFileSystem::createDirectory(const std::string &absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryDoesNotExist(absolute_path);
         this->content[absolute_path] = {};
@@ -84,7 +84,7 @@ namespace wrench {
  * @param absolute_path the directory's absolute path
  * @return true if the directory exists
  */
-    bool LogicalFileSystem::doesDirectoryExist(std::string absolute_path) {
+    bool LogicalFileSystem::doesDirectoryExist(const std::string &absolute_path) {
         assertInitHasBeenCalled();
         return (this->content.find(absolute_path) != this->content.end());
     }
@@ -96,8 +96,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    bool LogicalFileSystem::isDirectoryEmpty(std::string absolute_path) {
-
+    bool LogicalFileSystem::isDirectoryEmpty(const std::string &absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         return (this->content[absolute_path].empty());
@@ -109,7 +108,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::removeEmptyDirectory(std::string absolute_path) {
+    void LogicalFileSystem::removeEmptyDirectory(const std::string &absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         assertDirectoryIsEmpty(absolute_path);
@@ -124,7 +123,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::storeFileInDirectory(std::shared_ptr<DataFile> file, std::string absolute_path) {
+    void LogicalFileSystem::storeFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
         assertInitHasBeenCalled();
         // If directory does not exit, create it
         if (not doesDirectoryExist(absolute_path)) {
@@ -147,7 +146,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::removeFileFromDirectory(std::shared_ptr<DataFile> file, std::string absolute_path) {
+    void LogicalFileSystem::removeFileFromDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         assertFileIsInDirectory(file, absolute_path);
@@ -161,7 +160,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::removeAllFilesInDirectory(std::string absolute_path) {
+    void LogicalFileSystem::removeAllFilesInDirectory(const std::string &absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         this->content[absolute_path].clear();
@@ -176,7 +175,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    bool LogicalFileSystem::isFileInDirectory(std::shared_ptr<DataFile> file, std::string absolute_path) {
+    bool LogicalFileSystem::isFileInDirectory(std::shared_ptr<DataFile> file, const std::string &absolute_path) {
         assertInitHasBeenCalled();
         // If directory does not exist, say "no"
         if (not doesDirectoryExist(absolute_path)) {
@@ -194,7 +193,7 @@ namespace wrench {
  *
  * @throw std::invalid_argument
  */
-    std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(std::string absolute_path) {
+    std::set<std::shared_ptr<DataFile>> LogicalFileSystem::listFilesInDirectory(const std::string &absolute_path) {
         assertInitHasBeenCalled();
         assertDirectoryExist(absolute_path);
         return this->content[absolute_path];
@@ -234,7 +233,7 @@ namespace wrench {
  * @param absolute_path: the path where it will be written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::reserveSpace(std::shared_ptr<DataFile> file, std::string absolute_path) {
+    void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
 
@@ -256,9 +255,9 @@ namespace wrench {
  * @param absolute_path: the path where it would have been written
  * @throw std::invalid_argument
  */
-    void LogicalFileSystem::unreserveSpace(std::shared_ptr<DataFile> file, std::string absolute_path) {
+    void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         assertInitHasBeenCalled();
-        std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
+        std::string key = FileLocation::sanitizePath(std::move(absolute_path)) + file->getID();
 
         if (this->reserved_space.find(key) == this->reserved_space.end()) {
             return;// oh well, the transfer was cancelled/terminated/whatever
@@ -276,12 +275,12 @@ namespace wrench {
 
     /**
      * @brief Stage file in directory
+     * @param file: the file to stage
      * @param absolute_path: the directory's absolute path (at the mount point)
      *
      * @throw std::invalid_argument
      */
-    void LogicalFileSystem::stageFile(std::shared_ptr<DataFile> file, std::string absolute_path) {
-
+    void LogicalFileSystem::stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         // If Space is not sufficient, forget it
         if (this->occupied_space + file->getSize() > this->total_capacity) {
             throw std::invalid_argument("LogicalFileSystem::stageFile(): Insufficient space to store file " +

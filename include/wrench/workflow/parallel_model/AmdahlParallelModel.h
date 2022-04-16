@@ -22,13 +22,12 @@ namespace wrench {
     class AmdahlParallelModel : public ParallelModel {
 
     public:
-        double getAlpha();
+        double getAlpha() const;
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        //        std::vector<double> getWorkPerThread(double total_work, unsigned long num_threads) override;
         double getPurelySequentialWork(double total_work, unsigned long num_threads) override;
         double getParallelPerThreadWork(double total_work, unsigned long num_threads) override;
         ~AmdahlParallelModel() override = default;

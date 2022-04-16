@@ -11,6 +11,8 @@
 
 #include <wrench/logging/TerminalOutput.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_fatal_failure, "Log category for FatalFailure");
 
 namespace wrench {
@@ -20,7 +22,7 @@ namespace wrench {
     * @param message: the failure message
     */
     FatalFailure::FatalFailure(std::string message) {
-        this->message = message;
+        this->message = std::move(message);
     }
 
     /**

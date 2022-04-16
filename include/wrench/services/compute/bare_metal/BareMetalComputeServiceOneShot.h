@@ -20,6 +20,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     class Simulation;
     class StorageService;
     class FailureCause;
@@ -48,13 +52,18 @@ namespace wrench {
                                        WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
                                        double ttl,
                                        std::shared_ptr<PilotJob> pj,
-                                       std::string suffix,
+                                       const std::string &suffix,
                                        std::shared_ptr<StorageService> scratch_space);// reference to upper level scratch space
 
         int main() override;
 
         std::shared_ptr<CompoundJob> job;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 };// namespace wrench
 
 

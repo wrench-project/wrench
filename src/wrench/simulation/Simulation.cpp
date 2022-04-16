@@ -33,6 +33,8 @@
 
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <memory>
+#include <utility>
 
 WRENCH_LOG_CATEGORY(wrench_core_simulation, "Log category for Simulation");
 
@@ -77,7 +79,7 @@ namespace wrench {
         }
 
         // Create the S4U simulation wrapper
-        this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
+        this->s4u_simulation = std::make_unique<S4U_Simulation>();
     }
 
     /**
@@ -98,7 +100,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
-
         if (Simulation::initialized) {
             throw std::runtime_error("Simulation::init(): Simulation already initialized");
         }
@@ -207,7 +208,7 @@ namespace wrench {
 
 
         *argc = 0;
-        for (auto a: cleanedup_args) {
+        for (const auto &a: cleanedup_args) {
             //free(argv[(*argc)]);//you cant free the base args, so no one is going to try to free ours.  This is just going to have to stay a memory leak
             argv[(*argc)] = strdup(a.c_str());
             (*argc)++;
@@ -273,7 +274,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void Simulation::instantiatePlatform(std::string filename) {
+    void Simulation::instantiatePlatform(const std::string &filename) {
         if (not this->s4u_simulation->isInitialized()) {
             throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
         }
@@ -352,7 +353,7 @@ namespace wrench {
      *
      * @return a bandwidth in Bps
      */
-    double Simulation::getLinkBandwidth(std::string link_name) {
+    double Simulation::getLinkBandwidth(const std::string &link_name) {
         return S4U_Simulation::getLinkBandwidth(link_name);
     }
 
@@ -362,13 +363,14 @@ namespace wrench {
      *
      * @return a bandwidth usage
      */
-    double Simulation::getLinkUsage(std::string link_name) {
+    double Simulation::getLinkUsage(const std::string &link_name) {
         return S4U_Simulation::getLinkUsage(link_name);
     }
 
     /**
      * @brief Obtains the current link bandwidth usage on a link and will add SimulationTimestampLinkUsage to
      *        simulation output if record_as_time_stamp is set to true
+     *        
      * @param link_name: the link's name
      * @param record_as_time_stamp: bool signaling whether or not to record a SimulationTimestampLinkUsage object
      * @return current bandwidth usage in Bps
@@ -443,7 +445,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::launch() {
-
         // Check that the simulation is correctly initialized
         try {
             this->checkSimulationSetup();
@@ -482,7 +483,7 @@ namespace wrench {
      *
      * @return true or false
      */
-    bool Simulation::isRunning() {
+    bool Simulation::isRunning() const {
         return this->is_running;
     }
 
@@ -566,7 +567,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(std::shared_ptr<ComputeService> service) {
+    void Simulation::addService(const std::shared_ptr<ComputeService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -581,7 +582,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(std::shared_ptr<NetworkProximityService> service) {
+    void Simulation::addService(const std::shared_ptr<NetworkProximityService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -596,7 +597,7 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    void Simulation::addService(std::shared_ptr<StorageService> service) {
+    void Simulation::addService(const std::shared_ptr<StorageService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -611,7 +612,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::addService(std::shared_ptr<ExecutionController> service) {
+    void Simulation::addService(const std::shared_ptr<ExecutionController> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -626,7 +627,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(std::shared_ptr<FileRegistryService> service) {
+    void Simulation::addService(const std::shared_ptr<FileRegistryService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -641,7 +642,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(std::shared_ptr<EnergyMeterService> service) {
+    void Simulation::addService(const std::shared_ptr<EnergyMeterService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -656,7 +657,7 @@ namespace wrench {
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(std::shared_ptr<BandwidthMeterService> service) {
+    void Simulation::addService(const std::shared_ptr<BandwidthMeterService> &service) {
         if (service == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr service)");
         }
@@ -667,11 +668,11 @@ namespace wrench {
     /**
       * @brief Add a MemoryManager to the simulation.
       *
-      * @param service: a MemoryManager
+      * @param memory_manager: a MemoryManager
       *
       * @throw std::invalid_argument
       */
-    void Simulation::addService(std::shared_ptr<MemoryManager> memory_manager) {
+    void Simulation::addService(const std::shared_ptr<MemoryManager> &memory_manager) {
         if (memory_manager == nullptr) {
             throw std::invalid_argument("Simulation::addService(): invalid argument (nullptr memory_manager)");
         }
@@ -688,8 +689,8 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> storage_service) {
-        Simulation::stageFile(file, FileLocation::LOCATION(storage_service));
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service) {
+        Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service)));
     }
 
     /**
@@ -702,17 +703,17 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<StorageService> storage_service,
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> storage_service,
                                std::string directory_absolute_path) {
-        Simulation::stageFile(file, FileLocation::LOCATION(storage_service, directory_absolute_path));
+        Simulation::stageFile(file, FileLocation::LOCATION(std::move(storage_service), std::move(directory_absolute_path)));
     }
 
     /**
-     * @brief State a copy of a file at a location
+     * @brief State a copy of a file at a location, and update the file registry service
      * @param file: the file
      * @param location: the location
      */
-    void Simulation::stageFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
+    void Simulation::stageFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
         if ((file == nullptr) or (location == nullptr)) {
             throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
         }
@@ -735,9 +736,23 @@ namespace wrench {
         }
 
         // Update all file registry services
-        for (auto frs: this->file_registry_services) {
+        for (const auto &frs: this->file_registry_services) {
             frs->addEntryToDatabase(file, location);
         }
+    }
+
+    /**
+     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+     *
+     * @param file: a file
+     * @param location: a file location
+     *
+     * @throw std::invalid_argument
+     */
+    void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+        location->getStorageService()->stageFile(file, location->getMountPoint(),
+                                                 location->getAbsolutePathAtMountPoint());
     }
 
     /**
@@ -749,7 +764,7 @@ namespace wrench {
      *
      * @throw invalid_argument
      */
-    void Simulation::readFromDisk(double num_bytes, std::string hostname, std::string mount_point) {
+    void Simulation::readFromDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
@@ -775,9 +790,9 @@ namespace wrench {
      * @throw invalid_argument
      */
     void Simulation::readFromDiskAndWriteToDiskConcurrently(double num_bytes_to_read, double num_bytes_to_write,
-                                                            std::string hostname,
-                                                            std::string read_mount_point,
-                                                            std::string write_mount_point) {
+                                                            const std::string &hostname,
+                                                            const std::string &read_mount_point,
+                                                            const std::string &write_mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskReadStart(Simulation::getCurrentSimulatedDate(), hostname, read_mount_point, num_bytes_to_read,
@@ -809,7 +824,7 @@ namespace wrench {
      *
      * @throw invalid_argument
      */
-    void Simulation::writeToDisk(double num_bytes, std::string hostname, std::string mount_point) {
+    void Simulation::writeToDisk(double num_bytes, const std::string &hostname, const std::string &mount_point) {
         unique_disk_sequence_number += 1;
         int temp_unique_sequence_number = unique_disk_sequence_number;
         this->getOutput().addTimestampDiskWriteStart(Simulation::getCurrentSimulatedDate(), hostname, mount_point, num_bytes, temp_unique_sequence_number);
@@ -831,7 +846,7 @@ namespace wrench {
      * @param n_bytes: number of read bytes
      * @param location: file location
      */
-    void Simulation::readWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location) {
+    void Simulation::readWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -842,11 +857,11 @@ namespace wrench {
         auto mem_mng = getMemoryManagerByHost(hostname);
         std::vector<Block *> file_blocks = mem_mng->getCachedBlocks(file->getID());
         long cached_amt = 0;
-        for (unsigned int i = 0; i < file_blocks.size(); i++) {
-            cached_amt += file_blocks[i]->getSize();
+        for (auto &file_block: file_blocks) {
+            cached_amt += (long) (file_block->getSize());
         }
 
-        double from_disk = std::min(n_bytes, file->getSize() - cached_amt);
+        double from_disk = std::min(n_bytes, file->getSize() - (double) cached_amt);
         double from_cache = n_bytes - from_disk;
 
         mem_mng->flush(n_bytes + from_disk - mem_mng->getFreeMemory() - mem_mng->getEvictableMemory(),
@@ -876,7 +891,7 @@ namespace wrench {
      * @param is_dirty: true or false
      */
     void
-    Simulation::writebackWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes, std::shared_ptr<FileLocation> location,
+    Simulation::writebackWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes, const std::shared_ptr<FileLocation> &location,
                                          bool is_dirty) {
         std::string hostname = getHostName();
 
@@ -926,8 +941,8 @@ namespace wrench {
      * @param n_bytes: number of written bytes
      * @param location: file location
      */
-    void Simulation::writeThroughWithMemoryCache(std::shared_ptr<DataFile> file, double n_bytes,
-                                                 std::shared_ptr<FileLocation> location) {
+    void Simulation::writeThroughWithMemoryCache(const std::shared_ptr<DataFile> &file, double n_bytes,
+                                                 const std::shared_ptr<FileLocation> &location) {
         std::string hostname = getHostName();
 
         unique_disk_sequence_number += 1;
@@ -953,7 +968,7 @@ namespace wrench {
      * @param hostname: name of the host
      * @return pointer to the memory manager running on the host (or nullptr)
      */
-    MemoryManager *Simulation::getMemoryManagerByHost(std::string hostname) {
+    MemoryManager *Simulation::getMemoryManagerByHost(const std::string &hostname) {
         for (const auto &ptr: this->memory_managers) {
             if (strcmp(ptr->getHostname().c_str(), hostname.c_str()) == 0) {
                 return ptr.get();
@@ -969,17 +984,17 @@ namespace wrench {
      * @return boolean of existence
      */
     bool Simulation::doesHostExist(std::string hostname) {
-        return S4U_Simulation::hostExists(hostname);
+        return S4U_Simulation::hostExists(std::move(hostname));
     }
 
     /**
      * @brief Wrapper for S4U_Simulation linkExists()
      *
-     * @param linkname - name of link being queried
+     * @param link_name - name of link being queried
      * @return boolean of existence
      */
-    bool Simulation::doesLinkExist(std::string linkname) {
-        return S4U_Simulation::linkExists(linkname);
+    bool Simulation::doesLinkExist(const std::string &link_name) {
+        return S4U_Simulation::linkExists(link_name);
     }
 
     /**
@@ -995,7 +1010,7 @@ namespace wrench {
      * @param hostname: the hostname
      * @return a memory_manager_service capacity in bytes
      */
-    double Simulation::getHostMemoryCapacity(std::string hostname) {
+    double Simulation::getHostMemoryCapacity(const std::string &hostname) {
         return S4U_Simulation::getHostMemoryCapacity(hostname);
     }
 
@@ -1004,7 +1019,7 @@ namespace wrench {
     * @param hostname: the hostname
     * @return a number of cores
     */
-    unsigned long Simulation::getHostNumCores(std::string hostname) {
+    unsigned long Simulation::getHostNumCores(const std::string &hostname) {
         return S4U_Simulation::getHostNumCores(hostname);
     }
 
@@ -1013,7 +1028,7 @@ namespace wrench {
      * @param hostname: the hostname
      * @return a flop rate (flop / sec)
      */
-    double Simulation::getHostFlopRate(std::string hostname) {
+    double Simulation::getHostFlopRate(const std::string &hostname) {
         return S4U_Simulation::getHostFlopRate(hostname);
     }
 
@@ -1022,7 +1037,7 @@ namespace wrench {
      * @param hostname: the hostname
      * @return true or false
      */
-    bool Simulation::isHostOn(std::string hostname) {
+    bool Simulation::isHostOn(const std::string &hostname) {
         return S4U_Simulation::isHostOn(hostname);
     }
 
@@ -1030,7 +1045,7 @@ namespace wrench {
      * @brief Turns off a host
      * @param hostname: the hostname
      */
-    void Simulation::turnOffHost(std::string hostname) {
+    void Simulation::turnOffHost(const std::string &hostname) {
         S4U_Simulation::turnOffHost(hostname);
     }
 
@@ -1038,33 +1053,33 @@ namespace wrench {
      * @brief Turns on a host
      * @param hostname: the hostname
      */
-    void Simulation::turnOnHost(std::string hostname) {
+    void Simulation::turnOnHost(const std::string &hostname) {
         S4U_Simulation::turnOnHost(hostname);
     }
 
     /**
      * @brief Returns whether a link is on or not
-     * @param linkname: the linkname
+     * @param link_name: the link_name
      * @return true or false
      */
-    bool Simulation::isLinkOn(std::string linkname) {
-        return S4U_Simulation::isLinkOn(linkname);
+    bool Simulation::isLinkOn(const std::string &link_name) {
+        return S4U_Simulation::isLinkOn(link_name);
     }
 
     /**
      * @brief Turns off a link
-     * @param linkname: the linkname
+     * @param link_name: the link_name
      */
-    void Simulation::turnOffLink(std::string linkname) {
-        S4U_Simulation::turnOffLink(linkname);
+    void Simulation::turnOffLink(const std::string &link_name) {
+        S4U_Simulation::turnOffLink(link_name);
     }
 
     /**
      * @brief Turns on a link
-     * @param linkname: the linkname
+     * @param link_name: the link_name
      */
-    void Simulation::turnOnLink(std::string linkname) {
-        S4U_Simulation::turnOnLink(linkname);
+    void Simulation::turnOnLink(const std::string &link_name) {
+        S4U_Simulation::turnOnLink(link_name);
     }
 
     /**
@@ -1212,7 +1227,7 @@ namespace wrench {
      * @return The index of the current pstate of the host (as specified in the platform xml description file)
      */
     int Simulation::getCurrentPstate(const std::string &hostname) {
-        return S4U_Simulation::getCurrentPstate(hostname);
+        return (int) S4U_Simulation::getCurrentPstate(hostname);
     }
 
     /**
@@ -1500,8 +1515,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    std::shared_ptr<DataFile> Simulation::addFile(const std::string id, double size) {
-
+    std::shared_ptr<DataFile> Simulation::addFile(const std::string &id, double size) {
         if (size < 0) {
             throw std::invalid_argument("Simulation::addFile(): Invalid arguments");
         }
@@ -1524,7 +1538,7 @@ namespace wrench {
      * @brief Remove a file from the simulation (use at your own peril if you're using the workflow API - use Workflow::removeFile() instead)
      * @param file : file to remove
      */
-    void Simulation::removeFile(std::shared_ptr<DataFile> file) {
+    void Simulation::removeFile(const std::shared_ptr<DataFile> &file) {
         if (Simulation::data_files.find(file->getID()) == Simulation::data_files.end()) {
             throw std::invalid_argument("Simulation::removeFile(): Unknown file");
         }

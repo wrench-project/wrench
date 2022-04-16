@@ -209,7 +209,7 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     this->file = workflow->addFile("some_file", 1000000.0);
 
     // Put it on ss1
-    this->ss1->createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+    wrench::Simulation::createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
