@@ -33,15 +33,15 @@ namespace wrench {
         CustomAction(const std::string &name,
                      double ram,
                      unsigned long num_cores,
-                     std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_execute,
-                     std::function<void(std::shared_ptr<ActionExecutor> action_executor)> lambda_terminate);
+                     const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_execute,
+                     const std::function<void(std::shared_ptr<ActionExecutor>)> &lambda_terminate);
 
         unsigned long getMinNumCores() const override;
         unsigned long getMaxNumCores() const override;
         double getMinRAMFootprint() const override;
 
-        void execute(std::shared_ptr<ActionExecutor> action_executor) override;
-        void terminate(std::shared_ptr<ActionExecutor> action_executor) override;
+        void execute(const std::shared_ptr<ActionExecutor> &action_executor) override;
+        void terminate(const std::shared_ptr<ActionExecutor> &action_executor) override;
 
     private:
         double ram;

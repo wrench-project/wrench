@@ -22,7 +22,6 @@ WRENCH_LOG_CATEGORY(wrench_core_network_daemons_service, "Log category for Netwo
 
 namespace wrench {
 
-
     /**
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
@@ -68,7 +67,6 @@ namespace wrench {
             int noise_seed,
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list,
             std::string suffix = "") : Service(std::move(hostname), "network_daemon" + suffix) {
-
         // Set the message payloads
         setMessagePayloads(messagepayload_list, {});
 
@@ -100,15 +98,12 @@ namespace wrench {
      * @return time until next measurement (in seconds)
      */
     double NetworkProximityDaemon::getTimeUntilNextMeasurement() {
-
         static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
         double noise = noise_dist(rng);
         return S4U_Simulation::getClock() + measurement_period + noise;
     }
 
     int NetworkProximityDaemon::main() {
-
-
         TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
         WRENCH_INFO("Network Daemon Service starting on host %s!", S4U_Simulation::getHostName().c_str());
@@ -148,16 +143,13 @@ namespace wrench {
                         S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                                 new NetworkProximityTransferMessage(
                                                         this->message_size));
-
                     } catch (std::shared_ptr<NetworkError> &cause) {
                         time_for_next_measurement = this->getTimeUntilNextMeasurement();
                         continue;
                     }
 
                     double end_time = S4U_Simulation::getClock();
-
                     double proximityValue = end_time - start_time;
-
 
                     std::pair<std::string, std::string> hosts;
                     hosts = std::make_pair(S4U_Simulation::getHostName(), this->next_host_to_send);
@@ -195,7 +187,6 @@ namespace wrench {
 
 
     bool NetworkProximityDaemon::processNextMessage(double timeout) {
-
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = nullptr;
 
@@ -223,7 +214,6 @@ namespace wrench {
             return false;
 
         } else if (auto msg = dynamic_cast<NextContactDaemonAnswerMessage *>(message.get())) {
-
             this->next_host_to_send = msg->next_host_to_send;
             this->next_daemon_to_send = msg->next_daemon_to_send;
             this->next_mailbox_to_send = msg->next_mailbox_to_send;
@@ -231,7 +221,6 @@ namespace wrench {
             return true;
 
         } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
-
             return true;
 
         } else {

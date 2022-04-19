@@ -129,12 +129,12 @@ namespace wrench {
         * @brief Method to execute the task
         * @param action_executor: the executor that executes this action
         */
-        virtual void execute(std::shared_ptr<ActionExecutor> action_executor) = 0;
+        virtual void execute(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
         /**
          * @brief Method called when the task terminates
          * @param action_executor:  the executor that executes this action
          */
-        virtual void terminate(std::shared_ptr<ActionExecutor> action_executor) = 0;
+        virtual void terminate(const std::shared_ptr<ActionExecutor> &action_executor) = 0;
 
         void updateState();
 

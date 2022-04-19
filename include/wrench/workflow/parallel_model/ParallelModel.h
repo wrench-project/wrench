@@ -25,7 +25,7 @@ namespace wrench {
     public:
         static std::shared_ptr<ParallelModel> AMDAHL(double alpha);
         static std::shared_ptr<ParallelModel> CONSTANTEFFICIENCY(double efficiency);
-        static std::shared_ptr<ParallelModel> CUSTOM(std::function<double(double, long)> lambda_sequential, std::function<double(double, long)> lambda_per_thread);
+        static std::shared_ptr<ParallelModel> CUSTOM(const std::function<double(double, long)> &lambda_sequential, const std::function<double(double, long)> &lambda_per_thread);
 
         /***********************/
         /** \cond INTERNAL    **/

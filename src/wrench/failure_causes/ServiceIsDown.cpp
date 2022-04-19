@@ -12,6 +12,8 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/ComputeService.h>
 
+#include <utility>
+
 WRENCH_LOG_CATEGORY(wrench_core_service_is_down, "Log category for ServiceIsDown");
 
 namespace wrench {
@@ -21,7 +23,7 @@ namespace wrench {
      * @param service: the service that was down
      */
     ServiceIsDown::ServiceIsDown(std::shared_ptr<Service> service) {
-        this->service = service;
+        this->service = std::move(service);
     }
 
     /**
