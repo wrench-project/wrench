@@ -22,6 +22,7 @@ namespace wrench {
 
     public:
         double getSize() const;
+        void setSize(double size);
         std::string getID() const;
 
     protected:
