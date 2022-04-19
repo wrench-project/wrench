@@ -36,7 +36,7 @@ public:
     void do_getReadyTasksTest_test();
 
 protected:
-    ~SimpleSimulationTest() {
+    ~SimpleSimulationTest() override {
         workflow->clear();
     }
 
@@ -305,6 +305,9 @@ private:
 
         data_movement_manager->kill();
         job_manager->kill();
+
+        // Coverage
+        this->test->input_file->setSize(10);
 
         return 0;
     }

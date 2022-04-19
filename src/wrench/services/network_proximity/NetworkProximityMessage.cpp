@@ -29,7 +29,6 @@ namespace wrench {
     NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::pair<std::string, std::string> hosts,
                                                                                double payload) : NetworkProximityMessage(payload), answer_mailbox(answer_mailbox), hosts(std::move(hosts)) {
-
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
             throw std::invalid_argument(

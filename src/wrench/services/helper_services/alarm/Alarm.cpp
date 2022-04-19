@@ -31,7 +31,6 @@ namespace wrench {
      */
     Alarm::Alarm(double date, std::string hostname, simgrid::s4u::Mailbox *reply_mailbox,
                  SimulationMessage *msg, std::string suffix) : Service(hostname, "alarm_service_" + suffix) {
-
         this->date = date;
         //      if (this->date <= S4U_Simulation::getClock()) {
         //        WRENCH_INFO(

@@ -13,6 +13,7 @@
  **/
 
 #include <iostream>
+#include <utility>
 
 #include "TwoActionsAtATimeExecutionController.h"
 
@@ -32,10 +33,10 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the WMS
      */
     TwoActionsAtATimeExecutionController::TwoActionsAtATimeExecutionController(int num_actions,
-                                                                               const std::shared_ptr<BareMetalComputeService> compute_service,
-                                                                               const std::shared_ptr<SimpleStorageService> storage_service,
+                                                                               std::shared_ptr<BareMetalComputeService> compute_service,
+                                                                               std::shared_ptr<SimpleStorageService> storage_service,
                                                                                const std::string &hostname) : ExecutionController(hostname, "me"),
-                                                                                                              compute_service(compute_service), storage_service(storage_service), num_actions(num_actions) {
+                                                                                                              compute_service(std::move(compute_service)), storage_service(std::move(storage_service)), num_actions(num_actions) {
     }
 
     /**
@@ -46,7 +47,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     int TwoActionsAtATimeExecutionController::main() {
-
         /* Initialize and seed a RNG */
         std::uniform_real_distribution<double> gflop_dist(10 * GFLOP, 1000 * GFLOP);
         std::uniform_real_distribution<double> mb_dist(1.0 * MB, 100.0 * MB);
