@@ -171,6 +171,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Get all properties attached to this service
+     * @return the property list
+     */
+    const WRENCH_PROPERTY_COLLECTION_TYPE &Service::getPropertyList() const {
+        return this->property_list;
+    }
+
+    /**
      * @brief Get a property of the Service as a boolean
      * @param property: the property
      * @return the property value as a boolean

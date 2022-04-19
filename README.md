@@ -7,8 +7,11 @@
 [![CII Best Practices][cii-badge]][cii-link]
 [![Slack][slack-badge]][slack-link]
 
-<a href="https://wrench-project.org" target="_blank"><img src="https://wrench-project.org/images/logo-horizontal.png" width="350" alt="WRENCH Project" /></a>
-<br/>_Cyberinfrastructure Simulation Workbench_
+<p align="center">
+  <a href="https://wrench-project.org" target="_blank"><img src="https://wrench-project.org/images/logo-horizontal.png" width="500" alt="WRENCH Project" /></a>
+  <br /><i>Cyberinfrastructure Simulation Workbench</i>
+  <br /><br />
+</p>
 
 WRENCH is an _open-source library_ that exposes several high-level simulation 
 abstractions that serve as **building blocks** for developing custom simulators.

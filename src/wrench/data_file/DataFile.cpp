@@ -36,6 +36,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Set the file size (to be used only in very specific
+     * cases in which it is guaranteed that changing a file's size after that file
+     * has been created is a valid thing to do)
+     */
+    void DataFile::setSize(double s) {
+        this->size = s;
+    }
+
+    /**
      * @brief Get the file id
      * @return the id
      */

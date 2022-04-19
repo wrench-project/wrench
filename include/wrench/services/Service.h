@@ -57,6 +57,7 @@ namespace wrench {
         double getPropertyValueAsDouble(WRENCH_PROPERTY_TYPE);
         unsigned long getPropertyValueAsUnsignedLong(WRENCH_PROPERTY_TYPE);
         bool getPropertyValueAsBoolean(WRENCH_PROPERTY_TYPE);
+        const WRENCH_PROPERTY_COLLECTION_TYPE &getPropertyList() const;
 
         void assertServiceIsUp();
 
