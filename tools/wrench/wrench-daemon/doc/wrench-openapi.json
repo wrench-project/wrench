@@ -1,0 +1,1468 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "WRENCH REST API",
+    "description": "Test for WRENCH",
+    "termsOfService": "https://wrench-project.org/terms",
+    "contact": {
+      "email": "support@wrench-project.org"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about WRENCH",
+    "url": "https://wrench-project.org/"
+  },
+  "servers": [
+    {
+      "url": "https://wrench-project.org/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "WRENCH",
+      "description": "Everything about your simulations",
+      "externalDocs": {
+        "description": "Find out more about WRENCH",
+        "url": "https://wrench-project.org/"
+      }
+    }
+  ],
+  "paths": {
+    "/simulation/startSimulation": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Start a new simulation",
+        "operationId": "startSimulation",
+        "requestBody": {
+          "description": "Start a new simulation based on a platform file and a controller hostname.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationReturn"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/getTime": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve the current simulated time.",
+        "operationId": "getTime",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/advanceTime": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve the current simulated time.",
+        "operationId": "advanceTime",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "increment": {
+                    "type": "number",
+                    "description": "Increment in seconds."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/createTask": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a new task.",
+        "operationId": "createTask",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Task characteristics.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/waitForNextSimulationEvent": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve the next simulation event.",
+        "operationId": "waitForNextSimulationEvent",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/simulationEvents": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve all simulation events since last time we checked.",
+        "operationId": "getSimulationEvents",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/hostnames": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve the names of all hosts in the simulated platform.",
+        "operationId": "getAllHostnames",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostnameList"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/inputFiles": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve task's input files",
+        "deprecated": false,
+        "operationId": "getTaskInputFiles",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/addInputFile": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add an input file to a task",
+        "deprecated": false,
+        "operationId": "addInputFile",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/addOutputFile": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add an output file to a task",
+        "deprecated": false,
+        "operationId": "addOutputFile",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/inputFiles": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Return the list of input files of the workflow.",
+        "deprecated": false,
+        "operationId": "getInputFiles",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/addFile": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Add a file to the workflow.",
+        "deprecated": false,
+        "operationId": "addFile",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/files/{file_id}/size": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a file size.",
+        "deprecated": false,
+        "operationId": "fileGetSize",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "Name of the file",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/jobs/{jid}/tasks": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Retrieve job's tasks",
+        "deprecated": false,
+        "operationId": "standardJobGetTasks",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jid",
+            "in": "path",
+            "description": "ID of the job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/taskGetFlops": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a task's flops",
+        "deprecated": false,
+        "operationId": "taskGetFlops",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskFlops"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/taskGetMinNumCores": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a task's minimum number of cores.",
+        "deprecated": false,
+        "operationId": "taskGetMinNumCores",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCores"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/taskGetMaxNumCores": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a task's maximum number of cores.",
+        "deprecated": false,
+        "operationId": "taskGetMaxNumCores",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCores"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/tasks/{tid}/taskGetMemory": {
+      "get": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Get a task's memory requirement.",
+        "deprecated": false,
+        "operationId": "taskGetMemory",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tid",
+            "in": "path",
+            "description": "ID of the task",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskMem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Job not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/createStandardJob": {
+      "put": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create a new standard job.",
+        "operationId": "createStandardJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StandardJob"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{jid}/submit": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Submit a standard job.",
+        "operationId": "submitStandardJob",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jid",
+            "in": "path",
+            "description": "ID of the job",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Job characteristics.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "compute_service_name": {
+                    "type": "string",
+                    "description": "The compute service's name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/addBareMetalComputeService": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create and start a bare-metal compute service.",
+        "operationId": "addBareMetalComputeService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/addSimpleStorageService": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create and start a simple storage service.",
+        "operationId": "addSimpleStorageService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/addFileRegistryService": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create and start a file registery service.",
+        "operationId": "addFileRegistryService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "head_host": {
+                    "type": "string",
+                    "description": "The service's head host"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/simulation/{simid}/{storage_service_id}/createFileCopy": {
+      "post": {
+        "tags": [
+          "WRENCH"
+        ],
+        "summary": "Create, ex nihilo, a copy of a file copy at a storage service.",
+        "operationId": "createFileCopyAtStorageService",
+        "parameters": [
+          {
+            "name": "simid",
+            "in": "path",
+            "description": "ID of the simulation",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "storage_service_id",
+            "in": "path",
+            "description": "The storage service's head host",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Input to start a new service.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "filename": {
+                    "type": "string",
+                    "description": "The file name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Simulation or storage service not found",
+            "content": {}
+          },
+          "405": {
+            "description": "Invalid input",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SimulationInput": {
+        "type": "object",
+        "properties": {
+          "platform_xml": {
+            "type": "string",
+            "description": "XML description of the simulated platform (using the SimGrid DTD)"
+          },
+          "controller_hostname": {
+            "type": "string",
+            "description": "Name of the host in the simulated platform that runs the simulation execution_controller"
+          }
+        },
+        "required": [
+          "platform_xml",
+          "controller_hostname"
+        ]
+      },
+      "SimulationReturn": {
+        "type": "object",
+        "properties": {
+          "port_number": {
+            "type": "integer",
+            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+          },
+          "flops": {
+            "type": "number",
+            "format": "double",
+            "description": "The task's floating operations per second"
+          },
+          "min_num_cores": {
+            "type": "number",
+            "format": "double",
+            "description": "The task's minimum number of cores"
+          },
+          "max_num_cores": {
+            "type": "number",
+            "format": "double",
+            "description": "The task's maximum number of cores"
+          },
+          "memory": {
+            "type": "number",
+            "format": "double",
+            "description": "The task's memory requirement"
+          }
+        }
+      },
+      "StandardJob": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Port number to which all subsequent HTTP Post requests should be sent"
+          }
+        }
+      },
+      "GenericResponse": {
+        "type": "object",
+        "properties": {
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "ServiceResponse": {
+        "type": "object",
+        "properties": {
+          "service_name": {
+            "type": "string",
+            "description": "The new service's name"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "description": "JSON event description"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "EventList": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of JSON event descriptions"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "HostnameList": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of host names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskList": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of task names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "FileList": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of file names"
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "JobResponse": {
+        "type": "object",
+        "properties": {
+          "job_name": {
+            "type": "string",
+            "description": "The new job's name."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "FileResponse": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "number",
+            "description": "The file's size in bytes."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskFlops": {
+        "type": "object",
+        "properties": {
+          "flops": {
+            "type": "number",
+            "description": "The task's flops."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskCores": {
+        "type": "object",
+        "properties": {
+          "cores": {
+            "type": "number",
+            "description": "The task's minimum/maximum number of cores."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      },
+      "TaskMem": {
+        "type": "object",
+        "properties": {
+          "memory": {
+            "type": "number",
+            "description": "The task's memory requirement in bytes."
+          },
+          "wrench_api_request_success": {
+            "type": "boolean",
+            "description": "true if success, false if failure"
+          },
+          "failure_cause": {
+            "type": "string",
+            "description": "human-readable error message (if failure)"
+          }
+        }
+      }
+    }
+  }
+}
