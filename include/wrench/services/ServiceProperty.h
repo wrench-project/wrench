@@ -10,7 +10,7 @@
 
 #ifndef WRENCH_SERVICEPROPERTY_H
 #define WRENCH_SERVICEPROPERTY_H
-
+#include <map>
 #include <string>
 
 
@@ -34,7 +34,11 @@ namespace wrench {
 
     class ServiceProperty {
 
+        static std::map<std::string,WRENCH_PROPERTY_TYPE> stringToPropertyMap;
     public:
+        static WRENCH_PROPERTY_TYPE addServiceProperty(std::string classname,std::string messagePayload);
+        static WRENCH_PROPERTY_TYPE translateString(std::string serviceProperty);
+
     };
 
 };// namespace wrench
