@@ -326,16 +326,16 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Adding services to an uninitialized simulation
     std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
     ASSERT_THROW(simulation->add(
-                         new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
+            new wrench::CloudComputeService("DualCoreHost", hosts, "/scratch")),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-                         new wrench::SimpleStorageService("DualCoreHost", {"/"})),
+            new wrench::SimpleStorageService("DualCoreHost", {"/"})),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-                         new wrench::NetworkProximityService("DualCoreHost", hosts)),
+            new wrench::NetworkProximityService("DualCoreHost", hosts)),
                  std::runtime_error);
     ASSERT_THROW(simulation->add(
-                         new wrench::FileRegistryService("DualCoreHost")),
+            new wrench::FileRegistryService("DualCoreHost")),
                  std::runtime_error);
 
     ASSERT_NO_THROW(simulation->init(&argc, argv));
@@ -349,12 +349,19 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Create a Storage Service
     ASSERT_THROW(storage_service = simulation->add(
-                         new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
-                                                          {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
+            new wrench::SimpleStorageService(hostname, {"/disk1"}, {},
+                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, -1}})),
                  std::invalid_argument);
     storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/disk2"}, {},
-                                             {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123}}));
+            new wrench::SimpleStorageService(hostname, {"/disk2"},
+                                             {
+                                                     {wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS, "567"},
+                                                     {wrench::ServiceProperty::translateString("wrench::SimpleStorageServiceProperty::BUFFER_SIZE"), "678"}
+                                             },
+                                             {
+                                                     {wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},
+                                                     {wrench::ServiceMessagePayload::translateString("wrench::SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD"), 234}
+                                             }));
 
 
     // Try to get a bogus property as string or double
@@ -363,16 +370,27 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(storage_service->getPropertyValueAsUnsignedLong(-1), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsBoolean(-1), std::invalid_argument);
 
+    ASSERT_EQ(storage_service->getPropertyValueAsUnsignedLong(wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS), 567);
+    ASSERT_EQ(storage_service->getPropertyValueAsUnsignedLong(wrench::ServiceProperty::translateString("wrench::SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS")), 567);
+    ASSERT_EQ(storage_service->getPropertyValueAsUnsignedLong(wrench::SimpleStorageServiceProperty::BUFFER_SIZE), 678);
+
     ASSERT_THROW(storage_service->getMessagePayloadValue(-1), std::invalid_argument);
     ASSERT_EQ(123, storage_service->getMessagePayloadValue(
-                           wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
+            wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
+    ASSERT_EQ(123, storage_service->getMessagePayloadValue(
+            wrench::ServiceMessagePayload::translateString("wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD")));
+    ASSERT_EQ(234, storage_service->getMessagePayloadValue(
+            wrench::SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+    ASSERT_EQ(234, storage_service->getMessagePayloadValue(
+            wrench::ServiceMessagePayload::translateString("wrench::SimpleStorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD")));
+
 
 
     // Create a Cloud Service
     std::vector<std::string> execution_hosts = {"QuadCoreHost"};
     ASSERT_NO_THROW(compute_service = simulation->add(
-                            new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
-                                                            {{wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}})));
+            new wrench::CloudComputeService(hostname, execution_hosts, "/scratch",
+                                            {{wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"}})));
 
     // Try to get the property in bogus ways, for coverage
     ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD), std::invalid_argument);
@@ -384,7 +402,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
+            new SimpleSimulationReadyTasksTestWMS(this, hostname)));
 
     // BOGUS ADDS
     ASSERT_THROW(simulation->add((wrench::ExecutionController *) nullptr), std::invalid_argument);
