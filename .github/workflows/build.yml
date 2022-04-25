@@ -50,7 +50,7 @@ jobs:
             COMPILER: gcc7-batsched
             batsched: on
 
-          - build: "Ubuntu Bionic - clang-9"
+          - build: "Ubuntu Bionic - clang++-9"
             DIST: ubuntu-bionic
             COMPILER: clang9
             batsched: off
@@ -58,11 +58,6 @@ jobs:
           - build: "Ubuntu Focal - g++-9"
             DIST: ubuntu-focal
             COMPILER: gcc9
-            batsched: off
-
-          - build: "Ubuntu Focal - clang-10"
-            DIST: ubuntu-focal
-            COMPILER: clang10
             batsched: off
 
           - build: "Debian Buster - g++-8"
@@ -73,6 +68,16 @@ jobs:
           - build: "Debian Bullseye - g++-10"
             DIST: debian-bullseye
             COMPILER: gcc10
+            batsched: off
+
+          - build: "Ubuntu Jammy Jellyfish - g++-11"
+            DIST: ubuntu-jammy
+            COMPILER: gcc11
+            batsched: off
+
+          - build: "Ubuntu Jammy Jellyfish - clang++-14"
+            DIST: ubuntu-jammy
+            COMPILER: clang14
             batsched: off
 
     steps:
@@ -113,7 +118,7 @@ jobs:
           batsched: ${{ matrix.batsched }}
           TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
         run: |
-          if [[ "$DIST" == "ubuntu-focal" && "$COMPILER" == "gcc9" && "$batsched" == "off" ]]; then
+          if [[ "$DIST" == "ubuntu-jammy" && "$COMPILER" == "gcc11" && "$batsched" == "off" ]]; then
             docker exec -w /home/wrench/wrench/build wrench cmake -DENABLE_BATSCHED=${batsched} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
             docker exec -w /home/wrench/wrench/build wrench make doc;
             docker cp wrench:/home/wrench/wrench/docs .;
@@ -142,7 +147,7 @@ jobs:
           batsched: ${{ matrix.batsched }}
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          if [[ "$DIST" == "ubuntu-focal" && "$COMPILER" == "gcc9" && "$batsched" == "off" ]]; then
+          if [[ "$DIST" == "ubuntu-jammy" && "$COMPILER" == "gcc11" && "$batsched" == "off" ]]; then
             docker exec -w /home/wrench/wrench/build wrench lcov --directory . --capture --output-file coverage.info;
             docker exec -w /home/wrench/wrench/build wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
             docker cp wrench:/home/wrench/wrench/build/coverage.info .;
