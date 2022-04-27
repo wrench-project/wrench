@@ -15,7 +15,8 @@ namespace wrench {
      * @brief message payload count
      */
     WRENCH_MESSAGEPAYLOAD_TYPE WRENCH_MESSAGEPAYLOAD_COUNT = 0;
-    std::map<std::string,WRENCH_MESSAGEPAYLOAD_TYPE> ServiceMessagePayload::stringToPayloadMap;
+    std::map<std::string,WRENCH_MESSAGEPAYLOAD_TYPE> ServiceMessagePayload::stringToPayloadMap = {};
+    std::map<WRENCH_MESSAGEPAYLOAD_TYPE,std::string> ServiceMessagePayload::payloadToString = {};
     SET_MESSAGEPAYLOAD_NAME(ServiceMessagePayload, STOP_DAEMON_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(ServiceMessagePayload, DAEMON_STOPPED_MESSAGE_PAYLOAD);
 
@@ -27,6 +28,7 @@ namespace wrench {
     WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::addMessagePayload(std::string classname,std::string messagePayload){
          ++WRENCH_MESSAGEPAYLOAD_COUNT;
          stringToPayloadMap[classname+"::"+messagePayload]=WRENCH_MESSAGEPAYLOAD_COUNT;
+         payloadToString[WRENCH_MESSAGEPAYLOAD_COUNT]=classname+"::"+messagePayload;
          //std::cout<<classname+"::"+messagePayload<<std::endl;
          return WRENCH_MESSAGEPAYLOAD_COUNT;
     }
@@ -36,6 +38,13 @@ namespace wrench {
      */
     WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::translateString(std::string messagePayload){
         return stringToPayloadMap[messagePayload];
+    }
+    /**
+     * @brief translate a message payload ID to a string key
+     * @param messagePayload: the ID of the message payload 
+     */
+    std::string ServiceMessagePayload::translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE messagePayload) {
+        return payloadToString[messagePayload];
     }
 
 };// namespace wrench

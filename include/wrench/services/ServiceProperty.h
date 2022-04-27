@@ -35,9 +35,11 @@ namespace wrench {
     class ServiceProperty {
 
         static std::map<std::string,WRENCH_PROPERTY_TYPE> stringToPropertyMap;
+        static std::map<WRENCH_PROPERTY_TYPE,std::string> propertyToStringMap;
     public:
         static WRENCH_PROPERTY_TYPE addServiceProperty(std::string classname,std::string messagePayload);
         static WRENCH_PROPERTY_TYPE translateString(std::string serviceProperty);
+        static std::string translatePropertyType(WRENCH_PROPERTY_TYPE serviceProperty);
 
     };
 
