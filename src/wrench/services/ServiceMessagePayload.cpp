@@ -8,7 +8,7 @@
  */
 
 #include <wrench/services/ServiceMessagePayload.h>
-//#include <iostream>
+#include <iostream>
 
 namespace wrench {
     /**
@@ -17,6 +17,7 @@ namespace wrench {
     WRENCH_MESSAGEPAYLOAD_TYPE WRENCH_MESSAGEPAYLOAD_COUNT = 0;
     std::map<std::string,WRENCH_MESSAGEPAYLOAD_TYPE> ServiceMessagePayload::stringToPayloadMap = {};
     std::map<WRENCH_MESSAGEPAYLOAD_TYPE,std::string> ServiceMessagePayload::payloadToString = {};
+
     SET_MESSAGEPAYLOAD_NAME(ServiceMessagePayload, STOP_DAEMON_MESSAGE_PAYLOAD);
     SET_MESSAGEPAYLOAD_NAME(ServiceMessagePayload, DAEMON_STOPPED_MESSAGE_PAYLOAD);
 
@@ -37,14 +38,14 @@ namespace wrench {
      * @param messagePayload: the name of the message payload to get in classname::messagePayload form (Note: the classname must be the parent class that defines the property)
      */
     WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::translateString(std::string messagePayload){
-        return stringToPayloadMap[messagePayload];
+        return stringToPayloadMap.at(messagePayload);
     }
     /**
      * @brief translate a message payload ID to a string key
      * @param messagePayload: the ID of the message payload 
      */
     std::string ServiceMessagePayload::translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE messagePayload) {
-        return payloadToString[messagePayload];
+        return payloadToString.at(messagePayload);
     }
 
 };// namespace wrench
