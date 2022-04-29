@@ -22,7 +22,7 @@ namespace wrench {
     /**
      * @brief Configurable properties for a ActionExecutionService
      */
-    class ActionExecutionServiceProperty {
+    class ActionExecutionServiceProperty : public ServiceProperty {
 
     public:
         /** @brief The ActionExecutionService's overhead for creating a thread, in seconds **/
