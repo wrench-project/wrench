@@ -154,7 +154,6 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_EQ(3, workflow->getTasks().size());
 
     workflow->removeTask(t1);
-
 }
 
 TEST_F(WorkflowTest, ControlDependency) {
