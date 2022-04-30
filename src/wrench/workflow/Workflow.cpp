@@ -747,19 +747,19 @@ namespace wrench {
      * @brief Update the top level of all tasks (in case dynamic top level udpates
      * had been disabled)
      */
-     void Workflow::updateAllTopLevels() {
-         std::vector<std::shared_ptr<WorkflowTask>> entry_tasks;
-         for (auto const &t : this->tasks) {
-             if (t.second->getNumberOfChildren() == 0) {
-                 entry_tasks.push_back(t.second);
-             }
-         }
-         for (auto const &et : entry_tasks) {
-             et->updateTopLevel();
-             for (auto const &child : et->getChildren()) {
-                 child->updateTopLevel();
-             }
-         }
-     }
+    void Workflow::updateAllTopLevels() {
+        std::vector<std::shared_ptr<WorkflowTask>> entry_tasks;
+        for (auto const &t: this->tasks) {
+            if (t.second->getNumberOfChildren() == 0) {
+                entry_tasks.push_back(t.second);
+            }
+        }
+        for (auto const &et: entry_tasks) {
+            et->updateTopLevel();
+            for (auto const &child: et->getChildren()) {
+                child->updateTopLevel();
+            }
+        }
+    }
 
 }// namespace wrench
