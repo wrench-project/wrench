@@ -141,9 +141,12 @@ namespace wrench {
         // Remove the task from the master list
         tasks.erase(tasks.find(task->id));
 
+
         // Brute-force update of the top-level of all the children of the removed task
-        for (auto const &child: children) {
-            child->updateTopLevel();
+        if (this->update_top_levels_dynamically) {
+            for (auto const &child: children) {
+                child->updateTopLevel();
+            }
         }
     }
 
@@ -187,7 +190,9 @@ namespace wrench {
             WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
             this->dag.addEdge(src.get(), dst.get());
 
-            dst->updateTopLevel();
+            if (this->update_top_levels_dynamically) {
+                dst->updateTopLevel();
+            }
 
             if (src->getState() != WorkflowTask::State::COMPLETED) {
                 dst->setInternalState(WorkflowTask::InternalState::TASK_NOT_READY);
@@ -217,7 +222,9 @@ namespace wrench {
         if (this->dag.doesEdgeExist(src.get(), dst.get())) {
             this->dag.removeEdge(src.get(), dst.get());
 
-            dst->updateTopLevel();
+            if (this->update_top_levels_dynamically) {
+                dst->updateTopLevel();
+            }
 
             /* Update state */
             if ((dst->getState() == WorkflowTask::State::NOT_READY) and (dst->getInternalState() == WorkflowTask::InternalState::TASK_NOT_READY)) {
@@ -272,6 +279,7 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
+        this->update_top_levels_dynamically = true;
     }
 
     /**
@@ -719,5 +727,39 @@ namespace wrench {
     std::shared_ptr<Workflow> Workflow::createWorkflow() {
         return std::shared_ptr<Workflow>(new Workflow());
     }
+
+    /**
+     * @brief Disable dynamic top level updates (so that each task dependency update
+     * does not trigger a recursive, and thus expensive, top level computations)
+     */
+    void Workflow::disableTopLevelDynamicUpdates() {
+        this->update_top_levels_dynamically = false;
+    }
+
+    /**
+    * @brief Enable dynamic top level updates
+    */
+    void Workflow::enableTopLevelDynamicUpdates() {
+        this->update_top_levels_dynamically = true;
+    }
+
+    /**
+     * @brief Update the top level of all tasks (in case dynamic top level udpates
+     * had been disabled)
+     */
+     void Workflow::updateAllTopLevels() {
+         std::vector<std::shared_ptr<WorkflowTask>> entry_tasks;
+         for (auto const &t : this->tasks) {
+             if (t.second->getNumberOfChildren() == 0) {
+                 entry_tasks.push_back(t.second);
+             }
+         }
+         for (auto const &et : entry_tasks) {
+             et->updateTopLevel();
+             for (auto const &child : et->getChildren()) {
+                 child->updateTopLevel();
+             }
+         }
+     }
 
 }// namespace wrench
