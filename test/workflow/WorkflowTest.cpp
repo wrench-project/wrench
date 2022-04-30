@@ -173,10 +173,12 @@ TEST_F(WorkflowTest, ControlDependency) {
     workflow->addControlDependency(t1, new_task);
     workflow->removeControlDependency(t1, new_task);
 
+    auto new_task_top_level = new_task->getTopLevel();
     workflow->disableTopLevelDynamicUpdates();
     workflow->addControlDependency(t1, new_task);
     workflow->enableTopLevelDynamicUpdates();
     workflow->updateAllTopLevels();
+    ASSERT_EQ(new_task->getTopLevel(), new_task_top_level + 1);
 
 }
 
