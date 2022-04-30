@@ -154,6 +154,7 @@ TEST_F(WorkflowTest, WorkflowStructure) {
     ASSERT_EQ(3, workflow->getTasks().size());
 
     workflow->removeTask(t1);
+
 }
 
 TEST_F(WorkflowTest, ControlDependency) {
@@ -171,6 +172,12 @@ TEST_F(WorkflowTest, ControlDependency) {
     auto new_task = workflow->addTask("new_task", 1.0, 1, 1, 0);
     workflow->addControlDependency(t1, new_task);
     workflow->removeControlDependency(t1, new_task);
+
+    workflow->disableTopLevelDynamicUpdates();
+    workflow->addControlDependency(t1, new_task);
+    workflow->enableTopLevelDynamicUpdates();
+    workflow->updateAllTopLevels();
+
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
