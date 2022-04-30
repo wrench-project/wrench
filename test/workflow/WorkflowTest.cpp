@@ -178,7 +178,6 @@ TEST_F(WorkflowTest, ControlDependency) {
     workflow->enableTopLevelDynamicUpdates();
     workflow->updateAllTopLevels();
     ASSERT_EQ(new_task->getTopLevel(), new_task_top_level + 1);
-
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
