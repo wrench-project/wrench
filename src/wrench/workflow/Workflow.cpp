@@ -132,8 +132,10 @@ namespace wrench {
             this->task_output_files.erase(f);
         }
 
-        // Get the task children
+        // Get the children
         auto children = this->dag.getChildren(task.get());
+        // Get the parents
+        auto parents = this->dag.getParents(task.get());
 
         // Remove the task from the DAG
         this->dag.removeVertex(task.get());
@@ -141,11 +143,14 @@ namespace wrench {
         // Remove the task from the master list
         tasks.erase(tasks.find(task->id));
 
-
-        // Brute-force update of the top-level of all the children of the removed task
-        if (this->update_top_levels_dynamically) {
+        // Brute-force update of the top-level of all the children and the bottom-level
+        // of the parents of the removed task
+        if (this->update_top_bottom_levels_dynamically) {
             for (auto const &child: children) {
                 child->updateTopLevel();
+            }
+            for (auto const &parent: parents) {
+                parent->updateBottomLevel();
             }
         }
     }
@@ -190,8 +195,9 @@ namespace wrench {
             WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
             this->dag.addEdge(src.get(), dst.get());
 
-            if (this->update_top_levels_dynamically) {
+            if (this->update_top_bottom_levels_dynamically) {
                 dst->updateTopLevel();
+                src->updateBottomLevel();
             }
 
             if (src->getState() != WorkflowTask::State::COMPLETED) {
@@ -222,8 +228,9 @@ namespace wrench {
         if (this->dag.doesEdgeExist(src.get(), dst.get())) {
             this->dag.removeEdge(src.get(), dst.get());
 
-            if (this->update_top_levels_dynamically) {
+            if (this->update_top_bottom_levels_dynamically) {
                 dst->updateTopLevel();
+                src->updateBottomLevel();
             }
 
             /* Update state */
@@ -279,7 +286,7 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
-        this->update_top_levels_dynamically = true;
+        this->update_top_bottom_levels_dynamically = true;
     }
 
     /**
@@ -552,6 +559,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Returns all tasks with bottom-levels in a range
+     * @param min: the low end of the range (inclusive)
+     * @param max: the high end of the range (inclusive)
+     * @return a vector of tasks
+     */
+    std::vector<std::shared_ptr<WorkflowTask>> Workflow::getTasksInBottomLevelRange(unsigned long min, unsigned long max) {
+        std::vector<std::shared_ptr<WorkflowTask>> to_return;
+        for (auto const &task: this->getTasks()) {
+            if ((task->getBottomLevel() >= min) and (task->getBottomLevel() <= max)) {
+                to_return.push_back(task);
+            }
+        }
+        return to_return;
+    }
+
+    /**
      * @brief Get the list of exit tasks of the workflow, i.e., those tasks
      *        that don't have parents
      * @return A map of tasks indexed by their IDs
@@ -729,28 +752,22 @@ namespace wrench {
     }
 
     /**
-     * @brief Disable dynamic top level updates (so that each task dependency update
-     * does not trigger a recursive, and thus expensive, top level computations)
-     */
-    void Workflow::disableTopLevelDynamicUpdates() {
-        this->update_top_levels_dynamically = false;
-    }
-
-    /**
-    * @brief Enable dynamic top level updates
+    * @brief Enable dynamic top/bottom level updates
+    * @param enabled: true if dynamic updates are to be enabled, false otherwise
     */
-    void Workflow::enableTopLevelDynamicUpdates() {
-        this->update_top_levels_dynamically = true;
+    void Workflow::enableTopBottomLevelDynamicUpdates(bool enabled) {
+        this->update_top_bottom_levels_dynamically = enabled;
     }
 
     /**
      * @brief Update the top level of all tasks (in case dynamic top level udpates
      * had been disabled)
      */
-    void Workflow::updateAllTopLevels() {
+    void Workflow::updateAllTopBottomLevels() {
+        // Update top levels
         std::vector<std::shared_ptr<WorkflowTask>> entry_tasks;
         for (auto const &t: this->tasks) {
-            if (t.second->getNumberOfChildren() == 0) {
+            if (t.second->getNumberOfParents() == 0) {
                 entry_tasks.push_back(t.second);
             }
         }
@@ -758,6 +775,19 @@ namespace wrench {
             et->updateTopLevel();
             for (auto const &child: et->getChildren()) {
                 child->updateTopLevel();
+            }
+        }
+        // Update bottom levels
+        std::vector<std::shared_ptr<WorkflowTask>> exit_tasks;
+        for (auto const &t: this->tasks) {
+            if (t.second->getNumberOfChildren() == 0) {
+                exit_tasks.push_back(t.second);
+            }
+        }
+        for (auto const &et: exit_tasks) {
+            et->updateBottomLevel();
+            for (auto const &parent: et->getParents()) {
+                parent->updateBottomLevel();
             }
         }
     }

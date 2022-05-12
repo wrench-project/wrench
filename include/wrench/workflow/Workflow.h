@@ -96,15 +96,15 @@ namespace wrench {
         std::set<std::shared_ptr<WorkflowTask>> getTasksThatInput(const std::shared_ptr<DataFile> &file);
         bool isDone();
 
-        void disableTopLevelDynamicUpdates();
-        void enableTopLevelDynamicUpdates();
-        void updateAllTopLevels();
+        void enableTopBottomLevelDynamicUpdates(bool enabled);
+        void updateAllTopBottomLevels();
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
         std::vector<std::shared_ptr<WorkflowTask>> getTasksInTopLevelRange(unsigned long min, unsigned long max);
+        std::vector<std::shared_ptr<WorkflowTask>> getTasksInBottomLevelRange(unsigned long min, unsigned long max);
 
         std::vector<std::shared_ptr<WorkflowTask>> getReadyTasks();
 
@@ -119,7 +119,7 @@ namespace wrench {
         friend class Simulation;
         friend class WorkflowTask;
 
-        bool update_top_levels_dynamically;
+        bool update_top_bottom_levels_dynamically;
 
         Workflow();
 
