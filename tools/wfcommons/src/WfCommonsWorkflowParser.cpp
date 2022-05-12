@@ -37,6 +37,7 @@ namespace wrench {
         std::set<std::string> ignored_transfer_jobs;
 
         auto workflow = Workflow::createWorkflow();
+        workflow->disableTopLevelDynamicUpdates();
 
         double flop_rate;
 
@@ -229,6 +230,8 @@ namespace wrench {
             }
         }
         file.close();
+        workflow->enableTopLevelDynamicUpdates();
+        workflow->updateAllTopLevels();
 
         return workflow;
     }

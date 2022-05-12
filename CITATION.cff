@@ -50,5 +50,5 @@ license: "LGPL-3.0"
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/wrench-project/wrench"
 title: "Developing Accurate and Scalable Simulators of Production Workflow Management Systems with WRENCH"
-version: "1.8"
+version: "2.0"
 ...
