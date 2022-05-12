@@ -36,9 +36,17 @@ namespace wrench {
             /** @brief The number of bytes in the control message sent to the daemon to request a file read **/
             DECLARE_MESSAGEPAYLOAD_NAME(FILE_READ_REQUEST_MESSAGE_PAYLOAD);
             /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
-            DECLARE_MESSAGEPAYLOAD_NAME(FILE_READ_ANSWER_MESSAGE_PAYLOAD);
+            DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
+
+            /** @brief The number of bytes in the control message sent by the daemon to continue a search request **/
             DECLARE_MESSAGEPAYLOAD_NAME(CONTINUE_SEARCH);
+
+            /** @brief The number of bytes in the control message sent by the daemon to update the cache **/
             DECLARE_MESSAGEPAYLOAD_NAME(UPDATE_CACHE);
+
+            /** @brief The number of bytes in each cache entry **/
+            DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
+
 
         };
     };
