@@ -28,13 +28,10 @@ namespace wrench {
      */
     extern WRENCH_PROPERTY_TYPE WRENCH_PROPERTY_COUNT;
 
-} // namespace wrench
+}// namespace wrench
 
 #define DECLARE_PROPERTY_NAME(name) static const wrench::WRENCH_PROPERTY_TYPE name
-//#define SET_PROPERTY_NAME(classname, name) const wrench::WRENCH_PROPERTY_TYPE classname::name = ++wrench::WRENCH_PROPERTY_COUNT
-#define SET_PROPERTY_NAME(classname, name) const wrench::WRENCH_PROPERTY_TYPE classname::name = classname::addServiceProperty(#classname,#name)
-//++wrench::WRENCH_PROPERTY_COUNT
-//#name
+#define SET_PROPERTY_NAME(classname, name) const wrench::WRENCH_PROPERTY_TYPE classname::name = classname::addServiceProperty(#classname, #name)
 
 namespace wrench {
 
@@ -44,18 +41,14 @@ namespace wrench {
 
     class ServiceProperty {
 
-        static std::map<std::string,WRENCH_PROPERTY_TYPE> stringToPropertyMap;
-        static std::map<WRENCH_PROPERTY_TYPE,std::string> propertyToStringMap;
 
     public:
-        static WRENCH_PROPERTY_TYPE addServiceProperty(std::string classname,std::string messagePayload);
+        static WRENCH_PROPERTY_TYPE addServiceProperty(std::string classname, std::string messagePayload);
         static WRENCH_PROPERTY_TYPE translateString(std::string serviceProperty);
         static std::string translatePropertyType(WRENCH_PROPERTY_TYPE serviceProperty);
-
     };
 
 };// namespace wrench
-
 
 
 #endif//WRENCH_SERVICEPROPERTY_H
