@@ -119,6 +119,8 @@ namespace wrench {
 
         unsigned long getTopLevel() const;
 
+        unsigned long getBottomLevel() const;
+
         double getStartDate() const;
 
         double getEndDate() const;
@@ -180,6 +182,8 @@ namespace wrench {
         static std::string stateToString(InternalState internal_state);
 
         unsigned long updateTopLevel();
+
+        unsigned long updateBottomLevel();
 
         void setInternalState(WorkflowTask::InternalState);
 
@@ -282,6 +286,7 @@ namespace wrench {
         double memory_requirement;
         unsigned long priority = 0;    // Task priority
         unsigned long toplevel;        // 0 if entry task
+        unsigned long bottomlevel;     // 0 if exit task
         unsigned int failure_count = 0;// Number of times the tasks has failed
         std::string execution_host;    // Host on which the task executed ("" if not executed successfully - yet)
         State visible_state;           // To be exposed to developer level

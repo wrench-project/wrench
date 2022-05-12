@@ -36,7 +36,7 @@ namespace wrench {
 
 #define DECLARE_MESSAGEPAYLOAD_NAME(name) static const wrench::WRENCH_MESSAGEPAYLOAD_TYPE name
 
-#define SET_MESSAGEPAYLOAD_NAME(classname, name) const wrench::WRENCH_MESSAGEPAYLOAD_TYPE classname::name = classname::addMessagePayload(#classname,#name)
+#define SET_MESSAGEPAYLOAD_NAME(classname, name) const wrench::WRENCH_MESSAGEPAYLOAD_TYPE classname::name = classname::addMessagePayload(#classname, #name)
 //#name
 //++WRENCH_MESSAGEPAYLOAD_COUNT
 namespace wrench {
@@ -45,11 +45,11 @@ namespace wrench {
      * @brief Configurable message payloads for a Service
      */
     class ServiceMessagePayload {
-         static std::map<std::string,WRENCH_MESSAGEPAYLOAD_TYPE> stringToPayloadMap;
-         static std::map<WRENCH_MESSAGEPAYLOAD_TYPE,std::string> payloadToString;
-    public:
+        static std::map<std::string, WRENCH_MESSAGEPAYLOAD_TYPE> stringToPayloadMap;
+        static std::map<WRENCH_MESSAGEPAYLOAD_TYPE, std::string> payloadToString;
 
-        static WRENCH_MESSAGEPAYLOAD_TYPE addMessagePayload(std::string classname,std::string messagePayload);
+    public:
+        static WRENCH_MESSAGEPAYLOAD_TYPE addMessagePayload(std::string classname, std::string messagePayload);
         static WRENCH_MESSAGEPAYLOAD_TYPE translateString(std::string messagePayload);
         static std::string translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE messagePayload);
 
