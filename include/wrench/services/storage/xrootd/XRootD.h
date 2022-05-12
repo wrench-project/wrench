@@ -17,11 +17,12 @@
 
 #ifndef WRENCH_XROOTD_H
 #define WRENCH_XROOTD_H
-//#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/Service.h"
 #include <vector>
 #include <unordered_map>
 #include <memory>
 #include "wrench/data_file/DataFile.h"
+#include <set>
 namespace wrench {
     namespace XRootD{
         //class StorageServer;
@@ -31,10 +32,10 @@ namespace wrench {
         class XRootD{
         public:
             int defaultTimeToLive=1024;//how long trivial search message can wander for;
-            std::shared_ptr<Node> createStorageServer(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+            std::shared_ptr<Node> createStorageServer(const std::string& hostname,std::set<std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
             std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
-            int size();
+            unsigned int size();
         private:
             friend Node;
             std::vector<std::shared_ptr<Node>> getFileNodes(std::shared_ptr<DataFile> file);

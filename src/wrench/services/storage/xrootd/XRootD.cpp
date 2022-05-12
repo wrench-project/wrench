@@ -44,7 +44,7 @@ namespace wrench {
             return files[file];
 
         }
-        int XRootD::size(){
+        unsigned int XRootD::size(){
             return nodes.size();
 
         }

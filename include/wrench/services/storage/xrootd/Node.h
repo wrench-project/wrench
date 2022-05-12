@@ -35,7 +35,7 @@ namespace wrench {
             //XRootD* getMetavisor();
             Node(const std::string& hostname);
             std::shared_ptr<SimpleStorageService> getStorageServer();
-            Node* getChild(int n);
+            Node* getChild(unsigned int n);
             Node* getParent();
             int main();
             bool processNextMessage();
