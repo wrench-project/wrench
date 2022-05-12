@@ -12,6 +12,7 @@
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/storage/xrootd/XRootDMessagePayload.h"
 #include <stack>
+#include "wrench/services/storage/xrootd/Cache.h"
 namespace wrench {
     namespace XRootD{
         class XRootD;
@@ -27,7 +28,8 @@ namespace wrench {
                     {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::UPDATE_CACHE, 1024},
                     {MessagePayload::CONTINUE_SEARCH, 1024},
-                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024}
+                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, 1024}
             };
         public:
             //XRootD* getMetavisor();
@@ -43,7 +45,7 @@ namespace wrench {
             void readFile(std::shared_ptr<DataFile>file, double num_bytes);
 
             bool cached(shared_ptr<DataFile> file);
-            std::vector<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
+            std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
         private:
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 
@@ -52,7 +54,7 @@ namespace wrench {
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<SimpleStorageService> internalStorage=nullptr;
             std::vector<std::shared_ptr<Node>> children;
-            std::unordered_map< std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> cache;//probiably change the payload of this to an object containing the file location AND its queue time stamp
+            Cache cache;
             Node* supervisor=nullptr;
             XRootD* metavisor=nullptr;
             friend XRootD;

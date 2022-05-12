@@ -191,6 +191,7 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/XRootDMessagePayload.h
         include/wrench/services/storage/xrootd/XRootDMessage.h
         include/wrench/services/storage/xrootd/SearchStack.h
+        include/wrench/services/storage/xrootd/Cache.h
         )
 
 # source files
@@ -355,6 +356,9 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/XRootD.cpp
         src/wrench/services/storage/xrootd/Node.cpp
         src/wrench/services/storage/xrootd/SearchStack.cpp
+        src/wrench/services/storage/xrootd/Cache.cpp
+        src/wrench/services/storage/xrootd/XRootDMessagePayload.cpp
+        src/wrench/services/storage/xrootd/XRootDMessage.cpp
         )
 
 # test files

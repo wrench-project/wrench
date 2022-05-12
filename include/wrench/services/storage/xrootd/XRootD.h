@@ -30,6 +30,7 @@ namespace wrench {
 
         class XRootD{
         public:
+            int defaultTimeToLive=1024;//how long trivial search message can wander for;
             std::shared_ptr<Node> createStorageServer(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
             std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
