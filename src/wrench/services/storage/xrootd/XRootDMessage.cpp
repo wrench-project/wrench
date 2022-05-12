@@ -53,7 +53,7 @@ namespace wrench {
                                      double payload,int timeToLive):Message(payload),file(file),timeToLive(timeToLive){}
             FileDeleteRequestMessage::FileDeleteRequestMessage(FileDeleteRequestMessage* other):Message(payload),file(other->file),timeToLive(other->timeToLive-1){}
 
-/
+
     }
 };// namespace wrench
 
