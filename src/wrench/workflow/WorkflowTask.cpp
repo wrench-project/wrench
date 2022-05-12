@@ -43,6 +43,7 @@ namespace wrench {
                                                                   job(nullptr) {
         // The default is that the task is perfectly parallelizable
         this->parallel_model = ParallelModel::CONSTANTEFFICIENCY(1.0);
+        this->bottomlevel = 0;
         this->toplevel = 0;
     }
 
@@ -732,17 +733,40 @@ namespace wrench {
             this->toplevel = 0;
         } else {
             unsigned long max_toplevel = 0;
-            for (const auto &parent: parents) {
+            for (const auto &parent : parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
             this->toplevel = 1 + max_toplevel;
         }
         std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
-        for (const auto &child: children) {
+        for (const auto &child : children) {
             child->updateTopLevel();
         }
         return this->toplevel;
     }
+
+    /**
+     * @brief Update the task's bottom level (looking only at the children, and updating parents)
+     * @return the task's updated bottom level
+     */
+    unsigned long WorkflowTask::updateBottomLevel() {
+        std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
+        if (children.empty()) {
+            this->bottomlevel = 0;
+        } else {
+            unsigned long max_bottomlevel = 0;
+            for (const auto &child : children) {
+                max_bottomlevel = (max_bottomlevel < child->bottomlevel ? child->bottomlevel : max_bottomlevel);
+            }
+            this->bottomlevel = 1 + max_bottomlevel;
+        }
+        std::vector<std::shared_ptr<WorkflowTask>> parents = this->workflow->getTaskParents(this->getSharedPtr());
+        for (const auto &parent: parents) {
+            parent->updateBottomLevel();
+        }
+        return this->bottomlevel;
+    }
+
 
     /**
      * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
@@ -752,6 +776,16 @@ namespace wrench {
     unsigned long WorkflowTask::getTopLevel() const {
         return this->toplevel;
     }
+
+    /**
+     * @brief Returns the task's bottom level (max number of hops on a path down to an exit task. Exit
+     *        tasks have a bottom-level of 0)
+     * @return
+     */
+    unsigned long WorkflowTask::getBottomLevel() const {
+        return this->bottomlevel;
+    }
+
 
     /**
      * @brief Returns the name of the host on which the task has most recently been executed, or "" if
