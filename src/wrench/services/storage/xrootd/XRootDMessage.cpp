@@ -43,15 +43,15 @@ namespace wrench {
                                   double payload,
                                   std::shared_ptr<bool> answered,
                                   int timeToLive):Message(payload),file(file),node(node),answered(answered),timeToLive(timeToLive){}
-            ContinueSearchMessage::ContinueSearchMessage(ContinueSearchMessage* other):Message(payload),file(other->file),node(other->node),answered(other->answered),timeToLive(other->timeToLive-1){}
+            ContinueSearchMessage::ContinueSearchMessage(ContinueSearchMessage* other):Message(other->payload),file(other->file),node(other->node),answered(other->answered),timeToLive(other->timeToLive-1){}
 
 
             UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
-                               double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),node(node),file(file),locations(locations),answered(answered){}
+                               double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),file(file),locations(locations),node(node),answered(answered){}
 
             FileDeleteRequestMessage::FileDeleteRequestMessage(              std::shared_ptr<DataFile> file,
                                      double payload,int timeToLive):Message(payload),file(file),timeToLive(timeToLive){}
-            FileDeleteRequestMessage::FileDeleteRequestMessage(FileDeleteRequestMessage* other):Message(payload),file(other->file),timeToLive(other->timeToLive-1){}
+            FileDeleteRequestMessage::FileDeleteRequestMessage(FileDeleteRequestMessage* other):Message(other->payload),file(other->file),timeToLive(other->timeToLive-1){}
 
 
     }
