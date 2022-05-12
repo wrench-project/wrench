@@ -22,7 +22,6 @@ WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
 namespace wrench {
     namespace XRootD{
-//todo add specific handling for being a file server
             int Node::main() {
                 //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
@@ -86,51 +85,7 @@ namespace wrench {
                         shared_ptr<FileLocation> best=cached[0];//use load based search, not just 0
                         StorageService::readFile(msg->file,best,msg->answer_mailbox,msg->mailbox_to_receive_the_file_content,msg->num_bytes_to_read);
                     }else{
-                        bool failed=false;
-                        auto all= metavisor->getFileNodes(msg->file);
-                        if(all.size()>0){
-                            auto subtree= searchAll(all,msg->file);
-                            if(subtree.size()>0){
-                                for(auto stack:subtree){
-                                    stack->moveDown();
-                                }
-                                auto bundles=bundle(subtree);
-                                for(auto stacks :bundles){
-                                    auto target=stacks[0]->peak();
-                                    S4U_Mailbox::putMessage(target->mailbox,new ContinueSearchMessage(msg->answer_mailbox,msg->mailbox_to_receive_the_file_content,stacks,msg->payload));
-                                }
-                            }else{
-                                failed=true;
-                                WRENCH_INFO(
-                                        "Received a read request for a file Not in XRootD subtree");
-                            }
-                            auto client_answer_mailbox = msg->answer_mailbox;
-                            auto client_mailbox_to_receive_the_file_content = msg->mailbox_to_receive_the_file_content;
 
-                            //search all
-                            //send message to all and appropriate stacks
-                        }else{
-                            failed=true;
-                            WRENCH_INFO(
-                                    "Received a read request for a file Not in XRootD tree");
-                        }
-                        if(failed){
-
-                            std::shared_ptr<FailureCause> failure_cause;
-
-                            failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(msg->file, nullptr));//I dont know what to give for the location
-
-                            S4U_Mailbox::dputMessage(
-                                    msg->answer_mailbox,
-                                    new FileReadAnswerMessage(
-                                            msg->file,
-                                            nullptr,
-                                            false,
-                                            failure_cause,
-                                            this->getMessagePayloadValue(
-                                                    MessagePayload::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
-
-                        }
                     }
                     return true;
                 }  else if (auto msg = dynamic_cast<UpdateCacheMessage *>(message.get())) {
@@ -146,39 +101,14 @@ namespace wrench {
                     return true;
 
                 }  else if (auto msg = dynamic_cast<ContinueSearchMessage *>(message.get())) {
-                    //add queue checking
-//                    if(msg->path.size()>0){//continue search in "children"
-//                        auto targets=msg->path.top();
-//                        msg->path.pop();
-//                        //filter repeat sends
-//                        for(auto target:targets){
-//                            S4U_Mailbox::putMessage(target->mailbox,msg);
-//                        }
-//                    }
-//                    if(internalStorage){//check own file system
-//                        auto potentialLocaiton=FileLocation::LOCATION(internalStorage);
-//                        if(StorageService::lookupFile(msg->file,potentialLocaiton)){
-//                            if(supervisor&&this!=msg->cache_to){
-//                                S4U_Mailbox::putMessage(supervisor->mailbox,new UpdateCacheMessage(msg->file,msg->cache_to,potentialLocaiton,MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD));
-//                            }
-//                        }
-//                    }
+
                     return true;
                 } else {
                     throw std::runtime_error(
                             "SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
                 }
             }
-            std::vector<std::vector<std::shared_ptr<SearchStack>>> Node::bundle(std::vector<std::shared_ptr<SearchStack>> stacks){
-                std::map<Node*,std::vector<std::shared_ptr<SearchStack>>> bundles;
-                for(auto stack: stacks){
-                    bundles[stack->peak()].push_back(stack);
-                }
-                return std::vector<std::vector<std::shared_ptr<SearchStack>>>(bundles.begin(),bundles.end());
-            }
-            std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
-                return internalStorage;
-            }
+
             Node* Node::getChild(int n){
                 if(n>0&&n<children.size()){
                     return children[n].get();
@@ -189,7 +119,6 @@ namespace wrench {
             Node* Node::getParent(){
                 return supervisor;
             }
-
 
             std::shared_ptr<FileLocation> Node::hasFile(shared_ptr<DataFile> file){
                 if(internalStorage==nullptr or file==nullptr){
@@ -204,117 +133,11 @@ namespace wrench {
             std::vector<std::shared_ptr<FileLocation>> Node::getCached(shared_ptr<DataFile> file) {
                 return cache[file];//once timestamps are implimented also check the file is still in cache it (remove if not) and unwrap, and refresh timestamp
             }
-        std::vector<std::shared_ptr<SearchStack>> Node::searchAll(const std::vector<std::shared_ptr<Node>> &potential,const shared_ptr<DataFile> &file){
-
-                std::vector< std::shared_ptr<SearchStack>> ret(potential.size());
-                for(auto host:potential){
-                    std::shared_ptr<SearchStack> path = make_shared<SearchStack>(host.get(),file);
-                    if(path->inTree(this)){
-                        ret.push_back(path);
-                    }
-                }
-                return ret;
-            }
-//            SearchStack Node::search(Node* other,const shared_ptr<DataFile>& file){
-//                SearchStack ret(other,file);
-//                Node* current=other;
-//                do{
-//                    ret.push(current);
-//                    if(current==this){
-//                        return ret;
-//                    }
-//                    current=current->supervisor;
-//                    if(ret.size()>metavisor->nodes.size()){//crude cycle detection, but should prevent infinite unexplainable loop on file read
-//                        throw std::runtime_error("Cycle detected in XRootD file server.  This version of wrench does not support cycles within XRootD.");
-//                    }
-//                }while( current!=nullptr);
-//
-//                return  std::stack<Node*>();//if we get to here, the node is not in our subtree
-//
-//            }//returns the path of nodes between here and other IF other is in this subtree.
-
-        /***********************************************************************************
-             *                                                                                 *
-             *      Functions under this line may need SERIOUS rework to fit simgird model     *
-             *                                                                                 *
-             ***********************************************************************************/
-
-
-            std::vector<shared_ptr<FileLocation>> Node::XRootDSearch(std::shared_ptr<DataFile> file){
-                std::vector<shared_ptr<FileLocation>> subLocations;
-                if(cached(file)){
-                    subLocations= getCached(file);
-                }else{
-                    auto potential=metavisor->getFileNodes(file);
-                    auto searchPath =searchAll(potential,file);
-                   // subLocations=traverse(searchPath,file);
-                }
-                return subLocations;
-            }
 
 
 
-            bool Node::lookupFile(std::shared_ptr<DataFile>file){
-                //seperate handling if not supervisor
-
-                return XRootDSearch(file).empty();
-
-            }
 
 
-            void Node::deleteFile(std::shared_ptr<DataFile>file){
-                //seperate handling if not supervisor
-                auto allNodes=metavisor->getFileNodes(file);
-                auto allSub=searchAll(allNodes,file);
-                //auto allLocation =traverse(allSub,file,true);
-                //for(auto location:allLocation){
-                //    StorageService::deleteFile(file, location);
-                //}
-            }//meta delete from sub tree
-            void Node::readFile(std::shared_ptr<DataFile>file){
-                //seperate handling if not supervisor
-                auto locations=XRootDSearch(file);
-                //determine best location
-                shared_ptr<FileLocation> best;
-                StorageService::readFile(file,best);
-            }
-            void Node::readFile(std::shared_ptr<DataFile>file, double num_bytes){
-                auto locations=XRootDSearch(file);
-                //determine best location
-                shared_ptr<FileLocation> best;
-                StorageService::readFile(file,best,num_bytes);
-            }
-            //void writeFile(std::shared_ptr<DataFile>file);//unclear how this would work, do we write to 1 existing file then let the background clone it?
-            //utility
-
-            std::shared_ptr<FileLocation> Node::traverse(std::stack<Node*> nodes,std::shared_ptr<DataFile> file,bool meta){
-
-                    Node* node;
-                    std::stack<Node*> reverse;
-                    while(!nodes.empty()){
-                        node=nodes.top();
-                        if(!meta){
-                            //some message thing here I dont know
-                        }
-                        reverse.push(node);
-                        nodes.pop();
-                    }
-                    shared_ptr<FileLocation> location= FileLocation::LOCATION(node->internalStorage);
-                    if(!meta){
-                        while(!nodes.empty()){
-                            node=nodes.top();
-                            //some message thing here I dont know
-                            //add to cache
-                            nodes.pop();
-                        }
-                    }
-            }//fake a search for the file, adding to the cache as we return
-
-            std::vector<std::shared_ptr<FileLocation>> Node::traverse(std::vector<std::stack<Node*>> nodes,std::shared_ptr<DataFile> file,bool meta){
-
-
-            }//"search" multiple paths that go through this supreviser in parallel
-            //meta
 
             bool Node::makeSupervisor() {//this function does nothing anymore?
                 return true;
@@ -333,6 +156,22 @@ namespace wrench {
                 internalStorage=make_shared<SimpleStorageService>(hostname,path,property_list,messagepayload_list);
                 return true;
             }
+            std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
+                return internalStorage;
+            }
 
+            bool Node::lookupFile(std::shared_ptr<DataFile>file){
+
+            }
+            void Node::deleteFile(std::shared_ptr<DataFile>file) { //meta delete from sub tree
+
+            }
+            void Node::readFile(std::shared_ptr<DataFile>file){
+                readFile(file,file->getSize());
+            }
+            void Node::readFile(std::shared_ptr<DataFile>file, double num_bytes){
+
+
+            }
     }
 }
