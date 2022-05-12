@@ -199,21 +199,8 @@ set(SOURCE_FILES
         include/wrench/services/compute/batch/batch_schedulers/homegrown/HomegrownBatchScheduler.h
         include/wrench/services/storage/storage_helpers/FileTransferThread.h
         include/wrench/services/storage/storage_helpers/LogicalFileSystem.h
-        src/wrench/services/helper_services/alarm/Alarm.cpp
-        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
-        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
-        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
-        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
-        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
-        src/wrench/services/helper_services/action_execution_service/ActionExecutionService.cpp
-        src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.cpp
-        src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.cpp
-        src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
-        src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/managers/DataMovementManager.cpp
-        src/wrench/services/metering/EnergyMeterService.cpp
-        src/wrench/services/metering/BandwidthMeterService.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/managers/JobManagerMessage.cpp
         include/wrench/managers/JobManagerMessage.h
@@ -225,6 +212,19 @@ set(SOURCE_FILES
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessagePayload.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
+        src/wrench/services/metering/EnergyMeterService.cpp
+        src/wrench/services/metering/BandwidthMeterService.cpp
+        src/wrench/services/helper_services/alarm/Alarm.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetector.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorMessage.cpp
+        src/wrench/services/helper_services/host_state_change_detector/HostStateChangeDetectorProperty.cpp
+        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetector.cpp
+        src/wrench/services/helper_services/service_termination_detector/ServiceTerminationDetectorMessage.cpp
+        src/wrench/services/helper_services/action_execution_service/ActionExecutionService.cpp
+        src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceProperty.cpp
+        src/wrench/services/helper_services/action_execution_service/ActionExecutionServiceMessage.cpp
+        src/wrench/services/helper_services/action_executor/ActionExecutor.cpp
+        src/wrench/services/helper_services/action_executor/ActionExecutorMessage.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeService.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceOneShot.cpp
         src/wrench/services/compute/bare_metal/BareMetalComputeServiceMessagePayload.cpp
