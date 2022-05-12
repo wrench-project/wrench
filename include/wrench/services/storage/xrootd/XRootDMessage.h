@@ -23,7 +23,7 @@
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 #include "wrench/simulation/Simulation.h"
-#include "wrench/simulation/SimulationOutput.h"]
+#include "wrench/simulation/SimulationOutput.h"
 #include "SearchStack.h"
 
 namespace wrench {
@@ -92,10 +92,11 @@ namespace wrench {
 
             /** @brief The file being searched for */
             std::shared_ptr<DataFile> file;
-            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
-            std::shared_ptr<bool> answered;
+
             /** The node that oriinaly received the FileLookupRequest or FileReadRequest */
             Node* node;
+            /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
+            std::shared_ptr<bool> answered;
             /** How many more hops this message can live for, to prevent messages living forever in impropper configurations with loops.*/
             int timeToLive;
         };

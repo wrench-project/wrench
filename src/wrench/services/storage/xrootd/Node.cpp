@@ -234,9 +234,10 @@ namespace wrench {
                     throw std::runtime_error(
                             "SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
                 }
+                return true;
             }
 
-            Node* Node::getChild(int n){
+            Node* Node::getChild(unsigned int n){
                 if(n>0&&n<children.size()){
                     return children[n].get();
                 }else{
