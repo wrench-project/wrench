@@ -1012,8 +1012,8 @@ namespace wrench {
                         this->hostname,
                         resources,
                         {{BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
-                                 this->getPropertyValueAsString(
-                                         BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}},
+                          this->getPropertyValueAsString(
+                                  BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}},
                         {},
                         DBL_MAX,
                         nullptr,
@@ -1305,7 +1305,7 @@ namespace wrench {
                     this->host_id_to_names[node]);// Use the whole RAM
             this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
             resources.insert(std::make_pair(this->host_id_to_names[node], std::make_tuple(
-                    cores_per_node_asked_for, ram_capacity)));
+                                                                                  cores_per_node_asked_for, ram_capacity)));
         }
 
         startJob(resources, compound_job, batch_job, num_nodes_allocated, time_in_seconds,
