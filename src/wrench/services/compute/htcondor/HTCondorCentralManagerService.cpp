@@ -225,6 +225,10 @@ namespace wrench {
             processCompoundJobCompletion(msg->job);
             return true;
 
+        } else if (auto msg = dynamic_cast<ComputeServiceCompoundJobFailedMessage *>(message.get())) {
+            processCompoundJobFailure(msg->job);
+            return true;
+
         } else if (auto msg = dynamic_cast<NegotiatorCompletionMessage *>(message.get())) {
             processNegotiatorCompletion(msg->scheduled_jobs);
             return true;
@@ -315,7 +319,7 @@ namespace wrench {
     //    }
 
     /**
-     * @brief Process a standard job completion
+     * @brief Process a compound job completion
      *
      * @param job: the job
      *
@@ -329,6 +333,27 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobDoneMessage(
                                           job, this->getSharedPtr<HTCondorCentralManagerService>(), this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_DONE_MESSAGE_PAYLOAD)));
+        this->resources_unavailable = false;
+
+        this->running_jobs.erase(job);
+    }
+
+    /**
+     * @brief Process a compound job failure
+     *
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void HTCondorCentralManagerService::processCompoundJobFailure(std::shared_ptr<CompoundJob> job) {
+        WRENCH_INFO("A compound job has failed: %s", job->getName().c_str());
+        auto callback_mailbox = job->popCallbackMailbox();
+
+        // Send the callback to the originator
+        S4U_Mailbox::dputMessage(
+                callback_mailbox, new ComputeServiceCompoundJobFailedMessage(
+                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                                this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
