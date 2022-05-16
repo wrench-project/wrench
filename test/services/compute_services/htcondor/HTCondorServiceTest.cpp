@@ -35,7 +35,6 @@ public:
     std::shared_ptr<wrench::WorkflowTask> task5;
     std::shared_ptr<wrench::WorkflowTask> task6;
     std::shared_ptr<wrench::WorkflowTask> task7;
-    //std::shared_ptr<wrench::WorkflowTask> task8;
     std::shared_ptr<wrench::HTCondorComputeService> htcondor_service = nullptr;
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_service = nullptr;
     std::shared_ptr<wrench::StorageService> storage_service = nullptr;
@@ -45,6 +44,7 @@ public:
     std::shared_ptr<wrench::Workflow> grid_workflow;
 
     void do_StandardJobTaskTest_test();
+    void do_StandardJobTaskFailureTest_test();
     void do_StandardJobTaskAddComputeServiceTest_test();
     void do_PilotJobTaskTest_test();
     void do_SimpleServiceTest_test();
@@ -359,6 +359,141 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
     free(argv);
 }
 
+
+/**************************************************************************/
+/**  STANDARD JOB SUBMISSION TASK FAILUER SIMULATION TEST ON ONE HOST    **/
+/**************************************************************************/
+
+class HTCondorStandardJobFailureTestWMS : public wrench::ExecutionController {
+
+public:
+    HTCondorStandardJobFailureTestWMS(HTCondorServiceTest *test,
+                               std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    HTCondorServiceTest *test;
+
+    int main() {
+        // Create a data movement manager
+        auto data_movement_manager = this->createDataMovementManager();
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a job
+        std::map<std::shared_ptr<wrench::DataFile>, std::shared_ptr<wrench::FileLocation>> file_locations;
+        file_locations[this->test->input_file] = wrench::FileLocation::LOCATION(this->test->storage_service);
+        file_locations[this->test->output_file1] = wrench::FileLocation::LOCATION(this->test->storage_service);
+        auto two_task_job = job_manager->createStandardJob(
+                {this->test->task1},
+                file_locations,
+                {},
+                {}, {});
+
+        // Submit the job for execution with service-specific args, which is not allowed
+        try {
+            std::map<std::string, std::string> service_specific_args;
+            service_specific_args[this->test->task1->getID()] = "2";
+            job_manager->submitJob(two_task_job, this->test->htcondor_service, service_specific_args);
+            throw std::runtime_error("Should not have been able to submit a job with service-specific args");
+        } catch (std::invalid_argument &e) {
+        }
+
+        // Remove a needed file to force a failure
+        this->test->storage_service->deleteFile(this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service));
+
+        // Submit the job for execution
+        try {
+            job_manager->submitJob(two_task_job, this->test->htcondor_service);
+        } catch (wrench::ExecutionException &e) {
+            throw std::runtime_error(e.what());
+        }
+
+        // Wait for a workflow execution event
+        std::shared_ptr<wrench::ExecutionEvent> event;
+        try {
+            event = this->waitForNextEvent();
+        } catch (wrench::ExecutionException &e) {
+            throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::StandardJobFailedEvent>(event)) {
+            throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(HTCondorServiceTest, HTCondorStandardJobFailureTest) {
+    DO_TEST_WITH_FORK(do_StandardJobTaskFailureTest_test);
+}
+
+void HTCondorServiceTest::do_StandardJobTaskFailureTest_test() {
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = wrench::Simulation::getHostnameList()[0];
+
+    // Create a Storage Service
+    ASSERT_NO_THROW(storage_service = simulation->add(
+            new wrench::SimpleStorageService(hostname, {"/"})));
+
+    // Create a BareMetalComputeService
+    std::string execution_host = wrench::Simulation::getHostnameList()[1];
+    std::shared_ptr<wrench::BareMetalComputeService> baremetal_compute_service;
+    ASSERT_NO_THROW(baremetal_compute_service = simulation->add(
+            new wrench::BareMetalComputeService(
+                    execution_host,
+                    {std::make_pair(
+                            execution_host,
+                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+                    "/scratch")));
+
+    // Create a set of compute services for the HTCondorComputeService to use
+    std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
+    compute_services.insert(baremetal_compute_service);
+
+    // Create a HTCondor Service
+    ASSERT_NO_THROW(htcondor_service = simulation->add(
+            new wrench::HTCondorComputeService(
+                    hostname, std::move(compute_services),
+                    {})));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new HTCondorStandardJobFailureTestWMS(this, hostname)));
+
+    // Create a file registry
+    ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+    // Staging the input_file on the storage service
+    ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+    // Running a "run a single task1" simulation
+    ASSERT_NO_THROW(simulation->launch());
+
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
 
 /**********************************************************************/
 /**  STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
