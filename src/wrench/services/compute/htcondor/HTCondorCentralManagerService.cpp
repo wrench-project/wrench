@@ -352,8 +352,8 @@ namespace wrench {
         // Send the callback to the originator
         S4U_Mailbox::dputMessage(
                 callback_mailbox, new ComputeServiceCompoundJobFailedMessage(
-                        job, this->getSharedPtr<HTCondorCentralManagerService>(),
-                                this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                          job, this->getSharedPtr<HTCondorCentralManagerService>(),
+                                          this->getMessagePayloadValue(HTCondorCentralManagerServiceMessagePayload::COMPOUND_JOB_FAILED_MESSAGE_PAYLOAD)));
         this->resources_unavailable = false;
 
         this->running_jobs.erase(job);
