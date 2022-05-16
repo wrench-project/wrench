@@ -368,7 +368,7 @@ class HTCondorStandardJobFailureTestWMS : public wrench::ExecutionController {
 
 public:
     HTCondorStandardJobFailureTestWMS(HTCondorServiceTest *test,
-                               std::string &hostname) : wrench::ExecutionController(hostname, "test") {
+                                      std::string &hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
@@ -450,19 +450,19 @@ void HTCondorServiceTest::do_StandardJobTaskFailureTest_test() {
 
     // Create a Storage Service
     ASSERT_NO_THROW(storage_service = simulation->add(
-            new wrench::SimpleStorageService(hostname, {"/"})));
+                            new wrench::SimpleStorageService(hostname, {"/"})));
 
     // Create a BareMetalComputeService
     std::string execution_host = wrench::Simulation::getHostnameList()[1];
     std::shared_ptr<wrench::BareMetalComputeService> baremetal_compute_service;
     ASSERT_NO_THROW(baremetal_compute_service = simulation->add(
-            new wrench::BareMetalComputeService(
-                    execution_host,
-                    {std::make_pair(
-                            execution_host,
-                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
-                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
-                    "/scratch")));
+                            new wrench::BareMetalComputeService(
+                                    execution_host,
+                                    {std::make_pair(
+                                            execution_host,
+                                            std::make_tuple(wrench::Simulation::getHostNumCores(execution_host),
+                                                            wrench::Simulation::getHostMemoryCapacity(execution_host)))},
+                                    "/scratch")));
 
     // Create a set of compute services for the HTCondorComputeService to use
     std::set<std::shared_ptr<wrench::ComputeService>> compute_services;
@@ -470,15 +470,15 @@ void HTCondorServiceTest::do_StandardJobTaskFailureTest_test() {
 
     // Create a HTCondor Service
     ASSERT_NO_THROW(htcondor_service = simulation->add(
-            new wrench::HTCondorComputeService(
-                    hostname, std::move(compute_services),
-                    {})));
+                            new wrench::HTCondorComputeService(
+                                    hostname, std::move(compute_services),
+                                    {})));
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(
-            new HTCondorStandardJobFailureTestWMS(this, hostname)));
+                            new HTCondorStandardJobFailureTestWMS(this, hostname)));
 
     // Create a file registry
     ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
