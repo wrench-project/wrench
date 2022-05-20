@@ -286,10 +286,9 @@ namespace wrench {
      */
 
     void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
-        //if ((file == nullptr) or (location == nullptr)) {
-        //    throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        //}
-        //I dont think we need to check this HERE because we hand off to another fundtion that will
+        if ((file == nullptr) or (location == nullptr)) {
+            throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
+        }//This check DOES need to exist, becasue we call file->getSize()
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
         readFile(file, location, answer_mailbox, chunk_receiving_mailbox, file->getSize());
