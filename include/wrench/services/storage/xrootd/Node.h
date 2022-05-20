@@ -17,7 +17,7 @@ namespace wrench {
     namespace XRootD{
         class XRootD;
         class SearchStack;
-        class Node:public Service{//Conceptualy all nodes ARE storage services, HOWEVER, the API is entirly differnt for accessing a file in an XRootD deployment than usuall.
+        class Node:public StorageService{
         private:
             WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
             };

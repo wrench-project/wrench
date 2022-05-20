@@ -111,6 +111,77 @@ namespace wrench {
     }
 
     /***************************************************************/
+    /****** THESE FUNCTIONS PROVIDE AN OBJECT API FOR TALKING ******/
+    /******     TO SPECIFIC STORAGE SERVERS NOT LOCATIONS     ******/
+    /******    CONSTRUCTS LOCATION AND FORWARDS TO DAEMNON    ******/
+    /***************************************************************/
+
+    /**
+     * @brief Synchronously asks the storage service whether it holds a file
+     *
+     * @param file: the file
+     *
+     * @return true or false
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    bool StorageService::lookupFile(const std::shared_ptr<DataFile> &file){
+        return StorageService::lookupFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+    }
+    /**
+     * @brief Synchronously delete a file at a location
+     *
+     * @param file: the file
+     * @param file_registry_service: a file registry service that should be updated once the
+     *         file deletion has (successfully) completed (none if nullptr)
+     *
+     * @throw ExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void StorageService::deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service){
+        StorageService::deleteFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())),file_registry_service);
+    }
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file){
+        StorageService::readFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+    }
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param location: the location to read the file from
+     * @param num_bytes: the numger of bytes to read
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file, double num_bytes){
+        StorageService::readFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())),num_bytes);
+
+    }
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     *
+     * @throw ExecutionException
+     */
+    void StorageService::writeFile(const std::shared_ptr<DataFile> &file){
+        StorageService::writeFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+    }
+
+
+
+    /***************************************************************/
     /****** EVERYTHING BELOW ARE INTERACTIONS WITH THE DAEMON ******/
     /***************************************************************/
 

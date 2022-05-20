@@ -56,8 +56,8 @@ namespace wrench {
              */
             bool Node::processNextMessage() {
                 //TODO: add cpu overhead to... everything
+                //S4U_Simulation::compute(flops);
                 S4U_Simulation::computeZeroFlop();
-
                 // Wait for a message
                 std::shared_ptr<SimulationMessage> message = nullptr;
 
@@ -229,6 +229,13 @@ namespace wrench {
                         for(auto child:children){
                             S4U_Mailbox::putMessage(child->mailbox,new FileDeleteRequestMessage(msg));
                         }
+
+                    }
+                } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
+                    if(internalStorage){//if there is an internal storage server, assume the message is misstargeted and forward
+                        S4U_Mailbox::putMessage(internalStorage->mailbox,msg);
+                    }else{
+                        WRENCH_WARN("XRootD manager %s received an unhandled vanilla StorageService message %s",hostname.c_str(),msg->getName().c_str());
                     }
                 }else {
                     throw std::runtime_error(
@@ -271,7 +278,7 @@ namespace wrench {
                 return true;
 
             }
-            Node::Node(const std::string& hostname):Service(hostname,"XRootD"){
+            Node::Node(const std::string& hostname):StorageService(hostname,{"/"},"XRootD"){
                 //no other construction needed
 
             }
