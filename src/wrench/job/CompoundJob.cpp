@@ -21,7 +21,7 @@
 #include <wrench/action/FileRegistryAddEntryAction.h>
 #include <wrench/action/FileRegistryDeleteEntryAction.h>
 #include <wrench/action/CustomAction.h>
-
+#include "wrench/services/storage/storage_helpers/FileLocation.h"
 WRENCH_LOG_CATEGORY(wrench_core_compound_job, "Log category for CompoundJob");
 
 namespace wrench {
@@ -119,7 +119,38 @@ namespace wrench {
         return new_action;
     }
 
+    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
+                                                      const std::shared_ptr<DataFile> &file,
+                                                      const std::shared_ptr<StorageService>& storageService){
+        return addFileReadAction(name,file,FileLocation::LOCATION(storageService));
+    }
 
+    std::shared_ptr<FileReadAction> CompoundJob::addFileReadAction(const std::string &name,
+                                                      const std::shared_ptr<DataFile> &file,
+                                                      const std::shared_ptr<StorageService>& storageService,
+                                                      const double num_bytes_to_read){
+        return addFileReadAction(name,file,FileLocation::LOCATION(storageService),num_bytes_to_read);
+    }
+
+
+    std::shared_ptr<FileWriteAction> CompoundJob::addFileWriteAction(const std::string &name,
+                                                        const std::shared_ptr<DataFile> &file,
+                                                                     const std::shared_ptr<StorageService>& storageService){
+        return addFileWriteAction(name,file,FileLocation::LOCATION(storageService));
+    }
+
+    std::shared_ptr<FileCopyAction> CompoundJob::addFileCopyAction(const std::string &name,
+                                                      std::shared_ptr<DataFile> file,
+                                                      const std::shared_ptr<StorageService>& src_storageService,
+                                                      const std::shared_ptr<StorageService>& dest_storageService){
+        return addFileCopyAction(name,file,FileLocation::LOCATION(src_storageService),FileLocation::LOCATION(dest_storageService));
+    }
+
+    std::shared_ptr<FileDeleteAction> CompoundJob::addFileDeleteAction(const std::string &name,
+                                                          std::shared_ptr<DataFile> file,
+                                                          const std::shared_ptr<StorageService>& storageService){
+        return addFileDeleteAction(name,file,FileLocation::LOCATION(storageService));
+    }
     /**
      * @brief Add a file read action to the job
      * @param name: the action's name (if empty, a unique name will be picked for you)
