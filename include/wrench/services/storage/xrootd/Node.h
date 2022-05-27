@@ -33,7 +33,7 @@ namespace wrench {
             };
         public:
             //XRootD* getMetavisor();
-            Node(const std::string& hostname);
+
             std::shared_ptr<SimpleStorageService> getStorageServer();
             Node* getChild(unsigned int n);
             Node* getParent();
@@ -46,6 +46,8 @@ namespace wrench {
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
+            int addChild(std::shared_ptr<Node> child);
+            Node(const std::string& hostname);
         private:
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 
