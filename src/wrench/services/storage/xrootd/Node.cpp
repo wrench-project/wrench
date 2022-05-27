@@ -48,12 +48,24 @@ namespace wrench {
 
                 return 0;
             }
-
+        /**
+         * @brief Adds a child node to an XRootD supervisor
+         * @param child: the new child to add
+         * @return the child id of the new node, or -1 if the supervisor already has 64
+         */
+            int Node::addChild(std::shared_ptr<Node> child){
+                if(children.size()<64){
+                    children.push_back(child);
+                    return children.size()-1;
+                }
+                return -1;
+            }
             /**
              * @brief Process a received control message
              *
              * @return false if the daemon should terminate
              */
+
             bool Node::processNextMessage() {
                 //TODO: add cpu overhead to... everything
                 //S4U_Simulation::compute(flops);
