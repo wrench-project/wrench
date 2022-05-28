@@ -754,6 +754,9 @@ namespace wrench {
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
+    void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server) {
+        createFile(file, FileLocation::LOCATION(server));
+    }
 
     /**
      * @brief Wrapper enabling timestamps for disk reads
