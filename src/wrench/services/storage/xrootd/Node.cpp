@@ -290,7 +290,7 @@ namespace wrench {
                 return true;
 
             }
-            Node::Node(const std::string& hostname):StorageService(hostname,{"/"},"XRootD"){
+            Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
                 //no other construction needed
 
             }

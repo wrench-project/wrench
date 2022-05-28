@@ -56,7 +56,21 @@ namespace wrench {
         this->state = StorageService::UP;
         this->is_stratch = false;
     }
+    /**
+     * @brief Constructor
+     *
+     * @param hostname: the name of the host on which the service should run
+     * @param service_name: the name of the storage service
+     * @note if you use this constructor from a derived class, overload mount point functions
+     *
+     * @throw std::invalid_argument
+     */
+    StorageService::StorageService(const std::string &hostname,
+                                   const std::string &service_name) : Service(hostname, service_name) {
 
+        this->state = StorageService::UP;
+        this->is_stratch = false;
+    }
     /**
      * @brief Determines whether the storage service is a scratch service of a ComputeService
      * @return true if it is, false otherwise
