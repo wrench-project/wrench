@@ -46,10 +46,10 @@ namespace wrench {
 
         std::map<std::string, double> getTotalSpace();
 
-        std::string getMountPoint();
-        std::set<std::string> getMountPoints();
-        bool hasMultipleMountPoints();
-        bool hasMountPoint(const std::string &mp);
+        virtual std::string getMountPoint();
+        virtual std::set<std::string> virgetMountPoints();
+        virtual bool hasMultipleMountPoints();
+        virtual bool hasMountPoint(const std::string &mp);
 
         static bool lookupFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
         static void deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
@@ -93,6 +93,8 @@ namespace wrench {
                        const std::string &service_name);
 
     protected:
+        StorageService(const std::string &hostname,
+                       const std::string &service_name);
         friend class Simulation;
         friend class FileRegistryService;
         friend class FileTransferThread;
