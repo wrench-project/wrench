@@ -256,9 +256,9 @@ namespace wrench {
                 return true;
             }
 
-            Node* Node::getChild(unsigned int n){
+        std::shared_ptr<Node> Node::getChild(unsigned int n){
                 if(n>0&&n<children.size()){
-                    return children[n].get();
+                    return children[n];
                 }else{
                     return nullptr;
                 }

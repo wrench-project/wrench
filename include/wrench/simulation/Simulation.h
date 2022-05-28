@@ -102,7 +102,7 @@ namespace wrench {
         void stageFile(const std::shared_ptr<DataFile> &file, std::shared_ptr<StorageService> ss, std::string directory_absolute_path);
 
         static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
-
+        static void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server);
 
         /***********************/
         /** \cond DEVELOPER    */
