@@ -60,6 +60,31 @@ namespace wrench {
                 }
                 return -1;
             }
+            std::string Node::getMountPoint(){
+                if(internalStorage){
+                    return internalStorage->getMountPoint();
+                }
+                return "";
+            }
+            std::set<std::string> Node::getMountPoints() {
+                if(internalStorage){
+                    return internalStorage->getMountPoints();
+                }
+                return std::set<std::string>();
+            }
+            bool Node::hasMultipleMountPoints(){
+                if(internalStorage){
+                    return internalStorage->hasMultipleMountPoints();
+                }
+                return false;
+            }
+            bool Node::hasMountPoint(const std::string &mp){
+                if(internalStorage){
+                    return internalStorage->hasMultipleMountPoints();
+                }
+                return false;
+
+            }
             /**
              * @brief Process a received control message
              *
