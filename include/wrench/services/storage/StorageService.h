@@ -47,7 +47,7 @@ namespace wrench {
         std::map<std::string, double> getTotalSpace();
 
         virtual std::string getMountPoint();
-        virtual std::set<std::string> virgetMountPoints();
+        virtual std::set<std::string> getMountPoints();
         virtual bool hasMultipleMountPoints();
         virtual bool hasMountPoint(const std::string &mp);
 

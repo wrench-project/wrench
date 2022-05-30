@@ -46,7 +46,7 @@ namespace wrench {
             void readFile(std::shared_ptr<DataFile>file, double num_bytes);
 
             std::string getMountPoint() override;
-            std::set<std::string> virgetMountPoints() override;
+            std::set<std::string> getMountPoints() override;
             bool hasMultipleMountPoints() override;
             bool hasMountPoint(const std::string &mp) override;
 
