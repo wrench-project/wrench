@@ -13,11 +13,12 @@
 namespace wrench {
     namespace XRootD{
 
-        std::shared_ptr<Node> XRootD::createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
+        std::shared_ptr<Node> XRootD::createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
             std::shared_ptr<Node> ret=createNode(hostname);
             ret->makeSupervisor();
             supervisors.push_back(ret);
             ret->makeFileServer({"/"},property_list,messagepayload_list);
+            simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
             return ret;
         }
@@ -27,7 +28,7 @@ namespace wrench {
             supervisors.push_back(ret);
             return ret;
         }
-        std::shared_ptr<Node> XRootD::createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
+        std::shared_ptr<Node> XRootD::createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
             auto ret=createNode(hostname);
             ret->makeFileServer({"/"},property_list,messagepayload_list);
             simulation->add(ret->internalStorage);
