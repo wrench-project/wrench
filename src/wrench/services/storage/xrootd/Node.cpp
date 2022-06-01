@@ -300,7 +300,7 @@ namespace wrench {
             }
 
         std::shared_ptr<Node> Node::getChild(unsigned int n){
-                if(n>0&&n<children.size()){
+                if(n>=0&&n<children.size()){
                     return children[n];
                 }else{
                     return nullptr;
