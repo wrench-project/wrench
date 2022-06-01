@@ -23,6 +23,7 @@
 #include <memory>
 #include "wrench/data_file/DataFile.h"
 #include <set>
+#include "wrench/simulation/Simulation.h"
 namespace wrench {
     namespace XRootD{
         //class StorageServer;
@@ -31,6 +32,11 @@ namespace wrench {
 
         class XRootD{
         public:
+            /**
+             * @brief Create an XRootD manager
+             * @param simulation: the simulation that all nodes run in.  Nodes are automaticaly added to this simulation as created.
+             */
+            XRootD(std::shared_ptr<Simulation>  simulation):simulation(simulation){}
             int defaultTimeToLive=1024;//how long trivial search message can wander for;
             std::shared_ptr<Node> createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
@@ -46,6 +52,7 @@ namespace wrench {
             std::vector<std::shared_ptr<Node>> dataservers;
             std::vector<std::shared_ptr<Node>> supervisors;
             std::unordered_map<std::shared_ptr<DataFile> ,std::vector<std::shared_ptr<Node>>> files;
+            std::shared_ptr<Simulation>  simulation;
         };
     }
 }
