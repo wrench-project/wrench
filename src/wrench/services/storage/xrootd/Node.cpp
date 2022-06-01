@@ -28,7 +28,7 @@ namespace wrench {
                 //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
                 // Start file storage server
-                if(internalStorage!= nullptr){
+                if(internalStorage){
                     internalStorage->start(internalStorage,true,true);
 
                 }

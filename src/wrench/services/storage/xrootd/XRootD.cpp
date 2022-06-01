@@ -30,6 +30,7 @@ namespace wrench {
         std::shared_ptr<Node> XRootD::createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
             auto ret=createNode(hostname);
             ret->makeFileServer({"/"},property_list,messagepayload_list);
+            simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
             return ret;
         }
@@ -38,6 +39,7 @@ namespace wrench {
             std::shared_ptr<Node> ret= make_shared<Node>(hostname);
             ret->metavisor=this;
             nodes.push_back(ret);
+            simulation->add(ret);
             return ret;
         }
         std::vector<std::shared_ptr<Node>> XRootD::getFileNodes(std::shared_ptr<DataFile> file){
