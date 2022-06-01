@@ -84,6 +84,11 @@ namespace wrench {
             this->addService(s);
             return s;
         }
+        template<class T>
+        std::shared_ptr<T> add(std::shared_ptr<T> t) {
+            this->addService(t);
+            return t;
+        }
 
         SimulationOutput &getOutput();
 
