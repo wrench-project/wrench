@@ -59,49 +59,49 @@ namespace wrench {
                 }
                 return -1;
             }
-            /**
-             * @brief Get mount point of underlying storage service
-             * @return the (sole) mount point of the service if there is one, and null otherwise
-             */
-            std::string Node::getMountPoint(){
-                if(internalStorage){
-                    return internalStorage->getMountPoint();
-                }
-                return "";
-            }
-            /**
-             * @brief Get the set of mount points of the underlying storage service
-             * @return the set of mount points of the service if there is one, and empty set otherwise
-             */
-            std::set<std::string> Node::getMountPoints() {
-                if(internalStorage){
-                    return internalStorage->getMountPoints();
-                }
-                return std::set<std::string>();
-            }
-            /**
-             * @brief Check whether the underlying storage service has multiple mount points
-             * @return whether the service has multiple mount points, if there is no storage service, returns false
-             */
-            bool Node::hasMultipleMountPoints(){
-                if(internalStorage){
-                    return internalStorage->hasMultipleMountPoints();
-                }
-                return false;
-            }
-            /**
-            * @brief Check whether the underlying storage service has a particular mount point
-            * @param mp: a mount point
-            *
-            * @return whether the underlying service has that mount point, if there is no storage service, returns false
-            */
-            bool Node::hasMountPoint(const std::string &mp){
-                if(internalStorage){
-                    return internalStorage->hasMultipleMountPoints();
-                }
-                return false;
-
-            }
+//            /**
+//             * @brief Get mount point of underlying storage service
+//             * @return the (sole) mount point of the service if there is one, and null otherwise
+//             */
+//            std::string Node::getMountPoint(){
+//                if(internalStorage){
+//                    return internalStorage->getMountPoint();
+//                }
+//                return "";
+//            }
+//            /**
+//             * @brief Get the set of mount points of the underlying storage service
+//             * @return the set of mount points of the service if there is one, and empty set otherwise
+//             */
+//            std::set<std::string> Node::getMountPoints() {
+//                if(internalStorage){
+//                    return internalStorage->getMountPoints();
+//                }
+//                return std::set<std::string>();
+//            }
+//            /**
+//             * @brief Check whether the underlying storage service has multiple mount points
+//             * @return whether the service has multiple mount points, if there is no storage service, returns false
+//             */
+//            bool Node::hasMultipleMountPoints(){
+//                if(internalStorage){
+//                    return internalStorage->hasMultipleMountPoints();
+//                }
+//                return false;
+//            }
+//            /**
+//            * @brief Check whether the underlying storage service has a particular mount point
+//            * @param mp: a mount point
+//            *
+//            * @return whether the underlying service has that mount point, if there is no storage service, returns false
+//            */
+//            bool Node::hasMountPoint(const std::string &mp){
+//                if(internalStorage){
+//                    return internalStorage->hasMultipleMountPoints();
+//                }
+//                return false;
+//
+//            }
             /**
              * @brief Process a received control message
              *

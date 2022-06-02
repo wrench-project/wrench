@@ -61,7 +61,6 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which the service should run
      * @param service_name: the name of the storage service
-     * @note if you use this constructor from a derived class, overload mount point functions
      *
      * @throw std::invalid_argument
      */
