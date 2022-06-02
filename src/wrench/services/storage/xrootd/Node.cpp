@@ -28,10 +28,9 @@ namespace wrench {
                 //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
                 // Start file storage server
-                if(internalStorage){
-                    internalStorage->start(internalStorage,true,true);
-
-                }
+                //if(internalStorage){
+                //    internalStorage->start(internalStorage,true,true);
+                //}
 
                 std::string message = "XRootD Node " + this->getName() + "  starting on host " + this->getHostname();
                 WRENCH_INFO("%s", message.c_str());
