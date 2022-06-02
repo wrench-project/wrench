@@ -45,10 +45,10 @@ namespace wrench {
             void readFile(std::shared_ptr<DataFile>file);
             void readFile(std::shared_ptr<DataFile>file, double num_bytes);
 
-            std::string getMountPoint() override;
-            std::set<std::string> getMountPoints() override;
-            bool hasMultipleMountPoints() override;
-            bool hasMountPoint(const std::string &mp) override;
+           // std::string getMountPoint() override;
+            //std::set<std::string> getMountPoints() override;
+            //bool hasMultipleMountPoints() override;
+            //bool hasMountPoint(const std::string &mp) override;
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
