@@ -66,10 +66,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageService::StorageService(const std::string &hostname,
-                                   const std::string &service_name) : Service(hostname, service_name) {
-
-        this->state = StorageService::UP;
-        this->is_stratch = false;
+                                   const std::string &service_name) : StorageService(hostname,{LogicalFileSystem::DEV_NULL}, service_name) {
     }
     /**
      * @brief Determines whether the storage service is a scratch service of a ComputeService
