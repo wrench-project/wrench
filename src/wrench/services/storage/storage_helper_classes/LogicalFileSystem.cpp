@@ -17,7 +17,7 @@ WRENCH_LOG_CATEGORY(wrench_core_logical_file_system, "Log category for Logical F
 
 
 namespace wrench {
-
+    const std::string LogicalFileSystem::DEV_NULL="/dev/null";
     std::map<std::string, StorageService *> LogicalFileSystem::mount_points;
 
     /**
@@ -36,7 +36,7 @@ namespace wrench {
 
         this->occupied_space = 0;
         this->initialized = false;
-        if mount_point==DEV_NULL)
+        if (mount_point==DEV_NULL){
             devnull=true;
             this->total_capacity = std::numeric_limits<double>::infinity();
         }else{
@@ -266,7 +266,7 @@ namespace wrench {
  */
     void LogicalFileSystem::reserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         if(devnull) {
-            return false;
+            return;
         }
         assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(absolute_path) + file->getID();
@@ -291,7 +291,7 @@ namespace wrench {
  */
     void LogicalFileSystem::unreserveSpace(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         if(devnull) {
-            return false;
+            return;
         }
         assertInitHasBeenCalled();
         std::string key = FileLocation::sanitizePath(std::move(absolute_path)) + file->getID();
@@ -319,7 +319,7 @@ namespace wrench {
      */
     void LogicalFileSystem::stageFile(const std::shared_ptr<DataFile> &file, std::string absolute_path) {
         if(devnull) {
-            return false;
+            return;
         }
         // If Space is not sufficient, forget it
         if (this->occupied_space + file->getSize() > this->total_capacity) {

@@ -39,7 +39,7 @@ namespace wrench {
 
         void init();
 
-        const static string DEV_NULL="/dev/null";
+        const static std::string DEV_NULL;
         double getTotalCapacity();
         bool hasEnoughFreeSpace(double bytes);
         double getFreeSpace();
