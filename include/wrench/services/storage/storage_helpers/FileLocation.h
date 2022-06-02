@@ -68,7 +68,7 @@ namespace wrench {
                     (lhs->getFullAbsolutePath() == rhs->getFullAbsolutePath()));
         }
         /**
-         * @brief Method to compare a file lopcation with another
+         * @brief Method to compare a file location with another
          *
          * @param other: a file location
          *
@@ -76,7 +76,8 @@ namespace wrench {
          *
          */
         bool equal(const std::shared_ptr<FileLocation> &other) {
-            return equal(this,other);
+            return ((this->getStorageService() == other->getStorageService()) and
+                    (this->getFullAbsolutePath() == other->getFullAbsolutePath()));
         }
 
 
