@@ -59,7 +59,7 @@ namespace wrench {
         // Check uniqueness
         auto lfs = LogicalFileSystem::mount_points.find(this->hostname + ":" + this->mount_point);
 
-        if (lfs != LogicalFileSystem::mount_points.end()) {
+        if (lfs != LogicalFileSystem::mount_points.end()&&mount_point!=DEV_NULL) {
             if (lfs->second != this->storage_service) {
                 throw std::invalid_argument("LogicalFileSystem::init(): A FileSystem with mount point " + this->mount_point + " at host " + this->hostname + " already exists");
             } else {
