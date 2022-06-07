@@ -32,7 +32,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should run
-     * @param mount_points: the mount points of each disk usable by the service
+     * @param mount_points: the mount points of each disk usable by the service.  "/dev/null" is a reserved mount point with no physical disk associated.  It acts similar to /dev/null on unix systems.
      * @param service_name: the name of the storage service
      *
      * @throw std::invalid_argument
