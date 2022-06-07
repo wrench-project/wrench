@@ -13,6 +13,8 @@
 #include "wrench/services/storage/xrootd/XRootDMessagePayload.h"
 #include <stack>
 #include "wrench/services/storage/xrootd/Cache.h"
+
+#include <wrench/services/storage/xrootd/XRootDProperty.h>
 //todo overload mountpoint functions
 namespace wrench {
     namespace XRootD{
@@ -21,6 +23,10 @@ namespace wrench {
         class Node:public StorageService{
         private:
             WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+                    {Property::MESSAGE_OVERHEAD,"1"},
+                    {Property::CACHE_LOOKUP_OVERHEAD,"1"},
+                    {Property::SEARCH_BROADCAST_OVERHEAD,"1"},
+                    {Property::UPDATE_CACHE_OVERHEAD,"1"}
             };
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
