@@ -192,6 +192,7 @@ set(HEADER_FILES
         include/wrench/services/storage/xrootd/XRootDMessage.h
         include/wrench/services/storage/xrootd/SearchStack.h
         include/wrench/services/storage/xrootd/Cache.h
+        include/wrench/services/storage/xrootd/XRootDProperty.h
         )
 
 # source files
@@ -359,6 +360,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/xrootd/Cache.cpp
         src/wrench/services/storage/xrootd/XRootDMessagePayload.cpp
         src/wrench/services/storage/xrootd/XRootDMessage.cpp
+        src/wrench/services/storage/xrootd/XRootDProperty.cpp
         )
 
 # test files
@@ -466,7 +468,7 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp)
+        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp include/wrench/services/storage/xrootd/XRootDProperty.h)
 
 
 add_library(wrench STATIC ${SOURCE_FILES})

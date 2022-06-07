@@ -18,7 +18,7 @@
 #include "wrench/services/storage/xrootd/XRootDMessage.h"
 #include "wrench/services/storage/StorageServiceMessage.h"
 #include "wrench/services/storage/xrootd/SearchStack.h"
-
+#include <wrench/services/storage/xrootd/XRootDProperty.h>
 #include <wrench/exceptions/ExecutionException.h>
 WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
@@ -115,6 +115,7 @@ namespace wrench {
                 // Wait for a message
                 std::shared_ptr<SimulationMessage> message = nullptr;
 
+                S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::MESSAGE_OVERHEAD));
                 try {
                     message = S4U_Mailbox::getMessage(this->mailbox);
                 } catch (std::shared_ptr<NetworkError> &cause) {
@@ -123,7 +124,6 @@ namespace wrench {
                 }
 
                 WRENCH_DEBUG("Got a [%s] message", message->getName().c_str());
-
                 if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
                     try {
                         S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -135,6 +135,8 @@ namespace wrench {
                     return false;
 
                 }  else if (auto msg = dynamic_cast<FileSearchRequestMessage *>(message.get())) {
+
+                    S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
                     if(cached(msg->file)){//File Cached
                         auto cached=getCached(msg->file);
                         shared_ptr<FileLocation> best=*cached.begin();//use load based search, not just start
@@ -167,7 +169,9 @@ namespace wrench {
                                 throw ExecutionException(cause);
                             }
                         }else{//File not in internal storage or cache
-                            if(children.size()>0){//shotgun continued search message to all chldren
+
+                            S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
+                            if(children.size()>0){//shotgun continued search message to all children
                                 shared_ptr<bool> answered=make_shared<bool>(false);
 
                                 for(auto child:children){
@@ -200,6 +204,7 @@ namespace wrench {
                     }
                     return true;
                 } else if (auto msg = dynamic_cast<ContinueSearchMessage *>(message.get())) {
+                    S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
                     if(cached(msg->file)){//File Cached
                         auto cached=getCached(msg->file);
                         try {
@@ -235,6 +240,8 @@ namespace wrench {
                                 throw ExecutionException(cause);
                             }
                         }else{//File not in internal storage or cache
+
+                            S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                             if(children.size()>0&&msg->timeToLive>0){//shotgun continued search message to all chldren
 
                                 for(auto child:children){
@@ -250,6 +257,7 @@ namespace wrench {
                     return true;
                 } else if (auto msg = dynamic_cast<UpdateCacheMessage *>(message.get())) {
 
+                    S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::UPDATE_CACHE_OVERHEAD));
                     cache.add(msg->file,msg->locations);
                     if(this!=msg->node){
                         S4U_Mailbox::putMessage(supervisor->mailbox,msg);
@@ -270,6 +278,7 @@ namespace wrench {
                     return true;
 
                 } else if (auto msg = dynamic_cast<FileDeleteRequestMessage *>(message.get())) {
+                    S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::UPDATE_CACHE_OVERHEAD));
                     if(cached(msg->file)){//Clean Cache
                         cache.remove(msg->file);
                     }
@@ -277,6 +286,7 @@ namespace wrench {
                         //File in internal storage
                         StorageService::deleteFile(msg->file,FileLocation::LOCATION(internalStorage));
                     }
+                    S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                     if(children.size()>0&&msg->timeToLive>0){//shotgun remove search message to all chldren
                         shared_ptr<bool> answered=make_shared<bool>(false);
 
