@@ -343,8 +343,8 @@ namespace wrench {
 
             }
             Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
-                this->setProperties(this->default_property_values, std::move(property_list));
-
+                this->setProperties(this->default_property_values, {});
+                setMessagePayloads(default_messagepayload_values.{});
             }
 
             bool Node::makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
