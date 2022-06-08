@@ -343,7 +343,7 @@ namespace wrench {
 
             }
             Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
-                //no other construction needed
+                this->setProperties(this->default_property_values, std::move(property_list));
 
             }
 
