@@ -139,7 +139,7 @@ namespace wrench {
         }
         if (sscanf(string_value.c_str(), "%lu", &value) != 1) {
             throw std::invalid_argument(
-                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + std::to_string(property) +
+                    "Service::getPropertyValueAsUnsignedLong(): Invalid unsigned long property value " + ServiceProperty::translatePropertyType(property) +
                     " " +
                     this->getPropertyValueAsString(property));
         }
@@ -156,7 +156,7 @@ namespace wrench {
     double Service::getMessagePayloadValue(WRENCH_MESSAGEPAYLOAD_TYPE message_payload) {
         if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
             throw std::invalid_argument(
-                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + std::to_string(message_payload) +
+                    "Service::getMessagePayloadValue(): Cannot find value for message_payload " + ServiceMessagePayload::translatePayloadType(message_payload) +
                     " (perhaps a derived service class does not provide a default value?)");
         }
         return this->messagepayload_list[message_payload];
