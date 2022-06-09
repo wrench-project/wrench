@@ -70,7 +70,7 @@ namespace wrench {
         std::string mount_point;
         double total_capacity;
         double occupied_space;
-        bool devnull;
+        bool devnull=false;
         std::map<std::string, double> reserved_space;
 
         bool initialized;
