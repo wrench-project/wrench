@@ -27,6 +27,7 @@ namespace wrench {
         public:
 
 
+            /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
             DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
 
             /** @brief The number of bytes in the control message sent by the daemon to continue a search request **/
