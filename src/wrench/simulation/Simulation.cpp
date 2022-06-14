@@ -1445,19 +1445,19 @@ namespace wrench {
             }
         }
 
-//        // Check Disk Bandwidth
-//        for (auto const &h: hostnames) {
-//            //            WRENCH_INFO("---> %s", h.c_str());
-//            for (auto const &d: simgrid::s4u::Host::by_name(h)->get_disks()) {
-//                double read_bw = d->get_read_bandwidth();
-//                double write_bw = d->get_write_bandwidth();
-//                if (std::abs<double>(read_bw - write_bw) > DBL_EPSILON) {
-//                    throw std::invalid_argument("Simulation::platformSanityCheck(): For now, disks must have equal "
-//                                                "read and write bandwidth (offending disk: " +
-//                                                h + ":" + d->get_property("mount"));
-//                }
-//            }
-//        }
+        //        // Check Disk Bandwidth
+        //        for (auto const &h: hostnames) {
+        //            //            WRENCH_INFO("---> %s", h.c_str());
+        //            for (auto const &d: simgrid::s4u::Host::by_name(h)->get_disks()) {
+        //                double read_bw = d->get_read_bandwidth();
+        //                double write_bw = d->get_write_bandwidth();
+        //                if (std::abs<double>(read_bw - write_bw) > DBL_EPSILON) {
+        //                    throw std::invalid_argument("Simulation::platformSanityCheck(): For now, disks must have equal "
+        //                                                "read and write bandwidth (offending disk: " +
+        //                                                h + ":" + d->get_property("mount"));
+        //                }
+        //            }
+        //        }
 
         // Check that if --pagecache is passed, each host has a "/memory" disk
         if (this->isPageCachingEnabled()) {
