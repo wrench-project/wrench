@@ -38,7 +38,8 @@ namespace wrench {
                     {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::CACHE_ENTRY,1024},
-                    {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD,1024}
+                    {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD,1024},
+                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,1024}
             };
         public:
             //XRootD* getMetavisor();
@@ -48,10 +49,10 @@ namespace wrench {
             Node* getParent();
             int main();
             bool processNextMessage();
-            bool lookupFile(std::shared_ptr<DataFile>file);
-            void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
-            void readFile(std::shared_ptr<DataFile>file);
-            void readFile(std::shared_ptr<DataFile>file, double num_bytes);
+            //bool lookupFile(std::shared_ptr<DataFile>file);
+            //void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
+            //void readFile(std::shared_ptr<DataFile>file);
+            //void readFile(std::shared_ptr<DataFile>file, double num_bytes);
 
            // std::string getMountPoint() override;
             //std::set<std::string> getMountPoints() override;

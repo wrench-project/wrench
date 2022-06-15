@@ -83,6 +83,7 @@ namespace wrench {
 
         /** @brief The file that was looked up */
         std::shared_ptr<DataFile> file;
+
         /** @brief Whether the file was found */
         bool file_is_available;
     };
@@ -235,7 +236,6 @@ namespace wrench {
                                              std::shared_ptr<DataFile> file,
                                              std::shared_ptr<FileLocation> location,
                                              double num_bytes_to_read,
-                                             unsigned long buffer_size,
                                              double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
@@ -248,8 +248,6 @@ namespace wrench {
         std::shared_ptr<FileLocation> location;
         /** @brief The number of bytes to read */
         double num_bytes_to_read;
-        /** @brief The requested buffer size */
-        unsigned long buffer_size;
     };
 
     /**
@@ -261,6 +259,7 @@ namespace wrench {
                                             std::shared_ptr<FileLocation> location,
                                             bool success,
                                             std::shared_ptr<FailureCause> failure_cause,
+                                            unsigned long buffer_size,
                                             double payload);
 
         /** @brief The file that was read */
@@ -271,6 +270,8 @@ namespace wrench {
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
+        /** @brief The requested buffer size */
+        unsigned long buffer_size;
     };
 
     /**
