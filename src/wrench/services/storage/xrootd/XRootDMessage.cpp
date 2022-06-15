@@ -25,7 +25,7 @@
 
 namespace wrench {
     namespace XRootD{
-            Message::Message(double payload):ServiceMessage(payload){}
+            Message::Message(double payload):StorageServiceMessage(payload){}
             FileSearchRequestMessage::FileSearchRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                      std::shared_ptr<DataFile> file,
                                      double payload):Message(payload),answer_mailbox(answer_mailbox),file(file){}
@@ -38,20 +38,22 @@ namespace wrench {
                                     double payload):Message(payload),file(file),location(location),success(success),failure_cause(failure_cause){}
 
             ContinueSearchMessage::ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                         std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                   std::shared_ptr<DataFile> file,
                                   Node* node,
                                   double payload,
                                   std::shared_ptr<bool> answered,
-                                  int timeToLive):Message(payload),file(file),node(node),answered(answered),timeToLive(timeToLive){}
-            ContinueSearchMessage::ContinueSearchMessage(ContinueSearchMessage* other):Message(other->payload),file(other->file),node(other->node),answered(other->answered),timeToLive(other->timeToLive-1){}
+                                  int timeToLive):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),node(node),answered(answered),timeToLive(timeToLive){}
+            ContinueSearchMessage::ContinueSearchMessage(ContinueSearchMessage* other):Message(other->payload),answer_mailbox(other->answer_mailbox),original(other->original),file(other->file),node(other->node),answered(other->answered),timeToLive(other->timeToLive-1){}
 
 
-            UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
-                               double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),file(file),locations(locations),node(node),answered(answered){}
+            UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
+                               double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),locations(locations),node(node),answered(answered){}
 
-            FileDeleteRequestMessage::FileDeleteRequestMessage(              std::shared_ptr<DataFile> file,
+        RippleDelete::RippleDelete(              std::shared_ptr<DataFile> file,
                                      double payload,int timeToLive):Message(payload),file(file),timeToLive(timeToLive){}
-            FileDeleteRequestMessage::FileDeleteRequestMessage(FileDeleteRequestMessage* other):Message(other->payload),file(other->file),timeToLive(other->timeToLive-1){}
+        RippleDelete::RippleDelete(RippleDelete* other):Message(other->payload),file(other->file),timeToLive(other->timeToLive-1){}
+        RippleDelete::RippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive):Message(other->payload),file(other->file),timeToLive(timeToLive){}
 
 
     }

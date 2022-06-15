@@ -271,7 +271,6 @@ namespace wrench {
    * @param file: the file
    * @param location: the location where the file is stored
    * @param num_bytes_to_read: the number of bytes to read
-   * @param buffer_size: the requested buffer size
    * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
@@ -281,8 +280,7 @@ namespace wrench {
                                                                                std::shared_ptr<DataFile> file,
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
-                                                                               unsigned long buffer_size,
-                                                                               double payload) : StorageServiceMessage(payload), answer_mailbox(answer_mailbox), mailbox_to_receive_the_file_content(mailbox_to_receive_the_file_content), file(file), location(location), num_bytes_to_read(num_bytes_to_read), buffer_size(buffer_size) {
+                                                                               double payload) : StorageServiceMessage(payload),answer_mailbox(answer_mailbox), mailbox_to_receive_the_file_content(mailbox_to_receive_the_file_content), file(file), location(location), num_bytes_to_read(num_bytes_to_read){
         if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
             (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
             throw std::invalid_argument(
@@ -296,6 +294,7 @@ namespace wrench {
      * @param location: the location of the file trrex
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
+   * @param buffer_size: the buffer size that will be used
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -304,6 +303,7 @@ namespace wrench {
                                                                              std::shared_ptr<FileLocation> location,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
+                                                                             unsigned long buffer_size,
                                                                              double payload) : StorageServiceMessage(payload) {
         if ((file == nullptr) || (location == nullptr) ||
             (success && (failure_cause != nullptr)) || (!success && (failure_cause == nullptr))) {
@@ -314,6 +314,7 @@ namespace wrench {
         this->location = location;
         this->success = success;
         this->failure_cause = failure_cause;
+        this->buffer_size = buffer_size;
     }
 
     /**

@@ -497,8 +497,6 @@ namespace wrench {
                             f,
                             src_loc,
                             f->getSize(),
-                            std::min<unsigned long>(this->buffer_size,
-                                                    this->buffer_size),
                             src_loc->getStorageService()->getMessagePayloadValue(
                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
