@@ -11,7 +11,7 @@
 namespace wrench{
     namespace XRootD{
         bool Cache::isCached(std::shared_ptr<DataFile> file) {
-            return cache.find(file)==cache.end();//once timestamps are implimented also check the file is still in cache  it (remove if not)
+            return cache.find(file)!=cache.end();//once timestamps are implimented also check the file is still in cache  it (remove if not)
         }
         void Cache::add(std::shared_ptr<DataFile> file,std::shared_ptr<FileLocation> location){
             wrench::S4U_Simulation::getClock();

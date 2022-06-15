@@ -53,6 +53,7 @@ namespace wrench {
          * @return the child id of the new node, or -1 if the supervisor already has 64
          */
             int Node::addChild(std::shared_ptr<Node> child){
+                child->supervisor=this;
                 if(children.size()<64){
                     children.push_back(child);
                     return children.size()-1;
@@ -113,12 +114,12 @@ namespace wrench {
                 //S4U_Simulation::compute(flops);
                 S4U_Simulation::computeZeroFlop();
                 // Wait for a message
-                std::shared_ptr<SimulationMessage> message = nullptr;
+                std::shared_ptr <SimulationMessage> message = nullptr;
 
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::MESSAGE_OVERHEAD));
                 try {
                     message = S4U_Mailbox::getMessage(this->mailbox);
-                } catch (std::shared_ptr<NetworkError> &cause) {
+                } catch (std::shared_ptr <NetworkError> &cause) {
                     WRENCH_INFO("Got a network error while getting some message... ignoring");
                     return true;// oh well
                 }
@@ -128,75 +129,92 @@ namespace wrench {
                     try {
                         S4U_Mailbox::putMessage(msg->ack_mailbox,
                                                 new ServiceDaemonStoppedMessage(this->getMessagePayloadValue(
-                                                    SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-                    } catch (std::shared_ptr<NetworkError> &cause) {
+                                                        SimpleStorageServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                    } catch (std::shared_ptr <NetworkError> &cause) {
                         return false;
                     }
                     return false;
 
-                }  else if (auto msg = dynamic_cast<FileSearchRequestMessage *>(message.get())) {
+                } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
 
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
-                    if(cached(msg->file)){//File Cached
-                        auto cached=getCached(msg->file);
-                        shared_ptr<FileLocation> best=*cached.begin();//use load based search, not just start
+                    if (cached(msg->file)) {//File Cached
+                        auto cacheCopies = getCached(msg->file);
+                        shared_ptr <FileLocation> best = *cacheCopies.begin();//TODO use load based search, not just start
+
                         try {
-                            S4U_Mailbox::putMessage(msg->answer_mailbox,
-                                                    new FileSearchAnswerMessage(
+                            S4U_Mailbox::putMessage(best->getStorageService()->mailbox,
+                                                    new StorageServiceFileReadRequestMessage(
+                                                            msg->answer_mailbox,
+                                                            msg->mailbox_to_receive_the_file_content,
                                                             msg->file,
                                                             best,
-                                                            true,
-                                                            nullptr,
-                                                            getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
+                                                            msg->num_bytes_to_read,
+                                                            getMessagePayloadValue(
+                                                                    MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
                             );
-                        } catch (std::shared_ptr<NetworkError> &cause) {
+                        } catch (std::shared_ptr <NetworkError> &cause) {
                             throw ExecutionException(cause);
                         }
-                    }else{//File Not Cached
-                        if(internalStorage&&StorageService::lookupFile(msg->file,FileLocation::LOCATION(internalStorage))){
+                    } else {//File Not Cached
+                        if (internalStorage &&
+                            StorageService::lookupFile(msg->file, FileLocation::LOCATION(internalStorage))) {
                             //File in internal storage
-                            cache.add(msg->file,FileLocation::LOCATION(internalStorage));
+                            cache.add(msg->file, FileLocation::LOCATION(internalStorage));
                             try {
-                                S4U_Mailbox::putMessage(msg->answer_mailbox,
-                                                        new FileSearchAnswerMessage(
+                                S4U_Mailbox::putMessage(internalStorage->mailbox,
+                                                        new StorageServiceFileReadRequestMessage(
+                                                                msg->answer_mailbox,
+                                                                msg->mailbox_to_receive_the_file_content,
                                                                 msg->file,
                                                                 FileLocation::LOCATION(internalStorage),
-                                                                true,
-                                                                nullptr,
-                                                                getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
+                                                                msg->num_bytes_to_read,
+                                                                getMessagePayloadValue(
+                                                                        MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
+
                                 );
-                            } catch (std::shared_ptr<NetworkError> &cause) {
+                            } catch (std::shared_ptr <NetworkError> &cause) {
                                 throw ExecutionException(cause);
                             }
-                        }else{//File not in internal storage or cache
+                        } else {//File not in internal storage or cache
 
-                            S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                            if(children.size()>0){//shotgun continued search message to all children
-                                shared_ptr<bool> answered=make_shared<bool>(false);
+                            S4U_Simulation::compute(
+                                    this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
+                            if (children.size() > 0) {//shotgun continued search message to all children
+                                shared_ptr<bool> answered = make_shared<bool>(false);
 
-                                for(auto child:children){
+                                for (auto child: children) {
                                     S4U_Mailbox::putMessage(child->mailbox,
                                                             new ContinueSearchMessage(
-                                                                                    msg->answer_mailbox,
-                                                                                    msg->file,
-                                                                                    this,
-                                                                                    getMessagePayloadValue(MessagePayload::CONTINUE_SEARCH),
-                                                                                    answered,
-                                                                                    metavisor->defaultTimeToLive
-                                                                            )
+                                                                    msg->answer_mailbox,
+                                                                    static_pointer_cast<StorageServiceFileReadRequestMessage>(message),//this should be safe, message was JUST dynamically cast to the same type
+                                                                    msg->file,
+                                                                    this,
+                                                                    getMessagePayloadValue(
+                                                                            MessagePayload::CONTINUE_SEARCH),
+                                                                    answered,
+                                                                    metavisor->defaultTimeToLive
+                                                            )
                                     );
                                 }
-                            }else{//you asked a leaf directly and it didnt have the file
+                            } else {//you asked a leaf directly and it didnt have the file
                                 try {
                                     S4U_Mailbox::putMessage(msg->answer_mailbox,
-                                                            new FileSearchAnswerMessage(
+                                                            new StorageServiceFileReadAnswerMessage(
                                                                     msg->file,
                                                                     FileLocation::LOCATION(internalStorage),
                                                                     false,
-                                                                    std::shared_ptr<FailureCause>(new FileNotFound(msg->file, FileLocation::LOCATION(internalStorage))),
-                                                                    getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
+                                                                    std::shared_ptr<FailureCause>(
+                                                                        new FileNotFound(
+                                                                                msg->file,
+                                                                                FileLocation::LOCATION(internalStorage)
+                                                                        )
+                                                                    ),
+                                                                    0,
+                                                                    getMessagePayloadValue(
+                                                                            MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
                                     );
-                                } catch (std::shared_ptr<NetworkError> &cause) {
+                                } catch (std::shared_ptr <NetworkError> &cause) {
                                     throw ExecutionException(cause);
                                 }
                             }
@@ -205,79 +223,123 @@ namespace wrench {
                     return true;
                 } else if (auto msg = dynamic_cast<ContinueSearchMessage *>(message.get())) {
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::CACHE_LOOKUP_OVERHEAD));
-                    if(cached(msg->file)){//File Cached
-                        auto cached=getCached(msg->file);
+                    if (cached(msg->file)) {//File Cached
+                        auto cached = getCached(msg->file);
                         try {
                             S4U_Mailbox::putMessage(supervisor->mailbox,
                                                     new UpdateCacheMessage(
                                                             msg->answer_mailbox,
+                                                            msg->original,
                                                             msg->node,
                                                             msg->file,
                                                             cached,
-                                                            getMessagePayloadValue(MessagePayload::UPDATE_CACHE)+getMessagePayloadValue(MessagePayload::CACHE_ENTRY)*cached.size(),
+                                                            getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                                            getMessagePayloadValue(MessagePayload::CACHE_ENTRY) *
+                                                            cached.size(),
                                                             msg->answered
                                                     )
                             );
-                        } catch (std::shared_ptr<NetworkError> &cause) {
+                        } catch (std::shared_ptr <NetworkError> &cause) {
                             throw ExecutionException(cause);
                         }
-                    }else{//File Not Cached
-                        if(internalStorage&&StorageService::lookupFile(msg->file,FileLocation::LOCATION(internalStorage))){
+                    } else {//File Not Cached
+                        if (internalStorage &&
+                            StorageService::lookupFile(msg->file, FileLocation::LOCATION(internalStorage))) {
                             //File in internal storage
-                            cache.add(msg->file,FileLocation::LOCATION(internalStorage));
+                            cache.add(msg->file, FileLocation::LOCATION(internalStorage));
                             try {
                                 S4U_Mailbox::putMessage(supervisor->mailbox,
                                                         new UpdateCacheMessage(
                                                                 msg->answer_mailbox,
+                                                                msg->original,
                                                                 msg->node,
                                                                 msg->file,
-                                                                set<std::shared_ptr<FileLocation>>{FileLocation::LOCATION(internalStorage)},
-                                                                getMessagePayloadValue(MessagePayload::UPDATE_CACHE)+getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
+                                                                set < std::shared_ptr < FileLocation
+                                                                        >> {FileLocation::LOCATION(internalStorage)},
+                                                                getMessagePayloadValue(MessagePayload::UPDATE_CACHE) +
+                                                                getMessagePayloadValue(MessagePayload::CACHE_ENTRY),
                                                                 msg->answered
-                                                                )
+                                                        )
                                 );
-                            } catch (std::shared_ptr<NetworkError> &cause) {
+                            } catch (std::shared_ptr <NetworkError> &cause) {
                                 throw ExecutionException(cause);
                             }
-                        }else{//File not in internal storage or cache
+                        } else {//File not in internal storage or cache
 
-                            S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
-                            if(children.size()>0&&msg->timeToLive>0){//shotgun continued search message to all chldren
+                            S4U_Simulation::compute(
+                                    this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
+                            if (children.size() > 0 &&
+                                msg->timeToLive > 0) {//shotgun continued search message to all chldren
 
-                                for(auto child:children){
+                                for (auto child: children) {
                                     S4U_Mailbox::putMessage(child->mailbox,
                                                             new ContinueSearchMessage(msg)
                                     );
                                 }
-                            }else{
+                            } else {
                                 //this is a leaf that just didnt have the file.  XRootD protocal is to silently fail in this case.  Do not respond
                             }
                         }
                     }
                     return true;
                 } else if (auto msg = dynamic_cast<UpdateCacheMessage *>(message.get())) {
-
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::UPDATE_CACHE_OVERHEAD));
-                    cache.add(msg->file,msg->locations);
-                    if(this!=msg->node){
-                        S4U_Mailbox::putMessage(supervisor->mailbox,msg);
-                    }else{
-                        if(!*msg->answered){
-                            *msg->answered=true;
-                            S4U_Mailbox::putMessage(msg->answer_mailbox,
-                                                    new FileSearchAnswerMessage(
-                                                            msg->file,
-                                                            *msg->locations.begin(),
-                                                            true,
-                                                            nullptr,
-                                                            getMessagePayloadValue(MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
-                            );
+                    cache.add(msg->file, msg->locations);
+                    if (this != msg->node) {
+                        S4U_Mailbox::putMessage(supervisor->mailbox, msg);
+                    } else {
+                        if (!*msg->answered) {
+                            *msg->answered = true;
+
+                            auto cacheCopies = getCached(msg->file);
+                            if(msg->original) {//this was a file read
+                                shared_ptr<FileLocation> best = *cacheCopies.begin();//TODO use load based search, not just start
+                                msg->original->location=best;
+                                try {
+
+                                    S4U_Mailbox::putMessage(best->getStorageService()->mailbox,
+                                                            new StorageServiceFileReadRequestMessage(
+                                                                    msg->answer_mailbox,
+                                                                    msg->original->mailbox_to_receive_the_file_content,
+                                                                    msg->file,
+                                                                    best,
+                                                                    msg->original->num_bytes_to_read,
+                                                                    getMessagePayloadValue(
+                                                                            MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD))
+                                    );
+                                } catch (std::shared_ptr<NetworkError> &cause) {
+                                    throw ExecutionException(cause);
+                                }
+                            }else{//this was a file lookup
+                                try {
+                                    S4U_Mailbox::putMessage(msg->answer_mailbox,
+                                                            new StorageServiceFileLookupAnswerMessage(
+                                                                   msg->file,
+                                                                    true,//xrootd silently fails if the file doesnt exist, so if we have gotten here, the file does for sure exist
+                                                                    getMessagePayloadValue(
+                                                                            MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD))
+                                    );
+                                } catch (std::shared_ptr<NetworkError> &cause) {
+                                    throw ExecutionException(cause);
+                                }
+                            }
                         }
                     }
 
                     return true;
 
-                } else if (auto msg = dynamic_cast<FileDeleteRequestMessage *>(message.get())) {
+                } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())){
+                    S4U_Mailbox::putMessage(this->mailbox,new RippleDelete(msg,metavisor->defaultTimeToLive));
+
+
+                        S4U_Mailbox::putMessage(msg->answer_mailbox,
+                                                new StorageServiceFileDeleteAnswerMessage(
+                                                        msg->file,
+                                                        this->getSharedPtr<Node>(),
+                                                        true,
+                                                        nullptr,
+                                                        getMessagePayloadValue(MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+                }else if(auto msg = dynamic_cast<RippleDelete *>(message.get())) {
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::UPDATE_CACHE_OVERHEAD));
                     if(cached(msg->file)){//Clean Cache
                         cache.remove(msg->file);
@@ -291,7 +353,7 @@ namespace wrench {
                         shared_ptr<bool> answered=make_shared<bool>(false);
 
                         for(auto child:children){
-                            S4U_Mailbox::putMessage(child->mailbox,new FileDeleteRequestMessage(msg));
+                            S4U_Mailbox::putMessage(child->mailbox,new RippleDelete(msg));
                         }
 
                     }
@@ -358,7 +420,7 @@ namespace wrench {
             std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
                 return internalStorage;
             }
-
+            /*
             bool Node::lookupFile(std::shared_ptr<DataFile>file){
                 if ((file == nullptr) ) {
                     throw std::invalid_argument("XrootD::Node::lookupFile(): Invalid arguments");
@@ -402,6 +464,7 @@ namespace wrench {
                                                 )
                 );
             }
+
             void Node::readFile(std::shared_ptr<DataFile>file){
                 readFile(file,file->getSize());
             }
@@ -444,5 +507,6 @@ namespace wrench {
                                              message->getName() + "] message!");
                 }
             }
+            */
     }
 }

@@ -355,7 +355,6 @@ namespace wrench {
                                             file,
                                             location,
                                             num_bytes_to_read,
-                                            storage_service->buffer_size,
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -381,7 +380,7 @@ namespace wrench {
                 throw ExecutionException(cause);
             }
 
-            if (storage_service->buffer_size == 0) {
+            if (msg->buffer_size == 0) {
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 

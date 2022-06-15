@@ -25,6 +25,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
 #include "SearchStack.h"
+#include "wrench/services/storage/StorageServiceMessage.h"
 
 namespace wrench {
     namespace XRootD{
@@ -39,7 +40,7 @@ namespace wrench {
          * @brief Top-level class for messages received/sent by a XRootD Node
          */
          class Node;
-        class Message : public ServiceMessage {
+        class Message : public StorageServiceMessage {
         protected:
             Message(double payload);
         };
@@ -81,6 +82,7 @@ namespace wrench {
         class ContinueSearchMessage : public Message {
         public:
             ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                  std::shared_ptr<StorageServiceFileReadRequestMessage> original,
                                   std::shared_ptr<DataFile> file,
                                   Node* node,
                                   double payload,
@@ -90,10 +92,13 @@ namespace wrench {
             /** @brief Mailbox to which the FINAL answer message should be sent */
             simgrid::s4u::Mailbox *answer_mailbox;
 
+            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/\
+            std::shared_ptr<StorageServiceFileReadRequestMessage> original;
+
             /** @brief The file being searched for */
             std::shared_ptr<DataFile> file;
 
-            /** The node that oriinaly received the FileLookupRequest or FileReadRequest */
+            /** The node that originally received the FileLookupRequest or FileReadRequest */
             Node* node;
             /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
             std::shared_ptr<bool> answered;
@@ -107,11 +112,13 @@ namespace wrench {
 
         class UpdateCacheMessage : public Message {
         public:
-            UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
+            UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
                                double payload, std::shared_ptr<bool> answered);
 
             /** @brief Mailbox to which the FINAL answer message should be sent */
             simgrid::s4u::Mailbox *answer_mailbox;
+            /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/\
+            std::shared_ptr<StorageServiceFileReadRequestMessage> original;
             /** @brief The file found */
             std::shared_ptr<DataFile> file;
             /** @brief the locations to cache */
@@ -125,11 +132,11 @@ namespace wrench {
         /**
          * @brief A message sent to a XRootD Node to delete a file
          */
-        class FileDeleteRequestMessage : public Message {
+        class RippleDelete : public Message {
         public:
-            FileDeleteRequestMessage(              std::shared_ptr<DataFile> file,
-                                                   double payload,int timeToLive);
-            FileDeleteRequestMessage(FileDeleteRequestMessage* other);
+            RippleDelete(std::shared_ptr<DataFile> file,double payload,int timeToLive);
+            RippleDelete(RippleDelete* other);
+            RippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive);
             /** @brief The file to delete */
             std::shared_ptr<DataFile> file;
             int timeToLive;
