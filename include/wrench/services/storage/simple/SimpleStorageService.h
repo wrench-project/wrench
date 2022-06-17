@@ -80,7 +80,7 @@ namespace wrench {
         ~SimpleStorageService() override;
 
         void cleanup(bool has_returned_from_main, int return_value) override;
-
+        
         /***********************/
         /** \endcond          **/
         /***********************/

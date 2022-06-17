@@ -49,6 +49,8 @@ namespace wrench {
 
             UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
                                double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),locations(locations),node(node),answered(answered){}
+        UpdateCacheMessage::UpdateCacheMessage(UpdateCacheMessage* other):UpdateCacheMessage(*other){}
+        UpdateCacheMessage::UpdateCacheMessage(UpdateCacheMessage& other):Message(other.payload),answer_mailbox(other.answer_mailbox),original(other.original),file(other.file),locations(other.locations),node(other.node),answered(other.answered){}
 
         RippleDelete::RippleDelete(              std::shared_ptr<DataFile> file,
                                      double payload,int timeToLive):Message(payload),file(file),timeToLive(timeToLive){}
