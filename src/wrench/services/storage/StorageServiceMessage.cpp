@@ -287,7 +287,22 @@ namespace wrench {
                     "StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
         }
     }
-
+    /**
+    * @brief Constructor
+    * @param other: packet to copy
+    *
+    * @throw std::invalid_argument
+    */
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage& other):StorageServiceFileReadRequestMessage(&other){
+    }
+    /**
+    * @brief Constructor
+    * @param other: packet to copy
+    *
+    * @throw std::invalid_argument
+    */
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage* other):StorageServiceMessage(other->payload),answer_mailbox(other->answer_mailbox), mailbox_to_receive_the_file_content(other->mailbox_to_receive_the_file_content), file(other->file), location(other->location), num_bytes_to_read(other->num_bytes_to_read){
+    }
     /**
      * @brief Constructor
      * @param file: the file

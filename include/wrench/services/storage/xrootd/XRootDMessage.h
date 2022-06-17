@@ -114,7 +114,8 @@ namespace wrench {
         public:
             UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
                                double payload, std::shared_ptr<bool> answered);
-
+            UpdateCacheMessage(UpdateCacheMessage& other);
+            UpdateCacheMessage(UpdateCacheMessage* other);
             /** @brief Mailbox to which the FINAL answer message should be sent */
             simgrid::s4u::Mailbox *answer_mailbox;
             /** @brief The original file read request that kicked off the search (if null this was a lookup request)*/\
