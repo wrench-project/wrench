@@ -114,7 +114,7 @@ namespace wrench {
                 //S4U_Simulation::compute(flops);
                 S4U_Simulation::computeZeroFlop();
                 // Wait for a message
-                std::shared_ptr <SimulationMessage> message = nullptr;
+                std::unique_ptr <SimulationMessage> message = nullptr;
 
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::MESSAGE_OVERHEAD));
                 try {
@@ -187,7 +187,7 @@ namespace wrench {
                                     S4U_Mailbox::putMessage(child->mailbox,
                                                             new ContinueSearchMessage(
                                                                     msg->answer_mailbox,
-                                                                    static_pointer_cast<StorageServiceFileReadRequestMessage>(message),//this should be safe, message was JUST dynamically cast to the same type
+                                                                    make_shared<StorageServiceFileReadRequestMessage>(msg),
                                                                     msg->file,
                                                                     this,
                                                                     getMessagePayloadValue(
@@ -285,8 +285,8 @@ namespace wrench {
                 } else if (auto msg = dynamic_cast<UpdateCacheMessage *>(message.get())) {
                     S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::UPDATE_CACHE_OVERHEAD));
                     cache.add(msg->file, msg->locations);
-                    if (this != msg->node) {
-                        S4U_Mailbox::putMessage(supervisor->mailbox, msg);
+                    if (this != msg->node&&supervisor) {
+                        S4U_Mailbox::putMessage(supervisor->mailbox, new UpdateCacheMessage(msg));
                     } else {
                         if (!*msg->answered) {
                             *msg->answered = true;
@@ -294,7 +294,7 @@ namespace wrench {
                             auto cacheCopies = getCached(msg->file);
                             if(msg->original) {//this was a file read
                                 shared_ptr<FileLocation> best = *cacheCopies.begin();//TODO use load based search, not just start
-                                msg->original->location=best;
+                                //msg->original->location=best;
                                 try {
 
                                     S4U_Mailbox::putMessage(best->getStorageService()->mailbox,
@@ -359,7 +359,7 @@ namespace wrench {
                     }
                 } else if (auto msg = dynamic_cast<StorageServiceMessage *>(message.get())) {//we got a message targeted at a normal storage server
                     if(internalStorage){//if there is an internal storage server, assume the message is misstargeted and forward
-                        S4U_Mailbox::putMessage(internalStorage->mailbox,msg);
+                        S4U_Mailbox::putMessage(internalStorage->mailbox,message.release());
                     }else{
                         WRENCH_WARN("XRootD manager %s received an unhandled vanilla StorageService message %s",hostname.c_str(),msg->getName().c_str());
                     }

@@ -237,7 +237,8 @@ namespace wrench {
                                              std::shared_ptr<FileLocation> location,
                                              double num_bytes_to_read,
                                              double payload);
-
+        StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage& other);
+        StorageServiceFileReadRequestMessage(StorageServiceFileReadRequestMessage* other);
         /** @brief The mailbox to which the answer message should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The mailbox to which the file content should be sent */
