@@ -63,7 +63,10 @@ namespace wrench {
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
             int addChild(std::shared_ptr<Node> child);
             Node(const std::string& hostname);
+
+            double getLoad() override;
         private:
+            static std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 
             bool makeSupervisor();
