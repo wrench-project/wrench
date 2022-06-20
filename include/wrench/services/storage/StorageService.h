@@ -62,7 +62,11 @@ namespace wrench {
         virtual void readFile(const std::shared_ptr<DataFile> &file);
         virtual void readFile(const std::shared_ptr<DataFile> &file, double num_bytes);
         virtual void writeFile(const std::shared_ptr<DataFile> &file);
-
+        /**
+         * @brief Get the theoretical load of a service
+         * @return the load on the service
+         */
+        virtual double getLoad()=0;
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
