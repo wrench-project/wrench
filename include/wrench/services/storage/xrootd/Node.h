@@ -73,6 +73,7 @@ namespace wrench {
             int addChild(std::shared_ptr<Node> child);
             Node(const std::string& hostname);
             double getLoad() override;
+            void createFile(const std::shared_ptr<DataFile> &file);
             /***********************/
             /** \cond INTERNAL     */
             /***********************/

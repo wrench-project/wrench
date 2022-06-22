@@ -91,11 +91,10 @@ namespace wrench {
 
         }
         /**
-        * @brief create a new file to the federation.  Use instead of wrench::Simulation::addFile when adding files to XRootD
+        * @brief create a new file to the federation.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param file: A shared pointer to the file to add
         * @param location: A shared pointer to the Node to put the file on.  The Node MUST be a storage server
         *
-        * @return vector of Node pointers that are all File Servers with the file
         * @throw std::invalid_argument
         */
         void XRootD::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location){
