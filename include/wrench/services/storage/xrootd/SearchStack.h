@@ -16,7 +16,9 @@
 namespace wrench {
     namespace XRootD{
         class Node;
-
+        /**
+        * @brief A possibly defunct stack to use for a file search.
+        */
         class SearchStack{
         public:
             SearchStack(Node* terminal,std::shared_ptr<DataFile> file);

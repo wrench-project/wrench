@@ -32,53 +32,17 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-
-
-
-
         /**
          * @brief Top-level class for messages received/sent by a XRootD Node
          */
-         class Node;
+        class Node;
         class Message : public StorageServiceMessage {
         protected:
             Message(double payload);
         };
-
         /**
-         * @brief A message sent to a XRootD Node to read a file
+         * @brief A message sent to a XRootD Node to continue an ongoing search for a file
          */
-        class FileSearchRequestMessage : public Message {
-        public:
-            FileSearchRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                   std::shared_ptr<DataFile> file,
-                                   double payload);
-
-            /** @brief The mailbox to which the answer message should be sent */
-            simgrid::s4u::Mailbox *answer_mailbox;
-            /** @brief The file to read */
-            std::shared_ptr<DataFile> file;
-            /** @brief The number of bytes to read */
-            double num_bytes_to_read;
-        };
-
-        class FileSearchAnswerMessage : public Message {
-        public:
-            std::shared_ptr<DataFile> file;
-            std::shared_ptr<FileLocation> location;
-            bool success;
-            std::shared_ptr<FailureCause> failure_cause;
-            double payload;
-            FileSearchAnswerMessage(std::shared_ptr<DataFile> file,
-                                  std::shared_ptr<FileLocation> location,
-                                  bool success,
-                                  std::shared_ptr<FailureCause> failure_cause,
-                                  double payload);
-
-
-
-
-        };
         class ContinueSearchMessage : public Message {
         public:
             ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
@@ -140,6 +104,7 @@ namespace wrench {
             RippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive);
             /** @brief The file to delete */
             std::shared_ptr<DataFile> file;
+            /** @brief The remaining hops before the message should no longer be prepetuated */
             int timeToLive;
         };
 

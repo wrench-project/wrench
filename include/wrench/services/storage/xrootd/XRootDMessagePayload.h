@@ -20,7 +20,7 @@
 namespace wrench {
     namespace XRootD{
         /**
-         * @brief Configurable message payloads for a StorageService
+         * @brief Configurable message payloads for a XRootD node
          */
         class MessagePayload : public StorageServiceMessagePayload {
 
@@ -36,7 +36,7 @@ namespace wrench {
             /** @brief The number of bytes in the control message sent by the daemon to update the cache **/
             DECLARE_MESSAGEPAYLOAD_NAME(UPDATE_CACHE);
 
-            /** @brief The number of bytes in each cache entry **/
+            /** @brief The number of bytes for each cache entry **/
             DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
 
 
