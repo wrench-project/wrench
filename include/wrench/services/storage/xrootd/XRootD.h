@@ -25,6 +25,9 @@
 #include <set>
 #include "wrench/simulation/Simulation.h"
 namespace wrench {
+    /**
+     * @brief A Meta manager for an XRootD data Federation.  This tracks all nodes and files within the system.
+     */
     namespace XRootD{
         //class StorageServer;
         //class Supervisor;
@@ -32,27 +35,41 @@ namespace wrench {
 
         class XRootD{
         public:
+            /***********************/
+            /** \cond DEVELOPER    */
+            /***********************/
             /**
              * @brief Create an XRootD manager
              * @param simulation: the simulation that all nodes run in.  Nodes are automaticaly added to this simulation as created.
              */
             XRootD(std::shared_ptr<Simulation>  simulation):simulation(simulation){}
+            /** @brief The max number of hops a search message can take.  Used to prevent infinite loops in a poorly constructed XRootD tree. */
             int defaultTimeToLive=1024;//how long trivial search message can wander for;
             std::shared_ptr<Node> createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
             std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
-
+            void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             unsigned int size();
         private:
+            /***********************/
+            /** \cond INTERNAL     */
+            /***********************/
             friend Node;
             std::vector<std::shared_ptr<Node>> getFileNodes(std::shared_ptr<DataFile> file);
             std::shared_ptr<Node> createNode(const std::string& hostname);
-
+            /** @brief All nodes that are connected to this XRootD data Federation */
             std::vector<std::shared_ptr<Node>> nodes;
+            /** @brief All nodes in the XRootD Federation that have and internal file server */
             std::vector<std::shared_ptr<Node>> dataservers;
+            /** @brief All nodes in the XRootD Federation that have child nodes */
             std::vector<std::shared_ptr<Node>> supervisors;
+            /** @brief All files withing the data federation regardless of which server */
             std::unordered_map<std::shared_ptr<DataFile> ,std::vector<std::shared_ptr<Node>>> files;
+            /** @brief The simulation that this XRootD federation is connected too */
             std::shared_ptr<Simulation>  simulation;
+            /***********************/
+            /** \endcond           */
+            /***********************/
         };
     }
 }
