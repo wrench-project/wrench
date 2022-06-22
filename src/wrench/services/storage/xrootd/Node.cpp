@@ -587,5 +587,14 @@ namespace wrench {
             return 0;
 
         }
+        /**
+        * @brief create a new file to the file server
+        * @param file: A shared pointer to the file to add
+        *
+        * @throw std::invalid_argument
+        */
+        void Node::createFile(const std::shared_ptr<DataFile> &file) {
+            metavisor->createFile(file,this->getSharedPtr<Node>());
+        }
     }
 }
