@@ -447,16 +447,32 @@ namespace wrench {
 
 
 
-
+        /**
+        * @brief Makes this node a supervisor.  Since there is nothing special about a supervisor, this cant fail and does nothing
+        * @return true
+        */
         bool Node::makeSupervisor() {//this function does nothing anymore?
             return true;
 
         }
+        /**
+        * @brief Constructor
+        * @param hostname: the name of the host on which the service and its storage service should run
+        *
+        * @return a shared pointer to the newly created Node
+        */
         Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
             this->setProperties(this->default_property_values, {});
             setMessagePayloads(default_messagepayload_values,{});
         }
-
+/**
+        * @brief make this node a file server
+        * @param path: the path the filesystem gets.
+        * @param property_list: The property list to use for the underlying storage server
+        * @param messagepayload_list: The message payload list to use for the underlying storage server
+        *
+        * @return true if the Node was made a storage server.  false if it was already a storage server
+        */
         bool Node::makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                   WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
             if(internalStorage!=nullptr){
@@ -465,6 +481,10 @@ namespace wrench {
             internalStorage=make_shared<SimpleStorageService>(hostname,path,property_list,messagepayload_list);
             return true;
         }
+        /**
+        * @brief Gets the underlying storage server
+        * @return A pointer to the simple storage server for this file server
+        */
         std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
             return internalStorage;
         }

@@ -46,8 +46,8 @@ namespace wrench {
         /**
         * @brief Create a new XRootD Node that is a leaf storage server
         * @param hostname: the name of the host on which the service and its storage service should run
-        * @param property_list: The property list to use for the host AND the underlying storage server
-        * @param messagepayload_list: The message payload list to use for the host AND the underlying storage server
+        * @param property_list: The property list to use for the underlying storage server
+        * @param messagepayload_list: The message payload list to use for the underlying storage server
         *
         * @return a shared pointer to the newly created Node
         */
