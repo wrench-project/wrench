@@ -25,36 +25,68 @@
 
 namespace wrench {
     namespace XRootD{
-            Message::Message(double payload):StorageServiceMessage(payload){}
-            FileSearchRequestMessage::FileSearchRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                     std::shared_ptr<DataFile> file,
-                                     double payload):Message(payload),answer_mailbox(answer_mailbox),file(file){}
+        /**
+         * @brief Constructor
+         * @param payload: the message size in bytes
+         */
+        Message::Message(double payload):StorageServiceMessage(payload){}
+        /**
+         * @brief Constructor
+         * @param answer_mailbox: The mailbox the final answer should be sent to
+         * @param original: The original file read request being responded too.  If this is a file locate search, this should be null
+         * @param file: The file to search for
+         * @param node: The node where the search was initiated
+         * @param payload: The message size in bytes
+         * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
+         * @param timeToLive: The max number of hops this message can take
+         */
+        ContinueSearchMessage::ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                                                     std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+                              std::shared_ptr<DataFile> file,
+                              Node* node,
+                              double payload,
+                              std::shared_ptr<bool> answered,
+                              int timeToLive):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),node(node),answered(answered),timeToLive(timeToLive){}
+        /**
+        * @brief Copy Constructor
+        * @param other: The message to copy.  timeToLive is decremented
+        */
+        ContinueSearchMessage::ContinueSearchMessage(ContinueSearchMessage* other):Message(other->payload),answer_mailbox(other->answer_mailbox),original(other->original),file(other->file),node(other->node),answered(other->answered),timeToLive(other->timeToLive-1){}
 
-
-            FileSearchAnswerMessage::FileSearchAnswerMessage(std::shared_ptr<DataFile> file,
-                                    std::shared_ptr<FileLocation> location,
-                                    bool success,
-                                    std::shared_ptr<FailureCause> failure_cause,
-                                    double payload):Message(payload),file(file),location(location),success(success),failure_cause(failure_cause){}
-
-            ContinueSearchMessage::ContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
-                                                         std::shared_ptr<StorageServiceFileReadRequestMessage> original,
-                                  std::shared_ptr<DataFile> file,
-                                  Node* node,
-                                  double payload,
-                                  std::shared_ptr<bool> answered,
-                                  int timeToLive):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),node(node),answered(answered),timeToLive(timeToLive){}
-            ContinueSearchMessage::ContinueSearchMessage(ContinueSearchMessage* other):Message(other->payload),answer_mailbox(other->answer_mailbox),original(other->original),file(other->file),node(other->node),answered(other->answered),timeToLive(other->timeToLive-1){}
-
-
-            UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
-                               double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),locations(locations),node(node),answered(answered){}
+        /**
+         * @brief Constructor
+         * @param answer_mailbox: The mailbox the final answer should be sent to
+         * @param original: The original file read request being responded too.  If this is a file locate search, this should be null
+         * @param node: The node where the search was initiated
+         * @param file: The file that was found
+         * @param locations: All locations that where found in this subtree
+         * @param payload: The message size in bytes
+         * @param answered: A shared boolean for if the answer has been sent to the client.  This should be the same for all messages searching for this request.  Used to prevent the multiple response problem
+         */
+        UpdateCacheMessage::UpdateCacheMessage(simgrid::s4u::Mailbox *answer_mailbox,std::shared_ptr<StorageServiceFileReadRequestMessage> original,Node* node,std::shared_ptr<DataFile> file,  std::set<std::shared_ptr<FileLocation>> locations,
+                           double payload, std::shared_ptr<bool> answered):Message(payload),answer_mailbox(answer_mailbox),original(original),file(file),locations(locations),node(node),answered(answered){}
+        /**
+        * @brief Pointer Copy Constructor
+        * @param other: The message to copy.
+        */
         UpdateCacheMessage::UpdateCacheMessage(UpdateCacheMessage* other):UpdateCacheMessage(*other){}
+        /**
+        * @brief Reference Copy Constructor
+        * @param other: The message to copy.
+        */
         UpdateCacheMessage::UpdateCacheMessage(UpdateCacheMessage& other):Message(other.payload),answer_mailbox(other.answer_mailbox),original(other.original),file(other.file),locations(other.locations),node(other.node),answered(other.answered){}
 
-        RippleDelete::RippleDelete(              std::shared_ptr<DataFile> file,
-                                     double payload,int timeToLive):Message(payload),file(file),timeToLive(timeToLive){}
+        /**
+        * @brief Copy Constructor
+        * @param other: The message to copy.
+        */
         RippleDelete::RippleDelete(RippleDelete* other):Message(other->payload),file(other->file),timeToLive(other->timeToLive-1){}
+
+        /**
+        * @brief External Copy Constructor
+        * @param other: The storage service file delete message to copy.
+        * @param timeToLive:  The max number of hops this message can take
+        */
         RippleDelete::RippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive):Message(other->payload),file(other->file),timeToLive(timeToLive){}
 
 

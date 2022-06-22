@@ -21,6 +21,11 @@ namespace wrench{
     namespace XRootD{
         class Cache{
         private:
+            /***********************/
+            /** \cond INTERNAL     */
+            /***********************/
+
+            /** @brief The internal cache datastructure, currently just a map of data files pointers to a set of file locations.  In future, this will contain timestamps */
             std::unordered_map< std::shared_ptr<DataFile>, std::set<std::shared_ptr<FileLocation>>> cache;//probiably change the payload of this to an object containing the file location AND its queue time stamp
         public:
             bool isCached(std::shared_ptr<DataFile> file);
@@ -31,6 +36,9 @@ namespace wrench{
 
             std::set<std::shared_ptr<FileLocation>> operator[](std::shared_ptr<DataFile> file);
             void remove(std::shared_ptr<DataFile> file);
+            /***********************/
+            /** \endcond           */
+            /***********************/
         };
 
     }

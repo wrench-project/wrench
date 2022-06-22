@@ -20,7 +20,16 @@ namespace wrench {
     namespace XRootD{
         class XRootD;
         class SearchStack;
+        /**
+         * @brief An XRootD node, this can be either a supervisor or a storage server.
+         * All nodes are classified as storage services even though not all have physical storage
+         * Unless a node is also has an internal storage service, some normal storage service messages will error out.
+         * Only File Read, locate, and delete are supported at this time, anything else requires talking directly to a specific file server with physical storage.
+         */
         class Node:public StorageService{
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
         private:
             WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
                     {Property::MESSAGE_OVERHEAD,"1"},
@@ -63,8 +72,11 @@ namespace wrench {
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
             int addChild(std::shared_ptr<Node> child);
             Node(const std::string& hostname);
-
             double getLoad() override;
+            /***********************/
+            /** \cond INTERNAL     */
+            /***********************/
+
         private:
             static std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
@@ -72,13 +84,22 @@ namespace wrench {
             bool makeSupervisor();
             bool makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+
+            /** @brief A pointer to the internal file storage, IF it exists */
             std::shared_ptr<SimpleStorageService> internalStorage=nullptr;
+            /** @brief A vector of all children If the node has any */
             std::vector<std::shared_ptr<Node>> children;
+            /** @brief The internal cache of files within the subtree */
             Cache cache;
+            /** @brief The supervisor of this node.  All continue search and ripple delete messages should come from this, and all update cache messages go to this server */
             Node* supervisor=nullptr;
+            /** @brief The Meta supervisor for this entire XRootD data federation */
             XRootD* metavisor=nullptr;
             friend XRootD;
             friend SearchStack;
+            /***********************/
+            /** \endcond           */
+            /***********************/
         };
     }
 }

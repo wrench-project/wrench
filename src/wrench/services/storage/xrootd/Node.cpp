@@ -24,6 +24,11 @@ WRENCH_LOG_CATEGORY(wrench_core_xrootd_data_server,
                     "Log category for XRootD");
 namespace wrench {
     namespace XRootD {
+        /**
+      * @brief Main method of the daemon
+      *
+      * @return 0 on termination
+      */
         int Node::main() {
             //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
@@ -372,6 +377,12 @@ namespace wrench {
             }
             return true;
         }
+        /**
+        * @brief Select the best file server to read from based on current load
+        * @param locations: All locations to consider for file read
+        *
+        * @return the "best" file server from within locations to use
+        */
         std::shared_ptr<FileLocation> Node::selectBest(std::set<std::shared_ptr<FileLocation>> locations) {
 
             std::shared_ptr<FileLocation> best=*locations.begin();
@@ -384,154 +395,177 @@ namespace wrench {
             }
             return best;
         }
-        std::shared_ptr<Node> Node::getChild(unsigned int n){
-                if(n>=0&&n<children.size()){
-                    return children[n];
-                }else{
-                    return nullptr;
-                }
-            }
-            Node* Node::getParent(){
-                return supervisor;
-            }
-
-            std::shared_ptr<FileLocation> Node::hasFile(shared_ptr<DataFile> file){
-                if(internalStorage==nullptr or file==nullptr){
-                    return nullptr;
-                }
-                return FileLocation::LOCATION(internalStorage);
-
-            }
-            bool Node::cached(shared_ptr<DataFile> file) {
-                return cache.isCached(file);
-            }
-            std::set<std::shared_ptr<FileLocation>> Node::getCached(shared_ptr<DataFile> file) {
-                return cache[file];//once timestamps are implimented also check the file is still in cache it (remove if not) and unwrap, and refresh timestamp
-            }
-
-
-
-
-
-
-            bool Node::makeSupervisor() {//this function does nothing anymore?
-                return true;
-
-            }
-            Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
-                this->setProperties(this->default_property_values, {});
-                setMessagePayloads(default_messagepayload_values,{});
-            }
-
-            bool Node::makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
-                                      WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
-                if(internalStorage!=nullptr){
-                    return false;
-                }
-                internalStorage=make_shared<SimpleStorageService>(hostname,path,property_list,messagepayload_list);
-                return true;
-            }
-            std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
-                return internalStorage;
-            }
-            /*
-            bool Node::lookupFile(std::shared_ptr<DataFile>file){
-                if ((file == nullptr) ) {
-                    throw std::invalid_argument("XrootD::Node::lookupFile(): Invalid arguments");
-                }
-                assertServiceIsUp();
-                auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-                try {
-                    S4U_Mailbox::putMessage(mailbox,
-                                            new FileSearchRequestMessage(
-                                                    answer_mailbox,
-                                                    file,
-                                                    getMessagePayloadValue(MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD))
-                    );
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw ExecutionException(cause);
-                }
-
-                // Wait for a reply
-                std::unique_ptr<SimulationMessage> message = nullptr;
-
-                try {
-                    message = S4U_Mailbox::getMessage(answer_mailbox, network_timeout);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    return false;
-                }
-
-                if (auto msg = dynamic_cast<FileSearchAnswerMessage *>(message.get())) {
-                    // If it's not a success, throw an exception
-                    return msg->success;
-                } else {
-                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
-                }
-            }
-            void Node::deleteFile(std::shared_ptr<DataFile>file) { //nonmeta delete from sub tree
-                S4U_Mailbox::putMessage(mailbox,
-                                        new FileDeleteRequestMessage(
-                                                file,
-                                                getMessagePayloadValue(MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD),
-                                                metavisor->defaultTimeToLive
-                                                )
-                );
-            }
-
-            void Node::readFile(std::shared_ptr<DataFile>file){
-                readFile(file,file->getSize());
-            }
-            void Node::readFile(std::shared_ptr<DataFile>file, double num_bytes){
-                if ((file == nullptr)  or (num_bytes < 0.0)) {
-
-                    throw std::invalid_argument("XrootD::Node::readFile(): Invalid arguments");
-                }
-                assertServiceIsUp();
-                auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
-                try {
-                    S4U_Mailbox::putMessage(mailbox,
-                                            new FileSearchRequestMessage(
-                                                    answer_mailbox,
-                                                    file,
-                                                    getMessagePayloadValue(MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD))
-                                            );
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw ExecutionException(cause);
-                }
-
-                // Wait for a reply
-                std::unique_ptr<SimulationMessage> message = nullptr;
-
-                try {
-                    message = S4U_Mailbox::getMessage(answer_mailbox, network_timeout);
-                } catch (std::shared_ptr<NetworkError> &cause) {
-                    throw ExecutionException(cause);
-                }
-
-                if (auto msg = dynamic_cast<FileSearchAnswerMessage *>(message.get())) {
-                    // If it's not a success, throw an exception
-                    if (not msg->success) {
-                        std::shared_ptr<FailureCause> &cause = msg->failure_cause;
-                        throw ExecutionException(cause);
-                    }
-                    StorageService::readFile(msg->file,msg->location);
-                } else {
-                    throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
-                                             message->getName() + "] message!");
-                }
-            }
-            */
         /**
-         * @brief Get the load of the underlying storage service
-         * @return the load on the service
-         */
-            double Node::getLoad() {
-                if(internalStorage){
-                    return internalStorage->getLoad();
-                }
-                return 0;
-
+        * @brief A meta tree traversal operation to get the nth child of this node
+        * @param n: The index of the child to receive.  Nodes are in order added
+        * @return the Child Nodes shared pointer, or nullptr if this node is a leaf
+        */
+        std::shared_ptr<Node> Node::getChild(unsigned int n){
+            if(n>=0&&n<children.size()){
+                return children[n];
+            }else{
+                return nullptr;
             }
+        }
+        /**
+        * @brief A Meta tree traversal to get the parent of this node
+        * @return pointer supervisor.  Will be nullptr if root
+        */
+        Node* Node::getParent(){
+            return supervisor;
+        }
+/**
+        * @brief A meta operation to determine if a file exists on this node
+        * @param file: the file to check for
+        * @return a shared pointer the file location if the file was found.  Nullptr if the file was not found or if this is not a storage server
+        */
+        std::shared_ptr<FileLocation> Node::hasFile(shared_ptr<DataFile> file){
+            if(internalStorage==nullptr or file==nullptr){
+                return nullptr;
+            }
+            return FileLocation::LOCATION(internalStorage);
+
+        }
+        /**
+        * @brief Check the cache for a file
+        * @param file: The file to check the cache for
+        * @return true if the file is cached, false otherwise
+        */
+        bool Node::cached(shared_ptr<DataFile> file) {
+            return cache.isCached(file);
+        }
+        /**
+        * @brief Get all cached locations of the file.
+        * @param file: The file to check the cache for
+        * @return A set of valid cached files.  Empty set if none are cached
+        */
+        std::set<std::shared_ptr<FileLocation>> Node::getCached(shared_ptr<DataFile> file) {
+            return cache[file];
+        }
+
+
+
+
+
+
+        bool Node::makeSupervisor() {//this function does nothing anymore?
+            return true;
+
+        }
+        Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
+            this->setProperties(this->default_property_values, {});
+            setMessagePayloads(default_messagepayload_values,{});
+        }
+
+        bool Node::makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
+                                  WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
+            if(internalStorage!=nullptr){
+                return false;
+            }
+            internalStorage=make_shared<SimpleStorageService>(hostname,path,property_list,messagepayload_list);
+            return true;
+        }
+        std::shared_ptr<SimpleStorageService> Node::getStorageServer(){
+            return internalStorage;
+        }
+        /*
+        bool Node::lookupFile(std::shared_ptr<DataFile>file){
+            if ((file == nullptr) ) {
+                throw std::invalid_argument("XrootD::Node::lookupFile(): Invalid arguments");
+            }
+            assertServiceIsUp();
+            auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+            try {
+                S4U_Mailbox::putMessage(mailbox,
+                                        new FileSearchRequestMessage(
+                                                answer_mailbox,
+                                                file,
+                                                getMessagePayloadValue(MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD))
+                );
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw ExecutionException(cause);
+            }
+
+            // Wait for a reply
+            std::unique_ptr<SimulationMessage> message = nullptr;
+
+            try {
+                message = S4U_Mailbox::getMessage(answer_mailbox, network_timeout);
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                return false;
+            }
+
+            if (auto msg = dynamic_cast<FileSearchAnswerMessage *>(message.get())) {
+                // If it's not a success, throw an exception
+                return msg->success;
+            } else {
+                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                         message->getName() + "] message!");
+            }
+        }
+        void Node::deleteFile(std::shared_ptr<DataFile>file) { //nonmeta delete from sub tree
+            S4U_Mailbox::putMessage(mailbox,
+                                    new FileDeleteRequestMessage(
+                                            file,
+                                            getMessagePayloadValue(MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD),
+                                            metavisor->defaultTimeToLive
+                                            )
+            );
+        }
+
+        void Node::readFile(std::shared_ptr<DataFile>file){
+            readFile(file,file->getSize());
+        }
+        void Node::readFile(std::shared_ptr<DataFile>file, double num_bytes){
+            if ((file == nullptr)  or (num_bytes < 0.0)) {
+
+                throw std::invalid_argument("XrootD::Node::readFile(): Invalid arguments");
+            }
+            assertServiceIsUp();
+            auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
+            try {
+                S4U_Mailbox::putMessage(mailbox,
+                                        new FileSearchRequestMessage(
+                                                answer_mailbox,
+                                                file,
+                                                getMessagePayloadValue(MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD))
+                                        );
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw ExecutionException(cause);
+            }
+
+            // Wait for a reply
+            std::unique_ptr<SimulationMessage> message = nullptr;
+
+            try {
+                message = S4U_Mailbox::getMessage(answer_mailbox, network_timeout);
+            } catch (std::shared_ptr<NetworkError> &cause) {
+                throw ExecutionException(cause);
+            }
+
+            if (auto msg = dynamic_cast<FileSearchAnswerMessage *>(message.get())) {
+                // If it's not a success, throw an exception
+                if (not msg->success) {
+                    std::shared_ptr<FailureCause> &cause = msg->failure_cause;
+                    throw ExecutionException(cause);
+                }
+                StorageService::readFile(msg->file,msg->location);
+            } else {
+                throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                         message->getName() + "] message!");
+            }
+        }
+        */
+    /**
+     * @brief Get the load of the underlying storage service
+     * @return the load on the service
+     */
+        double Node::getLoad() {
+            if(internalStorage){
+                return internalStorage->getLoad();
+            }
+            return 0;
+
+        }
     }
 }
