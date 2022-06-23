@@ -25,8 +25,12 @@ namespace wrench {
          * All nodes are classified as storage services even though not all have physical storage
          * Unless a node is also has an internal storage service, some normal storage service messages will error out.
          * Only File Read, locate, and delete are supported at this time, anything else requires talking directly to a specific file server with physical storage.
+         * Nodes not directly be created, instead an XRootD Metavisor should create them
          */
         class Node:public StorageService{
+            int addChild(std::shared_ptr<Node> child);
+            std::shared_ptr<Node> getChild(unsigned int n);
+            Node* getParent();
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
@@ -54,10 +58,7 @@ namespace wrench {
             //XRootD* getMetavisor();
 
             std::shared_ptr<SimpleStorageService> getStorageServer();
-            std::shared_ptr<Node> getChild(unsigned int n);
-            Node* getParent();
-            int main();
-            bool processNextMessage();
+
             //bool lookupFile(std::shared_ptr<DataFile>file);
             //void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
             //void readFile(std::shared_ptr<DataFile>file);
@@ -70,14 +71,14 @@ namespace wrench {
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
-            int addChild(std::shared_ptr<Node> child);
             Node(const std::string& hostname);
             double getLoad() override;
             void createFile(const std::shared_ptr<DataFile> &file);
             /***********************/
             /** \cond INTERNAL     */
             /***********************/
-
+            int main();
+            bool processNextMessage();
         private:
             static std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
