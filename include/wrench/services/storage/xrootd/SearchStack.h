@@ -12,7 +12,9 @@
 #include <list>
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
 #include "wrench/data_file/DataFile.h"
-
+/***********************/
+/** \cond INTERNAL    **/
+/***********************/
 namespace wrench {
     namespace XRootD{
         class Node;
@@ -42,4 +44,7 @@ namespace wrench {
 
     }
 }
+/***********************/
+/** \endcond          **/
+/***********************/
 #endif //WRENCH_SEARCHSTACK_H

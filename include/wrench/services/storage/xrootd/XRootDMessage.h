@@ -29,6 +29,7 @@
 
 namespace wrench {
     namespace XRootD{
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -66,7 +67,7 @@ namespace wrench {
             Node* node;
             /** @brief Whether or not the calling client has been answered yet.  Used to prevent answer_mailbox spamming for multiple file hits */
             std::shared_ptr<bool> answered;
-            /** How many more hops this message can live for, to prevent messages living forever in impropper configurations with loops.*/
+            /** How many more hops this message can live for, to prevent messages living forever in improper configurations with loops.*/
             int timeToLive;
         };
 
@@ -104,7 +105,7 @@ namespace wrench {
             RippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive);
             /** @brief The file to delete */
             std::shared_ptr<DataFile> file;
-            /** @brief The remaining hops before the message should no longer be prepetuated */
+            /** @brief The remaining hops before the message should no longer be perpetuated */
             int timeToLive;
         };
 
