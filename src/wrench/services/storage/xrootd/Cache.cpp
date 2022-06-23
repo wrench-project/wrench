@@ -13,10 +13,10 @@ namespace wrench{
         /**
          * @brief Check the cache for a file
          * @param file: The file to check the cache for
-         * @return true if the file is cached and if timestamp (not implimented) is valid, false otherwise
+         * @return true if the file is cached and if timestamp (not implemented) is valid, false otherwise
          */
         bool Cache::isCached(std::shared_ptr<DataFile> file) {
-            return cache.find(file)!=cache.end();//once timestamps are implimented also check the file is still in cache  it (remove if not)
+            return cache.find(file)!=cache.end();//once timestamps are implemented also check the file is still in cache  it (remove if not)
         }
         /**
          * @brief Add a file to the cache
