@@ -456,14 +456,17 @@ namespace wrench {
 
         }
         /**
-        * @brief Constructor
+        * @brief Constructor, should not be used directly except by XRootD createNode
         * @param hostname: the name of the host on which the service and its storage service should run
+        * @param property_list: A property list
+        * @param messagepayload_list: A Message Payload list
         *
         * @return a shared pointer to the newly created Node
         */
-        Node::Node(const std::string& hostname):StorageService(hostname,"XRootD"){
-            this->setProperties(this->default_property_values, {});
-            setMessagePayloads(default_messagepayload_values,{});
+        Node::Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list):StorageService(hostname,"XRootD"){
+            this->setProperties(this->default_property_values, property_list);
+            setMessagePayloads(default_messagepayload_values,messagepayload_list);
+            cache.maxCacheTime= getPropertyValueAsDouble(Property::CACHE_MAX_LIFETIME);
         }
 /**
         * @brief make this node a file server
