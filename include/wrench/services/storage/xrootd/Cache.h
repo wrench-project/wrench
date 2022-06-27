@@ -16,6 +16,8 @@
 #include <set>
 #include "wrench/data_file/DataFile.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+#include <utility>
+#include <limits>
 namespace wrench{
     namespace XRootD{
 
@@ -24,18 +26,19 @@ namespace wrench{
 /***********************/
         class Cache{
         private:
-            /** @brief The internal cache data structure, currently just a map of data files pointers to a set of file locations.  In future, this will contain timestamps */
-            std::unordered_map< std::shared_ptr<DataFile>, std::set<std::shared_ptr<FileLocation>>> cache;//probably change the payload of this to an object containing the file location AND its queue time stamp
+            /** @brief The internal cache data structure, currently just a map of data files pointers to a set of file locations, each with corresponding last update time */
+            std::unordered_map< std::shared_ptr<DataFile>, std::map<std::shared_ptr<FileLocation>,double>> cache;//possibly change time to last access time
         public:
+            /** @brief The maximum time an unupdated entry can remain in the cache.*/
+            double maxCacheTime=std::numeric_limits<double>::infinity();
             bool isCached(std::shared_ptr<DataFile> file);
             void add(std::shared_ptr<DataFile> file,std::shared_ptr<FileLocation> location);
-
             void add(std::shared_ptr<DataFile> file, std::set<std::shared_ptr<FileLocation>> locations);
             std::set<std::shared_ptr<FileLocation>> get(std::shared_ptr<DataFile> file);
 
             std::set<std::shared_ptr<FileLocation>> operator[](std::shared_ptr<DataFile> file);
             void remove(std::shared_ptr<DataFile> file);
-
+            void clean();
         };
 
 /***********************/
