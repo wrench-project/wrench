@@ -15,16 +15,16 @@ namespace wrench {
         /**
         * @brief Create a new XRootD Node that is both a storage server and a supervisor
         * @param hostname: the name of the host on which the service and its storage service should run
-        * @param property_list: The property list to use for the Node AND the underlying storage server
-        * @param messagepayload_list: The message payload list to use for the Node AND the underlying storage server
+        * @param storage_property_list: The property list to use for the Node AND the underlying storage server
+        * @param storage_messagepayload_list: The message payload list to use for the Node AND the underlying storage server
         *
         * @return a shared pointer to the newly created Node
         */
-        std::shared_ptr<Node> XRootD::createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
+        std::shared_ptr<Node> XRootD::createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list){
             std::shared_ptr<Node> ret=createNode(hostname);
             ret->makeSupervisor();
             supervisors.push_back(ret);
-            ret->makeFileServer({"/"},property_list,messagepayload_list);
+            ret->makeFileServer({"/"},storage_property_list,storage_messagepayload_list);
             simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
             return ret;
@@ -46,14 +46,14 @@ namespace wrench {
         /**
         * @brief Create a new XRootD Node that is a leaf storage server
         * @param hostname: the name of the host on which the service and its storage service should run
-        * @param property_list: The property list to use for the underlying storage server
-        * @param messagepayload_list: The message payload list to use for the underlying storage server
+        * @param storage_property_list: The property list to use for the underlying storage server
+        * @param storage_messagepayload_list: The message payload list to use for the underlying storage server
         *
         * @return a shared pointer to the newly created Node
         */
-        std::shared_ptr<Node> XRootD::createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list){
+        std::shared_ptr<Node> XRootD::createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list){
             auto ret=createNode(hostname);
-            ret->makeFileServer({"/"},property_list,messagepayload_list);
+            ret->makeFileServer({"/"},storage_property_list,storage_messagepayload_list);
             simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
             return ret;

@@ -16,15 +16,14 @@
 #include <set>
 #include "wrench/data_file/DataFile.h"
 #include "wrench/services/storage/storage_helpers/FileLocation.h"
+namespace wrench{
+    namespace XRootD{
+
 /***********************/
 /** \cond INTERNAL     */
 /***********************/
-namespace wrench{
-    namespace XRootD{
         class Cache{
         private:
-
-
             /** @brief The internal cache data structure, currently just a map of data files pointers to a set of file locations.  In future, this will contain timestamps */
             std::unordered_map< std::shared_ptr<DataFile>, std::set<std::shared_ptr<FileLocation>>> cache;//probably change the payload of this to an object containing the file location AND its queue time stamp
         public:
@@ -39,9 +38,9 @@ namespace wrench{
 
         };
 
-    }
-}
 /***********************/
 /** \endcond           */
 /***********************/
+    }
+}
 #endif//WRENCH_CACHE_H

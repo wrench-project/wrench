@@ -39,11 +39,13 @@ namespace wrench {
             /**
              * @brief Create an XRootD manager
              * @param simulation: the simulation that all nodes run in.  Nodes are automatically added to this simulation as created.
+             * @param property_values: The property values that should be used to overwrite the defaults of all Nodes (defaults to none) (unless otherwise specified)
+             * @param messagepayload_values: The message paylaod values that should be used to overwrite the defaults of all Nodes (defaults to none) (unless otherwise specified)
              */
-            XRootD(std::shared_ptr<Simulation>  simulation):simulation(simulation){}
-            std::shared_ptr<Node> createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+            XRootD(std::shared_ptr<Simulation>  simulation,WRENCH_PROPERTY_COLLECTION_TYPE property_values={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_values={}):simulation(simulation),property_values(property_values),messagepayload_values(messagepayload_values){}
+            std::shared_ptr<Node> createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
             std::shared_ptr<Node> createSupervisor(const std::string& hostname);
-            std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+            std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
             /***********************/
             /** \cond DEVELOPER    */
             /***********************/
@@ -52,6 +54,12 @@ namespace wrench {
             void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             unsigned int size();
         private:
+
+            /** @brief The property values that should be used to overwrite the defaults of all Nodes (unless otherwise specified) */
+            WRENCH_PROPERTY_COLLECTION_TYPE property_values = {};
+
+            /** @brief The message paylaod values that should be used to overwrite the defaults of all Nodes (unless otherwise specified) */
+            WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_values = {};
             /***********************/
             /** \cond INTERNAL     */
             /***********************/
