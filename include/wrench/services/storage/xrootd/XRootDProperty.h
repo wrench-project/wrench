@@ -21,7 +21,8 @@ namespace wrench {
             DECLARE_PROPERTY_NAME(SEARCH_BROADCAST_OVERHEAD);
             /** @brief The overhead to handle a cache update, in flops **/
             DECLARE_PROPERTY_NAME(UPDATE_CACHE_OVERHEAD);
-
+            /** @brief The time an entry can remain in the cache **/
+            DECLARE_PROPERTY_NAME(CACHE_MAX_LIFETIME);
         };
 
     }

@@ -39,7 +39,8 @@ namespace wrench {
                     {Property::MESSAGE_OVERHEAD,"1"},
                     {Property::CACHE_LOOKUP_OVERHEAD,"1"},
                     {Property::SEARCH_BROADCAST_OVERHEAD,"1"},
-                    {Property::UPDATE_CACHE_OVERHEAD,"1"}
+                    {Property::UPDATE_CACHE_OVERHEAD,"1"},
+                    {Property::CACHE_MAX_LIFETIME,"infinity"}
             };
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
@@ -71,7 +72,7 @@ namespace wrench {
 
             bool cached(shared_ptr<DataFile> file);
             std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
-            Node(const std::string& hostname);
+
             double getLoad() override;
             void createFile(const std::shared_ptr<DataFile> &file);
             /***********************/
@@ -79,6 +80,7 @@ namespace wrench {
             /***********************/
             int main();
             bool processNextMessage();
+            Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
         private:
             static std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
             std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
