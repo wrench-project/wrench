@@ -28,6 +28,7 @@ namespace wrench {
          * Nodes not directly be created, instead an XRootD Metavisor should create them
          */
         class Node:public StorageService{
+        public:
             int addChild(std::shared_ptr<Node> child);
             std::shared_ptr<Node> getChild(unsigned int n);
             Node* getParent();
