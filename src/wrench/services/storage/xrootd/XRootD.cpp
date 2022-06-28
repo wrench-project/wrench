@@ -124,5 +124,28 @@ namespace wrench {
             wrench::Simulation::createFile(file, location->getStorageServer());
 
         }
+        /**
+        * @brief remove a specific file from the registry.  DOES NOT REMOVE FILE FROM SERVERS
+        * @param file: A shared pointer to the file to remove
+        *
+        * @throw std::invalid_argument
+        */
+        void XRootD::deleteFile(const std::shared_ptr<DataFile> &file){
+            files.erase(file);
+
+        }
+        /**
+        * @brief remove a specific file location from the registry.  DOES NOT REMOVE FILE FROM SERVER
+        * @param file: A shared pointer to the file the location is for
+        * @param location: The location to remove
+        *
+        * @throw std::invalid_argument
+        */
+        void XRootD::removeFileLocation(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location) {
+            if(file==nullptr){
+                throw std::invalid_argument("XRootD::createFile(): The file can not be null");
+            }
+            std::remove(files[file].begin(), files[file].end(),location);
+        }
     }
 }
