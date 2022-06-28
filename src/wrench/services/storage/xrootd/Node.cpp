@@ -31,17 +31,13 @@ namespace wrench {
       */
         int Node::main() {
             //TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
-
             // Start file storage server
             //if(internalStorage){
             //    internalStorage->start(internalStorage,true,true);
             //}
-
             std::string message =
                     "XRootD Node " + this->getName() + "  starting on host " + this->getHostname();WRENCH_INFO("%s",
                                                                                                                message.c_str());
-
-
             /** Main loop **/
             while (this->processNextMessage()) {
 
@@ -165,7 +161,7 @@ namespace wrench {
                     }
                 } else {//File Not Cached
                     if (internalStorage &&
-                        StorageService::lookupFile(msg->file, FileLocation::LOCATION(internalStorage))) {
+                            StorageService::lookupFile(msg->file, FileLocation::LOCATION(internalStorage))) {
                         //File in internal storage
                         cache.add(msg->file, FileLocation::LOCATION(internalStorage));
                         try {
@@ -336,6 +332,7 @@ namespace wrench {
                 return true;
 
             } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+                metavisor->deleteFile(msg->file);
                 S4U_Mailbox::putMessage(this->mailbox, new RippleDelete(msg, metavisor->defaultTimeToLive));
 
 
