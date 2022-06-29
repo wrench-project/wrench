@@ -109,7 +109,36 @@ namespace wrench {
             int timeToLive;
         };
 
-
+/**
+         * @brief A message sent to a XRootD Node to delete a file
+         */
+        class AdvancedContinueSearchMessage : public ContinueSearchMessage {
+        public:
+            AdvancedContinueSearchMessage(simgrid::s4u::Mailbox *answer_mailbox,
+                    std::shared_ptr<StorageServiceFileReadRequestMessage> original,
+                    std::shared_ptr<DataFile> file,
+                    Node* node,
+                    double payload,
+                    std::shared_ptr<bool> answered,
+                    int timeToLive,
+                    std::vector<std::stack<Node*>> searchStack);
+            AdvancedContinueSearchMessage(AdvancedContinueSearchMessage* toCopy);
+            AdvancedContinueSearchMessage(ContinueSearchMessage* toCopy,std::vector<std::stack<Node*>> searchStack);
+            std::vector<std::stack<Node*>> searchStack;
+            /** @brief The paths to follow */
+        };/**
+ *
+         * @brief A message sent to a XRootD Node to delete a file
+         */
+        class AdvancedRippleDelete : public RippleDelete {
+        public:
+            AdvancedRippleDelete(std::shared_ptr<DataFile> file,double payload,int timeToLive,std::vector<std::stack<Node*>> searchStack);
+            AdvancedRippleDelete(AdvancedRippleDelete* other);
+            AdvancedRippleDelete(StorageServiceFileDeleteRequestMessage* other,int timeToLive,std::vector<std::stack<Node*>> searchStack);
+            AdvancedRippleDelete(RippleDelete* other,std::vector<std::stack<Node*>> searchStack);
+            /** @brief The paths to follow */
+            std::vector<std::stack<Node*>> searchStack;
+        };
 
 
 
