@@ -41,7 +41,8 @@ namespace wrench {
                     {Property::CACHE_LOOKUP_OVERHEAD,"1"},
                     {Property::SEARCH_BROADCAST_OVERHEAD,"1"},
                     {Property::UPDATE_CACHE_OVERHEAD,"1"},
-                    {Property::CACHE_MAX_LIFETIME,"infinity"}
+                    {Property::CACHE_MAX_LIFETIME,"infinity"},
+                    {Property::REDUCED_SIMULATION,"false"}
             };
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
@@ -79,12 +80,15 @@ namespace wrench {
             /***********************/
             /** \cond INTERNAL     */
             /***********************/
+
+
             int main();
             bool processNextMessage();
             Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
         private:
-            static std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
-            std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
+            map<Node*,vector<stack<Node*>>> splitStack(vector<stack<Node*>> searchStack);
+            virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
+            //std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
 
             bool makeSupervisor();
             bool makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
@@ -100,6 +104,8 @@ namespace wrench {
             Node* supervisor=nullptr;
             /** @brief The Meta supervisor for this entire XRootD data federation */
             XRootD* metavisor=nullptr;
+            /** @brief Whether this node is running a reduced simulation.  Initilized from the properties in main */
+            bool reduced;
             friend XRootD;
             friend SearchStack;
             /***********************/

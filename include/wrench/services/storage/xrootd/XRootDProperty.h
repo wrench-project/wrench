@@ -23,6 +23,8 @@ namespace wrench {
             DECLARE_PROPERTY_NAME(UPDATE_CACHE_OVERHEAD);
             /** @brief The time an entry can remain in the cache **/
             DECLARE_PROPERTY_NAME(CACHE_MAX_LIFETIME);
+            /** @brief Should the Node use Meta operations to reduce simulation overhead **/
+            DECLARE_PROPERTY_NAME(REDUCED_SIMULATION);
         };
 
     }
