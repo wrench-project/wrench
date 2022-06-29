@@ -242,7 +242,7 @@ namespace wrench {
                         S4U_Simulation::compute(
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
                         for (auto entry: splitStacks) {
-                            if (entry.first != this) { {
+                            if (entry.first != this) {
                                 try {
                                     S4U_Mailbox::putMessage(entry.first->mailbox,
                                                             new AdvancedRippleDelete(
