@@ -114,7 +114,6 @@ namespace wrench {
          */
 
         bool Node::processNextMessage() {
-            //TODO: add cpu overhead to... everything
             //S4U_Simulation::compute(flops);
             S4U_Simulation::computeZeroFlop();
             // Wait for a message
@@ -317,9 +316,37 @@ namespace wrench {
                                 this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
 
                         if (children.size() > 0) {//recursive search
-                            if(reduced){//TODO use optimised search
+                            if(reduced){
+                                shared_ptr<bool> answered = make_shared<bool>(false);
+                                auto targets=metavisor->getFileNodes(msg->file);
+                                auto searchStack=constructFileSearchTree(targets);
+                                map<Node *, vector<stack<Node *>>> splitStacks = splitStack(searchStack);
+                                S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
+                                for (auto entry: splitStacks) {
+                                    if (entry.first == this) {//this node was the target
+                                        //we shouldnt have to worry about this, it should have been handled earlier.  But just in case, I dont want a rogue search going who knows where
+                                    } else {
+                                        try {
+                                            S4U_Mailbox::putMessage(entry.first->mailbox,
+                                                                    new AdvancedContinueSearchMessage(
+                                                                            msg->answer_mailbox,
+                                                                            make_shared<StorageServiceFileReadRequestMessage>(msg),
+                                                                            msg->file,
+                                                                            this,
+                                                                            getMessagePayloadValue(
+                                                                                    MessagePayload::CONTINUE_SEARCH),
+                                                                            answered,
+                                                                            metavisor->defaultTimeToLive,
+                                                                            entry.second
+                                                                    )
+                                            );
+                                        } catch (std::shared_ptr<NetworkError> &cause) {
+                                            throw ExecutionException(cause);
+                                        }
 
+                                    }
 
+                                }
                             }else {//shotgun continued search message to all children
 
                                 shared_ptr<bool> answered = make_shared<bool>(false);
@@ -474,9 +501,31 @@ namespace wrench {
 
             } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
                 if(reduced) {//TODO use optimised search
-                    metavisor->deleteFile(msg->file);
+
+                    shared_ptr<bool> answered = make_shared<bool>(false);
+                    auto targets=metavisor->getFileNodes(msg->file);
+                    auto searchStack=constructFileSearchTree(targets);
+                    map<Node *, vector<stack<Node *>>> splitStacks = splitStack(searchStack);
+                    S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::SEARCH_BROADCAST_OVERHEAD));
+                    for (auto entry: splitStacks) {
+                        if (entry.first == this) {//this node was the target
+                            //we shouldnt have to worry about this, it should have been handled earlier.  But just in case, I dont want a rogue search going who knows where
+                        } else {
+                            try {
+                                S4U_Mailbox::putMessage(entry.first->mailbox,
+                                                        new AdvancedRippleDelete(
+                                                                msg,
+                                                                metavisor->defaultTimeToLive,
+                                                                entry.second
+                                                        )
+                                );
+                            } catch (std::shared_ptr<NetworkError> &cause) {
+                                throw ExecutionException(cause);
+                            }
+
+                        }
+                    }
                 }else {
-                    metavisor->deleteFile(msg->file);
                     S4U_Mailbox::putMessage(this->mailbox, new RippleDelete(msg, metavisor->defaultTimeToLive));
 
 
@@ -489,6 +538,9 @@ namespace wrench {
                                                     getMessagePayloadValue(
                                                             MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
                 }
+
+                metavisor->deleteFile(msg->file);
+                return true;
             } else if (auto msg = dynamic_cast<RippleDelete *>(message.get())) {
                 S4U_Simulation::compute(this->getPropertyValueAsDouble(Property::UPDATE_CACHE_OVERHEAD));
                 if (cached(msg->file)) {//Clean Cache
@@ -761,6 +813,45 @@ namespace wrench {
         */
         void Node::createFile(const std::shared_ptr<DataFile> &file) {
             metavisor->createFile(file,this->getSharedPtr<Node>());
+        }
+        /**
+        * @brief construct the path to all targets IF they are in the subtree
+        * @param targets: All the nodes to search for
+        *
+        * @returns the path to each target in the subtree.
+        */
+        vector<stack<Node*>>  Node::constructFileSearchTree(vector<shared_ptr<Node>>& targets){
+            vector<stack<Node*>> ret;
+            for(auto target:targets){
+                if(target.get()==this){
+                    ret.push_back(stack<Node*>());//I dont think this should ever happen, but it might
+                }else {
+                    stack<Node *> tmp = constructSearchStack(target.get());
+                    if(!tmp.empty()){
+                        ret.push_back(tmp);
+                    }
+                }
+            }
+            return ret;
+        }
+        /**
+        * @brief construct the path to a targets IF it is in the subtree
+        * @param target: The node to search for
+        *
+        * @returns the path to the target if it is in the subtree, empty stack otherwise.
+        */
+        stack<Node*>  Node::constructSearchStack(Node* target){
+            stack<Node *> ret;
+            Node* next=target;
+            while(next!=nullptr&&next!=this){
+                ret.push(next);
+                next=next->supervisor;
+
+            }
+            if(next!=this){//failed to find this in parrent tree
+                ret=stack<Node*>();
+            }
+            return ret;
         }
     }
 }
