@@ -1011,9 +1011,9 @@ namespace wrench {
                         compound_job,
                         this->hostname,
                         resources,
-                        {{BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                        {{BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
                           this->getPropertyValueAsString(
-                                  BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}},
+                                  BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}},
                         {},
                         DBL_MAX,
                         nullptr,
