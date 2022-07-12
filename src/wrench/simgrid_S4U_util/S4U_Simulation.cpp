@@ -482,23 +482,23 @@ namespace wrench {
         if (num_threads == 1) {
             simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
         } else {
-            #if 0 // TODO: Re-establish this onces behavior on VMs is fixed
+#if 0// TODO: Re-establish this onces behavior on VMs is fixed
             // Launch compute-heavy thread
             auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
             // Launch all other threads
             simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, (int) num_threads - 1);
             // Wait for the compute-heavy thread
             bottleneck_thread->wait();
-            #else
+#else
             std::vector<simgrid::s4u::ExecPtr> thread_handles;
             thread_handles.push_back(simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work));
-            for (int i=0; i < num_threads -1; i++) {
+            for (int i = 0; i < num_threads - 1; i++) {
                 thread_handles.push_back(simgrid::s4u::this_actor::exec_async(parallel_per_thread_work));
             }
-            for (int i=0; i < num_threads; i++) {
+            for (int i = 0; i < num_threads; i++) {
                 thread_handles.at(i)->wait();
             }
-            #endif
+#endif
         }
     }
 
