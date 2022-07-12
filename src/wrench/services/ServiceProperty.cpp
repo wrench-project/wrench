@@ -38,6 +38,7 @@ namespace wrench {
      * @brief add new message to payload map.  DO NOT CALL THIS FUNCTION DIRECTLY, use SET_PROPERTY_NAME and DECLARE_PROPERTY_NAME
      * @param classname: The class to add the message too
      * @param serviceProperty: the name of the service property to add
+     * @return a property type
      */
     WRENCH_PROPERTY_TYPE ServiceProperty::addServiceProperty(std::string classname, std::string serviceProperty) {
         ++WRENCH_PROPERTY_COUNT;
@@ -48,6 +49,7 @@ namespace wrench {
     /**
      * @brief translate a string key to a property ID
      * @param serviceProperty: the name of the service Property to get in classname::serviceProperty form (Note: the classname must be the parent class that defines the property)
+     * @return a property type
      */
     WRENCH_PROPERTY_TYPE ServiceProperty::translateString(std::string serviceProperty) {
         return wrapper_stringToPropertyMap().at(serviceProperty);
@@ -55,6 +57,7 @@ namespace wrench {
     /**
      * @brief translate a property ID to a string key
      * @param serviceProperty: the ID of the service Property
+     * @return a property type, as a string
      */
     std::string ServiceProperty::translatePropertyType(WRENCH_PROPERTY_TYPE serviceProperty) {
         return wrapper_propertyToStringMap().at(serviceProperty);
