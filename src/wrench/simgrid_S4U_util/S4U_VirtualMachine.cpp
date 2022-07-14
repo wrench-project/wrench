@@ -77,14 +77,21 @@ namespace wrench {
                     "S4U_VirtualMachine::suspend(): Cannot suspend a VM that's in state " + this->getStateAsString());
         }
 
-        simgrid::s4u::Host *physical_host = simgrid::s4u::Host::by_name_or_null(pm_name);
+        auto physical_host = simgrid::s4u::Host::by_name_or_null(pm_name);
         if (physical_host == nullptr) {
             throw std::invalid_argument("S4U_VirtualMachine::start(): unknown physical host '" + pm_name + "'");
         }
-        this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
-                                                    physical_host,
-                                                    (int) this->num_cores,
-                                                    (size_t) this->ram_memory);
+
+        std::cerr << "CALLING create_vm() on host " << physical_host->get_name() << "\n";
+        this->vm = physical_host->create_vm(this->vm_name,
+                                                 (int) this->num_cores,
+                                                 (size_t) this->ram_memory);
+
+//        this->vm = new simgrid::s4u::VirtualMachine(this->vm_name,
+//                                                    physical_host,
+//                                                    (int) this->num_cores,
+//                                                    (size_t) this->ram_memory);
+        std::cerr << "CALLED create_vm() \n";
         this->vm->start();
         this->state = State::RUNNING;
         this->pm_name = pm_name;
@@ -162,7 +169,7 @@ namespace wrench {
      */
     void S4U_VirtualMachine::migrate(const std::string &dest_pm_name) {
         std::string src_pm_hostname = this->vm->get_pm()->get_name();
-        simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name_or_null(dest_pm_name);
+        simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name(dest_pm_name);
 
         double mig_sta = simgrid::s4u::Engine::get_clock();
         sg_vm_migrate(this->vm, dest_pm);
