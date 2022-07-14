@@ -507,7 +507,7 @@ namespace wrench {
         }
     }
 
-/**
+    /**
  * @brief Simulates a disk write
  *
  * @param num_bytes: number of bytes to write
