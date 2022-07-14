@@ -13,7 +13,6 @@
 #include <wrench/action/FileCopyAction.h>
 #include <wrench/data_file/DataFile.h>
 #include <wrench/services/storage/StorageService.h>
-#include <wrench/exceptions/ExecutionException.h>
 #include <wrench/services/helper_services/action_executor/ActionExecutor.h>
 
 #include <utility>
