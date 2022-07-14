@@ -485,9 +485,9 @@ namespace wrench {
             simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
         } else {
 
-        // TODO: Remove this after the next WRENCH release if WRENCH uses 3.31.1 or above
+            // TODO: Remove this after the next WRENCH release if WRENCH uses 3.31.1 or above
 #if (SIMGRID_VERSION_MAJOR >= 3) && (SIMGRID_VERSION_MINOR >= 31) && (SIMGRID_VERSION_PATCH >= 1)
-           // Launch compute-heavy thread
+            // Launch compute-heavy thread
             auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
             // Launch all other threads
             simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, (int) num_threads - 1);
@@ -504,7 +504,6 @@ namespace wrench {
                 thread_handles.at(i)->wait();
             }
 #endif
-
         }
     }
 
