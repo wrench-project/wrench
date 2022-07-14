@@ -28,7 +28,6 @@ namespace wrench {
     * @param name: the action's name (if empty, a unique name will be picked for you)
     * @param file: the file
     * @param file_location: the location where the file should be written
-    * @param num_bytes_to_write: the number of bytes to write (if < 0, write the whole file)
     */
     FileWriteAction::FileWriteAction(const std::string &name,
                                      std::shared_ptr<DataFile> file,

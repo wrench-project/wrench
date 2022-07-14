@@ -25,6 +25,7 @@ namespace wrench {
      * @brief add new message to payload map.  DO NOT CALL THIS FUNCTION DIRECTLY, use SET_MESSAGEPAYLOAD_NAME and DECLARE_MESSAGEPAYLOAD_NAME
      * @param classname: The class to add the message too
      * @param messagePayload: the name of the message payload to add
+     * @return a wrench message payload type
      */
     WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::addMessagePayload(std::string classname, std::string messagePayload) {
         ++WRENCH_MESSAGEPAYLOAD_COUNT;
@@ -36,6 +37,7 @@ namespace wrench {
     /**
      * @brief translate a string key to a message payload id
      * @param messagePayload: the name of the message payload to get in classname::messagePayload form (Note: the classname must be the parent class that defines the property)
+     * @return a wrench message payload type
      */
     WRENCH_MESSAGEPAYLOAD_TYPE ServiceMessagePayload::translateString(std::string messagePayload) {
         return stringToPayloadMap.at(messagePayload);
@@ -43,6 +45,7 @@ namespace wrench {
     /**
      * @brief translate a message payload ID to a string key
      * @param messagePayload: the ID of the message payload 
+     * @return a wrench message payload type, as a string
      */
     std::string ServiceMessagePayload::translatePayloadType(WRENCH_MESSAGEPAYLOAD_TYPE messagePayload) {
         return payloadToString.at(messagePayload);

@@ -22,9 +22,9 @@ namespace wrench {
 
     public:
         /**
-         * @brief The overhead to start a task execution, in seconds
+         * @brief The overhead to start a thread, in seconds
          */
-        DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
+        DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
 
         /**
          * @brief The batch scheduling algorithm. Can be:

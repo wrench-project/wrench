@@ -384,7 +384,7 @@ namespace wrench {
                     std::move(compute_resources),
                     nullptr,
                     {
-                            {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD)},
+                            {ActionExecutionServiceProperty::THREAD_CREATION_OVERHEAD, this->getPropertyValueAsString(BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
                             {ActionExecutionServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, this->getPropertyValueAsString(BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH)},
                             {ActionExecutionServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, this->getPropertyValueAsString(BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN)},
                     },
@@ -762,15 +762,15 @@ namespace wrench {
         double thread_startup_overhead = 0;
         try {
             thread_startup_overhead = this->getPropertyValueAsDouble(
-                    BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD);
+                    BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
         } catch (std::invalid_argument &e) {
             success = false;
         }
 
         if ((!success) or (thread_startup_overhead < 0)) {
-            throw std::invalid_argument("Invalid TASK_STARTUP_OVERHEAD property specification: " +
+            throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
                                         this->getPropertyValueAsString(
-                                                BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD));
+                                                BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
         }
     }
 

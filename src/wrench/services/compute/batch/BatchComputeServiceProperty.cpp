@@ -11,7 +11,7 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(BatchComputeServiceProperty, TASK_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(BatchComputeServiceProperty, THREAD_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, HOST_SELECTION_ALGORITHM);
     SET_PROPERTY_NAME(BatchComputeServiceProperty, TASK_SELECTION_ALGORITHM);
 

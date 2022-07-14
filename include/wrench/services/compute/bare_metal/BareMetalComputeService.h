@@ -52,7 +52,7 @@ namespace wrench {
 
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0.0"},
+                {BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0.0"},
                 {BareMetalComputeServiceProperty::FAIL_ACTION_AFTER_ACTION_EXECUTOR_CRASH, "true"},
                 {BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN, "false"},
         };

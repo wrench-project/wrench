@@ -106,13 +106,13 @@ namespace wrench {
                     } else {
                         num_cores = core_spec.at("count").to_number<unsigned long>();
                     }
-                    double ghz;
+                    double mhz;
                     if (core_spec.find("speed") == core_spec.end()) {
-                        ghz = -1.0;
+                        mhz = -1.0;
                     } else {
-                        ghz = core_spec.at("speed").to_number<double>();
+                        mhz = core_spec.at("speed").to_number<double>();
                     }
-                    machines[name] = std::make_pair(num_cores, ghz);
+                    machines[name] = std::make_pair(num_cores, mhz);
                 }
             }
         }
@@ -167,7 +167,7 @@ namespace wrench {
                                                         "  but no description for that machine is found on the JSON file");
                         }
                         if (machines[execution_machine].second >= 0) {
-                            double core_ghz = (machines[execution_machine].second);
+                            double core_ghz = (machines[execution_machine].second) / 1000.0;
                             double total_compute_power_used = core_ghz * (double) min_num_cores;
                             double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
                             flop_amount = runtime * actual_flop_rate;

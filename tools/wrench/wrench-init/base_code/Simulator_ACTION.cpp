@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
             "ComputeHost", {"ComputeHost"}, "", {}, {}));
 
     /* Instantiate an execution controller */
-    auto wms = simulation->add(
+    auto controller = simulation->add(
             new wrench::Controller(baremetal_service, storage_service, "UserHost"));
 
     /* Launch the simulation */
