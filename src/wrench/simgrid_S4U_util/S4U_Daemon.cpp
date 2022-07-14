@@ -41,8 +41,8 @@ namespace wrench {
             throw std::runtime_error("Simulation must be initialized before services can be created");
         }
 
-        if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-            throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+        if (S4U_Simulation::get_host_or_vm_by_name_or_null(hostname) == nullptr) {
+            throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host or vm '" + hostname + "'");
         }
 
 #ifdef ACTOR_TRACKING_OUTPUT
@@ -152,7 +152,7 @@ namespace wrench {
         // Create the s4u_actor
         try {
             this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
-                                                          simgrid::s4u::Host::by_name(hostname),
+                                                           S4U_Simulation::get_host_or_vm_by_name(hostname),
                                                           S4U_DaemonActor(this));
         } catch (simgrid::Exception &e) {
             throw std::runtime_error("S4U_Daemon::startDaemon(): SimGrid actor creation failed... shouldn't happen.");

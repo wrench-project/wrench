@@ -290,8 +290,8 @@ namespace wrench {
     }
 
 
-    /**
- * @brief Determines whether a host exists for a given hostname
+/**
+ * @brief Determines whether a host exists for a given hostname (does not include VMs)
  * @param hostname: the name of the host
  * @return true or false
  */
@@ -317,7 +317,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     unsigned int S4U_Simulation::getHostNumCores(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -341,7 +341,7 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     double S4U_Simulation::getHostFlopRate(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -357,7 +357,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     bool S4U_Simulation::isHostOn(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -372,7 +373,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void S4U_Simulation::turnOffHost(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -387,7 +389,8 @@ namespace wrench {
  * @throw std::invalid_argument
  */
     void S4U_Simulation::turnOnHost(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -518,12 +521,13 @@ namespace wrench {
         mount_point = FileLocation::sanitizePath(mount_point);
 
         WRENCH_DEBUG("Writing %lf bytes to disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("S4U_Simulation::writeToDisk(): unknown host " + hostname);
         }
 
-        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        auto disk_list = host->get_disks();
         for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
@@ -557,7 +561,7 @@ namespace wrench {
         simgrid::s4u::Disk *read_disk = nullptr;
         simgrid::s4u::Disk *write_disk = nullptr;
 
-        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        auto disk_list = S4U_Simulation::get_host_or_vm_by_name(hostname)->get_disks();
         for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
@@ -591,12 +595,12 @@ namespace wrench {
 
         WRENCH_DEBUG("Reading %.2lf bytes from disk %s:%s", num_bytes, hostname.c_str(), mount_point.c_str());
 
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (not host) {
             throw std::invalid_argument("S4U_Simulation::readFromDisk(): unknown host " + hostname);
         }
 
-        auto disk_list = simgrid::s4u::Host::by_name(hostname)->get_disks();
+        auto disk_list = host->get_disks();
         for (auto disk: disk_list) {
             std::string disk_mountpoint =
                     FileLocation::sanitizePath(std::string(std::string(disk->get_property("mount"))));
@@ -632,7 +636,7 @@ namespace wrench {
  * @return a memory_manager_service capacity in bytes
  */
     double S4U_Simulation::getHostMemoryCapacity(const std::string &hostname) {
-        auto host = simgrid::s4u::Host::by_name_or_null(hostname);
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
         }
@@ -723,7 +727,7 @@ namespace wrench {
 
 
     /**
- * @brief Set a property associated to a host specified in the platform file
+ * @brief Set a property associated to a host specified in the platform file (does not include VMs)
  * @param hostname: the host name
  * @param property_name: the property name
  * @param property_value: the property value
@@ -745,6 +749,7 @@ namespace wrench {
  */
     double S4U_Simulation::getEnergyConsumedByHost(const std::string &hostname) {
         double energy_consumed = 0;
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -791,6 +796,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void S4U_Simulation::setPstate(const std::string &hostname, unsigned long pstate) {
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("S4U_Simulation::setPstate(): Unknown hostname " + hostname);
@@ -817,6 +823,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -837,6 +844,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     unsigned long S4U_Simulation::getCurrentPstate(const std::string &hostname) {
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -858,6 +866,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     double S4U_Simulation::getMinPowerConsumption(const std::string &hostname) {
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -879,6 +888,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     double S4U_Simulation::getMaxPowerConsumption(const std::string &hostname) {
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -903,6 +913,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
+
         auto host = simgrid::s4u::Host::by_name_or_null(hostname);
         if (host == nullptr) {
             throw std::invalid_argument("Unknown hostname " + hostname);
@@ -944,7 +955,7 @@ namespace wrench {
     std::vector<std::string> S4U_Simulation::getDisks(const std::string &hostname) {
         simgrid::s4u::Host *host;
         try {
-            host = simgrid::s4u::Host::by_name(hostname);
+            host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::getDisks(): Unknown host " + hostname);
         }
@@ -972,6 +983,7 @@ namespace wrench {
     bool S4U_Simulation::hostHasMountPoint(const std::string &hostname, const std::string &mount_point) {
         simgrid::s4u::Host *host;
         try {
+            host = S4U_Simulation::get_host_or_vm_by_name(hostname);
             host = simgrid::s4u::Host::by_name(hostname);
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::hostHasMountPoint(): Unknown host " + hostname);
@@ -1003,12 +1015,12 @@ namespace wrench {
     std::vector<std::string> S4U_Simulation::getRoute(std::string &src_host, std::string &dst_host) {
         simgrid::s4u::Host *src, *dst;
         try {
-            src = simgrid::s4u::Host::by_name(src_host);
+            src = S4U_Simulation::get_host_or_vm_by_name(src_host);
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::getRoute(): Unknown host " + src_host);
         }
         try {
-            dst = simgrid::s4u::Host::by_name(dst_host);
+            dst = S4U_Simulation::get_host_or_vm_by_name(dst_host);
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::getRoute(): Unknown host " + dst_host);
         }
@@ -1035,7 +1047,7 @@ namespace wrench {
         //        WRENCH_INFO("==== %s %s ==== ", hostname.c_str(), mount_point.c_str());
         simgrid::s4u::Host *host;
         try {
-            host = simgrid::s4u::Host::by_name(hostname);
+            host = S4U_Simulation::get_host_or_vm_by_name(hostname);
         } catch (std::exception &e) {
             throw std::invalid_argument("S4U_Simulation::getDiskCapacity(): Unknown host " + hostname);
         }
@@ -1079,7 +1091,7 @@ namespace wrench {
 
     /**
      * @brief Method to create, programmatically, a new disk
-     * @param hostname: the name of the host to which the disk should be attaced
+     * @param hostname: the name of the host to which the disk should be attached
      * @param disk_id: the nae of the disk
      * @param read_bandwidth_in_bytes_per_sec: the disk's read bandwidth in byte/sec
      * @param write_bandwidth_in_bytes_per_sec: the disk's write bandwidth in byte/sec
@@ -1118,5 +1130,36 @@ namespace wrench {
         disk->set_property("size", std::to_string(capacity_in_bytes) + "B");
         disk->set_property("mount", mount_point);
     }
+
+    /**
+     * @brief Convenient s4u wrapper to retrieve a Host (which can be a VM) based on a name
+     * @param name: the host/vm name or null if none
+     * @return a SimGrid host
+     */
+    simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name_or_null(const std::string& name) {
+        auto host = simgrid::s4u::Host::by_name_or_null(name);
+        if (!host) {
+            // Perhaps it's a VM
+            if (S4U_VirtualMachine::vm_to_pm_map.find(name) != S4U_VirtualMachine::vm_to_pm_map.end()) {
+                auto physical_host = simgrid::s4u::Host::by_name_or_null(S4U_VirtualMachine::vm_to_pm_map[name]);
+                host = physical_host->vm_by_name_or_null(name);
+            }
+        }
+        return host;
+    }
+
+    /**
+     * @brief Convenient s4u wrapper to retrieve a Host (which can be a VM) based on a name
+     * @param name: the host/vm name
+     * @return a SimGrid host
+     */
+    simgrid::s4u::Host *S4U_Simulation::get_host_or_vm_by_name(const std::string& name) {
+        auto host = S4U_Simulation::get_host_or_vm_by_name_or_null(name);
+        if (!host) {
+            throw std::invalid_argument("S4U_Simulation::get_host_or_vm_by_name(): Unknown host");
+        }
+        return host;
+    }
+
 
 };// namespace wrench

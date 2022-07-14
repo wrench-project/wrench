@@ -1463,7 +1463,7 @@ namespace wrench {
         if (this->isPageCachingEnabled()) {
             for (auto const &h: hostnames) {
                 bool has_memory_disk = false;
-                for (auto const &d: simgrid::s4u::Host::by_name(h)->get_disks()) {
+                for (auto const &d: S4U_Simulation::get_host_or_vm_by_name(h)->get_disks()) {
                     if (std::string(d->get_property("mount")) == "/memory") {
                         has_memory_disk = true;
                         break;
