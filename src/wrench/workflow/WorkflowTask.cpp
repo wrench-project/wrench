@@ -733,13 +733,13 @@ namespace wrench {
             this->toplevel = 0;
         } else {
             unsigned long max_toplevel = 0;
-            for (const auto &parent : parents) {
+            for (const auto &parent: parents) {
                 max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
             }
             this->toplevel = 1 + max_toplevel;
         }
         std::vector<std::shared_ptr<WorkflowTask>> children = this->workflow->getTaskChildren(this->getSharedPtr());
-        for (const auto &child : children) {
+        for (const auto &child: children) {
             child->updateTopLevel();
         }
         return this->toplevel;
@@ -755,7 +755,7 @@ namespace wrench {
             this->bottomlevel = 0;
         } else {
             unsigned long max_bottomlevel = 0;
-            for (const auto &child : children) {
+            for (const auto &child: children) {
                 max_bottomlevel = (max_bottomlevel < child->bottomlevel ? child->bottomlevel : max_bottomlevel);
             }
             this->bottomlevel = 1 + max_bottomlevel;

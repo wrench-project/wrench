@@ -19,6 +19,8 @@
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/logging/TerminalOutput.h>
 
+#include <simgrid/version.h>
+
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_s4u_simulation, "Log category for S4U_Simulation");
@@ -482,16 +484,30 @@ namespace wrench {
         if (num_threads == 1) {
             simgrid::s4u::this_actor::execute(sequential_work + parallel_per_thread_work);
         } else {
+
+            // TODO: Remove this after the next WRENCH release if WRENCH uses 3.31.1 or above
+#if (SIMGRID_VERSION_MAJOR >= 3) && (SIMGRID_VERSION_MINOR >= 31) && (SIMGRID_VERSION_PATCH >= 1)
             // Launch compute-heavy thread
             auto bottleneck_thread = simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work);
             // Launch all other threads
             simgrid::s4u::this_actor::thread_execute(simgrid::s4u::this_actor::get_host(), parallel_per_thread_work, (int) num_threads - 1);
             // Wait for the compute-heavy thread
             bottleneck_thread->wait();
+#else
+            // Broken behavior of thread_execute() on VMs in SimGrid 3.31.0 and before
+            std::vector<simgrid::s4u::ExecPtr> thread_handles;
+            thread_handles.push_back(simgrid::s4u::this_actor::exec_async(sequential_work + parallel_per_thread_work));
+            for (int i = 0; i < num_threads - 1; i++) {
+                thread_handles.push_back(simgrid::s4u::this_actor::exec_async(parallel_per_thread_work));
+            }
+            for (int i = 0; i < num_threads; i++) {
+                thread_handles.at(i)->wait();
+            }
+#endif
         }
     }
 
-    /**
+/**
  * @brief Simulates a disk write
  *
  * @param num_bytes: number of bytes to write
