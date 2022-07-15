@@ -82,7 +82,6 @@ namespace wrench {
             throw std::invalid_argument("S4U_VirtualMachine::start(): unknown physical host '" + pm_name + "'");
         }
 
-        std::cerr << "CALLING create_vm() on host " << physical_host->get_name() << "\n";
         this->vm = physical_host->create_vm(this->vm_name,
                                                  (int) this->num_cores,
                                                  (size_t) this->ram_memory);
@@ -91,7 +90,6 @@ namespace wrench {
 //                                                    physical_host,
 //                                                    (int) this->num_cores,
 //                                                    (size_t) this->ram_memory);
-        std::cerr << "CALLED create_vm() \n";
         this->vm->start();
         this->state = State::RUNNING;
         this->pm_name = pm_name;
