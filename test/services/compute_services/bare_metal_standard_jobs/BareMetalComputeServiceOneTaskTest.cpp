@@ -275,7 +275,7 @@ void BareMetalComputeServiceOneTaskTest::do_BadSetup_test() {
                                                                                              100000.0))},
                                                              "",
                                                              {std::make_pair(
-                                                                     wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                                                                     wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
                                                                      "-1.0")},
                                                              {})),
                  std::invalid_argument);

@@ -39,6 +39,9 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
+    /**
+     * @brief A class that implements the concept of a service property
+     */
     class ServiceProperty {
 
 

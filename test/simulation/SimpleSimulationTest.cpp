@@ -414,7 +414,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
     ASSERT_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::translateString("CloudComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD")), std::exception);
 
     // Try to get the property in bogus ways, for coverage
-    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
