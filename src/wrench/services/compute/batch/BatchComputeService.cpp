@@ -10,7 +10,6 @@
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
@@ -1375,7 +1374,6 @@ namespace wrench {
                 // It has to be an action
                 bool found_task = false;
                 if (job != nullptr) {
-                    // TODO: Should we have an ID/Action map in the job instead of just a set of actions?
                     for (auto const &action: job->getActions()) {
                         if (action->getName() == key) {
                             found_task = true;
