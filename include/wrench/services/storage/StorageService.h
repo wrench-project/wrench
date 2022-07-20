@@ -45,11 +45,10 @@ namespace wrench {
         std::map<std::string, double> getFreeSpace();
 
         std::map<std::string, double> getTotalSpace();
-
-        std::string getMountPoint();
-        std::set<std::string> getMountPoints();
-        bool hasMultipleMountPoints();
-        bool hasMountPoint(const std::string &mp);
+        virtual std::string getMountPoint();
+        virtual std::set<std::string> getMountPoints();
+        virtual bool hasMultipleMountPoints();
+        virtual bool hasMountPoint(const std::string &mp);
 
         static bool lookupFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
         static void deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location,
@@ -58,7 +57,16 @@ namespace wrench {
         static void readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location, double num_bytes);
         static void writeFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location);
 
-
+        virtual bool lookupFile(const std::shared_ptr<DataFile> &file);
+        virtual void deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service = nullptr);
+        virtual void readFile(const std::shared_ptr<DataFile> &file);
+        virtual void readFile(const std::shared_ptr<DataFile> &file, double num_bytes);
+        virtual void writeFile(const std::shared_ptr<DataFile> &file);
+        /**
+         * @brief Get the theoretical load of a service
+         * @return the load on the service
+         */
+        virtual double getLoad()=0;
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -88,6 +96,8 @@ namespace wrench {
                        const std::string &service_name);
 
     protected:
+        StorageService(const std::string &hostname,
+                       const std::string &service_name);
         friend class Simulation;
         friend class FileRegistryService;
         friend class FileTransferThread;

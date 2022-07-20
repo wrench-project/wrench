@@ -32,7 +32,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should run
-     * @param mount_points: the mount points of each disk usable by the service
+     * @param mount_points: the mount points of each disk usable by the service.  "/dev/null" is a reserved mount point with no physical disk associated.  It acts similar to /dev/null on unix systems.
      * @param service_name: the name of the storage service
      *
      * @throw std::invalid_argument
@@ -56,7 +56,17 @@ namespace wrench {
         this->state = StorageService::UP;
         this->is_stratch = false;
     }
-
+    /**
+     * @brief Constructor
+     *
+     * @param hostname: the name of the host on which the service should run
+     * @param service_name: the name of the storage service
+     *
+     * @throw std::invalid_argument
+     */
+    StorageService::StorageService(const std::string &hostname,
+                                   const std::string &service_name) : StorageService(hostname,{LogicalFileSystem::DEV_NULL}, service_name) {
+    }
     /**
      * @brief Determines whether the storage service is a scratch service of a ComputeService
      * @return true if it is, false otherwise
@@ -109,6 +119,77 @@ namespace wrench {
         // Just call the super class's method
         Service::stop();
     }
+
+    /***************************************************************/
+    /****** THESE FUNCTIONS PROVIDE AN OBJECT API FOR TALKING ******/
+    /******     TO SPECIFIC STORAGE SERVERS NOT LOCATIONS     ******/
+    /******    CONSTRUCTS LOCATION AND FORWARDS TO DAEMNON    ******/
+    /***************************************************************/
+
+    /**
+     * @brief Synchronously asks the storage service whether it holds a file
+     *
+     * @param file: the file
+     *
+     * @return true or false
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    bool StorageService::lookupFile(const std::shared_ptr<DataFile> &file){
+        return StorageService::lookupFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+    }
+    /**
+     * @brief Synchronously delete a file at a location
+     *
+     * @param file: the file
+     * @param file_registry_service: a file registry service that should be updated once the
+     *         file deletion has (successfully) completed (none if nullptr)
+     *
+     * @throw ExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void StorageService::deleteFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileRegistryService> &file_registry_service){
+        StorageService::deleteFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())),file_registry_service);
+    }
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file){
+        StorageService::readFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+    }
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param location: the location to read the file from
+     * @param num_bytes: the numger of bytes to read
+     *
+     * @throw ExecutionException
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file, double num_bytes){
+        StorageService::readFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())),num_bytes);
+
+    }
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     *
+     * @throw ExecutionException
+     */
+    void StorageService::writeFile(const std::shared_ptr<DataFile> &file){
+        StorageService::writeFile(file,FileLocation::LOCATION(static_pointer_cast<StorageService>(shared_from_this())));
+    }
+
+
 
     /***************************************************************/
     /****** EVERYTHING BELOW ARE INTERACTIONS WITH THE DAEMON ******/
@@ -214,11 +295,10 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
 
-    void StorageService::readFile(std::shared_ptr<DataFile> file, std::shared_ptr<FileLocation> location) {
-        //if ((file == nullptr) or (location == nullptr)) {
-        //    throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-        //}
-        //I dont think we need to check this HERE because we hand off to another fundtion that will
+    void StorageService::readFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+        if ((file == nullptr) or (location == nullptr)) {
+            throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
+        }//This check DOES need to exist, becasue we call file->getSize()
         auto answer_mailbox = S4U_Daemon::getRunningActorRecvMailbox();
         auto chunk_receiving_mailbox = S4U_Mailbox::getTemporaryMailbox();
         readFile(file, location, answer_mailbox, chunk_receiving_mailbox, file->getSize());
@@ -275,7 +355,6 @@ namespace wrench {
                                             file,
                                             location,
                                             num_bytes_to_read,
-                                            storage_service->buffer_size,
                                             storage_service->getMessagePayloadValue(
                                                     StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -301,7 +380,7 @@ namespace wrench {
                 throw ExecutionException(cause);
             }
 
-            if (storage_service->buffer_size == 0) {
+            if (msg->buffer_size == 0) {
                 S4U_Mailbox::retireTemporaryMailbox(chunk_receiving_mailbox);
                 throw std::runtime_error("StorageService::readFile(): Zero buffer size not implemented yet");
 
