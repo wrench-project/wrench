@@ -412,6 +412,7 @@ set(TEST_FILES
         test/services/compute_services/batch_standard_and_pilot_jobs/BatchServiceBatschedContiguityTest.cpp
         test/services/helper_services/HostStateChangeTest.cpp
         test/services/helper_services/AlarmTest.cpp
+        test/services/storage_services/XRootDStorageService/XRootDStorageServiceFunctionalTest.cpp
         test/wms/WMSTest.cpp
         test/wms/MultipleWMSTest.cpp
         test/services/compute_services/virtualized_cluster/VirtualizedClusterServiceTest.cpp
@@ -468,7 +469,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp include/wrench/services/storage/xrootd/XRootDProperty.h)
+        test/simulation/S4U_MailboxTest.cpp
+        )
 
 
 add_library(wrench STATIC ${SOURCE_FILES})

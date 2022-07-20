@@ -24,6 +24,8 @@
 #include "wrench/data_file/DataFile.h"
 #include <set>
 #include "wrench/simulation/Simulation.h"
+#include "wrench/services/storage/xrootd/Node.h"
+
 namespace wrench {
     /**
      * @brief A Meta manager for an XRootD data Federation.  This tracks all nodes and files within the system.
@@ -31,7 +33,7 @@ namespace wrench {
     namespace XRootD{
         //class StorageServer;
         //class Supervisor;
-        class Node;
+//        class Node;
 
         class XRootD{
         public:
@@ -43,7 +45,7 @@ namespace wrench {
              * @param messagepayload_values: The message paylaod values that should be used to overwrite the defaults of all Nodes (defaults to none) (unless otherwise specified)
              */
             XRootD(std::shared_ptr<Simulation>  simulation,WRENCH_PROPERTY_COLLECTION_TYPE property_values={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_values={}):property_values(property_values),messagepayload_values(messagepayload_values),simulation(simulation){}
-            std::shared_ptr<Node> createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
+            std::shared_ptr<Node> createStorageServer(const std::string& hostname, const std::string& mount_point, WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
             std::shared_ptr<Node> createSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
             std::shared_ptr<Node> createStorageSupervisor(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list={},WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list={});
             /***********************/
