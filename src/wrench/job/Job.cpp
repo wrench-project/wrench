@@ -11,9 +11,6 @@
 #include <string>
 #include <utility>
 #include <wrench-dev.h>
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/job/Job.h>
-#include <wrench/workflow/Workflow.h>
 
 WRENCH_LOG_CATEGORY(wrench_core_workflow_job, "Log category for Job");
 

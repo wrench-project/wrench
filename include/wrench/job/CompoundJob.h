@@ -168,7 +168,6 @@ namespace wrench {
 
         bool isReady();
 
-        //        std::shared_ptr<CompoundJob> shared_this; // Set by the Job Manager
         /**
          * @brief Actions in the job
          */

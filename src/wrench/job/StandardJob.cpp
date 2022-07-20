@@ -804,7 +804,7 @@ namespace wrench {
     /**
      * @brief Apply updates to tasks
      * @param state_changes: state changes
-     * @param failure_count_increments: failure_cound_increments
+     * @param failure_count_increments: set of tasks whose failure counts should be incremented by one
      */
     void StandardJob::applyTaskUpdates(map<std::shared_ptr<WorkflowTask>, WorkflowTask::State> &state_changes,
                                        set<std::shared_ptr<WorkflowTask>> &failure_count_increments) {
