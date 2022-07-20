@@ -53,6 +53,7 @@ namespace wrench {
             /***********************/
             /** @brief The max number of hops a search message can take.  Used to prevent infinite loops in a poorly constructed XRootD tree. */
             int defaultTimeToLive=1024;//how long trivial search message can wander for;
+            void createFile(const std::shared_ptr<DataFile> &file);
             void createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
             void deleteFile(const std::shared_ptr<DataFile> &file);
             void removeFileLocation(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location);
