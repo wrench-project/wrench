@@ -50,6 +50,7 @@ namespace wrench {
         /**
         * @brief Create a new XRootD Node that is a leaf storage server
         * @param hostname: the name of the host on which the service and its storage service should run
+        * @param mount_point: the single mountpoint of the disk on which files will be stored
         * @param storage_property_list: The property list to use for the underlying storage server
         * @param storage_messagepayload_list: The message payload list to use for the underlying storage server
         * @param node_property_list: The property list to use for the new Node, defaluts to {}
@@ -57,9 +58,15 @@ namespace wrench {
         *
         * @return a shared pointer to the newly created Node
         */
-        std::shared_ptr<Node> XRootD::createStorageServer(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list){
+        std::shared_ptr<Node> XRootD::createStorageServer(
+                const std::string& hostname,
+                const std::string &mount_point,
+                WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list,
+                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list,
+                WRENCH_PROPERTY_COLLECTION_TYPE node_property_list,
+                WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE node_messagepayload_list){
             std::shared_ptr<Node> ret=createNode(hostname,node_property_list,node_messagepayload_list);
-            ret->makeFileServer({"/"},storage_property_list,storage_messagepayload_list);
+            ret->makeFileServer({mount_point},storage_property_list,storage_messagepayload_list);
             simulation->add(ret->internalStorage);
             dataservers.push_back(ret);
             return ret;
