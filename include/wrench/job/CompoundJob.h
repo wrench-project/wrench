@@ -18,7 +18,7 @@
 #include <wrench/action/Action.h>
 
 #include "Job.h"
-
+#include <wrench/services/storage/StorageService.h>
 
 namespace wrench {
 
@@ -40,7 +40,6 @@ namespace wrench {
     class CustomAction;
     class ActionExecutor;
     class DataFile;
-
     /**
      * @brief A compound job class
      */
@@ -73,6 +72,31 @@ namespace wrench {
         void setPriority(double p) override;
 
         std::shared_ptr<SleepAction> addSleepAction(const std::string &name, double sleep_time);
+
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<StorageService>& storageService);
+
+        std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
+                                                          const std::shared_ptr<DataFile> &file,
+                                                          const std::shared_ptr<StorageService>& storageService,
+                                                          const double num_bytes_to_read);
+
+
+        std::shared_ptr<FileWriteAction> addFileWriteAction(const std::string &name,
+                                                            const std::shared_ptr<DataFile> &file,
+                                                            const std::shared_ptr<StorageService>& storageService);
+
+        std::shared_ptr<FileCopyAction> addFileCopyAction(const std::string &name,
+                                                          std::shared_ptr<DataFile> file,
+                                                          const std::shared_ptr<StorageService>& src_storageService,
+                                                          const std::shared_ptr<StorageService>& dest_storageService);
+
+        std::shared_ptr<FileDeleteAction> addFileDeleteAction(const std::string &name,
+                                                              std::shared_ptr<DataFile> file,
+                                                              const std::shared_ptr<StorageService>& storageService);
+
+
 
         std::shared_ptr<FileReadAction> addFileReadAction(const std::string &name,
                                                           const std::shared_ptr<DataFile> &file,

@@ -12,13 +12,37 @@
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/storage/xrootd/XRootDMessagePayload.h"
 #include <stack>
+#include "wrench/services/storage/xrootd/Cache.h"
+
+#include <wrench/services/storage/xrootd/XRootDProperty.h>
+//todo overload mountpoint functions
 namespace wrench {
     namespace XRootD{
         class XRootD;
         class SearchStack;
-        class Node:public Service{//Conceptualy all nodes ARE storage services, HOWEVER, the API is entirly differnt for accessing a file in an XRootD deployment than usuall.
+        /**
+         * @brief An XRootD node, this can be either a supervisor or a storage server.
+         * All nodes are classified as storage services even though not all have physical storage
+         * Unless a node is also has an internal storage service, some normal storage service messages will error out.
+         * Only File Read, locate, and delete are supported at this time, anything else requires talking directly to a specific file server with physical storage.
+         * Nodes not directly be created, instead an XRootD Metavisor should create them
+         */
+        class Node:public StorageService{
+        public:
+            int addChild(std::shared_ptr<Node> child);
+            std::shared_ptr<Node> getChild(unsigned int n);
+            Node* getParent();
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
         private:
             WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
+                    {Property::MESSAGE_OVERHEAD,"1"},
+                    {Property::CACHE_LOOKUP_OVERHEAD,"1"},
+                    {Property::SEARCH_BROADCAST_OVERHEAD,"1"},
+                    {Property::UPDATE_CACHE_OVERHEAD,"1"},
+                    {Property::CACHE_MAX_LIFETIME,"infinity"},
+                    {Property::REDUCED_SIMULATION,"false"}
             };
 
             WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE default_messagepayload_values = {
@@ -27,48 +51,68 @@ namespace wrench {
                     {MessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, 1024},
                     {MessagePayload::UPDATE_CACHE, 1024},
                     {MessagePayload::CONTINUE_SEARCH, 1024},
-                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024}
+                    {MessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD, 1024},
+                    {MessagePayload::CACHE_ENTRY,1024},
+                    {MessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD,1024},
+                    {MessagePayload::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,1024}
             };
         public:
             //XRootD* getMetavisor();
-            Node(const std::string& hostname);
+
             std::shared_ptr<SimpleStorageService> getStorageServer();
-            Node* getChild(int n);
-            Node* getParent();
+
+            //bool lookupFile(std::shared_ptr<DataFile>file);
+            //void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
+            //void readFile(std::shared_ptr<DataFile>file);
+            //void readFile(std::shared_ptr<DataFile>file, double num_bytes);
+
+           // std::string getMountPoint() override;
+            //std::set<std::string> getMountPoints() override;
+            //bool hasMultipleMountPoints() override;
+            //bool hasMountPoint(const std::string &mp) override;
+
+            bool cached(shared_ptr<DataFile> file);
+            std::set<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
+
+            double getLoad() override;
+            void createFile(const std::shared_ptr<DataFile> &file);
+            /***********************/
+            /** \cond INTERNAL     */
+            /***********************/
+
+
             int main();
             bool processNextMessage();
-            bool lookupFile(std::shared_ptr<DataFile>file);
-            void deleteFile(std::shared_ptr<DataFile>file);//meta delete from sub tree
-            void readFile(std::shared_ptr<DataFile>file);
-            void readFile(std::shared_ptr<DataFile>file, double num_bytes);
-
-            //void writeFile(std::shared_ptr<DataFile>file);//unclear how this would work, do we write to 1 existing file then let the background clone it?
-
-
-            //utility
-            std::shared_ptr<FileLocation> traverse(std::stack<Node*> nodes,std::shared_ptr<DataFile> file,bool meta=false);//fake a search for the file, adding to the cache as we return
-
-            std::vector<std::shared_ptr<FileLocation>> traverse(std::vector<std::stack<Node*>> nodes,std::shared_ptr<DataFile> file,bool meta=false);//"search" multiple paths that go through this supreviser in parallel
-            //meta
-
-            //SearchStack search(Node* other,const shared_ptr<DataFile> & file);//returns the path of nodes between here and other IF other is in this subtree.
-            bool cached(shared_ptr<DataFile> file);
-            std::vector<std::shared_ptr<FileLocation>> getCached(shared_ptr<DataFile> file);
+            Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
         private:
-            std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
-            std::vector<shared_ptr<FileLocation>> XRootDSearch(shared_ptr<DataFile> file);
-            std::vector<std::shared_ptr<SearchStack>> searchAll(const std::vector<std::shared_ptr<Node>>&  potential,const shared_ptr<DataFile> & file);
+            map<Node*,vector<stack<Node*>>> splitStack(vector<stack<Node*>> searchStack);
+            virtual std::shared_ptr<FileLocation> selectBest(std::set<std::shared_ptr<FileLocation>> locations);
+            vector<stack<Node*>> constructFileSearchTree(vector<shared_ptr<Node>>& targets);
+            stack<Node*>constructSearchStack(Node* target);
+            //std::shared_ptr<FileLocation> hasFile(shared_ptr<DataFile> file);
+
             bool makeSupervisor();
-            std::vector<std::vector<std::shared_ptr<SearchStack>>> bundle(std::vector<std::shared_ptr<SearchStack>> stacks);
             bool makeFileServer(std::set <std::string> path,WRENCH_PROPERTY_COLLECTION_TYPE property_list,
                                 WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE messagepayload_list);
+
+            /** @brief A pointer to the internal file storage, IF it exists */
             std::shared_ptr<SimpleStorageService> internalStorage=nullptr;
+            /** @brief A vector of all children If the node has any */
             std::vector<std::shared_ptr<Node>> children;
-            std::unordered_map< std::shared_ptr<DataFile>, std::vector<std::shared_ptr<FileLocation>>> cache;//probiably change the payload of this to an object containing the file location AND its queue time stamp
+            /** @brief The internal cache of files within the subtree */
+            Cache cache;
+            /** @brief The supervisor of this node.  All continue search and ripple delete messages should come from this, and all update cache messages go to this server */
             Node* supervisor=nullptr;
+            /** @brief The Meta supervisor for this entire XRootD data federation */
             XRootD* metavisor=nullptr;
+            /** @brief Whether this node is running a reduced simulation.  Initilized from the properties in main */
+            bool reduced;
             friend XRootD;
             friend SearchStack;
+            /***********************/
+            /** \endcond           */
+            /***********************/
         };
     }
 }

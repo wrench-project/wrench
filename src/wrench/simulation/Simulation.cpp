@@ -754,6 +754,17 @@ namespace wrench {
         location->getStorageService()->stageFile(file, location->getMountPoint(),
                                                  location->getAbsolutePathAtMountPoint());
     }
+    /**
+     * @brief Store a file on a particular file server ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+     * @param file: a file
+     * @param location: a storage service
+     *
+     * @throw std::invalid_argument
+     */
+    void Simulation::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<StorageService> &server) {
+        createFile(file, FileLocation::LOCATION(server));
+    }
 
     /**
      * @brief Wrapper enabling timestamps for disk reads
