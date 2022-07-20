@@ -17,6 +17,8 @@
 #include "wrench/services/compute/bare_metal/BareMetalComputeServiceProperty.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/storage/simple/SimpleStorageServiceProperty.h"
+#include "wrench/services/storage/xrootd/XRootD.h"
+#include "wrench/services/storage/xrootd/XRootDProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterComputeService.h"

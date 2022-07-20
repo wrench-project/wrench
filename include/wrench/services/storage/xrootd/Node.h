@@ -82,7 +82,7 @@ namespace wrench {
             /***********************/
 
 
-            int main();
+            int main() override;
             bool processNextMessage();
             Node(const std::string& hostname,WRENCH_PROPERTY_COLLECTION_TYPE storage_property_list, WRENCH_MESSAGE_PAYLOADCOLLECTION_TYPE storage_messagepayload_list);
         private:
