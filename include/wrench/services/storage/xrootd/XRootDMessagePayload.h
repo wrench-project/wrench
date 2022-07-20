@@ -15,30 +15,30 @@
 
 
 #include "wrench/services/ServiceMessagePayload.h"
-
+#include <wrench/services/storage/StorageServiceMessagePayload.h>
 
 namespace wrench {
     namespace XRootD{
         /**
-         * @brief Configurable message payloads for a StorageService
+         * @brief Configurable message payloads for a XRootD node
          */
-        class MessagePayload : public ServiceMessagePayload {
+        class MessagePayload : public StorageServiceMessagePayload {
 
         public:
-            /** @brief The number of bytes in the control message sent to the daemon to request its free space information **/
 
-            /** @brief The number of bytes in the control message sent to the daemon to request a file lookup **/
-            DECLARE_MESSAGEPAYLOAD_NAME(FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
 
-            /** @brief The number of bytes in the control message sent to the daemon to request a file deletion **/
-            DECLARE_MESSAGEPAYLOAD_NAME(FILE_DELETE_REQUEST_MESSAGE_PAYLOAD);
-
-            /** @brief The number of bytes in the control message sent to the daemon to request a file read **/
-            DECLARE_MESSAGEPAYLOAD_NAME(FILE_READ_REQUEST_MESSAGE_PAYLOAD);
             /** @brief The number of bytes in the control message sent by the daemon to answer a file read request **/
-            DECLARE_MESSAGEPAYLOAD_NAME(FILE_READ_ANSWER_MESSAGE_PAYLOAD);
+            DECLARE_MESSAGEPAYLOAD_NAME(FILE_SEARCH_ANSWER_MESSAGE_PAYLOAD);
+
+            /** @brief The number of bytes in the control message sent by the daemon to continue a search request **/
             DECLARE_MESSAGEPAYLOAD_NAME(CONTINUE_SEARCH);
+
+            /** @brief The number of bytes in the control message sent by the daemon to update the cache **/
             DECLARE_MESSAGEPAYLOAD_NAME(UPDATE_CACHE);
+
+            /** @brief The number of bytes for each cache entry **/
+            DECLARE_MESSAGEPAYLOAD_NAME(CACHE_ENTRY);
+
 
         };
     };
