@@ -173,12 +173,75 @@ TEST_F(WorkflowTest, ControlDependency) {
     workflow->removeControlDependency(t1, new_task);
 
     auto new_task_top_level = new_task->getTopLevel();
-    workflow->disableTopLevelDynamicUpdates();
+    workflow->enableTopBottomLevelDynamicUpdates(false);
     workflow->addControlDependency(t1, new_task);
-    workflow->enableTopLevelDynamicUpdates();
-    workflow->updateAllTopLevels();
+    workflow->enableTopBottomLevelDynamicUpdates(true);
+    workflow->updateAllTopBottomLevels();
     ASSERT_EQ(new_task->getTopLevel(), new_task_top_level + 1);
 }
+
+void doTopBottomLevelsTest(bool dynamic_updates) {
+    // Create a test workflow
+    auto wf = wrench::Workflow::createWorkflow();
+    auto t1 = wf->addTask("t1", 1.0, 1, 1, 0.0);
+    auto t2 = wf->addTask("t2", 1.0, 1, 1, 0.0);
+    auto t3 = wf->addTask("t3", 1.0, 1, 1, 0.0);
+    auto t4 = wf->addTask("t4", 1.0, 1, 1, 0.0);
+    auto t5 = wf->addTask("t5", 1.0, 1, 1, 0.0);
+
+    // Add dependencies and check them
+    if (not dynamic_updates) {
+        wf->enableTopBottomLevelDynamicUpdates(false);
+    }
+    wf->addControlDependency(t1, t2);
+    wf->addControlDependency(t1, t3);
+    wf->addControlDependency(t3, t4);
+
+    if (not dynamic_updates) {
+        wf->updateAllTopBottomLevels();
+    }
+
+    ASSERT_TRUE(t1->getTopLevel() == 0 and t1->getBottomLevel() == 2);
+    ASSERT_TRUE(t2->getTopLevel() == 1 and t2->getBottomLevel() == 0);
+    ASSERT_TRUE(t3->getTopLevel() == 1 and t3->getBottomLevel() == 1);
+    ASSERT_TRUE(t4->getTopLevel() == 2 and t4->getBottomLevel() == 0);
+    ASSERT_TRUE(t5->getTopLevel() == 0 and t5->getBottomLevel() == 0);
+    auto tl_range_1 = wf->getTasksInTopLevelRange(1, 1);
+    ASSERT_TRUE(tl_range_1.size() == 2);
+    ASSERT_TRUE(std::find(tl_range_1.begin(), tl_range_1.end(), t2) != tl_range_1.end());
+    ASSERT_TRUE(std::find(tl_range_1.begin(), tl_range_1.end(), t3) != tl_range_1.end());
+    auto bl_range_1 = wf->getTasksInBottomLevelRange(1, 1);
+    ASSERT_TRUE(bl_range_1.size() == 1);
+    ASSERT_TRUE(std::find(bl_range_1.begin(), bl_range_1.end(), t3) != bl_range_1.end());
+
+    // Add/remove dependencies/tasks just for kicks
+    wf->addControlDependency(t4, t5);
+    wf->removeControlDependency(t1, t3);
+    auto t0 = wf->addTask("t0", 1, 1, 1, 0);
+    wf->addControlDependency(t0, t1);
+    wf->addControlDependency(t0, t5);
+    wf->addControlDependency(t1, t4);
+
+    if (not dynamic_updates) {
+        wf->updateAllTopBottomLevels();
+    }
+
+    ASSERT_TRUE(t0->getTopLevel() == 0 and t0->getBottomLevel() == 3);
+    ASSERT_TRUE(t1->getTopLevel() == 1 and t1->getBottomLevel() == 2);
+    ASSERT_TRUE(t2->getTopLevel() == 2 and t2->getBottomLevel() == 0);
+    ASSERT_TRUE(t3->getTopLevel() == 0 and t3->getBottomLevel() == 2);
+    ASSERT_TRUE(t4->getTopLevel() == 2 and t4->getBottomLevel() == 1);
+    ASSERT_TRUE(t5->getTopLevel() == 3 and t5->getBottomLevel() == 0);
+
+    ASSERT_EQ(wf->getTasksInTopLevelRange(1, 2).size(), 3);
+    ASSERT_EQ(wf->getTasksInBottomLevelRange(0, 2).size(), 5);
+}
+
+TEST_F(WorkflowTest, TopBottomLevelsDynamic) {
+    doTopBottomLevelsTest(true);
+    doTopBottomLevelsTest(false);
+}
+
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
     // testing invalid task1 creation

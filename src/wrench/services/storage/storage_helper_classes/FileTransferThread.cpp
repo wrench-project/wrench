@@ -231,16 +231,10 @@ namespace wrench {
         }
 
         // Call retire on all mailboxes passed, which is pretty brute force be should work
-        // TODO: Figure out which ones to retire in the methods called above
-        //        if (answer_mailbox_if_read) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_read);
-        //        if (answer_mailbox_if_write) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_write);
-        //        if (answer_mailbox_if_copy) S4U_Mailbox::retireTemporaryMailbox(answer_mailbox_if_copy);
         if (this->dst_mailbox) {
-            //            std::cerr << "FTT: RETIRING MAILBOX " << this->dst_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(this->dst_mailbox);
         }
         if (this->src_mailbox) {
-            //            std::cerr << "FTT: RETIRING MAILBOX " << this->src_mailbox->get_name() << "\n";
             S4U_Mailbox::retireTemporaryMailbox(this->src_mailbox);
         }
 
