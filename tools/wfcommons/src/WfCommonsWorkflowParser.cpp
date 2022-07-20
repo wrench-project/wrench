@@ -37,7 +37,7 @@ namespace wrench {
         std::set<std::string> ignored_transfer_jobs;
 
         auto workflow = Workflow::createWorkflow();
-        workflow->disableTopLevelDynamicUpdates();
+        workflow->enableTopBottomLevelDynamicUpdates(false);
 
         double flop_rate;
 
@@ -79,13 +79,13 @@ namespace wrench {
                     } catch (nlohmann::detail::out_of_range &e) {
                         num_cores = 1;
                     }
-                    double ghz;
+                    double mhz;
                     try {
-                        ghz = core_spec.at("speed");
+                        mhz = core_spec.at("speed");
                     } catch (nlohmann::detail::out_of_range &e) {
-                        ghz = -1.0;// unknown
+                        mhz = -1.0;// unknown
                     }
-                    machines[name] = std::make_pair(num_cores, ghz);
+                    machines[name] = std::make_pair(num_cores, mhz);
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace wrench {
                                                         "  but no description for that machine is found on the JSON file");
                         }
                         if (machines[execution_machine].second >= 0) {
-                            double core_ghz = (machines[execution_machine].second);
+                            double core_ghz = (machines[execution_machine].second) / 1000.0;
                             double total_compute_power_used = core_ghz * (double) min_num_cores;
                             double actual_flop_rate = total_compute_power_used * 1000.0 * 1000.0 * 1000.0;
                             flop_amount = runtime * actual_flop_rate;
@@ -230,8 +230,8 @@ namespace wrench {
             }
         }
         file.close();
-        workflow->enableTopLevelDynamicUpdates();
-        workflow->updateAllTopLevels();
+        workflow->enableTopBottomLevelDynamicUpdates(true);
+        workflow->updateAllTopBottomLevels();
 
         return workflow;
     }
