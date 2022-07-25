@@ -118,7 +118,7 @@ namespace wrench {
          * @param file: A shared pointer to the file
          */
         void XRootD::createFile(const std::shared_ptr<DataFile> &file) {
-            throw std::invalid_argument("XRootD::createFile(): method not implemented. Use XRootD::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<Node> &location) instead");
+            throw std::invalid_argument("XRootD::createFile(file): Not implemented due to ambiguity over WHERE to put the file. Use XRootD::createFile(file,desiredStorageServer) instead");
         }
 
         /**
