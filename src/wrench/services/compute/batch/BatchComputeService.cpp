@@ -10,7 +10,6 @@
 #include <nlohmann/json.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <wrench/services/compute/cloud/CloudComputeService.h>
 #include <wrench/exceptions/ExecutionException.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/services/compute/batch/BatchComputeService.h>
@@ -143,16 +142,12 @@ namespace wrench {
         std::string workload_file = this->getPropertyValueAsString(
                 BatchComputeServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE);
         if (not workload_file.empty()) {
-            try {
-                this->workload_trace = TraceFileLoader::loadFromTraceFile(
-                        workload_file,
-                        this->getPropertyValueAsBoolean(
-                                BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE),
-                        this->getPropertyValueAsDouble(
-                                BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE));
-            } catch (std::exception &e) {
-                throw;
-            }
+            this->workload_trace = TraceFileLoader::loadFromTraceFile(
+                    workload_file,
+                    this->getPropertyValueAsBoolean(
+                            BatchComputeServiceProperty::IGNORE_INVALID_JOBS_IN_WORKLOAD_TRACE_FILE),
+                    this->getPropertyValueAsDouble(
+                            BatchComputeServiceProperty::SUBMIT_TIME_OF_FIRST_JOB_IN_WORKLOAD_TRACE_FILE));
             // Fix value
             for (auto &j: this->workload_trace) {
                 std::string id = std::get<0>(j);
@@ -339,14 +334,10 @@ namespace wrench {
         unsigned long num_hosts = 0;
         unsigned long num_cores_per_host = 0;
         unsigned long time_asked_for_in_minutes = 0;
-        try {
-            num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-N", batch_job_args);
-            num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-c", batch_job_args);
-            time_asked_for_in_minutes = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-t",
-                                                                                                      batch_job_args);
-        } catch (std::invalid_argument &e) {
-            throw;
-        }
+        num_hosts = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-N", batch_job_args);
+        num_cores_per_host = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-c", batch_job_args);
+        time_asked_for_in_minutes = BatchComputeService::parseUnsignedLongServiceSpecificArgument("-t",
+                                                                                                  batch_job_args);
 
         std::string username = "you";
         if (batch_job_args.find("-u") != batch_job_args.end()) {
@@ -460,11 +451,7 @@ namespace wrench {
 
         // Start the workload trace replayer if needed
         if (not this->workload_trace.empty()) {
-            try {
-                startBackgroundWorkloadProcess();
-            } catch (std::runtime_error &e) {
-                throw;
-            }
+            startBackgroundWorkloadProcess();
         }
 
         /** Main loop **/
@@ -1023,9 +1010,9 @@ namespace wrench {
                         compound_job,
                         this->hostname,
                         resources,
-                        {{BareMetalComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                        {{BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
                           this->getPropertyValueAsString(
-                                  BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD)}},
+                                  BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}},
                         {},
                         DBL_MAX,
                         nullptr,
@@ -1133,13 +1120,9 @@ namespace wrench {
                         this->getPropertyValueAsBoolean(
                                 BatchComputeServiceProperty::USE_REAL_RUNTIMES_AS_REQUESTED_RUNTIMES_IN_WORKLOAD_TRACE_FILE),
                         this->workload_trace));
-        try {
-            this->workload_trace_replayer->setSimulation(this->simulation);
-            this->workload_trace_replayer->start(this->workload_trace_replayer, true,
-                                                 false);// Daemonized, no auto-restart
-        } catch (std::runtime_error &e) {
-            throw;
-        }
+        this->workload_trace_replayer->setSimulation(this->simulation);
+        this->workload_trace_replayer->start(this->workload_trace_replayer, true,
+                                             false);// Daemonized, no auto-restart
     }
 
     /**
@@ -1391,7 +1374,6 @@ namespace wrench {
                 // It has to be an action
                 bool found_task = false;
                 if (job != nullptr) {
-                    // TODO: Should we have an ID/Action map in the job instead of just a set of actions?
                     for (auto const &action: job->getActions()) {
                         if (action->getName() == key) {
                             found_task = true;
