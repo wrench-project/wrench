@@ -1073,7 +1073,6 @@ namespace wrench {
     void ActionExecutionService::validateProperties() {
         bool success = true;
 
-        // TODO: Should there be properties here?
         if (not success) {
             throw std::invalid_argument("ActionExecutionService: Invalid properties");
         }

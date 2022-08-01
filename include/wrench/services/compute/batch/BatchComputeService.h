@@ -52,7 +52,7 @@ namespace wrench {
          */
     private:
         WRENCH_PROPERTY_COLLECTION_TYPE default_property_values = {
-                {BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD, "0"},
+                {BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD, "0"},
                 {BatchComputeServiceProperty::HOST_SELECTION_ALGORITHM, "FIRSTFIT"},
                 {BatchComputeServiceProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
 #ifdef ENABLE_BATSCHED

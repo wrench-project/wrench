@@ -202,7 +202,7 @@ void BatchComputeServiceOneActionTest::do_BadSetup_test() {
                                                          {"RAMHost"},
                                                          "",
                                                          {std::make_pair(
-                                                                 wrench::BatchComputeServiceProperty::TASK_STARTUP_OVERHEAD,
+                                                                 wrench::BatchComputeServiceProperty::THREAD_STARTUP_OVERHEAD,
                                                                  "-1.0")},
                                                          {})),
                  std::invalid_argument);
