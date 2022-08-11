@@ -87,7 +87,6 @@ namespace wrench {
 #endif
         this->answer_mailbox = answer_mailbox;
         this->batsched_decision_reply = std::move(batsched_decision_reply);
-
     }
 
     /**

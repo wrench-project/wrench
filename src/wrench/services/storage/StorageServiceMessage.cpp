@@ -37,7 +37,7 @@ namespace wrench {
     */
     StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
@@ -56,7 +56,7 @@ namespace wrench {
      */
     StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(
             std::map<std::string, double> free_space, double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
 
         for (auto const &f: free_space) {
@@ -82,7 +82,7 @@ namespace wrench {
                                                                                    std::shared_ptr<DataFile> file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (location == nullptr) || (answer_mailbox == nullptr)) {
             throw std::invalid_argument(
@@ -105,7 +105,7 @@ namespace wrench {
     StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(std::shared_ptr<DataFile> file,
                                                                                  bool file_is_available,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(
@@ -129,7 +129,7 @@ namespace wrench {
                                                                                    std::shared_ptr<DataFile> file,
                                                                                    std::shared_ptr<FileLocation> location,
                                                                                    double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
@@ -156,7 +156,7 @@ namespace wrench {
                                                                                  bool success,
                                                                                  std::shared_ptr<FailureCause> failure_cause,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (storage_service == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -187,8 +187,7 @@ namespace wrench {
                                                                                std::shared_ptr<FileLocation> src,
                                                                                std::shared_ptr<FileLocation> dst,
                                                                                std::shared_ptr<FileRegistryService> file_registry_service,
-                                                                               double payload) : StorageServiceMessage(payload)
-    {
+                                                                               double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (src == nullptr) || (dst == nullptr)) {
             throw std::invalid_argument(
@@ -223,7 +222,7 @@ namespace wrench {
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((file == nullptr) || (src == nullptr) || (dst == nullptr) ||
             (success && (failure_cause != nullptr)) ||
@@ -258,7 +257,7 @@ namespace wrench {
                                                                                  std::shared_ptr<FileLocation> location,
                                                                                  unsigned long buffer_size,
                                                                                  double payload)
-            : StorageServiceMessage(payload) {
+        : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
@@ -322,7 +321,7 @@ namespace wrench {
                                                                                std::shared_ptr<FileLocation> location,
                                                                                double num_bytes_to_read,
                                                                                unsigned long buffer_size,
-                                                                               double payload) : StorageServiceMessage(payload)  {
+                                                                               double payload) : StorageServiceMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (mailbox_to_receive_the_file_content == nullptr) ||
             (file == nullptr) || (location == nullptr) || (num_bytes_to_read == -1)) {
@@ -373,7 +372,7 @@ namespace wrench {
     * @param last_chunk: whether this is the last chunk in the file
     */
     StorageServiceFileContentChunkMessage::StorageServiceFileContentChunkMessage(
-            std::shared_ptr<DataFile> file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage((double)chunk_size) {
+            std::shared_ptr<DataFile> file, unsigned long chunk_size, bool last_chunk) : StorageServiceMessage((double) chunk_size) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (file == nullptr) {
             throw std::invalid_argument(
