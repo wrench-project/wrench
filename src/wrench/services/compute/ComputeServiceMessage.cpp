@@ -268,29 +268,29 @@ namespace wrench {
         this->compute_service = std::move(cs);
     }
 
-///**
-//     * @brief Constructor
-//     * @param job: a pilot job that has failed
-//     * @param cs: the compute service on which the pilot job has failed
-//     * @param cause: the failure cause
-//     * @param payload: message size in bytes
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob> job,
-//                                                                             std::shared_ptr<ComputeService> cs,
-//                                                                             std::shared_ptr<FailureCause> cause,
-//                                                                             double payload) : ComputeServiceMessage(payload) {
-//#ifdef WRENCH_INTERNAL_EXCEPTIONS
-//        if ((job == nullptr) || (cs == nullptr)) {
-//            throw std::invalid_argument(
-//                    "ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
-//        }
-//#endif
-//        this->job = std::move(job);
-//        this->compute_service = std::move(cs);
-//        this->cause = std::move(cause);
-//    }
+    ///**
+    //     * @brief Constructor
+    //     * @param job: a pilot job that has failed
+    //     * @param cs: the compute service on which the pilot job has failed
+    //     * @param cause: the failure cause
+    //     * @param payload: message size in bytes
+    //     *
+    //     * @throw std::invalid_argument
+    //     */
+    //    ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+    //                                                                             std::shared_ptr<ComputeService> cs,
+    //                                                                             std::shared_ptr<FailureCause> cause,
+    //                                                                             double payload) : ComputeServiceMessage(payload) {
+    //#ifdef WRENCH_INTERNAL_EXCEPTIONS
+    //        if ((job == nullptr) || (cs == nullptr)) {
+    //            throw std::invalid_argument(
+    //                    "ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
+    //        }
+    //#endif
+    //        this->job = std::move(job);
+    //        this->compute_service = std::move(cs);
+    //        this->cause = std::move(cause);
+    //    }
 
     /**
     * @brief Constructor
