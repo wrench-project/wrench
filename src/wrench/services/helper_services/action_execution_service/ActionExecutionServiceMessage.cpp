@@ -34,6 +34,11 @@ namespace wrench {
             simgrid::s4u::Mailbox *reply_mailbox,
             std::shared_ptr<Action> action,
             double payload) : ActionExecutionServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+        if ((reply_mailbox == nullptr) || (action == nullptr)) {
+            throw std::invalid_argument("ActionExecutionServiceSubmitActionRequestMessage::ActionExecutionServiceSubmitActionRequestMessage(): invalid argument");
+        }
+#endif
         this->action = std::move(action);
         this->reply_mailbox = reply_mailbox;
     }
@@ -48,6 +53,8 @@ namespace wrench {
             bool success,
             std::shared_ptr<FailureCause> cause,
             double payload) : ActionExecutionServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+#endif
         this->success = success;
         this->cause = std::move(cause);
     }
@@ -64,6 +71,11 @@ namespace wrench {
             std::shared_ptr<Action> action,
             ComputeService::TerminationCause termination_cause,
             double payload) : ActionExecutionServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+        if ((reply_mailbox == nullptr) || (action == nullptr)) {
+            throw std::invalid_argument("ActionExecutionServiceTerminateActionRequestMessage::ActionExecutionServiceTerminateActionRequestMessage(): invalid argument");
+        }
+#endif
         this->reply_mailbox = reply_mailbox;
         this->action = std::move(action);
         this->termination_cause = termination_cause;
@@ -78,6 +90,8 @@ namespace wrench {
     ActionExecutionServiceTerminateActionAnswerMessage::ActionExecutionServiceTerminateActionAnswerMessage(
             bool success,
             std::shared_ptr<FailureCause> cause, double payload) : ActionExecutionServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+#endif
         this->success = success;
         this->cause = std::move(cause);
     }
@@ -89,6 +103,12 @@ namespace wrench {
   */
     ActionExecutionServiceActionDoneMessage::ActionExecutionServiceActionDoneMessage(
             std::shared_ptr<Action> action, double payload) : ActionExecutionServiceMessage(payload) {
+
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+        if (action == nullptr) {
+            throw std::invalid_argument("ActionExecutionServiceActionDoneMessage::ActionExecutionServiceActionDoneMessage(): invalid argument");
+        }
+#endif
         this->action = std::move(action);
         this->payload = payload;
     }

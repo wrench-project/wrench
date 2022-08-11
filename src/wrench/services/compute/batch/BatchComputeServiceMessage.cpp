@@ -74,7 +74,8 @@ namespace wrench {
     BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
-        : BatchComputeServiceMessage(payload), answer_mailbox(answer_mailbox), batsched_decision_reply(batsched_decision_reply) {
+        : BatchComputeServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (answer_mailbox == nullptr) {
             throw std::invalid_argument(
                     "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
@@ -83,6 +84,10 @@ namespace wrench {
             throw std::invalid_argument(
                     "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->batsched_decision_reply = std::move(batsched_decision_reply);
+
     }
 
     /**
@@ -152,7 +157,8 @@ namespace wrench {
      */
     BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                std::shared_ptr<BatchJob> job, double payload)
-        : BatchComputeServiceMessage(payload), answer_mailbox(answer_mailbox), job(job) {
+        : BatchComputeServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Invalid arguments");
@@ -161,6 +167,9 @@ namespace wrench {
             throw std::invalid_argument(
                     "BatchComputeServiceJobRequestMessage::BatchComputeServiceJobRequestMessage(): Empty answer mailbox");
         }
+#endif
+        this->answer_mailbox = answer_mailbox;
+        this->job = std::move(job);
     }
 
     /**
@@ -172,11 +181,13 @@ namespace wrench {
      */
     AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(std::shared_ptr<BatchJob> job, double payload)
         : ServiceMessage(payload) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (job == nullptr) {
             throw std::invalid_argument(
                     "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
         }
-        this->job = job;
+#endif
+        this->job = std::move(job);
     }
 
 #if 0

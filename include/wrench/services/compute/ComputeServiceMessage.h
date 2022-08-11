@@ -349,7 +349,7 @@ namespace wrench {
         /** @brief The mailbox to which the answer should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The key (i.e., resource information name) desired */
-        const std::string &key;
+        std::string key;
     };
 
     /**
