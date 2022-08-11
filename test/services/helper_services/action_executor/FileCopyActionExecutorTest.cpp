@@ -137,6 +137,10 @@ private:
         auto file_copy_action = job->addFileCopyAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss1),
                                                        wrench::FileLocation::LOCATION(this->test->ss2));
+
+        // coverage
+        file_copy_action->getActionTypeAsString();
+
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_copy_action, nullptr));

@@ -142,6 +142,9 @@ private:
 
         action = std::dynamic_pointer_cast<wrench::Action>(job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
 
+        // coverage
+        action->getActionTypeAsString();
+
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2",
                                            num_cores,

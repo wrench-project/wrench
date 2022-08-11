@@ -135,6 +135,10 @@ private:
         // Add a file_write_action
         auto file_write_action = job->addFileWriteAction("", this->test->file,
                                                          wrench::FileLocation::LOCATION(this->test->ss1));
+
+        // coverage
+        file_write_action->getActionTypeAsString();
+
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_write_action, nullptr));
