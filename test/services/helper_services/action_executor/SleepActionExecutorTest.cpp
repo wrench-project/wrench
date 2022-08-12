@@ -131,7 +131,7 @@ private:
         auto sleep_action = job->addSleepAction("", 10.0);
 
         // coverage
-        sleep_action->getActionTypeAsString();
+        wrench::Action::getActionTypeAsString(sleep_action);
 
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(

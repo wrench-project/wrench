@@ -137,7 +137,7 @@ private:
                                                          wrench::FileLocation::LOCATION(this->test->ss1));
 
         // coverage
-        file_write_action->getActionTypeAsString();
+        wrench::Action::getActionTypeAsString(file_write_action);
 
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(

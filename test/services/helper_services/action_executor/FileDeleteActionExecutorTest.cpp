@@ -134,7 +134,7 @@ private:
                                                            wrench::FileLocation::LOCATION(this->test->ss));
 
         // coverage
-        file_delete_action->getActionTypeAsString();
+        wrench::Action::getActionTypeAsString(file_delete_action);
 
         // Create a file read action executor
         auto file_delete_action_executor = std::shared_ptr<wrench::ActionExecutor>(

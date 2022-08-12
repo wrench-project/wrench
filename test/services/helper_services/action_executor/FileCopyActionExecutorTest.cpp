@@ -139,7 +139,7 @@ private:
                                                        wrench::FileLocation::LOCATION(this->test->ss2));
 
         // coverage
-        file_copy_action->getActionTypeAsString();
+        wrench::Action::getActionTypeAsString(file_copy_action);
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
