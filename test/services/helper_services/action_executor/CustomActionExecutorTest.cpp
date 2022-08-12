@@ -151,7 +151,7 @@ private:
         action = std::dynamic_pointer_cast<wrench::Action>(job->addCustomAction("", 0, 0, lambda_execute, lambda_terminate));
 
         // coverage
-        action->getActionTypeAsString();
+        wrench::Action::getActionTypeAsString(action);
 
         auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2",
