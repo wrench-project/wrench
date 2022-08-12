@@ -454,7 +454,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
+        test/simulation/S4U_MailboxTest.cpp
+        test/misc/UnitParserTest.cpp
         )
 
 
