@@ -24,16 +24,15 @@ TEST_F(UnitParserTest, ParseTest) {
 
 void UnitParserTest::do_parse_test() {
 
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10b"), 10.0/8.0);
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10b"), 10.0 / 8.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10"), 10.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10B"), 10.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10kB"), 10.0*1000.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10MB"), 10.0*1000.0*1000.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10GB"), 10.0*1000.0*1000.0*1000.0);
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10kB"), 10.0 * 1000.0);
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10MB"), 10.0 * 1000.0 * 1000.0);
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_size("10GB"), 10.0 * 1000.0 * 1000.0 * 1000.0);
 
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10"), 10.0);
     ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10f"), 10.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10kf"), 10.0*1000.0);
-    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10Mf"), 10.0*1000.0*1000.0);
-
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10kf"), 10.0 * 1000.0);
+    ASSERT_DOUBLE_EQ(wrench::UnitParser::parse_compute_speed("10Mf"), 10.0 * 1000.0 * 1000.0);
 }
