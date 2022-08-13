@@ -773,6 +773,7 @@ private:
                                                    {test->output_file, wrench::FileLocation::LOCATION(
                                                                                test->storage_service1, "/disk1")}});
 
+
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
