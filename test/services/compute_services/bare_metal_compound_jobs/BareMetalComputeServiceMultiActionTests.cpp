@@ -735,7 +735,7 @@ private:
 
         // Coverage
         try {
-            job_manager->terminateJob((std::shared_ptr<wrench::CompoundJob>)nullptr);
+            job_manager->terminateJob((std::shared_ptr<wrench::CompoundJob>) nullptr);
             throw std::runtime_error("Shouldn't be able to terminate a null job");
         } catch (std::invalid_argument &ignore) {}
 
