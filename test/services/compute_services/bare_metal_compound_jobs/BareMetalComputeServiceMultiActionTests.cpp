@@ -733,7 +733,14 @@ private:
         // Sleep 11 seconds
         wrench::Simulation::sleep(11.0);
 
+        // Coverage
+        try {
+            job_manager->terminateJob((std::shared_ptr<wrench::CompoundJob>)nullptr);
+            throw std::runtime_error("Shouldn't be able to terminate a null job");
+        } catch (std::invalid_argument &ignore) {}
+
         // Terminate the job
+
         job_manager->terminateJob(job);
 
         // Check job state

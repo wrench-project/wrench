@@ -391,6 +391,13 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
+
+        // Submit the job without any action
+        try {
+            job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Shouldn't be able to submit a job with no actions in it");
+        } catch (std::invalid_argument &ignore) {}
+
         job->setPriority(10.0); // coverage
         job->getPriority();     // coverage
         job->getStateAsString();// coverage
