@@ -88,14 +88,14 @@ protected:
         output_file6 = workflow->addFile("output_file6", 10.0);
 
         // Create the tasks
-        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 0);
-        task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 0);
-        task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 0);
-        task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 0);
-        task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 0);
-        task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 0);
-        task7 = workflow->addTask("task_7_8s_1_to_4_cores", 8.0, 1, 4, 0);
-        task8 = workflow->addTask("task_8_8s_2_to_4_cores", 8.0, 2, 4, 0);
+        task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1);
+        task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 2);
+        task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 3);
+        task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 4);
+        task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 5);
+        task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 6);
+        task7 = workflow->addTask("task_7_8s_1_to_4_cores", 8.0, 1, 4, 7);
+        task8 = workflow->addTask("task_8_8s_2_to_4_cores", 8.0, 2, 4, 8);
 
         // Add file-task1 dependencies
         task1->addInputFile(input_file);
@@ -130,6 +130,7 @@ protected:
                           "             <prop id=\"size\" value=\"101B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
+                          "          <prop id=\"ram\" value=\"20MB\"/> "
                           "       </host>"
                           "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"> "
                           "          <disk id=\"large_disk\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
@@ -140,6 +141,7 @@ protected:
                           "             <prop id=\"size\" value=\"101B\"/>"
                           "             <prop id=\"mount\" value=\"/scratch\"/>"
                           "          </disk>"
+                          "          <prop id=\"ram\" value=\"20MB\"/> "
                           "       </host>"
                           "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
                           "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
@@ -387,6 +389,15 @@ private:
                                  wrench::FileLocation::LOCATION(this->test->storage_service),
                                  wrench::FileLocation::SCRATCH)},
                 {}, {});
+
+        // Coverage
+        if (two_task_job->getMinimumRequiredMemory() !=
+        std::max<double>(this->test->task1->getMemoryRequirement(), this->test->task2->getMemoryRequirement())) {
+            throw std::runtime_error("Job minimum required memory is incorrect");
+        }
+        two_task_job->getFileLocations();
+        two_task_job->setPreJobOverheadInSeconds(0.0);
+        two_task_job->setPostJobOverheadInSeconds(0.0);
 
         // Submit the 2-task1 job for execution
         job_manager->submitJob(two_task_job, this->test->compute_service);
