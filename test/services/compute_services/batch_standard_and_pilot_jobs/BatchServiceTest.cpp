@@ -391,7 +391,7 @@ private:
 
         // Coverage
         try {
-            job_manager->terminateJob((std::shared_ptr<wrench::StandardJob>)nullptr);
+            job_manager->terminateJob((std::shared_ptr<wrench::StandardJob>) nullptr);
             throw std::runtime_error("Shouldn't be able to terminate a null job");
         } catch (std::invalid_argument &ignore) {}
 
@@ -2596,7 +2596,7 @@ private:
 
             // Coverage
             try {
-                job_manager->terminateJob((std::shared_ptr<wrench::PilotJob>)nullptr);
+                job_manager->terminateJob((std::shared_ptr<wrench::PilotJob>) nullptr);
                 throw std::runtime_error("Shouldn't be able to terminate a null job");
             } catch (std::invalid_argument &ignore) {}
 

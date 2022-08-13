@@ -238,7 +238,7 @@ class FileCopyActionExecutorSuccessSameHostTestWMS : public wrench::ExecutionCon
 
 public:
     FileCopyActionExecutorSuccessSameHostTestWMS(FileCopyActionExecutorTest *test,
-                                         std::string hostname) : wrench::ExecutionController(hostname, "test") {
+                                                 std::string hostname) : wrench::ExecutionController(hostname, "test") {
         this->test = test;
     }
 
