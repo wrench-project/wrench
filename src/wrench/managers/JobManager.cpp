@@ -543,7 +543,7 @@ namespace wrench {
         }
 
         if (job->actions.empty()) {
-            throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that has any actions");
+            throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that doesn't have any actions");
         }
 
         try {
