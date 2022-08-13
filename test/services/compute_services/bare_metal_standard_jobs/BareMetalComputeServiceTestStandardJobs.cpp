@@ -392,7 +392,7 @@ private:
 
         // Coverage
         if (two_task_job->getMinimumRequiredMemory() !=
-        std::max<double>(this->test->task1->getMemoryRequirement(), this->test->task2->getMemoryRequirement())) {
+            std::max<double>(this->test->task1->getMemoryRequirement(), this->test->task2->getMemoryRequirement())) {
             throw std::runtime_error("Job minimum required memory is incorrect");
         }
         two_task_job->getFileLocations();
