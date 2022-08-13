@@ -241,6 +241,14 @@ private:
         wrench::Simulation::getLinknameList();
         wrench::Simulation::getLinkBandwidth("1");
         wrench::Simulation::getLinkUsage("1");
+        wrench::Simulation::isLinkOn("1");
+
+        try {
+            wrench::Simulation::getLinkBandwidth("bogus");
+            wrench::Simulation::getLinkUsage("bogus");
+            wrench::Simulation::isLinkOn("bogus");
+            throw std::runtime_error("Should not be able to get information about bogus link");
+        } catch (std::invalid_argument &ignore) {}
 
         // For coverage
         std::string src_host = "DualCoreHost";
