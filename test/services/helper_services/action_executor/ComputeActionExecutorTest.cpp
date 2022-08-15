@@ -37,7 +37,8 @@ public:
     std::shared_ptr<wrench::DataFile> file;
     std::shared_ptr<wrench::StorageService> ss;
 
-    void do_ComputeActionExecutorSuccessTest_test();
+    void do_ComputeActionExecutorSuccessTest_test(bool simulation_computation_as_sleep);
+    void do_ComputeActionExecutorFailureTest_test();
 
 protected:
     ComputeActionExecutorTest() {
@@ -120,12 +121,14 @@ class ComputeActionExecutorTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeActionExecutorTestWMS(ComputeActionExecutorTest *test,
-                                 std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                 std::string hostname,
+                                 bool simulation_computation_as_sleep) : wrench::ExecutionController(hostname, "test"), test(test), simulation_computation_as_sleep(simulation_computation_as_sleep) {
     }
 
 
 private:
     ComputeActionExecutorTest *test;
+    bool simulation_computation_as_sleep;
 
     int main() {
 
@@ -140,7 +143,8 @@ private:
         unsigned long num_cores = 2;
         double ram = 200;
 
-        action = std::dynamic_pointer_cast<wrench::Action>(job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
+        action = std::dynamic_pointer_cast<wrench::Action>(
+                job->addComputeAction("", 20.0, 100.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
 
         // coverage
         wrench::Action::getActionTypeAsString(action);
@@ -150,7 +154,7 @@ private:
                                            num_cores,
                                            ram,
                                            0.1,
-                                           false,
+                                           simulation_computation_as_sleep,
                                            this->mailbox,
                                            action,
                                            nullptr));
@@ -193,10 +197,11 @@ private:
 };
 
 TEST_F(ComputeActionExecutorTest, Success) {
-    DO_TEST_WITH_FORK(do_ComputeActionExecutorSuccessTest_test);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorSuccessTest_test, true);
+    DO_TEST_WITH_FORK_ONE_ARG(do_ComputeActionExecutorSuccessTest_test, false);
 }
 
-void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
+void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool simulation_computation_as_sleep) {
 
     // Create and initialize a simulation
     simulation = wrench::Simulation::createSimulation();
@@ -224,7 +229,130 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-                            new ComputeActionExecutorTestWMS(this, "Host1")));
+                            new ComputeActionExecutorTestWMS(this, "Host1", simulation_computation_as_sleep)));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    this->workflow->clear();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  COMPUTE ACTION EXECUTOR FAILURE TEST                            **/
+/**********************************************************************/
+
+
+class ComputeActionExecutorFailureTestWMS : public wrench::ExecutionController {
+
+public:
+    ComputeActionExecutorFailureTestWMS(ComputeActionExecutorTest *test,
+                                 std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+    }
+
+private:
+    ComputeActionExecutorTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("");
+
+        // Create an action executor
+        std::shared_ptr<wrench::Action> action;
+        unsigned long num_cores = 2;
+        double ram = 200;
+
+        // Coverage
+        try {
+            job->addComputeAction("", -1.0, -1.0, 0, 1, wrench::ParallelModel::AMDAHL(1.0));
+            throw std::runtime_error("Shouldn't be able to create a compute action with bogus arguments");
+        } catch (std::invalid_argument &ignore) {}
+
+        // Too much RAM
+        action = std::dynamic_pointer_cast<wrench::Action>(
+                job->addComputeAction("", 20.0, 300.0, 1, 4, wrench::ParallelModel::AMDAHL(1.0)));
+
+        auto action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2",
+                                           num_cores,
+                                           ram,
+                                           0.1,
+                                           false,
+                                           this->mailbox,
+                                           action,
+                                           nullptr));
+
+        // Start it
+        action_executor->setSimulation(this->simulation);
+        action_executor->start(action_executor, true, false);
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutorDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        if (action->getState() != wrench::Action::FAILED) {
+            throw std::runtime_error("Action should have failed");
+        }
+
+        if (not std::dynamic_pointer_cast<wrench::FatalFailure>(action->getFailureCause())) {
+            throw std::runtime_error("Action's failure cause should be NotEnoughResources");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(ComputeActionExecutorTest, Failure) {
+    DO_TEST_WITH_FORK(do_ComputeActionExecutorFailureTest_test);
+}
+
+void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
+
+    // Create and initialize a simulation
+    simulation = wrench::Simulation::createSimulation();
+    int argc = 2;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-host-shutdown-simulation");
+    //    argv[2] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    this->workflow = wrench::Workflow::createWorkflow();
+
+    // Create a Storage Service
+    this->ss = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create a file
+    this->file = this->workflow->addFile("some_file", 1000000.0);
+
+    wrench::Simulation::createFile(file, wrench::FileLocation::LOCATION(ss));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(
+            new ComputeActionExecutorFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
