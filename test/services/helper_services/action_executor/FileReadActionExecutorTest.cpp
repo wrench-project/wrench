@@ -136,11 +136,21 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
+
+        try {
+            job->addFileReadAction("", this->test->file,
+                                   wrench::FileLocation::LOCATION(this->test->ss),
+                                   this->test->file->getSize() + 10);
+            throw std::runtime_error("Shouldn't be able to read more bytes than the file contains");
+        } catch (std::invalid_argument &ignore) {}
+
         // Add a file_read_action
         auto file_read_action = job->addFileReadAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss));
         // coverage
         wrench::Action::getActionTypeAsString(file_read_action);
+        file_read_action->getFile();
+        file_read_action->getFileLocations();
 
         // Create a file read action executor
         auto file_read_action_executor = std::shared_ptr<wrench::ActionExecutor>(
