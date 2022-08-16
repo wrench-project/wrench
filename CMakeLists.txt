@@ -384,6 +384,7 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileRegistryActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp

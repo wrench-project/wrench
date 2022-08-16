@@ -141,6 +141,9 @@ private:
 
         // coverage
         wrench::Action::getActionTypeAsString(file_copy_action);
+        file_copy_action->getFile();
+        file_copy_action->getSourceFileLocation();
+        file_copy_action->getDestinationFileLocation();
 
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(

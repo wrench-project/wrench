@@ -127,6 +127,13 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
+
+        // Coverage
+        try {
+            job->addSleepAction("", -1.0);
+            throw std::runtime_error("Should not be able to create sleep action with negative sleep time");
+        } catch (std::exception &ignore) {}
+
         // Add a sleep_action
         auto sleep_action = job->addSleepAction("", 10.0);
 
