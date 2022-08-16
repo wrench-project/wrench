@@ -241,7 +241,6 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorSuccessTest_test(bool si
 }
 
 
-
 /**********************************************************************/
 /**  COMPUTE ACTION EXECUTOR FAILURE TEST                            **/
 /**********************************************************************/
@@ -251,7 +250,7 @@ class ComputeActionExecutorFailureTestWMS : public wrench::ExecutionController {
 
 public:
     ComputeActionExecutorFailureTestWMS(ComputeActionExecutorTest *test,
-                                 std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
+                                        std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test) {
     }
 
 private:
@@ -352,7 +351,7 @@ void ComputeActionExecutorTest::do_ComputeActionExecutorFailureTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(
-            new ComputeActionExecutorFailureTestWMS(this, "Host1")));
+                            new ComputeActionExecutorFailureTestWMS(this, "Host1")));
 
     ASSERT_NO_THROW(simulation->launch());
 
