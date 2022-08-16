@@ -138,6 +138,9 @@ private:
 
         // coverage
         wrench::Action::getActionTypeAsString(file_write_action);
+        file_write_action->getFile();
+        file_write_action->getFileLocation();
+        file_write_action->usesScratch();
 
         // Create a file read action executor
         auto file_write_action_executor = std::shared_ptr<wrench::ActionExecutor>(
