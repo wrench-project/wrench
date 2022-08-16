@@ -115,8 +115,8 @@ class FileRegistryActionExecutorSuccessTestWMS : public wrench::ExecutionControl
 
 public:
     FileRegistryActionExecutorSuccessTestWMS(FileRegistryActionExecutorTest *test,
-                                         std::shared_ptr<wrench::Workflow> workflow,
-                                         std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
+                                             std::shared_ptr<wrench::Workflow> workflow,
+                                             std::string hostname) : wrench::ExecutionController(hostname, "test"), test(test), workflow(workflow) {
     }
 
 private:
@@ -173,9 +173,9 @@ private:
             auto job = job_manager->createCompoundJob("");
             // Add a file_read_action
             auto file_registry_delete_entry_action = job->addFileRegistryDeleteEntryAction("", this->test->fr,
-                                                                                     this->test->file,
-                                                                                     wrench::FileLocation::LOCATION(
-                                                                                             this->test->ss));
+                                                                                           this->test->file,
+                                                                                           wrench::FileLocation::LOCATION(
+                                                                                                   this->test->ss));
             // coverage
             wrench::Action::getActionTypeAsString(file_registry_delete_entry_action);
             file_registry_delete_entry_action->getFile();
