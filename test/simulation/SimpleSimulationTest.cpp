@@ -205,6 +205,9 @@ private:
                 one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}},
                                                                           {}, {}, {});
 
+                // Coverage
+                one_task_jobs[job_index]->setPriority(1.0);
+
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
                     throw std::runtime_error("A one-task1 job should say it has one task1");
                 }
@@ -213,6 +216,10 @@ private:
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
+
+                // Coverage
+                one_task_jobs[job_index]->printCallbackMailboxStack();
+
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
