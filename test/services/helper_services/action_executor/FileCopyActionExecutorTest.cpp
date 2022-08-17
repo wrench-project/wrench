@@ -31,6 +31,7 @@ public:
     std::shared_ptr<wrench::Simulation> simulation;
 
     void do_FileCopyActionExecutorSuccessTest_test();
+    void do_FileCopyActionExecutorSuccessSameHostTest_test();
 
 
 protected:
@@ -137,6 +138,13 @@ private:
         auto file_copy_action = job->addFileCopyAction("", this->test->file,
                                                        wrench::FileLocation::LOCATION(this->test->ss1),
                                                        wrench::FileLocation::LOCATION(this->test->ss2));
+
+        // coverage
+        wrench::Action::getActionTypeAsString(file_copy_action);
+        file_copy_action->getFile();
+        file_copy_action->getSourceFileLocation();
+        file_copy_action->getDestinationFileLocation();
+
         // Create a file copy action executor
         auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_copy_action, nullptr));
@@ -177,7 +185,7 @@ private:
     }
 };
 
-TEST_F(FileCopyActionExecutorTest, SuccessTest) {
+TEST_F(FileCopyActionExecutorTest, Success) {
     DO_TEST_WITH_FORK(do_FileCopyActionExecutorSuccessTest_test);
 }
 
@@ -214,6 +222,106 @@ void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessTest_test() {
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     wms = simulation->add(new FileCopyActionExecutorSuccessTestWMS(this, "Host1"));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    workflow->clear();
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  DO FILE_READ ACTION EXECUTOR SUCCESS TEST SAME HOST             **/
+/**********************************************************************/
+
+class FileCopyActionExecutorSuccessSameHostTestWMS : public wrench::ExecutionController {
+
+public:
+    FileCopyActionExecutorSuccessSameHostTestWMS(FileCopyActionExecutorTest *test,
+                                                 std::string hostname) : wrench::ExecutionController(hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    FileCopyActionExecutorTest *test;
+
+    int main() {
+
+        // Create a job manager
+        auto job_manager = this->createJobManager();
+
+        // Create a compound job
+        auto job = job_manager->createCompoundJob("");
+        // Add a file_copy_action
+        auto file_copy_action = job->addFileCopyAction("", this->test->file,
+                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/"),
+                                                       wrench::FileLocation::LOCATION(this->test->ss1, "/disk2"));
+
+        // Create a file copy action executor
+        auto file_copy_action_executor = std::shared_ptr<wrench::ActionExecutor>(
+                new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, file_copy_action, nullptr));
+        // Start it
+        file_copy_action_executor->setSimulation(this->simulation);
+        file_copy_action_executor->start(file_copy_action_executor, true, false);
+
+        // Wait for a message from it
+        std::shared_ptr<wrench::SimulationMessage> message;
+        try {
+            message = wrench::S4U_Mailbox::getMessage(this->mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+            throw std::runtime_error("Network error while getting reply from Executor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = std::dynamic_pointer_cast<wrench::ActionExecutorDoneMessage>(message);
+        if (!msg) {
+            throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        return 0;
+    }
+};
+
+TEST_F(FileCopyActionExecutorTest, SuccessSameHost) {
+    DO_TEST_WITH_FORK(do_FileCopyActionExecutorSuccessSameHostTest_test);
+}
+
+
+void FileCopyActionExecutorTest::do_FileCopyActionExecutorSuccessSameHostTest_test() {
+
+    // Create and initialize a simulation
+    simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    char **argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Create a Storage Service
+    this->ss1 = simulation->add(new wrench::SimpleStorageService("Host3", {"/"}));
+
+    // Create another Storage Service
+    this->ss2 = simulation->add(new wrench::SimpleStorageService("Host1", {"/"}));
+
+    // Create a workflow
+    workflow = wrench::Workflow::createWorkflow();
+
+    // Create a file
+    this->file = workflow->addFile("some_file", 1000000000.0);
+
+    // Put it on ss1
+    wrench::Simulation::createFile(this->file, wrench::FileLocation::LOCATION(this->ss1));
+
+    // Create a WMS
+    std::shared_ptr<wrench::ExecutionController> wms = nullptr;
+    wms = simulation->add(new FileCopyActionExecutorSuccessSameHostTestWMS(this, "Host1"));
 
     ASSERT_NO_THROW(simulation->launch());
 
