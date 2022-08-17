@@ -47,6 +47,7 @@ protected:
                           "          </disk>"
                           "          <disk id=\"large_disk1\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"size\" value=\"30000GB\"/>"
+                          "             <prop id=\"mount\" value=\"/\"/>"
                           "          </disk>"
                           "          <disk id=\"no_capacity\" read_bw=\"100MBps\" write_bw=\"100MBps\">"
                           "             <prop id=\"mount\" value=\"/no_capacity\"/>"
@@ -250,7 +251,6 @@ private:
         if (wrench::S4U_Simulation::getHostProperty("Host1", "custom_property") != "whatever") {
             throw std::runtime_error("Getting property for valid host should have returned the set value");
         }
-
 
         return 0;
     }
