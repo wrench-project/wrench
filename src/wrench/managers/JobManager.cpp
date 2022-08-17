@@ -543,7 +543,7 @@ namespace wrench {
         }
 
         if (job->actions.empty()) {
-            throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that has any actions");
+            throw std::invalid_argument("JobManager::submitJob(): Cannot submit a job that doesn't have any actions");
         }
 
         try {
@@ -968,7 +968,8 @@ namespace wrench {
                 if (std::dynamic_pointer_cast<JobTimeout>(pjob_action->getFailureCause())) {
                     processPilotJobExpiration(pjob, msg->compute_service);
                 } else {
-                    processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
+                    throw std::runtime_error("JobManager::processNextMessage(): Received unexpected pilot job failure cause " + pjob_action->getFailureCause()->toString());
+                    //                    processPilotJobFailure(pjob, msg->compute_service, pjob_action->getFailureCause());
                 }
             } else {
                 processCompoundJobFailure(msg->job, msg->compute_service);
@@ -1097,27 +1098,27 @@ namespace wrench {
                                  new ComputeServicePilotJobExpiredMessage(job, std::move(compute_service), 0.0));
     }
 
-    /**
-  * @brief Process a pilot job failing (whatever that means)
-  * @param job: the pilot job that failed
-  * @param compute_service: the compute service on which it was running
-  * @param cause: the failure cause
-  */
-    void JobManager::processPilotJobFailure(const std::shared_ptr<PilotJob> &job,
-                                            std::shared_ptr<ComputeService> compute_service,
-                                            std::shared_ptr<FailureCause> cause) {
-        // update job state
-        job->state = PilotJob::State::FAILED;
-        this->num_running_pilot_jobs--;
-
-        // Remove the job from the "dispatched" list and put it in the completed list
-        this->jobs_dispatched.erase(job->compound_job);
-
-        // Forward the notification to the source
-        WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
-        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                 new ComputeServicePilotJobFailedMessage(job, std::move(compute_service), std::move(cause), 0.0));
-    }
+    //    /**
+    //  * @brief Process a pilot job failing (whatever that means)
+    //  * @param job: the pilot job that failed
+    //  * @param compute_service: the compute service on which it was running
+    //  * @param cause: the failure cause
+    //  */
+    //    void JobManager::processPilotJobFailure(const std::shared_ptr<PilotJob> &job,
+    //                                            std::shared_ptr<ComputeService> compute_service,
+    //                                            std::shared_ptr<FailureCause> cause) {
+    //        // update job state
+    //        job->state = PilotJob::State::FAILED;
+    //        this->num_running_pilot_jobs--;
+    //
+    //        // Remove the job from the "dispatched" list and put it in the completed list
+    //        this->jobs_dispatched.erase(job->compound_job);
+    //
+    //        // Forward the notification to the source
+    //        WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox()->get_cname());
+    //        S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+    //                                 new ComputeServicePilotJobFailedMessage(job, std::move(compute_service), std::move(cause), 0.0));
+    //    }
 
     /**
      * @brief Create a Compound job
@@ -1180,14 +1181,6 @@ namespace wrench {
                             S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
                         } catch (NetworkError &e) {
                         }
-                    }
-                } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                    try {
-                        auto message =
-                                new JobManagerPilotJobFailedMessage(pjob, pjob->parent_compute_service, e.getCause());
-
-                        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
-                    } catch (NetworkError &e) {
                     }
                 }
             }
