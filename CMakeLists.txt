@@ -384,6 +384,7 @@ set(TEST_FILES
         test/services/helper_services/action_executor/FileDeleteActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileCopyActionExecutorTest.cpp
         test/services/helper_services/action_executor/FileWriteActionExecutorTest.cpp
+        test/services/helper_services/action_executor/FileRegistryActionExecutorTest.cpp
         test/services/helper_services/action_executor/KillFailureActionExecutorTest.cpp
         test/services/helper_services/action_execution_service/ActionExecutionServiceTest.cpp
         test/services/compute_services/bare_metal_standard_jobs/BareMetalComputeServiceResourceInformationTest.cpp
@@ -454,7 +455,8 @@ set(TEST_FILES
         test/simulated_failures/failure_test_util/ComputerVictim.h
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.cpp
         test/simulated_failures/failure_test_util/ResourceRandomRepeatSwitcher.h
-        test/simulation/S4U_MailboxTest.cpp src/wrench/action/Action.cpp
+        test/simulation/S4U_MailboxTest.cpp
+        test/misc/UnitParserTest.cpp
         )
 
 
