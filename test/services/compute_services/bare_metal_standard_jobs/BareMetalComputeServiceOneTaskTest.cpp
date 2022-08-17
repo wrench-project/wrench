@@ -775,7 +775,9 @@ private:
 
 
         // Submit the job
+        test->task->getStateAsString();
         job_manager->submitJob(job, test->compute_service);
+        test->task->getStateAsString();
 
         // Submit the job again (coverage)
         try {
@@ -783,11 +785,13 @@ private:
             throw std::runtime_error("Shouldn't be able to submit job again");
         } catch (std::invalid_argument &ignore) {}
 
+        test->task->getStateAsString();
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+        test->task->getStateAsString();
 
         // bogus lookup #1
         try {
@@ -1583,7 +1587,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-
+        test->task->getStateAsString();
 
         return 0;
     }

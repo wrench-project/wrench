@@ -1182,14 +1182,6 @@ namespace wrench {
                         } catch (NetworkError &e) {
                         }
                     }
-                } else if (auto pjob = std::dynamic_pointer_cast<PilotJob>(job)) {
-                    try {
-                        auto message =
-                                new JobManagerPilotJobFailedMessage(pjob, pjob->parent_compute_service, e.getCause());
-
-                        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), message);
-                    } catch (NetworkError &e) {
-                    }
                 }
             }
         }
