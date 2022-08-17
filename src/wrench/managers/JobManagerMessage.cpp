@@ -65,24 +65,24 @@ namespace wrench {
         this->cause = std::move(cause);
     }
 
-    /**
-     * @brief Constructor 
-     * @param job: the job that has failed
-     * @param compute_service: the ComputeService on which it ran 
-     * @param cause: the cause of the failure
-     */
-    JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
-                                                                     std::shared_ptr<ComputeService> compute_service,
-                                                                     std::shared_ptr<FailureCause> cause) : JobManagerMessage() {
-#ifdef WRENCH_INTERNAL_EXCEPTIONS
-        if ((job == nullptr) || (compute_service == nullptr)) {
-            throw std::invalid_argument("JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(): Invalid arguments");
-        }
-#endif
-        this->job = std::move(job);
-        this->compute_service = std::move(compute_service);
-        this->cause = std::move(cause);
-    }
+//    /**
+//     * @brief Constructor
+//     * @param job: the job that has failed
+//     * @param compute_service: the ComputeService on which it ran
+//     * @param cause: the cause of the failure
+//     */
+//    JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(std::shared_ptr<PilotJob> job,
+//                                                                     std::shared_ptr<ComputeService> compute_service,
+//                                                                     std::shared_ptr<FailureCause> cause) : JobManagerMessage() {
+//#ifdef WRENCH_INTERNAL_EXCEPTIONS
+//        if ((job == nullptr) || (compute_service == nullptr)) {
+//            throw std::invalid_argument("JobManagerPilotJobFailedMessage::JobManagerPilotJobFailedMessage(): Invalid arguments");
+//        }
+//#endif
+//        this->job = std::move(job);
+//        this->compute_service = std::move(compute_service);
+//        this->cause = std::move(cause);
+//    }
 
 
     /**
