@@ -88,7 +88,7 @@ namespace wrench {
      *        one task in the job cannot run if less ram than this minimum is available)
      * @return the number of cores
      */
-    unsigned long StandardJob::getMinimumRequiredMemory() const {
+    double StandardJob::getMinimumRequiredMemory() const {
         unsigned long max_ram = 0;
         for (auto const &t: tasks) {
             max_ram = std::max<unsigned long>(max_ram, (unsigned long) (t->getMemoryRequirement()));
