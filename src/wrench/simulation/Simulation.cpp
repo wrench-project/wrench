@@ -138,14 +138,17 @@ namespace wrench {
             } else if (not strncmp(argv[i], "--wrench-mailbox-pool-size", strlen("--mailbox-pool-size"))) {
                 char *equal_sign = strchr(argv[i], '=');
                 if (!equal_sign) {
-                    std::cerr << "Invalid --wrench-mailbox-pool-size argument.\n";
-                    exit(1);
+                    throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
+                }
+                // Check that the value is all digits
+                char *ptr = equal_sign + 1;
+                while (*ptr) {
+                    if (*ptr < '0' or *ptr > '9') {
+                    throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
+                    }
+                    ptr++;
                 }
                 unsigned long pool_size = strtoul(equal_sign + 1, nullptr, 10);
-                if (pool_size <= 0) {
-                    std::cerr << "Invalid --wrench-mailbox-pool-size argument value.\n";
-                    exit(1);
-                }
                 S4U_Mailbox::mailbox_pool_size = pool_size;
                 mailbox_pool_size_set = true;
             } else if (not strcmp(argv[i], "--wrench-energy-simulation")) {
