@@ -262,6 +262,8 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
         ASSERT_EQ(fc.first->getFile(), fc.second->getFile());
     }
 
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
+
     // test constructors for invalid arguments
     ASSERT_THROW(simulation->getOutput().addTimestampFileCopyStart(0.0,
                                                                    nullptr,
@@ -318,6 +320,7 @@ void SimulationTimestampFileCopyTest::do_SimulationTimestampFileCopyBasic_test()
                                                                         wrench::FileLocation::LOCATION(this->source_storage_service),
                                                                         nullptr),
                  std::invalid_argument);
+#endif
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
