@@ -106,7 +106,7 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
 
     ASSERT_GT(t1->getFlops(), t2->getFlops());
     auto old_flops = t1->getFlops();
-    ASSERT_NO_THROW(t1->setFlops(old_flops+1));
+    ASSERT_NO_THROW(t1->setFlops(old_flops + 1));
     ASSERT_EQ(t1->getFlops(), old_flops + 1);
 
     ASSERT_EQ(t1->getMinNumCores(), 1);
