@@ -389,6 +389,12 @@ private:
 
         wrench::Simulation::sleep(1);
 
+        // Coverage
+        try {
+            job_manager->terminateJob((std::shared_ptr<wrench::StandardJob>) nullptr);
+            throw std::runtime_error("Shouldn't be able to terminate a null job");
+        } catch (std::invalid_argument &ignore) {}
+
         // Terminate job2 (which is pending)
         job_manager->terminateJob(job2);
 
@@ -521,7 +527,12 @@ private:
                     "Exception: " + std::string(e.what()));
         }
 
+
         wrench::Simulation::sleep(1);
+
+        if (job_manager->getNumRunningPilotJobs() != 2) {
+            throw std::runtime_error("The number of running pilot jobs should be 2");
+        }
 
         // Terminate job 2 (which is pending)
         job_manager->terminateJob(pjob2);
@@ -1081,6 +1092,13 @@ private:
             // Re-creating it
             pilot_job = job_manager->createPilotJob();
 
+            // Submit a pilot job to a null compute service
+            try {
+                job_manager->submitJob(pilot_job, nullptr, {});
+                throw std::runtime_error("Should not be able to submit a pilot job to a null compute service");
+            } catch (std::invalid_argument &ignore) {
+            }
+
             std::map<std::string, std::string> bogus_batch_job_args;
             bogus_batch_job_args["-N"] = "x";
             bogus_batch_job_args["-t"] = "1";//time in minutes
@@ -1094,7 +1112,7 @@ private:
                 job_manager->submitJob(pilot_job, this->test->compute_service,
                                        bogus_batch_job_args);
                 throw std::runtime_error("Should not be able to submit a pilot job with bogus arguments");
-            } catch (std::invalid_argument &e) {
+            } catch (std::invalid_argument &ignore) {
             }
 
             std::map<std::string, std::string> batch_job_args;
@@ -1112,6 +1130,12 @@ private:
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what()));
             }
+
+            // Coverage: submit the job again
+            try {
+                job_manager->submitJob(pilot_job, this->test->compute_service, batch_job_args);
+                throw std::runtime_error("Shouldn't be able to submit same job twice");
+            } catch (std::invalid_argument &ignore) {}
 
             // Wait for a workflow execution event (pilot job started)
             std::shared_ptr<wrench::ExecutionEvent> event;
@@ -2569,6 +2593,12 @@ private:
                 throw std::runtime_error(
                         "Exception: " + std::string(e.what()));
             }
+
+            // Coverage
+            try {
+                job_manager->terminateJob((std::shared_ptr<wrench::PilotJob>) nullptr);
+                throw std::runtime_error("Shouldn't be able to terminate a null job");
+            } catch (std::invalid_argument &ignore) {}
 
             // Terminate the pilot job while it's running a standard job
             try {

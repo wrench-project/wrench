@@ -127,8 +127,19 @@ private:
 
         // Create a compound job
         auto job = job_manager->createCompoundJob("");
+
+        // Coverage
+        try {
+            job->addSleepAction("", -1.0);
+            throw std::runtime_error("Should not be able to create sleep action with negative sleep time");
+        } catch (std::exception &ignore) {}
+
         // Add a sleep_action
         auto sleep_action = job->addSleepAction("", 10.0);
+
+        // coverage
+        wrench::Action::getActionTypeAsString(sleep_action);
+
         // Create a sleep action executor
         auto sleep_action_executor = std::shared_ptr<wrench::ActionExecutor>(
                 new wrench::ActionExecutor("Host2", 0, 0.0, 0, false, this->mailbox, sleep_action, nullptr));

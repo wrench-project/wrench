@@ -266,6 +266,7 @@ private:
         // Create a job manager
         auto job_manager = this->createJobManager();
 
+        this->counter = 0;
 
         // Get a "STANDARD JOB COMPLETION" event (default handler)
         auto cloud = this->test->cs_cloud;
@@ -320,6 +321,7 @@ private:
             throw std::runtime_error("Did not get expected FileCopyFailureEvent");
         }
 
+
         // Set a timer
         double timer_off_date = wrench::Simulation::getCurrentSimulatedDate() + 10;
         this->setTimer(timer_off_date, "timer went off");
@@ -333,6 +335,29 @@ private:
         if (this->counter != 7) {
             throw std::runtime_error("Did not get expected TimerEvent");
         }
+
+        // Get a "COMPOUND JOB COMPLETED" event (default handler)
+        auto sleep_job = job_manager->createCompoundJob("sleep_job");
+        sleep_job->addSleepAction("sleep_action", 1.0);
+        job_manager->submitJob(sleep_job, vm_cs);
+
+        this->waitForAndProcessNextEvent();
+        if (this->counter != 8) {
+            throw std::runtime_error("Did not get expected CompoundJobCompleted event");
+        }
+
+        // Get a "COMPOUND JOB FAILED" event (default handler)
+        auto fail_job = job_manager->createCompoundJob("fail_job");
+        auto file = wrench::Simulation::addFile("somefile", 1.0);
+        fail_job->addFileReadAction("file_read_action", file,
+                                    wrench::FileLocation::LOCATION(this->test->storage_service1));
+        job_manager->submitJob(fail_job, vm_cs);
+
+        this->waitForAndProcessNextEvent();
+        if (this->counter != 9) {
+            throw std::runtime_error("Did not get expected CompoundJobCompleted event");
+        }
+
 
         return 0;
     }
@@ -363,6 +388,14 @@ private:
 
     void processEventTimer(std::shared_ptr<wrench::TimerEvent> event) override {
         this->counter = 7;
+    }
+
+    void processEventCompoundJobCompletion(std::shared_ptr<wrench::CompoundJobCompletedEvent> event) override {
+        this->counter = 8;
+    }
+
+    void processEventCompoundJobFailure(std::shared_ptr<wrench::CompoundJobFailedEvent> event) override {
+        this->counter = 9;
     }
 };
 

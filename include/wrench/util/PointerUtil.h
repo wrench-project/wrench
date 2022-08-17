@@ -27,7 +27,9 @@ namespace wrench {
      */
     class PointerUtil {
 
-    public:
+#if 0
+
+        public:
         /**
          * @brief A helper method to move a unique_ptr from a set to another
          * @tparam template class
@@ -64,7 +66,6 @@ namespace wrench {
             (*to).insert(tmp);
         };
 
-#if 0
         /**
          * @brief A helper method to move a unique_ptr from a dequeue to a set
          * @tparam template class

@@ -137,7 +137,6 @@ private:
         auto file = this->test->workflow->addFile("some_file", 100);
         auto location = wrench::FileLocation::LOCATION(this->test->storage_service);
 
-
         //CUSTOM_THROW(new wrench::SimulationMessage("", 666), std:invalid_argument);//names are no longer a thing
         CUSTOM_THROW(new wrench::SimulationMessage(-1), std::invalid_argument);
 

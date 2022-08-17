@@ -59,7 +59,7 @@ namespace wrench {
 
         unsigned long getMinimumRequiredNumCores() const;
 
-        unsigned long getMinimumRequiredMemory() const;
+        double getMinimumRequiredMemory() const;
 
         unsigned long getNumCompletedTasks() const;
 

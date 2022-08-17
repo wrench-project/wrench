@@ -773,14 +773,25 @@ private:
                                                    {test->output_file, wrench::FileLocation::LOCATION(
                                                                                test->storage_service1, "/disk1")}});
 
-        // Submit the job
-        job_manager->submitJob(job, test->compute_service);
 
+        // Submit the job
+        test->task->getStateAsString();
+        job_manager->submitJob(job, test->compute_service);
+        test->task->getStateAsString();
+
+        // Submit the job again (coverage)
+        try {
+            job_manager->submitJob(job, test->compute_service);
+            throw std::runtime_error("Shouldn't be able to submit job again");
+        } catch (std::invalid_argument &ignore) {}
+
+        test->task->getStateAsString();
         // Wait for the workflow execution event
         std::shared_ptr<wrench::ExecutionEvent> event = this->waitForNextEvent();
         if (not std::dynamic_pointer_cast<wrench::StandardJobCompletedEvent>(event)) {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
+        test->task->getStateAsString();
 
         // bogus lookup #1
         try {
@@ -907,8 +918,13 @@ private:
         file_locations[test->output_file] = {};
         file_locations[test->output_file].push_back(wrench::FileLocation::LOCATION(test->storage_service1, "/disk1"));
 
-        auto job = job_manager->createStandardJob(test->task, file_locations);
+        try {
+            auto job = job_manager->createStandardJob(nullptr, file_locations);
+            throw std::runtime_error("Shouldn't be able to create a job with a null task");
+        } catch (std::invalid_argument &ignore) {
+        }
 
+        auto job = job_manager->createStandardJob(test->task, file_locations);
         // Submit the job
         job_manager->submitJob(job, test->compute_service);
 
@@ -1571,7 +1587,7 @@ private:
         } else {
             throw std::runtime_error("Unexpected workflow execution event: " + event->toString());
         }
-
+        test->task->getStateAsString();
 
         return 0;
     }

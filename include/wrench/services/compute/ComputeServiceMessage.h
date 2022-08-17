@@ -288,23 +288,23 @@ namespace wrench {
         std::shared_ptr<ComputeService> compute_service;
     };
 
-    /**
-     * @brief A message sent by a ComputeService when a PilotJob has failed
-     */
-    class ComputeServicePilotJobFailedMessage : public ComputeServiceMessage {
-    public:
-        ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob>,
-                                            std::shared_ptr<ComputeService>,
-                                            std::shared_ptr<FailureCause> cause,
-                                            double payload);
-
-        /** @brief The pilot job that has failed */
-        std::shared_ptr<PilotJob> job;
-        /** @brief The compute service on which the pilot job failed */
-        std::shared_ptr<ComputeService> compute_service;
-        /** @brief The failure cause */
-        std::shared_ptr<FailureCause> cause;
-    };
+//    /**
+//     * @brief A message sent by a ComputeService when a PilotJob has failed
+//     */
+//    class ComputeServicePilotJobFailedMessage : public ComputeServiceMessage {
+//    public:
+//        ComputeServicePilotJobFailedMessage(std::shared_ptr<PilotJob>,
+//                                            std::shared_ptr<ComputeService>,
+//                                            std::shared_ptr<FailureCause> cause,
+//                                            double payload);
+//
+//        /** @brief The pilot job that has failed */
+//        std::shared_ptr<PilotJob> job;
+//        /** @brief The compute service on which the pilot job failed */
+//        std::shared_ptr<ComputeService> compute_service;
+//        /** @brief The failure cause */
+//        std::shared_ptr<FailureCause> cause;
+//    };
 
     /**
     * @brief A message sent to a ComputeService to terminate a PilotJob previously submitted for execution
@@ -349,7 +349,7 @@ namespace wrench {
         /** @brief The mailbox to which the answer should be sent */
         simgrid::s4u::Mailbox *answer_mailbox;
         /** @brief The key (i.e., resource information name) desired */
-        const std::string &key;
+        std::string key;
     };
 
     /**

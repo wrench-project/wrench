@@ -166,6 +166,9 @@ private:
         // Get pointer to cloud service
         auto cs = this->test->compute_service;
 
+        // Coverage
+        cs->getPhysicalHostname();
+
         // Create a bogus VM
         try {
             cs->createVM(1000, 10000000);
@@ -202,6 +205,9 @@ private:
                 one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, wrench::FileLocation::LOCATION(this->test->storage_service)}},
                                                                           {}, {}, {});
 
+                // Coverage
+                one_task_jobs[job_index]->setPriority(1.0);
+
                 if (one_task_jobs[job_index]->getNumTasks() != 1) {
                     throw std::runtime_error("A one-task1 job should say it has one task1");
                 }
@@ -210,6 +216,10 @@ private:
                 }
 
                 job_manager->submitJob(one_task_jobs[job_index], vm_cs);
+
+                // Coverage
+                one_task_jobs[job_index]->printCallbackMailboxStack();
+
             } catch (wrench::ExecutionException &e) {
                 throw std::runtime_error(e.what());
             }
@@ -238,6 +248,14 @@ private:
         wrench::Simulation::getLinknameList();
         wrench::Simulation::getLinkBandwidth("1");
         wrench::Simulation::getLinkUsage("1");
+        wrench::Simulation::isLinkOn("1");
+
+        try {
+            wrench::Simulation::getLinkBandwidth("bogus");
+            wrench::Simulation::getLinkUsage("bogus");
+            wrench::Simulation::isLinkOn("bogus");
+            throw std::runtime_error("Should not be able to get information about bogus link");
+        } catch (std::invalid_argument &ignore) {}
 
         // For coverage
         std::string src_host = "DualCoreHost";
@@ -363,6 +381,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
                                              {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, 123},
                                               {wrench::ServiceMessagePayload::translateString("StorageServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD"), 234}}));
 
+    // Coverage
+    ASSERT_GE(storage_service->getPropertyList().size(), 2);
+    ASSERT_GE(storage_service->getMessagePayloadList().size(), 2);
+
     // Try to get a bogus property as string or double
     ASSERT_THROW(storage_service->getPropertyValueAsString(-1), std::invalid_argument);
     ASSERT_THROW(storage_service->getPropertyValueAsDouble(-1), std::invalid_argument);
@@ -415,10 +437,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
 
     // Try to get the property in bogus ways, for coverage
     ASSERT_THROW(compute_service->getPropertyValueAsBoolean(wrench::BareMetalComputeServiceProperty::THREAD_STARTUP_OVERHEAD), std::invalid_argument);
+    ASSERT_THROW(compute_service->getPropertyValueAsUnsignedLong(wrench::BareMetalComputeServiceProperty::TERMINATE_WHENEVER_ALL_RESOURCES_ARE_DOWN), std::invalid_argument);
 
     // Try to get a message payload value, just for kicks
     ASSERT_NO_THROW(compute_service->getMessagePayloadValue(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
-
 
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;

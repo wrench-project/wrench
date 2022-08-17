@@ -110,13 +110,16 @@ namespace wrench {
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                                  std::shared_ptr<DataFile> file,
                                                                                  std::shared_ptr<FileLocation> location,
-                                                                                 double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(std::move(file)), location(std::move(location)) {
+                                                                                 double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
         }
 #endif
+        this->answer_mailbox = answer_mailbox;
+        this->file = std::move(file);
+        this->location = std::move(location);
     }
 
 
@@ -140,13 +143,16 @@ namespace wrench {
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(simgrid::s4u::Mailbox *answer_mailbox,
                                                                            std::shared_ptr<DataFile> file,
                                                                            std::shared_ptr<FileLocation> location,
-                                                                           double payload) : FileRegistryMessage(payload), answer_mailbox(answer_mailbox), file(std::move(file)), location(std::move(location)) {
+                                                                           double payload) : FileRegistryMessage(payload) {
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if ((answer_mailbox == nullptr) || (file == nullptr) || (location == nullptr)) {
             throw std::invalid_argument(
                     "FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
         }
 #endif
+        this->answer_mailbox = answer_mailbox;
+        this->file = std::move(file);
+        this->location = std::move(location);
     }
 
     /**

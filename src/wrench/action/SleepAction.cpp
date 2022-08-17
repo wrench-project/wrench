@@ -23,6 +23,9 @@ namespace wrench {
     * @param sleep_time: the time to sleep, in seconds
     */
     SleepAction::SleepAction(const std::string &name, double sleep_time) : Action(name, "sleep_"), sleep_time(sleep_time) {
+        if (sleep_time < 0) {
+            throw std::invalid_argument("SleepAction::SleepAction(): Invalid (negative) sleep time");
+        }
     }
 
     /**

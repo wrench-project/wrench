@@ -9,8 +9,9 @@
 
 #include <gtest/gtest.h>
 #include <wrench/util/PointerUtil.h>
-
 #include "../include/TestWithFork.h"
+
+#if 0
 
 class PointerUtilTest : public ::testing::Test {
 public:
@@ -56,3 +57,5 @@ void PointerUtilTest::do_moveUniqueFromSetToSet_test() {
     ASSERT_EQ(sum_src, 4);
     ASSERT_EQ(sum_dst, 10);
 }
+
+#endif

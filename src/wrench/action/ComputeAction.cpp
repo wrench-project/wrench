@@ -37,7 +37,7 @@ namespace wrench {
                                  unsigned long min_num_cores,
                                  unsigned long max_num_cores,
                                  std::shared_ptr<ParallelModel> parallel_model) : Action(name, "compute_") {
-        if ((flops < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
+        if ((flops < 0) || (ram < 0) || (min_num_cores < 1) || (max_num_cores < min_num_cores)) {
             throw std::invalid_argument("ComputeAction::ComputeAction(): invalid arguments");
         }
         this->flops = flops;

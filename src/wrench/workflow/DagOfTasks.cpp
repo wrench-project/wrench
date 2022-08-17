@@ -37,8 +37,8 @@ namespace wrench {
  */
     void wrench::DagOfTasks::removeVertex(wrench::WorkflowTask *task) {
         // Find the vertex
-        if (this->task_map[task] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::removeVertex(): Trying to remove a non-existing vertex");
+        if (this->task_map.find(task) == this->task_map.end() or this->task_map[task] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::removeVertex(): Trying to remove a non-existing vertex");
         }
         // Remove the correspond task list item
         this->task_list.erase(this->task_list.begin() + this->task_map[task]);
@@ -62,12 +62,12 @@ namespace wrench {
  */
     void wrench::DagOfTasks::addEdge(wrench::WorkflowTask *src, wrench::WorkflowTask *dst) {
         // Check that vertices exist
-        if (this->task_map[src] >= this->task_list.size()) {
-            throw std::runtime_error(
+        if (this->task_map.find(src) == this->task_map.end() or this->task_map[src] >= this->task_list.size()) {
+            throw std::invalid_argument(
                     "wrench::DagOfTasks::removeVertex(): Trying to add an edge from a non-existing vertex");
         }
-        if (this->task_map[dst] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::removeVertex(): Trying to add an edge to a non-existing vertex");
+        if (this->task_map.find(dst) == this->task_map.end() or this->task_map[dst] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::removeVertex(): Trying to add an edge to a non-existing vertex");
         }
 
         // Add the edge
@@ -81,11 +81,11 @@ namespace wrench {
  */
     void wrench::DagOfTasks::removeEdge(wrench::WorkflowTask *src, wrench::WorkflowTask *dst) {
         // Check that vertices exist
-        if (this->task_map[src] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::removeEdge(): Trying add an edge from a non-existing vertex");
+        if (this->task_map.find(src) == this->task_map.end() or this->task_map[src] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::removeEdge(): Trying add an edge from a non-existing vertex");
         }
-        if (this->task_map[dst] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::removeEdge(): Trying add an edge to a non-existing vertex");
+        if (this->task_map.find(dst) == this->task_map.end() or this->task_map[dst] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::removeEdge(): Trying add an edge to a non-existing vertex");
         }
 
         // Remove the edge
@@ -100,12 +100,12 @@ namespace wrench {
  */
     bool wrench::DagOfTasks::doesPathExist(const wrench::WorkflowTask *src, const wrench::WorkflowTask *dst) {
         // Check that vertices exist
-        if (this->task_map[src] >= this->task_list.size()) {
-            throw std::runtime_error(
+        if (this->task_map.find(src) == this->task_map.end() or this->task_map[src] >= this->task_list.size()) {
+            throw std::invalid_argument(
                     "wrench::DagOfTasks::doesPathExist(): Trying to find a path from a non-existing vertex");
         }
-        if (this->task_map[dst] >= this->task_list.size()) {
-            throw std::runtime_error(
+        if (this->task_map.find(dst) == this->task_map.end() or this->task_map[dst] >= this->task_list.size()) {
+            throw std::invalid_argument(
                     "wrench::DagOfTasks::doesPathExist(): Trying to find a path to a non-existing vertex");
         }
         // Find the vertices
@@ -135,12 +135,12 @@ namespace wrench {
  */
     bool wrench::DagOfTasks::doesEdgeExist(const wrench::WorkflowTask *src, const wrench::WorkflowTask *dst) {
         // Check that vertices exist
-        if (this->task_map[src] >= this->task_list.size()) {
-            throw std::runtime_error(
+        if (this->task_map.find(src) == this->task_map.end() or this->task_map[src] >= this->task_list.size()) {
+            throw std::invalid_argument(
                     "wrench::DagOfTasks::doesPathExist(): Trying to find a path from a non-existing vertex");
         }
-        if (this->task_map[dst] >= this->task_list.size()) {
-            throw std::runtime_error(
+        if (this->task_map.find(dst) == this->task_map.end() or this->task_map[dst] >= this->task_list.size()) {
+            throw std::invalid_argument(
                     "wrench::DagOfTasks::doesPathExist(): Trying to find a path to a non-existing vertex");
         }
         // Find the vertices
@@ -157,8 +157,8 @@ namespace wrench {
  */
     long wrench::DagOfTasks::getNumberOfChildren(const WorkflowTask *task) {
         // Find the vertex
-        if (this->task_map[task] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::getNumberOfChildren(): Non-existing vertex");
+        if (this->task_map.find(task) == this->task_map.end() or this->task_map[task] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::getNumberOfChildren(): Non-existing vertex");
         }
         auto vertex = this->task_map[task];
         boost::graph_traits<DAG>::out_edge_iterator eo, edge_end;
@@ -176,8 +176,8 @@ namespace wrench {
  */
     std::vector<WorkflowTask *> wrench::DagOfTasks::getChildren(const WorkflowTask *task) {
         // Find the vertex
-        if (this->task_map[task] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::getChildren(): Non-existing vertex");
+        if (this->task_map.find(task) == this->task_map.end() or this->task_map[task] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::getChildren(): Non-existing vertex");
         }
         auto vertex = this->task_map[task];
         boost::graph_traits<DAG>::out_edge_iterator eo, edge_end;
@@ -196,8 +196,8 @@ namespace wrench {
  */
     long wrench::DagOfTasks::getNumberOfParents(const WorkflowTask *task) {
         // Find the vertex
-        if (this->task_map[task] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::getNumberOfParents(): Non-existing vertex");
+        if (this->task_map.find(task) == this->task_map.end() or this->task_map[task] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::getNumberOfParents(): Non-existing vertex");
         }
         auto vertex = this->task_map[task];
         boost::graph_traits<DAG>::in_edge_iterator ei, edge_end;
@@ -215,8 +215,8 @@ namespace wrench {
      */
     std::vector<WorkflowTask *> wrench::DagOfTasks::getParents(const WorkflowTask *task) {
         // Find the vertex
-        if (this->task_map[task] >= this->task_list.size()) {
-            throw std::runtime_error("wrench::DagOfTasks::getParents(): Non-existing vertex");
+        if (this->task_map.find(task) == this->task_map.end() or this->task_map[task] >= this->task_list.size()) {
+            throw std::invalid_argument("wrench::DagOfTasks::getParents(): Non-existing vertex");
         }
         auto vertex = this->task_map[task];
         boost::graph_traits<DAG>::in_edge_iterator ei, edge_end;

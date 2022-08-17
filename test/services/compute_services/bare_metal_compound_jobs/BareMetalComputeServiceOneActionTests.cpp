@@ -391,6 +391,13 @@ private:
 
         // Create a compound job and submit it
         auto job = job_manager->createCompoundJob("my_job");
+
+        // Submit the job without any action
+        try {
+            job_manager->submitJob(job, this->test->compute_service, {});
+            throw std::runtime_error("Shouldn't be able to submit a job with no actions in it");
+        } catch (std::invalid_argument &ignore) {}
+
         job->setPriority(10.0); // coverage
         job->getPriority();     // coverage
         job->getStateAsString();// coverage
@@ -681,6 +688,7 @@ private:
         // Submit the job with bogus args
         std::vector<std::map<std::string, std::string>> bogus_args;
         bogus_args.push_back({{"bogus_action", "somehost"}});
+        bogus_args.push_back({{"my_computation", "somehost"}});
         bogus_args.push_back({{"my_computation", "Host4:30:123:12:ba"}});
         bogus_args.push_back({{"my_computation", "Host4:1"}});
         bogus_args.push_back({{"my_computation", "Host4:12"}});

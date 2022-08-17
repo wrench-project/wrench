@@ -180,6 +180,17 @@ private:
             }
         }
 
+        // Coverage
+        auto memory_manager = this->simulation->getMemoryManagerByHost(this->getHostname());
+        auto disk = memory_manager->getMemory();
+        memory_manager->setMemory(disk);
+        memory_manager->setDirtyRatio(memory_manager->getDirtyRatio());
+        memory_manager->releaseMemory(0);
+        memory_manager->getTotalCachedAmount();
+        memory_manager->getTotalMemory();
+        memory_manager->getCachedAmount("foo");
+        memory_manager->export_log("/dev/null");
+
         return 0;
     }
 };
