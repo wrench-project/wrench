@@ -144,7 +144,7 @@ namespace wrench {
                 char *ptr = equal_sign + 1;
                 while (*ptr) {
                     if (*ptr < '0' or *ptr > '9') {
-                    throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
+                        throw std::invalid_argument("Invalid --wrench-mailbox-pool-size argument value");
                     }
                     ptr++;
                 }
