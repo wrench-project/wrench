@@ -40,7 +40,7 @@ namespace wrench {
      * @param endpoint: an corresponding "end" timestamp or "start" timestamp
      */
     SimulationTimestampPair::SimulationTimestampPair(double date, SimulationTimestampPair *endpoint)
-            : endpoint(endpoint) {
+        : endpoint(endpoint) {
         this->date = date;
     }
 
@@ -181,7 +181,7 @@ namespace wrench {
      * @param task: the WorkflowTask associated with this timestamp
      */
     SimulationTimestampTaskTermination::SimulationTimestampTaskTermination(double date, const std::shared_ptr<WorkflowTask> &task)
-            : SimulationTimestampTask(date, task) {
+        : SimulationTimestampTask(date, task) {
         WRENCH_DEBUG("Inserting a TaskTerminated timestamp for task '%s'", task->getID().c_str());
 
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
@@ -330,13 +330,13 @@ namespace wrench {
 
         // Making this an internal exception causes problems, because sometimes the exception
         // is expected by the caller (for file copy operations)
-//#ifdef WRENCH_INTERNAL_EXCEPTIONS
+        //#ifdef WRENCH_INTERNAL_EXCEPTIONS
         // all information about a file copy should be passed
         if ((this->file == nullptr) || (this->source == nullptr) || (this->destination == nullptr)) {
             throw std::invalid_argument(
                     "SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion() cannot take nullptr arguments");
         }
-//#endif
+        //#endif
 
         setEndpoints();
     }
@@ -1029,7 +1029,7 @@ namespace wrench {
      * @param joules: the energy consumption in joules 
      */
     SimulationTimestampEnergyConsumption::SimulationTimestampEnergyConsumption(double date, const std::string &hostname, double joules)
-            : hostname(hostname), joules(joules) {
+        : hostname(hostname), joules(joules) {
         this->date = date;
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (hostname.empty() || joules < 0.0) {
@@ -1062,7 +1062,7 @@ namespace wrench {
      * @param bytes_per_second: the bandwidth usage in bytes per second
      */
     SimulationTimestampLinkUsage::SimulationTimestampLinkUsage(double date, const std::string &linkname, double bytes_per_second)
-            : linkname(linkname), bytes_per_second(bytes_per_second) {
+        : linkname(linkname), bytes_per_second(bytes_per_second) {
         this->date = date;
 #ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (linkname.empty() || bytes_per_second < 0.0) {
