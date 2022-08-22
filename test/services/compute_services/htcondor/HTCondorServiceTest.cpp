@@ -338,6 +338,10 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
                                     hostname, std::move(compute_services),
                                     {})));
 
+    // Coverage
+    htcondor_service->supportsCompoundJobs();
+    htcondor_service->supportsPiloJobs();
+
     // Create a WMS
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
