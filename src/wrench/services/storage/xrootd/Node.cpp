@@ -869,5 +869,19 @@ namespace wrench {
             }
             return ret;
         }
+        /**
+        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
+        * @param file: A shared pointer to a file
+        * @param location: A shared pointer to the Node to put the file on.  The Node MUST be a storage server
+        *
+        * @throw std::invalid_argument
+        */
+        void Node::createFile(const std::shared_ptr<DataFile> &file) {
+            if(internalStorage==nullptr){
+                throw std::runtime_error("Node::createFile() called on non storage Node "+hostname);
+            }
+            metavisor->createFile(file, this->getSharedPtr<Node>());
+
+        }
     }
 }

@@ -122,7 +122,7 @@ namespace wrench {
         }
 
         /**
-        * @brief create a new file to the federation.  Use instead of wrench::Simulation::createFile when adding files to XRootD
+        * @brief create a new file in the federation.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param file: A shared pointer to a file
         * @param location: A shared pointer to the Node to put the file on.  The Node MUST be a storage server
         *
