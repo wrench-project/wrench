@@ -56,6 +56,7 @@ namespace wrench {
          * @param child: the new child to add
          * @return the child id of the new node, or -1 if the supervisor already has 64
          */
+         //should this throw an exception instead?
         int Node::addChild(std::shared_ptr<Node> child) {
             child->supervisor = this;
             if (children.size() < 64) {
