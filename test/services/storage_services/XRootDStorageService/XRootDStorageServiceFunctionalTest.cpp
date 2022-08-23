@@ -109,8 +109,13 @@ private:
         // that propagating the network timeout. Come to think of it, one should probably
         // set the search timeout as a special property, since the default 30-sec is WAY too long
         // here.
-        this->test->supervisor->readFile(file2);
+        try {
+            this->test->supervisor->readFile(file2);
+            throw std::runtime_error("Non extant files should throw exceptions when not found");
+        }catch(wrench::ExecutionException e){
 
+
+        }
 
 
         return 0;
