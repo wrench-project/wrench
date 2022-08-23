@@ -163,5 +163,6 @@ namespace wrench {
             }
             std::remove(files[file].begin(), files[file].end(),location);
         }
+
     }
 }
