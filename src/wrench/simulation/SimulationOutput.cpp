@@ -206,7 +206,7 @@ namespace wrench {
         output.close();
     }
 
-    #if 1 // Seems to never be used
+    #if 0 // Seems to never be used
     /**
      * @brief Function called by the nlohmann::json constructor when a WorkflowTaskExecutionInstance is passed in as
      *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance. The name of this function
