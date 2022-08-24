@@ -849,8 +849,8 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     EXPECT_NO_THROW(wms = simulation->add(
-            new SimulationOutputDumpEnergyConsumptionTestWMS(
-                    this, host)));
+                            new SimulationOutputDumpEnergyConsumptionTestWMS(
+                                    this, host)));
 
     simulation->getOutput().enableEnergyTimestamps(true);
 
@@ -858,7 +858,7 @@ void SimulationDumpJSONTest::do_SimulationDumpHostEnergyConsumptionJSON_test() {
 
     EXPECT_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(""), std::invalid_argument);
 
-//    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
+    //    ASSERT_NO_THROW(simulation->getOutput().dumpHostEnergyConsumptionJSON(this->energy_consumption_data_file_path));
 
     simulation->getOutput().dumpUnifiedJSON(workflow, this->energy_consumption_data_file_path, false, false, false, true, false, false, false);
 
@@ -1078,9 +1078,9 @@ void SimulationDumpJSONTest::do_SimulationDumpLinkUsageJSON_test() {
     single_task->addInputFile(link_usage_workflow->addFile("test_file", 10 * GB));
 
     EXPECT_NO_THROW(wms = simulation->add(
-            new SimulationOutputDumpLinkUsageTestWMS(
-                    this,
-                    host)));
+                            new SimulationOutputDumpLinkUsageTestWMS(
+                                    this,
+                                    host)));
 
     simulation->add(new wrench::FileRegistryService("host1"));
     for (auto const &file: link_usage_workflow->getInputFiles()) {
@@ -1252,7 +1252,7 @@ void SimulationDumpJSONTest::do_SimulationDumpDiskOperationsJSON_test() {
     std::shared_ptr<wrench::ExecutionController> wms = nullptr;
     ;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationDumpDiskOperationsTestWMS(
-            this, host1)));
+                            this, host1)));
 
     simulation->getOutput().enableDiskTimestamps(true);
 
