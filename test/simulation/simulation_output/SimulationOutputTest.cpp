@@ -114,6 +114,7 @@ private:
 
     int main() {
 
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         try {
             this->simulation->getOutput().addTimestampTaskStart(0.0, nullptr);
             this->simulation->getOutput().addTimestampTaskCompletion(0.0, nullptr);
@@ -122,6 +123,7 @@ private:
             throw std::runtime_error("Should have caught exception!");
         } catch (std::exception &ignore) {
         }
+#endif
 
         // do nothing
 

@@ -207,6 +207,7 @@ namespace wrench {
         output.close();
     }
 
+
     /**
      * @brief Determines if a point lies on a line segment.
      * @param segment: pair of start and end points that make up the line segment

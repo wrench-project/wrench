@@ -574,7 +574,7 @@ namespace wrench {
                 // May be no corresponding timestamp.
                 try {
                     this->simulation->getOutput().addTimestampFileCopyCompletion(Simulation::getCurrentSimulatedDate(), file, src_location, dst_location);
-                } catch (invalid_argument &e) {
+                } catch (invalid_argument &ignore) {
                 }
 
             } else {

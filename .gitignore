@@ -63,3 +63,9 @@ host_utilization_layout.json
 #unit testing
 unit_tests
 tools/wrench/wrench-daemon/include/REST_API_generated_code.h
+
+# Misc
+*.bak
+.swp
+.bash_history
+.viminfo

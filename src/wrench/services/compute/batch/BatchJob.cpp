@@ -26,11 +26,11 @@ namespace wrench {
      */
     BatchJob::BatchJob(const std::shared_ptr<CompoundJob> &job, unsigned long job_id, unsigned long time_in_minutes, unsigned long num_nodes,
                        unsigned long cores_per_node, const std::string &username, double ending_time_stamp, double arrival_time_stamp) {
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
         if (job == nullptr) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): job cannot be null");
         }
-        this->compound_job = job;
         if (job_id <= 0 || num_nodes == 0 || cores_per_node == 0) {
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): either jobid (" + std::to_string(job_id) +
@@ -38,7 +38,9 @@ namespace wrench {
                     "), cores_per_node (" + std::to_string(cores_per_node) +
                     ") is less than or equal to zero");
         }
+#endif
 
+        this->compound_job = job;
         this->job_id = job_id;
         this->requested_time = time_in_minutes * 60;
         this->requested_num_nodes = num_nodes;
