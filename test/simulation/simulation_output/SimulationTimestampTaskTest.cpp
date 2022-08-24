@@ -279,11 +279,12 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test() {
 
     // test constructors
 
+#ifdef WRENCH_INTERNAL_EXCEPIONS
     ASSERT_THROW(simulation->getOutput().addTimestampTaskStart(0.0, nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->getOutput().addTimestampTaskFailure(0.0, nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->getOutput().addTimestampTaskCompletion(0.0, nullptr), std::invalid_argument);
     ASSERT_THROW(simulation->getOutput().addTimestampTaskTermination(0.0, nullptr), std::invalid_argument);
-
+#endif
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
