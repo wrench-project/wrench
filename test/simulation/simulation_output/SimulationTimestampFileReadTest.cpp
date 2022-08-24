@@ -248,6 +248,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
 
 
     // test constructors for invalid arguments
+#ifdef WRENCH_INTERNAL_EXCEPTIONS
     ASSERT_THROW(simulation->getOutput().addTimestampFileReadStart(0.0,
                                                                    nullptr,
                                                                    wrench::FileLocation::LOCATION(this->storage_service),
@@ -311,6 +312,7 @@ void SimulationTimestampFileReadTest::do_SimulationTimestampFileReadBasic_test()
                                                                         nullptr,
                                                                         task1),
                  std::invalid_argument);
+#endif
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);

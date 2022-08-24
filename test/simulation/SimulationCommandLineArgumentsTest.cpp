@@ -30,6 +30,8 @@ public:
 
     void do_NoColorArgument_test();
 
+    void do_MailboxPoolSizeArgument_test();
+
     void do_FullLogArgument_test(std::string arg, int num_log_lines);
 
     void do_ActivateEnergyArgument_test();
@@ -283,6 +285,35 @@ void SimulationCommandLineArgumentsTest::do_HelpArgument_test() {
     ASSERT_EQ(argc, 2);
     ASSERT_EQ(!strcmp(argv[1], "--help"), 1);
 
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+/**********************************************************************/
+/**           MAILBOX-POOL-SIZE     COMMAND-LINE ARGUMENT            **/
+/**********************************************************************/
+
+TEST_F(SimulationCommandLineArgumentsTest, MailboxPoolSizeArgument) {
+    DO_TEST_WITH_FORK(do_MailboxPoolSizeArgument_test);
+}
+
+void SimulationCommandLineArgumentsTest::do_MailboxPoolSizeArgument_test() {
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 2;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    argv[1] = strdup("--wrench-mailbox-pool-size1000");
+
+    ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+
+    argv[1] = strdup("--wrench-mailbox-pool-size=-1000");
+    ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+
+    argv[1] = strdup("--wrench-mailbox-pool-size=1000");
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
