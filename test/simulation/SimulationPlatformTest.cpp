@@ -18,6 +18,7 @@ class SimulationPlatformTest : public ::testing::Test {
 public:
     void do_SimulationPlatformTest_test();
     void do_CreateNewDiskTest_test();
+    void do_ProgrammaticPlatformTest_test();
 
 protected:
     ~SimulationPlatformTest() {
@@ -249,6 +250,99 @@ void SimulationPlatformTest::do_CreateNewDiskTest_test() {
 
     // Running the simulation
     ASSERT_NO_THROW(simulation->launch());
+
+    for (int i = 0; i < argc; i++)
+        free(argv[i]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**            PROGRAMMATIC PLATFORM TEST                            **/
+/**********************************************************************/
+
+class PlatformCreator {
+
+public:
+    PlatformCreator(double link_bw) : link_bw(link_bw) {}
+
+    void operator()() const {
+        create_platform(this->link_bw);
+    }
+
+private:
+    double link_bw;
+
+    void create_platform(double link_bw) const {
+        // Create the top-level zone
+        auto zone = simgrid::s4u::create_full_zone("AS0");
+        // Create the WMSHost host with its disk
+        auto wms_host = zone->create_host("WMSHost", "10Gf");
+        wms_host->set_core_count(1);
+        auto wms_host_disk = wms_host->create_disk("hard_drive",
+                                                   "100MBps",
+                                                   "100MBps");
+        wms_host_disk->set_property("size", "5000GiB");
+        wms_host_disk->set_property("mount", "/");
+
+        // Create a ComputeHost
+        auto compute_host = zone->create_host("ComputeHost", "1Gf");
+        compute_host->set_core_count(10);
+        compute_host->set_property("ram", "16GB");
+
+        // Create three network links
+        auto network_link = zone->create_link("network_link", link_bw)->set_latency("20us");
+        auto loopback_WMSHost = zone->create_link("loopback_WMSHost", "1000EBps")->set_latency("0us");
+        auto loopback_ComputeHost = zone->create_link("loopback_ComputeHost", "1000EBps")->set_latency("0us");
+
+        // Add routes
+        {
+            simgrid::s4u::LinkInRoute network_link_in_route{network_link};
+            zone->add_route(compute_host->get_netpoint(),
+                            wms_host->get_netpoint(),
+                            nullptr,
+                            nullptr,
+                            {network_link_in_route});
+        }
+        {
+            simgrid::s4u::LinkInRoute network_link_in_route{loopback_WMSHost};
+            zone->add_route(wms_host->get_netpoint(),
+                            wms_host->get_netpoint(),
+                            nullptr,
+                            nullptr,
+                            {network_link_in_route});
+        }
+        {
+            simgrid::s4u::LinkInRoute network_link_in_route{loopback_ComputeHost};
+            zone->add_route(compute_host->get_netpoint(),
+                            compute_host->get_netpoint(),
+                            nullptr,
+                            nullptr,
+                            {network_link_in_route});
+        }
+
+        zone->seal();
+    }
+};
+
+
+TEST_F(SimulationPlatformTest, ProgrammaticPlatform) {
+    DO_TEST_WITH_FORK(do_ProgrammaticPlatformTest_test);
+}
+
+void SimulationPlatformTest::do_ProgrammaticPlatformTest_test() {
+
+    // Create and initialize a simulation
+    auto simulation = wrench::Simulation::createSimulation();
+    int argc = 1;
+    auto argv = (char **) calloc(argc, sizeof(char *));
+    argv[0] = strdup("unit_test");
+    //    argv[1] = strdup("--wrench-full-log");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    PlatformCreator platform_creator(100 * 1000000.0);
+    simulation->instantiatePlatform(platform_creator);
 
     for (int i = 0; i < argc; i++)
         free(argv[i]);
