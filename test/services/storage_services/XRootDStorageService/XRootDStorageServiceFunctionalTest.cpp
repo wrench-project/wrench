@@ -14,6 +14,7 @@
 #include "../../../include/TestWithFork.h"
 #include "../../../include/UniqueTmpPathPrefix.h"
 
+
 WRENCH_LOG_CATEGORY(xrootd_storage_service_functional_test, "Log category for XRootDServiceFunctionalTest");
 
 
@@ -98,8 +99,9 @@ private:
         // this->test->supervisor->createFile(file1);
 
         // Create a copy file1 on the first child
-        wrench::Simulation::createFile(file1,
-        wrench::FileLocation::LOCATION(this->test->supervisor->getChild(0)));
+        //wrench::Simulation::createFile(file1,
+        //wrench::FileLocation::LOCATION(this->test->supervisor->getChild(0)->internalStorage));
+        this->test->supervisor->getChild(0)->createFile(file1,"/disk100");
 
         // Read file1 from XRootD
         this->test->supervisor->readFile(file1);
@@ -112,7 +114,7 @@ private:
         try {
             this->test->supervisor->readFile(file2);
             throw std::runtime_error("Non extant files should throw exceptions when not found");
-        }catch(wrench::ExecutionException e){
+        }catch(wrench::ExecutionException &e){
 
 
         }

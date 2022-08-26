@@ -54,7 +54,8 @@ namespace wrench {
         /**
          * @brief Adds a child node to an XRootD supervisor
          * @param child: the new child to add
-         * @return the child id of the new node, or -1 if the supervisor already has 64
+         * @return the child id of the new node
+         * @throws runtime_error if node already has 64 children.
          */
          //should this throw an exception instead?
         int Node::addChild(std::shared_ptr<Node> child) {
@@ -63,7 +64,7 @@ namespace wrench {
                 children.push_back(child);
                 return children.size() - 1;
             }
-            return -1;
+            throw std::runtime_error(hostname+" already has 64 children");
         }
 //            /**
 //             * @brief Get mount point of underlying storage service
@@ -872,7 +873,6 @@ namespace wrench {
         /**
         * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
         * @param file: A shared pointer to a file
-        * @param location: A shared pointer to the Node to put the file on.  The Node MUST be a storage server
         *
         * @throw std::invalid_argument
         */
@@ -880,8 +880,40 @@ namespace wrench {
             if(internalStorage==nullptr){
                 throw std::runtime_error("Node::createFile() called on non storage Node "+hostname);
             }
-            metavisor->createFile(file, this->getSharedPtr<Node>());
 
+            metavisor->files[file].push_back(this->getSharedPtr<Node>());
+            internalStorage->createFile(file);
+        }
+        /**
+        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
+        * @param file: A shared pointer to a file
+        * @param location: a file location, must be the same object as the function is envoked on
+        *
+        * @throw std::invalid_argument
+        */
+        void Node::createFile(const std::shared_ptr<DataFile> &file,  const std::shared_ptr<FileLocation> &location) {
+            if(internalStorage==nullptr){
+                throw std::runtime_error("Node::createFile() called on non storage Node "+hostname);
+            }
+
+            internalStorage->createFile(file,location);
+
+            metavisor->files[file].push_back(this->getSharedPtr<Node>());
+        }
+        /**
+        * @brief create a new file in the federation on this node.  Use instead of wrench::Simulation::createFile when adding files to XRootD
+        * @param file: A shared pointer to a file
+        * @param location: a file location, must be the same object as the function is envoked on
+        *
+        * @throw std::invalid_argument
+        */
+        void Node::createFile(const std::shared_ptr<DataFile> &file, const string& path) {
+            if(internalStorage==nullptr){
+                throw std::runtime_error("Node::createFile() called on non storage Node "+hostname);
+            }
+
+            internalStorage->createFile(file, path);
+            metavisor->files[file].push_back(this->getSharedPtr<Node>());
         }
     }
 }
