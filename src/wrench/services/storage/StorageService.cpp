@@ -801,4 +801,51 @@ namespace wrench {
         return (this->file_systems.find(mp) != this->file_systems.end());
     }
 
+    /**
+     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+
+     *
+     * @param file: a file
+     * @param location: a file location, must be the same object as the function is envoked on
+     *
+     * @throw std::invalid_argument
+     */
+    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::shared_ptr<FileLocation> &location) {
+        if(location->getStorageService()!=this->getSharedPtr<StorageService>()){
+            throw std::invalid_argument("StorageService::createFile(file,location) must be called on the same StorageService that the location uses");
+        }
+        stageFile(file, location->getMountPoint(),
+                  location->getAbsolutePathAtMountPoint());
+    }
+    /**
+     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+
+    *
+    * @param file: a file
+    * @param path: optional path to file
+    *
+    */
+
+    void StorageService::createFile(const std::shared_ptr<DataFile> &file, const std::string& path) {
+
+            createFile(file,FileLocation::LOCATION(this->getSharedPtr<StorageService>(),path));
+    }
+
+    /**
+     * @brief Store a file at a particular mount point ex-nihilo. Doesn't notify a file registry service and will do nothing (and won't complain) if the file already exists
+     * at that location.
+
+    *
+            * @param file: a file
+                                   * @param path: optional path to file
+                                                          *
+                                                                  */
+
+    void StorageService::createFile(const std::shared_ptr<DataFile> &file) {
+
+        createFile(file,FileLocation::LOCATION(this->getSharedPtr<StorageService>(),getMountPoint()));
+    }
+
 }// namespace wrench
